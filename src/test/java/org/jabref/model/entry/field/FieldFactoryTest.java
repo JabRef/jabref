@@ -29,7 +29,8 @@ class FieldFactoryTest {
                 Arguments.of(new UserSpecificCommentField("user1"), "comment-user1"),
                 Arguments.of(new UserSpecificCommentField("other-user-id"), "comment-other-user-id"),
                 // unknown field
-                Arguments.of(new UnknownField("cased", "cAsEd"), "cAsEd")
+                Arguments.of(new UnknownField("cased", "cAsEd"), "cAsEd"),
+                Arguments.of(new UnknownField("rights", "rights"), "UnknownField{name='rights'}")
         );
     }
 

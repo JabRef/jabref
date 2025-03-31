@@ -2496,3 +2496,10 @@ journalInfo .grid-cell-b {
 .refresh {
     -fx-background-color: transparent;
 }
+
+.text-button-blue{
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.25em;
+    -fx-border-color: transparent;
+}

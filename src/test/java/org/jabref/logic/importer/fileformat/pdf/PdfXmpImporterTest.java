@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -41,13 +40,28 @@ class PdfXmpImporterTest {
         Path file = Path.of(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
 
-        assertEquals(1, bibEntries.size());
+        BibEntry expected = new BibEntry()
+                .withField(StandardField.ABSTRACT, "how to annotate a pdf")
+                .withField(StandardField.AUTHOR, "Chris")
+                .withField(StandardField.KEYWORDS, "pdf, annotation")
+                .withField(StandardField.FILE, ":" + file.toString().replace("\\", "/").replace(":", "\\:") + ":PDF")
+                .withField(StandardField.TITLE, "The best Pdf ever");
 
-        BibEntry be0 = bibEntries.getFirst();
-        assertEquals(Optional.of("how to annotate a pdf"), be0.getField(StandardField.ABSTRACT));
-        assertEquals(Optional.of("Chris"), be0.getField(StandardField.AUTHOR));
-        assertEquals(Optional.of("pdf, annotation"), be0.getField(StandardField.KEYWORDS));
-        assertEquals(Optional.of("The best Pdf ever"), be0.getField(StandardField.TITLE));
+        assertEquals(List.of(expected), bibEntries);
+    }
+
+    @Test
+    void pdf2024SPLCBecker() throws URISyntaxException {
+        Path file = Path.of(PdfXmpImporterTest.class.getResource("2024_SPLC_Becker.pdf").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file).getDatabase().getEntries();
+
+        BibEntry expected = new BibEntry()
+                .withField(StandardField.TITLE, "Not Quite There Yet: Remaining Challenges in Systems and Software Product Line Engineering as Perceived by Industry Practitioners")
+                .withField(StandardField.ABSTRACT, "-  Software and its engineering  ->  Software product lines.")
+                .withField(StandardField.DOI, "10.1145/3646548.3672587")
+                .withField(StandardField.FILE, ":" + file.toString().replace("\\", "/").replace(":", "\\:") + ":PDF");
+
+        assertEquals(List.of(expected), bibEntries);
     }
 
     @Test
