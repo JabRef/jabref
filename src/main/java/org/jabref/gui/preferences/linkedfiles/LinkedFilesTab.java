@@ -40,6 +40,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
     @FXML private CheckBox copyLinkedFiles;
+    @FXML private TextField CopyLinkedFilesDirectoryPath;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -68,7 +69,9 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
         //added:
         copyLinkedFiles.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesProperty());
-        copyLinkedFiles.selectedProperty().set(true);
+        //copyLinkedFiles.selectedProperty().set(true);
+        //CopyLinkedFilesDirectoryPath.textProperty().bindBidirectional(viewModel.CopyLinkedFilesDirectoryPathProperty());
+
 
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());

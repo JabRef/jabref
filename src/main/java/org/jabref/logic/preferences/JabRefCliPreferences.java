@@ -231,6 +231,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
     public static final String COPY_LINKED_FILES = "copyLinkedFiles";
+    public static final String COPY_LINKED_FILES_DIRECTORY_PATH = "CopyLinkedFilesDirectoryPath";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -1536,6 +1537,9 @@ public class JabRefCliPreferences implements CliPreferences {
     protected boolean copyLinkedFilesSupported() {
         return false;
     }
+    protected String CopyLinkedFilesDirectoryPathSupported(){
+        return "test";
+    }
 
     @Override
     public FilePreferences getFilePreferences() {
@@ -1559,6 +1563,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
                 getBoolean(COPY_LINKED_FILES, copyLinkedFilesSupported()),
+                get(COPY_LINKED_FILES_DIRECTORY_PATH, CopyLinkedFilesDirectoryPathSupported()),
                 getBoolean(KEEP_DOWNLOAD_URL));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
@@ -1574,6 +1579,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
         EasyBind.listen(filePreferences.moveToTrashProperty(), (obs, oldValue, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
         EasyBind.listen(filePreferences.copyLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(COPY_LINKED_FILES, newValue));
+        //EasyBind.listen(filePreferences.CopyLinkedFilesDirectoryPathProperty(), (obs, oldValue, newValue) -> putBoolean(COPY_LINKED_FILES, Boolean.parseBoolean(newValue)));
         EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (obs, oldValue, newValue) -> putBoolean(KEEP_DOWNLOAD_URL, newValue));
 
         return filePreferences;

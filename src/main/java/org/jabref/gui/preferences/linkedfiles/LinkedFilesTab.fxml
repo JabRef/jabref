@@ -80,5 +80,11 @@
     <Label styleClass="sectionHeader" text="%Attached files"/>
     <CheckBox fx:id="confirmLinkedFileDelete" text="%Show confirmation dialog when deleting attached files"/>
     <CheckBox fx:id="moveToTrash" text="%Move deleted files to trash (instead of deleting them)"/>
-    <CheckBox fx:id="copyLinkedFiles" text="%Copy/move files when copying/moving entries"/>
+
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="copyLinkedFiles" text="%Copy/move files when copying/moving entries."/>
+        <Label text="%Enter default database filepath:" GridPane.rowIndex="1"/>
+        <TextField fx:id="copyLinkedFilesDirectoryPath" HBox.hgrow="ALWAYS"/>
+    </HBox>
 </fx:root>
