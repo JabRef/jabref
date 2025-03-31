@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added buttons "Add example entry" and "Import existing PDFs" when a library is empty, making it easier for new users to get started. [#12662](https://github.com/JabRef/jabref/issues/12662)
 - In the Open/LibreOffice integration, we added the provision to modify the bibliography title and its format for CSL styles, in the "Select style" dialog. [#12663](https://github.com/JabRef/jabref/issues/12663)
 - We added a new Welcome tab which shows a welcome screen if no database is open. [#12272](https://github.com/JabRef/jabref/issues/12272)
 - We added <kbd>F5</kbd> as a shortcut key for fetching data and <kbd>Alt+F</kbd> as a shortcut for looking up data using DOI. [#11802](https://github.com/JabRef/jabref/issues/11802)
