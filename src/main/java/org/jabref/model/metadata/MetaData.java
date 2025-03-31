@@ -57,9 +57,8 @@ public class MetaData {
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
-
+    public static final String BLG_FILE_PATH = "blgFilePath";
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
-
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
@@ -81,6 +80,7 @@ public class MetaData {
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     private String versionDBStructure;
+    private Optional<Path> blgFilePath = Optional.empty();
 
     /**
      * Constructs an empty metadata.
@@ -412,5 +412,17 @@ public class MetaData {
     @Override
     public String toString() {
         return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+    }
+
+    public Optional<Path> getBlgFilePath() {
+        return blgFilePath;
+    }
+
+    public void setBlgFilePath(Path path) {
+        this.blgFilePath = Optional.ofNullable(path);
+    }
+
+    public void clearBlgFilePath() {
+        this.blgFilePath = Optional.empty();
     }
 }
