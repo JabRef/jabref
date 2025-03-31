@@ -133,7 +133,6 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                 }
                 configureButton(issue.get().getFix().get(), () -> {
                     viewModel.fix(issue.get(), message);
-                    viewModel.removeFromEntryTypes(message.field().getDisplayName());
                     removeRow(message);
                 });
                 setGraphic(button);
