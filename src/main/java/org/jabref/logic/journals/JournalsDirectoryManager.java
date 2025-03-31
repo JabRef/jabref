@@ -25,7 +25,7 @@ public class JournalsDirectoryManager {
         try {
             initializeDirectory(dirPath, externalJournalLists);
         } catch (IOException e) {
-            LOGGER.error("Error initializing the journal directory", e);
+            LOGGER.error("Failed to initialize journal directory: {}. Reason: {}", dirPath, e.getMessage(), e);
         }
     }
 

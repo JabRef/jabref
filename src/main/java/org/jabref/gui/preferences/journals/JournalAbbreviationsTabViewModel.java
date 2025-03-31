@@ -76,7 +76,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldValue, newValue) -> {
             boolean isAbbreviation = (newValue != null) && !newValue.isPseudoAbbreviation();
-            boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get() && !FileUtil.isMvFile(currentFile.get().getAbsolutePath().get());
+            AbbreviationsFileViewModel file = currentFile.get();
+            boolean isEditableFile = file != null
+                    && !file.isBuiltInListProperty().get()
+                    && !FileUtil.isMvFile(file.getAbsolutePath().get());
             isEditableAndRemovable.set(isEditableFile);
             isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
