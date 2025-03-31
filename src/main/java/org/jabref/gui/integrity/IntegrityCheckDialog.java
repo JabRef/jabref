@@ -208,7 +208,6 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     public void fix(IntegrityIssue issue, IntegrityMessage message) {
         viewModel.fix(issue, message);
-        viewModel.removeFromEntryTypes(message.field().getDisplayName());
         removeRow(message);
     }
 
