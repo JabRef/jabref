@@ -108,34 +108,29 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
+                setGraphic(null);
+                button.setOnAction(null);
+
                 if (empty || getTableRow() == null || getTableRow().getItem() == null) {
-                    setGraphic(null);
                     return;
                 }
-                IntegrityMessage rowData = getTableRow().getItem();
-                configureAction(rowData);
-            }
 
-            /**
-             * Configures the action for the button based on the provided {@link IntegrityMessage}.
-             * If a fix is available for the message, the button is configured to apply the fix when clicked.
-             *
-             * @param message the {@link IntegrityMessage} to check for available fixes
-             */
-            private void configureAction(IntegrityMessage message) {
-                Optional<IntegrityIssue> issue = IntegrityIssue.fromMessage(message);
+                IntegrityMessage rowData = getTableRow().getItem();
+                Optional<IntegrityIssue> issue = IntegrityIssue.fromMessage(rowData);
+
                 if (issue.isEmpty()) {
                     return;
                 }
+
                 if (issue.get().getFix().isEmpty()) {
                     setGraphic(new Label(Localization.lang("No fix available")));
-                    return;
+                } else {
+                    configureButton(issue.get().getFix().get(), () -> {
+                        viewModel.fix(issue.get(), rowData);
+                        removeRow(rowData);
+                    });
+                    setGraphic(button);
                 }
-                configureButton(issue.get().getFix().get(), () -> {
-                    viewModel.fix(issue.get(), message);
-                    removeRow(message);
-                });
-                setGraphic(button);
             }
 
             private void configureButton(String text, Runnable action) {
