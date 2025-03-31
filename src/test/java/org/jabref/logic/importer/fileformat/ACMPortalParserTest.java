@@ -18,12 +18,14 @@ import org.jabref.testutils.category.FetcherTest;
 
 import org.apache.hc.core5.net.URIBuilder;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @FetcherTest
+@Disabled("https://github.com/jabref/jabref/issues/10257")
 class ACMPortalParserTest {
 
     ACMPortalParser parser;

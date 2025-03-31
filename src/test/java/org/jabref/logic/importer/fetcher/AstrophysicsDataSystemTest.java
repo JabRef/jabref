@@ -15,6 +15,7 @@ import org.jabref.model.paging.Page;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@Disabled("https://github.com/JabRef/jabref-issue-melting-pot/issues/843")
 public class AstrophysicsDataSystemTest implements PagedSearchFetcherTest {
 
     private AstrophysicsDataSystem fetcher;
