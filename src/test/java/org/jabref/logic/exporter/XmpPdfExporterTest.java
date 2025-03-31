@@ -32,6 +32,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -163,9 +164,9 @@ class XmpPdfExporterTest {
         assertFalse(exporter.exportToFileByPath(databaseContext, filePreferences, path, abbreviationRepository));
     }
 
-    @ParameterizedTest
-    @MethodSource("providePathToNewPDFs")
-    void roundtripExportImport(Path path) throws Exception {
+    @Test
+    void roundtripExportImport() throws Exception {
+        Path path = tempDir.resolve("original.pdf").toAbsolutePath();
         try (PDDocument document = new PDDocument()) {
             PDPage page = new PDPage();
             document.addPage(page);
@@ -190,10 +191,6 @@ class XmpPdfExporterTest {
             entry.addFile(createDefaultLinkedFile("original.pdf", tempDir));
         }
         assertEquals(expectedEntries, importedEntries);
-    }
-
-    public static Stream<Arguments> providePathToNewPDFs() {
-        return Stream.of(Arguments.of(tempDir.resolve("original.pdf").toAbsolutePath()));
     }
 
     public static Stream<Arguments> providePathsToValidPDFs() {
