@@ -15,7 +15,7 @@ public enum IntegrityIssue {
     BIBLATEX_FIELD_ONLY(Localization.lang("biblatex field only")),
     BIBTEX_FIELD_ONLY(Localization.lang("BibTeX field only")),
     BOOKTITLE_ENDS_WITH_CONFERENCE_ON(Localization.lang("booktitle ends with 'conference on'")),
-    CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS(Localization.lang("capital letters are not masked using curly brackets {}"), Localization.lang("Mask letters")),
+    CAPITAL_LETTER_ARE_NOT_MASKED_USING_CURLY_BRACKETS(Localization.lang("capital letters are not masked using curly brackets {}"), Localization.lang("Dummy fix")),
     CITATION_KEY_DEVIATES_FROM_GENERATED_KEY(Localization.lang("Citation key deviates from generated key")),
     DOI_IS_INVALID(Localization.lang("DOI is invalid")),
     DUPLICATE_CITATION_KEY(Localization.lang("Duplicate citation key")),

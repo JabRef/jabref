@@ -131,10 +131,10 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                     setGraphic(new Label(Localization.lang("No fix available")));
                     return;
                 }
-                configureButton(issue.get().getFix().toString(), () -> {
+                configureButton(issue.get().getFix().get(), () -> {
                     viewModel.fix(issue.get(), message);
                     viewModel.removeFromEntryTypes(message.field().getDisplayName());
-                    Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
+                    removeRow(message);
                 });
                 setGraphic(button);
             }
@@ -210,7 +210,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     public void fix(IntegrityIssue issue, IntegrityMessage message) {
         viewModel.fix(issue, message);
         viewModel.removeFromEntryTypes(message.field().getDisplayName());
+        removeRow(message);
+    }
+
+    public void removeRow(IntegrityMessage message) {
         Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
+        updateEntryTypeCombo();
     }
 
     /**
