@@ -28,6 +28,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@Disabled("https://github.com/JabRef/jabref-issue-melting-pot/issues/846")
 class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
     private static ImportFormatPreferences importFormatPreferences;
