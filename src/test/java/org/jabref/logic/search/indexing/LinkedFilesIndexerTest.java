@@ -17,6 +17,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.lucene.index.IndexReader;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -43,6 +44,11 @@ public class LinkedFilesIndexerTest {
         when(context.getFulltextIndexPath()).thenReturn(indexDir);
 
         this.indexer = new DefaultLinkedFilesIndexer(context, filePreferences);
+    }
+
+    @AfterEach
+    void tearDown() {
+        this.indexer.closeAndWait();
     }
 
     @Test
