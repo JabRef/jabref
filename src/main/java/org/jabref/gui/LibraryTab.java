@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -93,6 +94,7 @@ import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DirectoryMonitor;
@@ -937,7 +939,56 @@ public class LibraryTab extends Tab {
             return;
         }
 
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+        boolean checkCopyPreferences = preferences.getFilePreferences().copyLinkedFiles();
+
+        if (checkCopyPreferences && (bibDatabaseContext.getLocation() == DatabaseLocation.SHARED)) {
+            List<BibEntry> linkedFileEntry = copyLinkedFiles(entriesToAdd);
+            importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, linkedFileEntry);
+        } else {
+            importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+        }
+    }
+
+    private List<BibEntry> copyLinkedFiles(List<BibEntry> entriesToAdd) {
+        String storagepath = "";
+        Optional<String> generalFileDirectory = bibDatabaseContext.getMetaData().getLibrarySpecificFileDirectory();
+        if (generalFileDirectory.isPresent()) {
+            storagepath += generalFileDirectory.get();
+        } else {
+            storagepath += preferences.getFilePreferences().getCopyLinkedFilesDirectoryPath();
+        }
+
+        Pattern pattern = Pattern.compile("/");
+        for (BibEntry entry : entriesToAdd) {
+            int i = 0;
+            String desired = "";
+
+            List<LinkedFile> entryLinkedFiles = entry.getFiles();
+
+            for (LinkedFile file : entryLinkedFiles) {
+                String[] parts = pattern.split(file.getLink());
+                String filename = parts[parts.length - 1];
+                Path destinationFilePath = Path.of(storagepath).resolve(filename);
+                Path orignalFilePath = Path.of(file.getLink());
+
+                FileUtil.copyFile(orignalFilePath, destinationFilePath, true);
+
+                filename = destinationFilePath.toString();
+
+                desired += file.getDescription() + ":" + filename + ":" + file.getFileType();
+
+                if (!file.getSourceUrl().isEmpty()) {
+                    desired += ":" + file.getSourceUrl();
+                }
+                if (i < entryLinkedFiles.size() - 1) {
+                    desired += ";";
+                } else {
+                    entry.setField(StandardField.FILE, desired);
+                }
+                i++;
+            }
+        }
+        return entriesToAdd;
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
