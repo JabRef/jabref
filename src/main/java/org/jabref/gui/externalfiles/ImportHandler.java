@@ -151,13 +151,21 @@ public class ImportHandler {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
                             } else {
+                                CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
+                                        bibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
+                                                                                                       .getKeyPatterns()),
+                                        bibDatabaseContext.getDatabase(),
+                                        preferences.getCitationKeyPatternPreferences());
+
                                 pdfEntriesInFile.forEach(entry -> {
                                     if (entry.getFiles().size() > 1) {
                                         LOGGER.warn("Entry has more than one file attached. This is not supported.");
                                         LOGGER.warn("Entry's files: {}", entry.getFiles());
                                     }
                                     entry.clearField(StandardField.FILE);
-                                    entry.setCitationKey(bibDatabaseContext, preferences);
+                                    if (entry.getCitationKey().isEmpty()) {
+                                        keyGenerator.generateAndSetKey(entry);
+                                    }
                                     // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                                     // Similar code as org.jabref.gui.preview.PreviewPanel.PreviewPanel
                                     DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);

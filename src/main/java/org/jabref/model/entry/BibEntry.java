@@ -28,13 +28,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.architecture.AllowedToUseLogic;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.bibtex.FileFieldWriter;
-import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.util.FileFieldParser;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldAddedOrRemovedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
@@ -388,23 +385,6 @@ public class BibEntry implements Cloneable {
         eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
         this.id = id;
         changed = true;
-    }
-
-    /**
-     * Retrieves the citation key pattern from the metadata of the provided {@code bibDatabaseContext} and applies
-     * them to generate citation key for this entry.
-     *
-     * @param bibDatabaseContext bibliographic database for metadata and database information
-     * @param preferences        the GUI preferences for citation key pattern
-     */
-    public void setCitationKey(BibDatabaseContext bibDatabaseContext, GuiPreferences preferences) {
-        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                bibDatabaseContext.getMetaData().getCiteKeyPatterns(preferences.getCitationKeyPatternPreferences()
-                                                                               .getKeyPatterns()),
-                bibDatabaseContext.getDatabase(),
-                preferences.getCitationKeyPatternPreferences());
-
-        keyGenerator.generateAndSetKey(this);
     }
 
     /**
