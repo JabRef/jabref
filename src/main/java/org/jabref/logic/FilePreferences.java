@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -31,7 +32,10 @@ public class FilePreferences {
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFiles = new SimpleBooleanProperty();
+    private final StringProperty CopyLinkedFilesDirectoryPath = new SimpleStringProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
+    private final StringProperty directoryPath = new SimpleStringProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -45,6 +49,8 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
+                           boolean copyLinkedFiles,
+                           String CopyLinkedFilesDirectoryPath,
                            boolean shouldKeepDownloadUrl) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
@@ -58,6 +64,8 @@ public class FilePreferences {
         this.backupDirectory.setValue(backupDirectory);
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
+        this.copyLinkedFiles.setValue(copyLinkedFiles);
+        //this.CopyLinkedFilesDirectoryPath.setValue(CopyLinkedFilesDirectoryPath);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
     }
 
@@ -216,4 +224,38 @@ public class FilePreferences {
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
         this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);
     }
+
+    public boolean copyLinkedFiles() {
+        return copyLinkedFiles.get();
+    }
+
+    public BooleanProperty copyLinkedFilesProperty() {
+        return copyLinkedFiles;
+    }
+
+    public void copyLinkedFiles(boolean copyLinkedFiles) {
+        this.copyLinkedFiles.set(copyLinkedFiles);
+    }
+
+    public String CopyLinkedFilesDirectoryPath() {
+        return CopyLinkedFilesDirectoryPath.get();
+    }
+
+    //good
+    public StringProperty CopyLinkedFilesDirectoryPathProperty() {
+        return CopyLinkedFilesDirectoryPath;
+    }
+
+    //good
+    public String getCopyLinkedFilesDirectoryPath() {
+        return CopyLinkedFilesDirectoryPath.get();
+    }
+
+    /*public void CopyLinkedFilesDirectoryPath(boolean CopyLinkedFilesDirectoryPath) {
+        this.CopyLinkedFilesDirectoryPath.set(CopyLinkedFilesDirectoryPath);
+    }*/
+    public void setLinkedFilesPath (String directoryPath) {
+        this.directoryPath.set(directoryPath);
+    }
+
 }

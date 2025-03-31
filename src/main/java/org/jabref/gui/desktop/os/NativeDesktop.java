@@ -385,4 +385,5 @@ public abstract class NativeDesktop {
     public boolean moveToTrashSupported() {
         return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
     }
+
 }

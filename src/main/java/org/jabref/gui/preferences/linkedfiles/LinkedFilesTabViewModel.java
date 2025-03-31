@@ -4,12 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -41,6 +36,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFilesProperty = new SimpleBooleanProperty();
+    private final StringProperty CopyLinkedFilesDirectoryPathProperty = new SimpleStringProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -84,6 +81,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
+        copyLinkedFilesProperty.setValue(filePreferences.copyLinkedFiles());
+        CopyLinkedFilesDirectoryPathProperty.setValue(filePreferences.getCopyLinkedFilesDirectoryPath());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -103,6 +102,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
+        filePreferences.setLinkedFilesPath(CopyLinkedFilesDirectoryPathProperty.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -116,6 +116,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
+        filePreferences.copyLinkedFiles(copyLinkedFilesProperty.getValue());
+        //filePreferences.CopyLinkedFilesDirectoryPath(CopyLinkedFilesDirectoryPathProperty.getValue());
+
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -191,6 +194,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty moveToTrashProperty() {
         return this.moveToTrashProperty;
+    }
+
+    public BooleanProperty copyLinkedFilesProperty() {
+        return this.copyLinkedFilesProperty;
+    }
+
+    public StringProperty CopyLinkedFilesDirectoryPathProperty() {
+        return CopyLinkedFilesDirectoryPathProperty;
     }
 }
 
