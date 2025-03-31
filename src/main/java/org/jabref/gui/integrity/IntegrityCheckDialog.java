@@ -191,7 +191,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     }
 
     private void updateEntryTypeCombo() {
-        Set<String> entryTypes = viewModel.getEntryTypes();
+        Set<String> entryTypes = new HashSet<>(viewModel.issueListProperty());
         Set<String> uniqueTexts = new HashSet<>();
         entryTypeCombo.getItems().clear();
 
@@ -214,7 +214,13 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     }
 
     public void removeRow(IntegrityMessage message) {
-        Platform.runLater(() -> viewModel.columnsListProperty().getValue().removeIf(column -> Objects.equals(column.message(), message.message())));
+        Platform.runLater(() ->
+                viewModel.columnsListProperty().getValue().removeIf(column ->
+                        Objects.equals(column.entry().getCitationKey().get(), message.entry().getCitationKey().get()) &&
+                                Objects.equals(column.message(), message.message())
+                )
+        );
+        Platform.runLater(() -> viewModel.issueListProperty().removeIf(issue -> Objects.equals(issue, message.message())));
         updateEntryTypeCombo();
     }
 
