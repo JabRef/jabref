@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -25,14 +26,47 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public class CSLFormatUtils {
 
-    // TODO: These are static final fields right now, should add the functionality to let user select these and store them in preferences.
-    public static final String DEFAULT_BIBLIOGRAPHY_TITLE = "References";
-    public static final String DEFAULT_BIBLIOGRAPHY_HEADER_PARAGRAPH_FORMAT = "Heading 2";
+    public enum Format {
+        TITLE("Title"),
+        BODY_TEXT("Body Text"),
+        SUBTITLE("Subtitle"),
+        HEADING_1("Heading 1"),
+        HEADING_2("Heading 2"),
+        HEADING_3("Heading 3"),
+        HEADING_4("Heading 4");
 
-    public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
+        private final String format;
+
+        Format(String format) {
+            this.format = format;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+    }
 
     public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
+
+    public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
+    
+    private static String bibliographyTitle;
+    private static String bibliographyHeaderFormat;
+    
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
+
+    public static String getBibliographyTitle() {
+        return bibliographyTitle;
+    }
+
+    public static String getBibliographyHeaderFormat() {
+        return bibliographyHeaderFormat;
+    }
+
+    public static void setBibliographyProperties(OpenOfficePreferences openOfficePreferences) {
+        bibliographyTitle = openOfficePreferences.getCslBibliographyTitle();
+        bibliographyHeaderFormat = openOfficePreferences.getCslBibliographyHeaderFormat();
+    }
 
     /**
      * Transforms provided HTML into a format that can be fully parsed and inserted into an OO document.
@@ -124,9 +158,9 @@ public class CSLFormatUtils {
         String inTextCitation = generateAlphanumericCitation(List.of(entry), bibDatabaseContext);
 
         String authorName = entry.getResolvedFieldOrAlias(StandardField.AUTHOR, bibDatabaseContext.getDatabase())
-                                        .map(AuthorList::parse)
-                                        .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
-                                        .orElse("");
+                                 .map(AuthorList::parse)
+                                 .map(list -> BracketedPattern.joinAuthorsOnLastName(list, 1, "", " et al."))
+                                 .orElse("");
 
         return authorName + " " + inTextCitation;
     }

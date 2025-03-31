@@ -719,16 +719,14 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeGroupKeepSubgroups(group);
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
-                case GROUP_EDIT, GROUP_SUBGROUP_RENAME -> {
-                    viewModel.editGroup(group);
-                    groupTree.refresh();
-                }
+                case GROUP_EDIT, GROUP_SUBGROUP_RENAME ->
+                        viewModel.editGroup(group);
                 case GROUP_GENERATE_EMBEDDINGS ->
                         viewModel.generateEmbeddings(group);
                 case GROUP_GENERATE_SUMMARIES ->
                         viewModel.generateSummaries(group);
                 case GROUP_CHAT ->
-                    viewModel.chatWithGroup(group);
+                        viewModel.chatWithGroup(group);
                 case GROUP_SUBGROUP_ADD ->
                         viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
                 case GROUP_SUBGROUP_REMOVE ->
@@ -746,6 +744,7 @@ public class GroupTreeView extends BorderPane {
                 case GROUP_ENTRIES_REMOVE ->
                         viewModel.removeSelectedEntries(group);
             }
+            groupTree.refresh();
         }
     }
 
