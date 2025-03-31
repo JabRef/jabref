@@ -14,12 +14,12 @@ import org.jabref.model.entry.types.EntryType;
  */
 public abstract class AbstractCitationKeyPatterns {
 
-    protected Pattern defaultPattern = Pattern.NULL_PATTERN;
+    protected KeyPattern defaultPattern = KeyPattern.NULL_PATTERN;
 
-    protected Map<EntryType, Pattern> data = new HashMap<>();
+    protected Map<EntryType, KeyPattern> data = new HashMap<>();
 
     public void addCitationKeyPattern(EntryType type, String pattern) {
-        data.put(type, new Pattern(pattern));
+        data.put(type, new KeyPattern(pattern));
     }
 
     @Override
@@ -57,13 +57,13 @@ public abstract class AbstractCitationKeyPatterns {
      * @param entryType a <code>String</code>
      * @return the list of Strings for the given key. First entry: the complete key
      */
-    public Pattern getValue(EntryType entryType) {
-        Pattern result = data.get(entryType);
+    public KeyPattern getValue(EntryType entryType) {
+        KeyPattern result = data.get(entryType);
         //  Test to see if we found anything
         if (result == null) {
             // check default value
             result = getDefaultValue();
-            if (result == null || Pattern.NULL_PATTERN.equals(result)) {
+            if (result == null || KeyPattern.NULL_PATTERN.equals(result)) {
                 // we are the "last" to ask
                 // we don't have anything left
                 return getLastLevelCitationKeyPattern(entryType);
@@ -84,7 +84,7 @@ public abstract class AbstractCitationKeyPatterns {
      *
      * @return null if not available.
      */
-    public Pattern getDefaultValue() {
+    public KeyPattern getDefaultValue() {
         return this.defaultPattern;
     }
 
@@ -95,16 +95,16 @@ public abstract class AbstractCitationKeyPatterns {
      */
     public void setDefaultValue(String bibtexKeyPattern) {
         Objects.requireNonNull(bibtexKeyPattern);
-        this.defaultPattern = new Pattern(bibtexKeyPattern);
+        this.defaultPattern = new KeyPattern(bibtexKeyPattern);
     }
 
     public Set<EntryType> getAllKeys() {
         return data.keySet();
     }
 
-    public Map<EntryType, Pattern> getPatterns() {
+    public Map<EntryType, KeyPattern> getPatterns() {
         return data.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public abstract Pattern getLastLevelCitationKeyPattern(EntryType key);
+    public abstract KeyPattern getLastLevelCitationKeyPattern(EntryType key);
 }

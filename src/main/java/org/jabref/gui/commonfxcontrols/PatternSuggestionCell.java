@@ -16,7 +16,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Window;
 
-import org.jabref.logic.citationkeypattern.Pattern;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 
 public class PatternSuggestionCell extends TextFieldTableCell<PatternsItemModel, String> {
@@ -155,26 +155,26 @@ public class PatternSuggestionCell extends TextFieldTableCell<PatternsItemModel,
         private Menu createPatternsSubMenu() {
             Menu patternsSubMenu = new Menu(Localization.lang("All patterns"));
 
-            Map<Pattern.Category, List<Pattern>> categorizedPatterns =
-                    Pattern.getAllPatterns().stream()
-                           .collect(Collectors.groupingBy(Pattern::getCategory));
+            Map<KeyPattern.Category, List<KeyPattern>> categorizedPatterns =
+                    KeyPattern.getAllPatterns().stream()
+                              .collect(Collectors.groupingBy(KeyPattern::getCategory));
 
-            Map<Pattern.Category, String> categoryNames = Map.of(
-                    Pattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
-                    Pattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
-                    Pattern.Category.TITLE_RELATED, Localization.lang("Title related"),
-                    Pattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
-                    Pattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields")
+            Map<KeyPattern.Category, String> categoryNames = Map.of(
+                    KeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
+                    KeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
+                    KeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
+                    KeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
+                    KeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields")
             );
 
-            for (Map.Entry<Pattern.Category, String> entry : categoryNames.entrySet()) {
-                Pattern.Category category = entry.getKey();
+            for (Map.Entry<KeyPattern.Category, String> entry : categoryNames.entrySet()) {
+                KeyPattern.Category category = entry.getKey();
                 String categoryName = entry.getValue();
 
                 Menu categoryMenu = new Menu(categoryName);
-                List<Pattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
+                List<KeyPattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
 
-                for (Pattern pattern : patterns) {
+                for (KeyPattern pattern : patterns) {
                     MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
                     menuItem.setOnAction(event -> {
                         setText(pattern.stringRepresentation());

@@ -1,20 +1,20 @@
 package org.jabref.logic.linkedfile;
 
-import org.jabref.logic.citationkeypattern.Pattern;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.model.entry.types.EntryType;
 
 public class GlobalLinkedFileNamePatterns extends AbstractLinkedFileNamePatterns {
 
-    public GlobalLinkedFileNamePatterns(Pattern defaultPattern) {
+    public GlobalLinkedFileNamePatterns(KeyPattern defaultPattern) {
         this.defaultPattern = defaultPattern;
     }
 
     public static GlobalLinkedFileNamePatterns fromPattern(String pattern) {
-        return new GlobalLinkedFileNamePatterns(new Pattern(pattern));
+        return new GlobalLinkedFileNamePatterns(new KeyPattern(pattern));
     }
 
     @Override
-    public Pattern getLastLevelLinkedFileNamePattern(EntryType entryType) {
+    public KeyPattern getLastLevelLinkedFileNamePattern(EntryType entryType) {
         return defaultPattern;
     }
 }

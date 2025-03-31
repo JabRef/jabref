@@ -22,7 +22,7 @@ class MakeLabelWithoutDatabaseTest {
 
     @BeforeEach
     void setUp() {
-        GlobalCitationKeyPatterns keyPattern = new GlobalCitationKeyPatterns(Pattern.NULL_PATTERN);
+        GlobalCitationKeyPatterns keyPattern = new GlobalCitationKeyPatterns(KeyPattern.NULL_PATTERN);
         keyPattern.setDefaultValue("[auth]");
         patternPreferences = new CitationKeyPatternPreferences(
                 false,

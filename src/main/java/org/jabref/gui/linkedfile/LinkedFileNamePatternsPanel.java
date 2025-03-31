@@ -16,7 +16,7 @@ import org.jabref.gui.commonfxcontrols.PatternSuggestionCell;
 import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.logic.citationkeypattern.Pattern;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
 import org.jabref.model.entry.BibEntryType;
@@ -39,9 +39,9 @@ public class LinkedFileNamePatternsPanel extends TableView<PatternsItemModel> {
     public LinkedFileNamePatternsPanel() {
         super();
         this.patterns = FXCollections.observableArrayList(
-                Pattern.getAllPatterns().stream()
-                       .map(Pattern::stringRepresentation)
-                       .toList()
+                KeyPattern.getAllPatterns().stream()
+                          .map(KeyPattern::stringRepresentation)
+                          .toList()
         );
 
         ViewLoader.view(this)

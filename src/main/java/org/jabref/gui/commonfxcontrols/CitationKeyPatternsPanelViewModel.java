@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
-import org.jabref.logic.citationkeypattern.Pattern;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
@@ -46,7 +46,7 @@ public class CitationKeyPatternsPanelViewModel {
 
     public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
         String defaultPattern;
-        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(Pattern.NULL_PATTERN)) {
+        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(KeyPattern.NULL_PATTERN)) {
             defaultPattern = "";
         } else {
             defaultPattern = initialKeyPattern.getDefaultValue().stringRepresentation();

@@ -15,7 +15,7 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.Pattern;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryType;
@@ -41,9 +41,9 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
     public CitationKeyPatternsPanel() {
         super();
         this.patterns = FXCollections.observableArrayList(
-                Pattern.getAllPatterns().stream()
-                       .map(Pattern::stringRepresentation)
-                       .toList()
+                KeyPattern.getAllPatterns().stream()
+                          .map(KeyPattern::stringRepresentation)
+                          .toList()
         );
 
         ViewLoader.view(this)

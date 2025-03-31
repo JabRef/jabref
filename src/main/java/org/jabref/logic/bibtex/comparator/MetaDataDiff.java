@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.Pattern;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.groups.GroupTreeNode;
@@ -48,7 +48,7 @@ public class MetaDataDiff {
             return Optional.empty();
         } else {
             MetaDataDiff diff = new MetaDataDiff(originalMetaData, newMetaData);
-            List<Difference> differences = diff.getDifferences(new GlobalCitationKeyPatterns(Pattern.NULL_PATTERN));
+            List<Difference> differences = diff.getDifferences(new GlobalCitationKeyPatterns(KeyPattern.NULL_PATTERN));
             if (differences.isEmpty()) {
                 return Optional.empty();
             }
@@ -136,7 +136,7 @@ public class MetaDataDiff {
                 "groupDiff=" + groupDiff +
                 ", originalMetaData=" + originalMetaData +
                 ", newMetaData=" + getNewMetaData() +
-                ", getDifferences()=" + getDifferences(new GlobalCitationKeyPatterns(Pattern.NULL_PATTERN)) +
+                ", getDifferences()=" + getDifferences(new GlobalCitationKeyPatterns(KeyPattern.NULL_PATTERN)) +
                 '}';
     }
 }

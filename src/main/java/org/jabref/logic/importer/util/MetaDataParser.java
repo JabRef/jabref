@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
@@ -102,8 +103,8 @@ public class MetaDataParser {
      * @return the given metaData instance (which is modified, too)
      */
     public MetaData parse(MetaData metaData, Map<String, String> data, Character keywordSeparator) throws ParseException {
-        Pattern defaultCiteKeyPattern = org.jabref.logic.citationkeypattern.Pattern.NULL_PATTERN;
-        Map<EntryType, Pattern> nonDefaultCiteKeyPatterns = new HashMap<>();
+        KeyPattern defaultCiteKeyPattern = KeyPattern.NULL_PATTERN;
+        Map<EntryType, KeyPattern> nonDefaultCiteKeyPatterns = new HashMap<>();
 
         // process groups (GROUPSTREE and GROUPSTREE_LEGACY) at the very end (otherwise it can happen that not all dependent data are set)
         List<Map.Entry<String, String>> entryList = new ArrayList<>(data.entrySet());
@@ -114,7 +115,7 @@ public class MetaDataParser {
 
             if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
                 EntryType entryType = EntryTypeFactory.parse(entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length()));
-                nonDefaultCiteKeyPatterns.put(entryType, new Pattern(getSingleItem(values)));
+                nonDefaultCiteKeyPatterns.put(entryType, new KeyPattern(getSingleItem(values)));
             } else if (entry.getKey().startsWith(MetaData.SELECTOR_META_PREFIX)) {
                 // edge case, it might be one special field e.g. article from biblatex-apa, but we can't distinguish this from any other field and rather prefer to handle it as UnknownField
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
@@ -134,7 +135,7 @@ public class MetaDataParser {
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(values)));
             } else if (MetaData.KEYPATTERNDEFAULT.equals(entry.getKey())) {
-                defaultCiteKeyPattern = new Pattern(getSingleItem(values));
+                defaultCiteKeyPattern = new KeyPattern(getSingleItem(values));
             } else if (MetaData.PROTECTED_FLAG_META.equals(entry.getKey())) {
                 if (Boolean.parseBoolean(getSingleItem(values))) {
                     metaData.markAsProtected();
@@ -156,7 +157,7 @@ public class MetaDataParser {
             }
         }
 
-        if (!defaultCiteKeyPattern.equals(org.jabref.logic.citationkeypattern.Pattern.NULL_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
+        if (!defaultCiteKeyPattern.equals(KeyPattern.NULL_PATTERN) || !nonDefaultCiteKeyPatterns.isEmpty()) {
             metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
         }
 

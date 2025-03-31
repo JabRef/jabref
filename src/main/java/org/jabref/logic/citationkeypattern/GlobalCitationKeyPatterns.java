@@ -4,16 +4,16 @@ import org.jabref.model.entry.types.EntryType;
 
 public class GlobalCitationKeyPatterns extends AbstractCitationKeyPatterns {
 
-    public GlobalCitationKeyPatterns(Pattern defaultPattern) {
+    public GlobalCitationKeyPatterns(KeyPattern defaultPattern) {
         this.defaultPattern = defaultPattern;
     }
 
     public static GlobalCitationKeyPatterns fromPattern(String pattern) {
-        return new GlobalCitationKeyPatterns(new Pattern(pattern));
+        return new GlobalCitationKeyPatterns(new KeyPattern(pattern));
     }
 
     @Override
-    public Pattern getLastLevelCitationKeyPattern(EntryType entryType) {
+    public KeyPattern getLastLevelCitationKeyPattern(EntryType entryType) {
         return defaultPattern;
     }
 }
