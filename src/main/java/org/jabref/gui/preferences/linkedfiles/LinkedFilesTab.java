@@ -37,12 +37,13 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
-    @FXML private TextField linkedFileDirectory;
 
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
+
     @FXML private CheckBox copyLinkedFiles;
-    @FXML private TextField copyLinkedFilesDirectoryPath;
+    @FXML private TextField linkedFileDirectory;
+
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -69,11 +70,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
         moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());
 
-        //added:
         copyLinkedFiles.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesProperty());
-        //copyLinkedFiles.selectedProperty().set(true);
-        copyLinkedFilesDirectoryPath.textProperty().bindBidirectional(viewModel.copyLinkedFilesDirectoryPathProperty());
-
+        linkedFileDirectory.textProperty().bindBidirectional(viewModel.linkedFileDirectoryProperty());
 
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());
@@ -84,8 +82,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
-        linkedFileDirectory.textProperty().bindBidirectional(viewModel.linkedFileDirectoryProperty());
-
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
 
         ActionFactory actionFactory = new ActionFactory();

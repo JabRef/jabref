@@ -10,7 +10,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -25,7 +24,6 @@ public class FilePreferences {
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
-    private final StringProperty linkedFileDirectory = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
@@ -33,17 +31,15 @@ public class FilePreferences {
     private final ObjectProperty<Path> backupDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
-    private final BooleanProperty copyLinkedFiles = new SimpleBooleanProperty();
-    private final StringProperty CopyLinkedFilesDirectoryPath = new SimpleStringProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
-    private final StringProperty directoryPath = new SimpleStringProperty();
+    private final BooleanProperty copyLinkedFiles = new SimpleBooleanProperty();
+    private final StringProperty linkedFileDirectory = new SimpleStringProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
                            String fileNamePattern,
                            String fileDirectoryPattern,
-                           String linkedFileDirectory,
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
@@ -51,15 +47,14 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
+                           boolean shouldKeepDownloadUrl,
                            boolean copyLinkedFiles,
-                           String CopyLinkedFilesDirectoryPath,
-                           boolean shouldKeepDownloadUrl) {
+                           String linkedFileDirectory) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
-        this.linkedFileDirectory.setValue(linkedFileDirectory);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
@@ -67,9 +62,9 @@ public class FilePreferences {
         this.backupDirectory.setValue(backupDirectory);
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
-        this.copyLinkedFiles.setValue(copyLinkedFiles);
-        this.CopyLinkedFilesDirectoryPath.setValue(CopyLinkedFilesDirectoryPath);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
+        this.copyLinkedFiles.setValue(copyLinkedFiles);
+        this.linkedFileDirectory.setValue(linkedFileDirectory);
     }
 
     public String getUserAndHost() {
@@ -124,24 +119,12 @@ public class FilePreferences {
         return fileDirectoryPattern.get();
     }
 
-    public String getLinkedFileDirectory() {
-        return linkedFileDirectory.get();
-    }
-
     public StringProperty fileDirectoryPatternProperty() {
         return fileDirectoryPattern;
     }
 
-    public StringProperty linkedFileDirectoryProperty() {
-        return linkedFileDirectory;
-    }
-
     public void setFileDirectoryPattern(String fileDirectoryPattern) {
         this.fileDirectoryPattern.set(fileDirectoryPattern);
-    }
-
-    public void setLinkedFileDirectory(String linkedFileDirectory) {
-        this.linkedFileDirectory.set(linkedFileDirectory);
     }
 
     public boolean shouldDownloadLinkedFiles() {
@@ -251,18 +234,16 @@ public class FilePreferences {
     public void copyLinkedFiles(boolean copyLinkedFiles) {
         this.copyLinkedFiles.set(copyLinkedFiles);
     }
-    public String CopyLinkedFilesDirectoryPath() {
-        return CopyLinkedFilesDirectoryPath.get();
-    }
-    //good
-    public StringProperty copyLinkedFilesDirectoryPathProperty() {
-        return CopyLinkedFilesDirectoryPath;
-    }//good
-    public String getCopyLinkedFilesDirectoryPath() {
-        return CopyLinkedFilesDirectoryPath.get();
-    }//good
-    public void setLinkedFilesPath (String directoryPath) {
-        this.directoryPath.set(directoryPath);
-    }//good
 
+    public String getLinkedFileDirectory() {
+        return linkedFileDirectory.get();
+    }
+
+    public StringProperty linkedFileDirectoryProperty() {
+        return linkedFileDirectory;
+    }
+
+    public void setLinkedFileDirectory(String linkedFileDirectory) {
+        this.linkedFileDirectory.set(linkedFileDirectory);
+    }
 }

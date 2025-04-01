@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.cli.JabKit;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
@@ -385,5 +386,4 @@ public abstract class NativeDesktop {
     public boolean moveToTrashSupported() {
         return Desktop.getDesktop().isSupported(Desktop.Action.MOVE_TO_TRASH);
     }
-
 }

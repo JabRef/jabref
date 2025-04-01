@@ -4,7 +4,12 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
@@ -34,11 +39,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty fulltextIndex = new SimpleBooleanProperty();
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
-    private final StringProperty linkedFileDirectoryProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
     private final BooleanProperty copyLinkedFilesProperty = new SimpleBooleanProperty();
-    private final StringProperty copyLinkedFilesDirectoryPathProperty = new SimpleStringProperty();
+    private final StringProperty linkedFileDirectoryProperty = new SimpleStringProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -80,11 +84,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
-        linkedFileDirectoryProperty.setValue(filePreferences.getLinkedFileDirectory());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
         copyLinkedFilesProperty.setValue(filePreferences.copyLinkedFiles());
-        copyLinkedFilesDirectoryPathProperty.setValue(filePreferences.getCopyLinkedFilesDirectoryPath());
+        linkedFileDirectoryProperty.setValue(filePreferences.getLinkedFileDirectory());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -103,9 +106,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
-        filePreferences.setLinkedFileDirectory(linkedFileDirectoryProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
-        filePreferences.setLinkedFilesPath(copyLinkedFilesDirectoryPathProperty.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -120,8 +121,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
         filePreferences.copyLinkedFiles(copyLinkedFilesProperty.getValue());
-        //filePreferences.CopyLinkedFilesDirectoryPath(copyLinkedFilesDirectoryPathProperty.getValue());
-
+        filePreferences.setLinkedFileDirectory(linkedFileDirectoryProperty.getValue());
     }
 
     ValidationStatus mainFileDirValidationStatus() {
@@ -187,10 +187,6 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return fileDirectoryPatternProperty;
     }
 
-    public StringProperty linkedFileDirectoryProperty() {
-        return linkedFileDirectoryProperty;
-    }
-
     public BooleanProperty useMainFileDirectoryProperty() {
         return useMainFileDirectoryProperty;
     }
@@ -207,8 +203,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return this.copyLinkedFilesProperty;
     }
 
-    public StringProperty copyLinkedFilesDirectoryPathProperty() {
-        return copyLinkedFilesDirectoryPathProperty;
+    public StringProperty linkedFileDirectoryProperty() {
+        return linkedFileDirectoryProperty;
     }
 }
 

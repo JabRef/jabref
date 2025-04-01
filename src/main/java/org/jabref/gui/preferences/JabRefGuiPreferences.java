@@ -1240,5 +1240,4 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     protected boolean moveToTrashSupported() {
         return NativeDesktop.get().moveToTrashSupported();
     }
-
 }
