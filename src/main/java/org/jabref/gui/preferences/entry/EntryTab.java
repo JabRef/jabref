@@ -84,7 +84,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     }
 
     private void setupResolveTagsForFields() {
-        resolvableTagsForFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
+            resolvableTagsForFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
         resolvableTagsForFields.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
         resolvableTagsForFields.tagsProperty().bindBidirectional(viewModel.resolvableTagsForFieldsProperty());
         setupTagsForField(resolvableTagsForFields);
