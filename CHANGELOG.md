@@ -38,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where drag'n'drop into the file editor would not add the file. [#12561](https://github.com/JabRef/jabref/issues/12561)
 - We fixed an issue where the F4 shortcut key did not work without opening the right-click context menu. [#6101](https://github.com/JabRef/jabref/pull/6101)
 - We fixed an issue where the file renaming dialog was not resizable and its size was too small for long file names. [#12518](https://github.com/JabRef/jabref/pull/12518)
 - We fixed an issue where the name of the untitled database was shown as a blank space in the right-click context menu's "Copy to" option. [#12459](https://github.com/JabRef/jabref/pull/12459)
