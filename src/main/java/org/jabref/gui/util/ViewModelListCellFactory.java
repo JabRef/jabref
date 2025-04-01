@@ -193,8 +193,9 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragDropped != null) {
                         setOnDragDropped(event -> {
-                            event.consume(); // Prevent cells from acting as drop targets
-                            getParent().fireEvent(event); // The action performed was not look at the parent, the drop box
+                            // The parent is the box for dropping; that should be used as target (and not this cell)
+                            event.consume();
+                            getParent().fireEvent(event);
                         });
                     }
                     if (toOnDragEntered != null) {
