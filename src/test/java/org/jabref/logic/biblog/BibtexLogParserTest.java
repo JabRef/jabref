@@ -1,7 +1,6 @@
 package org.jabref.logic.biblog;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.jabref.model.biblog.BibWarning;
@@ -22,7 +21,7 @@ public class BibtexLogParserTest {
 
     @Test
     public void parsesWarningsFromResourceFileTest() throws Exception {
-        Path blgFile = Paths.get("src/test/resources/org/jabref/logic/blg/Chocolate.blg");
+        Path blgFile = Path.of("src/test/resources/org/jabref/logic/blg/Chocolate.blg");
         List<BibWarning> warnings = parser.parseBiblog(blgFile);
         assertEquals(4, warnings.size());
         assertEquals(List.of(

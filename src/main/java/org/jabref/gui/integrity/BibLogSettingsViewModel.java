@@ -36,16 +36,15 @@ public class BibLogSettingsViewModel {
         this.metaData = metaData;
         this.bibPath = bibPath;
 
-        Optional<Path> resolved = BibLogPathResolver.resolve(metaData, bibPath);
-        LOGGER.info("Resolved .blg path = {}", resolved);
-
-        resolved.ifPresent(resolvedPath -> {
-            this.path.set(resolvedPath.toString());
-            // If user hasn't set a path, use resolved path as default for display
-            if (metaData.getBlgFilePath().isEmpty()) {
-                metaData.setBlgFilePath(resolvedPath);
-            }
-        });
+        Path resolvedPath = BibLogPathResolver.resolve(metaData, bibPath).orElse(null);
+        if (resolvedPath == null) {
+            return;
+        }
+        this.path.set(resolvedPath.toString());
+        if (metaData.getBlgFilePath().isEmpty()) {
+            metaData.setBlgFilePath(resolvedPath);
+            this.lastResolvedBlgPath = Optional.of(resolvedPath);
+        }
     }
 
     public StringProperty pathProperty() {
@@ -81,16 +80,24 @@ public class BibLogSettingsViewModel {
     public List<IntegrityMessage> getBlgWarnings(BibDatabaseContext databaseContext) {
         Optional<Path> resolved = BibLogPathResolver.resolve(metaData, bibPath)
                                                     .filter(Files::exists);
-        if (resolved.isPresent()) {
-            this.lastResolvedBlgPath = resolved;
-            try {
-                BibtexLogParser parser = new BibtexLogParser();
-                List<BibWarning> warnings = parser.parseBiblog(resolved.get());
-                return BibWarningToIntegrityMessageConverter.convert(warnings, databaseContext);
-            } catch (IOException e) {
-                LOGGER.warn("Failed to parse .blg file", e);
-            }
+        if (resolved.isEmpty()) {
+            return List.of();
         }
-        return List.of();
+
+        Path path = resolved.get();
+        this.lastResolvedBlgPath = Optional.of(path);
+        try {
+            BibtexLogParser parser = new BibtexLogParser();
+            List<BibWarning> warnings = parser.parseBiblog(path);
+            return BibWarningToIntegrityMessageConverter.convert(warnings, databaseContext);
+        } catch (IOException e) {
+            LOGGER.warn("Failed to parse .blg file", e);
+            return List.of();
+        }
+    }
+
+    public Path getInitialDirectory() {
+        return bibPath.flatMap(path -> Optional.ofNullable(path.getParent()))
+                      .orElse(Path.of(System.getProperty("user.home")));
     }
 }

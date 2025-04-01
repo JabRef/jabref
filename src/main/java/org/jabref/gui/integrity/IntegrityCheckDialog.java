@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
@@ -49,13 +50,16 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @Inject private ThemeManager themeManager;
     private final List<IntegrityMessage> messages;
     private final LibraryTab libraryTab;
+    private final DialogService dialogService;
     private IntegrityCheckDialogViewModel viewModel;
     private TableFilter<IntegrityMessage> tableFilter;
     private BibLogSettingsPane bibLogSettingsPane;
     private final List<IntegrityMessage> blgWarnings = new ArrayList<>();
-    public IntegrityCheckDialog(List<IntegrityMessage> messages, LibraryTab libraryTab) {
+    public IntegrityCheckDialog(List<IntegrityMessage> messages, LibraryTab libraryTab, DialogService dialogService) {
         this.messages = messages;
         this.libraryTab = libraryTab;
+        this.dialogService = dialogService;
+
         this.setTitle(Localization.lang("Check integrity"));
         this.initModality(Modality.NONE);
 
@@ -141,16 +145,23 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
      */
     private void loadBibLogSettingsPane() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("BibLogSettingsPane.fxml"));
-            Node settingsNode = loader.load();
-            bibLogSettingsPane = loader.getController();
-            bibLogSettingsPane.initialize(
-                    libraryTab.getBibDatabaseContext(),
-                    libraryTab.getDialogService(),
-                    this::reloadBlgWarnings
-            );
-            dialogVBox.getChildren().add(1, settingsNode);
-            reloadBlgWarnings();
+            FXMLLoader loader = new FXMLLoader();
+            try (var fxmlStream = getClass().getResourceAsStream("BibLogSettingsPane.fxml")) {
+                if (fxmlStream == null) {
+                    LOGGER.error("Could not find BibLogSettingsPane.fxml");
+                    return;
+                }
+
+                Node settingsNode = loader.load(fxmlStream);
+                bibLogSettingsPane = loader.getController();
+                bibLogSettingsPane.initialize(
+                        libraryTab.getBibDatabaseContext(),
+                        dialogService,
+                        this::reloadBlgWarnings
+                );
+                dialogVBox.getChildren().add(1, settingsNode);
+                reloadBlgWarnings();
+            }
         } catch (IOException e) {
             LOGGER.error("Failed to load BibLogSettingsPane", e);
         }
@@ -167,27 +178,19 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
      * 3. Replace old warnings and update the table.
      */
     private void reloadBlgWarnings() {
-        Optional<Path> maybeNewPath = bibLogSettingsPane.getViewModel().getResolvedBlgPath();
-        if (maybeNewPath.isEmpty()) {
-            return;
-        }
+        bibLogSettingsPane.getViewModel().getResolvedBlgPath().ifPresent(newBlgPath -> {
+            Optional<Path> lastPath = bibLogSettingsPane.getViewModel().getLastResolvedBlgPath();
+            if (lastPath.isPresent() && newBlgPath.equals(lastPath)) {
+                return;
+            }
+            List<IntegrityMessage> newWarnings = bibLogSettingsPane.getViewModel().getBlgWarnings(libraryTab.getBibDatabaseContext());
+            messages.removeAll(blgWarnings);
+            blgWarnings.clear();
+            blgWarnings.addAll(newWarnings);
+            messages.addAll(blgWarnings);
 
-        Path newBlgPath = maybeNewPath.get();
-        Optional<Path> lastPath = bibLogSettingsPane.getViewModel().getLastResolvedBlgPath();
-
-        if (lastPath.isPresent() && newBlgPath.equals(lastPath.get())) {
-            return;
-        }
-
-        List<IntegrityMessage> newWarnings =
-                bibLogSettingsPane.getViewModel().getBlgWarnings(libraryTab.getBibDatabaseContext());
-
-        messages.removeAll(blgWarnings);
-        blgWarnings.clear();
-        blgWarnings.addAll(newWarnings);
-        messages.addAll(blgWarnings);
-
-        viewModel = new IntegrityCheckDialogViewModel(messages);
-        messagesTable.setItems(viewModel.getMessages());
+            viewModel = new IntegrityCheckDialogViewModel(messages);
+            messagesTable.setItems(viewModel.getMessages());
+        });
     }
 }

@@ -1193,8 +1193,4 @@ public class LibraryTab extends Tab {
     public LibraryTabContainer getLibraryTabContainer() {
         return tabContainer;
     }
-
-    public DialogService getDialogService() {
-        return dialogService;
-    }
 }

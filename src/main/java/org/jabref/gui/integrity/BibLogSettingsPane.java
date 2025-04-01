@@ -1,12 +1,14 @@
 package org.jabref.gui.integrity;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 /**
@@ -31,28 +33,36 @@ public class BibLogSettingsPane {
 
     @FXML
     private void onBrowse() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select .blg file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("BibTeX log files", "*.blg"));
-        File selectedFile = fileChooser.showOpenDialog(null);
-        if (selectedFile != null) {
-            viewModel.setBlgFilePath(selectedFile.toPath());
-            if (onBlgPathChanged != null) {
-                // Notify Dialog to refresh
-                onBlgPathChanged.run();
-            }
-        }
+        FileDialogConfiguration fileDialogConfiguration = createBlgFileDialogConfig();
+        dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(path -> {
+            viewModel.setBlgFilePath(path);
+            notifyPathChanged();
+        });
     }
 
     @FXML
     private void onReset() {
         viewModel.resetBlgFilePath();
-        if (onBlgPathChanged != null) {
-            onBlgPathChanged.run();
-        }
+        notifyPathChanged();
     }
 
     public BibLogSettingsViewModel getViewModel() {
         return viewModel;
+    }
+
+    private FileDialogConfiguration createBlgFileDialogConfig() {
+        FileDialogConfiguration.Builder configBuilder = new FileDialogConfiguration.Builder();
+        Path initialDir = viewModel.getInitialDirectory();
+        configBuilder.withInitialDirectory(initialDir);
+        configBuilder.addExtensionFilter(
+                new FileChooser.ExtensionFilter(Localization.lang("BibTeX log files"), "*.blg")
+        );
+        return configBuilder.build();
+    }
+
+    private void notifyPathChanged() {
+        if (onBlgPathChanged != null) {
+            onBlgPathChanged.run();
+        }
     }
 }

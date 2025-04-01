@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -122,7 +123,13 @@ public class MetaDataParser {
             } else if (MetaData.FILE_DIRECTORY.equals(entry.getKey())) {
                 metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
             } else if (MetaData.BLG_FILE_PATH.equals(entry.getKey())) {
-                metaData.setBlgFilePath(Path.of(getSingleItem(values)));
+                try {
+                    String blgPathString = getSingleItem(values);
+                    metaData.setBlgFilePath(Path.of(blgPathString));
+                } catch (ParseException |
+                         InvalidPathException e) {
+                    LOGGER.warn("Invalid .blg file path in metadata: {}", values, e);
+                }
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);

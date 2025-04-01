@@ -16,6 +16,8 @@ import org.jabref.model.biblog.SeverityType;
  * Parses the contents of a .blg (BibTeX log) file to extract warning messages.
  */
 public class BibtexLogParser {
+    private static final Pattern WARNING_PATTERN = Pattern.compile("^Warning--(?<message>[a-zA-Z ]+) in (?<entryKey>[^\\s]+)$");
+
     public List<BibWarning> parseBiblog(Path blgFilePath) throws IOException {
         List<BibWarning> warnings = new ArrayList<>();
         List<String> lines = Files.readAllLines(blgFilePath);
@@ -40,11 +42,10 @@ public class BibtexLogParser {
      */
     private Optional<BibWarning> parseWarningLine(String line) {
         // TODO: Support additional warning formats
-        Pattern compile = Pattern.compile("^Warning--([a-zA-Z ]+) in ([^\\s]+)$");
-        Matcher matcher = compile.matcher(line);
+        Matcher matcher = WARNING_PATTERN.matcher(line);
         if (matcher.find()) {
-            String message = matcher.group(1).trim();
-            String entryKey = matcher.group(2);
+            String message = matcher.group("message").trim();
+            String entryKey = matcher.group("entryKey");
             String fieldName = null;
             if (message.startsWith("empty")) {
                 fieldName = message.substring("empty".length()).trim();

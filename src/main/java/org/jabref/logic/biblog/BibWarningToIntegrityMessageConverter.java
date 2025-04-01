@@ -2,7 +2,6 @@ package org.jabref.logic.biblog;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.model.biblog.BibWarning;
@@ -29,19 +28,16 @@ public class BibWarningToIntegrityMessageConverter {
     public static List<IntegrityMessage> convert(List<BibWarning> bibWarnings, BibDatabaseContext context) {
         List<IntegrityMessage> messages = new ArrayList<>();
         for (BibWarning bibWarning : bibWarnings) {
-            Optional<BibEntry> maybeEntry = context.getDatabase().getEntryByCitationKey(bibWarning.getEntryKey());
-            if (maybeEntry.isEmpty()) {
-                continue;
-            }
-            BibEntry entry = maybeEntry.get();
-            Field field = bibWarning.getFieldName()
-                    .map(FieldFactory::parseField)
-                    .orElse(InternalField.KEY_FIELD);
-            IntegrityMessage message = new IntegrityMessage(
-                    bibWarning.getMessage(),
-                    entry,
-                    field);
-            messages.add(message);
+            context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).ifPresent(entry -> {
+                Field field = bibWarning.getFieldName()
+                        .map(FieldFactory::parseField)
+                        .orElse(InternalField.KEY_FIELD);
+                IntegrityMessage message = new IntegrityMessage(
+                        bibWarning.message(),
+                        entry,
+                        field);
+                messages.add(message);
+            });
         }
         return messages;
     }

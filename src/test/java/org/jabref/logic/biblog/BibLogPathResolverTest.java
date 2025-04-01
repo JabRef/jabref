@@ -8,7 +8,6 @@ import org.jabref.model.metadata.MetaData;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BibLogPathResolverTest {
     /**
@@ -22,8 +21,7 @@ public class BibLogPathResolverTest {
 
         Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.of(Path.of("/library.bib")));
 
-        assertTrue(result.isPresent());
-        assertEquals(userBlgPath, result.get());
+        assertEquals(Optional.of(userBlgPath), result);
     }
 
     /**
@@ -36,8 +34,7 @@ public class BibLogPathResolverTest {
         Path bibPath = Path.of("/home/user/MyLibrary.bib");
         Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.of(bibPath));
 
-        assertTrue(result.isPresent());
-        assertEquals(Path.of("/home/user/MyLibrary.blg"), result.get());
+        assertEquals(Optional.of(Path.of("/home/user/MyLibrary.blg")), result);
     }
 
     /**
@@ -48,6 +45,6 @@ public class BibLogPathResolverTest {
         MetaData metaData = new MetaData();
         Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.empty());
 
-        assertTrue(result.isEmpty());
+        assertEquals(Optional.empty(), result);
     }
 }
