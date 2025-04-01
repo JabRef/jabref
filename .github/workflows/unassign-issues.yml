@@ -31,9 +31,9 @@ jobs:
               <summary>How to keep your assignment</summary>
 
               \
-              You can prevent automatic unassignment by:
+              If you are working on it, you can prevent automatic unassignment by:
 
-              - Making progress on the issue by submitting a draft PR
+              - Submitting a draft PR with your progress
               - Asking for the **{{{ pin_label }}}** label if you need more time
               </details>
 
