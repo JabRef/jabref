@@ -809,6 +809,7 @@ public class LibraryTab extends Tab {
         if (tableModel != null) {
             tableModel.unbind();
         }
+
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
@@ -976,7 +977,9 @@ public class LibraryTab extends Tab {
      */
     public void deleteEntry() {
         int entriesDeleted = doDeleteEntry(StandardActions.DELETE_ENTRY, mainTable.getSelectedEntries());
-        dialogService.notify(Localization.lang("Deleted %0 entry(s)", entriesDeleted));
+        if (entriesDeleted > 0) {
+            dialogService.notify(Localization.lang("Deleted %0 entry(s)", entriesDeleted));
+        }
     }
 
     public void deleteEntry(BibEntry entry) {

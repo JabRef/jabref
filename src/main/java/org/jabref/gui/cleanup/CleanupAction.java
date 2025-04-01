@@ -106,8 +106,10 @@ public class CleanupAction extends SimpleCommand {
 
     /**
      * Runs the cleanup on the entry and records the change.
+     *
+     * @return true iff entry was modified
      */
-    private void doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompound ce) {
+    private boolean doCleanup(BibDatabaseContext databaseContext, CleanupPreferences preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
@@ -123,6 +125,8 @@ public class CleanupAction extends SimpleCommand {
         }
 
         failures.addAll(cleaner.getFailures());
+
+        return !changes.isEmpty();
     }
 
     private void showResults() {
@@ -145,13 +149,12 @@ public class CleanupAction extends SimpleCommand {
 
     private void cleanup(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
         this.failures.clear();
-        NamedCompound ce = new NamedCompound(Localization.lang("Cleanup entries"));
 
-        for (BibEntry entry : stateManager.getSelectedEntries()) {
-            // undo granularity is on entry level
-            doCleanup(databaseContext, cleanupPreferences, entry, ce);
+        // undo granularity is on set of all entries
+        NamedCompound ce = new NamedCompound(Localization.lang("Clean up entries"));
 
-            if (ce.hasEdits()) {
+        for (BibEntry entry : List.copyOf(stateManager.getSelectedEntries())) {
+            if (doCleanup(databaseContext, cleanupPreferences, entry, ce)) {
                 modifiedEntriesCount++;
             }
         }

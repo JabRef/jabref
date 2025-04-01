@@ -260,6 +260,8 @@ public class JabRefGUI extends Application {
         LOGGER.debug("frame initialized");
 
         Platform.runLater(() -> mainFrame.handleUiCommands(uiCommands));
+
+        // Lifecycle note: after this method, #onShowing will be called
     }
 
     public void onShowing(WindowEvent event) {
@@ -270,6 +272,13 @@ public class JabRefGUI extends Application {
             && preferences.getWorkspacePreferences().shouldOpenLastEdited()) {
             mainFrame.openLastEditedDatabases();
         }
+
+        Platform.runLater(() -> {
+            // We need to check at this point, because here, all libraries are loaded (e.g., load previously opened libraries) and all UI commands (e.g., load libraries, blank workspace, ...) are handled.
+            if (stateManager.getOpenDatabases().isEmpty()) {
+                mainFrame.showWelcomeTab();
+            }
+        });
     }
 
     public void onCloseRequest(WindowEvent event) {

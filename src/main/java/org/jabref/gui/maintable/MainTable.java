@@ -12,6 +12,9 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -24,6 +27,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.ClipBoardManager;
@@ -35,11 +40,15 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.externalfiles.ExternalFilesEntryLinker;
+import org.jabref.gui.externalfiles.FindUnlinkedFilesAction;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.maintable.columns.LibraryColumn;
 import org.jabref.gui.maintable.columns.MainTableColumn;
+import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.ClipboardContentGenerator;
 import org.jabref.gui.search.MatchCategory;
@@ -49,11 +58,16 @@ import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.types.StandardEntryType;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
@@ -188,6 +202,32 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
         this.setItems(model.getEntriesFilteredAndSorted());
+
+        Button addExampleButton = new Button(Localization.lang("Add example entry"));
+        addExampleButton.getStyleClass().add("text-button-blue");
+        addExampleButton.setOnAction(event -> {
+            BibEntry entry = addExampleEntry();
+            libraryTab.showAndEdit(entry);
+        });
+
+        Button importPdfsButton = new Button(Localization.lang("Import existing PDFs"));
+        importPdfsButton.getStyleClass().add("text-button-blue");
+        importPdfsButton.setOnAction(event -> importPdfs());
+
+        Label noContentLabel = new Label(Localization.lang("No content in table"));
+        noContentLabel.getStyleClass().add("welcome-header-label");
+
+        HBox buttonBox = new HBox(20, addExampleButton, importPdfsButton);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        VBox placeholderBox = new VBox(15, noContentLabel, buttonBox);
+        placeholderBox.setAlignment(Pos.CENTER);
+
+        updatePlaceholder(placeholderBox);
+
+        database.getDatabase().getEntries().addListener((ListChangeListener<BibEntry>) change -> updatePlaceholder(placeholderBox));
+
+        this.getItems().addListener((ListChangeListener<BibEntryTableViewModel>) change -> updatePlaceholder(placeholderBox));
 
         // Enable sorting
         // Workaround for a JavaFX bug: https://bugs.openjdk.org/browse/JDK-8301761 (The sorting of the SortedList can become invalid)
@@ -330,6 +370,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenExternalFileAction openExternalFileActionFileAction = new OpenExternalFileAction(dialogService, stateManager, preferences, taskExecutor);
+        MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);
+        LookupIdentifierAction<DOI> lookupIdentifierAction = new LookupIdentifierAction<>(WebFetchers.getIdFetcherForIdentifier(DOI.class), stateManager, undoManager, dialogService, taskExecutor);
 
         this.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getCode() == KeyCode.ENTER) {
@@ -382,6 +424,15 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                     case OPEN_FILE:
                         openExternalFileActionFileAction.execute();
                         event.consume();
+                        break;
+                    case MERGE_WITH_FETCHED_ENTRY:
+                        mergeWithFetchedEntryAction.execute();
+                        event.consume();
+                        break;
+                    case LOOKUP_DOC_IDENTIFIER:
+                        lookupIdentifierAction.execute();
+                        event.consume();
+                        break;
                     default:
                         // Pass other keys to parent
                 }
@@ -522,5 +573,45 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     public void setCitationMergeMode(boolean citationMerge) {
         this.citationMergeMode = citationMerge;
+    }
+
+    private void updatePlaceholder(VBox placeholderBox) {
+       if (database.getDatabase().getEntries().isEmpty()) {
+           this.setPlaceholder(placeholderBox);
+       } else {
+           this.setPlaceholder(null);
+       }
+    }
+
+    private BibEntry addExampleEntry() {
+        BibEntry exampleEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker").withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software")
+                .withField(StandardField.JOURNAL, "TUGboat")
+                .withField(StandardField.VOLUME, "44")
+                .withField(StandardField.NUMBER, "3")
+                .withField(StandardField.PAGES, "441--447")
+                .withField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref")
+                .withField(StandardField.ISSN, "0896-3207")
+                .withField(StandardField.ISSUE, "138")
+                .withField(StandardField.YEAR, "2023");
+
+        database.getDatabase().insertEntry(exampleEntry);
+        return exampleEntry;
+    }
+
+    private void importPdfs() {
+        List<Path> fileDirectories = database.getFileDirectories(filePreferences);
+
+        if (fileDirectories.isEmpty()) {
+            dialogService.notify(
+                    Localization.lang("File directory is not set or does not exist.")
+            );
+            LibraryPropertiesAction libraryPropertiesAction = new LibraryPropertiesAction(stateManager);
+            libraryPropertiesAction.execute();
+            return;
+        }
+
+        FindUnlinkedFilesAction findUnlinkedFilesAction = new FindUnlinkedFilesAction(dialogService, stateManager);
+        findUnlinkedFilesAction.execute();
     }
 }
