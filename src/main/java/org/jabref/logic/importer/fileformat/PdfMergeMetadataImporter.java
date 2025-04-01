@@ -161,16 +161,66 @@ public class PdfMergeMetadataImporter extends PdfImporter {
     }
 
     private static BibEntry mergeCandidates(Stream<BibEntry> candidates) {
-        final BibEntry entry = new BibEntry();
-        candidates.forEach(entry::mergeWith);
+        // Convert the stream to a list so we can iterate over the list twice
+        List<BibEntry> candidateList = candidates.toList();
 
-        // Retain online links only
-        List<LinkedFile> onlineLinks = entry.getFiles().stream().filter(LinkedFile::isOnlineLink).toList();
+
+        BibEntry entry = new BibEntry();
+
+        //  Score titles to find the "best" title among candidates
+        int bestTitleScore = -1;
+        String bestTitle = null;
+
+        for (BibEntry candidate : candidateList) {
+            Optional<String> candidateTitle = candidate.getField(StandardField.TITLE);
+            if (candidateTitle.isPresent()) {
+                int score = calculateTitleScore(candidateTitle.get());
+                if (score > bestTitleScore) {
+                    bestTitleScore = score;
+                    bestTitle = candidateTitle.get();
+                }
+            }
+        }
+
+        // Merge all fields from the candidates, same as previous method
+        candidateList.forEach(entry::mergeWith);
+
+        // Override the best title we found
+        if (bestTitle != null) {
+            entry.setField(StandardField.TITLE, bestTitle);
+        }
+
+
+        List<LinkedFile> onlineLinks = entry.getFiles().stream()
+                .filter(LinkedFile::isOnlineLink)
+                .toList();
         entry.clearField(StandardField.FILE);
         entry.addFiles(onlineLinks);
 
         return entry;
     }
+
+    private static int calculateTitleScore(String Title) {
+        //for every word in the title, plus one point
+        int wordcount = Title.trim().split("\\s+").length;
+        if(wordcount > 35){
+            wordcount = -2; //super long titles are less favourable
+        }
+
+        //if the title ends in .ccc or .cccc where c is any alphabetic char, minus 10 points
+        int endsinExtension = Title.matches(".*\\.[a-zA-Z]{3,4}") ? -10 : 0;
+
+        int endsWithFileExtension = 0;
+
+        if (Title.matches("(?i).*(\\.(pdf|docx?|txt|jpg|png))$")){
+            //Check for some common file extensions, remove points if contains these common filepath endings.
+            endsWithFileExtension = -10; // subtract ten more points for file extension ending, very undesirable.
+        }
+        return wordcount + endsinExtension + endsWithFileExtension;
+    }
+
+
+
 
     /**
      * Imports the BibTeX data from the given PDF file and relativized the paths of each linked file based on the context and the file preferences.
