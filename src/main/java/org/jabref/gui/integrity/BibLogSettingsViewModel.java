@@ -36,15 +36,13 @@ public class BibLogSettingsViewModel {
         this.metaData = metaData;
         this.bibPath = bibPath;
 
-        Path resolvedPath = BibLogPathResolver.resolve(metaData, bibPath).orElse(null);
-        if (resolvedPath == null) {
-            return;
-        }
-        this.path.set(resolvedPath.toString());
-        if (metaData.getBlgFilePath().isEmpty()) {
-            metaData.setBlgFilePath(resolvedPath);
-            this.lastResolvedBlgPath = Optional.of(resolvedPath);
-        }
+        BibLogPathResolver.resolve(metaData, bibPath).ifPresent(resolvedPath -> {
+            this.path.set(resolvedPath.toString());
+            if (metaData.getBlgFilePath().isEmpty()) {
+                metaData.setBlgFilePath(resolvedPath);
+                this.lastResolvedBlgPath = Optional.of(resolvedPath);
+            }
+        });
     }
 
     public StringProperty pathProperty() {

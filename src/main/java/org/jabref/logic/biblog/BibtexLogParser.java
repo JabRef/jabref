@@ -43,20 +43,20 @@ public class BibtexLogParser {
     private Optional<BibWarning> parseWarningLine(String line) {
         // TODO: Support additional warning formats
         Matcher matcher = WARNING_PATTERN.matcher(line);
-        if (matcher.find()) {
-            String message = matcher.group("message").trim();
-            String entryKey = matcher.group("entryKey");
-            String fieldName = null;
-            if (message.startsWith("empty")) {
-                fieldName = message.substring("empty".length()).trim();
-            }
-            return Optional.of(new BibWarning(
-                    SeverityType.WARNING,
-                    message,
-                    fieldName,
-                    entryKey
-            ));
+        if (!matcher.find()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        String message = matcher.group("message").trim();
+        String entryKey = matcher.group("entryKey");
+        String fieldName = null;
+        if (message.startsWith("empty")) {
+            fieldName = message.substring("empty".length()).trim();
+        }
+        return Optional.of(new BibWarning(
+                SeverityType.WARNING,
+                message,
+                fieldName,
+                entryKey
+        ));
     }
 }

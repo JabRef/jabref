@@ -123,12 +123,17 @@ public class MetaDataParser {
             } else if (MetaData.FILE_DIRECTORY.equals(entry.getKey())) {
                 metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
             } else if (MetaData.BLG_FILE_PATH.equals(entry.getKey())) {
+                String blgPathString;
                 try {
-                    String blgPathString = getSingleItem(values);
+                    blgPathString = getSingleItem(values);
+                } catch (ParseException e) {
+                    LOGGER.warn("Invalid .blg metadata value (ParseException): {}", values, e);
+                    continue;
+                }
+                try {
                     metaData.setBlgFilePath(Path.of(blgPathString));
-                } catch (ParseException |
-                         InvalidPathException e) {
-                    LOGGER.warn("Invalid .blg file path in metadata: {}", values, e);
+                } catch (InvalidPathException e) {
+                    LOGGER.warn("Invalid .blg file path (InvalidPathException): {}", blgPathString, e);
                 }
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'

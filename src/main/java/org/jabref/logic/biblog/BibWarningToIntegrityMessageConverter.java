@@ -26,6 +26,9 @@ import org.jabref.model.entry.field.InternalField;
  */
 public class BibWarningToIntegrityMessageConverter {
     public static List<IntegrityMessage> convert(List<BibWarning> bibWarnings, BibDatabaseContext context) {
+        if (bibWarnings == null || context == null) {
+            return List.of();
+        }
         List<IntegrityMessage> messages = new ArrayList<>();
         for (BibWarning bibWarning : bibWarnings) {
             context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).ifPresent(entry -> {
