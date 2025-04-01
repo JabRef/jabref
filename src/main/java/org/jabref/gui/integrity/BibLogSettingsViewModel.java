@@ -76,8 +76,8 @@ public class BibLogSettingsViewModel {
      * Parses the .blg file (if it exists) into integrity messages.
      * Returns an empty list if the file doesn't exist or can't be read.
      *
-     * @param databaseContext the current database context used to resolve citation keys in warnings
-     * @return a list of {@link IntegrityMessage}s parsed from the .blg file, or an empty list if unavailable
+     * @param databaseContext the current database context used to resolve citation keys in warnings.
+     * @return a list of {@link IntegrityMessage}s parsed from the .blg file, or an empty list if unavailable.
      */
     public List<IntegrityMessage> getBlgWarnings(BibDatabaseContext databaseContext) {
         Optional<Path> resolved = BibLogPathResolver.resolve(metaData, bibPath)

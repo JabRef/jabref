@@ -38,7 +38,7 @@ public class BibWarningToIntegrityMessageConverterTest {
 
         assertEquals(2, messages.size());
 
-        IntegrityMessage msg1 = messages.get(0);
+        IntegrityMessage msg1 = messages.getFirst();
         assertEquals("empty journal", msg1.message());
         assertEquals(firstEntry, msg1.entry());
         assertEquals("journal", msg1.field().getName());
@@ -70,6 +70,6 @@ public class BibWarningToIntegrityMessageConverterTest {
         List<IntegrityMessage> messages = BibWarningToIntegrityMessageConverter.convert(warnings, context);
 
         assertEquals(1, messages.size());
-        assertEquals("Scholey_2013", messages.get(0).entry().getCitationKey().orElseThrow());
+        assertEquals("Scholey_2013", messages.getFirst().entry().getCitationKey().orElseThrow());
     }
 }
