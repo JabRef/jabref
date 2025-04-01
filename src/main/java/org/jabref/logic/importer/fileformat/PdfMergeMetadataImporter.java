@@ -200,7 +200,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         return entry;
     }
 
-    private static int calculateTitleScore(String Title) {
+    private static int calculateTitleScore(String title) {
         //for every word in the title, plus one point
         int wordcount = Title.trim().split("\\s+").length;
         if(wordcount > 35){
