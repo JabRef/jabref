@@ -19,13 +19,32 @@ jobs:
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 14
+          reminder_comment: |
+              ### ⏰ Assignment Reminder
+
+              Hi @{{ handle }}, this is a friendly reminder about your assignment to this issue.
+
+              > [!WARNING]
+              > This issue will be **automatically unassigned** in **{{ days_remaining }} days** if there's no activity.
+
+              <details open>
+              <summary>How to keep your assignment</summary>
+
+              \
+              If you are working on it, you can prevent automatic unassignment by:
+
+              - Submitting a draft PR with your progress
+              - Asking for the **{{{ pin_label }}}** label if you need more time
+              </details>
+
+              We appreciate your contribution and are here to help if needed!
+          days_until_unassign: 21
           unassigned_comment: |
             ### 📋 Assignment Update
 
             Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
 
-            <details open>
+            <details>
             <summary>Next steps</summary>
 
             \
