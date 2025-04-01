@@ -194,7 +194,7 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     if (toOnDragDropped != null) {
                         setOnDragDropped(event -> {
                             event.consume(); //This prevents cells from acting as drop targets
-                            getParent().requestFocus(); //At this point we're looking at the child, so we need to see its parent
+                            getParent().fireEvent(event); //At this point we're looking at the child, so we need to see its parent
                         });
                     }
                     if (toOnDragEntered != null) {
