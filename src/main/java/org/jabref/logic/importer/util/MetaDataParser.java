@@ -127,13 +127,13 @@ public class MetaDataParser {
                 try {
                     blgPathString = getSingleItem(values);
                 } catch (ParseException e) {
-                    LOGGER.warn("Invalid .blg metadata value (ParseException): {}", values, e);
+                    LOGGER.warn("Invalid .blg metadata value", e);
                     continue;
                 }
                 try {
                     metaData.setBlgFilePath(Path.of(blgPathString));
                 } catch (InvalidPathException e) {
-                    LOGGER.warn("Invalid .blg file path (InvalidPathException): {}", blgPathString, e);
+                    LOGGER.warn("Invalid .blg file path", e);
                 }
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
