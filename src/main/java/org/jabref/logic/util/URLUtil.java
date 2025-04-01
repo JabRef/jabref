@@ -29,10 +29,11 @@ public class URLUtil {
 
     /**
      * Cleans URLs returned by Google search.
-     * <example>
+     * <h4>Example</h4>
+     * <pre>{@code
      * If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
      * https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&&url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&ei=DifeVYHkDYWqU5W0j6gD&usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&sig2=0hSSMw9XZXL3HJWwEcJtOg
-     * </example>
+     * }</pre>
      *
      * @param url the Google search URL string
      * @return the cleaned Google URL or @code{url} if no search URL was detected

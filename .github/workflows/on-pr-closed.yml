@@ -13,21 +13,27 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Echo PR number and URL
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
       - name: Determine issue number
         id: get_issue_number
         uses: koppor/ticket-check-action@add-output
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
           bodyRegex: '#(?<ticketNumber>\d+)'
-          bodyURLRegex: 'http(s?):\/\/(github.com)(\/:owner)(\/:repo)(\/issues)\/(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - uses: actions/checkout@v4
       - name: Remove assignee
-        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }}
+        run: |
+          # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }} || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check assignees
@@ -42,19 +48,15 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Remove assigned label
+      - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
         if: steps.check_assignee.outputs.assigned == 'no'
-        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Remove pinned label
-        if: steps.check_assignee.outputs.assigned == 'no'
-        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📌 Pinned"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Remove FirstTimeCodeContribution label
-        if: steps.check_assignee.outputs.assigned == 'no'
-        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "FirstTimeCodeContribution"
+        run: |
+          set -e
+
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "🔔 reminder-sent"
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📌 Pinned"
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move issue to "Free to take" in "Good First Issues"
