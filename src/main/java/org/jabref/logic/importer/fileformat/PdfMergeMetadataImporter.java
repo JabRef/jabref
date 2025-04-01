@@ -208,7 +208,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         }
 
         //if the title ends in .ccc or .cccc where c is any alphabetic char, minus 10 points
-        int endsinExtension = Title.matches(".*\\.[a-zA-Z]{3,4}") ? -10 : 0;
+        int endsInExtension= title.matches(".*\\.[a-zA-Z]{3,4}") ? -10 : 0;
 
         int endsWithFileExtension = 0;
 
