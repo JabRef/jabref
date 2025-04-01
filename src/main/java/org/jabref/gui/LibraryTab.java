@@ -955,7 +955,7 @@ public class LibraryTab extends Tab {
         if (generalFileDirectory.isPresent()) {
             storagepath += generalFileDirectory.get();
         } else {
-            storagepath += preferences.getFilePreferences().getCopyLinkedFilesDirectoryPath();
+            storagepath += preferences.getFilePreferences().getLinkedFileDirectory();
         }
 
         Pattern pattern = Pattern.compile("/");

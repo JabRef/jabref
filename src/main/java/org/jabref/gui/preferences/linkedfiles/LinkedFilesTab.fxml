@@ -87,4 +87,8 @@
         <Label text="%Enter default database filepath:" GridPane.rowIndex="1"/>
         <TextField fx:id="copyLinkedFilesDirectoryPath" HBox.hgrow="ALWAYS"/>
     </HBox>
+
+    <Label text="%File directory pattern" GridPane.rowIndex="1"/>
+    <TextField fx:id="linkedFileDirectory" GridPane.columnIndex="1" GridPane.rowIndex="1"
+               prefWidth="300" minWidth="300" maxWidth="300"/>
 </fx:root>

@@ -37,10 +37,12 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
+    @FXML private TextField linkedFileDirectory;
+
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
     @FXML private CheckBox copyLinkedFiles;
-    @FXML private TextField CopyLinkedFilesDirectoryPath;
+    @FXML private TextField copyLinkedFilesDirectoryPath;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -70,7 +72,7 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         //added:
         copyLinkedFiles.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesProperty());
         //copyLinkedFiles.selectedProperty().set(true);
-        //CopyLinkedFilesDirectoryPath.textProperty().bindBidirectional(viewModel.CopyLinkedFilesDirectoryPathProperty());
+        copyLinkedFilesDirectoryPath.textProperty().bindBidirectional(viewModel.copyLinkedFilesDirectoryPathProperty());
 
 
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
@@ -82,6 +84,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
+        linkedFileDirectory.textProperty().bindBidirectional(viewModel.linkedFileDirectoryProperty());
+
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
 
         ActionFactory actionFactory = new ActionFactory();

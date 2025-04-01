@@ -25,6 +25,7 @@ public class FilePreferences {
     private final BooleanProperty storeFilesRelativeToBibFile = new SimpleBooleanProperty();
     private final StringProperty fileNamePattern = new SimpleStringProperty();
     private final StringProperty fileDirectoryPattern = new SimpleStringProperty();
+    private final StringProperty linkedFileDirectory = new SimpleStringProperty();
     private final BooleanProperty downloadLinkedFiles = new SimpleBooleanProperty();
     private final BooleanProperty fulltextIndexLinkedFiles = new SimpleBooleanProperty();
     private final ObjectProperty<Path> workingDirectory = new SimpleObjectProperty<>();
@@ -42,6 +43,7 @@ public class FilePreferences {
                            boolean storeFilesRelativeToBibFile,
                            String fileNamePattern,
                            String fileDirectoryPattern,
+                           String linkedFileDirectory,
                            boolean downloadLinkedFiles,
                            boolean fulltextIndexLinkedFiles,
                            Path workingDirectory,
@@ -57,6 +59,7 @@ public class FilePreferences {
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
         this.fileNamePattern.setValue(fileNamePattern);
         this.fileDirectoryPattern.setValue(fileDirectoryPattern);
+        this.linkedFileDirectory.setValue(linkedFileDirectory);
         this.downloadLinkedFiles.setValue(downloadLinkedFiles);
         this.fulltextIndexLinkedFiles.setValue(fulltextIndexLinkedFiles);
         this.workingDirectory.setValue(workingDirectory);
@@ -65,7 +68,7 @@ public class FilePreferences {
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
         this.copyLinkedFiles.setValue(copyLinkedFiles);
-        //this.CopyLinkedFilesDirectoryPath.setValue(CopyLinkedFilesDirectoryPath);
+        this.CopyLinkedFilesDirectoryPath.setValue(CopyLinkedFilesDirectoryPath);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
     }
 
@@ -121,12 +124,24 @@ public class FilePreferences {
         return fileDirectoryPattern.get();
     }
 
+    public String getLinkedFileDirectory() {
+        return linkedFileDirectory.get();
+    }
+
     public StringProperty fileDirectoryPatternProperty() {
         return fileDirectoryPattern;
     }
 
+    public StringProperty linkedFileDirectoryProperty() {
+        return linkedFileDirectory;
+    }
+
     public void setFileDirectoryPattern(String fileDirectoryPattern) {
         this.fileDirectoryPattern.set(fileDirectoryPattern);
+    }
+
+    public void setLinkedFileDirectory(String linkedFileDirectory) {
+        this.linkedFileDirectory.set(linkedFileDirectory);
     }
 
     public boolean shouldDownloadLinkedFiles() {
@@ -236,26 +251,18 @@ public class FilePreferences {
     public void copyLinkedFiles(boolean copyLinkedFiles) {
         this.copyLinkedFiles.set(copyLinkedFiles);
     }
-
     public String CopyLinkedFilesDirectoryPath() {
         return CopyLinkedFilesDirectoryPath.get();
     }
-
     //good
-    public StringProperty CopyLinkedFilesDirectoryPathProperty() {
+    public StringProperty copyLinkedFilesDirectoryPathProperty() {
         return CopyLinkedFilesDirectoryPath;
-    }
-
-    //good
+    }//good
     public String getCopyLinkedFilesDirectoryPath() {
         return CopyLinkedFilesDirectoryPath.get();
-    }
-
-    /*public void CopyLinkedFilesDirectoryPath(boolean CopyLinkedFilesDirectoryPath) {
-        this.CopyLinkedFilesDirectoryPath.set(CopyLinkedFilesDirectoryPath);
-    }*/
+    }//good
     public void setLinkedFilesPath (String directoryPath) {
         this.directoryPath.set(directoryPath);
-    }
+    }//good
 
 }

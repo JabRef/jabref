@@ -34,10 +34,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty fulltextIndex = new SimpleBooleanProperty();
     private final StringProperty fileNamePatternProperty = new SimpleStringProperty();
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
+    private final StringProperty linkedFileDirectoryProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
     private final BooleanProperty copyLinkedFilesProperty = new SimpleBooleanProperty();
-    private final StringProperty CopyLinkedFilesDirectoryPathProperty = new SimpleStringProperty();
+    private final StringProperty copyLinkedFilesDirectoryPathProperty = new SimpleStringProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -79,10 +80,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fulltextIndex.setValue(filePreferences.shouldFulltextIndexLinkedFiles());
         fileNamePatternProperty.setValue(filePreferences.getFileNamePattern());
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
+        linkedFileDirectoryProperty.setValue(filePreferences.getLinkedFileDirectory());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
         copyLinkedFilesProperty.setValue(filePreferences.copyLinkedFiles());
-        CopyLinkedFilesDirectoryPathProperty.setValue(filePreferences.getCopyLinkedFilesDirectoryPath());
+        copyLinkedFilesDirectoryPathProperty.setValue(filePreferences.getCopyLinkedFilesDirectoryPath());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -101,8 +103,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
+        filePreferences.setLinkedFileDirectory(linkedFileDirectoryProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
-        filePreferences.setLinkedFilesPath(CopyLinkedFilesDirectoryPathProperty.getValue());
+        filePreferences.setLinkedFilesPath(copyLinkedFilesDirectoryPathProperty.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -117,7 +120,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
         filePreferences.copyLinkedFiles(copyLinkedFilesProperty.getValue());
-        //filePreferences.CopyLinkedFilesDirectoryPath(CopyLinkedFilesDirectoryPathProperty.getValue());
+        //filePreferences.CopyLinkedFilesDirectoryPath(copyLinkedFilesDirectoryPathProperty.getValue());
 
     }
 
@@ -184,6 +187,10 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return fileDirectoryPatternProperty;
     }
 
+    public StringProperty linkedFileDirectoryProperty() {
+        return linkedFileDirectoryProperty;
+    }
+
     public BooleanProperty useMainFileDirectoryProperty() {
         return useMainFileDirectoryProperty;
     }
@@ -200,8 +207,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return this.copyLinkedFilesProperty;
     }
 
-    public StringProperty CopyLinkedFilesDirectoryPathProperty() {
-        return CopyLinkedFilesDirectoryPathProperty;
+    public StringProperty copyLinkedFilesDirectoryPathProperty() {
+        return copyLinkedFilesDirectoryPathProperty;
     }
 }
 
