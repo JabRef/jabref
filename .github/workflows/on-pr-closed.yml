@@ -13,6 +13,10 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Echo PR number and URL
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
       - name: Determine issue number
         id: get_issue_number
         uses: koppor/ticket-check-action@add-output
