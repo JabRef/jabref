@@ -212,7 +212,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
 
         int endsWithFileExtension = 0;
 
-        if (Title.matches("(?i).*(\\.(pdf|docx?|txt|jpg|png))$")){
+        if (title.matches("(?i).*(\\.(pdf|docx?|txt|jpg|png))$")){
             //Check for some common file extensions, remove points if contains these common filepath endings.
             endsWithFileExtension = -10; // subtract ten more points for file extension ending, very undesirable.
         }
