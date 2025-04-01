@@ -46,6 +46,8 @@ public class XmpUtilWriter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XmpUtilWriter.class);
 
+    private static final XmpUtilShared XMP_UTIL_SHARED = new XmpUtilShared();
+
     private final UnprotectTermsFormatter unprotectTermsFormatter = new UnprotectTermsFormatter();
     private final XmpPreferences xmpPreferences;
 
@@ -77,22 +79,6 @@ public class XmpUtilWriter {
                          BibDatabase database)
             throws IOException, TransformerException {
         writeXmp(file, List.of(entry), database);
-    }
-
-    /**
-     * Writes the information of the bib entry to the dublin core schema using
-     * a custom extractor.
-     *
-     * @param dcSchema Dublin core schema, which is filled with the bib entry.
-     * @param entry    The entry, which is added to the dublin core metadata.
-     * @param database An optional database which the given bibtex entries belong to, which will be used to
-     *                 resolve strings. If the database is null the strings will not be resolved.
-     */
-    private void writeToDCSchema(DublinCoreSchema dcSchema,
-                                 BibEntry entry,
-                                 BibDatabase database) {
-        BibEntry resolvedEntry = getDefaultOrDatabaseEntry(entry, database);
-        writeToDCSchema(dcSchema, resolvedEntry);
     }
 
     /**
@@ -137,7 +123,7 @@ public class XmpUtilWriter {
             meta = XMPMetadata.createXMPMetadata();
         } else {
             try {
-                meta = XmpUtilShared.parseXmpMetadata(metaRaw.createInputStream());
+                meta = XMP_UTIL_SHARED.parseXmpMetadata(metaRaw.createInputStream());
                 // In case, that the pdf file has no namespace definition for xmp,
                 // but metadata in a different format, the parser throws an exception
                 // Creating an empty xmp metadata element solves this problem
@@ -151,7 +137,7 @@ public class XmpUtilWriter {
 
         for (BibEntry entry : resolvedEntries) {
             DublinCoreSchema dcSchema = DublinCoreSchemaCustom.copyDublinCoreSchema(meta.createAndAddDublinCoreSchema());
-            writeToDCSchema(dcSchema, entry, null);
+            writeToDCSchema(dcSchema, entry);
         }
 
         // Save to stream and then input that stream to the PDF
@@ -221,7 +207,7 @@ public class XmpUtilWriter {
      * The method to write DublinCore is {@link DublinCoreExtractor#fillDublinCoreSchema()}
      *
      * @param document The pdf document to write to.
-     * @param entry    The Bibtex entry that is written into the PDF properties. *
+     * @param entry    The BibEntry that is written into the PDF properties.
      * @param database An optional database which the given bibtex entries belong to, which will be used to
      *                 resolve strings. If the database is null the strings will not be resolved.
      */
@@ -248,7 +234,7 @@ public class XmpUtilWriter {
                     case StandardField.FILE -> {
                     }
                     case null, default ->
-                            di.setCustomMetadataValue("bibtex/" + field, null);
+                            di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), null);
                 }
                 continue;
             }
@@ -265,12 +251,13 @@ public class XmpUtilWriter {
                         di.setKeywords(value);
                 case StandardField.ABSTRACT ->
                         di.setSubject(value);
-                // do not write file field
                 case StandardField.FILE -> {
+                    // do not write file field
                 }
-                case null, default ->
-                        resolvedEntry.getField(field).ifPresent(val -> di.setCustomMetadataValue("bibtex/" + field, val));
-                // We hit the case of an PDF-unsupported field --> write it directly
+                case null,
+                     default ->
+                        // We hit the case of an PDF-unsupported field --> write it directly
+                        resolvedEntry.getField(field).ifPresent(val -> di.setCustomMetadataValue(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName(), val));
             }
         }
         di.setCustomMetadataValue("bibtex/entrytype", resolvedEntry.getType().getDisplayName());

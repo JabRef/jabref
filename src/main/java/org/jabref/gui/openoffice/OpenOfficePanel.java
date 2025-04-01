@@ -407,8 +407,8 @@ public class OpenOfficePanel {
     }
 
     private void updateButtonAvailability() {
-        boolean isConnectedToDocument = (ooBase != null && !ooBase.isDocumentConnectionMissing());
-        boolean hasStyle = (currentStyle != null);
+        boolean isConnectedToDocument = ooBase != null && !ooBase.isDocumentConnectionMissing();
+        boolean hasStyle = currentStyle != null;
         boolean hasDatabase = !getBaseList().isEmpty();
         boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;

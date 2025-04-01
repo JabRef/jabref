@@ -42,13 +42,13 @@ class PdfEmbeddedBibFileImporterTest {
         Path file = Path.of(PdfEmbeddedBibFileImporterTest.class.getResource("mixedMetadata.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(StandardEntryType.Misc);
-        expected.setCitationKey("jabreftext2021");
-        expected.setField(StandardField.AUTHOR, "Someone embedded");
-        expected.setField(StandardField.TITLE, "I like beds");
-        expected.setField(StandardField.DOI, "10.1002/9781118257517");
-        expected.setField(StandardField.COMMENT, "From embedded bib");
+        BibEntry expected = new BibEntry(StandardEntryType.Misc)
+                .withCitationKey("jabreftext2021")
+                .withField(StandardField.AUTHOR, "Someone embedded")
+                .withField(StandardField.TITLE, "I like beds")
+                .withField(StandardField.DOI, "10.1002/9781118257517")
+                .withField(StandardField.COMMENT, "From embedded bib");
 
-        assertEquals(Collections.singletonList(expected), result);
+        assertEquals(List.of(expected), result);
     }
 }
