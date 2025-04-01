@@ -193,8 +193,8 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragDropped != null) {
                         setOnDragDropped(event -> {
-                            event.consume(); //This prevents cells from acting as drop targets
-                            getParent().fireEvent(event); //At this point we're looking at the child, so we need to see its parent
+                            event.consume(); // This prevents cells from acting as drop targets
+                            getParent().fireEvent(event); // At this point we're looking at the child, so we need to see its parent
                         });
                     }
                     if (toOnDragEntered != null) {
@@ -205,8 +205,8 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                     }
                     if (toOnDragOver != null) {
                         setOnDragOver(event -> {
-                            event.consume(); //This prevents cells from acting as drop targets
-                            getParent().fireEvent(event);  //At this point we're looking at the child, so we need to see its parent
+                            event.consume(); // This prevents cells from acting as drop targets
+                            getParent().fireEvent(event);  // At this point we're looking at the child, so we need to see its parent
                         });
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
