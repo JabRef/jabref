@@ -63,6 +63,9 @@ public class LibraryPropertiesView extends BaseDialog<LibraryPropertiesViewModel
     }
 
     private void savePreferencesAndCloseDialog() {
+        // Preferences will only be store if all properties are valid.
+        // This checks for any illegal settings in the tab, or if is ready to be closed.
+        // On pass, dialog will be closed after saving settings.
         if (viewModel.validateAllSettings()) {
             viewModel.storeAllSettings();
             close();
