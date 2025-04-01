@@ -181,7 +181,7 @@ dependencies {
     implementation "org.apache.lucene:lucene-analysis-common:$luceneVersion"
     implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.14.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
     implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
     implementation 'commons-logging:commons-logging:1.3.5'
@@ -206,7 +206,7 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.2'
     implementation 'org.antlr:antlr4-runtime:4.13.2'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.1.0.202411261347-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.2.0.202503040940-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.2'
@@ -246,7 +246,7 @@ dependencies {
     }
     implementation 'org.fxmisc.flowless:flowless:0.7.3'
     implementation 'org.fxmisc.richtext:richtextfx:0.11.4'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.95.0') {
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.96.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
@@ -264,7 +264,7 @@ dependencies {
         exclude group: 'com.squareup.okhttp3'
     }
 
-    implementation 'org.controlsfx:controlsfx:11.2.1'
+    implementation 'org.controlsfx:controlsfx:11.2.2'
 
     // region HTTP clients
     implementation 'org.jsoup:jsoup:1.19.1'
@@ -405,7 +405,7 @@ dependencies {
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.2.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
