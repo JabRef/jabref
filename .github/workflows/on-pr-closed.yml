@@ -31,7 +31,9 @@ jobs:
           outputOnly: true
       - uses: actions/checkout@v4
       - name: Remove assignee
-        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }}
+        run: |
+          # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }} || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check assignees
