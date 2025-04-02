@@ -200,4 +200,14 @@ public class ThreeWayMergeView extends VBox {
     public void saveConfiguration() {
         toolbar.saveToolbarConfiguration();
     }
+
+    /**
+     * Directs to the method autoSelectBetterValue() in FieldRowViewModel.java
+     * Select 'Better' values for each field row in the Entry
+     */
+    public void autoSelectBetterFields() {
+        for (FieldRowView row : fieldRows) {
+            row.autoSelectBetterValue_1();
+        }
+    }
 }

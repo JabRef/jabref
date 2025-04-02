@@ -30,6 +30,10 @@ import org.slf4j.LoggerFactory;
  */
 public class FieldRowView {
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldRowView.class);
+    private static final int YEAR_LOWER = 1800;
+    private static final int YEAR_DIF = 10;
+    private static final int YEAR_UPPER_DIF = 100;
+    private static final String MISC = "misc";
 
     protected final FieldRowViewModel viewModel;
 
@@ -211,5 +215,9 @@ public class FieldRowView {
     @Override
     public String toString() {
         return "FieldRowView [shouldShowDiffs=" + shouldShowDiffs.get() + ", fieldNameCell=" + fieldNameCell + ", leftValueCell=" + leftValueCell + ", rightValueCell=" + rightValueCell + ", mergedValueCell=" + mergedValueCell + "]";
+    }
+
+    public void autoSelectBetterValue_1() {
+        viewModel.autoSelectBetterValue();
     }
 }

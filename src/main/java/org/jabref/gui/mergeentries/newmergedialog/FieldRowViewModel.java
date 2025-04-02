@@ -1,5 +1,7 @@
 package org.jabref.gui.mergeentries.newmergedialog;
 
+import java.time.Year;
+
 import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -19,6 +21,7 @@ import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactor
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
@@ -37,6 +40,10 @@ public class FieldRowViewModel {
         NONE
     }
 
+    private static final int YEAR_LOWER = 1800;
+    private static final int YEAR_DIF = 10;
+    private static final int YEAR_UPPER_DIF = 100;
+    private static final String MISC = "misc";
     private final Logger LOGGER = LoggerFactory.getLogger(FieldRowViewModel.class);
     private final BooleanProperty isFieldsMerged = new SimpleBooleanProperty(Boolean.FALSE);
 
@@ -280,6 +287,45 @@ public class FieldRowViewModel {
             super.redo();
             setLeftFieldValue(mergedFields);
             setRightFieldValue(mergedFields);
+        }
+    }
+
+    /**
+     * Method for selecting the 'Better' year value.
+     * If the local year is out of a reasonable range (e.g., before 1800 or 100 years after current year as determined by the System Clock) or differs from the DOI year by more than 10 years, it will choose the more recent year out of the two.
+     */
+    public void autoSelectBetterValue() {
+        String leftVal = getLeftFieldValue();
+        String rightVal = getRightFieldValue();
+        if (leftVal == null || rightVal == null) {
+            return;
+        }
+        leftVal = leftVal.trim();
+        rightVal = rightVal.trim();
+
+        // Logic for auto selection based on field name
+        // Default is right value
+        if ((StandardField.YEAR) == field) {
+            try {
+                int leftYear = Integer.parseInt(leftVal);
+                int rightYear = Integer.parseInt(rightVal);
+                if (leftYear < YEAR_LOWER || leftYear > (Year.now().getValue() + YEAR_UPPER_DIF)) {
+                    selectRightValue(); // Select right value if left year is out of range, note that work created before Year 1800 will still be correctly processed
+                } else if (Math.abs(leftYear - rightYear) > YEAR_DIF) {
+                    // Select value based on a difference condition
+                    if (leftYear > rightYear) {
+                        selectLeftValue();
+                    } else {
+                        selectRightValue();
+                    }
+                }
+            } catch (NumberFormatException e) {
+                selectRightValue();
+            }
+        } else if ((StandardField.TYPE) == field) {
+            if (MISC.equalsIgnoreCase(leftVal)) {
+                selectRightValue(); // Select right value if left value is "misc"
+            }
         }
     }
 }

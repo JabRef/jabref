@@ -1,5 +1,6 @@
 package org.jabref.gui.mergeentries;
 
+import java.time.Year;
 import java.util.Optional;
 
 import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
@@ -29,6 +30,11 @@ public class FieldRowViewModelTest {
     BibEntry rightEntry;
 
     BibEntry extraEntry;
+    BibEntry extraEntry2;
+    BibEntry extraEntry3;
+    BibEntry extraEntry4;
+    BibEntry extraEntry5;
+    BibEntry extraEntry6;
 
     BibEntry mergedEntry;
 
@@ -70,6 +76,21 @@ public class FieldRowViewModelTest {
                 .withField(StandardField.TITLE, "A reconfigurable {FFT} architecture for variable-length and multi-streaming {OFDM} standards")
                 .withField(StandardField.KEYWORDS, "b, c, a")
                 .withField(StandardField.YEAR, "2013");
+
+        extraEntry2 = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.YEAR, "1750");
+
+        extraEntry3 = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.YEAR, String.valueOf(Year.now().getValue() + 110));
+
+        extraEntry4 = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.YEAR, "2001");
+
+        extraEntry5 = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.YEAR, "2022");
+
+        extraEntry6 = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.YEAR, "2011");
 
         mergedEntry = new BibEntry();
         fieldMergerFactory = new FieldMergerFactory(bibEntryPreferences);
@@ -124,6 +145,7 @@ public class FieldRowViewModelTest {
     void selectLeftValueShouldBeCorrect() {
         var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectLeftValue();
+
         assertEquals(FieldRowViewModel.Selection.LEFT, monthFieldViewModel.getSelection());
         assertEquals(Optional.of(""), Optional.ofNullable(monthFieldViewModel.getMergedFieldValue()));
 
@@ -215,7 +237,55 @@ public class FieldRowViewModelTest {
         assertEquals(oldRightGroups, groupsField.getRightFieldValue());
     }
 
+    @Test
+    void autoSelectBetterYearWhenMergingExistingYearOutOfBounds() {
+        var yearField = create2ndViewModelForField(StandardField.YEAR);
+        yearField.autoSelectBetterValue();
+
+        var yearField2 = create3rdViewModelForField(StandardField.YEAR);
+        yearField2.autoSelectBetterValue();
+
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField2.getSelection());
+    }
+
+    @Test
+    void autoSelectBetterYearWhenMergingExistingYearWithinBounds() {
+        var yearField = create4thViewModelForField(StandardField.YEAR);
+        yearField.autoSelectBetterValue();
+
+        var yearField2 = create5thViewModelForField(StandardField.YEAR);
+        yearField2.autoSelectBetterValue();
+
+        var yearField3 = create6thViewModelForField(StandardField.YEAR);
+        yearField3.autoSelectBetterValue();
+
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+        assertEquals(FieldRowViewModel.Selection.LEFT, yearField2.getSelection());
+        assertEquals(FieldRowViewModel.Selection.LEFT, yearField3.getSelection());
+    }
+
     public FieldRowViewModel createViewModelForField(Field field) {
         return new FieldRowViewModel(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+    }
+
+    public FieldRowViewModel create2ndViewModelForField(Field field) {
+        return new FieldRowViewModel(field, extraEntry2, extraEntry6, mergedEntry, fieldMergerFactory);
+    }
+
+    public FieldRowViewModel create3rdViewModelForField(Field field) {
+        return new FieldRowViewModel(field, extraEntry3, extraEntry6, mergedEntry, fieldMergerFactory);
+    }
+
+    public FieldRowViewModel create4thViewModelForField(Field field) {
+        return new FieldRowViewModel(field, extraEntry4, extraEntry, mergedEntry, fieldMergerFactory);
+    }
+
+    public FieldRowViewModel create5thViewModelForField(Field field) {
+        return new FieldRowViewModel(field, extraEntry5, extraEntry6, mergedEntry, fieldMergerFactory);
+    }
+
+    public FieldRowViewModel create6thViewModelForField(Field field) {
+        return new FieldRowViewModel(field, extraEntry, extraEntry5, mergedEntry, fieldMergerFactory);
     }
 }
