@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
+import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
@@ -13,6 +15,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Window;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
@@ -74,11 +77,17 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
         @Inject private DialogService dialogService;
 
+        private final List<String> citationKeyPatterns;
+        private final ContextMenu suggestionsList;
+        private int heightOfMenuItem;
+
         public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
             Injector.registerExistingAndInject(this);
 
             this.citationKeyPatterns = new ArrayList<>(citationKeyPatterns);
             this.suggestionsList = new ContextMenu();
+            // Initial reasonable estimate before the menu items are populated. We overwrite this dynamically
+            this.heightOfMenuItem = 30;
 
             setListener();
         }
@@ -116,7 +125,11 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
         private void populatePopup(List<String> searchResult) {
             List<CustomMenuItem> menuItems = new ArrayList<>();
-            int count = Math.min(searchResult.size(), MAX_ENTRIES);
+
+            double space = getAvailableSpaceBelow(this);
+            int maxItems = (int) (space / heightOfMenuItem) - 1;
+
+            int count = Math.min(searchResult.size(), maxItems);
 
             for (int i = 0; i < count; i++) {
                 final String result = searchResult.get(i);
@@ -135,6 +148,10 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
                 });
             }
 
+            if (!menuItems.isEmpty()) {
+                Platform.runLater(() -> heightOfMenuItem = (int) menuItems.getFirst().getContent().getBoundsInLocal().getHeight());
+            }
+
             suggestionsList.getItems().clear();
             suggestionsList.getItems().add(ALL_PATTERNS_POSITION, createPatternsSubMenu());
             suggestionsList.getItems().add(ALL_PATTERNS_POSITION + 1, createCompoundPatternsSubMenu());
@@ -143,6 +160,23 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             if (!menuItems.isEmpty()) {
                 menuItems.getFirst().getContent().requestFocus();
             }
+        }
+
+        public static double getAvailableSpaceBelow(TextField textField) {
+            if (textField.getScene() == null || textField.getScene().getWindow() == null) {
+                return 0;
+            }
+
+            Window window = textField.getScene().getWindow();
+            if (window == null) {
+                return 0;
+            }
+
+            Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());
+            double screenHeight = window.getHeight();
+            double textFieldBottom = bounds.getMinY() + textField.getHeight();
+
+            return screenHeight - (textFieldBottom - window.getY());
         }
 
         private Menu createPatternsSubMenu() {

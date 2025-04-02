@@ -1,0 +1,50 @@
+name: On issue unassigned
+
+on:
+  issues:
+     types:
+       - unassigned
+
+jobs:
+  ensure_column:
+    if: ${{ github.repository_owner == 'JabRef' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Move Issue to "Free to take" Column in "Candidates for University Projects"
+        uses: m7kvqbe1/github-action-move-issues@main
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: ""
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
+      - name: Move Issue to "Free to take" Column in "Good First Issues"
+        uses: m7kvqbe1/github-action-move-issues@main
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: ""
+          target-column: "Free to take"
+          ignored-columns: ""
+          default-column: "Free to take"
+          skip-if-not-in-project: true
+  remove_labels:
+    if: ${{ github.repository_owner == 'JabRef' }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove assigned label
+        run: gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove FirstTimeCodeContribution label
+        run: gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
