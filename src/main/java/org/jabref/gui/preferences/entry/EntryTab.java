@@ -84,7 +84,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
     }
 
     private void setupResolveTagsForFields() {
-            resolvableTagsForFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
+        resolvableTagsForFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
         resolvableTagsForFields.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
         resolvableTagsForFields.tagsProperty().bindBidirectional(viewModel.resolvableTagsForFieldsProperty());
         setupTagsForField(resolvableTagsForFields);
@@ -104,10 +104,11 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         tagsField.setOnMouseClicked(event -> tagsField.getEditor().requestFocus());
         tagsField.getEditor().getStyleClass().clear();
         tagsField.getEditor().getStyleClass().add("tags-field-editor");
-        tagsField.getEditor().focusedProperty().addListener((observable, oldValue, newValue) -> tagsField.pseudoClassStateChanged(FOCUSED, newValue));
+        tagsField.getEditor().focusedProperty().addListener((_, _, newValue) -> tagsField.pseudoClassStateChanged(FOCUSED, newValue));
     }
 
-    private Node createTag(TagsField<Field> tagsField, Field field) {
+    private Node createTag(TagsField<Field> tagsField, Field
+            field) {
         Label tagLabel = new Label();
         tagLabel.setText(field.getDisplayName());
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
