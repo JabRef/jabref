@@ -20,10 +20,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.texparser.CitationsDisplay;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DirectoryMonitorManager;
 
 import com.tobiasdiez.easybind.EasyBind;
 
@@ -41,12 +40,14 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     public LatexCitationsTab(GuiPreferences preferences,
                              DialogService dialogService,
-                             StateManager stateManager) {
+                             StateManager stateManager,
+                             DirectoryMonitor directoryMonitor) {
         this.stateManager = stateManager;
 
         this.viewModel = new LatexCitationsTabViewModel(
                 preferences,
-                dialogService);
+                dialogService,
+                directoryMonitor);
 
         this.searchPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
@@ -150,12 +151,8 @@ public class LatexCitationsTab extends EntryEditorTab {
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (stateManager.activeTabProperty().get().isPresent()) {
-            BibDatabaseContext databaseContext = stateManager.activeTabProperty().get()
-                                                             .map(LibraryTab::getBibDatabaseContext)
-                                                             .orElse(new BibDatabaseContext());
-            DirectoryMonitorManager directoryMonitorManager = stateManager.activeTabProperty().get().get()
-                                                                          .getDirectoryMonitorManager();
-            viewModel.bindToEntry(databaseContext, directoryMonitorManager, entry);
+            LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
+            viewModel.bindToEntry(libraryTab, entry);
         }
     }
 

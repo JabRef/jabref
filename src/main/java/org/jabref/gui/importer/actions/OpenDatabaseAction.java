@@ -23,6 +23,7 @@ import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -67,6 +68,7 @@ public class OpenDatabaseAction extends SimpleCommand {
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final DialogService dialogService;
+    private final DirectoryMonitor directoryMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final CountingUndoManager undoManager;
     private final ClipBoardManager clipboardManager;
@@ -78,6 +80,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                               DialogService dialogService,
                               StateManager stateManager,
                               FileUpdateMonitor fileUpdateMonitor,
+                              DirectoryMonitor directoryMonitor,
                               BibEntryTypesManager entryTypesManager,
                               CountingUndoManager undoManager,
                               ClipBoardManager clipBoardManager,
@@ -88,6 +91,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
+        this.directoryMonitor = directoryMonitor;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
         this.clipboardManager = clipBoardManager;
@@ -234,6 +238,7 @@ public class OpenDatabaseAction extends SimpleCommand {
                 stateManager,
                 tabContainer,
                 fileUpdateMonitor,
+                directoryMonitor,
                 entryTypesManager,
                 undoManager,
                 clipboardManager,

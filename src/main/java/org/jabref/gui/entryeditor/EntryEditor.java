@@ -52,6 +52,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -112,6 +113,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private StateManager stateManager;
     @Inject private ThemeManager themeManager;
     @Inject private FileUpdateMonitor fileMonitor;
+    @Inject private DirectoryMonitor directoryMonitor;
     @Inject private CountingUndoManager undoManager;
     @Inject private BibEntryTypesManager bibEntryTypesManager;
     @Inject private KeyBindingRepository keyBindingRepository;
@@ -332,7 +334,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 stateManager,
                 libraryTab.searchQueryProperty());
         tabs.add(sourceTab);
-        tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager));
+        tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, libraryTab.searchQueryProperty()));
         tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, preferences));
         tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, taskExecutor));

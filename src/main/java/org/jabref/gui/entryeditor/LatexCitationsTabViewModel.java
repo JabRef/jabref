@@ -20,13 +20,14 @@ import javafx.scene.input.MouseEvent;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.push.PushToTeXstudio;
 import org.jabref.gui.texparser.CitationsDisplay;
-import org.jabref.gui.util.DefaultDirectoryMonitor;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultLatexParser;
@@ -36,7 +37,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
-import org.jabref.model.util.DirectoryMonitorManager;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -61,36 +61,35 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     private final GuiPreferences preferences;
     private final DialogService dialogService;
-    private final ObjectProperty<Path> directory;
-    private final ObservableList<Citation> citationList;
-    private final ObjectProperty<Status> status;
-    private final StringProperty searchError;
-    private final BooleanProperty updateStatusOnCreate;
+
+    private final ObjectProperty<Path> directory = new SimpleObjectProperty<>();
+    private final ObservableList<Citation> citationList = FXCollections.observableArrayList();
+    private final ObjectProperty<Status> status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
+    private final StringProperty searchError = new SimpleStringProperty("");
+    private final BooleanProperty updateStatusOnCreate = new SimpleBooleanProperty(false);
+
     private final DefaultLatexParser latexParser;
     private final LatexParserResults latexFiles;
+    private final DirectoryMonitor directoryMonitor;
     private final FileAlterationListener listener;
 
     private FileAlterationObserver observer;
     private BibEntry currentEntry;
-    private DirectoryMonitorManager directoryMonitorManager;
-    private BibDatabaseContext databaseContext;
+    private BibDatabaseContext currentDatabaseContext;
 
     public LatexCitationsTabViewModel(GuiPreferences preferences,
-                                      DialogService dialogService) {
+                                      DialogService dialogService,
+                                      DirectoryMonitor directoryMonitor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.directory = new SimpleObjectProperty<>(FileUtil.getInitialDirectory(new BibDatabaseContext(), preferences.getFilePreferences().getWorkingDirectory()));
+        this.directoryMonitor = directoryMonitor;
 
-        this.citationList = FXCollections.observableArrayList();
-        this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
-        this.searchError = new SimpleStringProperty("");
-        this.updateStatusOnCreate = new SimpleBooleanProperty(false);
         this.latexParser = new DefaultLatexParser();
         this.latexFiles = new LatexParserResults();
         this.listener = new CitationsAlterationListener();
 
-        this.directoryMonitorManager = new DirectoryMonitorManager(new DefaultDirectoryMonitor());
-        this.databaseContext = new BibDatabaseContext();
+        this.currentDatabaseContext = new BibDatabaseContext();
+        this.directory.set(FileUtil.getInitialDirectory(currentDatabaseContext, preferences.getFilePreferences().getWorkingDirectory()));
     }
 
     public void handleMouseClick(MouseEvent event, CitationsDisplay citationsDisplay) {
@@ -109,22 +108,13 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
     }
 
-    public void bindToEntry(BibDatabaseContext newDatabaseContext, DirectoryMonitorManager newDirectoryMonitorManager, BibEntry entry) {
-        this.databaseContext = newDatabaseContext;
-        this.directoryMonitorManager = newDirectoryMonitorManager;
+    public void bindToEntry(LibraryTab libraryTab, BibEntry entry) {
+        currentDatabaseContext = libraryTab.getBibDatabaseContext();
 
         checkAndUpdateDirectory();
 
         currentEntry = entry;
         Optional<String> citationKey = entry.getCitationKey();
-
-        if (observer == null) {
-            observer = FileAlterationObserver.builder()
-                                             .setRootEntry(new FileEntry(directory.get().toFile()))
-                                             .setFileFilter(FILE_FILTER)
-                                             .getUnchecked();
-            directoryMonitorManager.addObserver(observer, listener);
-        }
 
         if (citationKey.isPresent()) {
             citationList.setAll(latexFiles.getCitationsByKey(citationKey.get()));
@@ -142,31 +132,33 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                databaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
+                currentDatabaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
 
         checkAndUpdateDirectory();
     }
 
     private void checkAndUpdateDirectory() {
-        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
+        Path newDirectory = currentDatabaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                  .orElse(FileUtil.getInitialDirectory(currentDatabaseContext, preferences.getFilePreferences().getWorkingDirectory()));
 
-        if (newDirectory.equals(directory.get())) {
-            return;
+        if (!newDirectory.equals(directory.get()) || observer == null) {
+            status.set(Status.IN_PROGRESS);
+            updateStatusOnCreate.set(false);
+            citationList.clear();
+            latexFiles.clear();
+            directoryMonitor.removeObserver(observer);
+
+            directory.set(newDirectory);
+            setAlterationObserver();
         }
+    }
 
-        status.set(Status.IN_PROGRESS);
-        updateStatusOnCreate.set(false);
-        citationList.clear();
-        latexFiles.clear();
-
-        directoryMonitorManager.removeObserver(observer); // FIXME Runaway process
-        directory.set(newDirectory);
+    private void setAlterationObserver() {
         observer = FileAlterationObserver.builder()
                                          .setRootEntry(new FileEntry(directory.get().toFile()))
                                          .setFileFilter(FILE_FILTER)
                                          .getUnchecked();
-        directoryMonitorManager.addObserver(observer, listener);
+        directoryMonitor.addObserver(observer, listener);
     }
 
     private void updateStatus() {

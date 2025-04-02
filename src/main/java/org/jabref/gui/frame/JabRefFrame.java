@@ -54,6 +54,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -222,6 +223,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 preferences,
                 aiService,
                 fileUpdateMonitor,
+                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
@@ -500,6 +502,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
+                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -577,6 +580,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,
+                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
