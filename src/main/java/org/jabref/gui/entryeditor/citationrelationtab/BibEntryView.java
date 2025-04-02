@@ -98,7 +98,7 @@ public class BibEntryView {
             );
             webView.setPrefSize(200, 38);
             return webView;
-        } else if (fieldName.equals("summary")) {
+        } else if ("summary".equals(fieldName)) {
             return new TextFlowLimited(new Text(text));
         } else {
             Label label = new Label(text);
