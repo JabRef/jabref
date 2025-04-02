@@ -73,13 +73,10 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         private final List<String> citationKeyPatterns;
         private final ContextMenu suggestionsList;
         private int selectionCount = 0;
+        private int heightOfMenuItem;
         private final StringBuilder selectedPatterns = new StringBuilder();
 
         @Inject private DialogService dialogService;
-
-        private final List<String> citationKeyPatterns;
-        private final ContextMenu suggestionsList;
-        private int heightOfMenuItem;
 
         public CitationKeyPatternSuggestionTextField(List<String> citationKeyPatterns) {
             Injector.registerExistingAndInject(this);
