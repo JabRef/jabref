@@ -31,6 +31,7 @@ import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 import com.tobiasdiez.easybind.optional.OptionalWrapper;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -418,8 +419,8 @@ public class MetaData {
         return Optional.ofNullable(blgFilePathMap.get(user));
     }
 
-    public void setBlgFilePath(String user, Path path) {
-        blgFilePathMap.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+    public void setBlgFilePath(@Nonnull String user, @Nonnull Path path) {
+        blgFilePathMap.put(user, path);
         postChange();
     }
 

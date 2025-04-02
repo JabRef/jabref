@@ -46,12 +46,14 @@ public class BibtexLogParser {
         if (!matcher.find()) {
             return Optional.empty();
         }
+
         String message = matcher.group("message").trim();
         String entryKey = matcher.group("entryKey");
         String fieldName = null;
         if (message.startsWith("empty")) {
             fieldName = message.substring("empty".length()).trim();
         }
+
         return Optional.of(new BibWarning(
                 SeverityType.WARNING,
                 message,

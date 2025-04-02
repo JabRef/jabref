@@ -1,6 +1,7 @@
 package org.jabref.gui.integrity;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -61,8 +62,6 @@ public class BibLogSettingsPane {
     }
 
     private void notifyPathChanged() {
-        if (onBlgPathChanged != null) {
-            onBlgPathChanged.run();
-        }
+        Optional.ofNullable(onBlgPathChanged).ifPresent(Runnable::run);
     }
 }

@@ -29,6 +29,7 @@ public class BibWarningToIntegrityMessageConverter {
         if (bibWarnings == null || context == null) {
             return List.of();
         }
+
         List<IntegrityMessage> messages = new ArrayList<>();
         for (BibWarning bibWarning : bibWarnings) {
             context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).ifPresent(entry -> {

@@ -280,11 +280,11 @@ public class MetaDataParser {
         try {
             values = getAsList(entry.getValue());
         } catch (ParseException e) {
-            LOGGER.warn("Invalid .blg metadata format for user {}: {}", user, entry.getValue(), e);
+            LOGGER.error("Invalid .blg metadata format for user {}: {}", user, entry.getValue(), e);
             return;
         }
         if (values.size() != 1) {
-            LOGGER.warn("Expected single .blg path entry for user {}, but got {}", user, values);
+            LOGGER.error("Expected single .blg path entry for user {}, but got {}", user, values);
             return;
         }
         String pathStr = values.getFirst();
@@ -292,7 +292,8 @@ public class MetaDataParser {
             Path path = Path.of(pathStr);
             metaData.setBlgFilePath(user, path);
         } catch (Exception e) {
-            LOGGER.warn("Invalid .blg file path for user {}: {}", user, pathStr, e);
+            LOGGER.error("Invalid .blg file path for user {}: {}", user, pathStr, e);
+            return;
         }
     }
 }
