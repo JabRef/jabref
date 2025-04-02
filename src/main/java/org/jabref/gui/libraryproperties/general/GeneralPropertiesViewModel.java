@@ -213,7 +213,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
         try {
             Path path = Path.of(directoryPath);
-            if (!(Files.exists(path) && Files.isDirectory(path))) {
+            if (!Files.isDirectory(path)) {
                 return ValidationMessage.error(
                         Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
                 );
