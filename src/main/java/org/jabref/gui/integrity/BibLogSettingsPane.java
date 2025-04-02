@@ -56,7 +56,7 @@ public class BibLogSettingsPane {
         Path initialDir = viewModel.getInitialDirectory();
         configBuilder.withInitialDirectory(initialDir);
         configBuilder.addExtensionFilter(
-                new FileChooser.ExtensionFilter(Localization.lang("%BibTeX log files"), "*.blg")
+                new FileChooser.ExtensionFilter(Localization.lang("BibTeX log files"), "*.blg")
         );
         return configBuilder.build();
     }
