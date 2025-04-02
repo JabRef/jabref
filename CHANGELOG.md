@@ -61,7 +61,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - A tooltip now appears after 300ms (instead of 2s). [#12649](https://github.com/JabRef/jabref/issues/12649)
 - We improved search in preferences and keybindings. [#12647](https://github.com/JabRef/jabref/issues/12647)
 - We improved the performance of the LibreOffice integration when inserting CSL citations/bibliography. [#12851](https://github.com/JabRef/jabref/pull/12851)
-- Keywords field are now displayed as tags. [#10910](https://github.com/JabRef/jabref/pull/10910)
 - 'Affected fields' and 'Do not wrap when saving' are now displayed as tags. [#12550](https://github.com/JabRef/jabref/issues/12550)
 
 ### Fixed

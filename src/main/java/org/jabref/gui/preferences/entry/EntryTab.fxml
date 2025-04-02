@@ -35,10 +35,6 @@
         </padding>
     </HBox>
 
-<!--    <HBox alignment="CENTER_LEFT" spacing="10.0">
-        <Label text="%Do not wrap when saving"/>
-        <TextField fx:id="nonWrappableFields" HBox.hgrow="ALWAYS"/>
-    </HBox>-->
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Do not wrap when saving"/>
         <TagsField fx:id="nonWrappableFields" HBox.hgrow="ALWAYS">
