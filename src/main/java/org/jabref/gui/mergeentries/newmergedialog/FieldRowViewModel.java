@@ -21,6 +21,7 @@ import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactor
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
 
@@ -294,12 +295,6 @@ public class FieldRowViewModel {
      * If the local year is out of a reasonable range (e.g., before 1800 or 100 years after current year as determined by the System Clock) or differs from the DOI year by more than 10 years, it will choose the more recent year out of the two.
      */
     public void autoSelectBetterValue() {
-        String field_1 = getField().getDisplayName();
-        if (field_1 == null) {
-            return;
-        }
-        field_1 = field_1.trim().toLowerCase();
-
         String leftVal = getLeftFieldValue();
         String rightVal = getRightFieldValue();
         if (leftVal == null || rightVal == null) {
@@ -310,7 +305,7 @@ public class FieldRowViewModel {
 
         // Logic for auto selection based on field name
         // Default is right value
-        if ("year".equals(field_1)) {
+        if ((StandardField.YEAR).equals(field)) {
             try {
                 int leftYear = Integer.parseInt(leftVal);
                 int rightYear = Integer.parseInt(rightVal);
@@ -327,7 +322,7 @@ public class FieldRowViewModel {
             } catch (NumberFormatException e) {
                 selectRightValue();
             }
-        } else if ("type".equals(field_1)) {
+        } else if ((StandardField.TYPE).equals(field)) {
             if (MISC.equalsIgnoreCase(leftVal)) {
                 selectRightValue(); // Select right value if left value is "misc"
             }
