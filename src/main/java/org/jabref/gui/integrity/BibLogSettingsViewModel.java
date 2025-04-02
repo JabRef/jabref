@@ -29,17 +29,20 @@ public class BibLogSettingsViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibLogSettingsViewModel.class);
     private final MetaData metaData;
     private final Optional<Path> bibPath;
+    private final String user;
     private final StringProperty path = new SimpleStringProperty("");
     private Optional<Path> lastResolvedBlgPath = Optional.empty();
 
     public BibLogSettingsViewModel(MetaData metaData, Optional<Path> bibPath) {
         this.metaData = metaData;
         this.bibPath = bibPath;
+        this.user = System.getProperty("user.name");
 
-        BibLogPathResolver.resolve(metaData, bibPath).ifPresent(resolvedPath -> {
+        BibLogPathResolver.resolve(metaData, bibPath, user)
+                          .ifPresent(resolvedPath -> {
             this.path.set(resolvedPath.toString());
-            if (metaData.getBlgFilePath().isEmpty()) {
-                metaData.setBlgFilePath(resolvedPath);
+            if (metaData.getBlgFilePath(user).isEmpty()) {
+                metaData.setBlgFilePath(user, resolvedPath);
                 this.lastResolvedBlgPath = Optional.of(resolvedPath);
             }
         });
@@ -50,21 +53,27 @@ public class BibLogSettingsViewModel {
     }
 
     public void setBlgFilePath(Path path) {
-        metaData.setBlgFilePath(path);
+        metaData.setBlgFilePath(user, path);
         this.path.set(path.toString());
+        this.lastResolvedBlgPath = Optional.of(path);
     }
 
     public void resetBlgFilePath() {
-        metaData.clearBlgFilePath();
-        BibLogPathResolver.resolve(metaData, bibPath)
-                          .map(Path::toString)
-                          .ifPresentOrElse(
-                                  this.path::set,
-                                  () -> this.path.set(""));
+        metaData.clearBlgFilePath(user);
+        Optional<Path> resolved = BibLogPathResolver.resolve(metaData, bibPath, user);
+        if (resolved.isEmpty()) {
+            path.set("");
+            lastResolvedBlgPath = Optional.empty();
+            return;
+        }
+
+        Path resolvedPath = resolved.get();
+        path.set(resolvedPath.toString());
+        lastResolvedBlgPath = Optional.of(resolvedPath);
     }
 
     public Optional<Path> getResolvedBlgPath() {
-        return BibLogPathResolver.resolve(metaData, bibPath)
+        return BibLogPathResolver.resolve(metaData, bibPath, user)
                                  .filter(Files::exists);
     }
 
@@ -80,8 +89,7 @@ public class BibLogSettingsViewModel {
      * @return a list of {@link IntegrityMessage}s parsed from the .blg file, or an empty list if unavailable.
      */
     public List<IntegrityMessage> getBlgWarnings(BibDatabaseContext databaseContext) {
-        Optional<Path> resolved = BibLogPathResolver.resolve(metaData, bibPath)
-                                                    .filter(Files::exists);
+        Optional<Path> resolved = getResolvedBlgPath();
         if (resolved.isEmpty()) {
             return List.of();
         }

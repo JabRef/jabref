@@ -3,7 +3,6 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -122,19 +121,8 @@ public class MetaDataParser {
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
             } else if (MetaData.FILE_DIRECTORY.equals(entry.getKey())) {
                 metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
-            } else if (MetaData.BLG_FILE_PATH.equals(entry.getKey())) {
-                String blgPathString;
-                try {
-                    blgPathString = getSingleItem(values);
-                } catch (ParseException e) {
-                    LOGGER.warn("Invalid .blg metadata value for key {} with values: {}", entry.getKey(), values, e);
-                    continue;
-                }
-                try {
-                    metaData.setBlgFilePath(Path.of(blgPathString));
-                } catch (InvalidPathException e) {
-                    LOGGER.warn("Invalid .blg file path: {} (parsed from metadata key {})", blgPathString, entry.getKey(), e);
-                }
+            } else if (entry.getKey().startsWith(MetaData.BLG_FILE_PATH + "-")) {
+                handleBlgFilePathEntry(entry, metaData);
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
@@ -277,6 +265,34 @@ public class MetaDataParser {
         } else {
             // return default actions
             return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
+        }
+    }
+
+    /**
+     * Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
+     *
+     * @param entry the metadata entry containing the user-specific .blg path.
+     * @param metaData the MetaData object to update.
+     */
+    private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {
+        String user = entry.getKey().substring(MetaData.BLG_FILE_PATH.length() + 1);
+        List<String> values;
+        try {
+            values = getAsList(entry.getValue());
+        } catch (ParseException e) {
+            LOGGER.warn("Invalid .blg metadata format for user {}: {}", user, entry.getValue(), e);
+            return;
+        }
+        if (values.size() != 1) {
+            LOGGER.warn("Expected single .blg path entry for user {}, but got {}", user, values);
+            return;
+        }
+        String pathStr = values.getFirst();
+        try {
+            Path path = Path.of(pathStr);
+            metaData.setBlgFilePath(user, path);
+        } catch (Exception e) {
+            LOGGER.warn("Invalid .blg file path for user {}: {}", user, pathStr, e);
         }
     }
 }

@@ -66,6 +66,7 @@ public class MetaData {
 
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
+    private final Map<String, Path> blgFilePathMap = new HashMap<>();
     private Optional<Version> groupSearchSyntaxVersion = Optional.empty();
 
     private Charset encoding;
@@ -80,7 +81,6 @@ public class MetaData {
     private boolean isEventPropagationEnabled = true;
     private boolean encodingExplicitlySupplied;
     private String versionDBStructure;
-    private Optional<Path> blgFilePath = Optional.empty();
 
     /**
      * Constructs an empty metadata.
@@ -414,15 +414,21 @@ public class MetaData {
         return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 
-    public Optional<Path> getBlgFilePath() {
-        return blgFilePath;
+    public Optional<Path> getBlgFilePath(String user) {
+        return Optional.ofNullable(blgFilePathMap.get(user));
     }
 
-    public void setBlgFilePath(Path path) {
-        this.blgFilePath = Optional.ofNullable(path);
+    public void setBlgFilePath(String user, Path path) {
+        blgFilePathMap.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+        postChange();
     }
 
-    public void clearBlgFilePath() {
-        this.blgFilePath = Optional.empty();
+    public void clearBlgFilePath(String user) {
+        blgFilePathMap.remove(user);
+        postChange();
+    }
+
+    public Map<String, Path> getBlgFilePaths() {
+        return blgFilePathMap;
     }
 }

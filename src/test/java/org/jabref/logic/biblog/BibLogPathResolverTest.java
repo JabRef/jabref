@@ -10,17 +10,18 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BibLogPathResolverTest {
+    private static final String TEST_USER = "testUser";
     /**
      * Returns the user-defined .blg path if it's set.
      */
     @Test
     void returnsUserDefinedBlgPathIfPresent() {
         MetaData metaData = new MetaData();
+
         Path userBlgPath = Path.of("/custom/path/output.blg");
-        metaData.setBlgFilePath(userBlgPath);
+        metaData.setBlgFilePath(TEST_USER, userBlgPath);
 
-        Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.of(Path.of("/library.bib")));
-
+        Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.of(Path.of("/library.bib")), TEST_USER);
         assertEquals(Optional.of(userBlgPath), result);
     }
 
@@ -32,7 +33,7 @@ public class BibLogPathResolverTest {
         MetaData metaData = new MetaData(); // no blg path set
 
         Path bibPath = Path.of("/home/user/MyLibrary.bib");
-        Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.of(bibPath));
+        Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.of(bibPath), TEST_USER);
 
         assertEquals(Optional.of(Path.of("/home/user/MyLibrary.blg")), result);
     }
@@ -43,8 +44,7 @@ public class BibLogPathResolverTest {
     @Test
     void returnsEmptyWhenNoUserPathAndNoBibPath() {
         MetaData metaData = new MetaData();
-        Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.empty());
-
+        Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.empty(), TEST_USER);
         assertEquals(Optional.empty(), result);
     }
 }
