@@ -137,8 +137,9 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         List<Field> suggestions = FieldFactory.getAllFieldsWithOutInternal().stream()
                                               .filter(field -> field.getDisplayName().toLowerCase().contains(request.toLowerCase()))
                                               .collect(Collectors.toList());
-        if (suggestions.isEmpty())
+        if (suggestions.isEmpty()) {
             suggestions.add(FieldFactory.parseField(request.trim()));
+        }
         return suggestions;
     }
 }

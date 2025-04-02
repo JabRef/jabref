@@ -107,8 +107,7 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         tagsField.getEditor().focusedProperty().addListener((_, _, newValue) -> tagsField.pseudoClassStateChanged(FOCUSED, newValue));
     }
 
-    private Node createTag(TagsField<Field> tagsField, Field
-            field) {
+    private Node createTag(TagsField<Field> tagsField, Field field) {
         Label tagLabel = new Label();
         tagLabel.setText(field.getDisplayName());
         tagLabel.setGraphic(IconTheme.JabRefIcons.REMOVE_TAGS.getGraphicNode());
