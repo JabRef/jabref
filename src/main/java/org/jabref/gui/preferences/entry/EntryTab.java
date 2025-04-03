@@ -11,6 +11,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
+import javafx.scene.input.KeyCode;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -33,8 +34,8 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
 
     @FXML private CheckBox resolveStrings;
 
-    @FXML private TagsField<Field> resolvableTagsForFields;
-    @FXML private TagsField<Field> nonWrappableFields;
+    @FXML private TagsField<Field> resolvableTagsField;
+    @FXML private TagsField<Field> nonWrappableTagsField;
 
     @FXML private CheckBox markOwner;
     @FXML private TextField markOwnerName;
@@ -67,8 +68,11 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         keywordSeparator.setTextFormatter(formatter);
 
         resolveStrings.selectedProperty().bindBidirectional(viewModel.resolveStringsProperty());
-        setupResolveTagsForFields();
-        setupNonWrappableFields();
+
+        setupTagsField(resolvableTagsField);
+        setupTagsField(nonWrappableTagsField);
+        resolvableTagsField.tagsProperty().bindBidirectional(viewModel.resolvableTagsFieldProperty());
+        nonWrappableTagsField.tagsProperty().bindBidirectional(viewModel.nonWrappableTagsFieldProperty());
 
         markOwner.selectedProperty().bindBidirectional(viewModel.markOwnerProperty());
         markOwnerName.textProperty().bindBidirectional(viewModel.markOwnerNameProperty());
@@ -83,28 +87,25 @@ public class EntryTab extends AbstractPreferenceTabView<EntryTabViewModel> imple
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.OWNER, dialogService, preferences.getExternalApplicationsPreferences()), markOwnerHelp);
     }
 
-    private void setupResolveTagsForFields() {
-        resolvableTagsForFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
-        resolvableTagsForFields.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
-        resolvableTagsForFields.tagsProperty().bindBidirectional(viewModel.resolvableTagsForFieldsProperty());
-        setupTagsForField(resolvableTagsForFields);
-    }
-
-    private void setupNonWrappableFields() {
-        nonWrappableFields.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
-        nonWrappableFields.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
-        nonWrappableFields.tagsProperty().bindBidirectional(viewModel.nonWrappableFieldsProperty());
-        setupTagsForField(nonWrappableFields);
-    }
-
-    private void setupTagsForField(TagsField<Field> tagsField) {
-        tagsField.setConverter(viewModel.getFieldStringConverter());
+    private void setupTagsField(TagsField<Field> tagsField) {
+        tagsField.setCellFactory(new ViewModelListCellFactory<Field>().withText(Field::getDisplayName));
         tagsField.setTagViewFactory(field -> createTag(tagsField, field));
+
+        tagsField.setSuggestionProvider(request -> viewModel.getSuggestions(request.getUserText()));
+        tagsField.setConverter(viewModel.getFieldStringConverter());
+
         tagsField.setShowSearchIcon(false);
         tagsField.setOnMouseClicked(event -> tagsField.getEditor().requestFocus());
         tagsField.getEditor().getStyleClass().clear();
         tagsField.getEditor().getStyleClass().add("tags-field-editor");
         tagsField.getEditor().focusedProperty().addListener((_, _, newValue) -> tagsField.pseudoClassStateChanged(FOCUSED, newValue));
+
+        tagsField.getEditor().setOnKeyReleased(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                tagsField.commit();
+                event.consume();
+            }
+        });
     }
 
     private Node createTag(TagsField<Field> tagsField, Field field) {

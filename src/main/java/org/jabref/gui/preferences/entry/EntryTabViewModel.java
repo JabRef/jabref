@@ -27,8 +27,8 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     private final BooleanProperty resolveStringsProperty = new SimpleBooleanProperty();
 
-    private final ListProperty<Field> resolvableTagsForFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ListProperty<Field> nonWrappableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> resolvableTagsFieldProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<Field> nonWrappableTagsFieldProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private final BooleanProperty markOwnerProperty = new SimpleBooleanProperty();
     private final StringProperty markOwnerNameProperty = new SimpleStringProperty("");
@@ -53,8 +53,8 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         keywordSeparatorProperty.setValue(bibEntryPreferences.getKeywordSeparator().toString());
 
         resolveStringsProperty.setValue(fieldPreferences.shouldResolveStrings());
-        resolvableTagsForFieldsProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getResolvableFields()));
-        nonWrappableFieldsProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getNonWrappableFields()));
+        resolvableTagsFieldProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getResolvableFields()));
+        nonWrappableTagsFieldProperty.setValue(FXCollections.observableArrayList(fieldPreferences.getNonWrappableFields()));
 
         markOwnerProperty.setValue(ownerPreferences.isUseOwner());
         markOwnerNameProperty.setValue(ownerPreferences.getDefaultOwner());
@@ -69,8 +69,8 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         bibEntryPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));
 
         fieldPreferences.setResolveStrings(resolveStringsProperty.getValue());
-        fieldPreferences.setResolvableFields(resolvableTagsForFieldsProperty.getValue());
-        fieldPreferences.setNonWrappableFields(resolvableTagsForFieldsProperty.getValue());
+        fieldPreferences.setResolvableFields(resolvableTagsFieldProperty.getValue());
+        fieldPreferences.setNonWrappableFields(resolvableTagsFieldProperty.getValue());
 
         ownerPreferences.setUseOwner(markOwnerProperty.getValue());
         ownerPreferences.setDefaultOwner(markOwnerNameProperty.getValue());
@@ -88,12 +88,12 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         return resolveStringsProperty;
     }
 
-    public ListProperty<Field> resolvableTagsForFieldsProperty() {
-        return resolvableTagsForFieldsProperty;
+    public ListProperty<Field> resolvableTagsFieldProperty() {
+        return resolvableTagsFieldProperty;
     }
 
-    public ListProperty<Field> nonWrappableFieldsProperty() {
-        return nonWrappableFieldsProperty;
+    public ListProperty<Field> nonWrappableTagsFieldProperty() {
+        return nonWrappableTagsFieldProperty;
     }
 
     // Entry owner
@@ -137,7 +137,12 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
         List<Field> suggestions = FieldFactory.getAllFieldsWithOutInternal().stream()
                                               .filter(field -> field.getDisplayName().toLowerCase().contains(request.toLowerCase()))
                                               .collect(Collectors.toList());
-        suggestions.add(FieldFactory.parseField(request.trim()));
+
+        Field requestedField = FieldFactory.parseField(request.trim());
+        if (!suggestions.contains(requestedField)) {
+            suggestions.addFirst(requestedField);
+        }
+
         return suggestions;
     }
 }

@@ -24,7 +24,7 @@
     <CheckBox fx:id="resolveStrings" text="%Resolve BibTeX strings"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Affected fields"/>
-        <TagsField fx:id="resolvableTagsForFields" HBox.hgrow="ALWAYS"
+        <TagsField fx:id="resolvableTagsField" HBox.hgrow="ALWAYS"
                    disable="${!resolveStrings.selected}">
             <HBox.margin>
                 <Insets top="-4.0"/>
@@ -37,7 +37,7 @@
 
     <HBox alignment="CENTER_LEFT" spacing="10.0">
         <Label text="%Do not wrap when saving"/>
-        <TagsField fx:id="nonWrappableFields" HBox.hgrow="ALWAYS">
+        <TagsField fx:id="nonWrappableTagsField" HBox.hgrow="ALWAYS">
         </TagsField>
     </HBox>
 
