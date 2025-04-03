@@ -35,6 +35,7 @@ import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
@@ -117,7 +118,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.setContextMenuEnabled(false);
         previewView.getEngine().setJavaScriptEnabled(true);
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
@@ -237,7 +238,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        if (!searchQueryProperty.get().isBlank()) {
+        if (StringUtil.isNotBlank(searchQueryProperty.get())) {
             SearchQuery searchQuery = new SearchQuery(searchQueryProperty.get());
             String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQuery);
             Platform.runLater(() -> previewView.getEngine().loadContent(highlightedHtml));
