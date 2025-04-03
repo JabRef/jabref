@@ -331,8 +331,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 dialogService,
                 bibEntryTypesManager,
                 keyBindingRepository,
-                stateManager,
-                libraryTab.searchQueryProperty());
+                stateManager);
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, libraryTab.searchQueryProperty()));

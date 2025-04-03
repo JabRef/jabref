@@ -64,8 +64,7 @@ class SourceTabTest {
                 mock(DialogService.class),
                 mock(BibEntryTypesManager.class),
                 keyBindingRepository,
-                mock(StateManager.class),
-                OptionalObjectProperty.empty());
+                mock(StateManager.class));
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),

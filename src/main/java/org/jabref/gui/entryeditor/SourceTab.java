@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -31,7 +32,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -50,6 +50,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
@@ -76,7 +77,6 @@ public class SourceTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private final StateManager stateManager;
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
@@ -89,8 +89,7 @@ public class SourceTab extends EntryEditorTab {
                      DialogService dialogService,
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
-                     StateManager stateManager,
-                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                     StateManager stateManager) {
         this.stateManager = stateManager;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
@@ -100,7 +99,6 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
-        this.searchQueryProperty = searchQueryProperty;
 
         EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
             if (library.isEmpty()) {
@@ -113,7 +111,7 @@ public class SourceTab extends EntryEditorTab {
                 this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
             }
         });
-        searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightSearchPattern());
+        stateManager.searchQueryProperty().addListener((_, _, _) -> Platform.runLater(this::highlightSearchPattern));
     }
 
     private void highlightSearchPattern() {
@@ -122,11 +120,12 @@ public class SourceTab extends EntryEditorTab {
         }
 
         codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
-        if (searchQueryProperty.get().isEmpty()) {
+        if (StringUtil.isBlank(stateManager.searchQueryProperty().get())) {
             return;
         }
 
-        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQueryProperty.get().get());
+        SearchQuery searchQuery = new SearchQuery(stateManager.searchQueryProperty().get());
+        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQuery);
         searchTermsMap.forEach((optionalField, terms) -> {
             Optional<String> searchPattern = Highlighter.buildSearchPattern(terms);
             if (searchPattern.isEmpty()) {
@@ -260,7 +259,7 @@ public class SourceTab extends EntryEditorTab {
             try {
                 codeArea.appendText(getSourceString(currentEntry, mode, fieldPreferences));
                 codeArea.setEditable(true);
-                highlightSearchPattern();
+                Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
                 codeArea.appendText(ex.getMessage() + "\n\n" +
