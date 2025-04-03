@@ -15,7 +15,6 @@ import org.jabref.model.entry.field.StandardField;
 
 // Undo redo stuff
 public class UndoableAbbreviator {
-
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final AbbreviationType abbreviationType;
     private final boolean useFJournalField;
@@ -46,23 +45,29 @@ public class UndoableAbbreviator {
             text = database.resolveForStrings(text);
         }
 
-        Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
+        String newText;
 
-        if (foundAbbreviation.isEmpty()) {
-            return false; // Unknown, cannot abbreviate anything.
+        if (abbreviationType == AbbreviationType.LTWA) {
+            newText = journalAbbreviationRepository.getLtwaAbbreviation(text);
+        } else {
+            Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
+
+            if (foundAbbreviation.isEmpty()) {
+                return false; // Unknown, cannot abbreviate anything.
+            }
+
+            Abbreviation abbreviation = foundAbbreviation.get();
+            newText = getAbbreviatedName(abbreviation);
+
+            // Store full name into fjournal but only if it exists
+            if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
+                entry.setField(AMSField.FJOURNAL, abbreviation.getName());
+                ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
+            }
         }
-
-        Abbreviation abbreviation = foundAbbreviation.get();
-        String newText = getAbbreviatedName(abbreviation);
 
         if (newText.equals(origText)) {
             return false;
-        }
-
-        // Store full name into fjournal but only if it exists
-        if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
-            entry.setField(AMSField.FJOURNAL, abbreviation.getName());
-            ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
         }
 
         entry.setField(fieldName, newText);

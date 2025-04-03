@@ -6,5 +6,6 @@ package org.jabref.gui.journals;
 public enum AbbreviationType {
     DEFAULT,
     DOTLESS,
-    SHORTEST_UNIQUE
+    SHORTEST_UNIQUE,
+    LTWA
 }

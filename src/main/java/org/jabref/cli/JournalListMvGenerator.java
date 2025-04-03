@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.AbbreviationRepositoryLoader;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -55,7 +55,7 @@ public class JournalListMvGenerator {
                     System.out.println(" ignored");
                 } else {
                     System.out.println("...");
-                    Collection<Abbreviation> abbreviations = AbbreviationRepositoryLoader.readAbbreviationsFromCsvFile(path);
+                    Collection<Abbreviation> abbreviations = JournalAbbreviationLoader.readAbbreviationsFromCsvFile(path);
                     Map<String, Abbreviation> abbreviationMap = abbreviations
                             .stream()
                             .collect(Collectors.toMap(

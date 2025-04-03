@@ -16,12 +16,12 @@ import org.slf4j.LoggerFactory;
  * A repository for LTWA (List of Title Word Abbreviations) entries.
  * Provides methods for retrieving and applying abbreviations based on LTWA rules.
  */
+@SuppressWarnings("checkstyle:RegexpMultiline")
 public class LtwaRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaRepository.class);
     private static final Pattern INFLECTION = Pattern.compile("[ieasn'’]{1,3}");
     private static final Pattern BOUNDARY = Pattern.compile("[\\s\\u2013\\u2014_.,:;!|=+*\\\\/\"()&#%@$?]");
 
-    private final MVStore store;
     private final PrefixTree<LtwaEntry> prefix = new PrefixTree<>();
     private final PrefixTree<LtwaEntry> suffix = new PrefixTree<>();
 
@@ -31,8 +31,7 @@ public class LtwaRepository {
      * @param ltwaListFile Path to the LTWA MVStore file
      */
     public LtwaRepository(Path ltwaListFile) {
-        try {
-            this.store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open();
+        try (var store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open()) {
             MVMap<String, LtwaEntry> prefixMap = store.openMap("Prefixes");
             MVMap<String, LtwaEntry> suffixMap = store.openMap("Suffixes");
 
@@ -56,6 +55,8 @@ public class LtwaRepository {
             throw new IllegalStateException("Could not load LTWA repository", e);
         }
     }
+
+    public LtwaRepository() { }
 
     /**
      * Abbreviates a given title using the ISO4 rules.
@@ -138,7 +139,7 @@ public class LtwaRepository {
                                                    return isSuffixA ? 1 : -1;
                                                }
 
-                                           // Longer first
+                                               // Longer first
                                                int lengthComparison = a.word().length() - b.word().length();
                                                if (lengthComparison != 0) {
                                                    return lengthComparison;
@@ -169,12 +170,6 @@ public class LtwaRepository {
         }
 
         return result.toString();
-    }
-
-    public void close() {
-        if (store != null && !store.isClosed()) {
-            store.close();
-        }
     }
 
     private static String restoreCapitalizationAndDiacritics(String abbreviation, String original) {
