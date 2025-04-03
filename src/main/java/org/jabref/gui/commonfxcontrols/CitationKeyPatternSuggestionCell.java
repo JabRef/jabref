@@ -131,7 +131,6 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             for (int i = 0; i < count; i++) {
                 final String result = searchResult.get(i);
                 Label entryLabel = new Label(result);
-                entryLabel.setPrefWidth(getWidth());
 
                 CustomMenuItem item = new CustomMenuItem(entryLabel, true);
                 item.setHideOnClick(false);
