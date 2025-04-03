@@ -45,25 +45,19 @@ public class UndoableAbbreviator {
             text = database.resolveForStrings(text);
         }
 
-        String newText;
+        Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
 
-        if (abbreviationType == AbbreviationType.LTWA) {
-            newText = journalAbbreviationRepository.getLtwaAbbreviation(text);
-        } else {
-            Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
+        if (foundAbbreviation.isEmpty() && abbreviationType != AbbreviationType.LTWA) {
+            return false; // Unknown, cannot abbreviate anything.
+        }
 
-            if (foundAbbreviation.isEmpty()) {
-                return false; // Unknown, cannot abbreviate anything.
-            }
+        String newText = abbreviationType == AbbreviationType.LTWA ? journalAbbreviationRepository.getLtwaAbbreviation(text) : getAbbreviatedName(foundAbbreviation.get());
 
-            Abbreviation abbreviation = foundAbbreviation.get();
-            newText = getAbbreviatedName(abbreviation);
-
-            // Store full name into fjournal but only if it exists
-            if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
-                entry.setField(AMSField.FJOURNAL, abbreviation.getName());
-                ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
-            }
+        // Store full name into fjournal but only if it exists
+        if (useFJournalField && foundAbbreviation.isPresent() && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
+            String fullName = foundAbbreviation.get().getName();
+            entry.setField(AMSField.FJOURNAL, fullName);
+            ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, fullName));
         }
 
         if (newText.equals(origText)) {

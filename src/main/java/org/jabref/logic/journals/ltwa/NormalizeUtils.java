@@ -7,10 +7,16 @@ public class NormalizeUtils {
     public static final Pattern BOUNDARY = Pattern.compile("[-\\s\\u2013\\u2014_.,:;!|=+*\\\\/\"()&#%@$?]");
 
     public static String toNFKC(String input) {
+        if (input == null) {
+            return null;
+        }
         return Normalizer.normalize(input, Normalizer.Form.NFKC);
     }
 
     public static String normalize(String input) {
+        if (input == null) {
+            return null;
+        }
         return Normalizer.normalize(input, Normalizer.Form.NFD)
         .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
     }

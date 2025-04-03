@@ -50,9 +50,6 @@ public class LtwaRepository {
             }
 
             LOGGER.debug("Loaded LTWA repository with {} prefixes and {} suffixes", prefixMap.size(), suffixMap.size());
-        } catch (Exception e) {
-            LOGGER.error("Failed to load LTWA repository", e);
-            throw new IllegalStateException("Could not load LTWA repository", e);
         }
     }
 

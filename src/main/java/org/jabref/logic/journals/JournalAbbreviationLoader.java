@@ -51,7 +51,7 @@ public class JournalAbbreviationLoader {
                 tempJournalList.toFile().deleteOnExit();
             }
         } catch (IOException e) {
-            LOGGER.error("Error while copying journal list", e);
+            LOGGER.error("Error while loading journal abbreviation repository", e);
             return null;
         }
 
@@ -73,11 +73,11 @@ public class JournalAbbreviationLoader {
         return repository;
     }
 
-    private static LtwaRepository loadLtwaRepository() {
+    private static LtwaRepository loadLtwaRepository() throws IOException {
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/ltwa-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no ltwa-list.mv. We cannot load the LTWA repository.");
-                return null;
+                throw new IOException("LTWA repository not found");
             } else {
                 Path tempDir = Files.createTempDirectory("jabref-ltwa");
                 Path tempLtwaList = tempDir.resolve("ltwa-list.mv");
@@ -87,9 +87,6 @@ public class JournalAbbreviationLoader {
                 tempLtwaList.toFile().deleteOnExit();
                 return ltwaRepository;
             }
-        } catch (IOException e) {
-            LOGGER.error("Error while copying LTWA list", e);
-            return null;
         }
     }
 

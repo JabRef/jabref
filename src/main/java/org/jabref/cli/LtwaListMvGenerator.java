@@ -27,7 +27,7 @@ public class LtwaListMvGenerator {
 
     public static void main(String[] args) {
         try {
-            Path tempCsvFile = downloadLtwaFile(LTWA_URL);
+            Path tempCsvFile = downloadLtwaFile();
             Path outputDir = Path.of("build", "resources", "main", "journals");
             Files.createDirectories(outputDir);
             Path outputFile = outputDir.resolve("ltwa-list.mv");
@@ -37,28 +37,29 @@ public class LtwaListMvGenerator {
             // Delete temp file
             Files.deleteIfExists(tempCsvFile);
 
-            LOGGER.info("LTWA MVStore file generated successfully at {}", outputFile);
-        } catch (IOException e) {
-            LOGGER.error("Error generating LTWA MVStore file", e);
+            LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile);
+        } catch (
+                IOException e) {
+            LOGGER.error("Error generating LTWA MVStore file.", e);
         }
     }
 
     /**
      * Downloads the LTWA CSV file from the specified URL.
      *
-     * @param url URL of the LTWA CSV file
      * @return Path to the downloaded file
      * @throws IOException If an I/O error occurs
      */
-    private static Path downloadLtwaFile(String url) throws IOException {
-        LOGGER.info("Downloading LTWA file from {}", url);
-        try (var in = URI.create(url).toURL().openStream()) {
-            return Files.writeString(
-                    Files.createTempFile("ltwa", ".csv"),
-                    new String(in.readAllBytes()),
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
-        }
+    private static Path downloadLtwaFile() throws IOException {
+        LOGGER.info("Downloading LTWA file from {}.", LtwaListMvGenerator.LTWA_URL);
+        var in = URI.create(LtwaListMvGenerator.LTWA_URL).toURL().openStream();
+        var path = Files.writeString(
+                Files.createTempFile("ltwa", ".csv"),
+                new String(in.readAllBytes()),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
+        in.close();
+        return path;
     }
 
     /**
