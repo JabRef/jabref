@@ -502,6 +502,42 @@ tasks.register("generateJournalListMV", JavaExec) {
 jar.dependsOn("generateJournalListMV")
 compileTestJava.dependsOn("generateJournalListMV")
 
+tasks.register('downloadLtwaFile') {
+    group = "JabRef"
+    description = "Downloads the LTWA file for journal abbreviations"
+    doLast {
+        def ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
+        def ltwaDir = file("build/resources/main/journals")
+        def ltwaCsvFile = file("${ltwaDir}/ltwa_20210702.csv")
+
+        if (!ltwaCsvFile.exists()) {
+            mkdir(ltwaDir)
+            ant.get(src: ltwaUrl, dest: ltwaCsvFile, verbose: true)
+            logger.lifecycle("Downloaded LTWA file to ${ltwaCsvFile}")
+        } else {
+            logger.lifecycle("LTWA file already exists at ${ltwaCsvFile}")
+        }
+    }
+    onlyIf {
+        !file("build/resources/main/journals/ltwa_20210702.csv").exists()
+    }
+}
+
+tasks.register('generateLtwaListMV', JavaExec) {
+    group = "JabRef"
+    description = "Converts the LTWA CSV file to a H2 MVStore"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "org.jabref.cli.LtwaListMvGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    dependsOn('downloadLtwaFile')
+    onlyIf {
+        !file("build/resources/main/journals/ltwa-list.mv").exists()
+    }
+}
+
+jar.dependsOn("generateLtwaListMV")
+compileTestJava.dependsOn("generateLtwaListMV")
+
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the citavi importer."
