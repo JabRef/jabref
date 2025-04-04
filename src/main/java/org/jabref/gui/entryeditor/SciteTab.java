@@ -97,14 +97,7 @@ public class SciteTab extends EntryEditorTab {
         Label titleLabel = new Label(Localization.lang("Tallies for %0", tallModel.doi()));
         titleLabel.getStyleClass().add("scite-tallies-label");
         Text message = new Text(Localization.lang(
-                """
-                Total Citations: %0
-                Supporting: %1
-                Contradicting: %2
-                Mentioning: %3
-                Unclassified: %4
-                Citing Publications: %5
-                """,
+                "Total Citations: %0\nSupporting: %1\nContradicting: %2\nMentioning: %3\nUnclassified: %4\nCiting Publications: %5",
                 tallModel.total(),
                 tallModel.supporting(),
                 tallModel.contradicting(),
