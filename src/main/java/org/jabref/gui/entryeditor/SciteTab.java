@@ -1,9 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-
 import javafx.geometry.HPos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -22,6 +18,9 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.EasyBind;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.controlsfx.control.HyperlinkLabel;
 
 /**
@@ -44,7 +43,7 @@ public class SciteTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.sciteResultsPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
-        setText(NAME);
+        setText(Localization.lang("Citation information"));
         setTooltip(new Tooltip(Localization.lang("Search scite.ai for Smart Citations")));
         setSciteResultsPane();
     }
@@ -96,7 +95,8 @@ public class SciteTab extends EntryEditorTab {
     private VBox getTalliesPane(SciteTallyModel tallModel) {
         Label titleLabel = new Label(Localization.lang("Tallies for %0", tallModel.doi()));
         titleLabel.getStyleClass().add("scite-tallies-label");
-        Text message = new Text("Total Citations: %d\nSupporting: %d\nContradicting: %d\nMentioning: %d\nUnclassified: %d\nCiting Publications: %d".formatted(
+        Text message = new Text(Localization.lang(
+                "Total Citations: %0\nSupporting: %1\nContradicting: %2\nMentioning: %3\nUnclassified: %4\nCiting Publications: %5",
                 tallModel.total(),
                 tallModel.supporting(),
                 tallModel.contradicting(),
