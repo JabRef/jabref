@@ -24,6 +24,10 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
 
     private final Pos position;
 
+    /**
+     * Creates a new IconValidationDecorator with default position CENTER_LEFT.
+     * This position is chosen to better align with text content regardless of case.
+     */
     public IconValidationDecorator() {
         this(Pos.CENTER_LEFT);
     }
