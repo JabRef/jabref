@@ -37,8 +37,13 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     @FXML private ComboBox<String> fileNamePattern;
     @FXML private TextField fileDirectoryPattern;
+
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
+
+    @FXML private CheckBox copyLinkedFiles;
+    @FXML private TextField linkedFileDirectory;
+
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -64,6 +69,9 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
         moveToTrash.selectedProperty().bindBidirectional(viewModel.moveToTrashProperty());
         moveToTrash.setDisable(!NativeDesktop.get().moveToTrashSupported());
+
+        copyLinkedFiles.selectedProperty().bindBidirectional(viewModel.copyLinkedFilesProperty());
+        linkedFileDirectory.textProperty().bindBidirectional(viewModel.linkedFileDirectoryProperty());
 
         autolinkFileStartsBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileStartsBibtexProperty());
         autolinkFileExactBibtex.selectedProperty().bindBidirectional(viewModel.autolinkFileExactBibtexProperty());

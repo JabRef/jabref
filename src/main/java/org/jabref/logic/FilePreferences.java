@@ -32,6 +32,8 @@ public class FilePreferences {
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
+    private final BooleanProperty copyLinkedFiles = new SimpleBooleanProperty();
+    private final StringProperty linkedFileDirectory = new SimpleStringProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -45,7 +47,9 @@ public class FilePreferences {
                            Path backupDirectory,
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
-                           boolean shouldKeepDownloadUrl) {
+                           boolean shouldKeepDownloadUrl,
+                           boolean copyLinkedFiles,
+                           String linkedFileDirectory) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -59,6 +63,8 @@ public class FilePreferences {
         this.confirmDeleteLinkedFile.setValue(confirmDeleteLinkedFile);
         this.moveToTrash.setValue(moveToTrash);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
+        this.copyLinkedFiles.setValue(copyLinkedFiles);
+        this.linkedFileDirectory.setValue(linkedFileDirectory);
     }
 
     public String getUserAndHost() {
@@ -215,5 +221,29 @@ public class FilePreferences {
 
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
         this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);
+    }
+
+    public boolean copyLinkedFiles() {
+        return copyLinkedFiles.get();
+    }
+
+    public BooleanProperty copyLinkedFilesProperty() {
+        return copyLinkedFiles;
+    }
+
+    public void copyLinkedFiles(boolean copyLinkedFiles) {
+        this.copyLinkedFiles.set(copyLinkedFiles);
+    }
+
+    public String getLinkedFileDirectory() {
+        return linkedFileDirectory.get();
+    }
+
+    public StringProperty linkedFileDirectoryProperty() {
+        return linkedFileDirectory;
+    }
+
+    public void setLinkedFileDirectory(String linkedFileDirectory) {
+        this.linkedFileDirectory.set(linkedFileDirectory);
     }
 }

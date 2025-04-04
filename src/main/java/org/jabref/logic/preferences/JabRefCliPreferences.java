@@ -230,6 +230,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
     public static final String TRASH_INSTEAD_OF_DELETE = "trashInsteadOfDelete";
+    public static final String COPY_LINKED_FILES = "copyLinkedFiles";
+    public static final String LINKED_FILEDIRPATTERN = "linkedFileDirPattern";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
@@ -606,6 +608,10 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
+
+        defaults.put(COPY_LINKED_FILES, Boolean.TRUE);
+        defaults.put(LINKED_FILEDIRPATTERN, "");
+
         defaults.put(AUTOLINK_FILES_ENABLED, Boolean.TRUE);
         defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
         defaults.put(ALLOW_INTEGER_EDITION_BIBTEX, Boolean.FALSE);
@@ -1563,7 +1569,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(CONFIRM_LINKED_FILE_DELETE),
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
-                getBoolean(KEEP_DOWNLOAD_URL));
+                getBoolean(KEEP_DOWNLOAD_URL),
+                getBoolean(COPY_LINKED_FILES),
+                get(LINKED_FILEDIRPATTERN));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
@@ -1578,6 +1586,8 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
         EasyBind.listen(filePreferences.moveToTrashProperty(), (obs, oldValue, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
         EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (obs, oldValue, newValue) -> putBoolean(KEEP_DOWNLOAD_URL, newValue));
+        EasyBind.listen(filePreferences.copyLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(COPY_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.linkedFileDirectoryProperty(), (obs, oldValue, newValue) -> put(LINKED_FILEDIRPATTERN, newValue));
 
         return filePreferences;
     }
