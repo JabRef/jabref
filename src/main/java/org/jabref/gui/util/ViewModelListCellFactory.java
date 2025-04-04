@@ -192,7 +192,11 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         setOnDragDetected(event -> toOnDragDetected.accept(viewModel, event));
                     }
                     if (toOnDragDropped != null) {
-                        setOnDragDropped(event -> toOnDragDropped.accept(viewModel, event));
+                        setOnDragDropped(event -> {
+                            // The parent is the box for dropping; that should be used as target (and not this cell)
+                            event.consume();
+                            getParent().fireEvent(event);
+                        });
                     }
                     if (toOnDragEntered != null) {
                         setOnDragEntered(event -> toOnDragEntered.accept(viewModel, event));
@@ -201,7 +205,10 @@ public class ViewModelListCellFactory<T> implements Callback<ListView<T>, ListCe
                         setOnDragExited(event -> toOnDragExited.accept(viewModel, event));
                     }
                     if (toOnDragOver != null) {
-                        setOnDragOver(event -> toOnDragOver.accept(viewModel, event));
+                        setOnDragOver(event -> {
+                            event.consume(); // Prevent cells from acting as drop targets
+                            getParent().fireEvent(event); // The action performed was not look at the parent, the drop box
+                        });
                     }
                     for (Map.Entry<PseudoClass, Callback<T, ObservableValue<Boolean>>> pseudoClassWithCondition : pseudoClasses.entrySet()) {
                         ObservableValue<Boolean> condition = pseudoClassWithCondition.getValue().call(viewModel);

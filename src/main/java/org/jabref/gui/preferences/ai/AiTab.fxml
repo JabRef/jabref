@@ -248,13 +248,13 @@
             <Tab text="%System message for chatting" closable="false">
                 <TextArea fx:id="systemMessageTextArea"/>
             </Tab>
-            <Tab text="User message for chatting" closable="false">
+            <Tab text="%User message for chatting" closable="false">
                 <TextArea fx:id="userMessageTextArea"/>
             </Tab>
-            <Tab text="Completion text for summarization of a chunk" closable="false">
+            <Tab text="%Completion text for summarization of a chunk" closable="false">
                 <TextArea fx:id="summarizationChunkTextArea"/>
             </Tab>
-            <Tab text="Completion text for summarization of several chunks" closable="false">
+            <Tab text="%Completion text for summarization of several chunks" closable="false">
                 <TextArea fx:id="summarizationCombineTextArea"/>
             </Tab>
         </TabPane>

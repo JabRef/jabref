@@ -28,8 +28,6 @@ jobs:
             Having any questions or issues? Feel free to ask here on GitHub. Need help setting up your local workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to show the direction it is heading towards. This way, you will receive valuable feedback.
 
             Happy coding! 🚀
-
-            ⏳ Please note, you will be automatically unassigned if there is not a (draft) pull request within **{{ total_days }} days** (by **{{ unassigned_date }}**).
           assignment_suggestion_comment: >
             👋 Hey @{{ handle }}, looks like you’re eager to work on this issue—great! 🎉
             It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
