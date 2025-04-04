@@ -1,5 +1,9 @@
 package org.jabref.gui.entryeditor;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import javafx.geometry.HPos;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -18,9 +22,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
 import com.tobiasdiez.easybind.EasyBind;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import org.controlsfx.control.HyperlinkLabel;
 
 /**
