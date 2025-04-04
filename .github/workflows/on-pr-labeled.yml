@@ -1,4 +1,4 @@
-name: On labeled PR
+name: On PR labeled
 
 on:
   pull_request:

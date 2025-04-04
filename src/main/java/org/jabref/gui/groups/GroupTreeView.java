@@ -18,6 +18,7 @@ import javax.swing.undo.UndoManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.css.PseudoClass;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -132,6 +133,7 @@ public class GroupTreeView extends BorderPane {
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.keyBindingRepository = preferences.getKeyBindingRepository();
+        this.disableProperty().bind(groupsDisabledProperty());
         createNodes();
         initialize();
     }
@@ -643,6 +645,16 @@ public class GroupTreeView extends BorderPane {
         }
     }
 
+    /**
+     * Creates an observable boolean value that is true if no database is open
+     */
+    private ObservableBooleanValue groupsDisabledProperty() {
+        return Bindings.createBooleanBinding(
+                () -> stateManager.getOpenDatabases().isEmpty(),
+                stateManager.getOpenDatabases()
+        );
+    }
+
     private static class DragExpansionHandler {
         private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
         private TreeItem<GroupNodeViewModel> draggedItem;
@@ -707,16 +719,14 @@ public class GroupTreeView extends BorderPane {
                         viewModel.removeGroupKeepSubgroups(group);
                 case GROUP_REMOVE_WITH_SUBGROUPS ->
                         viewModel.removeGroupAndSubgroups(group);
-                case GROUP_EDIT, GROUP_SUBGROUP_RENAME -> {
-                    viewModel.editGroup(group);
-                    groupTree.refresh();
-                }
+                case GROUP_EDIT, GROUP_SUBGROUP_RENAME ->
+                        viewModel.editGroup(group);
                 case GROUP_GENERATE_EMBEDDINGS ->
                         viewModel.generateEmbeddings(group);
                 case GROUP_GENERATE_SUMMARIES ->
                         viewModel.generateSummaries(group);
                 case GROUP_CHAT ->
-                    viewModel.chatWithGroup(group);
+                        viewModel.chatWithGroup(group);
                 case GROUP_SUBGROUP_ADD ->
                         viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
                 case GROUP_SUBGROUP_REMOVE ->
@@ -734,6 +744,7 @@ public class GroupTreeView extends BorderPane {
                 case GROUP_ENTRIES_REMOVE ->
                         viewModel.removeSelectedEntries(group);
             }
+            groupTree.refresh();
         }
     }
 

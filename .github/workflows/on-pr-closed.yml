@@ -1,0 +1,92 @@
+name: On PR closed
+
+on:
+  pull_request_target:
+    types: [ closed ]
+
+jobs:
+  unassign_issue:
+    name: Mark issue as available
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && !github.event.pull_request.merged
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Echo PR number and URL
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+      - uses: actions/checkout@v4
+      - name: Remove assignee
+        run: |
+          # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }} || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check assignees
+        id: check_assignee
+        run: |
+          issue=$(gh issue view ${{ steps.get_issue_number.outputs.ticketNumber }} --json assignees)
+          count=$(echo "$issue" | jq '.assignees | length')
+          if [ "$count" -gt 0 ]; then
+            echo "assigned=yes" >> $GITHUB_OUTPUT
+          else
+            echo "assigned=no" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
+        if: steps.check_assignee.outputs.assigned == 'no'
+        run: |
+          set -e
+
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📍 Assigned"
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "🔔 reminder-sent"
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "📌 Pinned"
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-label "FirstTimeCodeContribution"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Move issue to "Free to take" in "Good First Issues"
+        if: steps.check_assignee.outputs.assigned == 'no'
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/5"
+          target-labels: "📍 Assigned"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+      - name: Move issue to "Free to take" in "Candidates for University Projects"
+        if: steps.check_assignee.outputs.assigned == 'no'
+        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        with:
+          github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
+          project-url: "https://github.com/orgs/JabRef/projects/3"
+          target-labels: "📍 Assigned"
+          target-column: "Assigned"
+          ignored-columns: ""
+          default-column: "Free to take"
+          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          skip-if-not-in-project: true
+  close_issue_on_pr_merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Closes issues related to a merged pull request.
+        uses: ldez/gha-mjolnir@v1.4.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

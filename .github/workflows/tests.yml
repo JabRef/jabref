@@ -47,8 +47,6 @@ jobs:
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
@@ -68,8 +66,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
@@ -90,8 +86,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -142,6 +136,7 @@ jobs:
           grep -q "1 problem" heylogs.txt || exit 1
 
   changelog-unreleased-only:
+    if: github.event_name == 'pull_request'
     name: CHANGELOG.md - only unreleased touched
     runs-on: ubuntu-latest
     steps:
@@ -187,8 +182,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run tests
         run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -230,8 +223,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run tests on PostgreSQL
         run: ./gradlew databaseTest --rerun-tasks
         env:
@@ -271,8 +262,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run GUI tests
         run: xvfb-run --auto-servernum ./gradlew guiTest
         env:
@@ -321,8 +310,6 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -369,6 +356,78 @@ jobs:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v4
 
+  mandatory-checks-section-exists:
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    name: Mandatory Checks present
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+          
+      - name: Check for existence of Mandatory Checks section
+        id: check_mandatory_section
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+          
+          if echo "$BODY" | grep -q "### Mandatory checks"; then
+            echo "✅ '### Mandatory checks' section found."
+          else
+            echo "❌ '### Mandatory checks' section is missing!"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  checklist-checked:
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    name: PR checklist OK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Check for PR checklist
+        id: check_changelog_modification
+        run: |
+          set -e
+
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}' | grep -A5000 '### Mandatory checks')
+          echo "Found body: $BODY"
+
+          # Ensure the section exists
+          if ! printf '%s\n' "$BODY" | grep -q "### Mandatory checks"; then
+              echo "❌ '### Mandatory checks' section is missing!"
+              exit 1
+          fi
+
+          BOXES=$(printf '%s\n' "$BODY" | grep "^- \[")
+          echo "Found boxes: $BOXES"
+
+          while IFS= read -r line; do
+              if ! printf '%s\n' "$line" | grep -Eq "^- \[(x|/| )\] "; then
+                  echo "❌ Found improperly formatted checkbox: '$line'"
+                  exit 1
+              fi
+          done <<< "$BOXES"
+
+          LINE_COUNT=$(echo "$BOXES" | wc -l)
+
+          if [ "$LINE_COUNT" -ne 7 ]; then
+            echo "❌ Found $LINE_COUNT lines instead of 7 required lines"
+            exit 1
+          fi
+
+          echo "✅ All checkboxes are present and in the correct format."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
@@ -378,16 +437,16 @@ jobs:
         with:
           show-progress: 'false'
       - name: Merge Conflict finder
-        uses: olivernybroe/action-conflict-finder@v4.0
+        uses: olivernybroe/action-conflict-finder@v4.1
 
   no-force-push:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Check force push
         id: force_push_check
         run: |
@@ -403,7 +462,38 @@ jobs:
             exit 1
           fi
 
+  unmodified_submodules:
+    name: Submodules not modified
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          show-progress: 'false'
+      - name: Check for submodule modifications
+        id: check_submodule
+        run: |
+          git fetch origin ${{ github.base_ref }}
+
+          # enable diffing of submodules
+          sed -i "s/ all/ untracked/" .gitmodules
+
+          if git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -Eq "^Submodule .* contains modified content$"; then
+            echo "Debug:"
+            echo "Command: git diff --submodule=log origin/${{ github.base_ref }} HEAD"
+            echo "Result:"
+            git diff --submodule=log origin/${{ github.base_ref }} HEAD
+            echo "--end--"
+            echo "Grep result"
+            git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -E "^Submodule .* contains modified content$"
+            echo "❌ Submodule modifications detected"
+            exit 1
+          fi
+          echo "✅ No submodule modifications"
+
   other_than_main:
+    if: github.event_name == 'pull_request'
     name: Source branch is other than "main"
     runs-on: ubuntu-latest
     steps:
@@ -422,3 +512,38 @@ jobs:
         with:
           name: pr_number
           path: pr_number.txt
+
+  changelog_modified:
+    name: CHANGELOG.md needs to be modified
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check PR body for changelog note
+        id: changelog_check
+        run: |
+          BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
+          echo "Body: $BODY"
+
+          if echo "$BODY" | grep -q '\- \[x\] Change in `CHANGELOG.md`'; then
+            echo "found"
+            echo "found=yes" >> $GITHUB_OUTPUT
+          else
+            echo "not found"
+            echo "found=no" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check for CHANGELOG.md modifications
+        id: check_changelog_modification
+        if: steps.changelog_check.outputs.found == 'yes'
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q '^CHANGELOG\.md$'; then
+            echo "✅ CHANGELOG.md was modified"
+          else
+            echo "❌ CHANGELOG.md was NOT modified"
+            exit 1
+          fi
