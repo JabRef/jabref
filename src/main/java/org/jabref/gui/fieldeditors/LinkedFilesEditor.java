@@ -19,7 +19,6 @@ import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
@@ -34,11 +33,12 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
-import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.copyfiles.CopySingleFileAction;
+import org.jabref.gui.fieldeditors.contextmenu.ContextAction;
+import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory;
+import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.MultiContextCommandFactory;
+import org.jabref.gui.fieldeditors.contextmenu.ContextMenuFactory.SingleContextCommandFactory;
+import org.jabref.gui.fieldeditors.contextmenu.MultiContextAction;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.GrobidUseDialogHelper;
@@ -46,13 +46,11 @@ import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -88,6 +86,9 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     private ObservableOptionalValue<BibEntry> bibEntry = EasyBind.wrapNullable(new SimpleObjectProperty<>());
     private final UiThreadObservableList<LinkedFileViewModel> decoratedModelList;
 
+    private ContextMenu activeContextMenu = null;
+    private ContextMenuFactory contextMenuFactory;
+
     public LinkedFilesEditor(Field field,
                              BibDatabaseContext databaseContext,
                              SuggestionProvider<?> suggestionProvider,
@@ -98,8 +99,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         this.fieldCheckers = fieldCheckers;
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         decoratedModelList = new UiThreadObservableList<>(viewModel.filesProperty());
         Bindings.bindContentBidirectional(listView.itemsProperty().get(), decoratedModelList);
@@ -120,7 +121,6 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
         new ViewModelListCellFactory<LinkedFileViewModel>()
                 .withStringTooltip(LinkedFileViewModel::getDescriptionAndLink)
                 .withGraphic(this::createFileDisplay)
-                .withContextMenu(this::createContextMenuForFile)
                 .withOnMouseClickedEvent(this::handleItemMouseClick)
                 .setOnDragDetected(this::handleOnDragDetected)
                 .setOnDragDropped(this::handleOnDragDropped)
@@ -302,90 +302,40 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
 
     private void handleItemMouseClick(LinkedFileViewModel linkedFile, MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY && (event.getClickCount() == 2)) {
-            // Double click -> open
-            linkedFile.open();
+            linkedFile.open(); // Double-click: open file
+        } else if (activeContextMenu != null && event.getButton() == MouseButton.PRIMARY) {
+            activeContextMenu.hide(); // Hide context menu if left-click
+            activeContextMenu = null;
+        } else if (event.getButton() == MouseButton.SECONDARY) {
+            if (activeContextMenu != null) {
+                activeContextMenu.hide(); // Hide any existing context menu
+                activeContextMenu = null;
+            }
+
+            SingleContextCommandFactory contextCommandFactory = (action, file) ->
+                    new ContextAction(action, file, databaseContext, bibEntry, preferences, viewModel);
+
+            MultiContextCommandFactory multiContextCommandFactory = (action, files) ->
+                    new MultiContextAction(action, files, databaseContext, bibEntry, preferences, viewModel);
+
+            contextMenuFactory = new ContextMenuFactory(
+                    dialogService,
+                    preferences,
+                    databaseContext,
+                    bibEntry,
+                    viewModel,
+                    contextCommandFactory,
+                    multiContextCommandFactory
+            );
+
+            ContextMenu contextMenu = contextMenuFactory.createForSelection(listView.getSelectionModel().getSelectedItems());
+            contextMenu.show(listView, event.getScreenX(), event.getScreenY());
+            activeContextMenu = contextMenu;
         }
     }
 
     @Override
     public double getWeight() {
         return 3;
-    }
-
-    private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
-        ContextMenu menu = new ContextMenu();
-        ActionFactory factory = new ActionFactory();
-
-        menu.getItems().addAll(
-                factory.createMenuItem(StandardActions.EDIT_FILE_LINK, new ContextAction(StandardActions.EDIT_FILE_LINK, linkedFile, preferences)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.OPEN_FILE, new ContextAction(StandardActions.OPEN_FILE, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.OPEN_FOLDER, new ContextAction(StandardActions.OPEN_FOLDER, linkedFile, preferences)),
-                new SeparatorMenuItem(),
-                factory.createMenuItem(StandardActions.DOWNLOAD_FILE, new ContextAction(StandardActions.DOWNLOAD_FILE, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.RENAME_FILE_TO_PATTERN, new ContextAction(StandardActions.RENAME_FILE_TO_PATTERN, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.RENAME_FILE_TO_NAME, new ContextAction(StandardActions.RENAME_FILE_TO_NAME, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, new ContextAction(StandardActions.MOVE_FILE_TO_FOLDER_AND_RENAME, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, new CopySingleFileAction(linkedFile.getFile(), dialogService, databaseContext, preferences.getFilePreferences())),
-                factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, new ContextAction(StandardActions.REDOWNLOAD_FILE, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.REMOVE_LINK, new ContextAction(StandardActions.REMOVE_LINK, linkedFile, preferences)),
-                factory.createMenuItem(StandardActions.DELETE_FILE, new ContextAction(StandardActions.DELETE_FILE, linkedFile, preferences))
-        );
-
-        return menu;
-    }
-
-    private class ContextAction extends SimpleCommand {
-
-        private final StandardActions command;
-        private final LinkedFileViewModel linkedFile;
-
-        public ContextAction(StandardActions command, LinkedFileViewModel linkedFile, CliPreferences preferences) {
-            this.command = command;
-            this.linkedFile = linkedFile;
-
-            this.executable.bind(
-                    switch (command) {
-                        case RENAME_FILE_TO_PATTERN -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                        && !linkedFile.isGeneratedNameSameAsOriginal(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case MOVE_FILE_TO_FOLDER, MOVE_FILE_TO_FOLDER_AND_RENAME -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent()
-                                        && !linkedFile.isGeneratedPathSameAsOriginal(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case DOWNLOAD_FILE -> Bindings.createBooleanBinding(
-                                () -> linkedFile.getFile().isOnlineLink(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case REDOWNLOAD_FILE -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().getSourceUrl().isEmpty(),
-                                linkedFile.getFile().sourceUrlProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        case OPEN_FILE, OPEN_FOLDER, RENAME_FILE_TO_NAME, DELETE_FILE -> Bindings.createBooleanBinding(
-                                () -> !linkedFile.getFile().isOnlineLink()
-                                        && linkedFile.getFile().findIn(databaseContext, preferences.getFilePreferences()).isPresent(),
-                                linkedFile.getFile().linkProperty(), bibEntry.getValue().map(BibEntry::getFieldsObservable).orElse(null));
-                        default -> BindingsHelper.constantOf(true);
-                    });
-        }
-
-        @Override
-        public void execute() {
-            switch (command) {
-                case EDIT_FILE_LINK -> linkedFile.edit();
-                case OPEN_FILE -> linkedFile.open();
-                case OPEN_FOLDER -> linkedFile.openFolder();
-                case DOWNLOAD_FILE -> linkedFile.download(true);
-                case REDOWNLOAD_FILE -> linkedFile.redownload();
-                case RENAME_FILE_TO_PATTERN -> linkedFile.renameToSuggestion();
-                case RENAME_FILE_TO_NAME -> linkedFile.askForNameAndRename();
-                case MOVE_FILE_TO_FOLDER -> linkedFile.moveToDefaultDirectory();
-                case MOVE_FILE_TO_FOLDER_AND_RENAME -> linkedFile.moveToDefaultDirectoryAndRename();
-                case DELETE_FILE -> viewModel.deleteFile(linkedFile);
-                case REMOVE_LINK -> viewModel.removeFileLink(linkedFile);
-            }
-        }
     }
 }
