@@ -367,6 +367,30 @@ class FileUtilTest {
     }
 
     @Test
+    void isMvFile() throws IOException {
+        Path mvFile = Files.createFile(rootDir.resolve("test.mv"));
+        assertTrue(FileUtil.isMvFile(mvFile));
+    }
+
+    @Test
+    void isNotMvFile() throws IOException {
+        Path mvFile = Files.createFile(rootDir.resolve("test.pdf"));
+        assertFalse(FileUtil.isMvFile(mvFile));
+    }
+
+    @Test
+    void isCsvFile() throws IOException {
+        Path csvFile = Files.createFile(rootDir.resolve("test.csv"));
+        assertTrue(FileUtil.isCsvFile(csvFile));
+    }
+
+    @Test
+    void isNotCsvFile() throws IOException {
+        Path csvFile = Files.createFile(rootDir.resolve("test.pdf"));
+        assertFalse(FileUtil.isCsvFile(csvFile));
+    }
+
+    @Test
     void findInPath() {
         Optional<Path> resultPath1 = FileUtil.findSingleFileRecursively("existingTestFile.txt", rootDir);
         assertEquals(resultPath1.get().toString(), existingTestFile.toString());

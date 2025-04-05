@@ -330,6 +330,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
 
+    private static final String JOURNAL_ABBREVIATION_DIRECTORY = "journalAbbreviationDirectory";
+
     // Protected terms
     private static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
     private static final String PROTECTED_TERMS_DISABLED_EXTERNAL = "protectedTermsDisabledExternal";
@@ -602,6 +604,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
         defaults.put(LAST_USED_EXPORT, "");
+        defaults.put(JOURNAL_ABBREVIATION_DIRECTORY, Directories.getJournalAbbreviationsDirectory().toString());
 
         defaults.put(STORE_RELATIVE_TO_BIB, Boolean.TRUE);
 
@@ -1016,12 +1019,18 @@ public class JabRefCliPreferences implements CliPreferences {
 
         journalAbbreviationPreferences = new JournalAbbreviationPreferences(
                 getStringList(EXTERNAL_JOURNAL_LISTS),
-                getBoolean(USE_AMS_FJOURNAL));
+                getBoolean(USE_AMS_FJOURNAL),
+               get(JOURNAL_ABBREVIATION_DIRECTORY));
 
         journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
         EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
                 (obs, oldValue, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+
+        EasyBind.listen(journalAbbreviationPreferences.journalAbbreviationDirectoryProperty(),
+                (obs, oldValue, newValue) -> {
+                    put(JOURNAL_ABBREVIATION_DIRECTORY, newValue);
+                });
 
         return journalAbbreviationPreferences;
     }
