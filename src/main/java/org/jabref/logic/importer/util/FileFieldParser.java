@@ -56,7 +56,7 @@ public class FileFieldParser {
             return files;
         }
 
-        if (LinkedFile.isOnlineLink(value.trim())) {
+        if (URLUtil.isURL(value.trim())) {
             // needs to be modifiable
             try {
                 return List.of(new LinkedFile(URLUtil.create(value), ""));
@@ -173,7 +173,7 @@ public class FileFieldParser {
                     // there is no Path.isValidPath(String) method
                     field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
                 } catch (InvalidPathException e) {
-                    // Ignored
+                    // If the path is invalid, store it as a string
                     LOGGER.debug("Invalid path object, continuing with string", e);
                     field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
                 }
