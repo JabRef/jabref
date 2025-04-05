@@ -20,6 +20,7 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -219,6 +220,7 @@ class FileUtilTest {
     }
 
     @Test
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Assumed path separator is /")
     void uniquePathSubstrings() {
        List<String> paths = List.of("C:/uniquefile.bib",
                "C:/downloads/filename.bib",
@@ -236,12 +238,14 @@ class FileUtilTest {
     }
 
     @Test
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Assumed path separator is /")
     void uniquePathFragmentWithSameSuffix() {
         List<String> dirs = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliograsphy.bib");
         assertEquals(Optional.of("bibliography.bib"), FileUtil.getUniquePathFragment(dirs, Path.of("/users/jabref/bibliography.bib")));
     }
 
     @Test
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Assumed path separator is /")
     void uniquePathFragmentWithSameSuffixAndLongerName() {
         List<String> paths = List.of("/users/jabref/bibliography.bib", "/users/jabref/koppor-bibliography.bib");
         assertEquals(Optional.of("koppor-bibliography.bib"), FileUtil.getUniquePathFragment(paths, Path.of("/users/jabref/koppor-bibliography.bib")));
