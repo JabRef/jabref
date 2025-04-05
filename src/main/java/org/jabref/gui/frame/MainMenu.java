@@ -48,7 +48,6 @@ import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
-import org.jabref.gui.journals.AbbreviateAction;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
@@ -254,20 +253,11 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
                 factory.createMenuItem(StandardActions.CHECK_INTEGRITY, new IntegrityCheckAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, (UiTaskExecutor) taskExecutor, abbreviationRepository)),
                 factory.createMenuItem(StandardActions.CHECK_CONSISTENCY, new ConsistencyCheckAction(frame::getCurrentLibraryTab, dialogService, stateManager, preferences, entryTypesManager, (UiTaskExecutor) taskExecutor)),
-                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager)),
+                factory.createMenuItem(StandardActions.CLEANUP_ENTRIES, new CleanupAction(frame::getCurrentLibraryTab, preferences, dialogService, stateManager, taskExecutor, undoManager, abbreviationRepository)),
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor)),
-
-                new SeparatorMenuItem(),
-
-                factory.createSubMenu(StandardActions.ABBREVIATE,
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
-
-                factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))
+                factory.createMenuItem(StandardActions.SET_FILE_LINKS, new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor))
         );
 
         Menu lookupIdentifiers = factory.createSubMenu(StandardActions.LOOKUP_DOC_IDENTIFIER);

@@ -109,11 +109,6 @@ public enum StandardActions implements Action {
     COPY_LINKED_FILES(Localization.lang("Copy linked files to folder...")),
     COPY_DOI(Localization.lang("Copy DOI")),
     COPY_DOI_URL(Localization.lang("Copy DOI url")),
-    ABBREVIATE(Localization.lang("Abbreviate journal names")),
-    ABBREVIATE_DEFAULT(Localization.lang("default"), Localization.lang("Abbreviate journal names of the selected entries (DEFAULT abbreviation)"), KeyBinding.ABBREVIATE),
-    ABBREVIATE_DOTLESS(Localization.lang("dotless"), Localization.lang("Abbreviate journal names of the selected entries (DOTLESS abbreviation)")),
-    ABBREVIATE_SHORTEST_UNIQUE(Localization.lang("shortest unique"), Localization.lang("Abbreviate journal names of the selected entries (SHORTEST UNIQUE abbreviation)")),
-    UNABBREVIATE(Localization.lang("Unabbreviate journal names"), Localization.lang("Unabbreviate journal names of the selected entries"), KeyBinding.UNABBREVIATE),
 
     MANAGE_CUSTOM_EXPORTS(Localization.lang("Manage custom exports")),
     MANAGE_CUSTOM_IMPORTS(Localization.lang("Manage custom imports")),
