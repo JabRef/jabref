@@ -55,7 +55,7 @@ public class LtwaRepositoryTest {
                 Arguments.of("Mitteilungen der Österreichischen Geographischen Gesellschaft", "Mitt. Österr. Geogr. Ges."),
                 Arguments.of("Inorganica Chimica Acta", "Inorg. Chim. Acta"),
                 Arguments.of("Comptes rendus de l'Académie des Sciences", "C. r. Acad. Sci."),
-                Arguments.of("Proceedings of the National Academy of Sciences of the United States of America", "Proc. Natl. Acad. Sci. U. S. A."),
+                Arguments.of("Proceedings of the National Academy of    Sciences of the United States of America", "Proc. Natl. Acad. Sci. U. S. A."),
                 Arguments.of("Scando-Slavica", "Scando-Slav."),
                 Arguments.of("International Journal of e-Collaboration", "Int. J. e-Collab."),
                 Arguments.of("Proceedings of A. Razmadze Mathematical Institute", "Proc. A. Razmadze Math. Inst."),

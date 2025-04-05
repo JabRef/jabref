@@ -3,10 +3,14 @@ package org.jabref.logic.journals.ltwa;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
@@ -32,8 +36,8 @@ public class LtwaRepository {
      */
     public LtwaRepository(Path ltwaListFile) {
         try (var store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open()) {
-            MVMap<String, LtwaEntry> prefixMap = store.openMap("Prefixes");
-            MVMap<String, LtwaEntry> suffixMap = store.openMap("Suffixes");
+            MVMap<String, List<LtwaEntry>> prefixMap = store.openMap("Prefixes");
+            MVMap<String, List<LtwaEntry>> suffixMap = store.openMap("Suffixes");
 
             for (String key : prefixMap.keySet()) {
                 var value = prefixMap.get(key);
@@ -53,7 +57,8 @@ public class LtwaRepository {
         }
     }
 
-    public LtwaRepository() { }
+    public LtwaRepository() {
+    }
 
     /**
      * Abbreviates a given title using the ISO4 rules.
@@ -62,111 +67,179 @@ public class LtwaRepository {
      * @return The abbreviated title
      */
     public String abbreviate(String title) {
-        var lexer = new Lexer(title);
-        var tokens = lexer.tokenize();
+        String normalizedTitle = NormalizeUtils.toNFKC(title);
+        CharStream charStream = CharStreams.fromString(normalizedTitle);
+        LtwaLexer lexer = new LtwaLexer(charStream);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        LtwaParser parser = new LtwaParser(tokens);
+        LtwaParser.TitleContext titleContext = parser.title();
+        AbbreviationListener listener = new AbbreviationListener(normalizedTitle, prefix, suffix);
+        ParseTreeWalker walker = new ParseTreeWalker();
+        walker.walk(listener, titleContext);
+        return listener.getResult();
+    }
 
-        List<Token> processed = new LinkedList<>();
+    /**
+     * Listener to apply abbreviation rules to the parsed title
+     */
+    private static class AbbreviationListener extends LtwaBaseListener {
+        private final StringBuilder result = new StringBuilder();
+        private final String originalTitle;
+        private final PrefixTree<LtwaEntry> prefix;
+        private final PrefixTree<LtwaEntry> suffix;
+        private boolean isFirstElement = true;
+        private boolean addSpace = false;
+        private int lastPartPosition = -1;
+        private int abbreviatedTitlePosition = 0;
 
-        for (int i = 0; i < tokens.size(); i++) {
-            var token = tokens.get(i);
-            if (token.type() == Token.Type.ARTICLE) {
-                continue;
-            } else if (token.type() == Token.Type.STOPWORD && i != 0) {
-                continue;
-            } else if (token.type() == Token.Type.SYMBOLS) {
-                var val = token.value().replace("...", "").replace(",", "").replace(".", ",");
-                if (val.equals("&") || val.equals("+")) {
-                    continue;
-                }
-                token = new Token(Token.Type.SYMBOLS, val, token.position());
-            } else if (token.type() == Token.Type.ORDINAL && !processed.isEmpty()) {
-                var lastToken = processed.getLast();
-                if (lastToken.type() == Token.Type.PART) {
-                    processed.removeLast();
-                }
-            }
+        public AbbreviationListener(String originalTitle, PrefixTree<LtwaEntry> prefix, PrefixTree<LtwaEntry> suffix) {
+            this.originalTitle = originalTitle;
+            this.prefix = prefix;
+            this.suffix = suffix;
+        }
 
-            if (token.type() != Token.Type.EOS && !token.value().isEmpty()) {
-                processed.add(token);
+        @Override
+        public void exitArticleElement(LtwaParser.ArticleElementContext ctx) {
+            // Skip articles
+        }
+
+        @Override
+        public void exitStopwordElement(LtwaParser.StopwordElementContext ctx) {
+            if (isFirstElement) {
+                appendWithSpace(ctx.getText());
+                isFirstElement = false;
             }
         }
 
-        if (processed.size() == 1) {
-            return processed.getFirst().value();
+        @Override
+        public void exitSymbolsElement(LtwaParser.SymbolsElementContext ctx) {
+            String val = ctx.getText().replace("...", "").replace(",", "").replace(".", ",");
+            if (val.equals("&") || val.equals("+")) {
+                return;
+            }
+            result.append(val);
+            addSpace = false;
         }
 
-        if (processed.size() == 2) {
-            var first = processed.get(0);
-            var second = processed.get(1);
-            if (first.type() == Token.Type.STOPWORD) {
-                return first.value() + " " + second.value();
+        @Override
+        public void exitOrdinalElement(LtwaParser.OrdinalElementContext ctx) {
+            if (lastPartPosition != -1) {
+                result.delete(lastPartPosition, result.length());
             }
-            if (second.type() == Token.Type.SYMBOLS) {
-                return first.value() + second.value();
-            }
+            appendWithSpace(ctx.getText());
         }
 
-        boolean space = true;
-        StringBuilder result = new StringBuilder();
-        String normalized = NormalizeUtils.normalize(title).toLowerCase();
-        int position = 0;
+        @Override
+        public void exitHyphenElement(LtwaParser.HyphenElementContext ctx) {
+            result.append(ctx.getText());
+            addSpace = false;
+        }
 
-        for (var token : processed) {
-            String abbreviation = token.value();
-            int length;
+        @Override
+        public void exitPartElement(LtwaParser.PartElementContext ctx) {
+            lastPartPosition = result.length() + ((addSpace && !ctx.getText().isEmpty()) ? 1 : 0);
+            addAbbreviation(ctx.getStart().getStartIndex(), ctx.getText());
+        }
 
-            if (token.type() == Token.Type.WORD || token.type() == Token.Type.PART) {
-                if (token.position() < position) {
-                    continue;
+        @Override
+        public void exitAbbreviationElement(LtwaParser.AbbreviationElementContext ctx) {
+            appendWithSpace(ctx.getText());
+        }
+
+        @Override
+        public void exitWordElement(LtwaParser.WordElementContext ctx) {
+            addAbbreviation(ctx.getStart().getStartIndex(), ctx.getText());
+        }
+
+        private void addAbbreviation(int position, String text) {
+            if (position < abbreviatedTitlePosition) {
+                return;
+            }
+            String remainingTitle = originalTitle.substring(position);
+            String normalizedRemaining = NormalizeUtils.normalize(remainingTitle).toLowerCase();
+
+            // Process the word with LTWA entries
+            List<LtwaEntry> entries = new ArrayList<>();
+            entries.addAll(prefix.search(normalizedRemaining));
+            entries.addAll(suffix.search(reverse(normalizedRemaining)));
+
+            var optionalEntry = entries.stream()
+                                       .filter(e -> matches(normalizedRemaining, e))
+                                       .max((a, b) -> {
+                                           // Suffix first
+                                           boolean isSuffixA = a.word().endsWith("-");
+                                           boolean isSuffixB = b.word().endsWith("-");
+                                           if (isSuffixA != isSuffixB) {
+                                               return isSuffixA ? 1 : -1;
+                                           }
+
+                                           // Longer first
+                                           int lengthComparison = a.word().length() - b.word().length();
+                                           if (lengthComparison != 0) {
+                                               return lengthComparison;
+                                           }
+
+                                           // Valid first
+                                           boolean isValidA = a.abbreviation() != null;
+                                           boolean isValidB = b.abbreviation() != null;
+                                           return isValidA == isValidB ? 0 : (isValidA ? 1 : -1);
+                                       });
+
+            if (optionalEntry.isPresent()) {
+                var entry = optionalEntry.get();
+                if (entry.abbreviation() != null) {
+                    text = restoreCapitalizationAndDiacritics(entry.abbreviation(), remainingTitle);
                 }
-
-                List<LtwaEntry> entries = new ArrayList<>();
-
-                var remainingTitle = title.substring(token.position());
-                var remainingNormalizedTitle = normalized.substring(token.position());
-                entries.addAll(prefix.search(remainingNormalizedTitle));
-                entries.addAll(suffix.search(reverse(remainingNormalizedTitle)));
-                var optionalEntry = entries.stream()
-                                           .filter(e -> matches(remainingNormalizedTitle, e))
-                                           .max((a, b) -> {
-                                               // Suffix first
-                                               boolean isSuffixA = a.word().endsWith("-");
-                                               boolean isSuffixB = b.word().endsWith("-");
-                                               if (isSuffixA != isSuffixB) {
-                                                   return isSuffixA ? 1 : -1;
-                                               }
-
-                                               // Longer first
-                                               int lengthComparison = a.word().length() - b.word().length();
-                                               if (lengthComparison != 0) {
-                                                   return lengthComparison;
-                                               }
-
-                                               // Valid first
-                                               return a.abbreviation() == null && b.abbreviation() == null ? 1
-                                                       : a.abbreviation() == null ? -1 : 0;
-                                           });
-
-                if (optionalEntry.isEmpty()) {
-                    length = token.value().length();
-                } else {
-                    var entry = optionalEntry.get();
-                    abbreviation = entry.abbreviation() == null ? token.value() : restoreCapitalizationAndDiacritics(entry.abbreviation(), remainingTitle);
-                    length = entry.word().length();
-                }
-
-                position = token.position() + length;
-            } else if (token.type() == Token.Type.SYMBOLS || token.type() == Token.Type.HYPHEN) {
-                space = false;
+                abbreviatedTitlePosition += entry.word().length();
             }
 
-            result.append(space && !result.isEmpty() ? " " : "").append(abbreviation);
-
-            // If the last token is a hyphen, the next token should not have a space
-            space = token.type() != Token.Type.HYPHEN;
+            appendWithSpace(text);
         }
 
-        return result.toString();
+        @Override
+        public void exitSingleWordTitleFull(LtwaParser.SingleWordTitleFullContext ctx) {
+            result.append(ctx.singleWordTitle().getText());
+            addSpace = false;
+        }
+
+        @Override
+        public void exitStopwordPlusTitleFull(LtwaParser.StopwordPlusTitleFullContext ctx) {
+            String stopword = ctx.stopwordPlusAny().STOPWORD().getText();
+            String second = ctx.stopwordPlusAny().getChild(1).getText();
+            result.append(stopword).append(" ").append(second);
+            addSpace = false;
+        }
+
+        @Override
+        public void exitAnyPlusSymbolsFull(LtwaParser.AnyPlusSymbolsFullContext ctx) {
+            String first = ctx.anyPlusSymbols().getChild(0).getText();
+            String symbol = ctx.anyPlusSymbols().SYMBOLS().getText();
+            result.append(first).append(symbol);
+            addSpace = false;
+        }
+
+        @Override
+        public void exitEveryRule(ParserRuleContext ctx) {
+            isFirstElement = ctx.getParent() instanceof LtwaParser.TitleElementContext && isFirstElement;
+            if (!(ctx instanceof LtwaParser.PartContext ||
+                    ctx instanceof LtwaParser.PartElementContext ||
+                    ctx instanceof LtwaParser.OrdinalContext)) {
+                lastPartPosition = -1;
+            }
+            abbreviatedTitlePosition = Math.max(abbreviatedTitlePosition, ctx.getStart().getStartIndex());
+        }
+
+        private void appendWithSpace(String text) {
+            if (addSpace && !result.isEmpty()) {
+                result.append(" ");
+            }
+            result.append(text);
+            addSpace = true;
+        }
+
+        public String getResult() {
+            return result.toString();
+        }
     }
 
     private static String restoreCapitalizationAndDiacritics(String abbreviation, String original) {

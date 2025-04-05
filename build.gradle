@@ -459,6 +459,7 @@ processResources {
 tasks.register('generateSource') {
     dependsOn("generateBstGrammarSource",
             "generateSearchGrammarSource",
+            "generateLtwaGrammarSource",
             "generateCitaviSource")
     group = 'JabRef'
     description 'Generates all necessary (Java) source files.'
@@ -466,7 +467,7 @@ tasks.register('generateSource') {
 
 tasks.register("generateBstGrammarSource", JavaExec) {
     group = "JabRef"
-    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
+    description = 'Generates BstLexer.java and BstParser.java from the Bst.g4 grammar file using antlr4.'
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
@@ -478,7 +479,7 @@ tasks.register("generateBstGrammarSource", JavaExec) {
 
 tasks.register("generateSearchGrammarSource", JavaExec) {
     group = 'JabRef'
-    description = "Generates java files for Search.g antlr4."
+    description = "Generates java files for Search.g4 antlr4."
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
@@ -486,6 +487,18 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
+}
+
+tasks.register("generateLtwaGrammarSource", JavaExec) {
+    group = "JabRef"
+    description = 'Generates LtwaLexer.java and LtwaParser.java from the Ltwa.g4 grammar file using antlr4.'
+    classpath = configurations.antlr4
+    mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+
+    inputs.dir('src/main/antlr4/org/jabref/ltwa/')
+    outputs.dir("src-gen/main/java/org/jabref/logic/journals/ltwa/")
+    args = ["-o", "src-gen/main/java/org/jabref/logic/journals/ltwa/", "-no-visitor", "-listener", "-package", "org.jabref.logic.journals.ltwa", "$projectDir/src/main/antlr4/org/jabref/ltwa/Ltwa.g4"]
 }
 
 tasks.register("generateJournalListMV", JavaExec) {

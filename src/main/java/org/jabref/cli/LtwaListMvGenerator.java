@@ -5,10 +5,11 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.journals.ltwa.LtwaEntry;
-import org.jabref.logic.journals.ltwa.LtwaParser;
+import org.jabref.logic.journals.ltwa.LtwaTsvParser;
 import org.jabref.logic.journals.ltwa.NormalizeUtils;
 import org.jabref.logic.journals.ltwa.PrefixTree;
 
@@ -38,8 +39,7 @@ public class LtwaListMvGenerator {
             Files.deleteIfExists(tempCsvFile);
 
             LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile);
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LOGGER.error("Error generating LTWA MVStore file.", e);
         }
     }
@@ -71,7 +71,7 @@ public class LtwaListMvGenerator {
      */
     private static void generateMvStore(Path inputFile, Path outputFile) throws IOException {
         LOGGER.info("Parsing LTWA file...");
-        LtwaParser parser = new LtwaParser(inputFile);
+        LtwaTsvParser parser = new LtwaTsvParser(inputFile);
         List<LtwaEntry> entries = parser.parse();
 
         LOGGER.info("Found {} LTWA entries", entries.size());
@@ -80,8 +80,8 @@ public class LtwaListMvGenerator {
                 .fileName(outputFile.toString())
                 .compressHigh()
                 .open()) {
-            MVMap<String, LtwaEntry> prefixMap = store.openMap("Prefixes");
-            MVMap<String, LtwaEntry> suffixMap = store.openMap("Suffixes");
+            MVMap<String, List<LtwaEntry>> prefixMap = store.openMap("Prefixes");
+            MVMap<String, List<LtwaEntry>> suffixMap = store.openMap("Suffixes");
             var inflection = Character.toString(PrefixTree.WILD_CARD).repeat(3) + " ";
 
             for (var entry : entries) {
@@ -90,9 +90,21 @@ public class LtwaListMvGenerator {
                 boolean isSuffix = word.startsWith("-");
 
                 if (isSuffix) {
-                    suffixMap.put(word.substring(1), entry);
+                    String key = word.substring(1);
+                    List<LtwaEntry> entryList = suffixMap.get(key);
+                    if (entryList == null) {
+                        entryList = new ArrayList<>();
+                    }
+                    entryList.add(entry);
+                    suffixMap.put(key, entryList);
                 } else {
-                    prefixMap.put(word.endsWith("-") ? word.substring(0, word.length() - 1) : word, entry);
+                    String key = word.endsWith("-") ? word.substring(0, word.length() - 1) : word;
+                    List<LtwaEntry> entryList = prefixMap.get(key);
+                    if (entryList == null) {
+                        entryList = new ArrayList<>();
+                    }
+                    entryList.add(entry);
+                    prefixMap.put(key, entryList);
                 }
             }
 

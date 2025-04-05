@@ -1,11 +1,8 @@
 package org.jabref.logic.journals.ltwa;
 
 import java.text.Normalizer;
-import java.util.regex.Pattern;
 
 public class NormalizeUtils {
-    public static final Pattern BOUNDARY = Pattern.compile("[-\\s\\u2013\\u2014_.,:;!|=+*\\\\/\"()&#%@$?]");
-
     public static String toNFKC(String input) {
         if (input == null) {
             return null;

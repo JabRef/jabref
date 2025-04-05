@@ -15,7 +15,7 @@ public class PrefixTree<D> {
         this.root = new Node<>();
     }
 
-    public void insert(String key, D data) {
+    public void insert(String key, List<D> data) {
         StringBuilder normalized = new StringBuilder();
         boolean lastWasWildcard = false;
 
@@ -108,14 +108,14 @@ public class PrefixTree<D> {
             this.data = new ArrayList<>();
         }
 
-        public void insert(String key, D data) {
+        public void insert(String key, List<D> data) {
             Node<D> current = this;
             for (int i = 0; i < key.length(); ) {
                 int codepoint = key.codePointAt(i);
                 i += Character.charCount(codepoint);
                 current = current.children.computeIfAbsent(codepoint, _ -> new Node<>());
             }
-            current.data.add(data);
+            current.data.addAll(data);
         }
     }
 }
