@@ -15,7 +15,6 @@ import org.jabref.model.entry.field.StandardField;
 
 // Undo redo stuff
 public class UndoableAbbreviator {
-
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private final AbbreviationType abbreviationType;
     private final boolean useFJournalField;
@@ -48,21 +47,21 @@ public class UndoableAbbreviator {
 
         Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
 
-        if (foundAbbreviation.isEmpty()) {
+        if (foundAbbreviation.isEmpty() && abbreviationType != AbbreviationType.LTWA) {
             return false; // Unknown, cannot abbreviate anything.
         }
 
-        Abbreviation abbreviation = foundAbbreviation.get();
-        String newText = getAbbreviatedName(abbreviation);
+        String newText = abbreviationType == AbbreviationType.LTWA ? journalAbbreviationRepository.getLtwaAbbreviation(text) : getAbbreviatedName(foundAbbreviation.get());
+
+        // Store full name into fjournal but only if it exists
+        if (useFJournalField && foundAbbreviation.isPresent() && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
+            String fullName = foundAbbreviation.get().getName();
+            entry.setField(AMSField.FJOURNAL, fullName);
+            ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, fullName));
+        }
 
         if (newText.equals(origText)) {
             return false;
-        }
-
-        // Store full name into fjournal but only if it exists
-        if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
-            entry.setField(AMSField.FJOURNAL, abbreviation.getName());
-            ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, abbreviation.getName()));
         }
 
         entry.setField(fieldName, newText);
