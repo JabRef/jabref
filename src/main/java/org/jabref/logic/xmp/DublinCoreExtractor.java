@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class is used for <em>both</em> conversion from Dublin Core to BibTeX and conversion form BibTeX to Dublin Core
+ *
+ * Related class: {@link org.jabref.logic.xmp.DocumentInformationExtractor}
  */
 public class DublinCoreExtractor {
 
@@ -116,6 +118,13 @@ public class DublinCoreExtractor {
     private void extractDOI() {
         String identifier = dcSchema.getIdentifier();
         if (!StringUtil.isNullOrEmpty(identifier)) {
+            if (identifier.startsWith("doi:")) {
+                identifier = identifier.substring(4);
+            }
+            if (identifier.contains(":")) {
+                LOGGER.info("Found identifier other than DOI {}", identifier);
+                // TODO: If other prefix, write to other field
+            }
             bibEntry.setField(StandardField.DOI, identifier);
         }
     }
@@ -137,12 +146,12 @@ public class DublinCoreExtractor {
      * The relation attribute of DublinCore is abused to store these custom fields. The prefix <code>bibtex</code> is used.
      */
     private void extractBibTexFields() {
-        Predicate<String> isBibTeXElement = s -> s.startsWith("bibtex/");
+        Predicate<String> isBibTeXElement = s -> s.startsWith(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX);
         Consumer<String> splitBibTeXElement = s -> {
             // the default pattern is bibtex/key/value, but some fields contains url etc.
             // so the value property contains additional slashes, which makes the usage of
             // String#split complicated.
-            String temp = s.substring("bibtex/".length());
+            String temp = s.substring(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX.length());
             int i = temp.indexOf('/');
             if (i != -1) {
                 Field key = FieldFactory.parseField(temp.substring(0, i));
@@ -231,7 +240,7 @@ public class DublinCoreExtractor {
     }
 
     /**
-     * No Equivalent in BibTeX. Will create an Unknown "Coverage" Field
+     * No equivalent in BibTeX. Will create an unknown "Coverage" field.
      */
     private void extractCoverage() {
         String coverage = dcSchema.getCoverage();
@@ -396,7 +405,7 @@ public class DublinCoreExtractor {
         // We write the plain content of the field, because this is a custom DC field content with the semantics that
         // BibTeX data is stored. Thus, we do not need to get rid of BibTeX, but can keep it.
         String value = bibEntry.getField(field).get();
-        dcSchema.addRelation("bibtex/" + field.getName() + '/' + value);
+        dcSchema.addRelation(XmpUtilShared.BIBTEX_DI_FIELD_NAME_PREFIX + field.getName() + '/' + value);
     }
 
     /**
