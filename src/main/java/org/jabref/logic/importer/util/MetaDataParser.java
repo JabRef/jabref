@@ -121,6 +121,8 @@ public class MetaDataParser {
                 metaData.addContentSelector(ContentSelectors.parse(FieldFactory.parseField(entry.getKey().substring(MetaData.SELECTOR_META_PREFIX.length())), StringUtil.unquote(entry.getValue(), MetaData.ESCAPE_CHARACTER)));
             } else if (MetaData.FILE_DIRECTORY.equals(entry.getKey())) {
                 metaData.setLibrarySpecificFileDirectory(parseDirectory(entry.getValue()));
+            } else if (entry.getKey().startsWith(MetaData.BLG_FILE_PATH + "-")) {
+                handleBlgFilePathEntry(entry, metaData);
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
                 // The user name starts directly after FILE_DIRECTORY + '-'
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
@@ -263,6 +265,35 @@ public class MetaDataParser {
         } else {
             // return default actions
             return new FieldFormatterCleanups(false, DEFAULT_SAVE_ACTIONS);
+        }
+    }
+
+    /**
+     * Handles a blgFilePath-* metadata entry. Expects exactly one valid path.
+     *
+     * @param entry the metadata entry containing the user-specific .blg path.
+     * @param metaData the MetaData object to update.
+     */
+    private void handleBlgFilePathEntry(Map.Entry<String, String> entry, MetaData metaData) {
+        String user = entry.getKey().substring(MetaData.BLG_FILE_PATH.length() + 1);
+        List<String> values;
+        try {
+            values = getAsList(entry.getValue());
+        } catch (ParseException e) {
+            LOGGER.error("Invalid .blg metadata format for user {}: {}", user, entry.getValue(), e);
+            return;
+        }
+        if (values.size() != 1) {
+            LOGGER.error("Expected single .blg path entry for user {}, but got {}", user, values);
+            return;
+        }
+        String pathStr = values.getFirst();
+        try {
+            Path path = Path.of(pathStr);
+            metaData.setBlgFilePath(user, path);
+        } catch (Exception e) {
+            LOGGER.error("Invalid .blg file path for user {}: {}", user, pathStr, e);
+            return;
         }
     }
 }

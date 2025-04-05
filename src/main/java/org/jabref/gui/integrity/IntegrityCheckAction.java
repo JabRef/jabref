@@ -69,16 +69,20 @@ public class IntegrityCheckAction extends SimpleCommand {
                     result.addAll(check.checkEntry(entry));
                     updateProgress(i, entries.size());
                 }
-
                 return result;
             }
         };
         task.setOnSucceeded(value -> {
             List<IntegrityMessage> messages = task.getValue();
+            // After the main check: Load .blg warnings using BibLogSettingsViewModel
+            BibLogSettingsViewModel viewModel = new BibLogSettingsViewModel(
+                    database.getMetaData(),
+                    database.getDatabasePath()
+            );
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {
-                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier.get()));
+                dialogService.showCustomDialogAndWait(new IntegrityCheckDialog(messages, tabSupplier.get(), dialogService));
             }
         });
         task.setOnFailed(event -> dialogService.showErrorDialogAndWait("Integrity check failed.", task.getException()));

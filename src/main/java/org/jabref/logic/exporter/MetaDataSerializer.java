@@ -32,6 +32,7 @@ public class MetaDataSerializer {
 
     /**
      * Writes all data in the format &lt;key, serialized data>.
+     * Also serializes user-defined .blg file paths (if present).
      */
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
                                                              GlobalCitationKeyPatterns globalCiteKeyPatterns) {
@@ -60,6 +61,9 @@ public class MetaDataSerializer {
                 .put(MetaData.FILE_DIRECTORY_LATEX + '-' + user, Collections.singletonList(path.toString().trim())));
         metaData.getVersionDBStructure().ifPresent(
                 versionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, Collections.singletonList(versionDBStructure.trim())));
+        metaData.getBlgFilePaths().forEach((user, path) -> {
+            stringyMetaData.put(MetaData.BLG_FILE_PATH + "-" + user, Collections.singletonList(path.toString().trim()));
+        });
 
         for (ContentSelector selector : metaData.getContentSelectorsSorted()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());

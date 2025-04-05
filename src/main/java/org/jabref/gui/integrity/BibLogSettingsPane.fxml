@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      spacing="10"
+      alignment="CENTER_LEFT"
+      fx:controller="org.jabref.gui.integrity.BibLogSettingsPane"
+      fx:id="bibLogSettingsPane">
+    <Label text="BibTeX log (.blg) file:"/>
+    <TextField fx:id="pathField" prefWidth="300"/>
+    <Button onAction="#onBrowse" text="Browse..."/>
+    <Button onAction="#onReset" text="Reset"/>
+</HBox>

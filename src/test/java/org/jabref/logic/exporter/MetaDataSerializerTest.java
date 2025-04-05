@@ -1,5 +1,6 @@
 package org.jabref.logic.exporter;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -139,5 +140,20 @@ public class MetaDataSerializerTest {
     @MethodSource
     void serializeCustomizedEntryType(BibEntryTypeBuilder bibEntryTypeBuilder, String expected) {
         assertEquals(expected, MetaDataSerializer.serializeCustomEntryTypes(bibEntryTypeBuilder.build()));
+    }
+
+    /**
+     * Ensures that user-specific .blg path is correctly serialized
+     * to the form: blgFilePath-{username}=/path/to/file.blg;
+     */
+    @Test
+    void serializeUserSpecificBlgPath() {
+        String user = "testUser";
+        Path blgPath = Path.of("/home/user/test.blg");
+        metaData.setBlgFilePath(user, blgPath);
+
+        Map<String, String> serialized = MetaDataSerializer.getSerializedStringMap(metaData, pattern);
+
+        assertEquals("/home/user/test.blg;", serialized.get("blgFilePath-" + user));
     }
 }
