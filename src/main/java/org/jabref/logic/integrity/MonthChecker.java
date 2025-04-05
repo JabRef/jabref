@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.strings.StringUtil;
 
@@ -40,12 +39,12 @@ public class MonthChecker implements ValueChecker {
         // biblatex
         if (bibDatabaseContextMonth.isBiblatexMode()
                 && !(ONLY_AN_INTEGER.test(value.trim()) || MONTH_NORMALIZED.test(value.trim()))) {
-            return Optional.of(Localization.lang("should be an integer or normalized"));
+            return Optional.of(IntegrityIssue.SHOULD_BE_AN_INTEGER_OR_NORMALIZED.getText());
         }
 
         // BibTeX
         if (!bibDatabaseContextMonth.isBiblatexMode() && !MONTH_NORMALIZED.test(value.trim())) {
-            return Optional.of(Localization.lang("should be normalized"));
+            return Optional.of(IntegrityIssue.SHOULD_BE_NORMALIZED.getText());
         }
 
         return Optional.empty();

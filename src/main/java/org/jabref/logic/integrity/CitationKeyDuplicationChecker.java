@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -28,7 +27,7 @@ public class CitationKeyDuplicationChecker implements EntryChecker {
         boolean isDuplicate = database.isDuplicateCitationKeyExisting(citeKey.get());
         if (isDuplicate) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("Duplicate citation key"), entry, StandardField.KEY));
+                    new IntegrityMessage(IntegrityIssue.DUPLICATE_CITATION_KEY.getText(), entry, StandardField.KEY));
         }
         return Collections.emptyList();
     }
