@@ -69,11 +69,13 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         laTexFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
 
-        Platform.runLater(() -> librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory));
-        Platform.runLater(() -> userSpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.userSpecificFileDirectoryStatus(), userSpecificFileDirectory));
-        Platform.runLater(() -> laTexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), laTexFileDirectory));
+        Platform.runLater(() -> {
+            librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
+            userSpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.userSpecificFileDirectoryStatus(), userSpecificFileDirectory);
+            laTexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), laTexFileDirectory);
 
-        Platform.runLater(()-> librarySpecificFileDirectory.requestFocus());
+            librarySpecificFileDirectory.requestFocus();
+        });
     }
 
     @FXML
