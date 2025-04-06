@@ -14,6 +14,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
@@ -47,6 +49,7 @@ public class LinkedFile implements Serializable {
     // be a URI, where a file type might not be present.
     private transient StringProperty fileType = new SimpleStringProperty();
     private transient StringProperty sourceURL = new SimpleStringProperty();
+    private transient BooleanProperty downloadAutomatically = new SimpleBooleanProperty(false);
 
     public LinkedFile(String description, Path link, String fileType) {
         this(Objects.requireNonNull(description), Objects.requireNonNull(link).toString(), Objects.requireNonNull(fileType));
@@ -150,7 +153,7 @@ public class LinkedFile implements Serializable {
     }
 
     public Observable[] getObservables() {
-        return new Observable[] {this.link, this.description, this.fileType, this.sourceURL};
+        return new Observable[] {this.link, this.description, this.fileType, this.sourceURL, this.downloadAutomatically};
     }
 
     @Override
@@ -162,7 +165,8 @@ public class LinkedFile implements Serializable {
             return Objects.equals(description.get(), that.description.get())
                     && Objects.equals(link.get(), that.link.get())
                     && Objects.equals(fileType.get(), that.fileType.get())
-                    && Objects.equals(sourceURL.get(), that.sourceURL.get());
+                    && Objects.equals(sourceURL.get(), that.sourceURL.get())
+                    && Objects.equals(downloadAutomatically.get(), that.downloadAutomatically.get());
         }
         return false;
     }
@@ -175,6 +179,7 @@ public class LinkedFile implements Serializable {
         out.writeUTF(getLink());
         out.writeUTF(getDescription());
         out.writeUTF(getSourceUrl());
+        out.writeBoolean(shouldDownloadAutomatically());
         out.flush();
     }
 
@@ -186,6 +191,7 @@ public class LinkedFile implements Serializable {
         link = new SimpleStringProperty(in.readUTF());
         description = new SimpleStringProperty(in.readUTF());
         sourceURL = new SimpleStringProperty(in.readUTF());
+        downloadAutomatically = new SimpleBooleanProperty(in.readBoolean());
     }
 
     /**
@@ -201,7 +207,7 @@ public class LinkedFile implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(description.get(), link.get(), fileType.get(), sourceURL.get());
+        return Objects.hash(description.get(), link.get(), fileType.get(), sourceURL.get(), downloadAutomatically.get());
     }
 
     @Override
@@ -211,6 +217,7 @@ public class LinkedFile implements Serializable {
                 ", link='" + link.get() + '\'' +
                 ", fileType='" + fileType.get() + '\'' +
                 (StringUtil.isNullOrEmpty(sourceURL.get()) ? "" : (", sourceUrl='" + sourceURL.get() + '\'')) +
+                ", downloadAutomatically=" + downloadAutomatically.get() +
                 '}';
     }
 
@@ -220,6 +227,18 @@ public class LinkedFile implements Serializable {
 
     public boolean isOnlineLink() {
         return isOnlineLink(link.get());
+    }
+
+    public boolean shouldDownloadAutomatically() {
+        return downloadAutomatically.get();
+    }
+
+    public void setDownloadAutomatically(boolean shouldDownload) {
+        this.downloadAutomatically.set(shouldDownload);
+    }
+
+    public BooleanProperty downloadAutomaticallyProperty() {
+        return downloadAutomatically;
     }
 
     public Optional<Path> findIn(BibDatabaseContext databaseContext, FilePreferences filePreferences) {

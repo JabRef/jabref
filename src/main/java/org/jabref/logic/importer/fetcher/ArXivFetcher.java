@@ -781,7 +781,14 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 getDate().ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
                 primaryCategory.ifPresent(category -> bibEntry.setField(StandardField.EPRINTCLASS, category));
                 journalReferenceText.ifPresent(journal -> bibEntry.setField(StandardField.JOURNAL, journal));
-                getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
+                
+                // Set up LinkedFile for automatic PDF download
+                getPdfUrl().ifPresent(url -> {
+                    LinkedFile pdfFile = new LinkedFile(url, "PDF");
+                    pdfFile.setDownloadAutomatically(true);
+                    bibEntry.setFiles(Collections.singletonList(pdfFile));
+                });
+                
                 return bibEntry;
             }
         }

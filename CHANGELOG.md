@@ -1,5 +1,9 @@
 # Changelog
 
+### Added
+
+- We added automatic PDF downloads for arXiv entries when the "Download referenced files" option is enabled in Web Search preferences [#581](https://github.com/JabRef/jabref/issues/581)
+
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
