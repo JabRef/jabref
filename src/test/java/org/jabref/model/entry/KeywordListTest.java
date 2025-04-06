@@ -117,39 +117,40 @@ class KeywordListTest {
     }
 
     @Test
-    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword() {
+    public void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword() {
         assertEquals(new KeywordList("keyword,one", "keywordTwo"),
                 KeywordList.parse("keyword\\,one, keywordTwo", ',', '>'));
     }
 
     @Test
-    void parseKeywordWithEscapedDelimiterAtEndTreatsAsLiteral() {
+    public void parseKeywordWithEscapedDelimiterAtEndPreservesDelimiter() {
         assertEquals(new KeywordList("keywordOne,", "keywordTwo"),
                 KeywordList.parse("keywordOne\\,, keywordTwo", ',', '>'));
     }
 
     @Test
-    void parseKeywordWithEscapedBackslashTreatsAsLiteralBackslash() {
+    public void parseKeywordWithEscapedBackslashTreatsItAsLiteral() {
         assertEquals(new KeywordList("keyword\\", "keywordTwo"),
                 KeywordList.parse("keyword\\\\, keywordTwo", ',', '>'));
     }
 
     @Test
-    void parseEscapedDelimiterWithinHierarchicalKeywordParsesCorrectly() {
+    public void parseKeywordWithEscapedDelimiterAndHierarchicalDelimiterCreatesHierarchy() {
         Keyword expected = Keyword.of("keyword,one", "sub");
         assertEquals(new KeywordList(expected),
                 KeywordList.parse("keyword\\,one > sub", ',', '>'));
     }
 
     @Test
-    void parseKeywordWithMultipleEscapedDelimitersTreatsAllAsLiteral() {
+    public void parseKeywordWithMultipleEscapedDelimitersTreatsThemAsLiteral() {
         assertEquals(new KeywordList("one,two,three", "four"),
                 KeywordList.parse("one\\,two\\,three, four", ',', '>'));
     }
 
     @Test
-    void parseTrailingEscapeCharacterIsPreservedAsLiteralBackslash() {
+    public void parseKeywordWithTrailingEscapeCharacterTreatsItAsLiteralBackslash() {
         assertEquals(new KeywordList("keywordOne\\"),
                 KeywordList.parse("keywordOne\\\\", ',', '>'));
     }
+
 }
