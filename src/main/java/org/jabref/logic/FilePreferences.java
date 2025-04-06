@@ -33,6 +33,8 @@ public class FilePreferences {
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
     private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
+    private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty(true);
+    private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty(false);
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -47,7 +49,9 @@ public class FilePreferences {
                            boolean confirmDeleteLinkedFile,
                            boolean moveToTrash,
                            boolean shouldKeepDownloadUrl,
-                           Path lastUsedDirectory) {
+                           Path lastUsedDirectory,
+                           boolean openFileExplorerInFileDirectory,
+                           boolean openFileExplorerInLastUsedDirectory) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -62,6 +66,8 @@ public class FilePreferences {
         this.moveToTrash.setValue(moveToTrash);
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
         this.lastUsedDirectory.setValue(lastUsedDirectory);
+        this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);
+        this.openFileExplorerInLastUsedDirectory.set(openFileExplorerInLastUsedDirectory);
     }
 
     public String getUserAndHost() {
@@ -230,5 +236,29 @@ public class FilePreferences {
 
     public void setLastUsedDirectory(Path lastUsedDirectory) {
         this.lastUsedDirectory.set(lastUsedDirectory);
+    }
+
+    public boolean shouldOpenFileExplorerInFileDirectory() {
+        return openFileExplorerInFileDirectory.get();
+    }
+
+    public BooleanProperty openFileExplorerInFileDirectoryProperty() {
+        return openFileExplorerInFileDirectory;
+    }
+
+    public void setOpenFileExplorerInFileDirectory(boolean value) {
+        this.openFileExplorerInFileDirectory.set(value);
+    }
+
+    public boolean shouldOpenFileExplorerInLastUsedDirectory() {
+        return openFileExplorerInLastUsedDirectory.get();
+    }
+
+    public BooleanProperty openFileExplorerInLastUsedDirectoryProperty() {
+        return openFileExplorerInLastUsedDirectory;
+    }
+
+    public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
+        this.openFileExplorerInLastUsedDirectory.set(value);
     }
 }
