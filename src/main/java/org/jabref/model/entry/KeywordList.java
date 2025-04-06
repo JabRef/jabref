@@ -8,11 +8,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.strings.StringUtil;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a list of keyword chains.
@@ -53,13 +54,40 @@ public class KeywordList implements Iterable<Keyword> {
 
         KeywordList keywordList = new KeywordList();
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
-            keywordList.add(chainRoot);
+        List<String> tokens = splitRespectingEscapes(keywordString, delimiter);
+
+        for (String token : tokens) {
+            String[] parts = token.split(Pattern.quote(hierarchicalDelimiter.toString()));
+            Keyword chain = Keyword.of(Arrays.stream(parts).map(String::trim).toArray(String[]::new));
+            keywordList.add(chain);
         }
+
         return keywordList;
+    }
+
+    private static List<String> splitRespectingEscapes(String keywordString, Character delimiter) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean isEscaping = false;
+
+        for (int position = 0; position < keywordString.length(); position++) {
+            char currentChar = keywordString.charAt(position);
+
+            if (isEscaping) {
+                currentToken.append(currentChar);
+                isEscaping = false;
+            } else if (currentChar == '\\') {
+                isEscaping = true;
+            } else if (currentChar == delimiter) {
+                tokens.add(currentToken.toString().trim());
+                currentToken.setLength(0);
+            } else {
+                currentToken.append(currentChar);
+            }
+        }
+
+        tokens.add(currentToken.toString().trim());
+        return tokens;
     }
 
     /**
