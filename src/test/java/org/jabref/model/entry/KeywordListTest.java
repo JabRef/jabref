@@ -152,5 +152,4 @@ class KeywordListTest {
         assertEquals(new KeywordList("keywordOne\\"),
                 KeywordList.parse("keywordOne\\\\", ',', '>'));
     }
-
 }
