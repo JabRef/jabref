@@ -2,11 +2,13 @@ package org.jabref.cli;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.journals.ltwa.LtwaEntry;
 import org.jabref.logic.journals.ltwa.LtwaTsvParser;
@@ -41,6 +43,8 @@ public class LtwaListMvGenerator {
             LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile);
         } catch (IOException e) {
             LOGGER.error("Error generating LTWA MVStore file.", e);
+        } catch (URISyntaxException e) {
+            LOGGER.error("Invalid URL for LTWA file (this should never happen).", e);
         }
     }
 
@@ -50,9 +54,9 @@ public class LtwaListMvGenerator {
      * @return Path to the downloaded file
      * @throws IOException If an I/O error occurs
      */
-    private static Path downloadLtwaFile() throws IOException {
+    private static Path downloadLtwaFile() throws IOException, URISyntaxException {
         LOGGER.info("Downloading LTWA file from {}.", LtwaListMvGenerator.LTWA_URL);
-        var in = URI.create(LtwaListMvGenerator.LTWA_URL).toURL().openStream();
+        var in = new URI(LTWA_URL).toURL().openStream();
         var path = Files.writeString(
                 Files.createTempFile("ltwa", ".csv"),
                 new String(in.readAllBytes()),
@@ -82,31 +86,26 @@ public class LtwaListMvGenerator {
                 .open()) {
             MVMap<String, List<LtwaEntry>> prefixMap = store.openMap("Prefixes");
             MVMap<String, List<LtwaEntry>> suffixMap = store.openMap("Suffixes");
-            var inflection = Character.toString(PrefixTree.WILD_CARD).repeat(3) + " ";
+            String inflection = Character.toString(PrefixTree.WILD_CARD).repeat(3) + " ";
 
-            for (var entry : entries) {
-                String word = NormalizeUtils.normalize(entry.word()).toLowerCase().replace(" ",
-                        inflection);
-                boolean isSuffix = word.startsWith("-");
-
-                if (isSuffix) {
-                    String key = word.substring(1);
-                    List<LtwaEntry> entryList = suffixMap.get(key);
-                    if (entryList == null) {
-                        entryList = new ArrayList<>();
-                    }
-                    entryList.add(entry);
-                    suffixMap.put(key, entryList);
-                } else {
-                    String key = word.endsWith("-") ? word.substring(0, word.length() - 1) : word;
-                    List<LtwaEntry> entryList = prefixMap.get(key);
-                    if (entryList == null) {
-                        entryList = new ArrayList<>();
-                    }
-                    entryList.add(entry);
-                    prefixMap.put(key, entryList);
-                }
-            }
+            entries.forEach(entry ->
+                    NormalizeUtils.normalize(entry.word())
+                                  .map(String::toLowerCase)
+                                  .map(word -> word.replace(" ", inflection))
+                                  .ifPresent(word -> {
+                                      if (word.startsWith("-")) {
+                                          String key = word.substring(1);
+                                          suffixMap.computeIfAbsent(key, k ->
+                                                  Stream.<LtwaEntry>builder().build().collect(Collectors.toList())
+                                          ).add(entry);
+                                      } else {
+                                          String key = word.endsWith("-") ? word.substring(0, word.length() - 1) : word;
+                                          prefixMap.computeIfAbsent(key, k ->
+                                                  Stream.<LtwaEntry>builder().build().collect(Collectors.toList())
+                                          ).add(entry);
+                                      }
+                                  })
+            );
 
             LOGGER.info("Stored {} prefixes and {} suffixes", prefixMap.size(), suffixMap.size());
         }

@@ -108,9 +108,9 @@ public class JournalAbbreviationRepository {
     /**
      * Get the LTWA abbreviation for the given journal name.
      */
-    public String getLtwaAbbreviation(String journalName) {
+    public Optional<String> getLtwaAbbreviation(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
-            return journalName;
+            return Optional.of(journalName);
         }
         return ltwaRepository.abbreviate(journalName);
     }

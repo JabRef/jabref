@@ -39,11 +39,8 @@ public class UndoableAbbreviator {
             return false;
         }
 
-        String text = entry.getField(fieldName).get();
-        String origText = text;
-        if (database != null) {
-            text = database.resolveForStrings(text);
-        }
+        String origText = entry.getField(fieldName).get();
+        String text = database != null ? database.resolveForStrings(origText) : origText;
 
         Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
 
@@ -51,18 +48,25 @@ public class UndoableAbbreviator {
             return false; // Unknown, cannot abbreviate anything.
         }
 
-        String newText = abbreviationType == AbbreviationType.LTWA ? journalAbbreviationRepository.getLtwaAbbreviation(text) : getAbbreviatedName(foundAbbreviation.get());
+        Optional<String> newTextOptional = abbreviationType == AbbreviationType.LTWA
+                ? journalAbbreviationRepository.getLtwaAbbreviation(text)
+                : foundAbbreviation.map(this::getAbbreviatedName);
 
-        // Store full name into fjournal but only if it exists
-        if (useFJournalField && foundAbbreviation.isPresent() && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
-            String fullName = foundAbbreviation.get().getName();
-            entry.setField(AMSField.FJOURNAL, fullName);
-            ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, fullName));
-        }
-
-        if (newText.equals(origText)) {
+        // Return early if no abbreviation found or it matches original
+        if (newTextOptional.isEmpty() || newTextOptional.get().equals(origText)) {
             return false;
         }
+
+        String newText = newTextOptional.get();
+
+        // Store full name into fjournal but only if it exists
+        foundAbbreviation.ifPresent(abbr -> {
+            if (useFJournalField && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
+                String fullName = abbr.getName();
+                entry.setField(AMSField.FJOURNAL, fullName);
+                ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, fullName));
+            }
+        });
 
         entry.setField(fieldName, newText);
         ce.addEdit(new UndoableFieldChange(entry, fieldName, origText, newText));

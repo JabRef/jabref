@@ -50,8 +50,12 @@ public class LtwaTsvParser {
                 var abbreviationStr = matcher.group(2);
                 var languageStr = matcher.group(3);
 
-                word = NormalizeUtils.normalize(ANNOTATION.matcher(word).replaceAll("").strip());
-                var abbreviation = abbreviationStr.equals("n.a.") ? null : abbreviationStr;
+                var normalizeResult = NormalizeUtils.normalize(ANNOTATION.matcher(word).replaceAll("").strip());
+                if (normalizeResult.isEmpty()) {
+                    continue;
+                }
+                word = normalizeResult.get();
+                var abbreviation = "n.a.".equals(abbreviationStr) ? null : abbreviationStr;
                 List<String> languages = Arrays.stream(languageStr.split("\\s*,\\s*")).map(String::trim)
                         .filter(s -> !s.isEmpty()).toList();
 

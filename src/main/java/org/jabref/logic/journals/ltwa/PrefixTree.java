@@ -8,6 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 public class PrefixTree<D> {
+    /**
+     * Wildcard character used to match any character in the prefix tree.
+     * For example, WILD_CARD + WILD_CARD + WILD_CARD + "Hello World" -> would match .{,3}Hello World in this prefix tree
+     */
     public static final int WILD_CARD = '*';
     private final Node<D> root;
 

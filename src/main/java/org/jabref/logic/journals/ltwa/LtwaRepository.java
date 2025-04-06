@@ -1,10 +1,13 @@
 package org.jabref.logic.journals.ltwa;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
@@ -66,17 +69,20 @@ public class LtwaRepository {
      * @param title The title to be abbreviated
      * @return The abbreviated title
      */
-    public String abbreviate(String title) {
-        String normalizedTitle = NormalizeUtils.toNFKC(title);
-        CharStream charStream = CharStreams.fromString(normalizedTitle);
-        LtwaLexer lexer = new LtwaLexer(charStream);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        LtwaParser parser = new LtwaParser(tokens);
-        LtwaParser.TitleContext titleContext = parser.title();
-        AbbreviationListener listener = new AbbreviationListener(normalizedTitle, prefix, suffix);
-        ParseTreeWalker walker = new ParseTreeWalker();
-        walker.walk(listener, titleContext);
-        return listener.getResult();
+    public Optional<String> abbreviate(String title) {
+        return Optional.ofNullable(title)
+                       .flatMap(NormalizeUtils::toNFKC)
+                       .flatMap(normalizedTitle -> {
+                           CharStream charStream = CharStreams.fromString(normalizedTitle);
+                           LtwaLexer lexer = new LtwaLexer(charStream);
+                           CommonTokenStream tokens = new CommonTokenStream(lexer);
+                           LtwaParser parser = new LtwaParser(tokens);
+                           LtwaParser.TitleContext titleContext = parser.title();
+                           AbbreviationListener listener = new AbbreviationListener(normalizedTitle, prefix, suffix);
+                           ParseTreeWalker walker = new ParseTreeWalker();
+                           walker.walk(listener, titleContext);
+                           return listener.getResult();
+                       });
     }
 
     /**
@@ -91,6 +97,7 @@ public class LtwaRepository {
         private boolean addSpace = false;
         private int lastPartPosition = -1;
         private int abbreviatedTitlePosition = 0;
+        private boolean error = false;
 
         public AbbreviationListener(String originalTitle, PrefixTree<LtwaEntry> prefix, PrefixTree<LtwaEntry> suffix) {
             this.originalTitle = originalTitle;
@@ -114,15 +121,15 @@ public class LtwaRepository {
         @Override
         public void exitSymbolsElement(LtwaParser.SymbolsElementContext ctx) {
             String val = ctx.getText().replace("...", "").replace(",", "").replace(".", ",");
-            if (val.equals("&") || val.equals("+")) {
+            if ("&".equals(val) || "+".equals(val)) {
                 return;
             }
             result.append(val);
-            addSpace = false;
         }
 
         @Override
         public void exitOrdinalElement(LtwaParser.OrdinalElementContext ctx) {
+            addSpace = true;
             if (lastPartPosition != -1) {
                 result.delete(lastPartPosition, result.length());
             }
@@ -137,7 +144,7 @@ public class LtwaRepository {
 
         @Override
         public void exitPartElement(LtwaParser.PartElementContext ctx) {
-            lastPartPosition = result.length() + ((addSpace && !ctx.getText().isEmpty()) ? 1 : 0);
+            lastPartPosition = result.length();
             addAbbreviation(ctx.getStart().getStartIndex(), ctx.getText());
         }
 
@@ -151,49 +158,54 @@ public class LtwaRepository {
             addAbbreviation(ctx.getStart().getStartIndex(), ctx.getText());
         }
 
-        private void addAbbreviation(int position, String text) {
+        private void addAbbreviation(int position, String initialText) {
             if (position < abbreviatedTitlePosition) {
                 return;
             }
+
             String remainingTitle = originalTitle.substring(position);
-            String normalizedRemaining = NormalizeUtils.normalize(remainingTitle).toLowerCase();
+            Optional<String> normalizedOpt = NormalizeUtils.normalize(originalTitle.substring(position))
+                                                           .map(String::toLowerCase);
 
-            // Process the word with LTWA entries
-            List<LtwaEntry> entries = new ArrayList<>();
-            entries.addAll(prefix.search(normalizedRemaining));
-            entries.addAll(suffix.search(reverse(normalizedRemaining)));
-
-            var optionalEntry = entries.stream()
-                                       .filter(e -> matches(normalizedRemaining, e))
-                                       .max((a, b) -> {
-                                           // Suffix first
-                                           boolean isSuffixA = a.word().endsWith("-");
-                                           boolean isSuffixB = b.word().endsWith("-");
-                                           if (isSuffixA != isSuffixB) {
-                                               return isSuffixA ? 1 : -1;
-                                           }
-
-                                           // Longer first
-                                           int lengthComparison = a.word().length() - b.word().length();
-                                           if (lengthComparison != 0) {
-                                               return lengthComparison;
-                                           }
-
-                                           // Valid first
-                                           boolean isValidA = a.abbreviation() != null;
-                                           boolean isValidB = b.abbreviation() != null;
-                                           return isValidA == isValidB ? 0 : (isValidA ? 1 : -1);
-                                       });
-
-            if (optionalEntry.isPresent()) {
-                var entry = optionalEntry.get();
-                if (entry.abbreviation() != null) {
-                    text = restoreCapitalizationAndDiacritics(entry.abbreviation(), remainingTitle);
-                }
-                abbreviatedTitlePosition += entry.word().length();
+            if (normalizedOpt.isEmpty()) {
+                error = true;
+                appendWithSpace(initialText);
+                return;
             }
 
-            appendWithSpace(text);
+            String normalizedRemaining = normalizedOpt.get();
+
+            List<LtwaEntry> matchingEntries = Stream.concat(
+                                                            prefix.search(normalizedRemaining).stream(),
+                                                            suffix.search(reverse(normalizedRemaining)).stream())
+                                                    .filter(e -> matches(normalizedRemaining, e))
+                                                    .toList();
+
+            if (matchingEntries.isEmpty()) {
+                appendWithSpace(initialText);
+                return;
+            }
+
+            Optional<LtwaEntry> bestEntryOpt = matchingEntries.stream()
+                                                              .max(Comparator
+                                                                      .<LtwaEntry>comparingInt(e -> e.word().endsWith("-") ? 1 : 0)
+                                                                      .thenComparingInt(e -> e.word().length())
+                                                                      .thenComparingInt(e -> e.abbreviation() != null ? 1 : 0)
+                                                                      .thenComparingInt(e -> e.languages().contains("eng") ? 1 : 0));
+
+            LtwaEntry entry = bestEntryOpt.get();
+            if (entry.abbreviation() == null) {
+                appendWithSpace(initialText);
+                return;
+            }
+
+            abbreviatedTitlePosition += entry.word().length();
+            Optional<String> matchedOpt = restoreCapitalizationAndDiacritics(entry.abbreviation(), remainingTitle);
+            if (matchedOpt.isPresent()) {
+                appendWithSpace(matchedOpt.get());
+            } else {
+                error = true;
+            }
         }
 
         @Override
@@ -230,47 +242,45 @@ public class LtwaRepository {
         }
 
         private void appendWithSpace(String text) {
-            if (addSpace && !result.isEmpty()) {
+            if (addSpace && !result.isEmpty() && result.charAt(result.length() - 1) != ' ') {
                 result.append(" ");
             }
             result.append(text);
             addSpace = true;
         }
 
-        public String getResult() {
-            return result.toString();
+        public Optional<String> getResult() {
+            return error ? Optional.empty() : Optional.of(result.toString());
         }
     }
 
-    private static String restoreCapitalizationAndDiacritics(String abbreviation, String original) {
+    private static Optional<String> restoreCapitalizationAndDiacritics(String abbreviation, String original) {
         int abbrCodePointCount = abbreviation.codePointCount(0, abbreviation.length());
         int origCodePointCount = original.codePointCount(0, original.length());
 
         if (abbrCodePointCount > origCodePointCount) {
-            abbreviation = abbreviation.substring(0,
-                    abbreviation.offsetByCodePoints(0, origCodePointCount));
+            abbreviation = abbreviation.substring(0, abbreviation.offsetByCodePoints(0, origCodePointCount));
         }
 
-        String normalizedAbbreviation = NormalizeUtils.toNFKC(abbreviation);
+        return NormalizeUtils.toNFKC(abbreviation)
+                             .map(normalized -> {
+                                 int[] normalizedAbbrCodePoints = normalized.codePoints().toArray();
+                                 int[] origCodePoints = original.codePoints().toArray();
+                                 int[] resultCodePoints = Arrays.copyOf(normalizedAbbrCodePoints,
+                                         Math.min(normalizedAbbrCodePoints.length, origCodePoints.length));
+                                 IntStream.range(0, resultCodePoints.length)
+                                          .forEach(i -> {
+                                              String normalizedAbbrChar = new String(Character.toChars(normalizedAbbrCodePoints[i]));
+                                              String origChar = new String(Character.toChars(origCodePoints[i]));
 
-        int[] normalizedAbbrCodePoints = normalizedAbbreviation.codePoints().toArray();
-        int[] origCodePoints = original.codePoints().toArray();
+                                              NormalizeUtils.toNFKC(origChar)
+                                                            .filter(normalizedOrigChar -> !normalizedOrigChar.isEmpty() &&
+                                                                    normalizedAbbrChar.equalsIgnoreCase(normalizedOrigChar))
+                                                            .ifPresent(_ -> resultCodePoints[i] = origCodePoints[i]);
+                                          });
 
-        int[] resultCodePoints = Arrays.copyOf(normalizedAbbrCodePoints,
-                Math.min(normalizedAbbrCodePoints.length, origCodePoints.length));
-
-        for (int i = 0; i < resultCodePoints.length; i++) {
-            String normalizedAbbrChar = new String(Character.toChars(normalizedAbbrCodePoints[i]));
-            String origChar = new String(Character.toChars(origCodePoints[i]));
-            String normalizedOrigChar = NormalizeUtils.toNFKC(origChar);
-
-            if (!normalizedOrigChar.isEmpty() &&
-                    normalizedAbbrChar.equalsIgnoreCase(normalizedOrigChar)) {
-                resultCodePoints[i] = origCodePoints[i];
-            }
-        }
-
-        return new String(resultCodePoints, 0, resultCodePoints.length);
+                                 return new String(resultCodePoints, 0, resultCodePoints.length);
+                             });
     }
 
     private static boolean matches(String title, LtwaEntry entry) {
