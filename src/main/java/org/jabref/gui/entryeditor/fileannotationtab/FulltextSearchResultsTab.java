@@ -26,7 +26,6 @@ import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -34,7 +33,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResult;
 import org.jabref.model.search.query.SearchResults;
 
@@ -52,21 +50,18 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
     private final TextFlow content;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    TaskExecutor taskExecutor,
-                                    OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                                    TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
-        this.searchQueryProperty = searchQueryProperty;
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -76,14 +71,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         setText(Localization.lang("Search results"));
 
         // Rebinding is necessary because of re-rendering of highlighting of matched text
-        searchQueryProperty.addListener((observable, oldValue, newValue) -> bindToEntry(entry));
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, _) -> updateSearch());
     }
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return searchQueryProperty.get()
-                                  .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
-                                  .orElse(false);
+        return stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
+                           .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
+                           .orElse(false);
     }
 
     @Override
@@ -92,8 +87,11 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             return;
         }
         this.entry = entry;
-        content.getChildren().clear();
+        updateSearch();
+    }
 
+    private void updateSearch() {
+        content.getChildren().clear();
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(searchQuery -> {
             SearchResults searchResults = searchQuery.getSearchResults();
             if (searchResults != null) {
