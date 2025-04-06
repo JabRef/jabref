@@ -50,7 +50,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -62,7 +61,6 @@ import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
-import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -313,8 +311,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case NEW_INPROCEEDINGS:
                         new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, preferences, stateManager).execute();
                         break;
-                    case PASTE:
-                        break;
                     default:
                 }
             }
@@ -491,6 +487,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
             tabbedPane.requestFocus();
+            libraryTab.getMainTable().requestFocus();
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
