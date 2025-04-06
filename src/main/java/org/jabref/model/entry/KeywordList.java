@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.model.strings.StringUtil;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents a list of keyword chains.
