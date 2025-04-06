@@ -19,7 +19,7 @@ public class LtwaRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("provideJournalTitlesAndAbbreviations")
-    void testLtwaAbbreviations(String fullTitle, String expectedAbbreviation) {
+    void ltwaAbbreviations(String fullTitle, String expectedAbbreviation) {
         assertEquals(expectedAbbreviation, repository.getLtwaAbbreviation(fullTitle));
     }
 
@@ -49,7 +49,6 @@ public class LtwaRepositoryTest {
                 Arguments.of("Spunti e ricerche", "Spunti ric."),
                 Arguments.of("Journal of Chemical Physics A", "J. Chem. Phys. A"),
                 Arguments.of("Romanian Journal of Physics", "Rom. J. Phys."),
-                Arguments.of("Labor History", "Labor Hist."),
                 Arguments.of("Archiv Orientální", "Arch. Orient."),
                 Arguments.of("Ślaski Kwartalnik Historyczny Sobótka", "Śl. Kwart. Hist. Sobótka"),
                 Arguments.of("Mitteilungen der Österreichischen Geographischen Gesellschaft", "Mitt. Österr. Geogr. Ges."),

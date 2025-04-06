@@ -97,15 +97,16 @@ public class LtwaListMvGenerator {
                     }
                     entryList.add(entry);
                     suffixMap.put(key, entryList);
-                } else {
-                    String key = word.endsWith("-") ? word.substring(0, word.length() - 1) : word;
-                    List<LtwaEntry> entryList = prefixMap.get(key);
-                    if (entryList == null) {
-                        entryList = new ArrayList<>();
-                    }
-                    entryList.add(entry);
-                    prefixMap.put(key, entryList);
+                    continue;
                 }
+
+                String key = word.endsWith("-") ? word.substring(0, word.length() - 1) : word;
+                List<LtwaEntry> entryList = prefixMap.get(key);
+                if (entryList == null) {
+                    entryList = new ArrayList<>();
+                }
+                entryList.add(entry);
+                prefixMap.put(key, entryList);
             }
 
             LOGGER.info("Stored {} prefixes and {} suffixes", prefixMap.size(), suffixMap.size());

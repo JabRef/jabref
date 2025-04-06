@@ -53,15 +53,15 @@ public class UndoableAbbreviator {
 
         String newText = abbreviationType == AbbreviationType.LTWA ? journalAbbreviationRepository.getLtwaAbbreviation(text) : getAbbreviatedName(foundAbbreviation.get());
 
+        if (newText.equals(origText)) {
+            return false;
+        }
+
         // Store full name into fjournal but only if it exists
         if (useFJournalField && foundAbbreviation.isPresent() && (StandardField.JOURNAL == fieldName || StandardField.JOURNALTITLE == fieldName)) {
             String fullName = foundAbbreviation.get().getName();
             entry.setField(AMSField.FJOURNAL, fullName);
             ce.addEdit(new UndoableFieldChange(entry, AMSField.FJOURNAL, null, fullName));
-        }
-
-        if (newText.equals(origText)) {
-            return false;
         }
 
         entry.setField(fieldName, newText);

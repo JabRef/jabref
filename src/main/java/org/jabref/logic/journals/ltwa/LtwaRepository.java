@@ -67,6 +67,9 @@ public class LtwaRepository {
      * @return The abbreviated title
      */
     public String abbreviate(String title) {
+        if (title == null || title.isEmpty()) {
+            return title;
+        }
         String normalizedTitle = NormalizeUtils.toNFKC(title);
         CharStream charStream = CharStreams.fromString(normalizedTitle);
         LtwaLexer lexer = new LtwaLexer(charStream);
@@ -114,15 +117,15 @@ public class LtwaRepository {
         @Override
         public void exitSymbolsElement(LtwaParser.SymbolsElementContext ctx) {
             String val = ctx.getText().replace("...", "").replace(",", "").replace(".", ",");
-            if (val.equals("&") || val.equals("+")) {
+            if ("&".equals(val) || "+".equals(val)) {
                 return;
             }
             result.append(val);
-            addSpace = false;
         }
 
         @Override
         public void exitOrdinalElement(LtwaParser.OrdinalElementContext ctx) {
+            addSpace = true;
             if (lastPartPosition != -1) {
                 result.delete(lastPartPosition, result.length());
             }
@@ -137,7 +140,7 @@ public class LtwaRepository {
 
         @Override
         public void exitPartElement(LtwaParser.PartElementContext ctx) {
-            lastPartPosition = result.length() + ((addSpace && !ctx.getText().isEmpty()) ? 1 : 0);
+            lastPartPosition = result.length();
             addAbbreviation(ctx.getStart().getStartIndex(), ctx.getText());
         }
 
@@ -182,7 +185,17 @@ public class LtwaRepository {
                                            // Valid first
                                            boolean isValidA = a.abbreviation() != null;
                                            boolean isValidB = b.abbreviation() != null;
-                                           return isValidA == isValidB ? 0 : (isValidA ? 1 : -1);
+                                           if (isValidA != isValidB) {
+                                               return isValidA ? 1 : -1;
+                                           }
+
+                                           // English first
+                                           boolean isEnglishA = a.languages().contains("eng");
+                                           boolean isEnglishB = b.languages().contains("eng");
+                                           if (isEnglishA != isEnglishB) {
+                                               return isEnglishA ? 1 : -1;
+                                           }
+                                           return 0;
                                        });
 
             if (optionalEntry.isPresent()) {
@@ -230,7 +243,7 @@ public class LtwaRepository {
         }
 
         private void appendWithSpace(String text) {
-            if (addSpace && !result.isEmpty()) {
+            if (addSpace && !result.isEmpty() && result.charAt(result.length() - 1) != ' ') {
                 result.append(" ");
             }
             result.append(text);
