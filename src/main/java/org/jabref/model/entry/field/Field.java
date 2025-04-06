@@ -16,12 +16,17 @@ public interface Field {
     EnumSet<FieldProperty> getProperties();
 
     /**
-     * @return A version of the field name more suitable for display
+     * @return A version of the field name more suitable for display in the UI
      */
     default String getDisplayName() {
         return StringUtil.capitalizeFirst(getName());
     }
 
+    /**
+     * Name used for writing to .bib (or as XMP data)
+     *
+     * However, BibEntryWriter converts to lower case. See {@link org.jabref.logic.bibtex.BibEntryWriter#getFormattedFieldName}
+     */
     String getName();
 
     boolean isStandardField();

@@ -214,4 +214,10 @@ recipeList:
   # - org.openrewrite.java.testing.junit5.StaticImports
 
   # Logging
-  - org.openrewrite.java.logging.slf4j.Slf4jBestPractices
+  # cannot use "org.openrewrite.java.logging.slf4j.Slf4jBestPractices", because we sometimes really want "LOGGER.debug" instead of "LOGGER.error"
+  #   NOT: https://docs.openrewrite.org/recipes/java/logging/catchblockloglevel
+  # Manual collection of https://docs.openrewrite.org/recipes/java/logging/slf4j/slf4jbestpractices
+  - org.openrewrite.java.logging.slf4j.LoggersNamedForEnclosingClass
+  - org.openrewrite.java.logging.slf4j.ParameterizedLogging
+  - org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant
+  - org.openrewrite.java.logging.slf4j.CompleteExceptionLogging

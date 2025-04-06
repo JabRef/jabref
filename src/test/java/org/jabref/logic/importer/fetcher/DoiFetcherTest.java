@@ -70,6 +70,19 @@ class DoiFetcherTest {
             .withField(StandardField.PUBLISHER, "American Physical Society (APS)")
             .withField(StandardField.PAGES, "023315")
             .withField(StandardField.NUMBER, "2");
+    private final BibEntry bibBenedetto2000 = new BibEntry(StandardEntryType.Article)
+            .withCitationKey("Benedetto_2000")
+            .withField(StandardField.AUTHOR, "Benedetto, D. and Caglioti, E. and Marchioro, C.")
+            .withField(StandardField.JOURNAL, "Mathematical Methods in the Applied Sciences")
+            .withField(StandardField.TITLE, "On the motion of a vortex ring with a sharply concentrated vorticity")
+            .withField(StandardField.YEAR, "2000")
+            .withField(StandardField.MONTH, "#jan#")
+            .withField(StandardField.VOLUME, "23")
+            .withField(StandardField.DOI, "10.1002/(sici)1099-1476(20000125)23:2<147::aid-mma108>3.0.co;2-j")
+            .withField(StandardField.ISSN, "1099-1476")
+            .withField(StandardField.PUBLISHER, "Wiley")
+            .withField(StandardField.PAGES, "147--168")
+            .withField(StandardField.NUMBER, "2");
 
     @Test
     void getName() {
@@ -124,5 +137,11 @@ class DoiFetcherTest {
     void aPSJournalCopiesArticleIdToPageField() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1103/physreva.102.023315");
         assertEquals(Optional.of(bibEntryStenzel2020), fetchedEntry);
+    }
+
+    @Test
+    void performSearchDOIWithUnencodedCharacters() throws FetcherException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1002/(SICI)1099-1476(20000125)23:2<147::AID-MMA108>3.0.CO;2-J");
+        assertEquals(Optional.of(bibBenedetto2000), fetchedEntry);
     }
 }

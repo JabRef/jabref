@@ -294,7 +294,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         // Get target folder
         Optional<Path> fileDir = databaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
         if (fileDir.isEmpty()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist!"));
+            dialogService.showErrorDialogAndWait(Localization.lang("Move file"), Localization.lang("File directory is not set or does not exist."));
             return;
         }
 

@@ -85,13 +85,16 @@ jobs:
           show-progress: 'false'
       - name: Assign PR creator to issue
         run: |
+          set -e
+
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
 
           ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} --jq '[.assignees[].login]')
-    
+
           # Check if the user is already assigned
           if echo "$ASSIGNEES" | jq -e '. | index("${{ github.event.pull_request.user.login }}")' >/dev/null; then
             echo "User '${{ github.event.pull_request.user.login }}' is already an assignee. No update needed."
+            echo "Debug: $ASSIGNEES"
             exit 0
           fi
 
@@ -99,16 +102,15 @@ jobs:
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
           # Update issue with the new assignee list
+          echo "Updating issue #${{ steps.get_issue_number.outputs.ticketNumber }} updated with assignees: $UPDATED_ASSIGNEES..."
           gh api -X PATCH /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
 
-          echo "Issue #${{ steps.get_issue_number.outputs.ticketNumber }} updated with assignees: $UPDATED_ASSIGNEES"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add label "📌 Pinned"
         run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-label "📌 Pinned"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   conflicts_with_target:
     name: Conflicts with target branch
     runs-on: ubuntu-latest
