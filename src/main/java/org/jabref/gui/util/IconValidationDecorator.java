@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 
@@ -23,8 +24,12 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
 
     private final Pos position;
 
+    /**
+     * Creates a new IconValidationDecorator with default position CENTER_LEFT.
+     * This position is chosen to better align with text content regardless of case.
+     */
     public IconValidationDecorator() {
-        this(Pos.BOTTOM_LEFT);
+        this(Pos.CENTER_LEFT);
     }
 
     public IconValidationDecorator(Pos position) {
@@ -41,6 +46,8 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));
         label.setAlignment(position);
+        // Prevent label from stretching
+        label.setMaxHeight(Control.USE_PREF_SIZE); 
         return label;
     }
 

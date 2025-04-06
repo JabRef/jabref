@@ -8,6 +8,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -15,6 +16,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
 public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralPropertiesViewModel> {
@@ -23,6 +25,10 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField laTexFileDirectory;
+
+    private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer laTexFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
 
     @Inject private CliPreferences preferences;
 
@@ -59,7 +65,17 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
 
-        Platform.runLater(()-> librarySpecificFileDirectory.requestFocus());
+        librarySpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
+        userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
+        laTexFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
+
+        Platform.runLater(() -> {
+            librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
+            userSpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.userSpecificFileDirectoryStatus(), userSpecificFileDirectory);
+            laTexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), laTexFileDirectory);
+
+            librarySpecificFileDirectory.requestFocus();
+        });
     }
 
     @FXML
