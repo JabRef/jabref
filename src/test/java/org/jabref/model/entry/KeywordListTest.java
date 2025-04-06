@@ -117,41 +117,42 @@ class KeywordListTest {
     }
 
     @Test
-    void parseEscapedDelimiterShouldNotSplit() {
+    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword() {
         assertEquals(new KeywordList("keyword,one", "keywordTwo"),
                 KeywordList.parse("keyword\\,one, keywordTwo", ',', '>'));
     }
 
     @Test
-    void parseEscapedDelimiterAtEnd() {
+    void parseKeywordWithEscapedDelimiterAtEndTreatsAsLiteral() {
         assertEquals(new KeywordList("keywordOne,", "keywordTwo"),
                 KeywordList.parse("keywordOne\\,, keywordTwo", ',', '>'));
     }
 
     @Test
-    void parseEscapedEscapeCharacter() {
+    void parseKeywordWithEscapedBackslashTreatsAsLiteralBackslash() {
         assertEquals(new KeywordList("keyword\\", "keywordTwo"),
                 KeywordList.parse("keyword\\\\, keywordTwo", ',', '>'));
     }
 
     @Test
-    void parseEscapedAndHierarchicalShouldWorkTogether() {
+    void parseEscapedDelimiterWithinHierarchicalKeywordParsesCorrectly() {
         Keyword expected = Keyword.of("keyword,one", "sub");
         assertEquals(new KeywordList(expected),
                 KeywordList.parse("keyword\\,one > sub", ',', '>'));
     }
 
     @Test
-    void parseMultipleEscapedDelimiters() {
+    void parseKeywordWithMultipleEscapedDelimitersTreatsAllAsLiteral() {
         assertEquals(new KeywordList("one,two,three", "four"),
                 KeywordList.parse("one\\,two\\,three, four", ',', '>'));
     }
 
     @Test
-    void parseTrailingEscapeCharacterShouldBeLiteral() {
+    void parseTrailingEscapeCharacterIsPreservedAsLiteralBackslash() {
         assertEquals(new KeywordList("keywordOne\\"),
                 KeywordList.parse("keywordOne\\\\", ',', '>'));
     }
+
 
 
 }
