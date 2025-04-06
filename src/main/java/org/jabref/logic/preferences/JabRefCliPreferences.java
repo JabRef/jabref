@@ -276,6 +276,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
     public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
     public static final String OO_ALWAYS_ADD_CITED_ON_PAGES = "ooAlwaysAddCitedOnPages";
+    public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
+    public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -571,6 +573,8 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
         defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
+        defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");
+        defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
@@ -585,7 +589,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
-        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^");
+        defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
         defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
         defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
@@ -697,7 +701,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * @deprecated Never ever add a call to this method. There should be only one caller.
      *             All other usages should get the preferences passed (or injected).
-     *             The JabRef team leaves the <code>@deprecated</code> annotation to have IntelliJ listing this method with a strike-through.
+     *             The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
      */
     @Deprecated
     public static JabRefCliPreferences getInstance() {
@@ -1136,7 +1140,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getStringList(OO_EXTERNAL_STYLE_FILES),
                 get(OO_BIBLIOGRAPHY_STYLE_FILE),
                 currentStyle,
-                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES));
+                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),
+                get(OO_CSL_BIBLIOGRAPHY_TITLE),
+                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT));
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
@@ -1147,6 +1153,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
         EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
         EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
+
+        EasyBind.listen(openOfficePreferences.cslBibliographyTitleProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_TITLE, newValue));
+        EasyBind.listen(openOfficePreferences.cslBibliographyHeaderFormatProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, newValue));
 
         return openOfficePreferences;
     }
