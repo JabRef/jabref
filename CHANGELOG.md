@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
+- We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 
 ### Changed
 
@@ -65,6 +66,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where warning signs were improperly positioned next to text fields containing capital letters. [#12884](https://github.com/JabRef/jabref/issues/12884)
 - We fixed an issue where the drag'n'drop functionality in entryeditor did not work [#12561](https://github.com/JabRef/jabref/issues/12561)
 - We fixed an issue where the F4 shortcut key did not work without opening the right-click context menu. [#6101](https://github.com/JabRef/jabref/pull/6101)
 - We fixed an issue where the file renaming dialog was not resizable and its size was too small for long file names. [#12518](https://github.com/JabRef/jabref/pull/12518)
