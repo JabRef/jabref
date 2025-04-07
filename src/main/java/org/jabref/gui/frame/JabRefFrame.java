@@ -706,8 +706,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
-                } catch (
-                        IOException e) {
+                } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
             });
