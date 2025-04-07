@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BibWarningToIntegrityMessageConverterTest {
     @Test
-    public void convertsWarningsToIntegrityMessagesTest() {
+    void convertsWarningsToIntegrityMessagesTest() {
         BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Scholey_2013")
                 .withField(StandardField.AUTHOR, "Scholey");
@@ -53,7 +53,7 @@ public class BibWarningToIntegrityMessageConverterTest {
      * Gracefully skips warnings for entries not found in the database.
      */
     @Test
-    public void skipsWarningsForMissingEntries() {
+    void skipsWarningsForMissingEntries() {
         // Arrange: only one entry
         BibEntry scholey = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Scholey_2013");

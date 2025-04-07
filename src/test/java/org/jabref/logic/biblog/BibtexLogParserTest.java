@@ -15,12 +15,12 @@ public class BibtexLogParserTest {
     private BibtexLogParser parser;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         parser = new BibtexLogParser();
     }
 
     @Test
-    public void parsesWarningsFromResourceFileTest() throws Exception {
+    void parsesWarningsFromResourceFileTest() throws Exception {
         Path blgFile = Path.of("src/test/resources/org/jabref/logic/blg/Chocolate.blg");
         List<BibWarning> warnings = parser.parseBiblog(blgFile);
         assertEquals(4, warnings.size());

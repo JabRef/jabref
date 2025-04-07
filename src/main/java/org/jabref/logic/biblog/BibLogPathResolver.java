@@ -32,6 +32,10 @@ public class BibLogPathResolver {
             return userDefined;
         }
 
+        if (databasePath.isEmpty()) {
+            return Optional.empty();
+        }
+
         return databasePath.map(path ->
                 path.resolveSibling(
                         path.getFileName().toString().replaceFirst("\\.bib$", ".blg")

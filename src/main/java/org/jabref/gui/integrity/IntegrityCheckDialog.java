@@ -178,19 +178,24 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
      * 3. Replace old warnings and update the table.
      */
     private void reloadBlgWarnings() {
-        bibLogSettingsPane.getViewModel().getResolvedBlgPath().ifPresent(newBlgPath -> {
-            Optional<Path> lastPath = bibLogSettingsPane.getViewModel().getLastResolvedBlgPath();
-            if (lastPath.isPresent() && newBlgPath.equals(lastPath)) {
-                return;
-            }
-            List<IntegrityMessage> newWarnings = bibLogSettingsPane.getViewModel().getBlgWarnings(libraryTab.getBibDatabaseContext());
-            messages.removeAll(blgWarnings);
-            blgWarnings.clear();
-            blgWarnings.addAll(newWarnings);
-            messages.addAll(blgWarnings);
+        Optional<Path> resolvedBlgPath = bibLogSettingsPane.getViewModel().getResolvedBlgPath();
+        if (resolvedBlgPath.isEmpty()) {
+            return;
+        }
 
-            viewModel = new IntegrityCheckDialogViewModel(messages);
-            messagesTable.setItems(viewModel.getMessages());
-        });
+        Path newBlgPath = resolvedBlgPath.get();
+        Optional<Path> lastPath = bibLogSettingsPane.getViewModel().getLastResolvedBlgPath();
+        if (lastPath.isPresent() && newBlgPath.equals(lastPath)) {
+            return;
+        }
+
+        List<IntegrityMessage> newWarnings = bibLogSettingsPane.getViewModel().getBlgWarnings(libraryTab.getBibDatabaseContext());
+        messages.removeAll(blgWarnings);
+        blgWarnings.clear();
+        blgWarnings.addAll(newWarnings);
+        messages.addAll(blgWarnings);
+
+        viewModel = new IntegrityCheckDialogViewModel(messages);
+        messagesTable.setItems(viewModel.getMessages());
     }
 }
