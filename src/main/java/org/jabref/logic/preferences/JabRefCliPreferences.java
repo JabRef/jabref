@@ -1573,8 +1573,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
                 getBoolean(KEEP_DOWNLOAD_URL),
                 getPath(LAST_USED_DIRECTORY, getDefaultPath()),
-                getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, Boolean.TRUE),
-                getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE));
+                getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY),
+                getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY));
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));

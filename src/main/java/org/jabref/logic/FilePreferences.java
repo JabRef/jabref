@@ -33,8 +33,8 @@ public class FilePreferences {
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
     private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
-    private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty(true);
-    private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty(false);
+    private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
+    private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
