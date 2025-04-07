@@ -407,8 +407,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         int tabbedPaneSize = stateManager.getOpenDatabases().size();
 
         // Prevents hiding the bar when WelcomeTab and one database is open
-        if (tabbedPane.getTabs().stream().anyMatch(tab -> tab instanceof WelcomeTab))
+        if (tabbedPane.getTabs().stream().anyMatch(tab -> tab instanceof WelcomeTab)) {
             tabbedPaneSize += 1;
+        }
 
         if (preferences.getWorkspacePreferences().shouldHideTabBar() && tabbedPaneSize <= 1) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
