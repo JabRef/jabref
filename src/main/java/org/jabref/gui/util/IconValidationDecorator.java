@@ -46,8 +46,12 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         label.setGraphic(graphic);
         label.setTooltip(createTooltip(message));
         label.setAlignment(position);
+<<<<<<< HEAD
         // Prevent label from stretching
         label.setMaxHeight(Control.USE_PREF_SIZE); 
+=======
+        label.setMaxHeight(Control.USE_PREF_SIZE); // Prevent label from stretching
+>>>>>>> 24326a6bd7 (Final fix to issue #12884)
         return label;
     }
 
