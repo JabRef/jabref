@@ -404,7 +404,13 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void updateTabBarVisible() {
-        if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
+        int tabbedPaneSize = stateManager.getOpenDatabases().size();
+
+        // Prevents hiding the bar when WelcomeTab and one database is open
+        if (tabbedPane.getTabs().stream().anyMatch(tab -> tab instanceof WelcomeTab))
+            tabbedPaneSize += 1;
+
+        if (preferences.getWorkspacePreferences().shouldHideTabBar() && tabbedPaneSize <= 1) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
                 tabbedPane.getStyleClass().add("hide-tab-bar");
             }
@@ -531,9 +537,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public boolean closeTabs(@NonNull List<LibraryTab> tabs) {
         // Only accept library tabs that are shown in the tab container
         List<LibraryTab> toClose = tabs.stream()
-                .distinct()
-                .filter(getLibraryTabs()::contains)
-                .toList();
+                                       .distinct()
+                                       .filter(getLibraryTabs()::contains)
+                                       .toList();
 
         if (toClose.isEmpty()) {
             // Nothing to do
@@ -699,7 +705,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
-                } catch (IOException e) {
+                } catch (
+                        IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
             });
