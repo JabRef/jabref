@@ -2,8 +2,6 @@
 
 ### Added
 
-- We added automatic PDF downloads for arXiv entries when the "Download referenced files" option is enabled in Web Search preferences [#12889](https://github.com/JabRef/jabref/issues/12889)
-
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
@@ -33,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
+- We added automatic PDF downloads for arXiv entries when the "Download referenced files" option is enabled in Web Search preferences [#12889](https://github.com/JabRef/jabref/issues/12889)
 
 ### Changed
 

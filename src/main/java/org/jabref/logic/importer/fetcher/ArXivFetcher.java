@@ -23,6 +23,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.hc.core5.net.URIBuilder;
+import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.jabref.logic.cleanup.EprintCleanup;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
@@ -48,9 +50,6 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.paging.Page;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.OptionalUtil;
-
-import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -781,14 +780,6 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 getDate().ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
                 primaryCategory.ifPresent(category -> bibEntry.setField(StandardField.EPRINTCLASS, category));
                 journalReferenceText.ifPresent(journal -> bibEntry.setField(StandardField.JOURNAL, journal));
-                
-                // Set up LinkedFile for automatic PDF download
-                getPdfUrl().ifPresent(url -> {
-                    LinkedFile pdfFile = new LinkedFile(url, "PDF");
-                    pdfFile.setDownloadAutomatically(true);
-                    bibEntry.setFiles(Collections.singletonList(pdfFile));
-                });
-                
                 return bibEntry;
             }
         }
