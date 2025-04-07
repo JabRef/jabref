@@ -150,6 +150,18 @@ public class CitationStyle implements OOStyle {
             return Optional.empty();
         }
 
+        // First try to load as external file
+        Path externalPath = Path.of(styleFile);
+        if (Files.exists(externalPath)) {
+            try (InputStream inputStream = Files.newInputStream(externalPath)) {
+                return createCitationStyleFromSource(inputStream, styleFile);
+            } catch (IOException e) {
+                LOGGER.error("Error reading external file", e);
+                return Optional.empty();
+            }
+        }
+
+        // If not found as external file, try as internal resource
         String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
         Path internalFilePath = Path.of(internalFile);
         boolean isExternalFile = Files.exists(internalFilePath);
@@ -159,12 +171,10 @@ public class CitationStyle implements OOStyle {
                 return Optional.empty();
             }
             return createCitationStyleFromSource(inputStream, styleFile);
-        } catch (NoSuchFileException e) {
-            LOGGER.error("Could not find file: {}", styleFile, e);
         } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 
     /**
