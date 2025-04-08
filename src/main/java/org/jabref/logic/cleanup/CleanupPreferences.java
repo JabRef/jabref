@@ -11,6 +11,12 @@ import javafx.collections.ObservableSet;
 
 public class CleanupPreferences {
 
+    public static final String JOURNAL_CLEANUP_ABBREVIATE_DEFAULT = "Abbreviate (default)";
+    public static final String JOURNAL_CLEANUP_ABBREVIATE_DOTLESS = "Abbreviate (dotless)";
+    public static final String JOURNAL_CLEANUP_ABBREVIATE_SHORTEST_UNIQUE = "Abbreviate (shortest unique)";
+    public static final String JOURNAL_CLEANUP_UNABBREVIATE = "Unabbreviate";
+    public static final String JOURNAL_CLEANUP_NO_CHANGES = "No changes";
+
     private final ObservableSet<CleanupStep> activeJobs;
     private final ObjectProperty<FieldFormatterCleanups> fieldFormatterCleanups;
 
@@ -72,6 +78,25 @@ public class CleanupPreferences {
         fieldFormatterCleanups.setValue(fieldFormatters);
     }
 
+    public String getSelectedJournalCleanupOption() {
+        if (isActive(CleanupStep.NO_CHANGES)) {
+            return JOURNAL_CLEANUP_NO_CHANGES;
+        }
+        if (isActive(CleanupStep.ABBREVIATE_DEFAULT)) {
+            return JOURNAL_CLEANUP_ABBREVIATE_DEFAULT;
+        }
+        if (isActive(CleanupStep.ABBREVIATE_DOTLESS)) {
+            return JOURNAL_CLEANUP_ABBREVIATE_DOTLESS;
+        }
+        if (isActive(CleanupStep.ABBREVIATE_SHORTEST_UNIQUE)) {
+            return JOURNAL_CLEANUP_ABBREVIATE_SHORTEST_UNIQUE;
+        }
+        if (isActive(CleanupStep.UNABBREVIATE)) {
+            return JOURNAL_CLEANUP_UNABBREVIATE;
+        }
+        return JOURNAL_CLEANUP_NO_CHANGES;
+    }
+
     public enum CleanupStep {
         /**
          * Removes the http://... for each DOI. Moves DOIs from URL and NOTE filed to DOI field.
@@ -100,6 +125,14 @@ public class CleanupPreferences {
         DO_NOT_CONVERT_TIMESTAMP,
         MOVE_PDF,
         FIX_FILE_LINKS,
-        CLEAN_UP_ISSN
+        CLEAN_UP_ISSN,
+        /**
+         * Abbreviate or unabbreviate journal titles
+         */
+        ABBREVIATE_DEFAULT,
+        ABBREVIATE_DOTLESS,
+        ABBREVIATE_SHORTEST_UNIQUE,
+        UNABBREVIATE,
+        NO_CHANGES
     }
 }
