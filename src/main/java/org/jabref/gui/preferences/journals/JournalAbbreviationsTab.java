@@ -15,10 +15,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
@@ -35,6 +37,8 @@ import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
+import javafx.application.Platform;
+import com.airhacks.afterburner.injection.Injector;
 
 /**
  * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
@@ -82,6 +86,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         filteredAbbreviations = new FilteredList<>(viewModel.abbreviationsProperty());
 
         setUpTable();
+        setUpToggleButton();
         setBindings();
         setAnimations();
 
@@ -110,6 +115,32 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 .install(actionsColumn);
     }
 
+    private void setUpToggleButton() {
+        Button toggleButton = new Button(Localization.lang("Toggle"));
+        toggleButton.setOnAction(e -> toggleEnableList());
+        toggleButton.setTooltip(new javafx.scene.control.Tooltip(Localization.lang("Toggle selected list on/off")));
+        toggleButton.getStyleClass().add("icon-button");
+        
+        for (javafx.scene.Node node : getChildren()) {
+            if (node instanceof HBox) {
+                HBox hbox = (HBox) node;
+                boolean containsComboBox = false;
+                for (javafx.scene.Node child : hbox.getChildren()) {
+                    if (child == journalFilesBox) {
+                        containsComboBox = true;
+                        break;
+                    }
+                }
+                
+                if (containsComboBox) {
+                    int comboBoxIndex = hbox.getChildren().indexOf(journalFilesBox);
+                    hbox.getChildren().add(comboBoxIndex + 1, toggleButton);
+                    break;
+                }
+            }
+        }
+    }
+
     private void setBindings() {
         journalAbbreviationsTable.setItems(filteredAbbreviations);
 
@@ -125,6 +156,20 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         removeAbbreviationListButton.disableProperty().bind(viewModel.isFileRemovableProperty().not());
         journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
         journalFilesBox.valueProperty().bindBidirectional(viewModel.currentFileProperty());
+        
+        journalFilesBox.setCellFactory(listView -> new JournalFileListCell());
+        journalFilesBox.setButtonCell(new JournalFileListCell());
+        
+        viewModel.journalFilesProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null) {
+                return;
+            }
+            for (AbbreviationsFileViewModel fileViewModel : newValue) {
+                fileViewModel.enabledProperty().addListener((obs, oldVal, newVal) -> {
+                    refreshComboBoxDisplay();
+                });
+            }
+        });
 
         addAbbreviationButton.disableProperty().bind(viewModel.isEditableAndRemovableProperty().not());
 
@@ -137,20 +182,48 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         useFJournal.selectedProperty().bindBidirectional(viewModel.useFJournalProperty());
     }
 
-    private void setAnimations() {
-        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
-        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
-
-        searchBox.styleProperty().bind(
-                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
-        );
-        invalidateSearch = new Timeline(
-                new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
-                new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
-                new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
-                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> addAbbreviationActions()),
-                new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
-        );
+    /**
+     * Custom ListCell to display the journal file items with checkboxes.
+     * This simply shows the checkbox status without trying to handle
+     * direct checkbox interactions, to avoid conflicts with ComboBox selection.
+     */
+    private static class JournalFileListCell extends ListCell<AbbreviationsFileViewModel> {
+        @Override
+        protected void updateItem(AbbreviationsFileViewModel item, boolean empty) {
+            super.updateItem(item, empty);
+            
+            if (empty || item == null) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                String prefix = item.isEnabled() ? "✓ " : "○ ";
+                setText(prefix + item.toString());
+                
+                item.enabledProperty().addListener((obs, oldVal, newVal) -> {
+                    if (newVal != null) {
+                        setText((newVal ? "✓ " : "○ ") + item.toString());
+                    }
+                });
+            }
+        }
+    }
+    
+    /**
+     * Force the ComboBox to refresh its display
+     */
+    private void refreshComboBoxDisplay() {
+        Platform.runLater(() -> {
+            AbbreviationsFileViewModel currentSelection = journalFilesBox.getValue();
+            
+            journalFilesBox.setButtonCell(new JournalFileListCell());
+            
+            journalFilesBox.setValue(null);
+            journalFilesBox.setValue(currentSelection);
+            
+            journalFilesBox.setCellFactory(listView -> new JournalFileListCell());
+            
+            journalFilesBox.requestLayout();
+        });
     }
 
     @FXML
@@ -200,5 +273,43 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @Override
     public String getTabName() {
         return Localization.lang("Journal abbreviations");
+    }
+    
+    @FXML
+    private void toggleEnableList() {
+        AbbreviationsFileViewModel selected = journalFilesBox.getValue();
+        if (selected != null) {
+            boolean newEnabledState = !selected.isEnabled();
+            selected.setEnabled(newEnabledState);
+            
+            // Update repository immediately to reflect changes in the UI
+            JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+            if (selected.isBuiltInListProperty().get()) {
+                repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, newEnabledState);
+            } else if (selected.getAbsolutePath().isPresent()) {
+                String fileName = selected.getAbsolutePath().get().getFileName().toString();
+                repository.setSourceEnabled(fileName, newEnabledState);
+            }
+            
+            refreshComboBoxDisplay();
+            
+            viewModel.markAsDirty();
+        }
+    }
+
+    private void setAnimations() {
+        ObjectProperty<Color> flashingColor = new SimpleObjectProperty<>(Color.TRANSPARENT);
+        StringProperty flashingColorStringProperty = ColorUtil.createFlashingColorStringProperty(flashingColor);
+
+        searchBox.styleProperty().bind(
+                new SimpleStringProperty("-fx-control-inner-background: ").concat(flashingColorStringProperty).concat(";")
+        );
+        invalidateSearch = new Timeline(
+                new KeyFrame(Duration.seconds(0), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR)),
+                new KeyFrame(Duration.seconds(0.25), new KeyValue(flashingColor, Color.RED, Interpolator.LINEAR)),
+                new KeyFrame(Duration.seconds(0.25), new KeyValue(searchBox.textProperty(), "", Interpolator.DISCRETE)),
+                new KeyFrame(Duration.seconds(0.25), (ActionEvent event) -> addAbbreviationActions()),
+                new KeyFrame(Duration.seconds(0.5), new KeyValue(flashingColor, Color.TRANSPARENT, Interpolator.LINEAR))
+        );
     }
 }
