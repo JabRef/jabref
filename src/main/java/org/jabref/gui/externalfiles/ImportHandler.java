@@ -44,6 +44,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -374,7 +375,7 @@ public class ImportHandler {
             return result;
         } catch (ParseException ex) {
             LOGGER.error("Could not paste", ex);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -400,16 +401,16 @@ public class ImportHandler {
 
     public List<BibEntry> handleStringData(String data) throws FetcherException {
         if ((data == null) || data.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
         LOGGER.debug("Checking if URL is a PDF: {}", data);
 
-        if (org.jabref.logic.util.URLUtil.isURL(data) && data.toLowerCase().endsWith(".pdf")) {
+        if (URLUtil.isURL(data) && data.toLowerCase().endsWith(".pdf")) {
             try {
                 return handlePdfUrl(data);
             } catch (IOException ex) {
                 LOGGER.error("Could not handle PDF URL", ex);
-                return Collections.emptyList();
+                return List.of();
             }
         }
 
@@ -434,7 +435,7 @@ public class ImportHandler {
             return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -462,7 +463,7 @@ public class ImportHandler {
         Optional<Path> targetDirectory = bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
         if (targetDirectory.isEmpty()) {
             LOGGER.warn("File directory not available while downloading {}.", pdfUrl);
-            return Collections.emptyList();
+            return List.of();
         }
         URLDownload urlDownload = new URLDownload(pdfUrl);
         String filename = deriveFileNameFromUrl(pdfUrl);
@@ -471,7 +472,7 @@ public class ImportHandler {
             urlDownload.toFile(targetFile);
         } catch (FetcherException fe) {
             LOGGER.error("Error downloading PDF from URL", fe);
-            throw new IOException("Error downloading PDF", fe);
+            return List.of();
         }
         try {
             PdfMergeMetadataImporter importer = new PdfMergeMetadataImporter(preferences.getImportFormatPreferences());
@@ -492,9 +493,9 @@ public class ImportHandler {
                 entries.add(emptyEntry);
             }
             return entries;
-        } catch (Exception ex) {
-            LOGGER.error("Error importing PDF from URL", ex);
-            return Collections.emptyList();
+        } catch (IOException ex) {
+            LOGGER.error("Error importing PDF from URL - IO issue", ex);
+            return List.of();
         }
     }
 
