@@ -13,6 +13,10 @@ jobs:
       contents: read
       issues: write
     steps:
+      - name: Echo PR number and URL
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
       - name: Determine issue number
         id: get_issue_number
         uses: koppor/ticket-check-action@add-output
@@ -27,7 +31,9 @@ jobs:
           outputOnly: true
       - uses: actions/checkout@v4
       - name: Remove assignee
-        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }}
+        run: |
+          # "brute force" remove assignee - it might happen that the contributor was unassinged, but the PR closed later; therefore we need " || true" to ignore any error
+          gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --remove-assignee ${{ github.event.pull_request.user.login }} || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check assignees
@@ -77,3 +83,10 @@ jobs:
           default-column: "Free to take"
           issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           skip-if-not-in-project: true
+  close_issue_on_pr_merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Closes issues related to a merged pull request.
+        uses: ldez/gha-mjolnir@v1.5.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
