@@ -128,10 +128,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             TableColumn<ConsistencyMessage, String> clickedColumn = getTableColumn();
 
                             ConsistencyMessage message = getTableRow().getItem();
-                            String columnName = clickedColumn.getText();
                             String cellValue = getTableColumn().getCellObservableValue(getIndex()).getValue();
-
-                            Optional<StandardField> optionalField = StandardField.fromName(columnName);
+                            Optional<StandardField> optionalField = StandardField.fromName(clickedColumn.getText());
                             BibEntry entry = message.bibEntry();
 
                             if (optionalField.isEmpty()) {
