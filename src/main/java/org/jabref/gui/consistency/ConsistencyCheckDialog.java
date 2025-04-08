@@ -134,10 +134,10 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             boolean isPresent = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
 
                             Set<Field> fields = Set.of(StandardField.VERSION, StandardField.YEAR);
-
+y
                             if (fields.contains(field)) {
                                 if (!isPresent && hasField) {
-                                    libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                                    libraryTab.showAndEdit(message.bibEntry());
                                 }
                             } else {
                                 libraryTab.editEntryAndFocusField(message.bibEntry(), field);
