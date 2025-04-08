@@ -23,6 +23,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
@@ -127,22 +128,34 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             TableColumn<ConsistencyMessage, String> clickedColumn = getTableColumn();
 
                             ConsistencyMessage message = getTableRow().getItem();
-                            StandardField field = StandardField.fromName(clickedColumn.getText()).get();
+                            String columnName = clickedColumn.getText();
                             String cellValue = getTableColumn().getCellObservableValue(getIndex()).getValue();
 
-                            boolean hasField = message.bibEntry().hasField(field);
-                            boolean isPresent = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
+                            Optional<StandardField> optionalField = StandardField.fromName(columnName);
+                            BibEntry entry = message.bibEntry();
 
-                            Set<Field> fields = Set.of(StandardField.VERSION, StandardField.YEAR);
+                            if (optionalField.isEmpty()) {
+                                libraryTab.showAndEdit(entry);
+                                return;
+                            }
 
-                            if (fields.contains(field)) {
-                                if (!isPresent && hasField) {
-                                    libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                            StandardField field = optionalField.get();
+                            Set<Field> specialFields = Set.of(StandardField.VERSION, StandardField.YEAR);
+
+                            if (!entry.hasField(field)) {
+                                libraryTab.showAndEdit(entry);
+                                return;
+                            }
+
+                            if (specialFields.contains(field)) {
+                                boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
+                                if (isUnsetField) {
+                                    libraryTab.showAndEdit(entry);
                                 } else {
-                                    libraryTab.showAndEdit(message.bibEntry());
+                                    libraryTab.editEntryAndFocusField(entry, field);
                                 }
                             } else {
-                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                                libraryTab.editEntryAndFocusField(entry, field);
                             }
                         }
                     });
