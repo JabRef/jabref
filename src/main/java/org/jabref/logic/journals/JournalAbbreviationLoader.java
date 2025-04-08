@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +33,30 @@ public class JournalAbbreviationLoader {
         return parser.getAbbreviations();
     }
 
+    /**
+     * Loads a journal abbreviation repository based on the given preferences.
+     * Takes into account enabled/disabled state of journal abbreviation sources.
+     * 
+     * @param journalAbbreviationPreferences The preferences containing journal list paths and enabled states
+     * @return A repository with loaded abbreviations
+     */
     public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         JournalAbbreviationRepository repository;
+
+        boolean builtInEnabled = journalAbbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID);
 
         // Initialize with built-in list
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no journal-list.mv. We use a default journal list");
                 repository = new JournalAbbreviationRepository();
+                repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, builtInEnabled);
             } else {
                 Path tempDir = Files.createTempDirectory("jabref-journal");
                 Path tempJournalList = tempDir.resolve("journal-list.mv");
                 Files.copy(resourceAsStream, tempJournalList);
                 repository = new JournalAbbreviationRepository(tempJournalList);
+                repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, builtInEnabled);
                 tempDir.toFile().deleteOnExit();
                 tempJournalList.toFile().deleteOnExit();
             }
@@ -61,7 +73,38 @@ public class JournalAbbreviationLoader {
             Collections.reverse(lists);
             for (String filename : lists) {
                 try {
-                    repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(Path.of(filename)));
+                    Path filePath = Path.of(filename);
+                    
+                    String simpleFilename = filePath.getFileName().toString();
+                    String prefixedKey = "JABREF_JOURNAL_LIST:" + simpleFilename;
+                    String absolutePath = filePath.toAbsolutePath().toString();
+                    
+                    boolean enabled = false;
+                    
+                    if (journalAbbreviationPreferences.hasExplicitEnabledSetting(prefixedKey)) {
+                        enabled = journalAbbreviationPreferences.isSourceEnabled(prefixedKey);
+                        LOGGER.debug("Loading external abbreviations file {} (found by prefixed key): enabled = {}", 
+                            simpleFilename, enabled);
+                    } else if (journalAbbreviationPreferences.hasExplicitEnabledSetting(simpleFilename)) {
+                        enabled = journalAbbreviationPreferences.isSourceEnabled(simpleFilename);
+                        LOGGER.debug("Loading external abbreviations file {} (found by filename): enabled = {}", 
+                            simpleFilename, enabled);
+                    } else if (journalAbbreviationPreferences.hasExplicitEnabledSetting(absolutePath)) {
+                        enabled = journalAbbreviationPreferences.isSourceEnabled(absolutePath);
+                        LOGGER.debug("Loading external abbreviations file {} (found by path): enabled = {}", 
+                            simpleFilename, enabled);
+                    } else {
+                        enabled = true;
+                        LOGGER.debug("Loading external abbreviations file {} (no settings found): enabled = {}", 
+                            simpleFilename, enabled);
+                    }
+                    
+                    Collection<Abbreviation> abbreviations = readAbbreviationsFromCsvFile(filePath);
+                    
+                    repository.addCustomAbbreviations(abbreviations, simpleFilename, enabled);
+                    
+                    repository.addCustomAbbreviations(Collections.emptyList(), prefixedKey, enabled);
+                
                 } catch (IOException | InvalidPathException e) {
                     // invalid path might come from unix/windows mixup of prefs
                     LOGGER.error("Cannot read external journal list file {}", filename, e);

@@ -1,8 +1,15 @@
 package org.jabref.gui.preferences.journals;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -145,7 +152,12 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     List<AbbreviationViewModel> builtInViewModels = result.stream()
                                                                           .map(AbbreviationViewModel::new)
                                                                           .collect(Collectors.toList());
-                    journalFiles.add(new AbbreviationsFileViewModel(builtInViewModels, Localization.lang("JabRef built in list")));
+                    AbbreviationsFileViewModel builtInListModel = new AbbreviationsFileViewModel(builtInViewModels, Localization.lang("JabRef built in list"));
+                    
+                    boolean isEnabled = abbreviationsPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID);
+                    builtInListModel.setEnabled(isEnabled);
+                    
+                    journalFiles.add(builtInListModel);
                     selectLastJournalFile();
                 })
                 .onFailure(dialogService::showErrorDialogAndWait)
@@ -181,6 +193,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         if (abbreviationsFile.exists()) {
             try {
                 abbreviationsFile.readAbbreviations();
+                
+                String fileName = filePath.getFileName().toString();
+                boolean isEnabled = abbreviationsPreferences.isSourceEnabled(fileName);
+                abbreviationsFile.setEnabled(isEnabled);
             } catch (IOException e) {
                 LOGGER.debug("Could not read abbreviations file", e);
             }
@@ -335,17 +351,37 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());
+                    
+                    for (AbbreviationsFileViewModel fileViewModel : journalFiles) {
+                        if (fileViewModel.isBuiltInListProperty().get()) {
+                            abbreviationsPreferences.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, fileViewModel.isEnabled());
+                        } else if (fileViewModel.getAbsolutePath().isPresent()) {
+                            String fileName = fileViewModel.getAbsolutePath().get().getFileName().toString();
+                            abbreviationsPreferences.setSourceEnabled(fileName, fileViewModel.isEnabled());
+                        }
+                    }
 
                     if (shouldWriteLists) {
                         saveJournalAbbreviationFiles();
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess(success -> Injector.setModelOrService(
-                        JournalAbbreviationRepository.class,
-                        JournalAbbreviationLoader.loadRepository(abbreviationsPreferences)))
-                .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
+                .onSuccess(result -> {
+                    JournalAbbreviationRepository newRepository = 
+                        JournalAbbreviationLoader.loadRepository(abbreviationsPreferences);
+                        
+                    Injector.setModelOrService(JournalAbbreviationRepository.class, newRepository);
+                })
+                .onFailure(exception -> LOGGER.error("Failed to store journal preferences: {}", exception.getMessage(), exception))
                 .executeWith(taskExecutor);
+    }
+
+    /**
+     * Marks the abbreviation lists as needing to be saved
+     * This only tracks the dirty state but doesn't write to preferences
+     */
+    public void markAsDirty() {
+        shouldWriteLists = true;
     }
 
     public SimpleBooleanProperty isLoadingProperty() {

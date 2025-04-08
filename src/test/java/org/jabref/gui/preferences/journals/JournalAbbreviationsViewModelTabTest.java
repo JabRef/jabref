@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.DialogService;
 import org.jabref.logic.journals.Abbreviation;
@@ -32,7 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +66,7 @@ class JournalAbbreviationsViewModelTabTest {
     private Path tempFolder;
     private final JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadBuiltInRepository();
     private DialogService dialogService;
+    private JournalAbbreviationPreferences abbreviationPreferences;
 
     static class TestAbbreviation extends Abbreviation {
 
@@ -176,7 +180,12 @@ class JournalAbbreviationsViewModelTabTest {
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
-        JournalAbbreviationPreferences abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        
+
+        when(abbreviationPreferences.isSourceEnabled(anyString())).thenReturn(true);
+        when(abbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID)).thenReturn(true);
+        when(abbreviationPreferences.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList());
 
         dialogService = mock(DialogService.class);
         this.tempFolder = tempFolder;
@@ -531,5 +540,114 @@ class JournalAbbreviationsViewModelTabTest {
         Path file = this.tempFolder.resolve(testFile.fileName);
         Files.writeString(file, testFile.content);
         return file;
+    }
+
+    @Test
+    void toggleEnabledListChangesEnabledState() {
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
+        viewModel.addNewFile();
+        viewModel.selectLastJournalFile();
+        
+        AbbreviationsFileViewModel fileViewModel = viewModel.currentFileProperty().get();
+        
+        assertTrue(fileViewModel.isEnabled());
+        
+        fileViewModel.setEnabled(false);
+        
+        assertFalse(fileViewModel.isEnabled());
+        
+        fileViewModel.setEnabled(true);
+        assertTrue(fileViewModel.isEnabled());
+        
+        viewModel.markAsDirty();
+    }
+    
+    @Test
+    void storeSettingsSavesEnabledState() throws IOException {
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
+        viewModel.addNewFile();
+        viewModel.selectLastJournalFile();
+        
+        AbbreviationsFileViewModel fileViewModel = viewModel.currentFileProperty().get();
+        fileViewModel.setEnabled(false);
+        
+        viewModel.storeSettings();
+        
+        Optional<Path> path = fileViewModel.getAbsolutePath();
+        if (path.isPresent()) {
+            String fileName = path.get().getFileName().toString();
+            verify(abbreviationPreferences).setSourceEnabled(fileName, false);
+        }
+    }
+    
+    @Test
+    void addBuiltInListInitializesWithCorrectEnabledState() {
+        when(abbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID)).thenReturn(false);
+        
+        JournalAbbreviationsTabViewModel testViewModel = new JournalAbbreviationsTabViewModel(
+                abbreviationPreferences, dialogService, new CurrentThreadTaskExecutor(), repository);
+        
+        testViewModel.addBuiltInList();
+        
+        Optional<AbbreviationsFileViewModel> builtInViewModel = testViewModel.journalFilesProperty().stream()
+                .filter(vm -> vm.isBuiltInListProperty().get())
+                .findFirst();
+        
+        assertTrue(builtInViewModel.isPresent());
+        assertFalse(builtInViewModel.get().isEnabled());
+    }
+    
+    @Test
+    void enabledExternalListFiltersAbbreviationsWhenDisabled() throws IOException {
+        AbbreviationsFileViewModel fileViewModel = mock(AbbreviationsFileViewModel.class);
+        JournalAbbreviationRepository testRepository = mock(JournalAbbreviationRepository.class);
+        
+        when(fileViewModel.getAbsolutePath()).thenReturn(Optional.of(Path.of("test.csv")));
+        when(fileViewModel.isBuiltInListProperty()).thenReturn(new SimpleBooleanProperty(false));
+        when(fileViewModel.isEnabled()).thenReturn(true);
+        
+        JournalAbbreviationPreferences testPreferences = mock(JournalAbbreviationPreferences.class);
+        when(testPreferences.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList("test.csv"));
+        
+        TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
+        JournalAbbreviationsTabViewModel testViewModel = new JournalAbbreviationsTabViewModel(
+                testPreferences, dialogService, taskExecutor, testRepository);
+        
+        testViewModel.journalFilesProperty().add(fileViewModel);
+                
+        testViewModel.storeSettings();
+        
+        verify(testPreferences).setSourceEnabled(eq("test.csv"), anyBoolean());
+    }
+    
+    @Test
+    void disabledSourceAffectsAbbreviationFiltering() throws IOException {
+        CsvFileNameAndContent testFile = new CsvFileNameAndContent("unique-journal.csv", 
+                                      new TestAbbreviation("Unique Journal Title", "Unique J. Title"));
+        Path testFilePath = createTestFile(testFile);
+        
+        JournalAbbreviationPreferences mockPrefs = mock(JournalAbbreviationPreferences.class);
+        when(mockPrefs.isSourceEnabled(anyString())).thenReturn(true);
+        when(mockPrefs.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList());
+        
+        JournalAbbreviationsTabViewModel testViewModel = new JournalAbbreviationsTabViewModel(
+            mockPrefs, dialogService, new CurrentThreadTaskExecutor(), repository);
+        
+        when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFilePath));
+        testViewModel.addNewFile();
+        testViewModel.selectLastJournalFile();
+        
+        AbbreviationsFileViewModel fileViewModel = testViewModel.currentFileProperty().get();
+        
+        assertTrue(fileViewModel.isEnabled());
+        
+        fileViewModel.setEnabled(false);
+        assertFalse(fileViewModel.isEnabled());
+        
+        String filename = testFilePath.getFileName().toString();
+        
+        testViewModel.storeSettings();
+        
+        verify(mockPrefs).setSourceEnabled(eq(filename), eq(false));
     }
 }

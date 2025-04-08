@@ -2,6 +2,7 @@ package org.jabref.gui.journals;
 
 import java.util.List;
 import java.util.function.Supplier;
+import java.nio.file.Path;
 
 import javax.swing.undo.UndoManager;
 
@@ -14,6 +15,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -36,7 +38,7 @@ public class AbbreviateAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
-    private final JournalAbbreviationRepository abbreviationRepository;
+    private JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
 
@@ -47,7 +49,6 @@ public class AbbreviateAction extends SimpleCommand {
                             DialogService dialogService,
                             StateManager stateManager,
                             JournalAbbreviationPreferences abbreviationPreferences,
-                            JournalAbbreviationRepository abbreviationRepository,
                             TaskExecutor taskExecutor,
                             UndoManager undoManager) {
         this.action = action;
@@ -55,7 +56,6 @@ public class AbbreviateAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.journalAbbreviationPreferences = abbreviationPreferences;
-        this.abbreviationRepository = abbreviationRepository;
         this.taskExecutor = taskExecutor;
         this.undoManager = undoManager;
 
@@ -80,6 +80,11 @@ public class AbbreviateAction extends SimpleCommand {
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
         } else if (action == StandardActions.UNABBREVIATE) {
+            if (!areAnyJournalSourcesEnabled()) {
+                dialogService.notify(Localization.lang("Cannot unabbreviate: all journal lists are disabled"));
+                return;
+            }
+            
             dialogService.notify(Localization.lang("Unabbreviating..."));
             stateManager.getActiveDatabase().ifPresent(_ ->
                     BackgroundTask.wrap(() -> unabbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
@@ -91,6 +96,9 @@ public class AbbreviateAction extends SimpleCommand {
     }
 
     private String abbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
+        // Reload repository to ensure latest preferences are used
+        abbreviationRepository = JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences);
+            
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 abbreviationRepository,
                 abbreviationType,
@@ -113,6 +121,9 @@ public class AbbreviateAction extends SimpleCommand {
     }
 
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
+        // Reload repository to ensure latest preferences are used
+        abbreviationRepository = JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences);
+            
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(abbreviationRepository);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
@@ -127,5 +138,30 @@ public class AbbreviateAction extends SimpleCommand {
         undoManager.addEdit(ce);
         tabSupplier.get().markBaseChanged();
         return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
+    }
+
+    /**
+     * Checks if any journal abbreviation source is enabled in the preferences.
+     * This includes both the built-in list and any external journal lists.
+     *
+     * @return true if at least one source is enabled, false if all sources are disabled
+     */
+    private boolean areAnyJournalSourcesEnabled() {
+        boolean anySourceEnabled = journalAbbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID);
+        
+        if (!anySourceEnabled) {
+            for (String listPath : journalAbbreviationPreferences.getExternalJournalLists()) {
+                if (listPath != null && !listPath.isBlank()) {
+                    // Just check the filename since that's what's used as the source key
+                    String fileName = Path.of(listPath).getFileName().toString();
+                    if (journalAbbreviationPreferences.isSourceEnabled(fileName)) {
+                        anySourceEnabled = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return anySourceEnabled;
     }
 }

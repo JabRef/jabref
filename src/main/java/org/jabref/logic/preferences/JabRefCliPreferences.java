@@ -424,6 +424,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
 
+    private static final String ENABLED_EXTERNAL_JOURNAL_LISTS = "enabledExternalJournalLists";
+
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
      */
@@ -1014,14 +1016,41 @@ public class JabRefCliPreferences implements CliPreferences {
             return journalAbbreviationPreferences;
         }
 
+        Map<String, Boolean> enabledExternalLists = new HashMap<>();
+        
+        enabledExternalLists.put(JournalAbbreviationRepository.BUILTIN_LIST_ID, 
+                getBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + JournalAbbreviationRepository.BUILTIN_LIST_ID, true));
+        
+        for (String path : getStringList(EXTERNAL_JOURNAL_LISTS)) {
+            try {
+                String absolutePath = Path.of(path).toAbsolutePath().toString();
+                enabledExternalLists.put(absolutePath, getBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + absolutePath, true));
+            } catch (Exception e) {
+                enabledExternalLists.put(path, getBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + path, true));
+                LOGGER.warn("Could not resolve absolute path for {}", path, e);
+            }
+        }
+
         journalAbbreviationPreferences = new JournalAbbreviationPreferences(
                 getStringList(EXTERNAL_JOURNAL_LISTS),
-                getBoolean(USE_AMS_FJOURNAL));
+                getBoolean(USE_AMS_FJOURNAL),
+                enabledExternalLists);
 
         journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
         EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
                 (obs, oldValue, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+                
+        journalAbbreviationPreferences.getEnabledExternalLists().forEach((path, enabled) -> {
+            LOGGER.debug("Setting preference value for journal list: {} = {}", path, enabled);
+            putBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + path, enabled);
+        });
+        
+        journalAbbreviationPreferences.enabledListsChangedProperty().addListener(observable -> {
+            journalAbbreviationPreferences.getEnabledExternalLists().forEach((path, enabled) -> {
+                putBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + path, enabled);
+            });
+        });
 
         return journalAbbreviationPreferences;
     }
