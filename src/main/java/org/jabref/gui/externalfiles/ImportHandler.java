@@ -399,7 +399,6 @@ public class ImportHandler {
     }
 
     public List<BibEntry> handleStringData(String data) throws FetcherException {
-        LOGGER.debug("Handling string data: {}", data);
         if ((data == null) || data.isEmpty()) {
             return Collections.emptyList();
         }
@@ -460,8 +459,7 @@ public class ImportHandler {
     }
 
     private List<BibEntry> handlePdfUrl(String pdfUrl) throws IOException {
-        FilePreferences filePreferences = preferences.getFilePreferences();
-        Optional<Path> targetDirectory = bibDatabaseContext.getFirstExistingFileDir(filePreferences);
+        Optional<Path> targetDirectory = bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
         if (targetDirectory.isEmpty()) {
             LOGGER.warn("File directory not available while downloading {}.", pdfUrl);
             return Collections.emptyList();
@@ -477,7 +475,7 @@ public class ImportHandler {
         }
         try {
             PdfMergeMetadataImporter importer = new PdfMergeMetadataImporter(preferences.getImportFormatPreferences());
-            ParserResult parserResult = importer.importDatabase(targetFile, bibDatabaseContext, filePreferences);
+            ParserResult parserResult = importer.importDatabase(targetFile, bibDatabaseContext, preferences.getFilePreferences());
             if (parserResult.hasWarnings()) {
                 LOGGER.warn("PDF import had warnings: {}", parserResult.getErrorMessage());
             }
