@@ -140,14 +140,14 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             }
 
                             StandardField field = optionalField.get();
-                            Set<Field> specialFields = Set.of(StandardField.VERSION, StandardField.YEAR);
+                            Set<Field> fields = Set.of(StandardField.VERSION, StandardField.YEAR);
 
                             if (!entry.hasField(field)) {
                                 libraryTab.showAndEdit(entry);
                                 return;
                             }
 
-                            if (specialFields.contains(field)) {
+                            if (fields.contains(field)) {
                                 boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
                                 if (isUnsetField) {
                                     libraryTab.showAndEdit(entry);
