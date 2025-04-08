@@ -24,6 +24,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 
@@ -125,10 +126,22 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                         if (!isEmpty()) {
                             TableColumn<ConsistencyMessage, String> clickedColumn = getTableColumn();
 
-                            ConsistencyMessage selectedMessage = getTableRow().getItem();
-                            Optional<StandardField> field = StandardField.fromName(clickedColumn.getText());
+                            ConsistencyMessage message = getTableRow().getItem();
+                            StandardField field = StandardField.fromName(clickedColumn.getText()).get();
+                            String cellValue = getTableColumn().getCellObservableValue(getIndex()).getValue();
 
-                            field.ifPresent(standardField -> libraryTab.editEntryAndFocusField(selectedMessage.bibEntry(), standardField));
+                            boolean hasField = message.bibEntry().hasField(field);
+                            boolean isPresent = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
+
+                            Set<Field> fields = Set.of(StandardField.VERSION, StandardField.YEAR);
+
+                            if (fields.contains(field)) {
+                                if (!isPresent && hasField) {
+                                    libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                                }
+                            } else {
+                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                            }
                         }
                     });
                 }
