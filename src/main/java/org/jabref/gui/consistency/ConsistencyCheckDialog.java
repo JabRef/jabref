@@ -137,6 +137,8 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
                             if (fields.contains(field)) {
                                 if (!isPresent && hasField) {
+                                    libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                                } else {
                                     libraryTab.showAndEdit(message.bibEntry());
                                 }
                             } else {
