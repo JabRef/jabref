@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.io.FileUtil;
-import org.jabref.logic.journals.ltwa.LtwaRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
