@@ -2,6 +2,8 @@ package org.jabref.gui.fieldeditors;
 
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.Map;
+
 
 import javax.swing.undo.UndoManager;
 
@@ -13,6 +15,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -37,6 +40,8 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
+import org.jabref.gui.fieldeditors.msccodes.MscCodeUtils;
+
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -49,6 +54,8 @@ import org.slf4j.LoggerFactory;
 public class KeywordsEditor extends HBox implements FieldEditorFX {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
+
+    private Map<String, String> mscmap = MscCodeUtils.loadMscCodesFromJson("../../resources/main/org/jabref/gui/fieldeditors/msccodes/msc_codes.json");
 
     @FXML private KeywordsEditorViewModel viewModel;
     @FXML private TagsField<Keyword> keywordTagsField;
@@ -153,6 +160,24 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
             event.consume();
         });
+
+        // Checks Keyword for MSC code and displays tooltip with corresponding description
+        if(mscmap.containsKey(tagLabel.getText())){
+            String mscClassification = mscmap.get(tagLabel.getText());
+            Tooltip tooltip = new Tooltip(mscClassification);
+
+            tagLabel.setOnMouseEntered(event -> {
+                // Show tooltip when mouse enters
+                Tooltip.install(tagLabel, tooltip);
+            });
+
+            tagLabel.setOnMouseExited(event -> {
+                // Uninstall tooltip when mouse exits
+                Tooltip.uninstall(tagLabel, tooltip);
+            });
+        }
+        
+        
         tagLabel.setOnDragDetected(event -> {
             Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
