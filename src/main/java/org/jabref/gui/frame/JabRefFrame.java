@@ -271,7 +271,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case FOCUS_GROUP_LIST:
                         sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
                         event.consume();
-                    break;
+                        break;
                     case NEXT_LIBRARY:
                         tabbedPane.getSelectionModel().selectNext();
                         event.consume();
@@ -356,6 +356,24 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
             } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
+                Optional<BibDatabaseContext> activeDatabase = stateManager.activeDatabaseProperty().get();
+
+                if (activeDatabase.isPresent()) {
+                    // UID of previously selected database
+                    String activeUID = activeDatabase.get().getUid();
+
+                    // Check if the previously active database was closed
+                    boolean wasClosed = tabbedPane.getTabs().stream()
+                                                  .filter(tab -> tab instanceof LibraryTab)
+                                                  .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext().getUid().equals(activeUID));
+
+                    // Select the next tab, instead of the Home page
+                    if (wasClosed) {
+                        tabbedPane.getSelectionModel().selectNext();
+                        return;
+                    }
+                }
+
                 // All databases are closed or {@link WelcomeTab} is open
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
@@ -404,14 +422,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void updateTabBarVisible() {
-        int tabbedPaneSize = stateManager.getOpenDatabases().size();
-
-        // Prevents hiding the bar when WelcomeTab and one database is open
-        if (tabbedPane.getTabs().stream().anyMatch(tab -> tab instanceof WelcomeTab)) {
-            tabbedPaneSize += 1;
-        }
-
-        if (preferences.getWorkspacePreferences().shouldHideTabBar() && tabbedPaneSize <= 1) {
+        if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
             if (!tabbedPane.getStyleClass().contains("hide-tab-bar")) {
                 tabbedPane.getStyleClass().add("hide-tab-bar");
             }
