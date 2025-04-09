@@ -8,6 +8,10 @@ public record IntegrityMessage(
         BibEntry entry,
         Field field) implements Cloneable {
 
+    public IntegrityMessage(IntegrityIssue issue, BibEntry entry, Field field) {
+        this(issue.getText(), entry, field);
+    }
+
     @Override
     public String toString() {
         return "[" + entry().getCitationKey().orElse(entry().getAuthorTitleYear(50)) + "] in " + field.getDisplayName() + ": " + message();

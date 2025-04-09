@@ -28,7 +28,7 @@ public class JournalInAbbreviationListChecker implements EntryChecker {
 
         final String journal = value.get();
         if (!abbreviationRepository.isKnownName(journal)) {
-            return Collections.singletonList(new IntegrityMessage(IntegrityIssue.JOURNAL_NOT_FOUND_IN_ABBREVIATION_LIST.getText(), entry, field));
+            return Collections.singletonList(new IntegrityMessage(IntegrityIssue.JOURNAL_NOT_FOUND_IN_ABBREVIATION_LIST, entry, field));
         }
 
         return Collections.emptyList();

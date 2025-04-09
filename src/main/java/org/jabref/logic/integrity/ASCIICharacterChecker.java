@@ -20,7 +20,7 @@ public class ASCIICharacterChecker implements EntryChecker {
         for (Map.Entry<Field, String> field : entry.getFieldMap().entrySet()) {
             boolean asciiOnly = CharMatcher.ascii().matchesAllOf(field.getValue());
             if (!asciiOnly) {
-                results.add(new IntegrityMessage(IntegrityIssue.NON_ASCII_ENCODED_CHARACTER_FOUND.getText(), entry,
+                results.add(new IntegrityMessage(IntegrityIssue.NON_ASCII_ENCODED_CHARACTER_FOUND, entry,
                         field.getKey()));
             }
         }

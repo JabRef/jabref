@@ -35,6 +35,6 @@ public class NoBibtexFieldChecker implements EntryChecker {
         final Set<Field> allBiblatexOnlyFields = getAllBiblatexOnlyFields();
         return entry.getFields().stream()
                     .filter(allBiblatexOnlyFields::contains)
-                    .map(name -> new IntegrityMessage(IntegrityIssue.BIBLATEX_FIELD_ONLY.getText(), entry, name)).collect(Collectors.toList());
+                    .map(name -> new IntegrityMessage(IntegrityIssue.BIBLATEX_FIELD_ONLY, entry, name)).collect(Collectors.toList());
     }
 }

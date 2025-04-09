@@ -35,7 +35,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
 
         if (!Objects.equals(key, generatedKey)) {
             return Collections.singletonList(new IntegrityMessage(
-                    IntegrityIssue.CITATION_KEY_DEVIATES_FROM_GENERATED_KEY.getText(), entry, InternalField.KEY_FIELD));
+                    IntegrityIssue.CITATION_KEY_DEVIATES_FROM_GENERATED_KEY, entry, InternalField.KEY_FIELD));
         }
 
         return Collections.emptyList();

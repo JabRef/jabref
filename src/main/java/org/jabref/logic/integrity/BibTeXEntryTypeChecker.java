@@ -19,7 +19,7 @@ public class BibTeXEntryTypeChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         if (EntryTypeFactory.isExclusiveBiblatex(entry.getType())) {
             return Collections.singletonList(
-                    new IntegrityMessage(IntegrityIssue.ENTRY_TYPE_IS_ONLY_DEFINED_FOR_BIBLATEX_BUT_NOT_FOR_BIBTEX.getText(), entry, InternalField.KEY_FIELD)
+                    new IntegrityMessage(IntegrityIssue.ENTRY_TYPE_IS_ONLY_DEFINED_FOR_BIBLATEX_BUT_NOT_FOR_BIBTEX, entry, InternalField.KEY_FIELD)
             );
         }
         return Collections.emptyList();

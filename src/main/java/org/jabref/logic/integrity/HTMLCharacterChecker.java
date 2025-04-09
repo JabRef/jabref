@@ -18,7 +18,7 @@ public class HTMLCharacterChecker implements EntryChecker {
         return entry.getFieldMap().entrySet().stream()
                     .filter(field -> !field.getKey().getProperties().contains(FieldProperty.VERBATIM))
                     .filter(field -> HTML_CHARACTER_PATTERN.matcher(field.getValue()).find())
-                    .map(field -> new IntegrityMessage(IntegrityIssue.HTML_ENCODED_CHARACTER_FOUND.getText(), entry, field.getKey()))
+                    .map(field -> new IntegrityMessage(IntegrityIssue.HTML_ENCODED_CHARACTER_FOUND, entry, field.getKey()))
                     .toList();
     }
 }

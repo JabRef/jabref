@@ -34,7 +34,7 @@ public class BibStringChecker implements EntryChecker {
                 }
                 if ((hashCount & 1) == 1) { // Check if odd
                     // # is FieldWriter.BIBTEX_STRING_START_END_SYMBOL
-                    results.add(new IntegrityMessage(IntegrityIssue.ODD_NUMBER_OF_UNESCAPED.getText(), entry,
+                    results.add(new IntegrityMessage(IntegrityIssue.ODD_NUMBER_OF_UNESCAPED, entry,
                             field.getKey()));
                 }
             }
