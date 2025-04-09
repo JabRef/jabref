@@ -131,7 +131,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             Field field = FieldFactory.parseField(clickedColumn.getText());
                             boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
 
-                            if (!message.bibEntry().hasField(field) && isUnsetField) {
+                            if (field.isStandardField()) {
+                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                            } else if (!message.bibEntry().hasField(field) && isUnsetField) {
                                 libraryTab.showAndEdit(message.bibEntry());
                             } else {
                                 libraryTab.editEntryAndFocusField(message.bibEntry(), field);
