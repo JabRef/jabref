@@ -60,10 +60,16 @@ public class AbbreviateAction extends SimpleCommand {
         this.undoManager = undoManager;
 
         switch (action) {
-            case ABBREVIATE_DEFAULT -> abbreviationType = AbbreviationType.DEFAULT;
-            case ABBREVIATE_DOTLESS -> abbreviationType = AbbreviationType.DOTLESS;
-            case ABBREVIATE_SHORTEST_UNIQUE -> abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
-            default -> LOGGER.debug("Unknown action: {}", action.name());
+            case ABBREVIATE_DEFAULT ->
+                    abbreviationType = AbbreviationType.DEFAULT;
+            case ABBREVIATE_DOTLESS ->
+                    abbreviationType = AbbreviationType.DOTLESS;
+            case ABBREVIATE_SHORTEST_UNIQUE ->
+                    abbreviationType = AbbreviationType.SHORTEST_UNIQUE;
+            case ABBREVIATE_LTWA ->
+                    abbreviationType = AbbreviationType.LTWA;
+            default ->
+                    LOGGER.debug("Unknown action: {}", action.name());
         }
 
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -73,7 +79,8 @@ public class AbbreviateAction extends SimpleCommand {
     public void execute() {
         if ((action == StandardActions.ABBREVIATE_DEFAULT)
                 || (action == StandardActions.ABBREVIATE_DOTLESS)
-                || (action == StandardActions.ABBREVIATE_SHORTEST_UNIQUE)) {
+                || (action == StandardActions.ABBREVIATE_SHORTEST_UNIQUE)
+                || (action == StandardActions.ABBREVIATE_LTWA)) {
             dialogService.notify(Localization.lang("Abbreviating..."));
             stateManager.getActiveDatabase().ifPresent(_ ->
                     BackgroundTask.wrap(() -> abbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
