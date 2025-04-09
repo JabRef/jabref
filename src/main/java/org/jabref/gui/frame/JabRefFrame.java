@@ -355,24 +355,26 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             if (selectedTab instanceof LibraryTab libraryTab) {
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
-            } else if (selectedTab instanceof WelcomeTab && stateManager.getActiveDatabase().isPresent()) {
-                String activeUID = stateManager.getActiveDatabase().get().getUid();
+            } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
+                if (stateManager.getActiveDatabase().isPresent()) {
+                    String activeUID = stateManager.getActiveDatabase().get().getUid();
 
-                // Check if the previously active database was closed
-                boolean wasClosed = tabbedPane.getTabs().stream()
-                                              .filter(tab -> tab instanceof LibraryTab)
-                                              .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext().getUid().equals(activeUID));
+                    // Check if the previously active database was closed
+                    boolean wasClosed = tabbedPane.getTabs().stream()
+                                                  .filter(tab -> tab instanceof LibraryTab)
+                                                  .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext().getUid().equals(activeUID));
 
-                // Select the next tab, instead of the Home page
-                if (wasClosed) {
-                    tabbedPane.getSelectionModel().selectNext();
-                    return;
+                    // Select the next tab, instead of the Home page
+                    if (wasClosed) {
+                        tabbedPane.getSelectionModel().selectNext();
+                        return;
+                    }
                 }
-            }
 
-            // All databases are closed or {@link WelcomeTab} is open
-            stateManager.setActiveDatabase(null);
-            stateManager.activeTabProperty().set(Optional.empty());
+                // All databases are closed or {@link WelcomeTab} is open
+                stateManager.setActiveDatabase(null);
+                stateManager.activeTabProperty().set(Optional.empty());
+            }
         });
 
         /*
@@ -380,11 +382,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
          * correct database when the user switches tabs. Without this,
          * cut/paste/copy operations would sometimes occur in the wrong tab.
          */
-        EasyBind.subscribe(tabbedPane.getSelectionModel().
-
-                                     selectedItemProperty(), tab ->
-
-        {
+        EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (!(tab instanceof LibraryTab libraryTab)) {
                 stateManager.setSelectedEntries(Collections.emptyList());
                 mainStage.titleProperty().unbind();
@@ -416,16 +414,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         });
 
         // Hide tab bar
-        stateManager.getOpenDatabases().
-
-                    addListener((ListChangeListener<BibDatabaseContext>) _ ->
-
-                            updateTabBarVisible());
-        EasyBind.subscribe(preferences.getWorkspacePreferences().
-
-                                      hideTabBarProperty(), _ ->
-
-                updateTabBarVisible());
+        stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
+        EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
     }
 
     private void updateTabBarVisible() {
@@ -724,8 +714,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
-                } catch (
-                        IOException e) {
+                } catch (IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
             });
