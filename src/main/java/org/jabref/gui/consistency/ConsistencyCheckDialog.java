@@ -23,11 +23,10 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
-import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
@@ -129,25 +128,13 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
                             ConsistencyMessage message = getTableRow().getItem();
                             String cellValue = getTableColumn().getCellObservableValue(getIndex()).getValue();
-                            Optional<StandardField> optionalField = StandardField.fromName(clickedColumn.getText());
-                            BibEntry entry = message.bibEntry();
-
-                            if (optionalField.isEmpty()) {
-                                libraryTab.showAndEdit(entry);
-                                return;
-                            }
-
-                            StandardField field = optionalField.get();
-                            if (!entry.hasField(field)) {
-                                libraryTab.showAndEdit(entry);
-                                return;
-                            }
-
+                            Field field = FieldFactory.parseField(clickedColumn.getText());
                             boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
-                            if (isUnsetField) {
-                                libraryTab.showAndEdit(entry);
+
+                            if (!message.bibEntry().hasField(field) && isUnsetField) {
+                                libraryTab.showAndEdit(message.bibEntry());
                             } else {
-                                libraryTab.editEntryAndFocusField(entry, field);
+                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
                             }
                         }
                     });
