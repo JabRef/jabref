@@ -211,6 +211,21 @@ public class LinkedFileHandler {
      */
     public String getSuggestedFileName(String extension) {
         String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim();
+        if ((targetFileName.isEmpty() || "-".equals(targetFileName)) && linkedFile.isOnlineLink()) {
+            String oldFileName = linkedFile.getLink();
+            int lastSlashIndex = oldFileName.lastIndexOf('/');
+            if (lastSlashIndex >= 0 && lastSlashIndex < oldFileName.length() - 1) {
+                String fileNameFromUrl = oldFileName.substring(lastSlashIndex + 1);
+                int queryIndex = fileNameFromUrl.indexOf('?');
+                if (queryIndex > 0) {
+                    fileNameFromUrl = fileNameFromUrl.substring(0, queryIndex);
+                }
+                if (!extension.isEmpty() && !fileNameFromUrl.toLowerCase().endsWith("." + extension.toLowerCase())) {
+                    fileNameFromUrl = fileNameFromUrl + "." + extension;
+                }
+                return FileUtil.getValidFileName(fileNameFromUrl);
+            }
+        }
         if (!extension.isEmpty()) {
             targetFileName = targetFileName + '.' + extension;
         }
