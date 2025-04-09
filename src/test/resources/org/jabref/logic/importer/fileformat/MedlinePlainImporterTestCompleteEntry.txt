@@ -1,5 +1,4 @@
 PMID- 20481061
-LID - https://pubmed.ncbi.nlm.nih.gov/20481061/ [pii]
 OWN - NLM
 STAT- MEDLINE
 DA  - 20100520
