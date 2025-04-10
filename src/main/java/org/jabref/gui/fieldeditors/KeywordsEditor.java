@@ -1,10 +1,10 @@
 package org.jabref.gui.fieldeditors;
 
+import java.net.URL;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.Map;
-
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -30,6 +30,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
+import org.jabref.gui.fieldeditors.msccodes.MscCodeUtils;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -41,8 +42,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
-import org.jabref.gui.fieldeditors.msccodes.MscCodeUtils;
-
 
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
@@ -51,7 +50,6 @@ import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.net.URL;
 
 public class KeywordsEditor extends HBox implements FieldEditorFX {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
@@ -62,7 +60,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     static {
         URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("org/jabref/gui/fieldeditors/msccodes/msc_codes.json");
         
-        if (resourceUrl != null) {
+    if (resourceUrl != null) {
             try {
                 
                 mscmap = MscCodeUtils.loadMscCodesFromJson(resourceUrl); // Use the URL version
@@ -71,8 +69,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 
                 mscmap = new HashMap<>();
             }
-        } else {
-            
+    } else {
             LOGGER.error("msc_codes.json not found!");
             
             mscmap = new HashMap<>();
@@ -152,8 +149,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
-     
-        Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
+        Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());  
     }
 
     private Node createTag(Keyword keyword) {
@@ -185,7 +181,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         });
 
         // Checks Keyword for MSC code and displays tooltip with corresponding description
-        if(mscmap.containsKey(tagLabel.getText())){
+        if (mscmap.containsKey(tagLabel.getText())) {
             String mscClassification = mscmap.get(tagLabel.getText());
             Tooltip tooltip = new Tooltip(mscClassification);
 
@@ -198,8 +194,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 // Uninstall tooltip when mouse exits
                 Tooltip.uninstall(tagLabel, tooltip);
             });
-        }
-        
+        }        
         
         tagLabel.setOnDragDetected(event -> {
             Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);
