@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.util;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,5 +77,21 @@ public class MetaDataParserTest {
         FieldFormatterCleanups fieldFormatterCleanups = new FieldFormatterCleanups(true, List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         expected.setSaveActions(fieldFormatterCleanups);
         assertEquals(expected, parsed);
+    }
+
+    /**
+     * Verifies that a user-specific .blg path (e.g. blgFilePath-testUser) is correctly parsed from metadata.
+     * Ensures that the trailing semicolon (used as separator in .bib metadata) is handled and stripped properly.
+     */
+    @Test
+    void parsesUserSpecificBlgPathSuccessfully() throws Exception {
+        String user = "testUser";
+        String rawKey = "blgFilePath-" + user;
+        String rawValue = "/home/user/test.blg;";
+
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',');
+
+        assertEquals(Optional.of(Path.of("/home/user/test.blg")), parsed.getBlgFilePath(user));
     }
 }

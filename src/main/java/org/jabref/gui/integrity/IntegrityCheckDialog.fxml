@@ -3,15 +3,17 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefHeight="600.0" prefWidth="700.0"
             xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.integrity.IntegrityCheckDialog">
     <content>
-        <VBox spacing="4.0">
+        <VBox fx:id="dialogVBox" spacing="4.0">
             <TableView fx:id="messagesTable" prefHeight="550" prefWidth="700.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
                 <columns>
                     <TableColumn fx:id="keyColumn" prefWidth="150.0" maxWidth="200"  text="%Citation key"/>
