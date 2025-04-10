@@ -484,6 +484,7 @@
                 <ArticleId IdType="pmc">PMC7756617</ArticleId>
                 <ArticleId IdType="doi">10.1515/jib-2020-0021</ArticleId>
                 <ArticleId IdType="pii">jib-2020-0021</ArticleId>
+                <ArticleId IdType="url">https://pubmed.ncbi.nlm.nih.gov/32759406/</ArticleId>
             </ArticleIdList>
         </PubmedData>
     </PubmedArticle>

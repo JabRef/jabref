@@ -28,6 +28,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
+- We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832/)
+- We added a "LTWA" abbreviation feature in the "Quality > Abbreviate journal names > LTWA" menu [#12273](https://github.com/JabRef/jabref/issues/12273/)
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 
 ### Changed
@@ -62,6 +64,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - A tooltip now appears after 300ms (instead of 2s). [#12649](https://github.com/JabRef/jabref/issues/12649)
 - We improved search in preferences and keybindings. [#12647](https://github.com/JabRef/jabref/issues/12647)
 - We improved the performance of the LibreOffice integration when inserting CSL citations/bibliography. [#12851](https://github.com/JabRef/jabref/pull/12851)
+- 'Affected fields' and 'Do not wrap when saving' are now displayed as tags. [#12550](https://github.com/JabRef/jabref/issues/12550)
 
 ### Fixed
 
