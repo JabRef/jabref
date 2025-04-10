@@ -24,7 +24,7 @@ public class MscCodeUtils {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(new File(jsonFilePath), new TypeReference<Map<String, String>>() {});
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error in loadMscCodesFromJson, Message: {}", e.getMessage());
             return Collections.emptyMap();
         }
     }
