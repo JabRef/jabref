@@ -3,16 +3,19 @@ package org.jabref.logic.journals;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
+import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.io.FileUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.jabref.logic.journals.JournalAbbreviationMvGenerator.loadAbbreviationsFromMv;
 
 /**
  * <p>
@@ -36,7 +39,6 @@ public class JournalAbbreviationLoader {
 
     public static JournalAbbreviationRepository loadRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         JournalAbbreviationRepository repository;
-
         // Initialize with built-in list
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
             if (resourceAsStream == null) {
@@ -55,6 +57,8 @@ public class JournalAbbreviationLoader {
             return null;
         }
 
+        journalAbbreviationPreferences.updateJournalsDir(journalAbbreviationPreferences.getJournalAbbreviationDir());
+
         // Read external lists
         List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
         // might produce NPE in tests
@@ -63,9 +67,13 @@ public class JournalAbbreviationLoader {
             Collections.reverse(lists);
             for (String filename : lists) {
                 try {
-                    repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(Path.of(filename)));
-                } catch (IOException | InvalidPathException e) {
-                    // invalid path might come from unix/windows mixup of prefs
+                    Path filePath = Path.of(filename);
+                    if (FileUtil.isMvFile(filePath)) {
+                        repository.addCustomAbbreviations(loadAbbreviationsFromMv(filePath));
+                    } else if (FileUtil.isCsvFile(filePath)) {
+                        repository.addCustomAbbreviations(readAbbreviationsFromCsvFile(filePath));
+                    }
+                } catch (IOException e) {
                     LOGGER.error("Cannot read external journal list file {}", filename, e);
                 }
             }
@@ -91,6 +99,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
+        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true, Directories.getJournalAbbreviationsDirectory().toString()));
     }
 }
