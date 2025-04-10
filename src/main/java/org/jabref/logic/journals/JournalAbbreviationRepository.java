@@ -13,6 +13,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
@@ -30,11 +31,15 @@ public class JournalAbbreviationRepository {
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
     private final StringSimilarity similarity = new StringSimilarity();
+    private final LtwaRepository ltwaRepository;
 
     /**
      * Initializes the internal data based on the abbreviations found in the given MV file
+     *
+     * @param journalList The path to the MV file containing the journal abbreviations.
+     * @param ltwaRepository The LTWA repository to use for abbreviations.
      */
-    public JournalAbbreviationRepository(Path journalList) {
+    public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
         MVMap<String, Abbreviation> mvFullToAbbreviationObject;
         try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
             mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
@@ -52,6 +57,7 @@ public class JournalAbbreviationRepository {
                 shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
             });
         }
+        this.ltwaRepository = ltwaRepository;
     }
 
     /**
@@ -67,6 +73,7 @@ public class JournalAbbreviationRepository {
         abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
         dotlessToAbbreviationObject.put("Demo", newAbbreviation);
         shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
+        ltwaRepository = new LtwaRepository();
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -96,6 +103,16 @@ public class JournalAbbreviationRepository {
             return false;
         }
         return get(journalName).isPresent();
+    }
+
+    /**
+     * Get the LTWA abbreviation for the given journal name.
+     */
+    public Optional<String> getLtwaAbbreviation(String journalName) {
+        if (QUESTION_MARK.matcher(journalName).find()) {
+            return Optional.of(journalName);
+        }
+        return ltwaRepository.abbreviate(journalName);
     }
 
     /**

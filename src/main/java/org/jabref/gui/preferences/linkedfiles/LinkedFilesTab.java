@@ -31,6 +31,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private RadioButton autolinkFileStartsBibtex;
     @FXML private RadioButton autolinkFileExactBibtex;
     @FXML private RadioButton autolinkUseRegex;
+    @FXML private RadioButton openFileExplorerInFilesDirectory;
+    @FXML private RadioButton openFileExplorerInLastDirectory;
     @FXML private TextField autolinkRegexKey;
 
     @FXML private CheckBox fulltextIndex;
@@ -75,6 +77,8 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
         fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
+        openFileExplorerInFilesDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInFilesDirectoryProperty());
+        openFileExplorerInLastDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInLastDirectoryProperty());
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
