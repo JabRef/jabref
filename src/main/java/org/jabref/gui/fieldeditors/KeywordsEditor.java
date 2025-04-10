@@ -1,6 +1,7 @@
 package org.jabref.gui.fieldeditors;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.Map;
 
@@ -50,12 +51,33 @@ import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.net.URL;
 
 public class KeywordsEditor extends HBox implements FieldEditorFX {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
 
-    private Map<String, String> mscmap = MscCodeUtils.loadMscCodesFromJson("../../resources/main/org/jabref/gui/fieldeditors/msccodes/msc_codes.json");
+    private static Map<String, String> mscmap;
+
+    static {
+        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("org/jabref/gui/fieldeditors/msccodes/msc_codes.json");
+        
+        if (resourceUrl != null) {
+            try {
+                
+                mscmap = MscCodeUtils.loadMscCodesFromJson(resourceUrl); // Use the URL version
+            } catch (Exception e) {
+                LOGGER.error("Error loading msc_codes.json", e);
+                
+                mscmap = new HashMap<>();
+            }
+        } else {
+            
+            LOGGER.error("msc_codes.json not found!");
+            
+            mscmap = new HashMap<>();
+        }
+    }
 
     @FXML private KeywordsEditorViewModel viewModel;
     @FXML private TagsField<Keyword> keywordTagsField;
@@ -130,6 +152,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
+     
         Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
     }
 
