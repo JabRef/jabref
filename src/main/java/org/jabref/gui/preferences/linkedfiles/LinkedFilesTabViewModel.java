@@ -118,6 +118,23 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
 
+        GlobalLinkedFileNamePatterns newKeyPattern =
+                new GlobalLinkedFileNamePatterns(filePreferences.getKeyPatterns().getDefaultValue());
+        patternListProperty.forEach(item -> {
+            String patternString = item.getPattern();
+            if (!"default".equals(item.getEntryType().getName())) {
+                if (!patternString.trim().isEmpty()) {
+                    newKeyPattern.addLinkedFileNamePattern(item.getEntryType(), patternString);
+                }
+            }
+        });
+
+        if (!defaultNamePatternProperty.getValue().getPattern().trim().isEmpty()) {
+            // we do not trim the value at the assignment to enable users to have spaces at the beginning and
+            // at the end of the pattern
+            newKeyPattern.setDefaultValue(defaultNamePatternProperty.getValue().getPattern());
+        }
+
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
             autoLinkPreferences.setCitationKeyDependency(AutoLinkPreferences.CitationKeyDependency.START);
@@ -130,6 +147,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         autoLinkPreferences.setRegularExpression(autolinkRegexKeyProperty.getValue());
         filePreferences.confirmDeleteLinkedFile(confirmLinkedFileDeleteProperty.getValue());
         filePreferences.moveToTrash(moveToTrashProperty.getValue());
+        filePreferences.setFileNamePattern(newKeyPattern);
     }
 
     ValidationStatus mainFileDirValidationStatus() {

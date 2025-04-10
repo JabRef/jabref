@@ -101,6 +101,10 @@ public class FilePreferences {
         this.storeFilesRelativeToBibFile.set(shouldStoreFilesRelativeToBibFile);
     }
 
+    public GlobalLinkedFileNamePatterns getKeyPatterns() {
+        return keyPatterns.get();
+    }
+
     public ObjectProperty<GlobalLinkedFileNamePatterns> fileNamePatternProperty() {
         return keyPatterns;
     }
