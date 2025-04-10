@@ -10,6 +10,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -33,6 +34,8 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     private static ImportFormatPreferences importFormatPreferences;
 
     private static ImporterPreferences importerPreferences;
+
+    private static final Optional<String> API_KEY = Optional.of(new BuildInfo().ieeeAPIKey);
 
     private static final BibEntry IGOR_NEWCOMERS = new BibEntry(StandardEntryType.InProceedings)
             .withField(StandardField.AUTHOR, "Igor Steinmacher and Tayana Uchoa Conte and Christoph Treude and Marco Aurélio Gerosa")
@@ -60,7 +63,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
         importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
-
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(API_KEY);
         IEEE ieee = new IEEE(importFormatPreferences, importerPreferences);
 
         assumeFalse(List.of().equals(ieee.performSearch("article_number:8801912")));
@@ -68,6 +71,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @BeforeEach
     void setUp() {
+        when(importerPreferences.getApiKey(IEEE.FETCHER_NAME)).thenReturn(API_KEY);
         fetcher = new IEEE(importFormatPreferences, importerPreferences);
     }
 
