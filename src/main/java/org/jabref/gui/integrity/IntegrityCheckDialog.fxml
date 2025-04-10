@@ -32,9 +32,9 @@
             <HBox maxHeight="30" spacing="10.0" alignment="CENTER_RIGHT">
                 <HBox spacing="4.0">
                     <ComboBox fx:id="entryTypeCombo" maxWidth="400"  />
-                    <Button onAction="#fixByType" prefHeight="20.0" text="%Fix by type"/>
+                    <Button onAction="#resolveIssueByType" prefHeight="20.0" text="%Fix by type"/>
                 </HBox>
-                <Button onAction="#fixAll" prefHeight="20.0" text="%Fix all"/>
+                <Button onAction="#resolveAll" prefHeight="20.0" text="%Fix all"/>
             </HBox>
         </VBox>
     </content>

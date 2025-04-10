@@ -41,7 +41,7 @@ public class IntegrityCheckDialogViewModel extends AbstractViewModel {
         return messages;
     }
 
-    public void fix(IntegrityIssue issue, IntegrityMessage message) {
+    public void resolveIssue(IntegrityIssue issue, IntegrityMessage message) {
         // fixes
     }
 }

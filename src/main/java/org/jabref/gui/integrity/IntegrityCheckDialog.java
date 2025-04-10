@@ -126,7 +126,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                     setGraphic(new Label(Localization.lang("No fix available")));
                 } else {
                     configureButton(issue.get().getFix().get(), () -> {
-                        viewModel.fix(issue.get(), rowData);
+                        viewModel.resolveIssue(issue.get(), rowData);
                         removeRow(rowData);
                     });
                     setGraphic(button);
@@ -201,8 +201,8 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         entryTypeCombo.getSelectionModel().selectFirst();
     }
 
-    public void fix(IntegrityIssue issue, IntegrityMessage message) {
-        viewModel.fix(issue, message);
+    public void resolveIssue(IntegrityIssue issue, IntegrityMessage message) {
+        viewModel.resolveIssue(issue, message);
         removeRow(message);
     }
 
@@ -230,13 +230,13 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     }
 
     /**
-     * Attempts to fix all {@link IntegrityMessage} objects of the selected type.
+     * Attempts to resolve all {@link IntegrityMessage} objects of the selected type.
      * If fixes are available, they are applied, and the fixed messages are removed.
      * A notification is shown to indicate success or failure.
      */
     @FXML
-    private void fixByType() {
-        AtomicBoolean fixed = new AtomicBoolean(false);
+    private void resolveIssueByType() {
+        AtomicBoolean resolved = new AtomicBoolean(false);
 
         String selectedType = entryTypeCombo.getSelectionModel().getSelectedItem();
         Optional<IntegrityIssue> selectedIssue = Arrays.stream(IntegrityIssue.values())
@@ -248,29 +248,29 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
                          // Filter messages matching the selected issue type and have a fix
                          .filter(message -> message.message().equals(issue.getText()) && hasFix(message))
                          .forEach(message -> {
-                             fix(issue, message);
-                             fixed.set(true);
+                             resolveIssue(issue, message);
+                             resolved.set(true);
                          });
         });
 
         updateEntryTypeCombo();
 
-        if (fixed.get()) {
-            notificationService.notify(Localization.lang("Fixed successfully."));
+        if (resolved.get()) {
+            notificationService.notify(Localization.lang("Resolved successfully."));
         } else {
             notificationService.notify(Localization.lang("No fixes available."));
         }
     }
 
     /**
-     * Attempts to fix all {@link IntegrityMessage} objects that have a fix available.
+     * Attempts to resolve all {@link IntegrityMessage} objects that have a fix available.
      * Messages with applicable fixes are processed, and the corresponding UI elements are updated.
      */
     @FXML
-    private void fixAll() {
+    private void resolveAll() {
         messagesTable.getItems().stream()
                 .filter(this::hasFix)   // Filter all messages that have a fix
-                .forEach(message -> IntegrityIssue.fromMessage(message).ifPresent(issue -> fix(issue, message)));
+                .forEach(message -> IntegrityIssue.fromMessage(message).ifPresent(issue -> resolveIssue(issue, message)));
 
         updateEntryTypeCombo();
     }
