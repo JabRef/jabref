@@ -1,10 +1,13 @@
 package org.jabref.logic.net;
 
 import java.net.URI;
+import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -86,5 +89,30 @@ class URLUtilTest {
         String input = "http://example.com/test|file";
         URI uri = URLUtil.createUri(input);
         assertEquals("http://example.com/test%7Cfile", uri.toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+    // Relative URLs (should default to HTTPS)
+    "www.example.com, https://www.example.com",
+    "example.com, https://example.com",
+
+    // Absolute URLs (should remain unchanged)
+    "http://www.example.com, http://www.example.com",
+    "https://www.example.com, https://www.example.com"
+    })
+    void createShouldHandleURLs(String input, String expected) throws Exception {
+    URL url = URLUtil.create(input);
+    assertEquals(expected, url.toString());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "ftp://example.com, ftp://example.com",
+        "file:///path/to/file, file:/path/to/file"
+    })
+    void createShouldHandleOtherProtocols(String inputUrl, String expectedUrl) throws Exception {
+        URL actualUrl = URLUtil.create(inputUrl);
+        assertEquals(expectedUrl, actualUrl.toString());
     }
 }
