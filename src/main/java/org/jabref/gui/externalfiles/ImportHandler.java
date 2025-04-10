@@ -403,7 +403,7 @@ public class ImportHandler {
         if ((data == null) || data.isEmpty()) {
             return List.of();
         }
-        LOGGER.debug("Checking if URL is a PDF: {}", data);
+        LOGGER.trace("Checking if URL is a PDF: {}", data);
 
         if (URLUtil.isURL(data) && data.toLowerCase().endsWith(".pdf")) {
             try {
