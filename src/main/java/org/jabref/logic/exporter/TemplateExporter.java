@@ -210,7 +210,6 @@ public class TemplateExporter extends Exporter {
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
         }
-
         try (AtomicFileWriter ps = new AtomicFileWriter(file, encodingToUse)) {
             Layout beginLayout = null;
 
