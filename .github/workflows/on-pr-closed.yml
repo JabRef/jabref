@@ -83,10 +83,13 @@ jobs:
           default-column: "Free to take"
           issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           skip-if-not-in-project: true
-  close_issue_on_pr_merge:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Closes issues related to a merged pull request.
-        uses: ldez/gha-mjolnir@v1.5.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Comment on issue
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          message: |
+            Closed by ${{ github.event.pull_request.html_url }}
+
+            Please head to <https://builds.jabref.org/main> to try it out.
+
+            For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
