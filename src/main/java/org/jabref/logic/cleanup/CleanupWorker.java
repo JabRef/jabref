@@ -75,6 +75,8 @@ public class CleanupWorker {
                     new RemoveLinksToNotExistentFiles(databaseContext, filePreferences);
             case CONVERT_TO_BIBLATEX ->
                     new ConvertToBiblatexCleanup();
+            case CONVERT_MSC_CODES ->
+                    new ConvertMSCCodesCleanup();
             case CONVERT_TO_BIBTEX ->
                     new ConvertToBibtexCleanup();
             case CONVERT_TIMESTAMP_TO_CREATIONDATE ->

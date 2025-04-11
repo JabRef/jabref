@@ -39,6 +39,7 @@ public class CleanupPresetPanel extends VBox {
     @FXML private CheckBox cleanUpBibtex;
     @FXML private CheckBox cleanUpTimestampToCreationDate;
     @FXML private CheckBox cleanUpTimestampToModificationDate;
+    @FXML private CheckBox cleanUpConvertMSCcodes;
     @FXML private FieldFormatterCleanupsPanel formatterCleanupsPanel;
 
     public CleanupPresetPanel(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences, FilePreferences filePreferences) {
@@ -68,6 +69,8 @@ public class CleanupPresetPanel extends VBox {
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
 
+        cleanUpConvertMSCcodes.setText(Localization.lang("Convert MSC Keyword codes to their respective descriptions."));
+
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
         cleanupRenamePDFLabel.setText(currentPattern);
@@ -84,6 +87,13 @@ public class CleanupPresetPanel extends VBox {
                         cleanUpBibtex.selectedProperty().setValue(false);
                     }
                 });
+        cleanUpConvertMSCcodes.selectedProperty().addListener(
+            (observable, oldvalue, newvalue) -> {
+                if (newvalue) {
+                    cleanUpConvertMSCcodes.selectedProperty().setValue(false);
+                }
+            }
+        );
         cleanUpTimestampToCreationDate.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {
@@ -113,6 +123,7 @@ public class CleanupPresetPanel extends VBox {
         cleanUpDeletedFiles.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CLEAN_UP_DELETED_LINKED_FILES));
         cleanUpBiblatex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX));
         cleanUpBibtex.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
+        cleanUpConvertMSCcodes.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES));
         cleanUpTimestampToCreationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_CREATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.CONVERT_TIMESTAMP_TO_MODIFICATIONDATE));
         cleanUpTimestampToModificationDate.setSelected(preset.isActive(CleanupPreferences.CleanupStep.DO_NOT_CONVERT_TIMESTAMP));
@@ -138,6 +149,9 @@ public class CleanupPresetPanel extends VBox {
         }
         if (cleanUpISSN.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.CLEAN_UP_ISSN);
+        }
+        if (cleanUpConvertMSCcodes.isSelected()) {
+            activeJobs.add(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES);
         }
         if (cleanUpMakePathsRelative.isSelected()) {
             activeJobs.add(CleanupPreferences.CleanupStep.MAKE_PATHS_RELATIVE);
