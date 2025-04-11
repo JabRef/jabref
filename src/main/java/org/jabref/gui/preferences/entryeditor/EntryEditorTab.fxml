@@ -20,11 +20,15 @@
     </fx:define>
 
     <CheckBox fx:id="openOnNewEntry" text="%Open editor when a new entry is created"/>
-    <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
     <CheckBox
             fx:id="autoLinkFilesEnabled"
             text="%Automatically search and show unlinked files in the entry editor"/>
 
+    <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
+    <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
+    <CheckBox fx:id="journalPopupEnabled" text="%Fetch journal information online to show"/>
+    <CheckBox fx:id="showUserCommentsField" text="%Show user comments field"/>
+    <CheckBox fx:id="enableSciteTab" text="%Show tab 'Citation information'"/>
     <CheckBox fx:id="enableRelatedArticlesTab" text="%Show tab 'Related articles'"/>
     <CheckBox fx:id="acceptRecommendations" text="%Accept recommendations from Mr. DLib"
               disable="${!enableRelatedArticlesTab.selected}">
@@ -32,14 +36,10 @@
             <Insets left="20.0"/>
         </padding>
     </CheckBox>
+    <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
+    <CheckBox fx:id="enableLatexCitationsTab" text="%Show tab 'LaTeX citations'"/>
     <CheckBox fx:id="enableAiSummaryTab" text="%Show tab 'AI Summary'"/>
     <CheckBox fx:id="enableAiChatTab" text="%Show tab 'AI Chat'"/>
-    <CheckBox fx:id="enableLatexCitationsTab" text="%Show tab 'LaTeX citations'"/>
-    <CheckBox fx:id="enableValidation" text="%Show validation messages"/>
-    <CheckBox fx:id="allowIntegerEdition" text="%Allow integers in 'edition' field in BibTeX mode"/>
-    <CheckBox fx:id="journalPopupEnabled" text="%Fetch journal information online to show"/>
-    <CheckBox fx:id="enableSciteTab" text="%Show tab 'Citation information'"/>
-    <CheckBox fx:id="showUserCommentsField" text="%Show user comments field"/>
 
     <Label styleClass="sectionHeader" text="%Custom editor tabs"/>
     <HBox>
