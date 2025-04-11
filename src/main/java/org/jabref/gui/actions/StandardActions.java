@@ -210,6 +210,10 @@ public enum StandardActions implements Action {
     GROUP_SUBGROUP_RENAME(Localization.lang("Rename subgroup"), KeyBinding.GROUP_SUBGROUP_RENAME),
     GROUP_ENTRIES_REMOVE(Localization.lang("Remove selected entries from this group")),
 
+    GIT(Localization.lang("Git")),
+    GIT_PULL(Localization.lang("Git Pull")),
+    GIT_PUSH(Localization.lang("Git Push")),
+
     CLEAR_EMBEDDINGS_CACHE(Localization.lang("Clear embeddings cache"));
 
     private String text;
