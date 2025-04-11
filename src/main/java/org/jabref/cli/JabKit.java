@@ -6,10 +6,12 @@ import java.net.Authenticator;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -48,7 +50,7 @@ import org.tinylog.configuration.Configuration;
 /// Does not do any preference migrations.
 public class JabKit {
     private static Logger LOGGER;
-
+    private static Optional<String> deleteWhenClosingPath = Optional.empty();
     public static void main(String[] args) {
         initLogging(args);
 
@@ -71,7 +73,14 @@ public class JabKit {
     }
 
     public static List<UiCommand> processArguments(String[] args, JabRefCliPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
-        try {
+        try {Optional<String> deleteWhenClosingPath = Optional.empty();
+            JabKit.deleteWhenClosingPath = deleteWhenClosingPath;
+            
+for (String arg : args) {
+    if (arg.startsWith("--deleteWhenClosing=")) {
+        deleteWhenClosingPath = Optional.of(arg.substring("--deleteWhenClosing=".length()));
+    }
+}
             Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
             // Early exit in case another instance is already running
@@ -84,7 +93,17 @@ public class JabKit {
 
             Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
+Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+    deleteWhenClosingPath.ifPresent(path -> {
+        try {
+            Files.deleteIfExists(Paths.get(path));
+        } catch (IOException e) {
+            LOGGER.warn("Failed to delete temporary file: " + path, e);
+        }
+    });
+}));
 
+System.exit(status);
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
 
