@@ -71,8 +71,16 @@ class ACMPortalFetcherTest {
     }
 
     @Test
+    void performSearchPagedReturnsResults() throws FetcherException {
+    List<BibEntry> results = fetcher.performSearchPaged(new JabRefSearchTerm("machine learning"), 0);
+
+    assertNotNull(results);
+    assertFalse(results.isEmpty());
+}
+    @Test
     void getParser() {
         ACMPortalParser expected = new ACMPortalParser();
         assertEquals(expected.getClass(), fetcher.getParser().getClass());
+        
     }
 }

@@ -49,10 +49,11 @@ public class ACMPortalFetcher implements PagedSearchBasedFetcher {
      *
      * @param query QueryNode (user's search query parsed by Lucene)
      * @return A fully formed search URL for ACM Portal
-     * @throws URISyntaxException if URL syntax is invalid
-     * @throws MalformedURLException if URL is malformed
-     */
-    public URL getURLForQuery(QueryNode query) throws FetcherException {
+     * /**
+ @throws FetcherException if URL syntax is invalid or URL is malformed
+ */
+public URL getURLForQuery(QueryNode query) throws FetcherException {
+
         try {
             URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
             uriBuilder.addParameter("AllField", createQueryString(query));
