@@ -269,7 +269,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case FOCUS_GROUP_LIST:
                         sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
                         event.consume();
-                    break;
+                        break;
                     case NEXT_LIBRARY:
                         tabbedPane.getSelectionModel().selectNext();
                         event.consume();
@@ -344,6 +344,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
             } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
+                if (stateManager.getActiveDatabase().isPresent()) {
+                    String activeUID = stateManager.getActiveDatabase().get().getUid();
+
+                    // Check if the previously active database was closed
+                    boolean wasClosed = tabbedPane.getTabs().stream()
+                                                  .filter(tab -> tab instanceof LibraryTab)
+                                                  .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext().getUid().equals(activeUID));
+
+                    // Select the next tab, instead of the Home page
+                    if (wasClosed) {
+                        tabbedPane.getSelectionModel().selectNext();
+                        return;
+                    }
+                }
+
                 // All databases are closed or {@link WelcomeTab} is open
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
@@ -520,9 +535,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public boolean closeTabs(@NonNull List<LibraryTab> tabs) {
         // Only accept library tabs that are shown in the tab container
         List<LibraryTab> toClose = tabs.stream()
-                .distinct()
-                .filter(getLibraryTabs()::contains)
-                .toList();
+                                       .distinct()
+                                       .filter(getLibraryTabs()::contains)
+                                       .toList();
 
         if (toClose.isEmpty()) {
             // Nothing to do
