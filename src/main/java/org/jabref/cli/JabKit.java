@@ -93,17 +93,19 @@ for (String arg : args) {
 
             Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
-Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-    deleteWhenClosingPath.ifPresent(path -> {
-        try {
-            Files.deleteIfExists(Paths.get(path));
-        } catch (IOException e) {
-            LOGGER.warn("Failed to delete temporary file: " + path, e);
-        }
-    });
-}));
+
+            BackgroundTask.wrap(() -> {
+                deleteWhenClosingPath.ifPresent(path -> {
+                    try {
+                        Files.deleteIfExists(Path.of(path));
+                    } catch (IOException e) {
+                        LOGGER.warn("Failed to delete temporary file: " + path, e);
+                    }
+                });
+            }).executeWith(BackgroundTask.SHUTDOWN_EXECUTOR);            
 
 System.exit(status);
+
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
 

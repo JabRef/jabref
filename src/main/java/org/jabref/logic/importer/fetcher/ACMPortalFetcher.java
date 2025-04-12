@@ -52,7 +52,17 @@ public class ACMPortalFetcher implements PagedSearchBasedFetcher {
  * @throws FetcherException if URL syntax is invalid or URL is malformed
  */
 public URL getURLForQuery(QueryNode query) throws FetcherException {
-
+    /**
+ * Constructs a properly formatted URL for querying the ACM Digital Library
+ * based on the provided user search query.
+ *
+ * The resulting URL includes all required parameters to execute the search
+ * and returns search results related to the parsed query terms.
+ *
+ * @param query The parsed user search query to be included in the ACM search URL.
+ * @return A fully formed search URL targeting the ACM Digital Library.
+ * @throws FetcherException if the URL could not be created due to invalid syntax.
+ */
 
         try {
             URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
@@ -80,6 +90,7 @@ public URL getURLForQuery(QueryNode query) throws FetcherException {
      * @param pageNumber Page number (starting at 0)
      * @return Page of BibEntry results
      */
+    
     @Override
     public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
         String transformedQuery = createQueryString(luceneQuery);
