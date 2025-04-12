@@ -23,10 +23,7 @@ public class HelpAction extends SimpleCommand {
     }
 
     void openHelpPage(HelpFile helpPage) {
-        StringBuilder sb = new StringBuilder("https://docs.jabref.org/");
-        sb.append(helpPage.getPageName());
-        NativeDesktop.openBrowserShowPopup(sb.toString(), dialogService, externalApplicationPreferences
-        );
+        NativeDesktop.openBrowserShowPopup("https://docs.jabref.org/" + helpPage.getPageName(), dialogService, externalApplicationPreferences);
     }
 
     @Override

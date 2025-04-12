@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -25,6 +24,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -62,13 +63,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
     }
 
-    private void onSelectionChanged(ListChangeListener.Change<? extends ConsistencyMessage> change) {
-        if (change.next()) {
-            change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    libraryTab.showAndEdit(message.bibEntry()));
-        }
-    }
-
     public ConsistencyCheckDialogViewModel getViewModel() {
         return viewModel;
     }
@@ -76,8 +70,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);
-
-        tableView.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
 
         entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
         entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
@@ -129,6 +121,25 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                                                  setText(item);
                                              }
                                      );
+
+                    this.setOnMouseClicked(event -> {
+                        if (!isEmpty()) {
+                            TableColumn<ConsistencyMessage, String> clickedColumn = getTableColumn();
+
+                            ConsistencyMessage message = getTableRow().getItem();
+                            String cellValue = getTableColumn().getCellObservableValue(getIndex()).getValue();
+                            Field field = FieldFactory.parseField(clickedColumn.getText());
+                            boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
+
+                            if (field.isStandardField()) {
+                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                            } else if (!message.bibEntry().hasField(field) && isUnsetField) {
+                                libraryTab.showAndEdit(message.bibEntry());
+                            } else {
+                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                            }
+                        }
+                    });
                 }
             });
 
