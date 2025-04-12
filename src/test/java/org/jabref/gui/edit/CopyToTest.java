@@ -131,13 +131,22 @@ public class CopyToTest {
         when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any())).thenReturn(true);
 
         copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+
+        // Simulate entries added
+        when(targetDatabaseContext.getEntries()).thenReturn(
+                new BibDatabase(new ArrayList<>()).getEntries(),                             // before
+                new BibDatabase(List.of(entryWithCrossRef, referencedEntry)).getEntries()   // after
+        );
+
         copyTo.execute();
 
         List<BibEntry> expectedEntries = new ArrayList<>(selectedEntries);
         expectedEntries.add(referencedEntry);
 
         verify(importHandler).importEntriesWithDuplicateCheck(targetDatabaseContext, expectedEntries);
+        verify(dialogService).notify("Entries and cross-references successfully copied to target library");
     }
+
 
     @Test
     void executeWithCrossRefAndUserExcludes() {
@@ -147,8 +156,17 @@ public class CopyToTest {
         when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any())).thenReturn(false);
 
         copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+
+        // Simulate an entry was added
+        when(targetDatabaseContext.getEntries()).thenReturn(
+                new BibDatabase(new ArrayList<>()).getEntries(), // before
+                new BibDatabase(List.of(entryWithCrossRef)).getEntries() // after
+        );
+
         copyTo.execute();
 
         verify(importHandler).importEntriesWithDuplicateCheck(targetDatabaseContext, selectedEntries);
+        verify(dialogService).notify("Entries successfully copied to target library");
     }
+
 }

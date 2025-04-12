@@ -61,11 +61,27 @@ public class CopyTo extends SimpleCommand {
         }
 
         if (includeCrossReferences) {
+            int before = targetDatabaseContext.getEntries().size();
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."));
+            int after = targetDatabaseContext.getEntries().size();
+            if (after > before) {
+                String targetLibraryName = targetDatabaseContext.getDatabasePath()
+                        .map(path -> path.getFileName().toString())
+                        .orElse("target library");
+
+                dialogService.notify(Localization.lang("Entries copied successfully to %0, including cross-references.", targetLibraryName));
+            }
         } else {
+            int before = targetDatabaseContext.getEntries().size();
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entries copied successfully, without cross-references."));
+            int after = targetDatabaseContext.getEntries().size();
+            if (after > before) {
+                String targetLibraryName = targetDatabaseContext.getDatabasePath()
+                        .map(path -> path.getFileName().toString())
+                        .orElse("target library");
+
+                dialogService.notify(Localization.lang("Entries copied successfully to %0, without cross-references.", targetLibraryName));
+            }
         }
     }
 
