@@ -94,6 +94,17 @@ public URL getURLForQuery(QueryNode query) throws FetcherException {
      * @param pageNumber Page number (starting at 0)
      * @return Page of BibEntry results
      */
+    /**
+ * Executes a paged search on the ACM Digital Library using the provided Lucene query.
+ *
+ * This method constructs a search URL using the given query, sends a request to the ACM API,
+ * and retrieves a single page of BibEntry results based on the specified page number.
+ *
+ * @param luceneQuery The parsed user search query (from Lucene SyntaxParser)
+ * @param pageNumber  The page number to fetch results from (starting from 0)
+ * @return A Page object containing the fetched BibEntries for the given query and page number
+ * @throws FetcherException If there is an error building the URL or retrieving the results
+ */
 
     @Override
     public Page<BibEntry> performSearchPaged(QueryNode luceneQuery, int pageNumber) throws FetcherException {
