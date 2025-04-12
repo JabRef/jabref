@@ -200,7 +200,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
 
-        Button hideAITabsButton = new Button(Localization.lang("Hide AI tabs"));
+        Button hideAITabsButton = new Button(Localization.lang("Hide 'Related articles' tab"));
 
         DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(), 88d);
 
