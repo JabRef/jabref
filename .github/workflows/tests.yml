@@ -437,7 +437,7 @@ jobs:
         with:
           show-progress: 'false'
       - name: Merge Conflict finder
-        uses: olivernybroe/action-conflict-finder@v4.0
+        uses: olivernybroe/action-conflict-finder@v4.1
 
   no-force-push:
     if: github.event_name == 'pull_request'
