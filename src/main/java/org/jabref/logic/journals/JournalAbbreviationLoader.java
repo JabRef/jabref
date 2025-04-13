@@ -115,6 +115,9 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
+        JournalAbbreviationPreferences prefs = new JournalAbbreviationPreferences(Collections.emptyList(), true);
+        
+        prefs.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, true);
+        return loadRepository(prefs);
     }
 }
