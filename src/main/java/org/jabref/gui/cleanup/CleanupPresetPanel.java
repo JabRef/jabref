@@ -10,10 +10,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.cleanup.CleanupPreferences;
+import org.jabref.logic.cleanup.ConvertMSCCodesCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -65,6 +67,12 @@ public class CleanupPresetPanel extends VBox {
             cleanUpMovePDF.setSelected(false);
         }
 
+        if (!ConvertMSCCodesCleanup.isConversionPossible()) {
+            cleanUpConvertMSCcodes.setDisable(true);
+            cleanUpConvertMSCcodes.setSelected(false);
+            cleanUpConvertMSCcodes.setTooltip(new Tooltip(Localization.lang("MSC code conversion is not available - the MSC codes file could not be loaded")));
+        }
+
         cleanUpRenamePDFonlyRelativePaths.disableProperty().bind(cleanUpRenamePDF.selectedProperty().not());
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
@@ -87,13 +95,7 @@ public class CleanupPresetPanel extends VBox {
                         cleanUpBibtex.selectedProperty().setValue(false);
                     }
                 });
-        cleanUpConvertMSCcodes.selectedProperty().addListener(
-            (observable, oldvalue, newvalue) -> {
-                if (newvalue) {
-                    cleanUpConvertMSCcodes.selectedProperty().setValue(false);
-                }
-            }
-        );
+
         cleanUpTimestampToCreationDate.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {

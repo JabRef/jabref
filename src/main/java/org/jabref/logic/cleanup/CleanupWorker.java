@@ -10,18 +10,21 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 
 public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final BibEntryPreferences bibEntryPreferences;
     private final List<JabRefException> failures;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, BibEntryPreferences bibEntryPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.bibEntryPreferences = bibEntryPreferences;
         this.failures = new ArrayList<>();
     }
 
@@ -76,7 +79,7 @@ public class CleanupWorker {
             case CONVERT_TO_BIBLATEX ->
                     new ConvertToBiblatexCleanup();
             case CONVERT_MSC_CODES ->
-                    new ConvertMSCCodesCleanup();
+                    new ConvertMSCCodesCleanup(bibEntryPreferences);
             case CONVERT_TO_BIBTEX ->
                     new ConvertToBibtexCleanup();
             case CONVERT_TIMESTAMP_TO_CREATIONDATE ->

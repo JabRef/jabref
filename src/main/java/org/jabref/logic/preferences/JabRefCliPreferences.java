@@ -1785,7 +1785,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 CleanupPreferences.CleanupStep.MOVE_PDF,
                 CleanupPreferences.CleanupStep.RENAME_PDF_ONLY_RELATIVE_PATHS,
                 CleanupPreferences.CleanupStep.CONVERT_TO_BIBLATEX,
-                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX));
+                CleanupPreferences.CleanupStep.CONVERT_TO_BIBTEX,
+                CleanupPreferences.CleanupStep.CONVERT_MSC_CODES));
         return activeJobs;
     }
 

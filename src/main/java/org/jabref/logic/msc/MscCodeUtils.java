@@ -1,8 +1,8 @@
-package org.jabref.gui.fieldeditors.msccodes;
+package org.jabref.logic.msc;
+
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
@@ -13,37 +13,12 @@ import org.slf4j.LoggerFactory;
 
 public class MscCodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MscCodeUtils.class);
-    /**
-     * Load MSC codes and descriptions from a JSON file into a HashMap
+
+    /** Load MSC codes and descriptions from a JSON resource URL into a HashMap
      *
-     * @param jsonFilePath Path to the JSON file containing MSC codes
-     * 
-     * @return Map with MSC codes as keys and descriptions as values
-     */
-    public static Map<String, String> loadMscCodesFromJson(String jsonFilePath) {
-        if (jsonFilePath == null) {
-            LOGGER.error("param jsonFilePath is null {}", jsonFilePath);
-            return Collections.emptyMap();
-        }
-
-        try {
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            Path path = Path.of(jsonFilePath);
-
-            return mapper.readValue(path.toFile(), new TypeReference<Map<String, String>>() { });
-        } catch (IOException e) {
-            LOGGER.error("Error in loadMscCodesFromJson, Message: {}", e.getMessage());
-            return Collections.emptyMap();
-        }
-    }
-
-    /* Load MSC codes and descriptions from a JSON resource URL into a HashMap
-     * 
      * @param resourceUrl URL to the JSON resource containing MSC codes
      * @return Map with MSC codes as keys and descriptions as values
-     */
+    */
     public static Map<String, String> loadMscCodesFromJson(URL resourceUrl) {
         try {
             if (resourceUrl == null) {

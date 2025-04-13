@@ -30,13 +30,13 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.autocompleter.SuggestionProvider;
-import org.jabref.gui.fieldeditors.msccodes.MscCodeUtils;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.msc.MscCodeUtils;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
@@ -58,21 +58,21 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     private static Map<String, String> mscmap;
 
     static {
-        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("org/jabref/gui/fieldeditors/msccodes/msc_codes.json");
+        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("msc_codes.json");
         
-    if (resourceUrl != null) {
-            try {
-                
-                mscmap = MscCodeUtils.loadMscCodesFromJson(resourceUrl); // Use the URL version
-            } catch (Exception e) {
-                LOGGER.error("Error loading msc_codes.json", e);
+        if (resourceUrl != null) {
+                try {
+                    
+                    mscmap = MscCodeUtils.loadMscCodesFromJson(resourceUrl); // Returns Map<String, String>
+                } catch (Exception e) {
+                    LOGGER.error("Error loading msc_codes.json", e);
+                    
+                    mscmap = new HashMap<>();
+                }
+        } else {
+                LOGGER.error("msc_codes.json not found!");
                 
                 mscmap = new HashMap<>();
-            }
-    } else {
-            LOGGER.error("msc_codes.json not found!");
-            
-            mscmap = new HashMap<>();
         }
     }
 
