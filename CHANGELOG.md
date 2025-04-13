@@ -104,6 +104,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where valid DOI could not be imported if it had special characters like `<` or `>`. [#12434](https://github.com/JabRef/jabref/issues/12434)
 - We fixed an issue where the tooltip only displayed the first linked file when hovering. [#12470](https://github.com/JabRef/jabref/issues/12470)
 - We fixed an issue where some texts in the "Citation Information" tab and the "Preferences" dialog could not be translated. [#12883](https://github.com/JabRef/jabref/pull/12883)
+- We fixed an issue where postgres processes remain running after JabRef crashes or is forcefully terminated. [#12844] ()
 
 ### Removed
 

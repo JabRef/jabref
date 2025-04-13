@@ -10,6 +10,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.PostgreServer;
+import org.jabref.logic.search.PostgreProcessCleaner;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.migrations.PreferencesMigrations;
 
@@ -26,6 +27,9 @@ public class Launcher {
     public static void main(String[] args) {
         JabKit.initLogging(args);
 
+        //Clean up old Postgres instance if needed
+        PostgreProcessCleaner.getInstance().checkAndCleanupOldInstance();
+
         // Initialize preferences
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
         Injector.setModelOrService(CliPreferences.class, preferences);
@@ -41,6 +45,9 @@ public class Launcher {
 
         PostgreServer postgreServer = new PostgreServer();
         Injector.setModelOrService(PostgreServer.class, postgreServer);
+
+        //Register shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(postgreServer::shutdown));
 
         JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
         JabRefGUI.launch(JabRefGUI.class, args);
