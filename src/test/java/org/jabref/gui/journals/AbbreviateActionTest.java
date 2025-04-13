@@ -6,12 +6,14 @@ import javax.swing.undo.UndoManager;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -20,14 +22,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class AbbreviateActionTest {
+@AllowedToUseSwing("Uses UndoManager from javax.swing")
+class AbbreviateActionTest {
     
     @Mock
     private DialogService dialogService;
@@ -48,7 +50,7 @@ public class AbbreviateActionTest {
     private UndoManager undoManager;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList());
@@ -56,7 +58,7 @@ public class AbbreviateActionTest {
     }
 
     @Test
-    public void unabbreviateWithAllSourcesDisabledShowsNotification() {
+    void unabbreviateWithAllSourcesDisabledShowsNotification() {
         when(abbreviationPreferences.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList());
         when(abbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID)).thenReturn(false);
         
@@ -71,11 +73,11 @@ public class AbbreviateActionTest {
                 
         action.execute();
         
-        verify(dialogService).notify(eq("Cannot unabbreviate: all journal lists are disabled"));
+        verify(dialogService).notify(eq(Localization.lang("Cannot unabbreviate: all journal lists are disabled")));
     }
     
     @Test
-    public void unabbreviateWithOneSourceEnabledExecutesTask() {
+    void unabbreviateWithOneSourceEnabledExecutesTask() {
         when(abbreviationPreferences.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList());
         when(abbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID)).thenReturn(true);
         
@@ -93,6 +95,28 @@ public class AbbreviateActionTest {
                 
         action.execute();
         
-        verify(dialogService, never()).notify(eq("Cannot unabbreviate: all journal lists are disabled"));
+        verify(dialogService, never()).notify(eq(Localization.lang("Cannot unabbreviate: all journal lists are disabled")));
+    }
+    
+    @Test
+    void checksIfAnyJournalSourcesAreEnabled() {
+        when(abbreviationPreferences.getExternalJournalLists()).thenReturn(
+            FXCollections.observableArrayList("source1.csv", "source2.csv"));
+        when(abbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID)).thenReturn(false);
+        when(abbreviationPreferences.isSourceEnabled("source1.csv")).thenReturn(false);
+        when(abbreviationPreferences.isSourceEnabled("source2.csv")).thenReturn(true);
+        
+        AbbreviateAction action = new AbbreviateAction(
+                StandardActions.UNABBREVIATE, 
+                () -> libraryTab, 
+                dialogService, 
+                stateManager, 
+                abbreviationPreferences,
+                taskExecutor,
+                undoManager);
+        
+        action.execute();
+        
+        verify(dialogService, never()).notify(eq(Localization.lang("Cannot unabbreviate: all journal lists are disabled")));
     }
 } 

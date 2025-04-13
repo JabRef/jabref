@@ -555,26 +555,33 @@ class JournalAbbreviationRepositoryTest {
             new Abbreviation("Unique Journal Source Two ABC", "UniqueJS2")
         ), sourceKey2, true);
         
+        // Verify initial state
         assertTrue(testRepo.isSourceEnabled(sourceKey1), "Source 1 should be enabled initially");
         assertTrue(testRepo.isSourceEnabled(sourceKey2), "Source 2 should be enabled initially");
         
-        // Verify both abbreviations are accessible
+        // Verify both abbreviations are accessible when sources are enabled
         assertEquals("UniqueJS1", testRepo.getDefaultAbbreviation("Unique Journal Source One XYZ").orElse("WRONG"));
         assertEquals("UniqueJS2", testRepo.getDefaultAbbreviation("Unique Journal Source Two ABC").orElse("WRONG"));
         
+        // Disable first source
         testRepo.setSourceEnabled(sourceKey1, false);
         
+        // Verify first source is disabled, second still enabled
         assertFalse(testRepo.isSourceEnabled(sourceKey1), "Source 1 should be disabled");
         assertTrue(testRepo.isSourceEnabled(sourceKey2), "Source 2 should remain enabled");
         
+        // Verify first abbreviation is no longer accessible, second still is
         assertEquals("WRONG", testRepo.getDefaultAbbreviation("Unique Journal Source One XYZ").orElse("WRONG"));
         assertEquals("UniqueJS2", testRepo.getDefaultAbbreviation("Unique Journal Source Two ABC").orElse("WRONG"));
         
+        // Disable second source
         testRepo.setSourceEnabled(sourceKey2, false);
         
+        // Verify both sources are disabled
         assertFalse(testRepo.isSourceEnabled(sourceKey1), "Source 1 should remain disabled");
         assertFalse(testRepo.isSourceEnabled(sourceKey2), "Source 2 should be disabled");
         
+        // Verify both abbreviations are no longer accessible
         assertEquals("WRONG", testRepo.getDefaultAbbreviation("Unique Journal Source One XYZ").orElse("WRONG"));
         assertEquals("WRONG", testRepo.getDefaultAbbreviation("Unique Journal Source Two ABC").orElse("WRONG"));
     }
@@ -588,5 +595,93 @@ class JournalAbbreviationRepositoryTest {
         testRepo.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, false);
         
         assertFalse(testRepo.get("American Journal of Public Health").isPresent());
+    }
+    
+    @Test
+    void getForUnabbreviationRespectsEnabledSources() {
+        JournalAbbreviationRepository testRepo = createTestRepository();
+        
+        // Abbreviation should be initially present for unabbreviation
+        String abbreviation = "Am. J. Public Health";
+        assertTrue(testRepo.isAbbreviatedName(abbreviation), "Should recognize as abbreviation");
+        
+        Optional<Abbreviation> result = testRepo.getForUnabbreviation(abbreviation);
+        assertTrue(result.isPresent(), "Should find abbreviation when source is enabled");
+        assertEquals("American Journal of Public Health", result.get().getName());
+        
+        // After disabling the source, it should not be available
+        testRepo.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, false);
+        
+        // Should not return for unabbreviation since source is disabled
+        Optional<Abbreviation> resultAfterDisabling = testRepo.getForUnabbreviation(abbreviation);
+        assertFalse(resultAfterDisabling.isPresent(), "Should not find abbreviation when source is disabled");
+    }
+    
+    @Test
+    void isAbbreviatedNameRespectsEnabledSources() {
+        JournalAbbreviationRepository testRepo = createTestRepository();
+        
+        String abbreviation = "Am. J. Public Health";
+        assertTrue(testRepo.isAbbreviatedName(abbreviation), "Should recognize as abbreviation when source is enabled");
+        
+        testRepo.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, false);
+        
+        assertFalse(testRepo.isAbbreviatedName(abbreviation), "Should not recognize as abbreviation when source is disabled");
+    }
+    
+    @Test
+    void getAllAbbreviationsWithSourcesReturnsCorrectSources() {
+        // Create a custom repository with known abbreviations
+        JournalAbbreviationRepository testRepo = new JournalAbbreviationRepository();
+        
+        // Clear any existing abbreviations (clear the maps)
+        testRepo.getCustomAbbreviations().clear();
+        
+        // Add exactly 4 abbreviations with built-in source
+        testRepo.addCustomAbbreviations(List.of(
+            AMERICAN_JOURNAL,
+            ACS_MATERIALS,
+            ANTIOXIDANTS,
+            PHYSICAL_REVIEW
+        ), JournalAbbreviationRepository.BUILTIN_LIST_ID, true);
+        
+        // Add 1 abbreviation with custom source
+        String customSource = "test-custom";
+        testRepo.addCustomAbbreviations(List.of(
+            new Abbreviation("Custom Journal", "Cust. J.")
+        ), customSource, true);
+        
+        List<JournalAbbreviationRepository.AbbreviationWithSource> allWithSources = testRepo.getAllAbbreviationsWithSources();
+        
+        // Verify we have at least the number of abbreviations we added
+        assertTrue(allWithSources.size() >= 5, 
+                 "Should have at least 5 abbreviations (got " + allWithSources.size() + ")");
+        
+        // Verify custom abbreviation has correct source
+        long customCount = allWithSources.stream()
+                          .filter(aws -> customSource.equals(aws.getSource()))
+                          .count();
+        assertEquals(1, customCount, "Should have 1 custom source abbreviation");
+        
+        // Verify built-in abbreviations have correct source
+        long builtInCount = allWithSources.stream()
+                           .filter(aws -> JournalAbbreviationRepository.BUILTIN_LIST_ID.equals(aws.getSource()))
+                           .count();
+        assertTrue(builtInCount >= 4, "Should have at least 4 built-in abbreviations");
+        
+        // Verify we can find the specific custom abbreviation
+        Optional<JournalAbbreviationRepository.AbbreviationWithSource> customAbbr = allWithSources.stream()
+                                                                                  .filter(aws -> customSource.equals(aws.getSource()))
+                                                                                  .findFirst();
+        assertTrue(customAbbr.isPresent(), "Should find custom abbreviation with source");
+        assertEquals("Custom Journal", customAbbr.get().getAbbreviation().getName());
+        
+        // Verify our specific built-in abbreviations have the correct source
+        for (Abbreviation abbr : List.of(AMERICAN_JOURNAL, ACS_MATERIALS, ANTIOXIDANTS, PHYSICAL_REVIEW)) {
+            boolean found = allWithSources.stream()
+                           .anyMatch(aws -> aws.getSource().equals(JournalAbbreviationRepository.BUILTIN_LIST_ID) && 
+                                     aws.getAbbreviation().getName().equals(abbr.getName()));
+            assertTrue(found, "Should find " + abbr.getName() + " with built-in source");
+        }
     }
 }
