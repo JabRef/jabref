@@ -501,9 +501,9 @@ public class ImportHandler {
 
     private String deriveFileNameFromUrl(String url) {
         String fileName = url.substring(url.lastIndexOf('/') + 1);
-        if (fileName == null || fileName.isBlank()) {
+        if (fileName.isBlank()) {
             fileName = "downloaded.pdf";
         }
-        return fileName;
+        return FileUtil.getValidFileName(fileName);
     }
 }
