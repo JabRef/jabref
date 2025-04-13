@@ -72,7 +72,7 @@ class AbbreviateActionTest {
                 
         action.execute();
         
-        verify(dialogService).notify(eq(Localization.lang("%cannot unabbreviate: all journal lists are disabled")));
+        verify(dialogService).notify(eq(Localization.lang("%cannot unabbreviate: all journal lists are disabled.")));
     }
     
     @Test
@@ -94,7 +94,8 @@ class AbbreviateActionTest {
                 
         action.execute();
         
-        verify(dialogService, never()).notify(eq(Localization.lang("%cannot unabbreviate: all journal lists are disabled")));
+        verify(dialogService, never()).notify(eq(Localization.lang("%cannot unabbreviate: all journal lists are disabled.")));
+        verify(dialogService).notify(eq(Localization.lang("Unabbreviating...")));
     }
     
     @Test
@@ -116,6 +117,6 @@ class AbbreviateActionTest {
         
         action.execute();
         
-        verify(dialogService, never()).notify(eq(Localization.lang("%cannot unabbreviate: all journal lists are disabled")));
+        verify(dialogService, never()).notify(eq(Localization.lang("%cannot unabbreviate: all journal lists are disabled.")));
     }
 } 

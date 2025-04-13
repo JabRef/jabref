@@ -181,34 +181,19 @@ class JournalAbbreviationsViewModelTabTest {
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
         abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
-        if (abbreviationPreferences == null) {
-            throw new IllegalStateException("Failed to initialize abbreviationPreferences");
-        }
         
         when(abbreviationPreferences.isSourceEnabled(anyString())).thenReturn(true);
         when(abbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID)).thenReturn(true);
         when(abbreviationPreferences.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList());
 
         dialogService = mock(DialogService.class);
-        if (dialogService == null) {
-            throw new IllegalStateException("Failed to initialize dialogService");
-        }
         
         this.tempFolder = tempFolder;
-        if (this.tempFolder == null) {
-            throw new IllegalStateException("Temp folder is null");
-        }
 
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
         viewModel = new JournalAbbreviationsTabViewModel(abbreviationPreferences, dialogService, taskExecutor, repository);
-        if (viewModel == null) {
-            throw new IllegalStateException("Failed to initialize viewModel");
-        }
 
         emptyTestFile = createTestFile(new CsvFileNameAndContent("emptyTestFile.csv", ""));
-        if (emptyTestFile == null) {
-            throw new IllegalStateException("Failed to create empty test file");
-        }
     }
 
     @Test

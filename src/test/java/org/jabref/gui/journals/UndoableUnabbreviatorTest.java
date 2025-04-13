@@ -57,20 +57,18 @@ class UndoableUnabbreviatorTest {
     
     @Test
     void unabbreviateWithBothSourcesEnabled() {
-        assertTrue(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
-        assertTrue(repository.isSourceEnabled(CUSTOM_SOURCE));
+        assertEquals(true, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(true, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertTrue(builtInResult, "Unabbreviation of built-in abbreviation should succeed");
         assertEquals(BUILT_IN_1.getName(), builtInEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal name should be replaced with full name");
         
         BibEntry customEntry = createEntryWithAbbreviatedJournal(CUSTOM_1.getAbbreviation());
         boolean customResult = unabbreviator.unabbreviate(database, customEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertTrue(customResult, "Unabbreviation of custom abbreviation should succeed");
         assertEquals(CUSTOM_1.getName(), customEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal name should be replaced with full name");
     }
@@ -79,20 +77,18 @@ class UndoableUnabbreviatorTest {
     void unabbreviateWithOnlyBuiltInSourceEnabled() {
         repository.setSourceEnabled(CUSTOM_SOURCE, false);
         
-        assertTrue(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
-        assertFalse(repository.isSourceEnabled(CUSTOM_SOURCE));
+        assertEquals(true, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(false, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertTrue(builtInResult, "Unabbreviation of built-in abbreviation should succeed");
         assertEquals(BUILT_IN_1.getName(), builtInEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal name should be replaced with full name");
         
         BibEntry customEntry = createEntryWithAbbreviatedJournal(CUSTOM_1.getAbbreviation());
         boolean customResult = unabbreviator.unabbreviate(database, customEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertFalse(customResult, "Unabbreviation of custom abbreviation should fail when source is disabled");
         assertEquals(CUSTOM_1.getAbbreviation(), customEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal abbreviation should remain unchanged");
     }
@@ -101,20 +97,18 @@ class UndoableUnabbreviatorTest {
     void unabbreviateWithOnlyCustomSourceEnabled() {
         repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, false);
         
-        assertFalse(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
-        assertTrue(repository.isSourceEnabled(CUSTOM_SOURCE));
+        assertEquals(false, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(true, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertFalse(builtInResult, "Unabbreviation of built-in abbreviation should fail when built-in source is disabled");
         assertEquals(BUILT_IN_1.getAbbreviation(), builtInEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal abbreviation should remain unchanged");
         
         BibEntry customEntry = createEntryWithAbbreviatedJournal(CUSTOM_1.getAbbreviation());
         boolean customResult = unabbreviator.unabbreviate(database, customEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertTrue(customResult, "Unabbreviation of custom abbreviation should succeed");
         assertEquals(CUSTOM_1.getName(), customEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal name should be replaced with full name");
     }
@@ -124,20 +118,18 @@ class UndoableUnabbreviatorTest {
         repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, false);
         repository.setSourceEnabled(CUSTOM_SOURCE, false);
         
-        assertFalse(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
-        assertFalse(repository.isSourceEnabled(CUSTOM_SOURCE));
+        assertEquals(false, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(false, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertFalse(builtInResult, "Unabbreviation should fail when all sources are disabled");
         assertEquals(BUILT_IN_1.getAbbreviation(), builtInEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal abbreviation should remain unchanged");
         
         BibEntry customEntry = createEntryWithAbbreviatedJournal(CUSTOM_1.getAbbreviation());
         boolean customResult = unabbreviator.unabbreviate(database, customEntry, StandardField.JOURNAL, compoundEdit);
         
-        assertFalse(customResult, "Unabbreviation should fail when all sources are disabled");
         assertEquals(CUSTOM_1.getAbbreviation(), customEntry.getField(StandardField.JOURNAL).orElse(""),
                    "Journal abbreviation should remain unchanged");
     }

@@ -68,22 +68,13 @@ class JournalAbbreviationRepositoryTest {
     @BeforeEach
     void setUp() {
         abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
-        if (abbreviationPreferences == null) {
-            throw new IllegalStateException("Failed to initialize abbreviationPreferences");
-        }
         
         when(abbreviationPreferences.isSourceEnabled(anyString())).thenReturn(true);
         when(abbreviationPreferences.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList());
         
         repository = new JournalAbbreviationRepository();
-        if (repository == null) {
-            throw new IllegalStateException("Failed to initialize repository");
-        }
         
         undoableUnabbreviator = new UndoableUnabbreviator(repository);
-        if (undoableUnabbreviator == null) {
-            throw new IllegalStateException("Failed to initialize undoableUnabbreviator");
-        }
     }
 
     @Test
