@@ -405,12 +405,15 @@ public class ImportHandler {
         }
         LOGGER.trace("Checking if URL is a PDF: {}", data);
 
-        if (URLUtil.isURL(data) && data.toLowerCase().endsWith(".pdf")) {
-            try {
-                return handlePdfUrl(data);
-            } catch (IOException ex) {
-                LOGGER.error("Could not handle PDF URL", ex);
-                return List.of();
+        if (URLUtil.isURL(data)) {
+            String fileName = data.substring(data.lastIndexOf('/') + 1);
+            if (FileUtil.isPDFFile(Path.of(fileName))) {
+                try {
+                    return handlePdfUrl(data);
+                } catch (IOException ex) {
+                    LOGGER.error("Could not handle PDF URL", ex);
+                    return List.of();
+                }
             }
         }
 
