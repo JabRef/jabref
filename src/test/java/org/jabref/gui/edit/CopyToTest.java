@@ -144,7 +144,7 @@ public class CopyToTest {
         expectedEntries.add(referencedEntry);
 
         verify(importHandler).importEntriesWithDuplicateCheck(targetDatabaseContext, expectedEntries);
-        verify(dialogService).notify("Entries and cross-references successfully copied to target library");
+        verify(dialogService).notify(Localization.lang("Entries and cross-references successfully copied to target library"));
     }
 
 
@@ -166,7 +166,7 @@ public class CopyToTest {
         copyTo.execute();
 
         verify(importHandler).importEntriesWithDuplicateCheck(targetDatabaseContext, selectedEntries);
-        verify(dialogService).notify("Entries successfully copied to target library");
+        verify(dialogService).notify(Localization.lang("Entries successfully copied to target library"));
     }
 
 }

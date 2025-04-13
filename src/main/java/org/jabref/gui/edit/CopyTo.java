@@ -28,6 +28,9 @@ public class CopyTo extends SimpleCommand {
     private final BibDatabaseContext sourceDatabaseContext;
     private final BibDatabaseContext targetDatabaseContext;
 
+    private static final String DEFAULT_TARGET_LIBRARY_NAME = "target library";
+
+
     public CopyTo(DialogService dialogService,
                   StateManager stateManager,
                   CopyToPreferences copyToPreferences,
@@ -63,14 +66,18 @@ public class CopyTo extends SimpleCommand {
         if (includeCrossReferences) {
             int before = targetDatabaseContext.getEntries().size();
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
+            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."))
             int after = targetDatabaseContext.getEntries().size();
             if (after > before) {
-                String targetLibraryName = targetDatabaseContext.getDatabasePath()
-                        .map(path -> path.getFileName().toString())
-                        .orElse("target library");
-
-                dialogService.notify(Localization.lang("Entries copied successfully to %0, including cross-references.", targetLibraryName));
+                dialogService.notify(Localization.lang("No new entries were added to the target library."));
+                return;
             }
+
+            String targetLibraryName = targetDatabaseContext.getDatabasePath()
+                    .map(path -> path.getFileName().toString())
+                    .orElse(DEFAULT_TARGET_LIBRARY_NAME);
+
+            dialogService.notify(Localization.lang("Copied %0 entries to '%1'", String.valueOf(after - before), targetLibraryName));
         } else {
             int before = targetDatabaseContext.getEntries().size();
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
