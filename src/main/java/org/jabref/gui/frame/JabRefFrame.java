@@ -392,6 +392,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Update search AutoCompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
+            /*
+             * Ensure focus is set after the current UI update cycle completes
+             * (when switching tabs), which prevents other components from stealing focus unexpectedly.
+             */
             Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
             // Set window title - copy tab title
@@ -703,7 +707,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             Optional.of(databaseContext.get()).flatMap(BibDatabaseContext::getDatabasePath).ifPresent(path -> {
                 try {
                     NativeDesktop.openFolderAndSelectFile(path, preferences.getExternalApplicationsPreferences(), dialogService);
-                } catch (IOException e) {
+                } catch (
+                        IOException e) {
                     LOGGER.info("Could not open folder", e);
                 }
             });
