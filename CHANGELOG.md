@@ -26,8 +26,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a feature for enabling drag-and-drop of files into groups  [#12540](https://github.com/JabRef/jabref/issues/12540)
 - We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
 - We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
+- We added an option to choose whether to open the file explorer in the files directory or in the last opened directory when attaching files. [#12554](https://github.com/JabRef/jabref/issues/12554)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
+- We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832/)
 - We added a "LTWA" abbreviation feature in the "Quality > Abbreviate journal names > LTWA" menu [#12273](https://github.com/JabRef/jabref/issues/12273/)
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 
@@ -103,6 +105,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the tooltip only displayed the first linked file when hovering. [#12470](https://github.com/JabRef/jabref/issues/12470)
 - We fixed an issue where some texts in the "Citation Information" tab and the "Preferences" dialog could not be translated. [#12883](https://github.com/JabRef/jabref/pull/12883)
 - We fixed an issue where downloading PDFs from URLs to empty entries resulted in meaningless filenames like "-.pdf". [#12917](https://github.com/JabRef/jabref/issues/12917)
+- We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
 
 ### Removed
 
