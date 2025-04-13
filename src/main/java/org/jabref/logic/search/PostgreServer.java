@@ -1,31 +1,29 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jabref.model.search.PostgreConstants;
-
-import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
-import java.nio.file.Path;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.jabref.model.search.PostgreConstants;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
 
 public class PostgreServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
-    public static final Path POSTGRES_METADATA_FILE = Path.of("/tmp/jabref-postgres-info.json");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Path POSTGRES_METADATA_FILE = Path.of("/tmp/jabref-postgres-info.json");
 
     private final EmbeddedPostgres embeddedPostgres;
     private final DataSource dataSource;
@@ -121,5 +119,4 @@ public class PostgreServer {
             LOGGER.warn("Failed to write Postgres metadata file", e);
         }
     }
-
 }

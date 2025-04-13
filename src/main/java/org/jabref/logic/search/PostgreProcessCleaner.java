@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -14,13 +15,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.jabref.logic.os.OS.getHostName;
-import static org.jabref.logic.search.PostgreServer.POSTGRES_METADATA_FILE;
 
 public class PostgreProcessCleaner {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreProcessCleaner.class);
     private static final PostgreProcessCleaner INSTANCE = new PostgreProcessCleaner();
+    private static final Path POSTGRES_METADATA_FILE = Path.of("/tmp/jabref-postgres-info.json");
 
-    private PostgreProcessCleaner() {}
+    private PostgreProcessCleaner() {
+    }
 
     public static PostgreProcessCleaner getInstance() {
         return INSTANCE;
@@ -117,10 +119,14 @@ public class PostgreProcessCleaner {
         while ((line = reader.readLine()) != null) {
             if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
                 Long pid = parseUnixPidFromLine(line);
-                if (pid != null) return pid;
+                if (pid != null) {
+                    return pid;
+                }
             } else if (os.contains("win")) {
                 Long pid = parseWindowsPidFromLine(line);
-                if (pid != null) return pid;
+                if (pid != null) {
+                    return pid;
+                }
             }
         }
         return -1;

@@ -9,11 +9,10 @@ import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.search.PostgreProcessCleaner;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.migrations.PreferencesMigrations;
-import org.jabref.logic.search.PostgreProcessCleaner;
-
 
 import com.airhacks.afterburner.injection.Injector;
 
