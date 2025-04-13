@@ -52,7 +52,6 @@ class AbbreviateActionTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        
         when(stateManager.getSelectedEntries()).thenReturn(FXCollections.observableArrayList());
         when(stateManager.getActiveDatabase()).thenReturn(Optional.empty());
     }

@@ -181,8 +181,6 @@ class JournalAbbreviationsViewModelTabTest {
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws Exception {
         abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
-        
-
         when(abbreviationPreferences.isSourceEnabled(anyString())).thenReturn(true);
         when(abbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID)).thenReturn(true);
         when(abbreviationPreferences.getExternalJournalLists()).thenReturn(FXCollections.observableArrayList());
@@ -270,7 +268,7 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(1, viewModel.journalFilesProperty().size());
         assertEquals(4, viewModel.abbreviationsProperty().size());
 
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testData.abbreviationToCheck)));
+        assertEquals(true, viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testData.abbreviationToCheck)));
     }
 
     @ParameterizedTest
@@ -303,7 +301,7 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(4, viewModel.abbreviationsProperty().size());
 
         // check "arbitrary" abbreviation
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testData.abbreviationToCheck)));
+        assertEquals(true, viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testData.abbreviationToCheck)));
 
         // simulate add new file button
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(emptyTestFile));
@@ -328,7 +326,7 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(5, viewModel.abbreviationsProperty().size());
 
         // check "arbitrary" abbreviation
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testData.abbreviationToCheck)));
+        assertEquals(true, viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testData.abbreviationToCheck)));
     }
 
     @Test
@@ -436,7 +434,7 @@ class JournalAbbreviationsViewModelTabTest {
         // addAbbreviation(testAbbreviation);
 
         assertEquals(0, viewModel.abbreviationsProperty().size());
-        assertFalse(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
+        assertEquals(false, viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
     }
 
     @ParameterizedTest
@@ -501,14 +499,14 @@ class JournalAbbreviationsViewModelTabTest {
         assertEquals(5, viewModel.abbreviationsProperty().size());
 
         viewModel.selectLastJournalFile();
-        assertTrue(viewModel.currentFileProperty().get().getAbsolutePath().get().getFileName().toString().endsWith("3.csv"));
+        assertEquals(true, viewModel.currentFileProperty().get().getAbsolutePath().get().getFileName().toString().endsWith("3.csv"));
         selectLastAbbreviation();
         viewModel.deleteAbbreviation();
         viewModel.addAbbreviation(ABBREVIATION_6);
 
         // deletion and addition of an entry leads to same size
         assertEquals(5, viewModel.abbreviationsProperty().size());
-        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(ABBREVIATION_6)));
+        assertEquals(true, viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(ABBREVIATION_6)));
 
         // overwrite all files
         viewModel.saveJournalAbbreviationFiles();
@@ -550,14 +548,14 @@ class JournalAbbreviationsViewModelTabTest {
         
         AbbreviationsFileViewModel fileViewModel = viewModel.currentFileProperty().get();
         
-        assertTrue(fileViewModel.isEnabled());
+        assertEquals(true, fileViewModel.isEnabled());
         
         fileViewModel.setEnabled(false);
         
-        assertFalse(fileViewModel.isEnabled());
+        assertEquals(false, fileViewModel.isEnabled());
         
         fileViewModel.setEnabled(true);
-        assertTrue(fileViewModel.isEnabled());
+        assertEquals(true, fileViewModel.isEnabled());
         
         viewModel.markAsDirty();
     }
@@ -592,8 +590,8 @@ class JournalAbbreviationsViewModelTabTest {
                 .filter(vm -> vm.isBuiltInListProperty().get())
                 .findFirst();
         
-        assertTrue(builtInViewModel.isPresent());
-        assertFalse(builtInViewModel.get().isEnabled());
+        assertEquals(true, builtInViewModel.isPresent());
+        assertEquals(false, builtInViewModel.get().isEnabled());
     }
     
     @Test
@@ -638,10 +636,10 @@ class JournalAbbreviationsViewModelTabTest {
         
         AbbreviationsFileViewModel fileViewModel = testViewModel.currentFileProperty().get();
         
-        assertTrue(fileViewModel.isEnabled());
+        assertEquals(true, fileViewModel.isEnabled());
         
         fileViewModel.setEnabled(false);
-        assertFalse(fileViewModel.isEnabled());
+        assertEquals(false, fileViewModel.isEnabled());
         
         String filename = testFilePath.getFileName().toString();
         

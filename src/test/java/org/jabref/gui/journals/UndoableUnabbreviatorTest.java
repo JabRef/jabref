@@ -57,10 +57,8 @@ class UndoableUnabbreviatorTest {
     
     @Test
     void unabbreviateWithBothSourcesEnabled() {
-        assertTrue(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID), 
-                 "Built-in source should be enabled");
-        assertTrue(repository.isSourceEnabled(CUSTOM_SOURCE), 
-                 "Custom source should be enabled");
+        assertEquals(true, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(true, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
@@ -81,10 +79,8 @@ class UndoableUnabbreviatorTest {
     void unabbreviateWithOnlyBuiltInSourceEnabled() {
         repository.setSourceEnabled(CUSTOM_SOURCE, false);
         
-        assertTrue(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID), 
-                 "Built-in source should be enabled");
-        assertFalse(repository.isSourceEnabled(CUSTOM_SOURCE), 
-                  "Custom source should be disabled");
+        assertEquals(true, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(false, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
@@ -105,10 +101,8 @@ class UndoableUnabbreviatorTest {
     void unabbreviateWithOnlyCustomSourceEnabled() {
         repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, false);
         
-        assertFalse(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID), 
-                  "Built-in source should be disabled");
-        assertTrue(repository.isSourceEnabled(CUSTOM_SOURCE), 
-                 "Custom source should be enabled");
+        assertEquals(false, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(true, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
@@ -130,10 +124,8 @@ class UndoableUnabbreviatorTest {
         repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, false);
         repository.setSourceEnabled(CUSTOM_SOURCE, false);
         
-        assertFalse(repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID), 
-                  "Built-in source should be disabled");
-        assertFalse(repository.isSourceEnabled(CUSTOM_SOURCE), 
-                  "Custom source should be disabled");
+        assertEquals(false, repository.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID));
+        assertEquals(false, repository.isSourceEnabled(CUSTOM_SOURCE));
         
         BibEntry builtInEntry = createEntryWithAbbreviatedJournal(BUILT_IN_1.getAbbreviation());
         boolean builtInResult = unabbreviator.unabbreviate(database, builtInEntry, StandardField.JOURNAL, compoundEdit);
