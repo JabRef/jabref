@@ -10,9 +10,10 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.PostgreServer;
-import org.jabref.logic.search.PostgreProcessCleaner;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.migrations.PreferencesMigrations;
+import org.jabref.logic.search.PostgreProcessCleaner;
+
 
 import com.airhacks.afterburner.injection.Injector;
 
@@ -27,7 +28,7 @@ public class Launcher {
     public static void main(String[] args) {
         JabKit.initLogging(args);
 
-        //Clean up old Postgres instance if needed
+        // Clean up old Postgres instance if needed
         PostgreProcessCleaner.getInstance().checkAndCleanupOldInstance();
 
         // Initialize preferences
@@ -46,7 +47,7 @@ public class Launcher {
         PostgreServer postgreServer = new PostgreServer();
         Injector.setModelOrService(PostgreServer.class, postgreServer);
 
-        //Register shutdown hook
+        // Register shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(postgreServer::shutdown));
 
         JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);

@@ -1,9 +1,5 @@
 package org.jabref.logic.search;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,6 +8,10 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.jabref.logic.os.OS.getHostName;
 import static org.jabref.logic.search.PostgreServer.POSTGRES_METADATA_FILE;
@@ -27,13 +27,14 @@ public class PostgreProcessCleaner {
     }
 
     public void checkAndCleanupOldInstance() {
-        if (!Files.exists(POSTGRES_METADATA_FILE))
+        if (!Files.exists(POSTGRES_METADATA_FILE)) {
             return;
+        }
 
         try {
             Map<String, Object> metadata = new HashMap<>(new ObjectMapper()
                     .readValue(Files.readAllBytes(POSTGRES_METADATA_FILE), HashMap.class));
-            if(!metadata.isEmpty()) {
+            if (!metadata.isEmpty()) {
                 int port = ((Number) metadata.get("postgresPort")).intValue();
                 destroyPreviousJavaProcess(metadata);
                 destroyPostgresProcess(port);
@@ -97,7 +98,6 @@ public class PostgreProcessCleaner {
         } catch (Exception e) {
             LOGGER.warn("Failed to get PID for port {}: {}", port, e.getMessage());
         }
-
         return -1;
     }
 
@@ -128,16 +128,17 @@ public class PostgreProcessCleaner {
 
     private Long parseUnixPidFromLine(String line) {
         String[] parts = line.trim().split("\\s+");
-        if (parts.length > 1 && parts[1].matches("\\d+"))
+        if (parts.length > 1 && parts[1].matches("\\d+")) {
             return Long.parseLong(parts[1]);
+        }
         return null;
     }
 
     private Long parseWindowsPidFromLine(String line) {
         String[] parts = line.trim().split("\\s+");
-        if (parts.length >= 5 && parts[parts.length - 1].matches("\\d+"))
+        if (parts.length >= 5 && parts[parts.length - 1].matches("\\d+")) {
             return Long.parseLong(parts[parts.length - 1]);
+        }
         return null;
     }
-
 }
