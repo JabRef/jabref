@@ -6,16 +6,27 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jabref.model.search.PostgreConstants;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
 
 public class PostgreServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
+    public static final Path POSTGRES_METADATA_FILE = Path.of("/tmp/jabref-postgres-info.json");
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final EmbeddedPostgres embeddedPostgres;
     private final DataSource dataSource;
 
@@ -26,6 +37,7 @@ public class PostgreServer {
                                                .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
                                                .start();
             LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
+            writeMetadataToFile(embeddedPostgres.getPort());
         } catch (IOException e) {
             LOGGER.error("Could not start Postgres server", e);
             this.embeddedPostgres = null;
@@ -96,4 +108,18 @@ public class PostgreServer {
             }
         }
     }
+
+    private void writeMetadataToFile(int port) {
+        try {
+            Map<String, Object> meta = new HashMap<>();
+            meta.put("javaPid", ProcessHandle.current().pid());
+            meta.put("postgresPort", port);
+            meta.put("startedBy", "jabref");
+            meta.put("startedAt", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+            OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(POSTGRES_METADATA_FILE.toFile(), meta);
+        } catch (IOException e) {
+            LOGGER.warn("Failed to write Postgres metadata file", e);
+        }
+    }
+
 }

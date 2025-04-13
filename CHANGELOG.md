@@ -105,6 +105,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the tooltip only displayed the first linked file when hovering. [#12470](https://github.com/JabRef/jabref/issues/12470)
 - We fixed an issue where some texts in the "Citation Information" tab and the "Preferences" dialog could not be translated. [#12883](https://github.com/JabRef/jabref/pull/12883)
 - We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
+- We fixed an issue where postgres processes remain running after JabRef crashes or is forcefully terminated. [#12844] ()
 
 ### Removed
 
