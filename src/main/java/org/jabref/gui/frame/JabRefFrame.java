@@ -392,7 +392,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Update search AutoCompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
-            libraryTab.getMainTable().requestFocus();
+            Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
             // Set window title - copy tab title
             StringBinding windowTitle = Bindings.createStringBinding(
