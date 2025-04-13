@@ -939,9 +939,6 @@ public class LibraryTab extends Tab {
         }
 
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
-
-        // prevent the main table from loosing focus
-        getMainTable().requestFocus();
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
