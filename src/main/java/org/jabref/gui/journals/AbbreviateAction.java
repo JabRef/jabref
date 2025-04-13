@@ -1,6 +1,10 @@
 package org.jabref.gui.journals;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.nio.file.Path;
 
@@ -13,6 +17,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.undo.NamedCompound;
+import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -21,6 +26,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 
 import org.slf4j.Logger;
@@ -79,7 +85,7 @@ public class AbbreviateAction extends SimpleCommand {
                     BackgroundTask.wrap(() -> abbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
-        } else if (action == StandardActions.UNABBREVIATE) {
+        } else if (action == StandardActions.UNABBREVIATE) {            
             if (!areAnyJournalSourcesEnabled()) {
                 dialogService.notify(Localization.lang("Cannot unabbreviate: all journal lists are disabled"));
                 return;
@@ -120,16 +126,77 @@ public class AbbreviateAction extends SimpleCommand {
         return Localization.lang("Abbreviated %0 journal names.", String.valueOf(count));
     }
 
+    /**
+     * Unabbreviate journal names in entries, respecting the enabled/disabled state of sources.
+     * Only unabbreviates entries from enabled sources.
+     */
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
-        // Reload repository to ensure latest preferences are used
-        abbreviationRepository = JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences);
+        List<BibEntry> filteredEntries = new ArrayList<>();
+        
+        JournalAbbreviationRepository freshRepository = JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences);
+        
+        Map<String, Boolean> sourceEnabledStates = new HashMap<>();
+        String builtInId = JournalAbbreviationRepository.BUILTIN_LIST_ID;
+        sourceEnabledStates.put(builtInId, journalAbbreviationPreferences.isSourceEnabled(builtInId));
+        
+        for (String listPath : journalAbbreviationPreferences.getExternalJournalLists()) {
+            if (listPath != null && !listPath.isBlank()) {
+                String fileName = Path.of(listPath).getFileName().toString();
+                sourceEnabledStates.put(fileName, journalAbbreviationPreferences.isSourceEnabled(fileName));
+            }
+        }
+        
+        var allAbbreviationsWithSources = freshRepository.getAllAbbreviationsWithSources();
+        Map<String, List<JournalAbbreviationRepository.AbbreviationWithSource>> textToSourceMap = new HashMap<>();
+        
+        for (var abbrWithSource : allAbbreviationsWithSources) {
+            Abbreviation abbr = abbrWithSource.getAbbreviation();
+            addToMap(textToSourceMap, abbr.getName(), abbrWithSource);
+            addToMap(textToSourceMap, abbr.getAbbreviation(), abbrWithSource);
+            addToMap(textToSourceMap, abbr.getDotlessAbbreviation(), abbrWithSource);
+            addToMap(textToSourceMap, abbr.getShortestUniqueAbbreviation(), abbrWithSource);
+        }
+        
+        for (BibEntry entry : entries) {
+            boolean includeEntry = true;
             
-        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(abbreviationRepository);
-
+            for (Field journalField : FieldFactory.getJournalNameFields()) {
+                if (!entry.hasField(journalField)) {
+                    continue;
+                }
+                
+                String text = entry.getFieldLatexFree(journalField).orElse("");
+                List<JournalAbbreviationRepository.AbbreviationWithSource> possibleSources = 
+                    textToSourceMap.getOrDefault(text, Collections.emptyList());
+                
+                if (!possibleSources.isEmpty()) {
+                    boolean allSourcesDisabled = true;
+                    for (var abbrWithSource : possibleSources) {
+                        String source = abbrWithSource.getSource();
+                        if (sourceEnabledStates.getOrDefault(source, true)) {
+                            allSourcesDisabled = false;
+                            break;
+                        }
+                    }
+                    
+                    if (allSourcesDisabled) {
+                        includeEntry = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (includeEntry) {
+                filteredEntries.add(entry);
+            }
+        }
+        
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(freshRepository);
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
-        int count = entries.stream().mapToInt(entry ->
+        int count = filteredEntries.stream().mapToInt(entry ->
                 (int) FieldFactory.getJournalNameFields().stream().filter(journalField ->
                         undoableAbbreviator.unabbreviate(databaseContext.getDatabase(), entry, journalField, ce)).count()).sum();
+        
         if (count == 0) {
             return Localization.lang("No journal names could be unabbreviated.");
         }
@@ -138,6 +205,23 @@ public class AbbreviateAction extends SimpleCommand {
         undoManager.addEdit(ce);
         tabSupplier.get().markBaseChanged();
         return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
+    }
+
+    /**
+     * Helper method to add an abbreviation to the text-to-source map
+     *
+     * @param map The map to add to
+     * @param text The text to use as key
+     * @param abbrWithSource The abbreviation with source to add
+     */
+    private void addToMap(Map<String, List<JournalAbbreviationRepository.AbbreviationWithSource>> map, 
+                          String text, 
+                          JournalAbbreviationRepository.AbbreviationWithSource abbrWithSource) {
+        if (text == null || text.isBlank()) {
+            return;
+        }
+        
+        map.computeIfAbsent(text, k -> new ArrayList<>()).add(abbrWithSource);
     }
 
     /**

@@ -29,6 +29,8 @@ import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.ColorUtil;
 import org.jabref.gui.util.ValueTableCellFactory;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -282,16 +284,23 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
             boolean newEnabledState = !selected.isEnabled();
             selected.setEnabled(newEnabledState);
             
-            // Update repository immediately to reflect changes in the UI
-            JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+            refreshComboBoxDisplay();
+            
+            JournalAbbreviationPreferences abbreviationPreferences = preferences.getJournalAbbreviationPreferences();
+                
             if (selected.isBuiltInListProperty().get()) {
-                repository.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, newEnabledState);
+                abbreviationPreferences.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, newEnabledState);
             } else if (selected.getAbsolutePath().isPresent()) {
                 String fileName = selected.getAbsolutePath().get().getFileName().toString();
-                repository.setSourceEnabled(fileName, newEnabledState);
+                abbreviationPreferences.setSourceEnabled(fileName, newEnabledState);
             }
             
-            refreshComboBoxDisplay();
+            JournalAbbreviationRepository newRepository = 
+                JournalAbbreviationLoader.loadRepository(abbreviationPreferences);
+                
+            Injector.setModelOrService(JournalAbbreviationRepository.class, newRepository);
+            
+            abbreviationRepository = newRepository;
             
             viewModel.markAsDirty();
         }

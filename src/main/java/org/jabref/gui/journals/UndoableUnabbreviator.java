@@ -43,13 +43,13 @@ public class UndoableUnabbreviator {
         if (database != null) {
             text = database.resolveForStrings(text);
         }
-
-        var abbreviationOpt = journalAbbreviationRepository.get(text);
-        if (abbreviationOpt.isEmpty()) {
+        
+        if (!journalAbbreviationRepository.isAbbreviatedName(text)) {
             return false;
         }
-
-        if (!journalAbbreviationRepository.isAbbreviatedName(text)) {
+        
+        var abbreviationOpt = journalAbbreviationRepository.get(text);
+        if (abbreviationOpt.isEmpty()) {
             return false;
         }
 

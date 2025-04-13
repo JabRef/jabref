@@ -1,6 +1,7 @@
 package org.jabref.logic.journals;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -120,14 +121,18 @@ public class JournalAbbreviationRepository {
                 .filter(abbreviation -> isSourceEnabled(abbreviationSources.getOrDefault(abbreviation, BUILTIN_LIST_ID)))
                 .anyMatch(abbreviation -> isMatchedAbbreviated(journal, abbreviation));
                 
-        if (!isSourceEnabled(BUILTIN_LIST_ID)) {
+        boolean builtInEnabled = isSourceEnabled(BUILTIN_LIST_ID);
+        if (!builtInEnabled) {
             return isCustomAbbreviated;
         }
         
-        return isCustomAbbreviated || 
-               abbreviationToAbbreviationObject.containsKey(journal) ||
-               dotlessToAbbreviationObject.containsKey(journal) ||
-               shortestUniqueToAbbreviationObject.containsKey(journal);
+        boolean inAbbreviationMap = abbreviationToAbbreviationObject.containsKey(journal);
+        boolean inDotlessMap = dotlessToAbbreviationObject.containsKey(journal);
+        boolean inShortestMap = shortestUniqueToAbbreviationObject.containsKey(journal);
+        
+        boolean isAbbreviated = isCustomAbbreviated || inAbbreviationMap || inDotlessMap || inShortestMap;
+        
+        return isAbbreviated;
     }
 
     /**
@@ -147,13 +152,14 @@ public class JournalAbbreviationRepository {
     /**
      * Attempts to get the abbreviation of the journal given.
      * if no exact match is found, attempts a fuzzy match on full journal names.
+     * This method respects the enabled/disabled state of journal abbreviation sources.
      *
      * @param input The journal name (either full name or abbreviated name).
      */
     public Optional<Abbreviation> get(String input) {
         // Clean up input: trim and unescape ampersand
         String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
-
+        
         Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
                 .filter(abbreviation -> isSourceEnabled(abbreviationSources.getOrDefault(abbreviation, BUILTIN_LIST_ID)))
                 .filter(abbreviation -> isMatched(journal, abbreviation))
@@ -167,20 +173,38 @@ public class JournalAbbreviationRepository {
             return Optional.empty();
         }
         
-        Optional<Abbreviation> builtInAbbreviation = Optional.empty();
-        
-        if (isSourceEnabled(BUILTIN_LIST_ID)) {
-            builtInAbbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
-                    .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
-                    .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
-                    .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
-        }
+        Optional<Abbreviation> builtInAbbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
+                .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
+                .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
+                .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
 
         if (builtInAbbreviation.isPresent()) {
             return builtInAbbreviation;
         }
 
         return findAbbreviationFuzzyMatched(journal);
+    }
+    
+    /**
+     * Specialized method for unabbreviation that first checks if a journal name is abbreviated
+     * from an enabled source before attempting to find its full form.
+     *
+     * @param input The journal name to check and unabbreviate.
+     * @return Optional containing the abbreviation object if the input is an abbreviation 
+     *         from an enabled source, empty otherwise.
+     */
+    public Optional<Abbreviation> getForUnabbreviation(String input) {        
+        boolean builtInEnabled = isSourceEnabled(BUILTIN_LIST_ID);
+        
+        boolean isAbbreviated = isAbbreviatedName(input);
+        
+        if (!isAbbreviated) {
+            return Optional.empty();
+        }
+        
+        Optional<Abbreviation> result = get(input);
+        
+        return result;
     }
 
     private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
@@ -330,5 +354,67 @@ public class JournalAbbreviationRepository {
 
     public Collection<Abbreviation> getAllLoaded() {
         return fullToAbbreviationObject.values();
+    }
+    
+    /**
+     * Class that pairs an abbreviation with its source for tracking purposes
+     */
+    public static class AbbreviationWithSource {
+        private final Abbreviation abbreviation;
+        private final String source;
+        
+        public AbbreviationWithSource(Abbreviation abbreviation, String source) {
+            this.abbreviation = abbreviation;
+            this.source = source;
+        }
+        
+        public Abbreviation getAbbreviation() {
+            return abbreviation;
+        }
+        
+        public String getSource() {
+            return source;
+        }
+    }
+    
+    /**
+     * Gets all abbreviations from both custom and built-in sources with their sources
+     * 
+     * @return List of all abbreviations with their sources
+     */
+    public List<AbbreviationWithSource> getAllAbbreviationsWithSources() {
+        List<AbbreviationWithSource> result = new ArrayList<>();
+        
+        for (Abbreviation abbr : customAbbreviations) {
+            String source = abbreviationSources.getOrDefault(abbr, "UNKNOWN");
+            result.add(new AbbreviationWithSource(abbr, source));
+        }
+        
+        for (Abbreviation abbr : fullToAbbreviationObject.values()) {
+            result.add(new AbbreviationWithSource(abbr, BUILTIN_LIST_ID));
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Gets all abbreviations from both custom and built-in sources
+     * 
+     * @return List of all abbreviations
+     */
+    public List<Abbreviation> getAllAbbreviations() {
+        return getAllAbbreviationsWithSources().stream()
+               .map(AbbreviationWithSource::getAbbreviation)
+               .collect(Collectors.toList());
+    }
+    
+    /**
+     * Gets the source identifier for a given abbreviation
+     * 
+     * @param abbreviation The abbreviation to look up
+     * @return The source key, or BUILTIN_LIST_ID if not found
+     */
+    public String getSourceForAbbreviation(Abbreviation abbreviation) {
+        return abbreviationSources.getOrDefault(abbreviation, BUILTIN_LIST_ID);
     }
 }
