@@ -12,7 +12,7 @@ jobs:
     permissions:
       issues: write
     outputs:
-      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues }}
+      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues || '[]' }}
     steps:
       - name: Unassign stale assignments
         id: unassign
