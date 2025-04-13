@@ -27,24 +27,22 @@ class AbbreviationsTest {
 
     @Test
     void getNextAbbreviationAbbreviatesJournalTitle() {
-        Optional<String> abbreviation = repository.getNextAbbreviation("Test Journal");
-        assertTrue(abbreviation.isPresent(), "Should find an abbreviation for 'Test Journal'");
-        assertEquals("Test J.", abbreviation.get());
+        assertEquals("Test J.", repository.getNextAbbreviation("Test Journal").orElseThrow(() -> 
+                     new AssertionError("Should find an abbreviation for 'Test Journal'")));
     }
 
     @Test
     void getNextAbbreviationConvertsAbbreviationToDotlessAbbreviation() {
-        Optional<String> abbreviation = repository.getNextAbbreviation("Test J.");
-        assertTrue(abbreviation.isPresent(), "Should find dotless abbreviation for 'Test J.'");
-        assertEquals("Test J", abbreviation.get());
+        assertEquals("Test J", repository.getNextAbbreviation("Test J.").orElseThrow(() -> 
+                    new AssertionError("Should find dotless abbreviation for 'Test J.'")));
     }
     
     @Test
     void getNextAbbreviationWrapsBackToFullName() {
-        assertEquals("Test J.", repository.getNextAbbreviation("Test Journal").get());
+        assertEquals("Test J.", repository.getNextAbbreviation("Test Journal").orElseThrow());
         
-        assertEquals("Test J", repository.getNextAbbreviation("Test J.").get());
+        assertEquals("Test J", repository.getNextAbbreviation("Test J.").orElseThrow());
         
-        assertEquals("Test Journal", repository.getNextAbbreviation("Test J").get());
+        assertEquals("Test Journal", repository.getNextAbbreviation("Test J").orElseThrow());
     }
 }
