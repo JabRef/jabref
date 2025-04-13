@@ -369,6 +369,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
          * The following state listener makes sure focus is registered with the
          * correct database when the user switches tabs. Without this,
          * cut/paste/copy operations would sometimes occur in the wrong tab.
+         *
+         * Platform.runLater() is used to ensure focus is set to the main table
+         * after the UI update cycle completes when switching tabs, which prevents
+         * other components (like the search bar) from stealing focus unexpectedly.
          */
         EasyBind.subscribe(tabbedPane.getSelectionModel().selectedItemProperty(), tab -> {
             if (!(tab instanceof LibraryTab libraryTab)) {
@@ -392,10 +396,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Update search AutoCompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
-            /*
-             * Ensure focus is set after the current UI update cycle completes
-             * (when switching tabs), which prevents other components from stealing focus unexpectedly.
-             */
+            // Is used to ensure focus to the main table when switching tabs
             Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
             // Set window title - copy tab title
