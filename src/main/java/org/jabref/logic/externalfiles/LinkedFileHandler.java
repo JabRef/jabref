@@ -220,8 +220,12 @@ public class LinkedFileHandler {
                 if (queryIndex > 0) {
                     fileNameFromUrl = fileNameFromUrl.substring(0, queryIndex);
                 }
-                if (!extension.isEmpty() && !fileNameFromUrl.toLowerCase().endsWith("." + extension.toLowerCase())) {
-                    fileNameFromUrl = fileNameFromUrl + "." + extension;
+                if (!extension.isEmpty()) {
+                    Optional<String> existingExtension = FileUtil.getFileExtension(fileNameFromUrl);
+                    if (existingExtension.isEmpty() || !existingExtension.get().equalsIgnoreCase(extension)) {
+                        String baseName = FileUtil.getBaseName(fileNameFromUrl);
+                        fileNameFromUrl = baseName + "." + extension;
+                    }
                 }
                 return FileUtil.getValidFileName(fileNameFromUrl);
             }
