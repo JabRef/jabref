@@ -200,7 +200,7 @@ public class RelatedArticlesTab extends EntryEditorTab {
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
 
-        Button hideAITabsButton = new Button(Localization.lang("Hide 'Related articles' tab"));
+        Button hideTab = new Button(Localization.lang("Hide 'Related articles' tab"));
 
         DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(), 88d);
 
@@ -243,13 +243,12 @@ public class RelatedArticlesTab extends EntryEditorTab {
             setContent(getRelatedArticlesPane(entry));
         });
 
-        hideAITabsButton.setOnAction(event -> {
-            preferences.getEntryEditorPreferences().setShouldShowAiSummaryTab(false);
-            preferences.getEntryEditorPreferences().setShouldShowAiChatTab(false);
+        hideTab.setOnAction(event -> {
+            preferences.getEntryEditorPreferences().setShouldShowRecommendationsTab(false);
             dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
         });
 
-        hbox.getChildren().addAll(button, hideAITabsButton);
+        hbox.getChildren().addAll(button, hideTab);
         vbox.getChildren().addAll(title, line1, line2, mdlLink, line3, vb, hbox);
         root.setContent(vbox);
 
