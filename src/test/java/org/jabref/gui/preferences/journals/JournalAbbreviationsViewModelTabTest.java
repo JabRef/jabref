@@ -573,13 +573,10 @@ class JournalAbbreviationsViewModelTabTest {
         
         viewModel.storeSettings();
         
-        Optional<Path> path = fileViewModel.getAbsolutePath();
-        if (path.isEmpty()) {
-            return;
-        }
-        
-        String fileName = path.get().getFileName().toString();
-        verify(abbreviationPreferences).setSourceEnabled(fileName, false);
+        fileViewModel.getAbsolutePath().ifPresent(path -> {
+            String fileName = path.getFileName().toString();
+            verify(abbreviationPreferences).setSourceEnabled(fileName, false);
+        });
     }
     
     @Test

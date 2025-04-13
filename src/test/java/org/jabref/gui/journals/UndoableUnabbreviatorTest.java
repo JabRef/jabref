@@ -51,9 +51,8 @@ class UndoableUnabbreviatorTest {
     }
     
     private BibEntry createEntryWithAbbreviatedJournal(String abbreviatedJournal) {
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.JOURNAL, abbreviatedJournal);
-        return entry;
+        return new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.JOURNAL, abbreviatedJournal);
     }
     
     @Test

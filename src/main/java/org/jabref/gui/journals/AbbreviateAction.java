@@ -87,7 +87,7 @@ public class AbbreviateAction extends SimpleCommand {
                                   .executeWith(taskExecutor));
         } else if (action == StandardActions.UNABBREVIATE) {            
             if (!areAnyJournalSourcesEnabled()) {
-                dialogService.notify(Localization.lang("Cannot unabbreviate: all journal lists are disabled"));
+                dialogService.notify(Localization.lang("%Cannot unabbreviate: all journal lists are disabled"));
                 return;
             }
             
