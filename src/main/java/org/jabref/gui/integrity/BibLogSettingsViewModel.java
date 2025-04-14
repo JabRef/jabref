@@ -12,10 +12,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.biblog.BibLogPathResolver;
 import org.jabref.logic.biblog.BibWarningToIntegrityMessageConverter;
 import org.jabref.logic.biblog.BibtexLogParser;
 import org.jabref.logic.integrity.IntegrityMessage;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.biblog.BibWarning;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
@@ -57,7 +59,7 @@ public class BibLogSettingsViewModel extends AbstractViewModel {
      *
      * @param databaseContext the current database context used to resolve citation keys in warnings.
      */
-    public void getBlgWarnings(BibDatabaseContext databaseContext) {
+    public void getBlgWarnings(BibDatabaseContext databaseContext) throws JabRefException {
         Optional<Path> resolved = getResolvedBlgPath();
         if (resolved.isEmpty()) {
             blgWarnings.clear();
@@ -76,9 +78,12 @@ public class BibLogSettingsViewModel extends AbstractViewModel {
             }
             blgWarnings.setAll(newWarnings);
         } catch (IOException e) {
-            LOGGER.warn("Failed to parse .blg file", e);
             blgWarnings.clear();
-            throw new RuntimeException("Failed to parse .blg file", e);
+            throw new JabRefException(
+                    "Failed to parse .blg file",
+                    Localization.lang("Could not read BibTeX log file. Please check the file path and try again."),
+                    e
+            );
         }
     }
 

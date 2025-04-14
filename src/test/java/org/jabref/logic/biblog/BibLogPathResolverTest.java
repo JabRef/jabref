@@ -25,7 +25,7 @@ public class BibLogPathResolverTest {
 
     @Test
     void returnsDefaultBlgPathWhenUserPathIsAbsent() {
-        MetaData metaData = new MetaData(); // no blg path set
+        MetaData metaData = new MetaData();
 
         Path bibPath = Path.of("/home/user/MyLibrary.bib");
         Optional<Path> result = BibLogPathResolver.resolve(metaData, Optional.of(bibPath), TEST_USER);

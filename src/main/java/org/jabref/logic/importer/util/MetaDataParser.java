@@ -3,6 +3,7 @@ package org.jabref.logic.importer.util;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -291,8 +292,10 @@ public class MetaDataParser {
         try {
             Path path = Path.of(pathStr);
             metaData.setBlgFilePath(user, path);
-        } catch (Exception e) {
-            LOGGER.error("Invalid .blg file path for user {}: {}", user, pathStr, e);
+        } catch (InvalidPathException e) {
+            LOGGER.error("Invalid .blg file path for user '{}': '{}'", user, pathStr, e);
+        } catch (IllegalArgumentException e) {
+            LOGGER.error("Illegal argument in .blg file path '{}' for user '{}': {}", pathStr, user, e.getMessage(), e);
         }
     }
 }

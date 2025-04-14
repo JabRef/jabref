@@ -36,16 +36,21 @@ public class BibWarningToIntegrityMessageConverter {
 
         List<IntegrityMessage> messages = new ArrayList<>();
         for (BibWarning bibWarning : bibWarnings) {
-            context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).ifPresent(entry -> {
-                Field field = bibWarning.getFieldName()
-                        .map(FieldFactory::parseField)
-                        .orElse(InternalField.KEY_FIELD);
-                IntegrityMessage message = new IntegrityMessage(
-                        bibWarning.message(),
-                        entry,
-                        field);
-                messages.add(message);
-            });
+            if (!context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).isPresent()) {
+                continue;
+            }
+
+            BibEntry entry = context.getDatabase().getEntryByCitationKey(bibWarning.entryKey()).get();
+
+            Field field = bibWarning.getFieldName()
+                                    .map(FieldFactory::parseField)
+                                    .orElse(InternalField.KEY_FIELD);
+
+            IntegrityMessage message = new IntegrityMessage(
+                    bibWarning.message(),
+                    entry,
+                    field);
+            messages.add(message);
         }
         return messages;
     }

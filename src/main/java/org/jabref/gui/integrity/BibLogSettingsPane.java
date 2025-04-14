@@ -1,7 +1,6 @@
 package org.jabref.gui.integrity;
 
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,6 +8,7 @@ import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -29,7 +29,7 @@ public class BibLogSettingsPane {
     @Inject private DialogService dialogService;
     private Runnable onBlgPathChanged;
 
-    public void initializeViewModel(BibDatabaseContext context, Runnable onBlgPathChanged) {
+    public void initializeViewModel(BibDatabaseContext context, Runnable onBlgPathChanged) throws JabRefException {
         this.onBlgPathChanged = onBlgPathChanged;
         this.viewModel = new BibLogSettingsViewModel(context.getMetaData(), context.getDatabasePath());
         pathField.textProperty().bindBidirectional(viewModel.pathProperty());
@@ -40,7 +40,7 @@ public class BibLogSettingsPane {
         return viewModel.getBlgWarningsObservable();
     }
 
-    public void refreshWarnings(BibDatabaseContext context) {
+    public void refreshWarnings(BibDatabaseContext context) throws JabRefException {
         viewModel.getBlgWarnings(context);
     }
 
@@ -60,7 +60,9 @@ public class BibLogSettingsPane {
     }
 
     private void notifyPathChanged() {
-        Optional.ofNullable(onBlgPathChanged).ifPresent(Runnable::run);
+        if (onBlgPathChanged != null) {
+            onBlgPathChanged.run();
+        }
     }
 
     public BibLogSettingsViewModel getViewModel() {

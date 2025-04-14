@@ -22,6 +22,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
 
@@ -157,10 +158,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
             );
             dialogVBox.getChildren().add(1, settingsNode);
             reloadBlgWarnings();
-        } catch (IllegalStateException e) {
-            LOGGER.error("Failed to load BibLogSettingsPane due to invalid state", e);
-        } catch (RuntimeException e) {
-            LOGGER.error("Failed to load BibLogSettingsPane", e);
+        } catch (JabRefException e) {
+            dialogService.notify(e.getLocalizedMessage());
+            LOGGER.error("Failed to initialize BibLogSettingsPane", e);
         }
     }
 
@@ -172,8 +172,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
      * This reloads .blg warnings and merges them into the main message list.
      */
     private void reloadBlgWarnings() {
-        bibLogSettingsPane.refreshWarnings(libraryTab.getBibDatabaseContext());
-
+        try {
+            bibLogSettingsPane.refreshWarnings(libraryTab.getBibDatabaseContext());
+        } catch (JabRefException e) {
+            dialogService.notify(e.getLocalizedMessage());
+            LOGGER.warn("Failed to load .blg warnings", e);
+        }
         List<IntegrityMessage> newWarnings = new ArrayList<>(bibLogSettingsPane.getBlgWarnings());
 
         if (!newWarnings.isEmpty()) {
