@@ -593,7 +593,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 .withField(StandardField.DOI, "10.47397/tb/44-3/tb138kopp-jabref")
                 .withField(StandardField.ISSN, "0896-3207")
                 .withField(StandardField.ISSUE, "138")
-                .withField(StandardField.YEAR, "2023");
+                .withField(StandardField.YEAR, "2023")
+                .withChanged(true);
 
         database.getDatabase().insertEntry(exampleEntry);
         return exampleEntry;
