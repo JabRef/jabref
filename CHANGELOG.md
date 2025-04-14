@@ -10,6 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+
 - Cleanup for bidirectional conversion of MSC codes to their descriptions added.
 - When hovering over a keyword in the editor that resembles an MSC code. A description/classification is now displayed in the form of a tooltip.
 - We added buttons "Add example entry" and "Import existing PDFs" when a library is empty, making it easier for new users to get started. [#12662](https://github.com/JabRef/jabref/issues/12662)
