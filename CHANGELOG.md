@@ -27,8 +27,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
 - We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
 - We added support for loading and displaying BibTeX .blg warnings in the Check integrity dialog, with custom path selection and metadata persistence. [#11998](https://github.com/JabRef/jabref/issues/11998)
+- We added an option to choose whether to open the file explorer in the files directory or in the last opened directory when attaching files. [#12554](https://github.com/JabRef/jabref/issues/12554)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
+- We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832/)
+- We added a "LTWA" abbreviation feature in the "Quality > Abbreviate journal names > LTWA" menu [#12273](https://github.com/JabRef/jabref/issues/12273/)
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 
 ### Changed
@@ -63,9 +66,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - A tooltip now appears after 300ms (instead of 2s). [#12649](https://github.com/JabRef/jabref/issues/12649)
 - We improved search in preferences and keybindings. [#12647](https://github.com/JabRef/jabref/issues/12647)
 - We improved the performance of the LibreOffice integration when inserting CSL citations/bibliography. [#12851](https://github.com/JabRef/jabref/pull/12851)
+- 'Affected fields' and 'Do not wrap when saving' are now displayed as tags. [#12550](https://github.com/JabRef/jabref/issues/12550)
 
 ### Fixed
 
+- We fixed an issue where pasted entries would sometimes end up in the search bar instead of the main table [#12910](https://github.com/JabRef/jabref/issues/12910)
 - We fixed an issue where warning signs were improperly positioned next to text fields containing capital letters. [#12884](https://github.com/JabRef/jabref/issues/12884)
 - We fixed an issue where the drag'n'drop functionality in entryeditor did not work [#12561](https://github.com/JabRef/jabref/issues/12561)
 - We fixed an issue where the F4 shortcut key did not work without opening the right-click context menu. [#6101](https://github.com/JabRef/jabref/pull/6101)
@@ -101,6 +106,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where valid DOI could not be imported if it had special characters like `<` or `>`. [#12434](https://github.com/JabRef/jabref/issues/12434)
 - We fixed an issue where the tooltip only displayed the first linked file when hovering. [#12470](https://github.com/JabRef/jabref/issues/12470)
 - We fixed an issue where some texts in the "Citation Information" tab and the "Preferences" dialog could not be translated. [#12883](https://github.com/JabRef/jabref/pull/12883)
+- We fixed an issue where pasting a PDF URL into the main table caused an import error instead of creating a new entry. [#12911](https://github.com/JabRef/jabref/pull/12911)
+- We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
 
 ### Removed
 

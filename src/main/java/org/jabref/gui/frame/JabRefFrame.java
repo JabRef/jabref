@@ -50,7 +50,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -62,7 +61,6 @@ import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyObservableList;
 import com.tobiasdiez.easybind.Subscription;
-import org.fxmisc.richtext.CodeArea;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,7 +269,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case FOCUS_GROUP_LIST:
                         sidePane.getSidePaneComponent(SidePaneType.GROUPS).requestFocus();
                         event.consume();
-                    break;
+                        break;
                     case NEXT_LIBRARY:
                         tabbedPane.getSelectionModel().selectNext();
                         event.consume();
@@ -313,16 +311,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     case NEW_INPROCEEDINGS:
                         new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, preferences, stateManager).execute();
                         break;
-                    case PASTE:
-                        if (OS.OS_X) { // Workaround for a jdk issue that executes paste twice when using cmd+v in a TextField
-                            // Extra workaround for CodeArea, which does not inherit from TextInputControl
-                            if (!(stateManager.getFocusOwner().isPresent() && (stateManager.getFocusOwner().get() instanceof CodeArea))) {
-                                event.consume();
-                                break;
-                            }
-                            break;
-                        }
-                        break;
                     default:
                 }
             }
@@ -356,6 +344,21 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager.setActiveDatabase(libraryTab.getBibDatabaseContext());
                 stateManager.activeTabProperty().set(Optional.of(libraryTab));
             } else if (selectedTab == null || selectedTab instanceof WelcomeTab) {
+                if (stateManager.getActiveDatabase().isPresent()) {
+                    String activeUID = stateManager.getActiveDatabase().get().getUid();
+
+                    // Check if the previously active database was closed
+                    boolean wasClosed = tabbedPane.getTabs().stream()
+                                                  .filter(tab -> tab instanceof LibraryTab)
+                                                  .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext().getUid().equals(activeUID));
+
+                    // Select the next tab, instead of the Home page
+                    if (wasClosed) {
+                        tabbedPane.getSelectionModel().selectNext();
+                        return;
+                    }
+                }
+
                 // All databases are closed or {@link WelcomeTab} is open
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
@@ -389,7 +392,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Update search AutoCompleter with information for the correct database:
             globalSearchBar.setAutoCompleter(libraryTab.getAutoCompleter());
 
-            libraryTab.getMainTable().requestFocus();
+            // [impl->req~maintable.focus~1]
+            Platform.runLater(() -> libraryTab.getMainTable().requestFocus());
 
             // Set window title - copy tab title
             StringBinding windowTitle = Bindings.createStringBinding(
@@ -499,6 +503,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         if (raisePanel) {
             tabbedPane.getSelectionModel().select(libraryTab);
             tabbedPane.requestFocus();
+            libraryTab.getMainTable().requestFocus();
         }
 
         libraryTab.setContextMenu(createTabContextMenuFor(libraryTab));
@@ -531,9 +536,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     public boolean closeTabs(@NonNull List<LibraryTab> tabs) {
         // Only accept library tabs that are shown in the tab container
         List<LibraryTab> toClose = tabs.stream()
-                .distinct()
-                .filter(getLibraryTabs()::contains)
-                .toList();
+                                       .distinct()
+                                       .filter(getLibraryTabs()::contains)
+                                       .toList();
 
         if (toClose.isEmpty()) {
             // Nothing to do

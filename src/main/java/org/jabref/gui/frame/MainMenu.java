@@ -265,7 +265,8 @@ public class MainMenu extends MenuBar {
                 factory.createSubMenu(StandardActions.ABBREVIATE,
                         factory.createMenuItem(StandardActions.ABBREVIATE_DEFAULT, new AbbreviateAction(StandardActions.ABBREVIATE_DEFAULT, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
                         factory.createMenuItem(StandardActions.ABBREVIATE_DOTLESS, new AbbreviateAction(StandardActions.ABBREVIATE_DOTLESS, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
-                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, new AbbreviateAction(StandardActions.ABBREVIATE_SHORTEST_UNIQUE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager)),
+                        factory.createMenuItem(StandardActions.ABBREVIATE_LTWA, new AbbreviateAction(StandardActions.ABBREVIATE_LTWA, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))),
 
                 factory.createMenuItem(StandardActions.UNABBREVIATE, new AbbreviateAction(StandardActions.UNABBREVIATE, frame::getCurrentLibraryTab, dialogService, stateManager, preferences.getJournalAbbreviationPreferences(), abbreviationRepository, taskExecutor, undoManager))
         );
@@ -352,7 +353,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction(URLs.FORUM_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                factory.createMenuItem(StandardActions.DONATE, new OpenBrowserAction(URLs.DONATION_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferences, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction(URLs.WEBPAGE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
