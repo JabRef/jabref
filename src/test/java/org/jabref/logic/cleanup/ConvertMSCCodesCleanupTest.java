@@ -3,6 +3,7 @@ package org.jabref.logic.cleanup;
 import java.util.Optional;
 
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.KeywordList;
 
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 class ConvertMSCCodesCleanupTest {
 
@@ -18,7 +20,8 @@ class ConvertMSCCodesCleanupTest {
 
     @BeforeEach
     void setUp() {
-        worker = new ConvertMSCCodesCleanup();
+        BibEntryPreferences preferences = mock(BibEntryPreferences.class);
+        worker = new ConvertMSCCodesCleanup(preferences, true);
     }
 
     @Test
