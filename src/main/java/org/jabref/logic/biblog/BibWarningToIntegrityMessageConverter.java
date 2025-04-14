@@ -11,6 +11,8 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Converts {@link BibWarning}s into {@link IntegrityMessage}s for integration with the existing integrity check UI.
  *
@@ -25,11 +27,9 @@ import org.jabref.model.entry.field.InternalField;
  *   to support warnings without fields cleanly.
  */
 public class BibWarningToIntegrityMessageConverter {
-    public static List<IntegrityMessage> convert(List<BibWarning> bibWarnings, BibDatabaseContext context) {
-        if (bibWarnings == null || context == null) {
-            return List.of();
-        }
-
+    public static @NonNull List<IntegrityMessage> convert(
+            @NonNull List<BibWarning> bibWarnings,
+            @NonNull BibDatabaseContext context) {
         if (bibWarnings.isEmpty()) {
             return List.of();
         }

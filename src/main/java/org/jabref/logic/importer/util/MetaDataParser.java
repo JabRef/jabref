@@ -280,7 +280,7 @@ public class MetaDataParser {
         try {
             values = getAsList(entry.getValue());
         } catch (ParseException e) {
-            LOGGER.error("Invalid .blg metadata format for user {}: {}", user, entry.getValue(), e);
+            LOGGER.error("Invalid .blg metadata format for user {}", user, e);
             return;
         }
         if (values.size() != 1) {
@@ -293,7 +293,6 @@ public class MetaDataParser {
             metaData.setBlgFilePath(user, path);
         } catch (Exception e) {
             LOGGER.error("Invalid .blg file path for user {}: {}", user, pathStr, e);
-            return;
         }
     }
 }

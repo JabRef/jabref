@@ -23,7 +23,6 @@ public class BibtexLogParserTest {
     void parsesWarningsFromResourceFileTest() throws Exception {
         Path blgFile = Path.of("src/test/resources/org/jabref/logic/blg/Chocolate.blg");
         List<BibWarning> warnings = parser.parseBiblog(blgFile);
-        assertEquals(4, warnings.size());
         assertEquals(List.of(
                 new BibWarning(SeverityType.WARNING, "empty journal", "journal", "Scholey_2013"),
                 new BibWarning(SeverityType.WARNING, "empty year", "year", "Scholey_2013"),

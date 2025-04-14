@@ -12,13 +12,16 @@ import java.util.regex.Pattern;
 import org.jabref.model.biblog.BibWarning;
 import org.jabref.model.biblog.SeverityType;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Parses the contents of a .blg (BibTeX log) file to extract warning messages.
  */
 public class BibtexLogParser {
     private static final Pattern WARNING_PATTERN = Pattern.compile("^Warning--(?<message>[a-zA-Z ]+) in (?<entryKey>[^\\s]+)$");
+    private static final String EMPTY_FIELD_PREFIX = "empty";
 
-    public List<BibWarning> parseBiblog(Path blgFilePath) throws IOException {
+    public List<BibWarning> parseBiblog(@NonNull Path blgFilePath) throws IOException {
         List<BibWarning> warnings = new ArrayList<>();
         List<String> lines = Files.readAllLines(blgFilePath);
         for (String line : lines) {
@@ -49,9 +52,10 @@ public class BibtexLogParser {
 
         String message = matcher.group("message").trim();
         String entryKey = matcher.group("entryKey");
+        // Extract field name for warnings related to empty fields  (e.g., "empty journal" -> fieldName = "journal")
         String fieldName = null;
-        if (message.startsWith("empty")) {
-            fieldName = message.substring("empty".length()).trim();
+        if (message.startsWith(EMPTY_FIELD_PREFIX)) {
+            fieldName = message.substring(EMPTY_FIELD_PREFIX.length()).trim();
         }
 
         return Optional.of(new BibWarning(

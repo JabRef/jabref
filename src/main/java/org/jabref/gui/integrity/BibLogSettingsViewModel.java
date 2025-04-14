@@ -8,7 +8,10 @@ import java.util.Optional;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
+import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.biblog.BibLogPathResolver;
 import org.jabref.logic.biblog.BibWarningToIntegrityMessageConverter;
 import org.jabref.logic.biblog.BibtexLogParser;
@@ -25,12 +28,13 @@ import org.slf4j.LoggerFactory;
  * 2. Wraps .blg warnings as IntegrityMessages.
  * 3. Supports file browsing and reset actions.
  */
-public class BibLogSettingsViewModel {
+public class BibLogSettingsViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibLogSettingsViewModel.class);
+    private final ObservableList<IntegrityMessage> blgWarnings = FXCollections.observableArrayList();
+    private final StringProperty path = new SimpleStringProperty("");
     private final MetaData metaData;
     private final Optional<Path> bibPath;
     private final String user;
-    private final StringProperty path = new SimpleStringProperty("");
     private Optional<Path> lastResolvedBlgPath = Optional.empty();
 
     public BibLogSettingsViewModel(MetaData metaData, Optional<Path> bibPath) {
@@ -46,6 +50,40 @@ public class BibLogSettingsViewModel {
                 this.lastResolvedBlgPath = Optional.of(resolvedPath);
             }
         });
+    }
+
+    /**
+     * Parses the .blg file (if it exists) into the observable list.
+     *
+     * @param databaseContext the current database context used to resolve citation keys in warnings.
+     */
+    public void getBlgWarnings(BibDatabaseContext databaseContext) {
+        Optional<Path> resolved = getResolvedBlgPath();
+        if (resolved.isEmpty()) {
+            blgWarnings.clear();
+            return;
+        }
+
+        Path path = resolved.get();
+
+        this.lastResolvedBlgPath = Optional.of(path);
+        try {
+            BibtexLogParser parser = new BibtexLogParser();
+            List<BibWarning> warnings = parser.parseBiblog(path);
+            List<IntegrityMessage> newWarnings = BibWarningToIntegrityMessageConverter.convert(warnings, databaseContext);
+            if (newWarnings.isEmpty()) {
+                LOGGER.debug("No blg warning matched the current database.");
+            }
+            blgWarnings.setAll(newWarnings);
+        } catch (IOException e) {
+            LOGGER.warn("Failed to parse .blg file", e);
+            blgWarnings.clear();
+            throw new RuntimeException("Failed to parse .blg file", e);
+        }
+    }
+
+    public ObservableList<IntegrityMessage> getBlgWarningsObservable() {
+        return blgWarnings;
     }
 
     public StringProperty pathProperty() {
@@ -75,35 +113,6 @@ public class BibLogSettingsViewModel {
     public Optional<Path> getResolvedBlgPath() {
         return BibLogPathResolver.resolve(metaData, bibPath, user)
                                  .filter(Files::exists);
-    }
-
-    public Optional<Path> getLastResolvedBlgPath() {
-        return lastResolvedBlgPath;
-    }
-
-    /**
-     * Parses the .blg file (if it exists) into integrity messages.
-     * Returns an empty list if the file doesn't exist or can't be read.
-     *
-     * @param databaseContext the current database context used to resolve citation keys in warnings.
-     * @return a list of {@link IntegrityMessage}s parsed from the .blg file, or an empty list if unavailable.
-     */
-    public List<IntegrityMessage> getBlgWarnings(BibDatabaseContext databaseContext) {
-        Optional<Path> resolved = getResolvedBlgPath();
-        if (resolved.isEmpty()) {
-            return List.of();
-        }
-
-        Path path = resolved.get();
-        this.lastResolvedBlgPath = Optional.of(path);
-        try {
-            BibtexLogParser parser = new BibtexLogParser();
-            List<BibWarning> warnings = parser.parseBiblog(path);
-            return BibWarningToIntegrityMessageConverter.convert(warnings, databaseContext);
-        } catch (IOException e) {
-            LOGGER.warn("Failed to parse .blg file", e);
-            return List.of();
-        }
     }
 
     public Path getInitialDirectory() {

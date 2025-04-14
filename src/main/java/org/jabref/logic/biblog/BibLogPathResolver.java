@@ -19,6 +19,10 @@ public class BibLogPathResolver {
      * Resolves .blg path using current user context.
      */
     public static Optional<Path> resolve(BibDatabaseContext context) {
+        if (context == null) {
+            return Optional.empty();
+        }
+
         String user = System.getProperty("user.name");
         return resolve(context.getMetaData(), context.getDatabasePath(), user);
     }
@@ -27,12 +31,16 @@ public class BibLogPathResolver {
      * Test-friendly API (allows direct input of MetaData and Path)
      */
     public static Optional<Path> resolve(MetaData metaData, Optional<Path> databasePath, String user) {
+        if (metaData == null || user == null) {
+            return Optional.empty();
+        }
+
         Optional<Path> userDefined = metaData.getBlgFilePath(user);
-        if (userDefined.isPresent()) {
+        if (userDefined.isPresent() && userDefined != null) {
             return userDefined;
         }
 
-        if (databasePath.isEmpty()) {
+        if (databasePath == null || databasePath.isEmpty()) {
             return Optional.empty();
         }
 

@@ -74,11 +74,6 @@ public class IntegrityCheckAction extends SimpleCommand {
         };
         task.setOnSucceeded(value -> {
             List<IntegrityMessage> messages = task.getValue();
-            // After the main check: Load .blg warnings using BibLogSettingsViewModel
-            BibLogSettingsViewModel viewModel = new BibLogSettingsViewModel(
-                    database.getMetaData(),
-                    database.getDatabasePath()
-            );
             if (messages.isEmpty()) {
                 dialogService.notify(Localization.lang("No problems found."));
             } else {

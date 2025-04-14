@@ -11,9 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class BibLogPathResolverTest {
     private static final String TEST_USER = "testUser";
-    /**
-     * Returns the user-defined .blg path if it's set.
-     */
+
     @Test
     void returnsUserDefinedBlgPathIfPresent() {
         MetaData metaData = new MetaData();
@@ -25,9 +23,6 @@ public class BibLogPathResolverTest {
         assertEquals(Optional.of(userBlgPath), result);
     }
 
-    /**
-     * Falls back to default .blg path (same name as .bib) if no user-defined path is set.
-     */
     @Test
     void returnsDefaultBlgPathWhenUserPathIsAbsent() {
         MetaData metaData = new MetaData(); // no blg path set
@@ -38,9 +33,6 @@ public class BibLogPathResolverTest {
         assertEquals(Optional.of(Path.of("/home/user/MyLibrary.blg")), result);
     }
 
-    /**
-     * Returns empty if neither user-defined path nor .bib path is available.
-     */
     @Test
     void returnsEmptyWhenNoUserPathAndNoBibPath() {
         MetaData metaData = new MetaData();

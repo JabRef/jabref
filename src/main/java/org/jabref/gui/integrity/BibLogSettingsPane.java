@@ -3,14 +3,18 @@ package org.jabref.gui.integrity;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
-import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
+
+import jakarta.inject.Inject;
 
 /**
  * Controller for the .blg file settings panel.
@@ -22,14 +26,22 @@ public class BibLogSettingsPane {
     @FXML
     private TextField pathField;
     private BibLogSettingsViewModel viewModel;
-    private DialogService dialogService;
+    @Inject private DialogService dialogService;
     private Runnable onBlgPathChanged;
 
-    public void initialize(BibDatabaseContext context, DialogService dialogService, Runnable onBlgPathChanged) {
-        this.dialogService = dialogService;
+    public void initializeViewModel(BibDatabaseContext context, Runnable onBlgPathChanged) {
         this.onBlgPathChanged = onBlgPathChanged;
         this.viewModel = new BibLogSettingsViewModel(context.getMetaData(), context.getDatabasePath());
         pathField.textProperty().bindBidirectional(viewModel.pathProperty());
+        viewModel.getBlgWarnings(context);
+    }
+
+    public ObservableList<IntegrityMessage> getBlgWarnings() {
+        return viewModel.getBlgWarningsObservable();
+    }
+
+    public void refreshWarnings(BibDatabaseContext context) {
+        viewModel.getBlgWarnings(context);
     }
 
     @FXML
@@ -47,21 +59,21 @@ public class BibLogSettingsPane {
         notifyPathChanged();
     }
 
+    private void notifyPathChanged() {
+        Optional.ofNullable(onBlgPathChanged).ifPresent(Runnable::run);
+    }
+
     public BibLogSettingsViewModel getViewModel() {
         return viewModel;
     }
 
     private FileDialogConfiguration createBlgFileDialogConfig() {
-        FileDialogConfiguration.Builder configBuilder = new FileDialogConfiguration.Builder();
         Path initialDir = viewModel.getInitialDirectory();
-        configBuilder.withInitialDirectory(initialDir);
-        configBuilder.addExtensionFilter(
-                new FileChooser.ExtensionFilter(Localization.lang("BibTeX log files"), "*.blg")
-        );
-        return configBuilder.build();
-    }
-
-    private void notifyPathChanged() {
-        Optional.ofNullable(onBlgPathChanged).ifPresent(Runnable::run);
+        FileDialogConfiguration config = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(Localization.lang("BibTeX log files"), StandardFileType.BLG)
+                .withDefaultExtension(Localization.lang("BibTeX log files"), StandardFileType.BLG)
+                .withInitialDirectory(viewModel.getInitialDirectory())
+                .build();
+        return config;
     }
 }
