@@ -83,6 +83,30 @@ jobs:
           default-column: "Free to take"
           issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           skip-if-not-in-project: true
+  comment_on_resolved_issue:
+    name: Comment on resolved issue
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.merged
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Echo PR number and URL
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '#(?<ticketNumber>\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
       - name: Comment on issue
         uses: thollander/actions-comment-pull-request@v3
         with:
