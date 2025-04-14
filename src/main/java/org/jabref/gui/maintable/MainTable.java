@@ -578,6 +578,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private void updatePlaceholder(VBox placeholderBox) {
        if (database.getDatabase().getEntries().isEmpty()) {
            this.setPlaceholder(placeholderBox);
+           // [impl->req~maintable.focus~1]
            requestFocus();
        } else {
            this.setPlaceholder(null);
