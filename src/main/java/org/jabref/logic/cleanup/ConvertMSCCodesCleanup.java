@@ -24,16 +24,21 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
     
     private static final Logger logger = LoggerFactory.getLogger(ConvertMSCCodesCleanup.class);
     private static final Map<String, String> mscmap;
+    private static final Map<String, String> reverseMscmap;
     private final Character keywordSeparator;
     private static boolean conversionPossible;
+    private final boolean convertToDescriptions;
 
     static {
         Map<String, String> tempMap = new HashMap<>();
+        Map<String, String> tempReverseMap = new HashMap<>();
         URL resourceUrl = ConvertMSCCodesCleanup.class.getClassLoader().getResource("msc_codes.json");
 
         if (resourceUrl != null) {
             try {
                 tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
+                // Create reverse mapping
+                tempMap.forEach((code, desc) -> tempReverseMap.put(desc, code));
                 logger.debug("Loaded {} MSC codes from file", tempMap.size());
                 // Log a few sample entries to verify content
                 if (!tempMap.isEmpty()) {
@@ -54,10 +59,12 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             conversionPossible = false;
         }
         mscmap = tempMap;
+        reverseMscmap = tempReverseMap;
     }
 
-    public ConvertMSCCodesCleanup(BibEntryPreferences preferences) {
+    public ConvertMSCCodesCleanup(BibEntryPreferences preferences, boolean convertToDescriptions) {
         this.keywordSeparator = preferences.getKeywordSeparator();
+        this.convertToDescriptions = convertToDescriptions;
     }
 
     /**
@@ -70,48 +77,45 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         if (!conversionPossible) {
-            logger.warn("MSC code conversion was attempted but is not possible because the codes file could not be loaded");
+            logger.info("MSC code conversion was attempted but is not possible because the codes file could not be loaded");
             return new ArrayList<>();
         }
 
         List<FieldChange> changes = new ArrayList<>();
         
-        // Get keywords from the entry
         if (!entry.hasField(StandardField.KEYWORDS)) {
-            logger.debug("No keywords field found in entry {}", entry.getCitationKey().orElse("<no citation key>"));
             return changes;
         }
 
         String keywordsStr = entry.getField(StandardField.KEYWORDS).orElse("");
         if (keywordsStr.trim().isEmpty()) {
-            logger.debug("Keywords field is empty in entry {}", entry.getCitationKey().orElse("<no citation key>"));
             return changes;
         }
 
-        logger.debug("Processing keywords: {}", keywordsStr);
-        // Instead of using getKeywords which may split on delimiters within descriptions,
-        // we'll get the raw field and do our own careful splitting
-        String[] rawKeywords = keywordsStr.split("\\s*" + keywordSeparator + "\\s*");
-        logger.debug("Found {} keywords to process", rawKeywords.length);
-        
-        // Create new list to store converted keywords
+        KeywordList rawKeywords = KeywordList.parse(keywordsStr, keywordSeparator);
         List<Keyword> newKeywords = new ArrayList<>();
         boolean hasChanges = false;
 
-        // Check each keyword against the MSC map
-        for (String keywordStr : rawKeywords) {
-            keywordStr = keywordStr.trim();
-            logger.debug("Processing keyword: {}", keywordStr);
-            if (mscmap.containsKey(keywordStr)) {
-                String description = mscmap.get(keywordStr);
-                logger.debug("Found match for {}: {}", keywordStr, description);
-                // If we find a match, use the description instead
-                newKeywords.add(new Keyword(description));
-                hasChanges = true;
+        for (Keyword keyword : rawKeywords) {
+            String keywordStr = keyword.get();
+            if (convertToDescriptions) {
+                // Convert codes to descriptions
+                if (mscmap.containsKey(keywordStr)) {
+                    String description = mscmap.get(keywordStr);
+                    newKeywords.add(new Keyword(description));
+                    hasChanges = true;
+                } else {
+                    newKeywords.add(keyword);
+                }
             } else {
-                logger.debug("No match found for keyword: {}", keywordStr);
-                // Keep original keyword if no match
-                newKeywords.add(new Keyword(keywordStr));
+                // Convert descriptions back to codes
+                if (reverseMscmap.containsKey(keywordStr)) {
+                    String code = reverseMscmap.get(keywordStr);
+                    newKeywords.add(new Keyword(code));
+                    hasChanges = true;
+                } else {
+                    newKeywords.add(keyword);
+                }
             }
         }
 
@@ -119,13 +123,17 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
         if (hasChanges) {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
-            logger.debug("Updating keywords from '{}' to '{}'", oldValue, newValue);
-            entry.setField(StandardField.KEYWORDS, newValue);
-            changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-        } else {
-            logger.debug("No MSC codes were converted in this entry");
+            
+            // Update the field on the JavaFX thread
+            javafx.application.Platform.runLater(() -> {
+                entry.setField(StandardField.KEYWORDS, newValue);
+                changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
+            });
+            
+            // Return the changes immediately, even though they'll be applied asynchronously
+            return changes;
         }
-
+        
         return changes;
     }
 }

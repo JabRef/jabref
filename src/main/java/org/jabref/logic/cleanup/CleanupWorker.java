@@ -47,8 +47,18 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
+        // Special handling for MSC code conversion
+        if (preset.isActive(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES)) {
+            jobs.add(new ConvertMSCCodesCleanup(bibEntryPreferences, true));
+        } else {
+            jobs.add(new ConvertMSCCodesCleanup(bibEntryPreferences, false));
+        }
+
+        // Handle all other cleanup actions
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
-            jobs.add(toJob(action));
+            if (action != CleanupPreferences.CleanupStep.CONVERT_MSC_CODES) {
+                jobs.add(toJob(action));
+            }
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
@@ -59,6 +69,7 @@ public class CleanupWorker {
     }
 
     private CleanupJob toJob(CleanupPreferences.CleanupStep action) {
+
         return switch (action) {
             case CLEAN_UP_DOI ->
                     new DoiCleanup();
@@ -78,8 +89,6 @@ public class CleanupWorker {
                     new RemoveLinksToNotExistentFiles(databaseContext, filePreferences);
             case CONVERT_TO_BIBLATEX ->
                     new ConvertToBiblatexCleanup();
-            case CONVERT_MSC_CODES ->
-                    new ConvertMSCCodesCleanup(bibEntryPreferences);
             case CONVERT_TO_BIBTEX ->
                     new ConvertToBibtexCleanup();
             case CONVERT_TIMESTAMP_TO_CREATIONDATE ->

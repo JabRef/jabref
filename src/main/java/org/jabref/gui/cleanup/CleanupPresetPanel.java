@@ -71,13 +71,13 @@ public class CleanupPresetPanel extends VBox {
             cleanUpConvertMSCcodes.setDisable(true);
             cleanUpConvertMSCcodes.setSelected(false);
             cleanUpConvertMSCcodes.setTooltip(new Tooltip(Localization.lang("MSC code conversion is not available - the MSC codes file could not be loaded")));
-        }
-
+        } 
+        cleanUpConvertMSCcodes.setText(Localization.lang("Convert MSC Keyword codes to their respective descriptions."));
+        cleanUpConvertMSCcodes.setSelected(false);
+        
         cleanUpRenamePDFonlyRelativePaths.disableProperty().bind(cleanUpRenamePDF.selectedProperty().not());
 
         cleanUpUpgradeExternalLinks.setText(Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", StandardField.FILE.getDisplayName()));
-
-        cleanUpConvertMSCcodes.setText(Localization.lang("Convert MSC Keyword codes to their respective descriptions."));
 
         String currentPattern = Localization.lang("Filename format pattern (from preferences)")
                                             .concat(filePreferences.getFileNamePattern());
