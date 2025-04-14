@@ -468,13 +468,7 @@ public class BibEntry implements Cloneable {
      * Returns an unmodifiable sequence containing the names of all fields that are a) set for this particular entry and b) matching the given predicate
      */
     public SequencedSet<Field> getFields(Predicate<Field> selector) {
-        SequencedSet<Field> selectedFields = new LinkedHashSet<>();
-        for (Field field : fields.keySet()) {
-            if (selector.test(field)) {
-                selectedFields.add(field);
-            }
-        }
-        return selectedFields;
+        return getFields().stream().filter(selector).collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     /**

@@ -2,12 +2,9 @@ package org.jabref.model.database;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.SequencedSet;
 import java.util.Set;
-import java.util.function.Predicate;
 
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -21,12 +18,6 @@ import com.google.common.eventbus.Subscribe;
 public class KeyChangeListener {
 
     private final BibDatabase database;
-
-    private static final Predicate<Field> SINGLE_ENTRY_LINK =
-            f -> f.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK);
-
-    private static final Predicate<Field> MULTIPLE_ENTRY_LINK =
-            f -> f.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK);
 
     public KeyChangeListener(BibDatabase database) {
         this.database = database;
@@ -53,18 +44,16 @@ public class KeyChangeListener {
     private void updateEntryLinks(String newKey, String oldKey) {
         Set<BibEntry> affectedEntries = database.getEntriesForCitationKey(oldKey);
         for (BibEntry entry : affectedEntries) {
-            SequencedSet<Field> fields = entry.getFields();
-
-            for (Field field : fields) {
-                EnumSet<FieldProperty> fieldProperties = field.getProperties();
-                if (fieldProperties.contains(FieldProperty.SINGLE_ENTRY_LINK)) {
-                    String fieldContent = entry.getField(field).orElseThrow();
-                    replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
-                } else if (fieldProperties.contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-                    String fieldContent = entry.getField(field).orElseThrow();
-                    replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
-                }
-            }
+            entry.getFields(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK))
+                 .forEach(field -> {
+                     String fieldContent = entry.getField(field).orElseThrow();
+                     replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
+                 });
+            entry.getFields(field -> field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK))
+                 .forEach(field -> {
+                String fieldContent = entry.getField(field).orElseThrow();
+                replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
+            });
         }
     }
 

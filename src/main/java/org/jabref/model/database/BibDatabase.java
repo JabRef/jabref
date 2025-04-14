@@ -252,9 +252,7 @@ public class BibDatabase {
 
     private void forEachCitationKey(BibEntry entry, Consumer<String> keyConsumer) {
         for (Field field : entry.getFields()) {
-            if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) ||
-                    field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
-
+            if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) || field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
                 List<ParsedEntryLink> parsedLinks = entry.getEntryLinkList(field, this);
 
                 for (ParsedEntryLink link : parsedLinks) {
@@ -294,7 +292,6 @@ public class BibDatabase {
             }
         });
     }
-
 
     /**
      * Returns the database's preamble.
@@ -688,13 +685,11 @@ public class BibDatabase {
 
     /**
      * @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
-     *
      * @implNote New entries are always added to the end of the list and always get a higher ID.
-     *           See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
-     *           {@link org.jabref.model.entry.IdGenerator IdGenerator},
-     *           {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
-     *           Therefore, using binary search to find the index.
-     *
+     * See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
+     * {@link org.jabref.model.entry.IdGenerator IdGenerator},
+     * {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+     * Therefore, using binary search to find the index.
      * @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
      */
     public int indexOf(BibEntry bibEntry) {
