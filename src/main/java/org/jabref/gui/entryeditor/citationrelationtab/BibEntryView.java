@@ -4,10 +4,10 @@ import java.util.EnumSet;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.scene.web.WebView;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.TextFlowLimited;
@@ -34,15 +34,15 @@ public class BibEntryView {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
         String authorsText = entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse("");
-        Node authors = createTextNode(authorsText, "authors");
+        Node authors = createLabel(authorsText);
         authors.getStyleClass().add("authors");
         String titleText = entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse("");
-        Node title = createTextNode(titleText, "title");
+        Node title = createLabel(titleText);
         title.getStyleClass().add("title");
         Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().add("year");
         String journalText = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse("");
-        Node journal = createTextNode(journalText, "journal");
+        Node journal = createLabel(journalText);
         journal.getStyleClass().add("journal");
 
         VBox entryContainer = new VBox(
@@ -52,7 +52,7 @@ public class BibEntryView {
         );
 
         entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
-            Node summary = createTextNode(summaryText, "summary");
+            Node summary = createSummary(summaryText);
             summary.getStyleClass().add("summary");
             entryContainer.getChildren().add(summary);
         });
@@ -78,28 +78,59 @@ public class BibEntryView {
         return IconTheme.JabRefIcons.ARTICLE;
     }
 
+    /**
+     * Checks if text contains right-to-left characters
+     *
+     * @param text Text to check
+     * @return true if text contains RTL characters
+     */
     private static boolean isRTL(String text) {
         for (char c : text.toCharArray()) {
             if (Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
-                    Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC ||
-                    Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING ||
-                    Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE) {
+                    Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC) {
                 return true;
             }
         }
         return false;
     }
 
-    private static Node createTextNode(String text, String fieldName) {
+    /**
+     * Creates a text node for the summary with horizontal scrolling for RTL text,
+     * avoiding JavaFX bug related to RTL text wrapping
+     *
+     * @param text The summary text content
+     * @return Node with either:
+     *         - ScrollPane (for RTL text)
+     *         - TextFlowLimited (for LTR text)
+     */
+    private static Node createSummary(String text) {
         if (isRTL(text)) {
-            WebView webView = new WebView();
-            webView.getEngine().loadContent(
-                    "<html><body dir='rtl'>" + text + "</body></html>"
-            );
-            webView.setPrefSize(200, 38);
-            return webView;
-        } else if ("summary".equals(fieldName)) {
+            Text textNode = new Text(text);
+            ScrollPane scrollPane = new ScrollPane(textNode);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.setFitToHeight(true);
+            return scrollPane;
+        } else {
             return new TextFlowLimited(new Text(text));
+        }
+    }
+
+    /**
+     * Creates a label with horizontal scrolling for RTL text, 
+     * avoiding JavaFX bug related to RTL text wrapping
+     *
+     * @param text The label text content
+     * @return Node with either:
+     *         - ScrollPane (for RTL text)
+     *         - Wrapped Label (for LTR text)
+     */
+    private static Node createLabel(String text) {
+        if (isRTL(text)) {
+            Label label = new Label(text);
+            ScrollPane scrollPane = new ScrollPane(label);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.setFitToHeight(true);
+            return scrollPane;
         } else {
             Label label = new Label(text);
             label.setWrapText(true);
