@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.KeywordList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,4 +95,4 @@ class ConvertMSCCodesCleanupTest {
         assertTrue(keywords.get().contains("Theory of fuzzy sets, etc."));
         assertTrue(keywords.get().contains("General topics in artificial intelligence"));
     }
-} 
+}

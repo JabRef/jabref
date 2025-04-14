@@ -69,7 +69,6 @@ public class CleanupWorker {
     }
 
     private CleanupJob toJob(CleanupPreferences.CleanupStep action) {
-
         return switch (action) {
             case CLEAN_UP_DOI ->
                     new DoiCleanup();

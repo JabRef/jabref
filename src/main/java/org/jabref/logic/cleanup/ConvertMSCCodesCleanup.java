@@ -6,16 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.application.Platform;
+
+import org.jabref.logic.msc.MscCodeUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.Keyword;
-import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.BibEntryPreferences;
+import org.jabref.model.entry.Keyword;
+import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.StandardField;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jabref.logic.msc.MscCodeUtils;
 
 public class ConvertMSCCodesCleanup implements CleanupJob {
     /*
@@ -23,10 +25,11 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
      */
     
     private static final Logger logger = LoggerFactory.getLogger(ConvertMSCCodesCleanup.class);
-    private static final Map<String, String> mscmap;
-    private static final Map<String, String> reverseMscmap;
-    private final Character keywordSeparator;
+    private static final Map<String, String> MSCMAP;
+    private static final Map<String, String> reverseMSCMAP;
     private static boolean conversionPossible;
+    private final Character keywordSeparator;
+    
     private final boolean convertToDescriptions;
 
     static {
@@ -58,8 +61,8 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             logger.error("Resource not found: msc_codes.json");
             conversionPossible = false;
         }
-        mscmap = tempMap;
-        reverseMscmap = tempReverseMap;
+        MSCMAP = tempMap;
+        reverseMSCMAP = tempReverseMap;
     }
 
     public ConvertMSCCodesCleanup(BibEntryPreferences preferences, boolean convertToDescriptions) {
@@ -100,8 +103,8 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             String keywordStr = keyword.get();
             if (convertToDescriptions) {
                 // Convert codes to descriptions
-                if (mscmap.containsKey(keywordStr)) {
-                    String description = mscmap.get(keywordStr);
+                if (MSCMAP.containsKey(keywordStr)) {
+                    String description = MSCMAP.get(keywordStr);
                     newKeywords.add(new Keyword(description));
                     hasChanges = true;
                 } else {
@@ -109,8 +112,8 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                 }
             } else {
                 // Convert descriptions back to codes
-                if (reverseMscmap.containsKey(keywordStr)) {
-                    String code = reverseMscmap.get(keywordStr);
+                if (reverseMSCMAP.containsKey(keywordStr)) {
+                    String code = reverseMSCMAP.get(keywordStr);
                     newKeywords.add(new Keyword(code));
                     hasChanges = true;
                 } else {
@@ -125,7 +128,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
             
             // Update the field on the JavaFX thread
-            javafx.application.Platform.runLater(() -> {
+            Platform.runLater(() -> {
                 entry.setField(StandardField.KEYWORDS, newValue);
                 changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
             });

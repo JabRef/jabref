@@ -1,6 +1,5 @@
 package org.jabref.logic.msc;
 
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;

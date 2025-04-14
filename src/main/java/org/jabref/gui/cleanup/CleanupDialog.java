@@ -15,7 +15,7 @@ public class CleanupDialog extends BaseDialog<CleanupPreferences> {
         getDialogPane().setPrefSize(600, 650);
         getDialogPane().getButtonTypes().setAll(ButtonType.OK, ButtonType.CANCEL);
 
-        CleanupPresetPanel presetPanel = new CleanupPresetPanel(databaseContext, initialPreset, filePreferences );
+        CleanupPresetPanel presetPanel = new CleanupPresetPanel(databaseContext, initialPreset, filePreferences);
 
         // placing the content of the presetPanel in a scroll pane
         ScrollPane scrollPane = new ScrollPane();
