@@ -469,7 +469,7 @@ public class ImportHandler {
             return List.of();
         }
         URLDownload urlDownload = new URLDownload(pdfUrl);
-        String filename = deriveFileNameFromUrl(pdfUrl);
+        String filename = URLUtil.getFileNameFromUrl(pdfUrl);
         Path targetFile = targetDirectory.get().resolve(filename);
         try {
             urlDownload.toFile(targetFile);
@@ -500,13 +500,5 @@ public class ImportHandler {
             LOGGER.error("Error importing PDF from URL - IO issue", ex);
             return List.of();
         }
-    }
-
-    private String deriveFileNameFromUrl(String url) {
-        String fileName = url.substring(url.lastIndexOf('/') + 1);
-        if (fileName.isBlank()) {
-            fileName = "downloaded.pdf";
-        }
-        return FileUtil.getValidFileName(fileName);
     }
 }
