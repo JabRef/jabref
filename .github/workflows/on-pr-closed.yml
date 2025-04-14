@@ -8,7 +8,9 @@ jobs:
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && !github.event.pull_request.merged
+    # dependabot writes PR comments with #{number}. That numbers are referering to issues of other repositories, not of this one.
+    # Therefore, we need to exclude dependabot here.
+    if: github.actor != 'dependabot[bot]' && (github.event.action == 'closed' && !github.event.pull_request.merged)
     permissions:
       contents: read
       issues: write
@@ -86,7 +88,9 @@ jobs:
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && github.event.pull_request.merged
+    # dependabot writes PR comments with #{number}. That numbers are referering to issues of other repositories, not of this one.
+    # Therefore, we need to exclude dependabot here.
+    if: github.actor != 'dependabot[bot]' && (github.event.action == 'closed' && github.event.pull_request.merged)
     permissions:
       contents: read
       issues: write
