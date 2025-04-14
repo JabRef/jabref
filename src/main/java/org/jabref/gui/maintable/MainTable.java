@@ -585,7 +585,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private BibEntry addExampleEntry() {
         BibEntry exampleEntry = new BibEntry(StandardEntryType.Article)
-                .withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker").withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software")
+                .withField(StandardField.AUTHOR, "Oliver Kopp and Carl Christian Snethlage and Christoph Schwentker")
+                .withField(StandardField.TITLE, "JabRef: BibTeX-based literature management software")
                 .withField(StandardField.JOURNAL, "TUGboat")
                 .withField(StandardField.VOLUME, "44")
                 .withField(StandardField.NUMBER, "3")
