@@ -56,7 +56,7 @@ public class AutosaveManager {
 
     @Subscribe
     public void listen(@SuppressWarnings("unused") BibDatabaseContextChangedEvent event) {
-        if (!event.isFilteredOut()) {
+        if (!event.isFiltered()) {
             this.needsSave = true;
         }
     }

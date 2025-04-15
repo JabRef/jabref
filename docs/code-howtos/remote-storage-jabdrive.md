@@ -32,13 +32,14 @@ Longer explanations are put below at "The 'pull-merge-push cycle'".
 
 In order to support synchronization, additional metadata is kept for each item:
 
-- `ID`: An unique identifier for the entry (will be a UUID).
-- `Revision`: The revision is a "generation Id" being increasing positive integer.
-  This is based on [Multiversion concurrency control (MVCC)](http://en.wikipedia.org/wiki/Multiversion_concurrency_control), where an increasing identifier ("time stamp") is used.
-- `hash`: This is the hash of the item (i.e., of all the data except for `Revision` and `hash`).
+- `ID`: An unique identifier for the entry (will be a [CUID2](https://github.com/paralleldrive/cuid2?tab=readme-ov-file#cuid2)).
+- `Version`: The version is a "generation Id" being increasing positive integer.
+  This is based on [Multiversion concurrency control (MVCC)](http://en.wikipedia.org/wiki/Multiversion_concurrency_control), where an increasing identifier ("time stamp") is used. See also [Optimistic Offline Lock](https://patterns-kompakt.de/patterns/persistenz/optimisticofflinelock).
+  Note that older versions called this "Revision". However, neither the page of MVCC nor the page of Optimistic Offline Lock use the term "Revision" (they do use "Version" though)
+- `hash`: This is the hash of the item (i.e., of all the data except for `Version` and `hash`).
 - (Client only) `dirty`: Marks whether the user changed the entry.
 
-`ID` and `Revision` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
+`ID` and `Version` are handled in [`org.jabref.model.entry.SharedBibEntryData`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/model/entry/SharedBibEntryData.java).
 
 {: .note-title }
 > Dirty flags
@@ -53,15 +54,15 @@ In order to support synchronization, additional metadata is kept for each item:
 
 ### Global time clock
 
-The idea is that the server tracks a global (logical) monotone increasing "time clock" tracking the existing revisions.
-Each entry has its own revision, increased "locally".
-The "global revision id" keeps track of the global synchronization state.
+The idea is that the server tracks a global (logical) monotone increasing "time clock" tracking the existing versions.
+Each entry has its own version, increased "locally".
+The "global version id" keeps track of the global synchronization state.
 One can view it as aggregation on the synchronization state of all entries.
-Similar to the revision concept of Subversion.
+Similar to the version concept of Subversion.
 
 ### Tombstones
 
-Deleted items are persisted as [tombstones](https://docs.couchbase.com/sync-gateway/current/managing-tombstones.html), which contain the metadata `ID` and `Revision` only.
+Deleted items are persisted as [tombstones](https://docs.couchbase.com/sync-gateway/current/managing-tombstones.html), which contain the metadata `ID` and `version` only.
 Tombstones ensure that all synchronizing devices can identify that a previously existing entry has been deleted.
 On the client, a tombstone is created whenever an entry is deleted.
 Moreover, the client keeps a list of all entries in the library so that external deletions can be recognized when loading the library into memory.
@@ -93,9 +94,9 @@ We assume that the server has some view on the library and the client has a view
 {: .note-title }
 > Straight-forward synchronization
 >
-> When the client connects to the server, one option for synchronization is to ask the server for all up-to-date entries and then using the `Revision` information to merge with the local data.
+> When the client connects to the server, one option for synchronization is to ask the server for all up-to-date entries and then using the `Version` information to merge with the local data.
 > However, this is highly inefficient as the whole database has to be sent over the wire.
-> A small improvement is gained by first asking only for tuples of `ID` and `Revision`, and only pull the complete entry if the local data is outdated or in conflict.
+> A small improvement is gained by first asking only for tuples of `ID` and `Version`, and only pull the complete entry if the local data is outdated or in conflict.
 > However, this still requires to send quite a bit of data.
 > Instead, we will use the following refinement.
 
@@ -103,7 +104,7 @@ We assume that the server has some view on the library and the client has a view
 
 The client pulls on first connect or when requested to pull.
 The client asks the server for a list of documents that changed since the last checkpoint. (Creating a checkpoint is explained further below.)
-The server responses with a batched list of these entries together with their `Revision` information.
+The server responses with a batched list of these entries together with their `Version` information.
 These entries could also be tombstones.
 Each batch includes also a checkpoint `To` that has the meaning "all changes to this point in time are included in the current batch".
 
@@ -115,15 +116,15 @@ This is more an implementation detail than a conceptual difference.
 
 The pulled data from the server needs to be merged with the local view of the data.
 The data is merged on a per-entry basis.
-Based on the "generation ID" (`Revision`) of server and client, following cases can occur:
+Based on the "generation ID" (`Version`) of server and client, following cases can occur:
 
-1. The server's `Revision` is higher than the client's `Revision`: Two cases need to be distinguished:
+1. The server's `Version` is higher than the client's `Version`: Two cases need to be distinguished:
    1. The client's entry is dirty. That means, the user has edited the entry in the meantime.
       Then the user is shown a message to resolve the conflict (see "Conflict Handling" below)
    2. The client's entry is clean. That means, the user has not edited the entry in the meantime.
-      In this case, the client's entry is replaced by the server's one (including the revision).
-2. The server's `Revision` is equal to the client's `Revision`: Both entries are up-to-date and nothing has to be done. This case may happen if the library is synchronized by other means.
-3. The server's `Revision` is lower than the client's `Revision`: This should never be the case, as revisions are only increased on the server. Show error message to user.
+      In this case, the client's entry is replaced by the server's one (including the Version).
+2. The server's `Version` is equal to the client's `Version`: Both entries are up-to-date and nothing has to be done. This case may happen if the library is synchronized by other means.
+3. The server's `Version` is lower than the client's `Version`: This should never be the case, as Version are only increased on the server. Show error message to user.
 
 If the entry returned by the server is a tombstone, then:
 
@@ -133,8 +134,8 @@ If the entry returned by the server is a tombstone, then:
 
 #### Conflict Handling
 
-If the user chooses to overwrite the local entry with the server entry, then the entry's `Revision` is updated as well, and it is no longer marked as dirty.
-Otherwise, its `Revision` is updated to the one provided by the server, but it is still marked as dirty.
+If the user chooses to overwrite the local entry with the server entry, then the entry's `Version` is updated as well, and it is no longer marked as dirty.
+Otherwise, its `Version` is updated to the one provided by the server, but it is still marked as dirty.
 This will enable pushing of the entry to the server during the "Push Phase".
 
 After the merging is done, the client sets its local checkpoint to the value of `To`.
@@ -143,17 +144,16 @@ After the merging is done, the client sets its local checkpoint to the value of 
 
 The client sends the following information back to the server:
 
-- The list of entries that are marked dirty (along with their `Revision` data).
+- The list of entries that are marked dirty (along with their `Version` data).
 - The list of entries that are new, i.e., that do not have an `ID` yet.
 - The list of tombstones, i.e., entries that have been deleted.
 
-The server accepts only changes if the provided `Revision` coincides with the `Revision` stored on the server.
+The server accepts only changes if the provided `Version` coincides with the `Version` stored on the server.
 If this is not the case, then the entry has been modified on the server since the last pull operation, and then the user needs to go through a new pull-merge-push cycle.
 
 During the push operation, the user is not allowed to locally edit these entries that are currently pushed.
 After the push operation, all entries accepted by the server are marked clean.
-Moreover, the server will generate a new revision number for each accepted entry, which will then be stored locally.
-Entries rejected (as conflicts) by the server stay dirty and their `Revision` remains unchanged.
+Moreover, the server will generate a new `Version` dirty and their `Version` remains unchanged.
 
 ### Start the "pull-merge-push cycle" again
 
@@ -199,7 +199,7 @@ If the user decides in step 3 to save their changes, then in step 5 JabRef would
 ### Sync after successful sync of client changes
 
 1. JabRef modifies local data: `{id: 1, value: 0, _rev=1, _dirty=false}` to `{id: 1, value: 1, _rev=1, _dirty=true}`.
-   `id` is `ID` from above, `value` summarizes all fields of the entry, `_rev` is `Revision` from above, and `_dirty` the dirty flag.
+   `id` is `ID` from above, `value` summarizes all fields of the entry, `_rev` is `Version` from above, and `_dirty` the dirty flag.
 2. JabRef pulls server changes. Suppose there are none.
 3. Consequently, Merge is not necessary. JabRef sets checkpoint to `T = 1`.
 4. JabRef pushes its changes to the server.
@@ -212,7 +212,7 @@ This is not quite optimal since the last pull response contains the full data of
 
 *Possible future improvements:*
 
-- First pull only the `IDs` and `Revisions` of the server-side changes, and then filter out the ones we already have locally before querying the complete entry.
+- First pull only the `IDs` and `Versions` of the server-side changes, and then filter out the ones we already have locally before querying the complete entry.
   Downside is that this solution always needs one more request (per change batch) and it is not clear if this outweighs the costs of sending the full entry.
 - The server can remember where a change came from and then not send these changes back to that client. Especially if the server's generation Id increased by one due to the update, this is straight-forward.
 
@@ -224,37 +224,37 @@ The identifier needs to be unique at the very least across the library and shoul
 Both features cannot be ensured for BibTeX keys.
 Note this is similar to the `shared_id` in the case of the SQL synchronization.
 
-### Why do we need revisions? Are `updatedAt` timeflags not enough?
+### Why do we need versions? Are `updatedAt` timeflags not enough?
 
-The revision functions as "generation Id" known from [Lamport clocks](https://en.wikipedia.org/wiki/Lamport_timestamp) and common in synchronization.
+The versions functions as "generation Id" known from [Lamport clocks](https://en.wikipedia.org/wiki/Lamport_timestamp) and common in synchronization.
 For instance, the [Optimistic Offline Lock](https://martinfowler.com/eaaCatalog/optimisticOfflineLock.html) also uses these kinds of clocks.
 
 A "generation Id" is essentially a clock local to the entry that ticks whenever the entry is synced with the server.
 As for us there is only one server, strictly speaking, it would suffice to use the global server time for this.
-Moreover, for the sync algorithm, the client would only need to store the revision/server time during the pull-merge-push cycle (to make sure that during this time the entry is not modified again on the server).
+Moreover, for the sync algorithm, the client would only need to store the version/server time during the pull-merge-push cycle (to make sure that during this time the entry is not modified again on the server).
 Nevertheless, the generation Id is only a tiny data blob, and it gives a bit of additional security/consistency during the merge operation, so we keep it around all the time.
 
 ### Why do we need an entry hash?
 
 The hash is only used on the client to determine whether an entry has been changed outside of JabRef.
 
-#### Why don't we need to keep the whole revision history as it is done in CouchDB?
+#### Why don't we need to keep the whole version history as it is done in CouchDB?
 
-The revision history is used by CouchDB to find a common ancestor of two given revisions.
+The versions history is used by CouchDB to find a common ancestor of two given versions.
 This is needed since CouchDB provides main-main sync.
-However, in our setting, we have a central server and thus the last synced revision is *the* common ancestor for both the new server and client revision.
+However, in our setting, we have a central server and thus the last synced versions is *the* common ancestor for both the new server and client versions.
 
-### Why is a dirty flag enough on the client? Why don't we need local revisions?
+### Why is a dirty flag enough on the client? Why don't we need local versionss?
 
-In CouchDB, every client has their own history of revisions.
+In CouchDB, every client has their own history of versionss.
 This is needed to have a deterministic conflict resolution that can run on both the server and client side independently.
-In this setting, it is important to determine which revision is older, which is then declared to be the winner.
+In this setting, it is important to determine which versions is older, which is then declared to be the winner.
 However, we do not need an automatic conflict resolution:
 Whenever there is a conflict, the user is asked to resolve it.
 For this it is not important to know how many times (and when) the user changed the entry locally.
 It suffices to know that it changed at some point from the last synced version.
 
-Local revision histories could be helpful in scenarios such as the following:
+Local version histories could be helpful in scenarios such as the following:
 
 1. Device A is offline, and the user changes an entry.
 2. The user sends this changed entry to Device B (say, via git).
@@ -262,8 +262,8 @@ Local revision histories could be helpful in scenarios such as the following:
 4. The user syncs Device B with the server.
 5. The user syncs Device A with the server.
 
-Without local revisions, it is not possible for Device A to figure out that the entry from the server logically evolved from its own local version.
-Instead, it shows a conflict message since the entry changed locally (step 1) and there is a newer revision on the server (from step 4).
+Without local versions, it is not possible for Device A to figure out that the entry from the server logically evolved from its own local version.
+Instead, it shows a conflict message since the entry changed locally (step 1) and there is a newer version on the server (from step 4).
 
 ## More Readings
 

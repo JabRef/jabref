@@ -1,31 +1,43 @@
 package org.jabref.logic.shared;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.testutils.category.DatabaseTest;
+
+import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 
 /**
  * Stores the credentials for the test systems
  */
 @DatabaseTest
-public class ConnectorTest {
+public class ConnectorTest implements AutoCloseable {
 
-    public static DBMSConnection getTestDBMSConnection(DBMSType dbmsType) throws SQLException, InvalidDBMSConnectionPropertiesException {
-        DBMSConnectionProperties properties = getTestConnectionProperties(dbmsType);
-        return new DBMSConnection(properties);
+    private EmbeddedPostgres postgres;
+    private Connection connection;
+
+    /**
+     * Fires up a new postgres
+     */
+    public DBMSConnection getTestDBMSConnection() throws SQLException, IOException {
+        postgres = EmbeddedPostgres.builder().start();
+        String url = postgres.getJdbcUrl("postgres", "postgres");
+        connection = DriverManager.getConnection(url, "postgres", "postgres");
+        return new DBMSConnection(connection, "postgres");
     }
 
-    public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
-        switch (dbmsType) {
-            case MYSQL:
-                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("127.0.0.1").setPort(3800).setDatabase("jabref").setUser("root").setPassword("root").setUseSSL(false).setAllowPublicKeyRetrieval(true).createDBMSConnectionProperties();
-            case POSTGRESQL:
-                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(dbmsType.getDefaultPort()).setDatabase("postgres").setUser("postgres").setPassword("postgres").setUseSSL(false).createDBMSConnectionProperties();
-            case ORACLE:
-                return new DBMSConnectionPropertiesBuilder().setType(dbmsType).setHost("localhost").setPort(32118).setDatabase("jabref").setUser("jabref").setPassword("jabref").setUseSSL(false).createDBMSConnectionProperties();
-            default:
-                return new DBMSConnectionPropertiesBuilder().createDBMSConnectionProperties();
+    /**
+     * Closes the connection and shuts down postgres
+     */
+    @Override
+    public void close() throws Exception {
+        if (connection != null) {
+            connection.close();
+        }
+        if (postgres != null) {
+            postgres.close();
         }
     }
 }

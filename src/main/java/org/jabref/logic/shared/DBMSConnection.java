@@ -9,6 +9,7 @@ import java.util.Set;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,12 @@ public class DBMSConnection implements DatabaseConnection {
 
     private final Connection connection;
     private final DBMSConnectionProperties properties;
+
+    @VisibleForTesting
+    public DBMSConnection(Connection connection, String databaseName) {
+        this.connection = connection;
+        this.properties = new DBMSConnectionProperties(databaseName);
+    }
 
     public DBMSConnection(DBMSConnectionProperties connectionProperties) throws SQLException, InvalidDBMSConnectionPropertiesException {
         if (!connectionProperties.isValid()) {
@@ -38,7 +45,7 @@ public class DBMSConnection implements DatabaseConnection {
             }
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
-            // Therefore a stable error determination is not possible.
+            // Therefore, a stable error determination is not possible.
             LOGGER.error("Could not connect to database: {} - Error code: {}", e.getMessage(), e.getErrorCode(), e);
             throw e;
         }

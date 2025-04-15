@@ -42,10 +42,11 @@ public class CoarseChangeFilter {
             boolean isChangedEntry = lastEntryChanged.filter(e -> !e.equals(fieldChange.getBibEntry())).isPresent();
             boolean isEditChanged = !isNewEdit && (isChangedField || isChangedEntry);
             // Only deltas of 1 when typing in manually, major change means pasting something (more than one character)
-            boolean isMajorChange = fieldChange.getMajorCharacterChange() > 1;
+            boolean isMajorChange = fieldChange.charactersChangedCount() > 1;
 
-            fieldChange.setFilteredOut(!(isEditChanged || isMajorChange));
+            fieldChange.setFiltered(!(isEditChanged || isMajorChange));
             // Post each FieldChangedEvent - even the ones being marked as "filtered"
+            // Explanation at https://github.com/JabRef/jabref/pull/6868. - especially necessary for BackupManager and AutoSaveManager
             eventBus.post(fieldChange);
 
             lastFieldChanged = Optional.of(fieldChange.getField());

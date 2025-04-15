@@ -1,4 +1,4 @@
-package org.jabref.logic.shared.listener;
+package org.jabref.logic.shared.notifications;
 
 import java.sql.SQLException;
 
@@ -13,15 +13,15 @@ import org.slf4j.LoggerFactory;
 /**
  * A listener for PostgreSQL database notifications.
  */
-public class PostgresSQLNotificationListener implements Runnable {
+public class NotificationListener implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PostgresSQLNotificationListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationListener.class);
 
     private final DBMSSynchronizer dbmsSynchronizer;
     private final PGConnection pgConnection;
     private volatile boolean stop;
 
-    public PostgresSQLNotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
+    public NotificationListener(DBMSSynchronizer dbmsSynchronizer, PGConnection pgConnection) {
         this.dbmsSynchronizer = dbmsSynchronizer;
         this.pgConnection = pgConnection;
     }
@@ -30,22 +30,21 @@ public class PostgresSQLNotificationListener implements Runnable {
     public void run() {
         stop = false;
         try {
-            // noinspection InfiniteLoopStatement
-            while (!stop) {
-                PGNotification[] notifications = pgConnection.getNotifications();
+            while (!stop && !Thread.currentThread().isInterrupted()) {
+                // Wait for 12 seconds for notifications. Result will be null if no notifications arrive
+                PGNotification[] notifications = pgConnection.getNotifications(12_000);
 
                 if (notifications != null) {
                     for (PGNotification notification : notifications) {
                         if (!DBMSProcessor.PROCESSOR_ID.equals(notification.getName())) {
+                            // Only process notifications that are not sent by this processor
+                            notification.getParameter();
                             dbmsSynchronizer.pullChanges();
                         }
                     }
                 }
-
-                // Wait a while before checking again for new notifications
-                Thread.sleep(500);
             }
-        } catch (SQLException | InterruptedException exception) {
+        } catch (SQLException exception) {
             LOGGER.error("Error while listening for updates to PostgresSQL", exception);
         }
     }

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
-import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.MetaDataParser;
@@ -20,6 +19,7 @@ import org.jabref.logic.shared.event.ConnectionLostEvent;
 import org.jabref.logic.shared.event.SharedEntriesNotPresentEvent;
 import org.jabref.logic.shared.event.UpdateRefusedEvent;
 import org.jabref.logic.shared.exception.OfflineLockException;
+import org.jabref.logic.shared.notifications.Notifier;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.event.EntriesAddedEvent;
@@ -34,6 +34,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,17 +47,24 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
+    private Connection currentConnection;
+    private Notifier notifier;
     private String dbName;
-    private final BibDatabaseContext bibDatabaseContext;
+
     private MetaData metaData;
+    private final BibDatabaseContext bibDatabaseContext;
     private final BibDatabase bibDatabase;
     private final EventBus eventBus;
-    private Connection currentConnection;
     private final Character keywordSeparator;
     private final GlobalCitationKeyPatterns globalCiteKeyPattern;
+
+    @SuppressWarnings("unused")
+    // will be required later for save actions
     private final FieldPreferences fieldPreferences;
+
     private final FileUpdateMonitor fileMonitor;
-    private Optional<BibEntry> lastEntryChanged;
+
+    private Optional<BibEntry> lastEntryChanged_REMOVEME;
 
     public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
                             FieldPreferences fieldPreferences,
@@ -69,7 +77,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
         this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
-        this.lastEntryChanged = Optional.empty();
+        this.lastEntryChanged_REMOVEME = Optional.empty();
     }
 
     /**
@@ -80,32 +88,30 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isEventSourceAccepted(event) && checkCurrentConnection()) {
+            // TODO: Make use of org.jabref.model.metadata.event.MetaDataChangedEvent (and also do Added/Removed there)
             synchronizeLocalMetaData();
+
             pullWithLastEntry();
             synchronizeLocalDatabase();
+            // TODO: Rewrite
             dbmsProcessor.insertEntries(event.getBibEntries());
             // Reset last changed entry because it just has already been synchronized -> Why necessary?
-            lastEntryChanged = Optional.empty();
+            lastEntryChanged_REMOVEME = Optional.empty();
         }
     }
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
+     *
+     * In JabRef (UI), the field is modified
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
-        BibEntry bibEntry = event.getBibEntry();
-        // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntriesEvents may be posted.
-        // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        if (isPresentLocalBibEntry(bibEntry) && isEventSourceAccepted(event) && checkCurrentConnection() && !event.isFilteredOut()) {
-            synchronizeLocalMetaData();
-            pullWithLastEntry();
-            synchronizeSharedEntry(bibEntry);
-            synchronizeLocalDatabase(); // Pull changes for the case that there were some
-        } else {
-            // Set new BibEntry that has been changed last
-            lastEntryChanged = Optional.of(bibEntry);
+        if (event.isFiltered() || !isEventSourceAccepted(event)) {
+            return;
         }
+
+        notifier.notifyAboutChangedField(event);
     }
 
     /**
@@ -130,9 +136,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
             synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
-            synchronizeLocalDatabase();
-            applyMetaData();
-            dbmsProcessor.notifyClients();
+            // TODO: applyMetaData();
         }
     }
 
@@ -156,7 +160,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
                 dbmsProcessor.setupSharedDatabase();
             }
         } catch (SQLException e) {
-            LOGGER.error("Could not check intergrity", e);
+            LOGGER.error("Could not check integrity", e);
             throw new IllegalStateException(e);
         }
 
@@ -185,7 +189,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (Map.Entry<Integer, Integer> idVersionEntry : idVersionMap.entrySet()) {
             boolean remoteEntryMatchingOneLocalEntryFound = false;
             for (BibEntry localEntry : localEntries) {
-                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedID())) {
+                if (idVersionEntry.getKey().equals(localEntry.getSharedBibEntryData().getSharedIdAsInt())) {
                     remoteEntryMatchingOneLocalEntryFound = true;
                     if (idVersionEntry.getValue() > localEntry.getSharedBibEntryData().getVersion()) {
                         Optional<BibEntry> sharedEntry = dbmsProcessor.getSharedEntry(idVersionEntry.getKey());
@@ -229,7 +233,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     private void removeNotSharedEntries(List<BibEntry> localEntries, Set<Integer> sharedIDs) {
         List<BibEntry> entriesToRemove =
                 localEntries.stream()
-                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedID()))
+                            .filter(localEntry -> !sharedIDs.contains(localEntry.getSharedBibEntryData().getSharedIdAsInt()))
                             .collect(Collectors.toList());
         if (!entriesToRemove.isEmpty()) {
             eventBus.post(new SharedEntriesNotPresentEvent(entriesToRemove));
@@ -247,7 +251,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             return;
         }
         try {
-            BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences); // perform possibly existing save actions
+            // TODO: Either reenable (compare with fix https://github.com/JabRef/jabref/pull/11282) or write user documentation that "cleanup actions" should be used or introduce SQL databse cleanup (stored procedure, ...)
+            // BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences); // perform possibly existing save actions
+
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
@@ -283,8 +289,9 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         }
         try {
             dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data, globalCiteKeyPattern));
+            // TODO: synchronize with server - currently, only data is written to the server
         } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
+            LOGGER.error("SQL Error", e);
         }
     }
 
@@ -298,13 +305,15 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
         for (BibEntry bibEntry : bibDatabase.getEntries()) {
             try {
                 // synchronize only if changes were present
-                if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
+                // TODO: apply save actions
+                // if (!BibDatabaseWriter.applySaveActions(bibEntry, metaData, fieldPreferences).isEmpty()) {
+                if (false) {
                     dbmsProcessor.updateEntry(bibEntry);
                 }
             } catch (OfflineLockException exception) {
                 eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
             } catch (SQLException e) {
-                LOGGER.error("SQL Error: ", e);
+                LOGGER.error("SQL Error", e);
             }
         }
     }
@@ -327,7 +336,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Synchronizes local BibEntries only if last entry changes still remain
      */
     public void pullLastEntryChanges() {
-        if (lastEntryChanged.isPresent()) {
+        if (lastEntryChanged_REMOVEME.isPresent()) {
             if (!checkCurrentConnection()) {
                 return;
             }
@@ -342,10 +351,10 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
      * Synchronizes local BibEntries and pulls remaining last entry changes
      */
     private void pullWithLastEntry() {
-        if (lastEntryChanged.isPresent() && isPresentLocalBibEntry(lastEntryChanged.get())) {
-            synchronizeSharedEntry(lastEntryChanged.get());
+        if (lastEntryChanged_REMOVEME.isPresent() && isPresentLocalBibEntry(lastEntryChanged_REMOVEME.get())) {
+            synchronizeSharedEntry(lastEntryChanged_REMOVEME.get());
         }
-        lastEntryChanged = Optional.empty();
+        lastEntryChanged_REMOVEME = Optional.empty();
     }
 
     /**
@@ -384,7 +393,13 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     public void openSharedDatabase(DatabaseConnection connection) throws DatabaseNotSupportedException {
         this.dbName = connection.getProperties().getDatabase();
         this.currentConnection = connection.getConnection();
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection);
+        try {
+            this.notifier = new Notifier(currentConnection.unwrap(PGConnection.class));
+        } catch (SQLException e) {
+            LOGGER.error("Could not get Postgres driver", e);
+            throw new DatabaseNotSupportedException();
+        }
+        this.dbmsProcessor = new DBMSProcessor(connection);
         initializeDatabases();
     }
 
@@ -396,7 +411,7 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
             dbmsProcessor.stopNotificationListener();
             currentConnection.close();
         } catch (SQLException e) {
-            LOGGER.error("SQL Error:", e);
+            LOGGER.error("SQL Error", e);
         }
     }
 
@@ -407,10 +422,6 @@ public class DBMSSynchronizer implements DatabaseSynchronizer {
     @Override
     public String getDBName() {
         return dbName;
-    }
-
-    public DBMSProcessor getDBProcessor() {
-        return dbmsProcessor;
     }
 
     @Override

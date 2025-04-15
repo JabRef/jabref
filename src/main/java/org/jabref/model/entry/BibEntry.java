@@ -99,7 +99,11 @@ import org.slf4j.LoggerFactory;
 public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
+
+    public static final String ENTRY_LINK_SEPARATOR = ",";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
+
     private final SharedBibEntryData sharedBibEntryData;
 
     /**
@@ -379,10 +383,7 @@ public class BibEntry implements Cloneable {
     @VisibleForTesting
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
-
-        String oldId = this.id;
-
-        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, id, oldId));
+        eventBus.post(new FieldChangedEvent(this, InternalField.INTERNAL_ID_FIELD, this.id, id));
         this.id = id;
         changed = true;
     }
@@ -453,7 +454,7 @@ public class BibEntry implements Cloneable {
         this.type.setValue(newType);
 
         FieldChange change = new FieldChange(this, InternalField.TYPE_HEADER, oldType.getName(), newType.getName());
-        eventBus.post(new FieldChangedEvent(change, eventSource));
+        eventBus.post(new FieldChangedEvent(eventSource, change));
         return Optional.of(change);
     }
 
@@ -643,7 +644,7 @@ public class BibEntry implements Cloneable {
         if (isNewField) {
             eventBus.post(new FieldAddedOrRemovedEvent(change, eventSource));
         } else {
-            eventBus.post(new FieldChangedEvent(change, eventSource));
+            eventBus.post(new FieldChangedEvent(eventSource, change));
         }
         return Optional.of(change);
     }
@@ -919,7 +920,7 @@ public class BibEntry implements Cloneable {
     }
 
     public BibEntry withSharedBibEntryData(int sharedId, int version) {
-        sharedBibEntryData.setSharedID(sharedId);
+        sharedBibEntryData.setSharedId(sharedId);
         sharedBibEntryData.setVersion(version);
         return this;
     }

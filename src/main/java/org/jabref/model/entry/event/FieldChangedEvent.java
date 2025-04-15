@@ -12,24 +12,23 @@ import org.jabref.model.entry.field.Field;
 public class FieldChangedEvent extends EntryChangedEvent {
 
     private final Field field;
-    private final String newValue;
     private final String oldValue;
-    private int majorCharacterChange = 0;
+    private final String newValue;
+    private int charactersChangedCount = 0;
 
     /**
+     * @param source source of this event
      * @param bibEntry Affected BibEntry object
      * @param field    Name of field which has been changed
      * @param oldValue old field value
      * @param newValue new field value
-     * @param location Location affected by this event
      */
-    public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue,
-                             EntriesEventSource location) {
-        super(bibEntry, location);
+    public FieldChangedEvent(EntriesEventSource source, BibEntry bibEntry, Field field, String oldValue, String newValue) {
+        super(bibEntry, source);
         this.field = field;
-        this.newValue = newValue;
         this.oldValue = oldValue;
-        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+        this.newValue = newValue;
+        this.charactersChangedCount = computeMajorCharacterChange(oldValue, newValue);
     }
 
     /**
@@ -37,30 +36,27 @@ public class FieldChangedEvent extends EntryChangedEvent {
      * @param field    Name of field which has been changed
      * @param newValue new field value
      */
-    public FieldChangedEvent(BibEntry bibEntry, Field field, String newValue, String oldValue) {
+    public FieldChangedEvent(BibEntry bibEntry, Field field, String oldValue, String newValue) {
         super(bibEntry);
         this.field = field;
         this.newValue = newValue;
         this.oldValue = oldValue;
-        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+        this.charactersChangedCount = computeMajorCharacterChange(oldValue, newValue);
     }
 
-    /**
-     * @param location Location affected by this event
-     */
-    public FieldChangedEvent(FieldChange fieldChange, EntriesEventSource location) {
-        super(fieldChange.getEntry(), location);
+    public FieldChangedEvent(EntriesEventSource source, FieldChange fieldChange) {
+        super(fieldChange.getEntry(), source);
         this.field = fieldChange.getField();
         this.newValue = fieldChange.getNewValue();
         this.oldValue = fieldChange.getOldValue();
-        this.majorCharacterChange = computeMajorCharacterChange(oldValue, newValue);
+        this.charactersChangedCount = computeMajorCharacterChange(oldValue, newValue);
     }
 
     public FieldChangedEvent(FieldChange fieldChange) {
-        this(fieldChange, EntriesEventSource.LOCAL);
+        this(EntriesEventSource.LOCAL, fieldChange);
     }
 
-    private int computeMajorCharacterChange(String oldValue, String newValue) {
+    private static int computeMajorCharacterChange(String oldValue, String newValue) {
         // Objects.equals first checks '=='
         if (Objects.equals(oldValue, newValue)) {
             return 0;
@@ -79,15 +75,15 @@ public class FieldChangedEvent extends EntryChangedEvent {
         return field;
     }
 
-    public String getNewValue() {
-        return newValue;
-    }
-
     public String getOldValue() {
         return oldValue;
     }
 
-    public int getMajorCharacterChange() {
-        return majorCharacterChange;
+    public String getNewValue() {
+        return newValue;
+    }
+
+    public int charactersChangedCount() {
+        return charactersChangedCount;
     }
 }
