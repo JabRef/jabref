@@ -21,7 +21,6 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.URLs;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
@@ -39,7 +38,6 @@ public class WelcomeTab extends Tab {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final DirectoryMonitor directoryMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final CountingUndoManager undoManager;
     private final ClipBoardManager clipBoardManager;
@@ -53,7 +51,6 @@ public class WelcomeTab extends Tab {
                       DialogService dialogService,
                       StateManager stateManager,
                       FileUpdateMonitor fileUpdateMonitor,
-                      DirectoryMonitor directoryMonitor,
                       BibEntryTypesManager entryTypesManager,
                       CountingUndoManager undoManager,
                       ClipBoardManager clipBoardManager,
@@ -70,7 +67,6 @@ public class WelcomeTab extends Tab {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.directoryMonitor = directoryMonitor;
         this.entryTypesManager = entryTypesManager;
         this.undoManager = undoManager;
         this.clipBoardManager = clipBoardManager;
@@ -125,7 +121,7 @@ public class WelcomeTab extends Tab {
         Hyperlink openLibraryLink = new Hyperlink(Localization.lang("Open library"));
         openLibraryLink.getStyleClass().add("welcome-hyperlink");
         openLibraryLink.setOnAction(e -> new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
-                stateManager, fileUpdateMonitor, directoryMonitor, entryTypesManager, undoManager, clipBoardManager,
+                stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                 taskExecutor).execute());
 
         return createVBoxContainer(startLabel, newLibraryLink, openLibraryLink);
@@ -138,7 +134,7 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.setAlignment(Pos.TOP_LEFT);
         updateWelcomeRecentLibraries();
 
-        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) change -> updateWelcomeRecentLibraries());
+        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
 
         return createVBoxContainer(recentLabel, recentLibrariesBox);
     }

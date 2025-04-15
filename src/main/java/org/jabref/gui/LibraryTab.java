@@ -57,7 +57,6 @@ import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
-import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
@@ -111,7 +110,6 @@ public class LibraryTab extends Tab {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final DirectoryMonitor directoryMonitor;
     private final StateManager stateManager;
     private final BibEntryTypesManager entryTypesManager;
     private final BooleanProperty changedProperty = new SimpleBooleanProperty(false);
@@ -169,7 +167,6 @@ public class LibraryTab extends Tab {
                        GuiPreferences preferences,
                        StateManager stateManager,
                        FileUpdateMonitor fileUpdateMonitor,
-                       DirectoryMonitor directoryMonitor,
                        BibEntryTypesManager entryTypesManager,
                        CountingUndoManager undoManager,
                        ClipBoardManager clipBoardManager,
@@ -182,7 +179,6 @@ public class LibraryTab extends Tab {
         this.preferences = Objects.requireNonNull(preferences);
         this.stateManager = Objects.requireNonNull(stateManager);
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.directoryMonitor = directoryMonitor;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
@@ -948,7 +944,6 @@ public class LibraryTab extends Tab {
                                               StateManager stateManager,
                                               LibraryTabContainer tabContainer,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              DirectoryMonitor directoryMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               CountingUndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
@@ -964,7 +959,6 @@ public class LibraryTab extends Tab {
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
-                directoryMonitor,
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -987,7 +981,6 @@ public class LibraryTab extends Tab {
                                               GuiPreferences preferences,
                                               StateManager stateManager,
                                               FileUpdateMonitor fileUpdateMonitor,
-                                              DirectoryMonitor directoryMonitor,
                                               BibEntryTypesManager entryTypesManager,
                                               UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
@@ -1002,7 +995,6 @@ public class LibraryTab extends Tab {
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
-                directoryMonitor,
                 entryTypesManager,
                 (CountingUndoManager) undoManager,
                 clipBoardManager,
@@ -1075,7 +1067,6 @@ public class LibraryTab extends Tab {
     public String toString() {
         return "LibraryTab{" +
                 "bibDatabaseContext=" + bibDatabaseContext +
-                ", showing=" + showing +
                 '}';
     }
 }

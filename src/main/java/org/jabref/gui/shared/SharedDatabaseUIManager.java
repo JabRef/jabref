@@ -21,7 +21,6 @@ import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.UndoableRemoveEntries;
-import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -42,7 +41,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.google.common.eventbus.Subscribe;
 
 public class SharedDatabaseUIManager {
@@ -181,7 +179,6 @@ public class SharedDatabaseUIManager {
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
-                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,

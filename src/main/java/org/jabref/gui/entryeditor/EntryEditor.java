@@ -152,7 +152,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 tabbed.getTabs().clear();
 
                 this.allPossibleTabs.clear();
-                this.allPossibleTabs.addAll(createTabs(tab.get()));
+                this.allPossibleTabs.addAll(createTabs());
 
                 adaptVisibleTabs();
             } else {
@@ -298,7 +298,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         tabSupplier.get().selectNextEntry();
     }
 
-    private List<EntryEditorTab> createTabs(LibraryTab libraryTab) {
+    private List<EntryEditorTab> createTabs() {
         List<EntryEditorTab> tabs = new LinkedList<>();
 
         tabs.add(new PreviewTab(preferences, stateManager, previewPanel));
@@ -426,7 +426,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         }
 
         if (!currentlyEditedEntry.isEmpty()) {
-            typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), type -> {
+            typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
                 typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
                 adaptVisibleTabs();
                 setupToolBar();
@@ -474,12 +474,12 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                     fetchAndMerge(pdfMergeMetadataImporter);
                 });
             } else {
-                fetcherMenuItem.setOnAction(event -> fetchAndMerge(fetcher));
+                fetcherMenuItem.setOnAction(_ -> fetchAndMerge(fetcher));
             }
             fetcherMenu.getItems().add(fetcherMenuItem);
         }
 
-        fetcherButton.setOnMouseClicked(event -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
+        fetcherButton.setOnMouseClicked(_ -> fetcherMenu.show(fetcherButton, Side.RIGHT, 0, 0));
     }
 
     private void fetchAndMerge(EntryBasedFetcher fetcher) {

@@ -55,7 +55,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -226,7 +225,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 preferences,
                 aiService,
                 fileUpdateMonitor,
-                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 taskExecutor,
                 entryTypesManager,
                 clipBoardManager,
@@ -298,20 +296,19 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void updateHorizontalDividerPosition() {
         if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getSidePaneWidth() / horizontalSplit.getWidth());
+            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition() / horizontalSplit.getWidth());
             horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
                                                     .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) -> preferences.getGuiPreferences().setSidePaneWidth(newValue.doubleValue()));
+                                                    .listenToValues((_, newValue) -> preferences.getGuiPreferences().setHorizontalDividerPosition(newValue.doubleValue()));
         }
     }
 
     public void updateVerticalDividerPosition() {
         if (mainStage.isShowing() && panelMode.get() == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
-            verticalSplit.setDividerPositions(preferences.getEntryEditorPreferences().getDividerPosition());
-            // ToDo: Move DividerPosition to GuiPreferences
+            verticalSplit.setDividerPositions(preferences.getGuiPreferences().getVerticalDividerPosition());
             verticalDividerSubscription = EasyBind.valueAt(verticalSplit.getDividers(), 0)
                                                   .mapObservable(SplitPane.Divider::positionProperty)
-                                                  .listenToValues((oldValue, newValue) -> preferences.getEntryEditorPreferences().setDividerPosition(newValue.doubleValue()));
+                                                  .listenToValues((_, newValue) -> preferences.getGuiPreferences().setVerticalDividerPosition(newValue.doubleValue()));
         }
     }
 
@@ -511,7 +508,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,
-                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -538,7 +534,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 preferences,
                 stateManager,
                 fileUpdateMonitor,
-                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,
@@ -617,7 +612,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 stateManager,
                 fileUpdateMonitor,
-                Injector.instantiateModelOrService(DirectoryMonitor.class),
                 entryTypesManager,
                 undoManager,
                 clipBoardManager,

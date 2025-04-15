@@ -41,7 +41,6 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableKeyChange;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -66,7 +65,6 @@ import org.jabref.model.openoffice.style.CitationType;
 import org.jabref.model.openoffice.uno.CreationException;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
@@ -332,7 +330,6 @@ public class OpenOfficePanel {
                     preferences,
                     stateManager,
                     fileUpdateMonitor,
-                    Injector.instantiateModelOrService(DirectoryMonitor.class),
                     entryTypesManager,
                     undoManager,
                     clipBoardManager,
