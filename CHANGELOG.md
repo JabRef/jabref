@@ -28,6 +28,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a feature for enabling drag-and-drop of files into groups  [#12540](https://github.com/JabRef/jabref/issues/12540)
 - We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
 - We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
+- We added an option to choose whether to open the file explorer in the files directory or in the last opened directory when attaching files. [#12554](https://github.com/JabRef/jabref/issues/12554)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
 - We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832/)
@@ -70,6 +71,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where pasted entries would sometimes end up in the search bar instead of the main table [#12910](https://github.com/JabRef/jabref/issues/12910)
 - We fixed an issue where warning signs were improperly positioned next to text fields containing capital letters. [#12884](https://github.com/JabRef/jabref/issues/12884)
 - We fixed an issue where the drag'n'drop functionality in entryeditor did not work [#12561](https://github.com/JabRef/jabref/issues/12561)
 - We fixed an issue where the F4 shortcut key did not work without opening the right-click context menu. [#6101](https://github.com/JabRef/jabref/pull/6101)
@@ -105,6 +107,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where valid DOI could not be imported if it had special characters like `<` or `>`. [#12434](https://github.com/JabRef/jabref/issues/12434)
 - We fixed an issue where the tooltip only displayed the first linked file when hovering. [#12470](https://github.com/JabRef/jabref/issues/12470)
 - We fixed an issue where some texts in the "Citation Information" tab and the "Preferences" dialog could not be translated. [#12883](https://github.com/JabRef/jabref/pull/12883)
+- We fixed an issue where downloading PDFs from URLs to empty entries resulted in meaningless filenames like "-.pdf". [#12917](https://github.com/JabRef/jabref/issues/12917)
+- We fixed an issue where pasting a PDF URL into the main table caused an import error instead of creating a new entry. [#12911](https://github.com/JabRef/jabref/pull/12911)
+- We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
+- We fixed an issue with deleting entries in large libraries that caused it to take a long time. [#8976](https://github.com/JabRef/jabref/issues/8976)
 
 ### Removed
 
