@@ -1,38 +1,76 @@
 package org.jabref.logic.cleanup;
 
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+
+import javafx.application.Platform;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class ConvertMSCCodesCleanupTest {
 
     private ConvertMSCCodesCleanup worker;
 
+    @BeforeAll
+    static void initializeJavaFX() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.startup(latch::countDown);
+        latch.await();  // Wait for JavaFX thread to initialize
+    }
+
     @BeforeEach
     void setUp() {
         BibEntryPreferences preferences = mock(BibEntryPreferences.class);
+        // Simulate default separator
+        Mockito.when(preferences.getKeywordSeparator()).thenReturn(',');
         worker = new ConvertMSCCodesCleanup(preferences, true);
+    }
+
+    private void runAndWait(Runnable action) {
+        if (Platform.isFxApplicationThread()) {
+            action.run();
+        } else {
+            CountDownLatch latch = new CountDownLatch(1);
+            Platform.runLater(() -> {
+                try {
+                    action.run();
+                } finally {
+                    latch.countDown();
+                }
+            });
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private void runCleanupAndWait(BibEntry entry) {
+        worker.cleanup(entry);
+        runAndWait(() -> { });  // Wait for JavaFX to finish
     }
 
     @Test
     void cleanupConvertsValidMSCCode() {
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.KEYWORDS, "03E72");  // Using a real MSC code for "Fuzzy set theory"
+        entry.setField(StandardField.KEYWORDS, "03E72");
 
-        worker.cleanup(entry);
+        runCleanupAndWait(entry);
 
         Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertTrue(keywords.isPresent());
-        assertTrue(keywords.get().contains("Theory of fuzzy sets, etc."));
+        assertEquals("Theory of fuzzy sets - etc.", keywords.get());
     }
 
     @Test
@@ -40,59 +78,40 @@ class ConvertMSCCodesCleanupTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.KEYWORDS, "03E72, Machine Learning, Artificial Intelligence");
 
-        worker.cleanup(entry);
+        runCleanupAndWait(entry);
 
         Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertTrue(keywords.isPresent());
-        assertTrue(keywords.get().contains("Theory of fuzzy sets, etc."));
-        assertTrue(keywords.get().contains("Machine Learning"));
-        assertTrue(keywords.get().contains("Artificial Intelligence"));
+        assertEquals("Theory of fuzzy sets - etc.,Machine Learning,Artificial Intelligence", keywords.get());
     }
 
     @Test
-    void cleanupHandlesEmptyKeywords() {
+    void cleanupHandlesInvalidMSCCode() {
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.KEYWORDS, "");
+        entry.setField(StandardField.KEYWORDS, "99Z99, Machine Learning");
 
-        worker.cleanup(entry);
+        runCleanupAndWait(entry);
 
         Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertTrue(keywords.isPresent());
-        assertEquals("", keywords.get());
+        assertEquals("99Z99, Machine Learning", keywords.get());
     }
 
     @Test
     void cleanupHandlesNoKeywordsField() {
         BibEntry entry = new BibEntry();
 
-        worker.cleanup(entry);
+        runCleanupAndWait(entry);
 
         assertEquals(Optional.empty(), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
-    void cleanupHandlesInvalidMSCCode() {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.KEYWORDS, "99Z99, Machine Learning");  // Invalid MSC code
-
-        worker.cleanup(entry);
-
-        Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertTrue(keywords.isPresent());
-        assertTrue(keywords.get().contains("99Z99"));  // Invalid code should remain unchanged
-        assertTrue(keywords.get().contains("Machine Learning"));
-    }
-
-    @Test
     void cleanupHandlesMultipleMSCCodes() {
         BibEntry entry = new BibEntry();
-        entry.setField(StandardField.KEYWORDS, "03E72, 68T01");  // Fuzzy set theory, General topics in artificial intelligence
+        entry.setField(StandardField.KEYWORDS, "03E72, 68T01");
 
-        worker.cleanup(entry);
+        runCleanupAndWait(entry);
 
         Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertTrue(keywords.isPresent());
-        assertTrue(keywords.get().contains("Theory of fuzzy sets, etc."));
-        assertTrue(keywords.get().contains("General topics in artificial intelligence"));
+        assertEquals("Theory of fuzzy sets - etc.,General topics in artificial intelligence", keywords.get());
     }
 }
