@@ -26,7 +26,8 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?<ticketNumber>\d+)'
+          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
+          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - uses: actions/checkout@v4
@@ -83,10 +84,37 @@ jobs:
           default-column: "Free to take"
           issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
           skip-if-not-in-project: true
-  close_issue_on_pr_merge:
+  comment_on_resolved_issue:
+    name: Comment on resolved issue
     runs-on: ubuntu-latest
+    if: github.event.action == 'closed' && github.event.pull_request.merged
+    permissions:
+      contents: read
+      issues: write
     steps:
-      - name: Closes issues related to a merged pull request.
-        uses: ldez/gha-mjolnir@v1.5.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Echo PR number and URL
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+      - name: Determine issue number
+        id: get_issue_number
+        uses: koppor/ticket-check-action@add-output
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
+          ticketPrefix: '#'
+          titleRegex: '^#(?<ticketNumber>\d+)'
+          branchRegex: '^(?<ticketNumber>\d+)'
+          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
+          outputOnly: true
+      - name: Comment on issue
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          pr-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          message: |
+            Closed by ${{ github.event.pull_request.html_url }}
+
+            Please head to <https://builds.jabref.org/main> to try it out.
+
+            For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
