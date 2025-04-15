@@ -26,7 +26,8 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?<ticketNumber>\d+)'
+          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
+          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - uses: actions/checkout@v4
@@ -104,7 +105,7 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?<ticketNumber>\d+)'
+          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - name: Comment on issue
