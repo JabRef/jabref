@@ -66,6 +66,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private CustomTextField searchBox;
     @FXML private TabPane tabPane;
     @FXML private Label currentStyleNameLabel;
+    @FXML private Button addCslButton;
 
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
@@ -197,6 +198,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setSelectedTab(newValue));
 
         updateCurrentStyleLabel();
+        addCslButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
     }
 
     private ContextMenu createContextMenu() {
@@ -271,5 +273,14 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                         .boxed()
                         .filter(i -> availableListView.getItems().get(i).getFilePath().equals(currentStyle.getFilePath()))
                         .findFirst();
+    }
+
+
+    /**
+     * Method to handle the "Add CSL file" button click in the CSL Styles tab
+     */
+    @FXML
+    private void addCslStyleFile() {
+        viewModel.addCslStyleFile();
     }
 }

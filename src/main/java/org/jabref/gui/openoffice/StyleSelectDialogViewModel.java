@@ -2,6 +2,7 @@ package org.jabref.gui.openoffice;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,6 +40,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+
+import com.airhacks.afterburner.injection.Injector;
 
 public class StyleSelectDialogViewModel {
 
@@ -223,5 +226,61 @@ public class StyleSelectDialogViewModel {
 
     public OOStyle getSetStyle() {
         return openOfficePreferences.getCurrentStyle();
+    }
+
+    /**
+     * Handles importing a custom CSL style file
+     */
+    public void addCslStyleFile() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(Localization.lang("CSL Style file"), StandardFileType.CITATION_STYLE)
+                .withDefaultExtension(Localization.lang("CSL Style file"), StandardFileType.CITATION_STYLE)
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
+                .build();
+
+        Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
+
+        path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
+            try {
+                Optional<CitationStyle> newStyleOptional = CitationStyle.createFromExternalFile(stylePath);
+
+                if (newStyleOptional.isPresent()) {
+                    CitationStyle newStyle = newStyleOptional.get();
+
+                    List<String> customStyles = new ArrayList<>(openOfficePreferences.getExternalCitationStyles());
+                    if (!customStyles.contains(stylePath)) {
+                        customStyles.add(stylePath);
+                        openOfficePreferences.setExternalCitationStyles(customStyles);
+                    }
+
+                    boolean styleExists = availableLayouts.stream()
+                                                          .anyMatch(layout -> layout.getFilePath().equals(stylePath));
+
+                    if (!styleExists) {
+                        CitationStylePreviewLayout newLayout = new CitationStylePreviewLayout(
+                                newStyle, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                        availableLayouts.add(newLayout);
+                        selectedLayoutProperty.set(newLayout);
+                    }
+
+                    openOfficePreferences.setCurrentStyle(newStyle);
+
+                    dialogService.showInformationDialogAndWait(
+                            Localization.lang("Style added"),
+                            Localization.lang("The CSL style has been added successfully.")
+                    );
+                } else {
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Invalid style selected"),
+                            Localization.lang("You must select a valid CSL style file.")
+                    );
+                }
+            } catch (Exception e) {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Error reading style file"),
+                        e.getMessage()
+                );
+            }
+        });
     }
 }

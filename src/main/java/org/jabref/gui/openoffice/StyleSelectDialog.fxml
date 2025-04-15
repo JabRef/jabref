@@ -26,11 +26,13 @@
                         <padding>
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                         </padding>
-                        <VBox spacing="4.0" VBox.vgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <Label text="%Available" styleClass="sectionHeader"/>
-                            <CustomTextField fx:id="searchBox" promptText="%Filter" prefHeight="20.0"/>
-                            <ListView fx:id="availableListView" VBox.vgrow="ALWAYS"/>
-                        </VBox>
+                            <HBox HBox.hgrow="ALWAYS" />
+                            <Button fx:id="addCslButton" onAction="#addCslStyleFile" text="%Add CSL file"/>
+                        </HBox>
+                        <CustomTextField fx:id="searchBox" promptText="%Filter" prefHeight="20.0"/>
+                        <ListView fx:id="availableListView" VBox.vgrow="ALWAYS"/>
                         <VBox spacing="4.0">
                             <Label text="%Preview" styleClass="sectionHeader"/>
                             <VBox fx:id="cslPreviewBox" prefHeight="300.0" spacing="4.0"/>

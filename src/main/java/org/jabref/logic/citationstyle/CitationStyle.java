@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,7 +52,7 @@ public class CitationStyle implements OOStyle {
     private final boolean isNumericStyle;
     private final String source;
 
-    private CitationStyle(final String filename, final String title, final boolean isNumericStyle, final String source) {
+    public CitationStyle(String filename, String title, boolean isNumericStyle, String source) {
         this.filePath = Objects.requireNonNull(filename);
         this.title = Objects.requireNonNull(title);
         this.isNumericStyle = isNumericStyle;
@@ -81,7 +82,7 @@ public class CitationStyle implements OOStyle {
     }
 
     @VisibleForTesting
-    static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
+    public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
 
         try {
@@ -178,6 +179,7 @@ public class CitationStyle implements OOStyle {
 
     /**
      * Provides the citation styles that come with JabRef.
+     * update: method to discover both built-in and user-added citation styles
      *
      * @return list of available citation styles
      */
@@ -186,8 +188,7 @@ public class CitationStyle implements OOStyle {
             return STYLES;
         }
 
-        // TODO: The list of files should be determined at build time (instead of the dynamic method in discoverCitationStylesInPath(path))
-
+        // Load built-in styles
         URL url = CitationStyle.class.getResource(STYLES_ROOT + DEFAULT);
         if (url == null) {
             LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT);
@@ -199,10 +200,24 @@ public class CitationStyle implements OOStyle {
             Path path = Path.of(uri).getParent();
             STYLES.addAll(discoverCitationStylesInPath(path));
 
+            try {
+                Preferences prefs = Preferences.userRoot().node("/org/jabref");
+
+                String externalStyles = prefs.get("externalCitationStyles", "");
+                if (!externalStyles.isEmpty()) {
+                    String[] externalStylePaths = externalStyles.split(";");
+
+                    for (String stylePath : externalStylePaths) {
+                        createFromExternalFile(stylePath).ifPresent(STYLES::add);
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error loading external citation styles from preferences", e);
+            }
+
             return STYLES;
-        } catch (URISyntaxException
-                 | IOException e) {
-            LOGGER.error("something went wrong while searching available CitationStyles", e);
+        } catch (URISyntaxException | IOException e) {
+            LOGGER.error("Something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
     }
@@ -280,11 +295,43 @@ public class CitationStyle implements OOStyle {
 
     @Override
     public boolean isInternalStyle() {
-        return true;
+        // If the path is an absolute path, it's an external style
+        return !Path.of(filePath).isAbsolute();
     }
 
     @Override
     public String getPath() {
         return getFilePath();
+    }
+
+    /**
+     * Creates a CitationStyle instance from an external file path
+     *
+     * @param filePath The path to the external CSL file
+     * @return An Optional containing the CitationStyle if successfully loaded
+     */
+    public static Optional<CitationStyle> createFromExternalFile(String filePath) {
+        if (!isCitationStyleFile(filePath)) {
+            LOGGER.error("Can only load citation style files: {}", filePath);
+            return Optional.empty();
+        }
+
+        Path path = Path.of(filePath);
+        if (!Files.exists(path)) {
+            LOGGER.error("External style file does not exist: {}", filePath);
+            return Optional.empty();
+        }
+
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            String filename = path.getFileName().toString();
+            Optional<CitationStyle> style = createCitationStyleFromSource(inputStream, filename);
+
+            // For external files, store the full path instead of just the filename
+            return style.map(citationStyle -> new CitationStyle(filePath, citationStyle.getTitle(),
+                    citationStyle.isNumericStyle(), citationStyle.getSource()));
+        } catch (IOException e) {
+            LOGGER.error("Error reading external style file: {}", filePath, e);
+            return Optional.empty();
+        }
     }
 }
