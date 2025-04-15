@@ -36,6 +36,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.msc.MscCodeLoadingException;
 import org.jabref.logic.msc.MscCodeUtils;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -46,6 +47,8 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
@@ -59,22 +62,27 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
 
     static {
         URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("msc_codes.json");
-        
-        if (resourceUrl != null) {
-                try {
-                    
-                    mscmap = MscCodeUtils.loadMscCodesFromJson(resourceUrl); // Returns Map<String, String>
-                } catch (Exception e) {
-                    LOGGER.error("Error loading msc_codes.json", e);
-                    
-                    mscmap = new HashMap<>();
-                }
-        } else {
-                LOGGER.error("msc_codes.json not found!");
-                
+
+        if (resourceUrl == null) {
+            LOGGER.error("msc_codes.json not found!");
+            mscmap = new HashMap<>();
+        }
+
+        try {
+            Optional<Map<String, String>> optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
+            
+            if (optionalMscCodes.isPresent()) {
+                mscmap = optionalMscCodes.get();  // Unwrap the map if present
+            } else {
+                LOGGER.warn("No MSC codes found in msc_codes.json.");
                 mscmap = new HashMap<>();
+            }
+        } catch (MscCodeLoadingException e) {
+            LOGGER.error("Error occurred while loading MSC codes", e);
+            mscmap = new HashMap<>();
         }
     }
+
 
     @FXML private KeywordsEditorViewModel viewModel;
     @FXML private TagsField<Keyword> keywordTagsField;

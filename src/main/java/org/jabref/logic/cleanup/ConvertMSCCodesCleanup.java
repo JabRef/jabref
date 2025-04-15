@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javafx.application.Platform;
 
+import org.jabref.logic.msc.MscCodeLoadingException;
 import org.jabref.logic.msc.MscCodeUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
@@ -37,29 +38,26 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
         Map<String, String> tempReverseMap = new HashMap<>();
         URL resourceUrl = ConvertMSCCodesCleanup.class.getClassLoader().getResource("msc_codes.json");
 
-        if (resourceUrl != null) {
+        if (resourceUrl == null) {
+            logger.error("Resource not found: msc_codes.json");
+            conversionPossible = false;
+        } else {
             try {
-                tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
+                tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl).get();
                 // Create reverse mapping
                 tempMap.forEach((code, desc) -> tempReverseMap.put(desc, code));
-                logger.debug("Loaded {} MSC codes from file", tempMap.size());
+                
                 // Log a few sample entries to verify content
                 if (!tempMap.isEmpty()) {
-                    tempMap.entrySet().stream().limit(3).forEach(entry ->
-                        logger.debug("Sample MSC code: {} -> {}", entry.getKey(), entry.getValue())
-                    );
                     conversionPossible = true;
                 } else {
                     logger.error("MSC codes file is empty");
                     conversionPossible = false;
                 }
-            } catch (Exception e) {
-                logger.error("Error loading MSC codes: {}", e.getMessage(), e);
+            } catch (MscCodeLoadingException e) {
+                logger.error("Error loading MSC codes: {}", e);
                 conversionPossible = false;
             }
-        } else {
-            logger.error("Resource not found: msc_codes.json");
-            conversionPossible = false;
         }
         MSCMAP = tempMap;
         reverseMSCMAP = tempReverseMap;

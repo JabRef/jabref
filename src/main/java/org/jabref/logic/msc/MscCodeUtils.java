@@ -2,10 +2,12 @@ package org.jabref.logic.msc;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,18 +19,23 @@ public class MscCodeUtils {
      *
      * @param resourceUrl URL to the JSON resource containing MSC codes
      * @return Map with MSC codes as keys and descriptions as values
-    */
-    public static Map<String, String> loadMscCodesFromJson(URL resourceUrl) {
+     * @throws MscCodeLoadingException If there is an issue loading or parsing the JSON
+     */
+    public static Optional<Map<String, String>> loadMscCodesFromJson(URL resourceUrl) throws MscCodeLoadingException {
+        if (resourceUrl == null) {
+            throw new MscCodeLoadingException("The resource URL is null.");
+        }
+        
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            if (resourceUrl == null) {
-                LOGGER.error("param resourceUrl is null");
-                return Collections.emptyMap();
-            }
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(resourceUrl, new TypeReference<Map<String, String>>() { });
+            return mapper.readValue(resourceUrl, new TypeReference<Optional<Map<String, String>>>() { });
+        } catch (JsonParseException | JsonMappingException e) {
+            LOGGER.error("Error parsing MSC codes from JSON", e);
+            throw new MscCodeLoadingException("Failed to parse MSC codes from JSON", e);
         } catch (IOException e) {
-            LOGGER.error("Failed to load MSC codes from JSON URL", e);
-            return Collections.emptyMap();
+            LOGGER.error("Error loading MSC codes from JSON URL", e);
+            throw new MscCodeLoadingException("Failed to load MSC codes from JSON URL", e);
         }
     }
 }
+
