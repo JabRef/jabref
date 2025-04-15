@@ -233,13 +233,19 @@ public class BibDatabase {
     public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        Set<String> ids = new HashSet<>();
+        Collection idsToBeDeleted;
+        if (toBeDeleted.size() > 10) {
+            idsToBeDeleted = new HashSet<>();
+        } else {
+            idsToBeDeleted = new ArrayList<>(toBeDeleted.size());
+        }
+
         for (BibEntry entry : toBeDeleted) {
-            ids.add(entry.getId());
+            idsToBeDeleted.add(entry.getId());
         }
 
         List<BibEntry> newEntries = new ArrayList<>(entries);
-        newEntries.removeIf(entry -> ids.contains(entry.getId()));
+        newEntries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
 
         toBeDeleted.forEach(entry -> {
             entriesId.remove(entry.getId());
@@ -611,7 +617,8 @@ public class BibDatabase {
     public void unregisterListener(Object listener) {
         try {
             this.eventBus.unregister(listener);
-        } catch (IllegalArgumentException e) {
+        } catch (
+                IllegalArgumentException e) {
             // occurs if the event source has not been registered, should not prevent shutdown
             LOGGER.debug("Problem unregistering", e);
         }
