@@ -138,7 +138,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     }
 
     protected Label createLabelAndEditor(BibDatabaseContext databaseContext, BibEntry entry, Field field) {
-
         SuggestionProviders suggestionProviders = stateManager.activeTabProperty().get()
                                                               .map(LibraryTab::getSuggestionProviders)
                                                               .orElse(new SuggestionProviders());
