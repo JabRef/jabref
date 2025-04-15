@@ -638,15 +638,22 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             this(tabContainer, null, stateManager);
         }
 
+        public TabPane getTabbedPane() {
+            return tabbedPane;
+        }
+
         @Override
         public void execute() {
             Platform.runLater(() -> {
+                tabContainer.getTabbedPane().requestFocus();
+
                 if (libraryTab == null) {
-                    if (tabContainer.getCurrentLibraryTab() == null) {
+                    LibraryTab current = tabContainer.getCurrentLibraryTab();
+                    if (current == null) {
                         LOGGER.error("No library tab to close");
                         return;
                     }
-                    tabContainer.closeTab(tabContainer.getCurrentLibraryTab());
+                    tabContainer.closeTab(current);
                 } else {
                     tabContainer.closeTab(libraryTab);
                 }
