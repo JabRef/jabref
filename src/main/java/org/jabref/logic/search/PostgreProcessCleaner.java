@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +19,7 @@ public class PostgreProcessCleaner {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreProcessCleaner.class);
     private static final PostgreProcessCleaner INSTANCE = new PostgreProcessCleaner();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"));
     private static final String FILE_PREFIX = "jabref-postgres-info-";
     private static final String FILE_SUFFIX = ".json";
 
