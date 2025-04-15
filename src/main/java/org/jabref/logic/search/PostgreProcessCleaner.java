@@ -63,7 +63,7 @@ public class PostgreProcessCleaner {
         if (isPortOpen("localhost", port)) {
             long pid = getPidUsingPort(port);
             if (pid != -1) {
-                LOGGER.info("Old Postgres instance found on port {} (PID {}). Killing it...", port, pid);
+                LOGGER.info("Old Postgres instance found on port {} (PID {}). Killing it.", port, pid);
                 destroyProcessByPID(pid, 1500);
             } else {
                 LOGGER.warn("Could not determine PID using port {}. Skipping kill step.", port);
