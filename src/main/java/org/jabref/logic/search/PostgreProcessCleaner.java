@@ -74,9 +74,10 @@ public class PostgreProcessCleaner {
     }
 
     private void destroyProcessByPID(long pid, int millis) throws InterruptedException {
-        Optional<ProcessHandle> handle = ProcessHandle.of(pid);
-        if (handle.isPresent() && handle.get().isAlive()) {
-            handle.get().destroy();
+        Optional<ProcessHandle> aliveProcess = ProcessHandle.of(pid)
+                .filter(ProcessHandle::isAlive);
+        if (aliveProcess.isPresent()) {
+            aliveProcess.get().destroy();
             Thread.sleep(millis);
         }
     }
