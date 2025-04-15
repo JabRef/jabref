@@ -47,8 +47,6 @@ import org.jabref.model.entry.field.Field;
 import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.common.collect.Comparators;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;

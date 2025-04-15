@@ -23,12 +23,19 @@ public class MscCodeUtils {
      */
     public static Optional<Map<String, String>> loadMscCodesFromJson(URL resourceUrl) throws MscCodeLoadingException {
         if (resourceUrl == null) {
-            throw new MscCodeLoadingException("The resource URL is null.");
+            return Optional.empty();
         }
         
         ObjectMapper mapper = new ObjectMapper();
         try {
-            return mapper.readValue(resourceUrl, new TypeReference<Optional<Map<String, String>>>() { });
+            Optional<Map<String, String>> result = 
+            mapper.readValue(resourceUrl, new TypeReference<Optional<Map<String, String>>>() { });
+
+            if (result.isEmpty()) {
+                return Optional.empty();
+            } 
+            
+            return result;
         } catch (JsonParseException | JsonMappingException e) {
             LOGGER.error("Error parsing MSC codes from JSON", e);
             throw new MscCodeLoadingException("Failed to parse MSC codes from JSON", e);

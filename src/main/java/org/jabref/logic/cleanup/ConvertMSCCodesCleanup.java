@@ -55,7 +55,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                     conversionPossible = false;
                 }
             } catch (MscCodeLoadingException e) {
-                logger.error("Error loading MSC codes: {}", e);
+                logger.error("Error loading MSC codes:", e);
                 conversionPossible = false;
             }
         }
@@ -78,7 +78,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         if (!conversionPossible) {
-            logger.info("MSC code conversion was attempted but is not possible because the codes file could not be loaded");
+            logger.error("MSC code conversion was attempted but is not possible because the codes file could not be loaded");
             return new ArrayList<>();
         }
 
