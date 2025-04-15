@@ -76,8 +76,7 @@ public class PostgreProcessCleaner {
     }
 
     private void destroyProcessByPID(long pid) throws InterruptedException {
-        Optional<ProcessHandle> aliveProcess = ProcessHandle.of(pid)
-                .filter(ProcessHandle::isAlive);
+        Optional<ProcessHandle> aliveProcess = ProcessHandle.of(pid).filter(ProcessHandle::isAlive);
         if (aliveProcess.isPresent()) {
             aliveProcess.get().destroy();
             Thread.sleep(PostgreProcessCleaner.POSTGRES_SHUTDOWN_WAIT_MILLIS);
