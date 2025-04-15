@@ -130,9 +130,6 @@ public class LibraryTab extends Tab {
 
     private PersonNameSuggestionProvider searchAutoCompleter;
 
-    // Used to track whether the base has changed since last save.
-    private BibEntry showing;
-
     private SuggestionProviders suggestionProviders;
 
     @SuppressWarnings({"FieldCanBeLocal"})
