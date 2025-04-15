@@ -22,6 +22,7 @@ public class PostgreProcessCleaner {
     private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"));
     private static final String FILE_PREFIX = "jabref-postgres-info-";
     private static final String FILE_SUFFIX = ".json";
+    private static final int POSTGRES_SHUTDOWN_WAIT_MILLIS = 1500;
 
     private PostgreProcessCleaner() {
     }
@@ -65,7 +66,7 @@ public class PostgreProcessCleaner {
             long pid = getPidUsingPort(port);
             if (pid != -1) {
                 LOGGER.info("Old Postgres instance found on port {} (PID {}). Killing it.", port, pid);
-                destroyProcessByPID(pid, 1500);
+                destroyProcessByPID(pid, POSTGRES_SHUTDOWN_WAIT_MILLIS);
             } else {
                 LOGGER.warn("Could not determine PID using port {}. Skipping kill step.", port);
             }
