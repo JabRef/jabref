@@ -112,15 +112,20 @@ public class PostgreServer {
 
     private void writeMetadataToFile(int port) {
         try {
-            Map<String, Object> meta = new HashMap<>();
-            meta.put("javaPid", ProcessHandle.current().pid());
-            meta.put("postgresPort", port);
-            meta.put("startedBy", "jabref");
-            meta.put("startedAt", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+            Map<String, Object> meta = createPostgresMetadata(port);
             OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(POSTGRES_METADATA_FILE.toFile(), meta);
             LOGGER.info("Postgres metadata file path: {}", POSTGRES_METADATA_FILE);
         } catch (IOException e) {
             LOGGER.warn("Failed to write Postgres metadata file", e);
         }
+    }
+
+    private Map<String, Object> createPostgresMetadata(int port) {
+        Map<String, Object> meta = new HashMap<>();
+        meta.put("javaPid", ProcessHandle.current().pid());
+        meta.put("postgresPort", port);
+        meta.put("startedBy", "jabref");
+        meta.put("startedAt", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+        return meta;
     }
 }
