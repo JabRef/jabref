@@ -174,7 +174,7 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "10.1.0"
+    def luceneVersion = "10.2.0"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
@@ -183,7 +183,7 @@ dependencies {
 
     implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.14.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
     implementation 'commons-logging:commons-logging:1.3.5'
     implementation 'com.h2database:h2-mvstore:2.3.232'
 
@@ -373,7 +373,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
     // endregion
 
-    implementation 'commons-io:commons-io:2.18.0'
+    implementation 'commons-io:commons-io:2.19.0'
 
     // Even if "compileOnly" is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use "implementation" instead of "compileOnly"
     implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
@@ -384,7 +384,7 @@ dependencies {
     implementation 'io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.179'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
     testImplementation 'org.junit.platform:junit-platform-launcher:1.12.1'
 
     testImplementation 'org.mockito:mockito-core:5.17.0'
