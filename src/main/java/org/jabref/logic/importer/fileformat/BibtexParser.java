@@ -101,6 +101,7 @@ public class BibtexParser implements Parser {
     private Set<BibEntryType> entryTypes;
     private boolean eof;
     private int line = 1;
+    private int col = 0;
     private ParserResult parserResult;
     private final MetaDataParser metaDataParser;
     private final Map<String, String> parsedBibdeskGroups;
@@ -232,6 +233,10 @@ public class BibtexParser implements Parser {
             boolean found = consumeUncritically('@');
             if (!found) {
                 break;
+            }
+
+            if (col > 1) {
+                continue;
             }
 
             skipWhitespace();
@@ -627,12 +632,14 @@ public class BibtexParser implements Parser {
 
     private int read() throws IOException {
         int character = pushbackReader.read();
+        col++;
 
         if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
         }
         if (character == '\n') {
             line++;
+            col = 0;
         }
         return character;
     }
@@ -640,8 +647,10 @@ public class BibtexParser implements Parser {
     private void unread(int character) throws IOException {
         if (character == '\n') {
             line--;
+            col = 0;
         }
         pushbackReader.unread(character);
+        col--;
         if (pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
