@@ -25,17 +25,17 @@ public class MscCodeUtils {
         if (resourceUrl == null) {
             return Optional.empty();
         }
-        
+
         ObjectMapper mapper = new ObjectMapper();
         try {
-            Optional<Map<String, String>> result = 
-            mapper.readValue(resourceUrl, new TypeReference<Optional<Map<String, String>>>() { });
+            Map<String, String> result =
+                    mapper.readValue(resourceUrl, new TypeReference<Map<String, String>>() { });
 
             if (result.isEmpty()) {
                 return Optional.empty();
-            } 
-            
-            return result;
+            }
+
+            return Optional.of(result);
         } catch (JsonParseException | JsonMappingException e) {
             LOGGER.error("Error parsing MSC codes from JSON", e);
             throw new MscCodeLoadingException("Failed to parse MSC codes from JSON", e);

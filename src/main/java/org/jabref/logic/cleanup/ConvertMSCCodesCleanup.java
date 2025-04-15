@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import javafx.application.Platform;
 
@@ -24,13 +26,13 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
     /*
      * Converts MSC codes found in keywords editor to their descriptions
      */
-    
+
     private static final Logger logger = LoggerFactory.getLogger(ConvertMSCCodesCleanup.class);
     private static final Map<String, String> MSCMAP;
     private static final Map<String, String> reverseMSCMAP;
     private static boolean conversionPossible;
     private final Character keywordSeparator;
-    
+
     private final boolean convertToDescriptions;
 
     static {
@@ -46,7 +48,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                 tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl).get();
                 // Create reverse mapping
                 tempMap.forEach((code, desc) -> tempReverseMap.put(desc, code));
-                
+
                 // Log a few sample entries to verify content
                 if (!tempMap.isEmpty()) {
                     conversionPossible = true;
@@ -83,7 +85,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
         }
 
         List<FieldChange> changes = new ArrayList<>();
-        
+
         if (!entry.hasField(StandardField.KEYWORDS)) {
             return changes;
         }
@@ -120,21 +122,39 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             }
         }
 
-        // If we made any changes, record them
+        // If we made any changes, update the entry
         if (hasChanges) {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
-            
-            // Update the field on the JavaFX thread
-            Platform.runLater(() -> {
+
+            // Update the field, handling JavaFX threading correctly
+            if (Platform.isFxApplicationThread()) {
+                // If we're already on the JavaFX thread, update directly
                 entry.setField(StandardField.KEYWORDS, newValue);
                 changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-            });
-            
-            // Return the changes immediately, even though they'll be applied asynchronously
-            return changes;
+            } else {
+                // If we're not on the JavaFX thread, use runLater but wait for completion
+                try {
+                    CompletableFuture<Void> future = new CompletableFuture<>();
+                    Platform.runLater(() -> {
+                        try {
+                            entry.setField(StandardField.KEYWORDS, newValue);
+                            changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
+                        } finally {
+                            future.complete(null);
+                        }
+                    });
+                    // Block until the update is done
+                    future.get();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.error("Interrupted while waiting for JavaFX thread", e);
+                } catch (ExecutionException e) {
+                    logger.error("Error while updating field on JavaFX thread", e);
+                }
+            }
         }
-        
+
         return changes;
     }
 }
