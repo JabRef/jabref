@@ -19,11 +19,14 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
+          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
+          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
   move_issue:
     name: Mark issue as in progress
+    # after determine_issue_number to ensure that there is only one failure because of no ticket number
+    needs: determine_issue_number
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -37,7 +40,7 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
+          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - name: Move issue to "In Progress" in "Good First Issues"
@@ -64,6 +67,8 @@ jobs:
           skip-if-not-in-project: true
   ensure_assignment:
     name: Ensure that contributor is assigned (fails if not commented on issue)
+    # after determine_issue_number to ensure that there is only one failure because of no ticket number
+    needs: determine_issue_number
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -77,22 +82,40 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
+          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
       - name: Assign PR creator to issue
-        # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
-        run: gh api -X PATCH /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} -f assignee=${{ github.event.pull_request.user.login }}
+        run: |
+          set -e
+
+          # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
+
+          ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} --jq '[.assignees[].login]')
+
+          # Check if the user is already assigned
+          if echo "$ASSIGNEES" | jq -e '. | index("${{ github.event.pull_request.user.login }}")' >/dev/null; then
+            echo "User '${{ github.event.pull_request.user.login }}' is already an assignee. No update needed."
+            echo "Debug: $ASSIGNEES"
+            exit 0
+          fi
+
+          # Append the new assignee
+          UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
+
+          # Update issue with the new assignee list
+          echo "Updating issue #${{ steps.get_issue_number.outputs.ticketNumber }} updated with assignees: $UPDATED_ASSIGNEES..."
+          gh api -X PATCH /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add label "📌 Pinned"
         run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-label "📌 Pinned"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   conflicts_with_target:
     name: Conflicts with target branch
     runs-on: ubuntu-latest

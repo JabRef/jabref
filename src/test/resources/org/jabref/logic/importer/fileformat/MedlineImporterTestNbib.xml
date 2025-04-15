@@ -230,6 +230,7 @@
 			<ArticleId IdType="pii">8949</ArticleId>
 			<ArticleId IdType="doi">10.3275/8949</ArticleId>
 			<ArticleId IdType="pubmed">23633646</ArticleId>
+            <ArticleId IdType="url">https://pubmed.ncbi.nlm.nih.gov/23633646/</ArticleId>
 		</ArticleIdList>
 	</PubmedData>
 </PubmedArticle>

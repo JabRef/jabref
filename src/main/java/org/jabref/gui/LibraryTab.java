@@ -21,6 +21,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
+import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -701,6 +702,7 @@ public class LibraryTab extends Tab {
         if (tableModel != null) {
             tableModel.unbind();
         }
+
         // clean up the groups map
         stateManager.clearSelectedGroups(bibDatabaseContext);
     }
@@ -1055,9 +1057,13 @@ public class LibraryTab extends Tab {
             this.show();
             if ((duration != null) && !duration.equals(Duration.ZERO)) {
                 PauseTransition delay = new PauseTransition(duration);
-                delay.setOnFinished(e -> this.hide());
+                delay.setOnFinished(this::handle);
                 delay.play();
             }
+        }
+
+        private void handle(ActionEvent e) {
+            this.hide();
         }
     }
 

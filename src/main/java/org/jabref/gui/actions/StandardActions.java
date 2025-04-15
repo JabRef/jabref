@@ -113,6 +113,7 @@ public enum StandardActions implements Action {
     ABBREVIATE_DEFAULT(Localization.lang("default"), Localization.lang("Abbreviate journal names of the selected entries (DEFAULT abbreviation)"), KeyBinding.ABBREVIATE),
     ABBREVIATE_DOTLESS(Localization.lang("dotless"), Localization.lang("Abbreviate journal names of the selected entries (DOTLESS abbreviation)")),
     ABBREVIATE_SHORTEST_UNIQUE(Localization.lang("shortest unique"), Localization.lang("Abbreviate journal names of the selected entries (SHORTEST UNIQUE abbreviation)")),
+    ABBREVIATE_LTWA(Localization.lang("LTWA"), Localization.lang("Abbreviate journal names of the selected entries (LTWA)")),
     UNABBREVIATE(Localization.lang("Unabbreviate journal names"), Localization.lang("Unabbreviate journal names of the selected entries"), KeyBinding.UNABBREVIATE),
 
     MANAGE_CUSTOM_EXPORTS(Localization.lang("Manage custom exports")),
@@ -162,6 +163,7 @@ public enum StandardActions implements Action {
     MOVE_FILE_TO_FOLDER_AND_RENAME(Localization.lang("Move file to file directory and rename file")),
     COPY_FILE_TO_FOLDER(Localization.lang("Copy linked file to folder..."), IconTheme.JabRefIcons.COPY_TO_FOLDER, KeyBinding.COPY),
     REMOVE_LINK(Localization.lang("Remove link"), IconTheme.JabRefIcons.REMOVE_LINK),
+    REMOVE_LINKS(Localization.lang("Remove links"), IconTheme.JabRefIcons.REMOVE_LINK),
     DELETE_FILE(Localization.lang("Permanently delete local file"), IconTheme.JabRefIcons.DELETE_FILE, KeyBinding.DELETE_ENTRY),
 
     HELP(Localization.lang("Online help"), IconTheme.JabRefIcons.HELP, KeyBinding.HELP),
@@ -181,10 +183,11 @@ public enum StandardActions implements Action {
     OPEN_CHANGELOG(Localization.lang("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
     OPEN_GITHUB("GitHub", Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
     DONATE(Localization.lang("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
-    OPEN_FORUM(Localization.lang("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcons.FORUM),
+    OPEN_FORUM(Localization.lang("Community forum"), Localization.lang("Community forum"), IconTheme.JabRefIcons.FORUM),
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),
     SEARCH_FOR_UPDATES(Localization.lang("Check for updates")),
     ABOUT(Localization.lang("About JabRef"), Localization.lang("About JabRef")),
+    OPEN_WELCOME_TAB(Localization.lang("Open welcome tab")),
 
     EDIT_LIST(Localization.lang("Edit"), IconTheme.JabRefIcons.EDIT),
     VIEW_LIST(Localization.lang("View"), IconTheme.JabRefIcons.FILE),

@@ -363,7 +363,7 @@ public class BibEntry implements Cloneable {
     /**
      * Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
      * <p>
-     * It is <emph>not</emph> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+     * It is <em>not</em> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
      */
     public String getId() {
         return id;
@@ -388,7 +388,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Sets the citation key. Note: This is <emph>not</emph> the internal Id of this entry.
+     * Sets the citation key. Note: This is <em>not</em> the internal Id of this entry.
      * The internal Id is always present, whereas the citation key might not be present.
      *
      * @param newKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
@@ -1248,7 +1248,28 @@ public class BibEntry implements Cloneable {
                     otherPrioritizedFieldsNames.contains(otherField.getName())) {
                 // As iterator only goes through non-null fields from OTHER, otherFieldValue can never be empty
                 otherFieldValue.ifPresent(s -> this.setField(otherField, s));
+            } else {
+                switch (otherField) {
+                    case StandardField.FILE -> {
+                        List<LinkedFile> currentFiles = this.getFiles();
+                        List<LinkedFile> otherFiles = other.getFiles();
+                        List<LinkedFile> filesToAdd = otherFiles.stream()
+                                                                .filter(file -> !currentFiles.contains(file))
+                                                                .toList();
+                        if (!filesToAdd.isEmpty()) {
+                            this.addFiles(filesToAdd);
+                        }
+                    }
+                    // TODO: Merging of keywords
+                    default -> {
+                        // We keep the data of the current BibEntry
+                    }
+                }
             }
+        }
+
+        if (this.getType().equals(DEFAULT_TYPE)) {
+            this.setType(other.getType());
         }
     }
 
