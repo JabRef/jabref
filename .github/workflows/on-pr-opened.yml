@@ -24,6 +24,8 @@ jobs:
           outputOnly: true
   move_issue:
     name: Mark issue as in progress
+    # after determine_issue_number to ensure that there is only one failure because of no ticket number
+    needs: determine_issue_number
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -64,6 +66,8 @@ jobs:
           skip-if-not-in-project: true
   ensure_assignment:
     name: Ensure that contributor is assigned (fails if not commented on issue)
+    # after determine_issue_number to ensure that there is only one failure because of no ticket number
+    needs: determine_issue_number
     runs-on: ubuntu-latest
     permissions:
       issues: write
