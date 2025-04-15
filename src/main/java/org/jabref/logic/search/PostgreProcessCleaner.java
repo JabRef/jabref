@@ -44,11 +44,12 @@ public class PostgreProcessCleaner {
         try {
             Map<String, Object> metadata = new HashMap<>(OBJECT_MAPPER.readValue(Files.readAllBytes(metadataPath), HashMap.class));
             long javaPid = ((Number) metadata.get("javaPid")).longValue();
-            if (!isJavaProcessAlive(javaPid)) {
-                int postgresPort = ((Number) metadata.get("postgresPort")).intValue();
-                destroyPostgresProcess(postgresPort);
-                Files.deleteIfExists(metadataPath);
+            if (isJavaProcessAlive(javaPid)) {
+                return;
             }
+            int postgresPort = ((Number) metadata.get("postgresPort")).intValue();
+            destroyPostgresProcess(postgresPort);
+            Files.deleteIfExists(metadataPath);
         } catch (IOException e) {
             LOGGER.warn("Failed to read or parse metadata file '{}': {}", metadataPath, e.getMessage(), e);
         } catch (InterruptedException e) {
@@ -97,10 +98,8 @@ public class PostgreProcessCleaner {
         try {
             Process process = createPortLookupProcess(os, port);
             if (process == null) {
-                LOGGER.warn("Unsupported OS for port-based PID lookup.");
                 return -1;
             }
-
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 return extractPidFromOutput(os, reader);
             }
