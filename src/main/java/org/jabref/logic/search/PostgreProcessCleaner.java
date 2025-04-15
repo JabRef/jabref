@@ -6,20 +6,23 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.jabref.logic.os.OS.getHostName;
-
 public class PostgreProcessCleaner {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreProcessCleaner.class);
     private static final PostgreProcessCleaner INSTANCE = new PostgreProcessCleaner();
-    private static final Path POSTGRES_METADATA_FILE = Path.of("/tmp/jabref-postgres-info.json");
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Path TEMP_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    private static final String FILE_PREFIX = "jabref-postgres-info-";
+    private static final String FILE_SUFFIX = ".json";
 
     private PostgreProcessCleaner() {
     }
@@ -28,37 +31,37 @@ public class PostgreProcessCleaner {
         return INSTANCE;
     }
 
-    public void checkAndCleanupOldInstance() {
-        if (!Files.exists(POSTGRES_METADATA_FILE)) {
-            return;
-        }
-
-        try {
-            Map<String, Object> metadata = new HashMap<>(new ObjectMapper()
-                    .readValue(Files.readAllBytes(POSTGRES_METADATA_FILE), HashMap.class));
-            if (!metadata.isEmpty()) {
-                int port = ((Number) metadata.get("postgresPort")).intValue();
-                destroyPreviousJavaProcess(metadata);
-                destroyPostgresProcess(port);
-            }
-            Files.deleteIfExists(POSTGRES_METADATA_FILE);
+    public void checkAndCleanupOldInstances() {
+        try (Stream<Path> files = Files.list(TEMP_DIR)) {
+            files.filter(path -> path.getFileName().toString().startsWith(FILE_PREFIX))
+                    .filter(path -> path.getFileName().toString().endsWith(FILE_SUFFIX))
+                    .forEach(this::cleanupIfDeadProcess);
         } catch (IOException e) {
-            LOGGER.warn("Failed to read Postgres metadata file: {}", e.getMessage());
-        } catch (InterruptedException e) {
-            LOGGER.warn("Thread sleep was interrupted while Postgres cleanup: {}", e.getMessage());
-            Thread.currentThread().interrupt();
-        } catch (Exception e) {
-            LOGGER.warn("Failed to clean up old embedded Postgres: {}", e.getMessage());
+            LOGGER.warn("Failed to list temp directory for Postgres metadata cleanup: {}", e.getMessage(), e);
         }
     }
 
-    private void destroyPreviousJavaProcess(Map<String, Object> meta) throws InterruptedException {
-        long javaPid = ((Number) meta.get("javaPid")).longValue();
-        destroyProcessByPID(javaPid, 1000);
+    private void cleanupIfDeadProcess(Path metadataPath) {
+        try {
+            Map<String, Object> metadata = new HashMap<>(OBJECT_MAPPER.readValue(Files.readAllBytes(metadataPath), HashMap.class));
+            long javaPid = ((Number) metadata.get("javaPid")).longValue();
+            if (!isJavaProcessAlive(javaPid)) {
+                int postgresPort = ((Number) metadata.get("postgresPort")).intValue();
+                destroyPostgresProcess(postgresPort);
+                Files.deleteIfExists(metadataPath);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Failed to read or parse metadata file '{}': {}", metadataPath, e.getMessage(), e);
+        } catch (InterruptedException e) {
+            LOGGER.warn("Cleanup was interrupted for '{}': {}", metadataPath, e.getMessage(), e);
+            Thread.currentThread().interrupt();
+        } catch (Exception e) {
+            LOGGER.warn("Unexpected error during cleanup of '{}': {}", metadataPath, e.getMessage(), e);
+        }
     }
 
     private void destroyPostgresProcess(int port) throws InterruptedException {
-        if (isPortOpen(getHostName(), port)) {
+        if (isPortOpen("localhost", port)) {
             long pid = getPidUsingPort(port);
             if (pid != -1) {
                 LOGGER.info("Old Postgres instance found on port {} (PID {}). Killing it...", port, pid);
@@ -75,6 +78,11 @@ public class PostgreProcessCleaner {
             handle.get().destroy();
             Thread.sleep(millis);
         }
+    }
+
+    private boolean isJavaProcessAlive(long javaPid) {
+        Optional<ProcessHandle> handle = ProcessHandle.of(javaPid);
+        return handle.map(ProcessHandle::isAlive).orElse(false);
     }
 
     private boolean isPortOpen(String host, int port) {
@@ -98,7 +106,7 @@ public class PostgreProcessCleaner {
                 return extractPidFromOutput(os, reader);
             }
         } catch (Exception e) {
-            LOGGER.warn("Failed to get PID for port {}: {}", port, e.getMessage());
+            LOGGER.warn("Failed to get PID for port {}: {}", port, e.getMessage(), e);
         }
         return -1;
     }
@@ -108,7 +116,18 @@ public class PostgreProcessCleaner {
             return new ProcessBuilder("lsof", "-i", "tcp:" + port, "-sTCP:LISTEN", "-Pn")
                     .redirectErrorStream(true).start();
         } else if (os.contains("win")) {
-            return new ProcessBuilder("cmd.exe", "/c", "netstat -ano | findstr :" + port)
+            return executeWindowsCommand(port);
+        }
+        return null;
+    }
+
+    private Process executeWindowsCommand(int port) throws IOException {
+        String systemRoot = System.getenv("SystemRoot");
+        if (systemRoot != null && !systemRoot.isBlank()) {
+            String netStatPath = systemRoot + "\\System32\\netstat.exe";
+            String findStrPath = systemRoot + "\\System32\\findstr.exe";
+            String command = netStatPath + " -ano | " + findStrPath + " :" + port;
+            return new ProcessBuilder("cmd.exe", "/c", command)
                     .redirectErrorStream(true).start();
         }
         return null;

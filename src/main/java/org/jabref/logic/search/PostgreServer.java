@@ -23,7 +23,10 @@ import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
 public class PostgreServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final Path POSTGRES_METADATA_FILE = Path.of("/tmp/jabref-postgres-info.json");
+    private static final Path POSTGRES_METADATA_FILE = Path.of(
+            System.getProperty("java.io.tmpdir"),
+            "jabref-postgres-info-" + ProcessHandle.current().pid() + ".json"
+    );
 
     private final EmbeddedPostgres embeddedPostgres;
     private final DataSource dataSource;
@@ -114,6 +117,7 @@ public class PostgreServer {
             meta.put("postgresPort", port);
             meta.put("startedBy", "jabref");
             meta.put("startedAt", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
+            LOGGER.info("Postgres metadata file path: {}", POSTGRES_METADATA_FILE);
             OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(POSTGRES_METADATA_FILE.toFile(), meta);
         } catch (IOException e) {
             LOGGER.warn("Failed to write Postgres metadata file", e);

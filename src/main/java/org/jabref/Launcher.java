@@ -28,7 +28,7 @@ public class Launcher {
         JabKit.initLogging(args);
 
         // Clean up old Postgres instance if needed
-        PostgreProcessCleaner.getInstance().checkAndCleanupOldInstance();
+        PostgreProcessCleaner.getInstance().checkAndCleanupOldInstances();
 
         // Initialize preferences
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
