@@ -15,6 +15,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseContext;
 
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controller for the .blg file settings panel.
@@ -23,6 +25,7 @@ import jakarta.inject.Inject;
  * and handles browse/reset button actions.
  */
 public class BibLogSettingsPane {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibLogSettingsPane.class);
     @FXML
     private TextField pathField;
     private BibLogSettingsViewModel viewModel;
@@ -30,6 +33,11 @@ public class BibLogSettingsPane {
     private Runnable onBlgPathChanged;
 
     public void initializeViewModel(BibDatabaseContext context, Runnable onBlgPathChanged) throws JabRefException {
+        if (context == null || context.getMetaData() == null) {
+            LOGGER.warn("BibLogSettingsPane initialized with null BibDatabaseContext or MetaData");
+            return;
+        }
+
         this.onBlgPathChanged = onBlgPathChanged;
         this.viewModel = new BibLogSettingsViewModel(context.getMetaData(), context.getDatabasePath());
         pathField.textProperty().bindBidirectional(viewModel.pathProperty());

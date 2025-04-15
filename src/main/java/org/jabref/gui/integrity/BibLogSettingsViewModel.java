@@ -58,6 +58,7 @@ public class BibLogSettingsViewModel extends AbstractViewModel {
      * Parses the .blg file (if it exists) into the observable list.
      *
      * @param databaseContext the current database context used to resolve citation keys in warnings.
+     * @throws JabRefException if the .blg file cannot be parsed or read
      */
     public void getBlgWarnings(BibDatabaseContext databaseContext) throws JabRefException {
         Optional<Path> resolved = getResolvedBlgPath();

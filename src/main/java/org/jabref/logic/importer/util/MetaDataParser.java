@@ -295,7 +295,7 @@ public class MetaDataParser {
         } catch (InvalidPathException e) {
             LOGGER.error("Invalid .blg file path for user '{}': '{}'", user, pathStr, e);
         } catch (IllegalArgumentException e) {
-            LOGGER.error("Illegal argument in .blg file path '{}' for user '{}': {}", pathStr, user, e.getMessage(), e);
+            LOGGER.error("Illegal argument in .blg file path '{}' for user '{}'", pathStr, user, e);
         }
     }
 }

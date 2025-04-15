@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StandardFileTypeTest {
     @Test
-    void testRecognizeBlgFileType() {
+    void recognizeBlgFileType() {
         FileType detected = StandardFileType.fromExtensions("blg");
         assertEquals(StandardFileType.BLG, detected);
     }
 
     @Test
-    void testBlgFileTypeProperties() {
+    void blgFileTypeProperties() {
         assertEquals("BibTeX log file", StandardFileType.BLG.getName());
         assertEquals(List.of("blg"), StandardFileType.BLG.getExtensions());
     }
