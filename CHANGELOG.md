@@ -109,7 +109,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where pasting a PDF URL into the main table caused an import error instead of creating a new entry. [#12911](https://github.com/JabRef/jabref/pull/12911)
 - We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
 - We fixed an issue with deleting entries in large libraries that caused it to take a long time. [#8976](https://github.com/JabRef/jabref/issues/8976)
-- We fixed an issue where comments were sometimes treated as entries causing a warning. [#1292](https://github.com/JabRef/jabref/issues/12929)
+- We fixed an issue where comments were sometimes treated as entries causing a warning. [#12929](https://github.com/JabRef/jabref/issues/12929)
 
 ### Removed
 
