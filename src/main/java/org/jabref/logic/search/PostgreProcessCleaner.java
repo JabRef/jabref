@@ -64,23 +64,23 @@ public class PostgreProcessCleaner {
     }
 
     private void destroyPostgresProcess(int port) throws InterruptedException {
-        if (isPortOpen("localhost", port)) {
+        if (isPortOpen(port)) {
             long pid = getPidUsingPort(port);
             if (pid != -1) {
                 LOGGER.info("Old Postgres instance found on port {} (PID {}). Killing it.", port, pid);
-                destroyProcessByPID(pid, POSTGRES_SHUTDOWN_WAIT_MILLIS);
+                destroyProcessByPID(pid);
             } else {
                 LOGGER.warn("Could not determine PID using port {}. Skipping kill step.", port);
             }
         }
     }
 
-    private void destroyProcessByPID(long pid, int millis) throws InterruptedException {
+    private void destroyProcessByPID(long pid) throws InterruptedException {
         Optional<ProcessHandle> aliveProcess = ProcessHandle.of(pid)
                 .filter(ProcessHandle::isAlive);
         if (aliveProcess.isPresent()) {
             aliveProcess.get().destroy();
-            Thread.sleep(millis);
+            Thread.sleep(PostgreProcessCleaner.POSTGRES_SHUTDOWN_WAIT_MILLIS);
         }
     }
 
@@ -89,8 +89,8 @@ public class PostgreProcessCleaner {
         return handle.map(ProcessHandle::isAlive).orElse(false);
     }
 
-    private boolean isPortOpen(String host, int port) {
-        try (Socket _ = new Socket(host, port)) {
+    private boolean isPortOpen(int port) {
+        try (Socket _ = new Socket("localhost", port)) {
             return true;
         } catch (IOException ex) {
             return false;
