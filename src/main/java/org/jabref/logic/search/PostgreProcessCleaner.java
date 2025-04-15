@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.logic.os.OS;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,14 +98,13 @@ public class PostgreProcessCleaner {
     }
 
     private long getPidUsingPort(int port) {
-        String os = System.getProperty("os.name").toLowerCase();
         try {
-            Process process = createPortLookupProcess(os, port);
+            Process process = createPortLookupProcess(port);
             if (process == null) {
                 return -1;
             }
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                return extractPidFromOutput(os, reader);
+                return extractPidFromOutput(reader);
             }
         } catch (Exception e) {
             LOGGER.warn("Failed to get PID for port {}: {}", port, e.getMessage(), e);
@@ -111,11 +112,11 @@ public class PostgreProcessCleaner {
         return -1;
     }
 
-    private Process createPortLookupProcess(String os, int port) throws IOException {
-        if (os.contains("mac") || os.contains("nix") || os.contains("nux")) {
+    private Process createPortLookupProcess(int port) throws IOException {
+        if (OS.LINUX || OS.OS_X) {
             return new ProcessBuilder("lsof", "-i", "tcp:" + port, "-sTCP:LISTEN", "-Pn")
                     .redirectErrorStream(true).start();
-        } else if (os.contains("win")) {
+        } else if (OS.WINDOWS) {
             return executeWindowsCommand(port);
         }
         return null;
@@ -133,15 +134,15 @@ public class PostgreProcessCleaner {
         return null;
     }
 
-    private long extractPidFromOutput(String os, BufferedReader reader) throws IOException {
+    private long extractPidFromOutput(BufferedReader reader) throws IOException {
         String line;
         while ((line = reader.readLine()) != null) {
-            if (os.contains("nix") || os.contains("nux") || os.contains("mac")) {
-                Long pid = parseUnixPidFromLine(line);
+            if (OS.LINUX || OS.OS_X) {
+                Long pid = parsePidFromLine(line);
                 if (pid != null) {
                     return pid;
                 }
-            } else if (os.contains("win")) {
+            } else if (OS.WINDOWS) {
                 Long pid = parseWindowsPidFromLine(line);
                 if (pid != null) {
                     return pid;
@@ -151,7 +152,7 @@ public class PostgreProcessCleaner {
         return -1;
     }
 
-    private Long parseUnixPidFromLine(String line) {
+    private Long parsePidFromLine(String line) {
         String[] parts = line.trim().split("\\s+");
         if (parts.length > 1 && parts[1].matches("\\d+")) {
             return Long.parseLong(parts[1]);
