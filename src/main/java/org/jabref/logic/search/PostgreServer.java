@@ -117,8 +117,8 @@ public class PostgreServer {
             meta.put("postgresPort", port);
             meta.put("startedBy", "jabref");
             meta.put("startedAt", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
-            LOGGER.info("Postgres metadata file path: {}", POSTGRES_METADATA_FILE);
             OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(POSTGRES_METADATA_FILE.toFile(), meta);
+            LOGGER.info("Postgres metadata file path: {}", POSTGRES_METADATA_FILE);
         } catch (IOException e) {
             LOGGER.warn("Failed to write Postgres metadata file", e);
         }
