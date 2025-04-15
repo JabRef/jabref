@@ -11,6 +11,7 @@ import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
@@ -48,6 +49,7 @@ public class OpenDatabaseActionTest {
                 dialogService,
                 mock(StateManager.class),
                 mock(FileUpdateMonitor.class),
+                mock(DirectoryMonitor.class),
                 mock(BibEntryTypesManager.class),
                 mock(CountingUndoManager.class),
                 mock(ClipBoardManager.class),

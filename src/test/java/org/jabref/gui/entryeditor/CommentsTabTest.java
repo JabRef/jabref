@@ -90,7 +90,6 @@ class CommentsTabTest {
 
         commentsTab = new CommentsTab(
                 preferences,
-                suggestionProviders,
                 undoManager,
                 mock(UndoAction.class),
                 mock(RedoAction.class),
