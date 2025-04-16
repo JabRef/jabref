@@ -15,34 +15,39 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.texparser.CitationsDisplay;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DirectoryMonitorManager;
 
 import com.tobiasdiez.easybind.EasyBind;
 
 public class LatexCitationsTab extends EntryEditorTab {
 
     public static final String NAME = "LaTeX citations";
+
+    private final StateManager stateManager;
+
     private final LatexCitationsTabViewModel viewModel;
+
     private final GridPane searchPane;
     private final ProgressIndicator progressIndicator;
     private final CitationsDisplay citationsDisplay;
 
-    public LatexCitationsTab(BibDatabaseContext databaseContext,
-                             GuiPreferences preferences,
+    public LatexCitationsTab(GuiPreferences preferences,
                              DialogService dialogService,
-                             DirectoryMonitorManager directoryMonitorManager) {
+                             StateManager stateManager,
+                             DirectoryMonitor directoryMonitor) {
+        this.stateManager = stateManager;
 
         this.viewModel = new LatexCitationsTabViewModel(
-                databaseContext,
                 preferences,
                 dialogService,
-                directoryMonitorManager);
+                directoryMonitor);
 
         this.searchPane = new GridPane();
         this.progressIndicator = new ProgressIndicator();
@@ -145,7 +150,10 @@ public class LatexCitationsTab extends EntryEditorTab {
 
     @Override
     protected void bindToEntry(BibEntry entry) {
-        viewModel.bindToEntry(entry);
+        if (stateManager.activeTabProperty().get().isPresent()) {
+            LibraryTab libraryTab = stateManager.activeTabProperty().get().get();
+            viewModel.bindToEntry(libraryTab, entry);
+        }
     }
 
     @Override
