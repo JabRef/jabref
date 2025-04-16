@@ -283,7 +283,6 @@ public class CSLStyleLoader {
     /**
      * Removes a style from the external styles list.
      *
-     * @param style The style to remove
      * @return True if the style was removed, false otherwise
      */
     public boolean removeStyle(CitationStyle style) {
