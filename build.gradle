@@ -561,11 +561,9 @@ tasks.register('generateCitationStyleCatalog', JavaExec) {
 
     mainClass = "org.jabref.logic.citationstyle.CitationStyleCatalogGenerator"
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-
-    standardOutput = System.out
-    errorOutput = System.err
 }
 jar.dependsOn('generateCitationStyleCatalog')
+compileTestJava.dependsOn("generateCitationStyleCatalog")
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
