@@ -84,7 +84,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
-    private PreviewViewer cslPreviewViewer;
 
     /**
      * ViewModel for the CitationStyle entries in the TableView
@@ -269,7 +268,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         });
 
         // Set up preview
-        cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+        PreviewViewer cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
         cslPreviewBox.getChildren().add(cslPreviewViewer);
 
