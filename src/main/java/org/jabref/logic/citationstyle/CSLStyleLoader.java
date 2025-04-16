@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public class CSLStyleLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
+    private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "/citation-style-catalog.json";
 
     private final OpenOfficePreferences openOfficePreferences;
@@ -66,8 +67,19 @@ public class CSLStyleLoader {
 
             for (Map<String, Object> info : styleInfoList) {
                 String path = (String) info.get("path");
-                Optional<CitationStyle> styleOpt = CitationStyle.createCitationStyleFromFile(path);
-                styleOpt.ifPresent(internalStyles::add);
+                String title = (String) info.get("title");
+                boolean isNumeric = (boolean) info.get("isNumeric");
+
+                // Now use these metadata and just load the content instead of re-parsing for them.
+                try (InputStream styleStream = CitationStyle.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
+                    if (styleStream != null) {
+                        String source = new String(styleStream.readAllBytes());
+                        CitationStyle style = new CitationStyle(path, title, isNumeric, source);
+                        internalStyles.add(style);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Error loading style file: {}", path, e);
+                }
             }
         } catch (IOException e) {
             LOGGER.error("Error loading citation style catalog", e);
