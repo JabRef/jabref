@@ -137,16 +137,16 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                     }
                     return null;
                 })
-                .withOnMouseClickedEvent(item -> evt -> viewModel.deleteStyle())
+                .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
                 .withTooltip(item -> Localization.lang("Remove style"))
                 .install(colDeleteIcon);
 
-        edit.setOnAction(e -> viewModel.editStyle());
+        edit.setOnAction(e -> viewModel.editJStyle());
 
         new ViewModelTableRowFactory<StyleSelectItemViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
                     if (event.getClickCount() == 2) {
-                        viewModel.viewStyle(item);
+                        viewModel.viewJStyle(item);
                     }
                 })
                 .withContextMenu(item -> createContextMenu())
@@ -215,7 +215,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void addStyleFile() {
-        viewModel.addStyleFile();
+        viewModel.addJStyleFile();
     }
 
     private PreviewViewer initializePreviewViewer(BibEntry entry) {

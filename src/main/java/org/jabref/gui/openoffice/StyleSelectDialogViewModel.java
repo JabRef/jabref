@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
@@ -70,7 +69,7 @@ public class StyleSelectDialogViewModel {
         this.jStyleLoader = jStyleLoader;
         this.cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
 
-        styles.addAll(loadStyles());
+        styles.addAll(loadJStyles());
 
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
 
@@ -82,7 +81,7 @@ public class StyleSelectDialogViewModel {
                       .onSuccess(styles -> {
                           List<CitationStylePreviewLayout> layouts = styles.stream()
                                                                            .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))
-                                                                           .collect(Collectors.toList());
+                                                                           .toList();
                           availableLayouts.setAll(layouts);
 
                           if (currentStyle instanceof CitationStyle citationStyle) {
@@ -113,7 +112,7 @@ public class StyleSelectDialogViewModel {
         return item.getJStyle();
     }
 
-    public void addStyleFile() {
+    public void addJStyleFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
                 .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
@@ -123,7 +122,7 @@ public class StyleSelectDialogViewModel {
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
             if (jStyleLoader.addStyleIfValid(stylePath)) {
                 openOfficePreferences.setCurrentJStyle(stylePath);
-                styles.setAll(loadStyles());
+                styles.setAll(loadJStyles());
                 selectedItem.setValue(getStyleOrDefault(stylePath));
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
@@ -131,15 +130,15 @@ public class StyleSelectDialogViewModel {
         });
     }
 
-    public List<StyleSelectItemViewModel> loadStyles() {
-        return jStyleLoader.getStyles().stream().map(this::fromOOBibStyle).collect(Collectors.toList());
+    public List<StyleSelectItemViewModel> loadJStyles() {
+        return jStyleLoader.getStyles().stream().map(this::fromOOBibStyle).toList();
     }
 
     public ListProperty<StyleSelectItemViewModel> stylesProperty() {
         return styles;
     }
 
-    public void deleteStyle() {
+    public void deleteJStyle() {
         JStyle jStyle = selectedItem.getValue().getJStyle();
         if (jStyleLoader.removeStyle(jStyle)) {
             styles.remove(selectedItem.get());
@@ -150,7 +149,7 @@ public class StyleSelectDialogViewModel {
         return selectedItem;
     }
 
-    public void editStyle() {
+    public void editJStyle() {
         JStyle jStyle = selectedItem.getValue().getJStyle();
         Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", externalApplicationsPreferences);
         try {
@@ -160,7 +159,7 @@ public class StyleSelectDialogViewModel {
         }
     }
 
-    public void viewStyle(StyleSelectItemViewModel item) {
+    public void viewJStyle(StyleSelectItemViewModel item) {
         DialogPane pane = new DialogPane();
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToHeight(true);
@@ -176,7 +175,7 @@ public class StyleSelectDialogViewModel {
                                             .map(this::toJStyle)
                                             .filter(style -> !style.isInternalStyle())
                                             .map(JStyle::getPath)
-                                            .collect(Collectors.toList());
+                                            .toList();
 
         openOfficePreferences.setExternalStyles(externalStyles);
 
@@ -265,7 +264,7 @@ public class StyleSelectDialogViewModel {
                 List<CitationStyle> allStyles = cslStyleLoader.getStyles();
                 List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
                                                                            .map(style -> new CitationStylePreviewLayout(style, Injector.instantiateModelOrService(BibEntryTypesManager.class)))
-                                                                           .collect(Collectors.toList());
+                                                                           .toList();
 
                 availableLayouts.setAll(updatedLayouts);
 
