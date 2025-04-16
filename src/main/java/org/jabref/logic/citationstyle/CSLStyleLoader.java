@@ -2,6 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -10,6 +11,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
@@ -22,20 +28,30 @@ import org.slf4j.LoggerFactory;
  * Manages the loading of CitationStyles from both internal resources and external files.
  */
 public class CSLStyleLoader {
+    public static final String DEFAULT_STYLE = "ieee.csl";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
     private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "/citation-style-catalog.json";
+    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+    private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
+
+    static {
+        XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
+        loadInternalStyles();
+    }
 
     private final OpenOfficePreferences openOfficePreferences;
-
-    // Lists of the internal and external styles
-    private final List<CitationStyle> internalStyles = new ArrayList<>();
     private final List<CitationStyle> externalStyles = new ArrayList<>();
+
+    /**
+     * Style information record (title, isNumericStyle) pair for a citation style.
+     */
+    public record StyleInfo(String title, boolean isNumericStyle) {
+    }
 
     public CSLStyleLoader(OpenOfficePreferences openOfficePreferences) {
         this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
-        loadInternalStyles();
         loadExternalStyles();
     }
 
@@ -43,16 +59,83 @@ public class CSLStyleLoader {
      * Returns a list of all available citation styles (both internal and external).
      */
     public List<CitationStyle> getStyles() {
-        List<CitationStyle> result = new ArrayList<>(internalStyles);
+        List<CitationStyle> result = new ArrayList<>(INTERNAL_STYLES);
         result.addAll(externalStyles);
         return result;
     }
 
     /**
-     * Loads the internal (built-in) CSL styles from the catalog generated at build time.
+     * Returns the default citation style which is currently IEEE.
      */
-    private void loadInternalStyles() {
-        internalStyles.clear();
+    public static CitationStyle getDefaultStyle() {
+        return INTERNAL_STYLES.stream()
+                              .filter(style -> style.getFilePath().equals(DEFAULT_STYLE))
+                              .findFirst()
+                              .orElseGet(() -> createFromFile(DEFAULT_STYLE)
+                                      .orElse(new CitationStyle("", "Empty", false, "", true)));
+    }
+
+    /**
+     * Parses the style information from a style content using StAX.
+     *
+     * @param filename The filename of the style (for logging)
+     * @param content The XML content of the style
+     * @return Optional containing the StyleInfo if valid, empty otherwise
+     */
+    public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
+        try {
+            XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(new StringReader(content));
+
+            boolean inInfo = false;
+            boolean hasBibliography = false;
+            String title = "";
+            boolean isNumericStyle = false;
+
+            while (reader.hasNext()) {
+                int event = reader.next();
+
+                if (event == XMLStreamConstants.START_ELEMENT) {
+                    String elementName = reader.getLocalName();
+
+                    switch (elementName) {
+                        case "bibliography" -> hasBibliography = true;
+                        case "info" -> inInfo = true;
+                        case "title" -> {
+                            if (inInfo) {
+                                title = reader.getElementText();
+                            }
+                        }
+                        case "category" -> {
+                            String citationFormat = reader.getAttributeValue(null, "citation-format");
+                            if (citationFormat != null) {
+                                isNumericStyle = "numeric".equals(citationFormat);
+                            }
+                        }
+                    }
+                } else if (event == XMLStreamConstants.END_ELEMENT) {
+                    if ("info".equals(reader.getLocalName())) {
+                        inInfo = false;
+                    }
+                }
+            }
+
+            if (hasBibliography && title != null) {
+                return Optional.of(new StyleInfo(title, isNumericStyle));
+            } else {
+                LOGGER.debug("No valid title or bibliography found for file {}", filename);
+                return Optional.empty();
+            }
+        } catch (XMLStreamException e) {
+            LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage(), e);
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * Loads the internal (built-in) CSL styles from the catalog generated at build-time.
+     */
+    private static void loadInternalStyles() {
+        INTERNAL_STYLES.clear();
 
         try (InputStream is = CSLStyleLoader.class.getResourceAsStream(CATALOG_PATH)) {
             if (is == null) {
@@ -70,12 +153,12 @@ public class CSLStyleLoader {
                 String title = (String) info.get("title");
                 boolean isNumeric = (boolean) info.get("isNumeric");
 
-                // Now use these metadata and just load the content instead of re-parsing for them.
-                try (InputStream styleStream = CitationStyle.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
+                // We use these metadata and just load the content instead of re-parsing for them
+                try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                     if (styleStream != null) {
                         String source = new String(styleStream.readAllBytes());
-                        CitationStyle style = new CitationStyle(path, title, isNumeric, source);
-                        internalStyles.add(style);
+                        CitationStyle style = new CitationStyle(path, title, isNumeric, source, true);
+                        INTERNAL_STYLES.add(style);
                     }
                 } catch (IOException e) {
                     LOGGER.error("Error loading style file: {}", path, e);
@@ -96,12 +179,8 @@ public class CSLStyleLoader {
         List<String> stylePaths = openOfficePreferences.getExternalCitationStyles();
         for (String stylePath : stylePaths) {
             try {
-                Optional<CitationStyle> style = createFromExternalFile(stylePath);
-                if (style.isPresent()) {
-                    externalStyles.add(style.get());
-                } else {
-                    LOGGER.error("Style with path {} is invalid", stylePath);
-                }
+                Optional<CitationStyle> style = createFromFile(stylePath);
+                style.ifPresent(externalStyles::add);
             } catch (Exception e) {
                 LOGGER.info("Problem reading external style file {}", stylePath, e);
             }
@@ -109,49 +188,56 @@ public class CSLStyleLoader {
     }
 
     /**
-     * Creates a CitationStyle from an external file.
+     * Creates a CitationStyle from a file path.
      *
-     * @param filePath Path to the external CSL file
+     * @param styleFile Path to the CSL file
      * @return Optional containing the CitationStyle if valid, empty otherwise
      */
-    private Optional<CitationStyle> createFromExternalFile(String filePath) {
-        if (!CitationStyle.isCitationStyleFile(filePath)) {
-            LOGGER.error("Can only load citation style files: {}", filePath);
+    public static Optional<CitationStyle> createFromFile(String styleFile) {
+        if (!CitationStyle.isCitationStyleFile(styleFile)) {
+            LOGGER.error("Can only load style files: {}", styleFile);
             return Optional.empty();
         }
 
-        Path path = Path.of(filePath);
-        if (!Files.exists(path)) {
-            LOGGER.error("External style file does not exist: {}", filePath);
-            return Optional.empty();
-        }
-
-        try (InputStream inputStream = Files.newInputStream(path)) {
-            Optional<CitationStyle> styleOpt = createCitationStyleFromSource(inputStream, filePath);
-
-            // Return a style with the full path for external files
-            if (styleOpt.isPresent()) {
-                CitationStyle style = styleOpt.get();
-                return Optional.of(new ExternalCitationStyle(filePath, style.getTitle(),
-                        style.isNumericStyle(), style.getSource()));
+        // Check if this is an absolute path (external file)
+        Path filePath = Path.of(styleFile);
+        if (filePath.isAbsolute() && Files.exists(filePath)) {
+            try (InputStream inputStream = Files.newInputStream(filePath)) {
+                return createFromSource(inputStream, styleFile, false);
+            } catch (IOException e) {
+                LOGGER.error("Error reading source file", e);
+                return Optional.empty();
             }
-
-            return Optional.empty();
-        } catch (IOException e) {
-            LOGGER.error("Error reading external style file: {}", filePath, e);
-            return Optional.empty();
         }
+
+        // If not an absolute path, treat as internal resource
+        String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
+        try (InputStream inputStream = CSLStyleLoader.class.getResourceAsStream(internalFile)) {
+            if (inputStream == null) {
+                LOGGER.error("Could not find file: {}", styleFile);
+                return Optional.empty();
+            }
+            return createFromSource(inputStream, styleFile, true);
+        } catch (IOException e) {
+            LOGGER.error("Error reading source file", e);
+        }
+        return Optional.empty();
     }
 
     /**
      * Creates a CitationStyle from the input stream.
+     *
+     * @param source The input stream containing the style content
+     * @param filename The filename of the style
+     * @param isInternal Whether this is an internal style
+     * @return Optional containing the CitationStyle if valid, empty otherwise
      */
-    private Optional<CitationStyle> createCitationStyleFromSource(InputStream source, String filename) {
+    private static Optional<CitationStyle> createFromSource(InputStream source, String filename, boolean isInternal) {
         try {
             String content = new String(source.readAllBytes());
 
-            Optional<CitationStyle.StyleInfo> styleInfo = CitationStyle.parseStyleInfo(filename, content);
-            return styleInfo.map(info -> new CitationStyle(filename, info.title(), info.isNumericStyle(), content));
+            Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
+            return styleInfo.map(info -> new CitationStyle(filename, info.title(), info.isNumericStyle(), content, isInternal));
         } catch (IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
@@ -167,7 +253,7 @@ public class CSLStyleLoader {
     public Optional<CitationStyle> addStyleIfValid(String stylePath) {
         Objects.requireNonNull(stylePath);
 
-        Optional<CitationStyle> newStyleOptional = createFromExternalFile(stylePath);
+        Optional<CitationStyle> newStyleOptional = createFromFile(stylePath);
         if (newStyleOptional.isPresent()) {
             CitationStyle newStyle = newStyleOptional.get();
 
@@ -212,18 +298,7 @@ public class CSLStyleLoader {
         return false;
     }
 
-    /**
-     * Extension of CitationStyle that represents an external style file.
-     */
-    private static class ExternalCitationStyle extends CitationStyle {
-
-        public ExternalCitationStyle(String filename, String title, boolean isNumericStyle, String source) {
-            super(filename, title, isNumericStyle, source);
-        }
-
-        @Override
-        public boolean isInternalStyle() {
-            return false;
-        }
+    public static List<CitationStyle> getInternalStyles() {
+        return List.copyOf(INTERNAL_STYLES);
     }
 }

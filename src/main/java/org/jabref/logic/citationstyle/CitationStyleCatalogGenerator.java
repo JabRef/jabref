@@ -27,8 +27,7 @@ public class CitationStyleCatalogGenerator {
 
     public static void generateCitationStyleCatalog() {
         try {
-            // Find the resources directory in your build environment
-            URL url = CitationStyleCatalogGenerator.class.getResource(STYLES_ROOT + CitationStyle.DEFAULT);
+            URL url = CitationStyleCatalogGenerator.class.getResource(STYLES_ROOT + "/" + CSLStyleLoader.DEFAULT_STYLE);
             if (url == null) {
                 LOGGER.error("Could not find citation styles directory");
                 return;
@@ -48,7 +47,7 @@ public class CitationStyleCatalogGenerator {
         try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
             return stream.map(Path::getFileName)
                          .map(Path::toString)
-                         .map(CitationStyle::createCitationStyleFromFile)
+                         .map(CSLStyleLoader::createFromFile)
                          .filter(Optional::isPresent)
                          .map(Optional::get)
                          .collect(Collectors.toList());

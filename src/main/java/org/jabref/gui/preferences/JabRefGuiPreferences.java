@@ -47,6 +47,7 @@ import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.gui.theme.Theme;
 import org.jabref.logic.bst.BstPreviewLayout;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -324,7 +325,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(SPECIALFIELDSENABLED, Boolean.TRUE);
 
         // region PreviewStyle
-        defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
+        defaults.put(CYCLE_PREVIEW, "Preview;" + CSLStyleLoader.DEFAULT_STYLE);
         defaults.put(CYCLE_PREVIEW_POS, 0);
         defaults.put(PREVIEW_AS_TAB, Boolean.FALSE);
         defaults.put(PREVIEW_IN_ENTRY_TABLE_TOOLTIP, Boolean.FALSE);
@@ -905,9 +906,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     .map(layout -> {
                         if (CitationStyle.isCitationStyleFile(layout)) {
                             BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-                            return CitationStyle.createCitationStyleFromFile(layout)
-                                                .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
-                                                .orElse(null);
+                            return CSLStyleLoader.createFromFile(layout)
+                                                 .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
+                                                 .orElse(null);
                         }
                         if (BstPreviewLayout.isBstStyleFile(layout)) {
                             return getStringList(PREVIEW_BST_LAYOUT_PATHS).stream()

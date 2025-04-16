@@ -43,6 +43,7 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -573,7 +574,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
-        defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
+        defaults.put(OO_CURRENT_STYLE, CSLStyleLoader.getDefaultStyle().getPath()); // Default CSL Style is IEEE
         defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");
         defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
         defaults.put(OO_EXTERNAL_CITATION_STYLES, "");
@@ -1119,12 +1120,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         String currentStylePath = get(OO_CURRENT_STYLE);
 
-        OOStyle currentStyle = CitationStyle.getDefault(); // Defaults to IEEE CSL Style
+        OOStyle currentStyle = CSLStyleLoader.getDefaultStyle(); // Defaults to IEEE CSL Style
 
         // Reassign currentStyle based on actual last used CSL style or JStyle
         if (CitationStyle.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CitationStyle.createCitationStyleFromFile(currentStylePath) // Assigns CSL Style
-                         .orElse(CitationStyle.getDefault());
+            currentStyle = CSLStyleLoader.createFromFile(currentStylePath)
+                         .orElse(CSLStyleLoader.getDefaultStyle());
         } else {
             // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
