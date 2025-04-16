@@ -5,6 +5,7 @@ import java.util.concurrent.CountDownLatch;
 
 import javafx.application.Platform;
 
+import org.jabref.logic.msc.JavaFXInitializer;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
@@ -23,9 +24,7 @@ class ConvertMSCCodesCleanupTest {
 
     @BeforeAll
     static void initializeJavaFX() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        Platform.startup(latch::countDown);
-        latch.await();  // Wait for JavaFX thread to initialize
+        JavaFXInitializer.initialize();
     }
 
     @BeforeEach
