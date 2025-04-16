@@ -551,6 +551,22 @@ tasks.register('generateLtwaListMV', JavaExec) {
 jar.dependsOn("generateLtwaListMV")
 compileTestJava.dependsOn("generateLtwaListMV")
 
+tasks.register('generateCitationStyleCatalog', JavaExec) {
+    group = "JabRef"
+    description = "Generates a catalog of all available citation styles"
+
+    dependsOn 'processResources'
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = "org.jabref.logic.citationstyle.CitationStyleCatalogGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+
+    standardOutput = System.out
+    errorOutput = System.err
+}
+jar.dependsOn('generateCitationStyleCatalog')
+
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the citavi importer."

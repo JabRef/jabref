@@ -3,18 +3,14 @@ package org.jabref.logic.citationstyle;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -25,6 +21,8 @@ import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.util.StandardFileType;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +37,7 @@ public class CitationStyle implements OOStyle {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyle.class);
     private static final String STYLES_ROOT = "/csl-styles";
+    private static final String CATALOG_PATH = "/citation-style-catalog.json";
     private static final List<CitationStyle> STYLES = new ArrayList<>();
     private static final XMLInputFactory FACTORY = XMLInputFactory.newInstance();
 
@@ -191,32 +190,27 @@ public class CitationStyle implements OOStyle {
             return STYLES;
         }
 
-        URL url = CitationStyle.class.getResource(STYLES_ROOT + DEFAULT);
-        if (url == null) {
-            LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT);
-            return Collections.emptyList();
-        }
+        try (InputStream is = CitationStyle.class.getResourceAsStream(CATALOG_PATH)) {
+            if (is == null) {
+                LOGGER.error("Could not find citation style catalog");
+                return Collections.emptyList();
+            }
 
-        try {
-            URI uri = url.toURI();
-            Path path = Path.of(uri).getParent();
-            STYLES.addAll(discoverCitationStylesInPath(path));
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String, Object>> styleInfoList = mapper.readValue(is,
+                    new TypeReference<>() {
+                    });
+
+            for (Map<String, Object> info : styleInfoList) {
+                String path = (String) info.get("path");
+                Optional<CitationStyle> styleOpt = createCitationStyleFromFile(path);
+                styleOpt.ifPresent(STYLES::add);
+            }
 
             return STYLES;
-        } catch (URISyntaxException | IOException e) {
-            LOGGER.error("something went wrong while searching available CitationStyles", e);
+        } catch (IOException e) {
+            LOGGER.error("Error loading citation style catalog", e);
             return Collections.emptyList();
-        }
-    }
-
-    private static List<CitationStyle> discoverCitationStylesInPath(Path path) throws IOException {
-        try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
-            return stream.map(Path::getFileName)
-                         .map(Path::toString)
-                         .map(CitationStyle::createCitationStyleFromFile)
-                         .filter(Optional::isPresent)
-                         .map(Optional::get)
-                         .collect(Collectors.toList());
         }
     }
 

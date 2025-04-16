@@ -2,20 +2,19 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class CSLStyleLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
-    private static final String STYLES_ROOT = "/csl-styles";
+    private static final String CATALOG_PATH = "/citation-style-catalog.json";
 
     private final OpenOfficePreferences openOfficePreferences;
 
@@ -49,37 +48,29 @@ public class CSLStyleLoader {
     }
 
     /**
-     * Loads the internal (built-in) CSL styles.
+     * Loads the internal (built-in) CSL styles from the catalog generated at build time.
      */
     private void loadInternalStyles() {
         internalStyles.clear();
 
-        URL url = CitationStyle.class.getResource(STYLES_ROOT + CitationStyle.DEFAULT);
-        if (url == null) {
-            LOGGER.error("Could not find any citation style. Tried with {}.", CitationStyle.DEFAULT);
-            return;
-        }
+        try (InputStream is = CSLStyleLoader.class.getResourceAsStream(CATALOG_PATH)) {
+            if (is == null) {
+                LOGGER.error("Could not find citation style catalog");
+                return;
+            }
 
-        try {
-            URI uri = url.toURI();
-            Path path = Path.of(uri).getParent();
-            internalStyles.addAll(discoverInternalStyles(path));
-        } catch (URISyntaxException | IOException e) {
-            LOGGER.error("Something went wrong while searching available CitationStyles", e);
-        }
-    }
+            ObjectMapper mapper = new ObjectMapper();
+            List<Map<String, Object>> styleInfoList = mapper.readValue(is,
+                    new TypeReference<>() {
+                    });
 
-    /**
-     * Discovers internal CSL styles from the specified directory path.
-     */
-    private List<CitationStyle> discoverInternalStyles(Path path) throws IOException {
-        try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
-            return stream.map(Path::getFileName)
-                         .map(Path::toString)
-                         .map(CitationStyle::createCitationStyleFromFile)
-                         .filter(Optional::isPresent)
-                         .map(Optional::get)
-                         .collect(Collectors.toList());
+            for (Map<String, Object> info : styleInfoList) {
+                String path = (String) info.get("path");
+                Optional<CitationStyle> styleOpt = CitationStyle.createCitationStyleFromFile(path);
+                styleOpt.ifPresent(internalStyles::add);
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error loading citation style catalog", e);
         }
     }
 
@@ -124,7 +115,6 @@ public class CSLStyleLoader {
         }
 
         try (InputStream inputStream = Files.newInputStream(path)) {
-            String filename = path.getFileName().toString();
             Optional<CitationStyle> styleOpt = createCitationStyleFromSource(inputStream, filePath);
 
             // Return a style with the full path for external files
