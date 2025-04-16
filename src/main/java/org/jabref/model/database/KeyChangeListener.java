@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
@@ -41,7 +42,8 @@ public class KeyChangeListener {
     }
 
     private void updateEntryLinks(String newKey, String oldKey) {
-        for (BibEntry entry : database.getEntries()) {
+        Set<BibEntry> affectedEntries = database.getEntriesForCitationKey(oldKey);
+        for (BibEntry entry : affectedEntries) {
             entry.getFields(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK))
                  .forEach(field -> {
                      String fieldContent = entry.getField(field).orElseThrow();
@@ -49,9 +51,9 @@ public class KeyChangeListener {
                  });
             entry.getFields(field -> field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK))
                  .forEach(field -> {
-                     String fieldContent = entry.getField(field).orElseThrow();
-                     replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
-                 });
+                String fieldContent = entry.getField(field).orElseThrow();
+                replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);
+            });
         }
     }
 
