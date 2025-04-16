@@ -6,7 +6,6 @@ import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -193,7 +192,7 @@ public class CitationStyle implements OOStyle {
         try (InputStream is = CitationStyle.class.getResourceAsStream(CATALOG_PATH)) {
             if (is == null) {
                 LOGGER.error("Could not find citation style catalog");
-                return Collections.emptyList();
+                return List.of();
             }
 
             ObjectMapper mapper = new ObjectMapper();
@@ -210,7 +209,7 @@ public class CitationStyle implements OOStyle {
             return STYLES;
         } catch (IOException e) {
             LOGGER.error("Error loading citation style catalog", e);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
