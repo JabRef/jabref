@@ -105,7 +105,7 @@ public class OpenOfficePanel {
     private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
-    private final JStyleLoader loader;
+    private final JStyleLoader jStyleLoader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -143,6 +143,13 @@ public class OpenOfficePanel {
         this.undoManager = undoManager;
         this.currentStyle = openOfficePreferences.getCurrentStyle();
 
+        this.currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
+
+        jStyleLoader = new JStyleLoader(
+                openOfficePreferences,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+
         ActionFactory factory = new ActionFactory();
 
         connect = new Button();
@@ -168,13 +175,6 @@ public class OpenOfficePanel {
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
-        loader = new JStyleLoader(
-                openOfficePreferences,
-                layoutFormatterPreferences,
-                abbreviationRepository);
-
-        currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
-
         initPanel();
     }
 
@@ -187,16 +187,16 @@ public class OpenOfficePanel {
      * Return true if failed. In this case the dialog is already shown.
      */
     private boolean getOrUpdateTheStyle(String title) {
-        currentStyle = loader.getUsedStyleUnified();
-        currentStyleProperty.set(currentStyle);
         final boolean FAIL = true;
         final boolean PASS = false;
 
         if (currentStyle == null) {
-            currentStyle = loader.getUsedStyleUnified();
+            currentStyle = openOfficePreferences.getCurrentStyle();
+            currentStyleProperty.set(currentStyle);
         } else {
             if (currentStyle instanceof JStyle jStyle) {
                 try {
+                    jStyle = jStyleLoader.getUsedJstyle();
                     jStyle.ensureUpToDate();
                 } catch (IOException ex) {
                     LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
@@ -230,7 +230,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(jStyleLoader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;
