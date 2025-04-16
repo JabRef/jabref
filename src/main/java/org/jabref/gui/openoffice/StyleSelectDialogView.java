@@ -98,7 +98,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         public CitationStyleViewModel(CitationStylePreviewLayout layout) {
             this.layout = layout;
             this.nameProperty.set(layout.getDisplayName());
-            this.pathProperty.set(layout.getFilePath());
+            if (layout.getCitationStyle().isInternalStyle()) {
+                this.pathProperty.set(Localization.lang("Internal style"));
+            } else {
+                this.pathProperty.set(layout.getFilePath());
+            }
             this.internalStyleProperty.set(layout.getCitationStyle().isInternalStyle());
         }
 
