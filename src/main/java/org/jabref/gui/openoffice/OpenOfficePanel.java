@@ -55,7 +55,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -105,7 +105,7 @@ public class OpenOfficePanel {
     private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
-    private final StyleLoader loader;
+    private final JStyleLoader loader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -168,7 +168,7 @@ public class OpenOfficePanel {
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
-        loader = new StyleLoader(
+        loader = new JStyleLoader(
                 openOfficePreferences,
                 layoutFormatterPreferences,
                 abbreviationRepository);

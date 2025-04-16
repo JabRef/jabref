@@ -77,7 +77,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -571,7 +571,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
         defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
-        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
         defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
         defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");

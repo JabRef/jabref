@@ -34,7 +34,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -46,7 +46,7 @@ import com.airhacks.afterburner.injection.Injector;
 public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
-    private final StyleLoader styleLoader;
+    private final JStyleLoader jStyleLoader;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final OpenOfficePreferences openOfficePreferences;
@@ -59,7 +59,7 @@ public class StyleSelectDialogViewModel {
     private final CSLStyleLoader cslStyleLoader;
 
     public StyleSelectDialogViewModel(DialogService dialogService,
-                                      StyleLoader styleLoader,
+                                      JStyleLoader jStyleLoader,
                                       GuiPreferences preferences,
                                       TaskExecutor taskExecutor,
                                       BibEntryTypesManager bibEntryTypesManager) {
@@ -67,7 +67,7 @@ public class StyleSelectDialogViewModel {
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.openOfficePreferences = preferences.getOpenOfficePreferences();
-        this.styleLoader = styleLoader;
+        this.jStyleLoader = jStyleLoader;
         this.cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
 
         styles.addAll(loadStyles());
@@ -121,7 +121,7 @@ public class StyleSelectDialogViewModel {
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
-            if (styleLoader.addStyleIfValid(stylePath)) {
+            if (jStyleLoader.addStyleIfValid(stylePath)) {
                 openOfficePreferences.setCurrentJStyle(stylePath);
                 styles.setAll(loadStyles());
                 selectedItem.setValue(getStyleOrDefault(stylePath));
@@ -132,7 +132,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public List<StyleSelectItemViewModel> loadStyles() {
-        return styleLoader.getStyles().stream().map(this::fromOOBibStyle).collect(Collectors.toList());
+        return jStyleLoader.getStyles().stream().map(this::fromOOBibStyle).collect(Collectors.toList());
     }
 
     public ListProperty<StyleSelectItemViewModel> stylesProperty() {
@@ -141,7 +141,7 @@ public class StyleSelectDialogViewModel {
 
     public void deleteStyle() {
         JStyle jStyle = selectedItem.getValue().getJStyle();
-        if (styleLoader.removeStyle(jStyle)) {
+        if (jStyleLoader.removeStyle(jStyle)) {
             styles.remove(selectedItem.get());
         }
     }

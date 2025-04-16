@@ -34,7 +34,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.style.JStyle;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.style.StyleLoader;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,7 +51,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
-    private final StyleLoader loader;
+    private final JStyleLoader loader;
 
     @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
     @FXML private TableView<StyleSelectItemViewModel> tvStyles;
@@ -78,7 +78,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
 
-    public StyleSelectDialogView(StyleLoader loader) {
+    public StyleSelectDialogView(JStyleLoader loader) {
         this.loader = loader;
 
         ViewLoader.view(this)

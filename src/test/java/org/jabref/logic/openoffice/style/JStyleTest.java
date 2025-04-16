@@ -42,7 +42,7 @@ class JStyleTest {
 
     @Test
     void authorYear() throws IOException {
-        JStyle style = new JStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
+        JStyle style = new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
         assertTrue(style.isInternalStyle());
         assertFalse(style.isCitationKeyCiteMarkers());
@@ -55,7 +55,7 @@ class JStyleTest {
 
     @Test
     void authorYearAsFile() throws URISyntaxException, IOException {
-        Path defFile = Path.of(JStyleTest.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI());
+        Path defFile = Path.of(JStyleTest.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI());
 
         JStyle style = new JStyle(defFile, layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
@@ -71,7 +71,7 @@ class JStyleTest {
     @Test
     void numerical() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         assertTrue(style.isValid());
@@ -162,7 +162,7 @@ class JStyleTest {
     @Test
     void getNumCitationMarker() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         assertEquals("[1] ", runGetNumCitationMarker2a(style, List.of(1), -1, true));
@@ -182,7 +182,7 @@ class JStyleTest {
     @Test
     void getNumCitationMarkerUndefined() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -232,7 +232,7 @@ class JStyleTest {
     @Test
     void getCitProperty() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         assertEquals(", ", style.getStringCitProperty("AuthorSeparator"));
@@ -253,7 +253,7 @@ class JStyleTest {
     @Test
     void getCitationMarker() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         BibEntry entry = new BibEntry()
@@ -295,7 +295,7 @@ class JStyleTest {
     @Test
     void layout() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -325,7 +325,7 @@ class JStyleTest {
     @Test
     void institutionAuthor() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         BibDatabase database = new BibDatabase();
@@ -346,7 +346,7 @@ class JStyleTest {
     @Test
     void vonAuthor() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         BibDatabase database = new BibDatabase();
@@ -367,7 +367,7 @@ class JStyleTest {
     @Test
     void institutionAuthorMarker() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -389,7 +389,7 @@ class JStyleTest {
     @Test
     void vonAuthorMarker() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -412,7 +412,7 @@ class JStyleTest {
     @Test
     void nullAuthorMarker() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -433,7 +433,7 @@ class JStyleTest {
     @Test
     void nullYearMarker() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -454,7 +454,7 @@ class JStyleTest {
     @Test
     void emptyEntryMarker() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -474,7 +474,7 @@ class JStyleTest {
     @Test
     void getCitationMarkerInParenthesisUniquefiers() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -518,7 +518,7 @@ class JStyleTest {
     @Test
     void getCitationMarkerInTextUniquefiers() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -562,7 +562,7 @@ class JStyleTest {
     @Test
     void getCitationMarkerInParenthesisUniquefiersThreeSameAuthor() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -605,7 +605,7 @@ class JStyleTest {
     @Test
     void getCitationMarkerInTextUniquefiersThreeSameAuthor() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
@@ -649,11 +649,11 @@ class JStyleTest {
         // TODO: equals only work when initialized from file, not from reader
     void equals() throws IOException {
         JStyle style1 = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         JStyle style2 = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         assertEquals(style1, style2);
@@ -663,11 +663,11 @@ class JStyleTest {
         // TODO: equals only work when initialized from file, not from reader
     void notEquals() throws IOException {
         JStyle style1 = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         JStyle style2 = new JStyle(
-                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         assertNotEquals(style1, style2);
@@ -676,11 +676,11 @@ class JStyleTest {
     @Test
     void compareToEqual() throws IOException {
         JStyle style1 = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         JStyle style2 = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         assertEquals(0, style1.compareTo(style2));
@@ -689,11 +689,11 @@ class JStyleTest {
     @Test
     void compareToNotEqual() throws IOException {
         JStyle style1 = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         JStyle style2 = new JStyle(
-                StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
+                JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
         assertTrue(style1.compareTo(style2) > 0);
@@ -729,7 +729,7 @@ class JStyleTest {
     @Test
     void getCitationMarkerJoinFirst() throws IOException {
         JStyle style = new JStyle(
-                StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
+                JStyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences,
                 abbreviationRepository);
 
