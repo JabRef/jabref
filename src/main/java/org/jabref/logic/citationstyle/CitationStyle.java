@@ -179,6 +179,7 @@ public class CitationStyle implements OOStyle {
 
     /**
      * Provides the citation styles that come with JabRef.
+     * The list of styles is determined via a build-time task that exports "citation-style-catalog.json"
      * Note: If we're in a context where OpenOfficePreferences is available, we should use CSLStyleLoader instead of this method.
      * This method is kept for backward compatibility (for Previews and tests, where preferences aren't involved).
      *
