@@ -25,12 +25,11 @@ public class PostgresMetadataWriter {
 
     public static void write(int port) {
         try {
-            Map<String, Object> meta = createMetadata(port);
             Path path = getMetadataFilePath();
-            OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(path.toFile(), meta);
+            OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValue(path.toFile(), createMetadata(port));
             LOGGER.info("Postgres metadata file path: {}", path);
         } catch (IOException e) {
-            LOGGER.warn("Failed to write Postgres metadata file", e);
+            LOGGER.warn("Failed to write Postgres metadata file.", e);
         }
     }
 
