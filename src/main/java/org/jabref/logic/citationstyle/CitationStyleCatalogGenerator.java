@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 public class CitationStyleCatalogGenerator {
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
     private static final String STYLES_ROOT = "/csl-styles";
+    private static final String CATALOG_PATH = "src/main/resources/citation-style-catalog.json";
 
     public static void main(String[] args) {
         generateCitationStyleCatalog();
@@ -55,7 +56,7 @@ public class CitationStyleCatalogGenerator {
     }
 
     private static void generateCatalog(List<CitationStyle> styles) throws IOException {
-        Path catalogFile = Path.of("src/main/resources/citation-style-catalog.json");
+        Path catalogFile = Path.of(CATALOG_PATH);
 
         // Create a JSON representation of the styles
         ObjectMapper mapper = new ObjectMapper();

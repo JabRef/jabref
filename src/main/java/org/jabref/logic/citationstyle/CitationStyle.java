@@ -125,15 +125,6 @@ public class CitationStyle implements OOStyle {
         }
     }
 
-    private static String stripInvalidProlog(String source) {
-        int startIndex = source.indexOf("<");
-        if (startIndex > 0) {
-            return source.substring(startIndex);
-        } else {
-            return source;
-        }
-    }
-
     /**
      * Loads the CitationStyle from the given file
      */
