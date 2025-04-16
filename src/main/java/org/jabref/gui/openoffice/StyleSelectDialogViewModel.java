@@ -90,7 +90,7 @@ public class StyleSelectDialogViewModel {
                                                                                                     .filter(layout -> layout.getFilePath().equals(citationStyle.getFilePath()))
                                                                                                     .findFirst();
 
-                              // If not found (maybe it's an internal style), match by name
+                              // If not found, match by name (for internal style)
                               if (matchingLayout.isEmpty()) {
                                   matchingLayout = availableLayouts.stream()
                                                                    .filter(layout -> layout.getDisplayName().equals(citationStyle.getTitle()))
@@ -254,13 +254,11 @@ public class StyleSelectDialogViewModel {
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
 
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
-            // Use the CSLStyleLoader to add the style
             Optional<CitationStyle> newStyleOptional = cslStyleLoader.addStyleIfValid(stylePath);
 
             if (newStyleOptional.isPresent()) {
                 CitationStyle newStyle = newStyleOptional.get();
 
-                // Update the available layouts with a fresh list from the loader
                 List<CitationStyle> allStyles = cslStyleLoader.getStyles();
                 List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
                                                                            .map(style -> new CitationStylePreviewLayout(style, Injector.instantiateModelOrService(BibEntryTypesManager.class)))
@@ -268,20 +266,16 @@ public class StyleSelectDialogViewModel {
 
                 availableLayouts.setAll(updatedLayouts);
 
-                // Find our newly added style in the list
                 Optional<CitationStylePreviewLayout> newLayoutOptional = updatedLayouts.stream()
                                                                                        .filter(layout -> layout.getFilePath().equals(stylePath))
                                                                                        .findFirst();
 
                 if (newLayoutOptional.isPresent()) {
-                    // Select the new style
                     CitationStylePreviewLayout newLayout = newLayoutOptional.get();
                     selectedLayoutProperty.set(newLayout);
 
-                    // Set as current style
                     openOfficePreferences.setCurrentStyle(newStyle);
 
-                    // Update the view
                     dialogService.showInformationDialogAndWait(
                             Localization.lang("Style added"),
                             Localization.lang("The CSL style has been added successfully.")
@@ -302,7 +296,6 @@ public class StyleSelectDialogViewModel {
     }
 
     public void deleteCslStyle(CitationStyle style) {
-        // First, confirm with the user if they really want to delete the style
         boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Delete style"),
                 Localization.lang("Are you sure you want to delete the style '%0'?", style.getTitle()),
@@ -311,7 +304,6 @@ public class StyleSelectDialogViewModel {
 
         if (deleteConfirmed) {
             if (cslStyleLoader.removeStyle(style)) {
-                // Remove from the layout list
                 Optional<CitationStylePreviewLayout> layoutToRemove = availableLayouts.stream()
                                                                                       .filter(layout -> layout.getFilePath().equals(style.getFilePath()))
                                                                                       .findFirst();
@@ -328,10 +320,9 @@ public class StyleSelectDialogViewModel {
                     }
                 }
 
-                // Update the current style if it was the deleted one
+                // Update the currently set style to default (ieee) if it was the deleted one
                 if (openOfficePreferences.getCurrentStyle() instanceof CitationStyle currentStyle &&
                         currentStyle.getFilePath().equals(style.getFilePath())) {
-                    // Set to default style
                     openOfficePreferences.setCurrentStyle(CSLStyleLoader.getDefaultStyle());
                 }
             } else {

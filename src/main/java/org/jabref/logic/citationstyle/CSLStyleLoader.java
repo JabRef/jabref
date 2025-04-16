@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -65,7 +64,7 @@ public class CSLStyleLoader {
     }
 
     /**
-     * Returns the default citation style which is currently IEEE.
+     * Returns the default citation style which is currently set to {@link CSLStyleLoader#DEFAULT_STYLE}.
      */
     public static CitationStyle getDefaultStyle() {
         return INTERNAL_STYLES.stream()
@@ -180,7 +179,7 @@ public class CSLStyleLoader {
         externalStyles.clear();
 
         // Read external lists
-        List<String> stylePaths = openOfficePreferences.getExternalCitationStyles();
+        List<String> stylePaths = openOfficePreferences.getExternalCslStyles();
         for (String stylePath : stylePaths) {
             try {
                 Optional<CitationStyle> style = createCitationStyleFromFile(stylePath);
@@ -231,9 +230,6 @@ public class CSLStyleLoader {
     /**
      * Creates a CitationStyle from the input stream.
      *
-     * @param source The input stream containing the style content
-     * @param filename The filename of the style
-     * @param isInternal Whether this is an internal style
      * @return Optional containing the CitationStyle if valid, empty otherwise
      */
     private static Optional<CitationStyle> createCitationStyleFromSource(InputStream source, String filename, boolean isInternal) {
@@ -251,7 +247,6 @@ public class CSLStyleLoader {
     /**
      * Adds a new external CSL style if it's valid.
      *
-     * @param stylePath Path to the CSL style file
      * @return Optional containing the added CitationStyle if valid, empty otherwise
      */
     public Optional<CitationStyle> addStyleIfValid(String stylePath) {
@@ -276,14 +271,14 @@ public class CSLStyleLoader {
     private void storeExternalStyles() {
         List<String> stylePaths = externalStyles.stream()
                                                 .map(CitationStyle::getPath)
-                                                .collect(Collectors.toList());
-        openOfficePreferences.setExternalCitationStyles(stylePaths);
+                                                .toList();
+        openOfficePreferences.setExternalCslStyles(stylePaths);
     }
 
     /**
      * Removes a style from the external styles list.
      *
-     * @return True if the style was removed, false otherwise
+     * @return true if the style was removed, false otherwise
      */
     public boolean removeStyle(CitationStyle style) {
         Objects.requireNonNull(style);

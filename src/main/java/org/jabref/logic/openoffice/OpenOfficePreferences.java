@@ -178,11 +178,11 @@ public class OpenOfficePreferences {
         return cslBibliographyHeaderFormat.get();
     }
 
-    public ObservableList<String> getExternalCitationStyles() {
+    public ObservableList<String> getExternalCslStyles() {
         return externalCitationStyles;
     }
 
-    public void setExternalCitationStyles(List<String> paths) {
+    public void setExternalCslStyles(List<String> paths) {
         externalCitationStyles.clear();
         externalCitationStyles.addAll(paths);
     }

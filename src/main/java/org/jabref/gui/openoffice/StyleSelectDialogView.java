@@ -225,7 +225,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslPathColumn.setCellValueFactory(cellData -> cellData.getValue().pathProperty());
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        // Set up delete icon column for CSL styles (similar to JStyles)
         new ValueTableCellFactory<CitationStyleViewModel, Boolean>()
                 .withGraphic(internalStyle -> {
                     if (!internalStyle) {
@@ -242,7 +241,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .withTooltip(item -> Localization.lang("Remove style"))
                 .install(cslDeleteColumn);
 
-        // Double-click to select a style
+        // Double-click to select a style (Only CSL styles can be selected with a double click, JStyles show a style description instead)
         new ViewModelTableRowFactory<CitationStyleViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
                     if (event.getClickCount() == 2) {
@@ -254,33 +253,28 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 })
                 .install(cslStylesTable);
 
-        // Set up selection listener
         cslStylesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 viewModel.selectedLayoutProperty().set(newValue.getLayout());
             }
         });
 
-        // Set up search filter
         searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
             viewModel.setAvailableLayoutsFilter(newValue);
             updateCslStylesTable();
         });
 
-        // Set up preview
         PreviewViewer cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
         EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
         cslPreviewBox.getChildren().add(cslPreviewViewer);
 
-        // Listen for changes in the available layouts
         viewModel.getAvailableLayouts().addListener((ListChangeListener<CitationStylePreviewLayout>) c -> {
             updateCslStylesTable();
             if (c.next() && c.wasAdded() && !initialScrollPerformed.get()) {
-                Platform.runLater(this::scrollToCurrentStyle);
+                Platform.runLater(this::scrollToCurrentStyle); // taking care of slight delay in table population
             }
         });
 
-        // Initial table setup
         updateCslStylesTable();
     }
 
@@ -290,7 +284,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             cslStylesTable.getItems().add(new CitationStyleViewModel(layout));
         }
 
-        // Select the current layout if available
         if (viewModel.selectedLayoutProperty().get() != null) {
             for (CitationStyleViewModel model : cslStylesTable.getItems()) {
                 if (model.getLayout().equals(viewModel.selectedLayoutProperty().get())) {
@@ -330,8 +323,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     }
 
     /**
-     * On a new run of JabRef, when Select Style dialog is opened for the first time, the CSL styles list takes a while to load.
-     * This function takes care of the case when the list is empty due to the initial loading time.
+     * When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.
+     * This function scrolls to the last selected style, while taking care of the delay.
      */
     private void onDialogShown(DialogEvent event) {
         if (!cslStylesTable.getItems().isEmpty()) {
@@ -346,7 +339,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
         if (currentStyle instanceof CitationStyle currentCitationStyle) {
-            // Find the row index of the current style
             for (int i = 0; i < cslStylesTable.getItems().size(); i++) {
                 CitationStyleViewModel item = cslStylesTable.getItems().get(i);
                 if (item.getLayout().getFilePath().equals(currentCitationStyle.getFilePath())) {

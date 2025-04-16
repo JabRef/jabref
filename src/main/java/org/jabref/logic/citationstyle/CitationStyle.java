@@ -22,7 +22,7 @@ public class CitationStyle implements OOStyle {
     private final boolean isInternalStyle;
 
     public CitationStyle(String filePath, String title, boolean isNumericStyle, String source, boolean isInternalStyle) {
-        this.filePath = Path.of(Objects.requireNonNull(filePath)).toString();
+        this.filePath = Path.of(Objects.requireNonNull(filePath)).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
         this.title = Objects.requireNonNull(title);
         this.isNumericStyle = isNumericStyle;
         this.source = Objects.requireNonNull(source);
@@ -31,18 +31,13 @@ public class CitationStyle implements OOStyle {
 
     /**
      * Creates a new citation style with an auto-determined internal/external state.
-     *
-     * @param filePath       Path to the style file
-     * @param title          Title of the style
-     * @param isNumericStyle Whether this is a numeric style
-     * @param source         The actual style content
      */
     public CitationStyle(String filePath, String title, boolean isNumericStyle, String source) {
         this(filePath, title, isNumericStyle, source, !Path.of(filePath).isAbsolute());
     }
 
     /**
-     * Checks if the given style file is a CitationStyle based on its extension.
+     * Checks if the given style file is a CitationStyle based on its extension
      */
     public static boolean isCitationStyleFile(String styleFile) {
         return StandardFileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);

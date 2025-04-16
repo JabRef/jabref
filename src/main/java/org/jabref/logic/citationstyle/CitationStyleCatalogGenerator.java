@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,9 +47,8 @@ public class CitationStyleCatalogGenerator {
             return stream.map(Path::getFileName)
                          .map(Path::toString)
                          .map(CSLStyleLoader::createCitationStyleFromFile)
-                         .filter(Optional::isPresent)
-                         .map(Optional::get)
-                         .collect(Collectors.toList());
+                         .flatMap(Optional::stream)
+                         .toList();
         }
     }
 
@@ -67,7 +65,7 @@ public class CitationStyleCatalogGenerator {
                                                             info.put("isNumeric", style.isNumericStyle());
                                                             return info;
                                                         })
-                                                        .collect(Collectors.toList());
+                                                        .toList();
 
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(styleInfoList);
         Files.writeString(catalogFile, json);
