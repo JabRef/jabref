@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import javafx.application.Platform;
 
 import org.jabref.logic.msc.MscCodeLoadingException;
 import org.jabref.logic.msc.MscCodeUtils;
@@ -49,7 +45,6 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                 // Create reverse mapping
                 tempMap.forEach((code, desc) -> tempReverseMap.put(desc, code));
 
-                // Log a few sample entries to verify content
                 if (!tempMap.isEmpty()) {
                     conversionPossible = true;
                 } else {
@@ -127,32 +122,9 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
 
-            // Update the field, handling JavaFX threading correctly
-            if (Platform.isFxApplicationThread()) {
-                // If we're already on the JavaFX thread, update directly
-                entry.setField(StandardField.KEYWORDS, newValue);
-                changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-            } else {
-                // If we're not on the JavaFX thread, use runLater but wait for completion
-                try {
-                    CompletableFuture<Void> future = new CompletableFuture<>();
-                    Platform.runLater(() -> {
-                        try {
-                            entry.setField(StandardField.KEYWORDS, newValue);
-                            changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-                        } finally {
-                            future.complete(null);
-                        }
-                    });
-                    // Block until the update is done
-                    future.get();
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    logger.error("Interrupted while waiting for JavaFX thread", e);
-                } catch (ExecutionException e) {
-                    logger.error("Error while updating field on JavaFX thread", e);
-                }
-            }
+            // Update the field directly without JavaFX threading
+            entry.setField(StandardField.KEYWORDS, newValue);
+            changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
         }
 
         return changes;
