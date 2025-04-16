@@ -69,7 +69,7 @@ public class CSLStyleLoader {
      */
     public static CitationStyle getDefaultStyle() {
         return INTERNAL_STYLES.stream()
-                              .filter(style -> style.getFilePath().equals(DEFAULT_STYLE))
+                              .filter(style -> DEFAULT_STYLE.equals(style.getFilePath()))
                               .findFirst()
                               .orElseGet(() -> createCitationStyleFromFile(DEFAULT_STYLE)
                                       .orElse(new CitationStyle("", "Empty", false, "", true)));
