@@ -11,10 +11,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.jabref.architecture.AllowedToUseClassGetResource;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseClassGetResource("Required for loading internal CSL styles")
 public class CitationStyleCatalogGenerator {
     private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "src/main/resources/citation-style-catalog.json";
