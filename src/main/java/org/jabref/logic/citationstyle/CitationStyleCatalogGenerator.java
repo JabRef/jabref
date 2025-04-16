@@ -16,9 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CitationStyleCatalogGenerator {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
     private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "src/main/resources/citation-style-catalog.json";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
 
     public static void main(String[] args) {
         generateCitationStyleCatalog();

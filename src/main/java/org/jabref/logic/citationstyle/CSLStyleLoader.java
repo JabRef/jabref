@@ -29,11 +29,12 @@ import org.slf4j.LoggerFactory;
 public class CSLStyleLoader {
     public static final String DEFAULT_STYLE = "ieee.csl";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
     private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "/citation-style-catalog.json";
     private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
     private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
 
     static {
         XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
