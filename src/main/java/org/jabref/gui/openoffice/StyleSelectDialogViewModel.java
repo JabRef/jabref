@@ -300,4 +300,45 @@ public class StyleSelectDialogViewModel {
             }
         });
     }
+
+    public void deleteCslStyle(CitationStyle style) {
+        // First, confirm with the user if they really want to delete the style
+        boolean deleteConfirmed = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Delete style"),
+                Localization.lang("Are you sure you want to delete the style '%0'?", style.getTitle()),
+                Localization.lang("Delete"),
+                Localization.lang("Cancel"));
+
+        if (deleteConfirmed) {
+            if (cslStyleLoader.removeStyle(style)) {
+                // Remove from the layout list
+                Optional<CitationStylePreviewLayout> layoutToRemove = availableLayouts.stream()
+                                                                                      .filter(layout -> layout.getFilePath().equals(style.getFilePath()))
+                                                                                      .findFirst();
+
+                layoutToRemove.ifPresent(availableLayouts::remove);
+
+                // If the deleted style was the current selection, select another style
+                if (selectedLayoutProperty.get() != null &&
+                        selectedLayoutProperty.get().getFilePath().equals(style.getFilePath())) {
+                    if (!availableLayouts.isEmpty()) {
+                        selectedLayoutProperty.set(availableLayouts.getFirst());
+                    } else {
+                        selectedLayoutProperty.set(null);
+                    }
+                }
+
+                // Update the current style if it was the deleted one
+                if (openOfficePreferences.getCurrentStyle() instanceof CitationStyle currentStyle &&
+                        currentStyle.getFilePath().equals(style.getFilePath())) {
+                    // Set to default style
+                    openOfficePreferences.setCurrentStyle(CSLStyleLoader.getDefaultStyle());
+                }
+            } else {
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("Cannot delete style"),
+                        Localization.lang("Could not delete style. It might be an internal style that cannot be removed."));
+            }
+        }
+    }
 }

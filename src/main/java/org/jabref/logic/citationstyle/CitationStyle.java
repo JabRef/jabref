@@ -22,7 +22,7 @@ public class CitationStyle implements OOStyle {
     private final boolean isInternalStyle;
 
     public CitationStyle(String filePath, String title, boolean isNumericStyle, String source, boolean isInternalStyle) {
-        this.filePath = Objects.requireNonNull(filePath);
+        this.filePath = Path.of(Objects.requireNonNull(filePath)).toString();
         this.title = Objects.requireNonNull(title);
         this.isNumericStyle = isNumericStyle;
         this.source = Objects.requireNonNull(source);

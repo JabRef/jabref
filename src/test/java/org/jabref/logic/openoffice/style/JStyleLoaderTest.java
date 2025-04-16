@@ -56,7 +56,7 @@ class JStyleLoaderTest {
 
     @Test
     void getStylesWithEmptyExternal() {
-        preferences.setExternalStyles(Collections.emptyList());
+        preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
         assertEquals(2, loader.getStyles().size());
@@ -64,7 +64,7 @@ class JStyleLoaderTest {
 
     @Test
     void addStyleLeadsToOneMoreStyle() throws URISyntaxException {
-        preferences.setExternalStyles(Collections.emptyList());
+        preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
         String filename = Path.of(JStyleLoader.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
@@ -75,7 +75,7 @@ class JStyleLoaderTest {
 
     @Test
     void addInvalidStyleLeadsToNoMoreStyle() {
-        preferences.setExternalStyles(Collections.emptyList());
+        preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
         loader.addStyleIfValid("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky");
@@ -143,7 +143,7 @@ class JStyleLoaderTest {
 
     @Test
     void addSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
-        preferences.setExternalStyles(Collections.emptyList());
+        preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
         String filename = Path.of(JStyleLoader.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
@@ -191,7 +191,7 @@ class JStyleLoaderTest {
 
     @Test
     void removeInternalStyleReturnsFalseAndDoNotRemove() {
-        preferences.setExternalStyles(Collections.emptyList());
+        preferences.setExternalStyles(List.of());
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         List<JStyle> toremove = new ArrayList<>();

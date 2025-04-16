@@ -1,10 +1,12 @@
 package org.jabref.gui.openoffice;
 
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.IntStream;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -12,7 +14,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogEvent;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -26,7 +27,6 @@ import org.jabref.gui.preview.PreviewViewer;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
-import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
@@ -53,15 +53,22 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
     private final JStyleLoader loader;
 
+    // JStyles TableView
     @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
     @FXML private TableView<StyleSelectItemViewModel> tvStyles;
     @FXML private TableColumn<StyleSelectItemViewModel, String> colJournals;
     @FXML private TableColumn<StyleSelectItemViewModel, String> colFile;
     @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
+
+    // CSL Styles TableView
+    @FXML private TableView<CitationStyleViewModel> cslStylesTable;
+    @FXML private TableColumn<CitationStyleViewModel, String> cslNameColumn;
+    @FXML private TableColumn<CitationStyleViewModel, String> cslPathColumn;
+    @FXML private TableColumn<CitationStyleViewModel, Boolean> cslDeleteColumn;
+
     @FXML private VBox jstylePreviewBox;
     @FXML private VBox cslPreviewBox;
-    @FXML private ListView<CitationStylePreviewLayout> availableListView;
     private final AtomicBoolean initialScrollPerformed = new AtomicBoolean(false);
     @FXML private CustomTextField searchBox;
     @FXML private TabPane tabPane;
@@ -77,6 +84,40 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private StyleSelectDialogViewModel viewModel;
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
+    private PreviewViewer cslPreviewViewer;
+
+    /**
+     * ViewModel for the CitationStyle entries in the TableView
+     */
+    public static class CitationStyleViewModel {
+        private final CitationStylePreviewLayout layout;
+        private final StringProperty nameProperty = new SimpleStringProperty();
+        private final StringProperty pathProperty = new SimpleStringProperty();
+        private final BooleanProperty internalStyleProperty = new SimpleBooleanProperty();
+
+        public CitationStyleViewModel(CitationStylePreviewLayout layout) {
+            this.layout = layout;
+            this.nameProperty.set(layout.getDisplayName());
+            this.pathProperty.set(layout.getFilePath());
+            this.internalStyleProperty.set(layout.getCitationStyle().isInternalStyle());
+        }
+
+        public StringProperty nameProperty() {
+            return nameProperty;
+        }
+
+        public StringProperty pathProperty() {
+            return pathProperty;
+        }
+
+        public BooleanProperty internalStyleProperty() {
+            return internalStyleProperty;
+        }
+
+        public CitationStylePreviewLayout getLayout() {
+            return layout;
+        }
+    }
 
     public StyleSelectDialogView(JStyleLoader loader) {
         this.loader = loader;
@@ -99,32 +140,27 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferences, taskExecutor, bibEntryTypesManager);
 
-        availableListView.setItems(viewModel.getAvailableLayouts());
-        new ViewModelListCellFactory<CitationStylePreviewLayout>()
-                .withText(CitationStylePreviewLayout::getDisplayName)
-                .install(availableListView);
+        setupJStylesTab();
+        setupCslStylesTab();
+
+        OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
+        if (currentStyle instanceof JStyle) {
+            tabPane.getSelectionModel().select(1);
+        } else {
+            tabPane.getSelectionModel().select(0);
+        }
+
+        viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setSelectedTab(newValue));
+
+        updateCurrentStyleLabel();
+        addCslButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
         this.setOnShown(this::onDialogShown);
+    }
 
-        availableListView.getItems().addListener((ListChangeListener<CitationStylePreviewLayout>) c -> {
-            if (c.next() && c.wasAdded() && !initialScrollPerformed.get()) {
-                Platform.runLater(this::scrollToCurrentStyle);
-            }
-        });
-
-        availableListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                viewModel.selectedLayoutProperty().set(newValue));
-
-        PreviewViewer cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
-        EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
-        cslPreviewBox.getChildren().add(cslPreviewViewer);
-
-        previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
-        jstylePreviewBox.getChildren().add(previewArticle);
-
-        previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
-        jstylePreviewBox.getChildren().add(previewBook);
-
+    private void setupJStylesTab() {
+        // Setup JStyles table columns
         colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());
         colFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
@@ -164,6 +200,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         add.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
+        // JStyle previews
+        previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
+        jstylePreviewBox.getChildren().add(previewArticle);
+
+        previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
+        jstylePreviewBox.getChildren().add(previewBook);
+
         EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
             if (viewModel.getSelectedStyle() instanceof JStyle) {
                 tvStyles.getSelectionModel().select(style);
@@ -171,34 +214,88 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 previewBook.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Book)));
             }
         });
+    }
 
-        availableListView.setItems(viewModel.getAvailableLayouts());
-        searchBox.textProperty().addListener((observable, oldValue, newValue) ->
-                viewModel.setAvailableLayoutsFilter(newValue));
+    private void setupCslStylesTab() {
+        // Set up CSL styles table columns
+        cslNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        cslPathColumn.setCellValueFactory(cellData -> cellData.getValue().pathProperty());
+        cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
-        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setSelectedTab(newValue));
+        // Set up delete icon column for CSL styles (similar to JStyles)
+        new ValueTableCellFactory<CitationStyleViewModel, Boolean>()
+                .withGraphic(internalStyle -> {
+                    if (!internalStyle) {
+                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
+                    }
+                    return null;
+                })
+                .withOnMouseClickedEvent(item -> evt -> {
+                    CitationStyleViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
+                    if (selectedStyle != null) {
+                        viewModel.deleteCslStyle(selectedStyle.getLayout().getCitationStyle());
+                    }
+                })
+                .withTooltip(item -> Localization.lang("Remove style"))
+                .install(cslDeleteColumn);
 
-        availableListView.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                viewModel.handleCslStyleSelection(); // Only CSL styles can be selected with a double click, JStyles show a style description instead
-                this.setResult(viewModel.getSelectedStyle());
-                this.close();
+        // Double-click to select a style
+        new ViewModelTableRowFactory<CitationStyleViewModel>()
+                .withOnMouseClickedEvent((item, event) -> {
+                    if (event.getClickCount() == 2) {
+                        viewModel.selectedLayoutProperty().set(item.getLayout());
+                        viewModel.handleCslStyleSelection();
+                        this.setResult(viewModel.getSelectedStyle());
+                        this.close();
+                    }
+                })
+                .install(cslStylesTable);
+
+        // Set up selection listener
+        cslStylesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                viewModel.selectedLayoutProperty().set(newValue.getLayout());
             }
         });
 
-        OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
-        if (currentStyle instanceof JStyle) {
-            tabPane.getSelectionModel().select(1);
-        } else {
-            tabPane.getSelectionModel().select(0);
+        // Set up search filter
+        searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
+            viewModel.setAvailableLayoutsFilter(newValue);
+            updateCslStylesTable();
+        });
+
+        // Set up preview
+        cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
+        EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
+        cslPreviewBox.getChildren().add(cslPreviewViewer);
+
+        // Listen for changes in the available layouts
+        viewModel.getAvailableLayouts().addListener((ListChangeListener<CitationStylePreviewLayout>) c -> {
+            updateCslStylesTable();
+            if (c.next() && c.wasAdded() && !initialScrollPerformed.get()) {
+                Platform.runLater(this::scrollToCurrentStyle);
+            }
+        });
+
+        // Initial table setup
+        updateCslStylesTable();
+    }
+
+    private void updateCslStylesTable() {
+        cslStylesTable.getItems().clear();
+        for (CitationStylePreviewLayout layout : viewModel.getAvailableLayouts()) {
+            cslStylesTable.getItems().add(new CitationStyleViewModel(layout));
         }
 
-        viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
-        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setSelectedTab(newValue));
-
-        updateCurrentStyleLabel();
-        addCslButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+        // Select the current layout if available
+        if (viewModel.selectedLayoutProperty().get() != null) {
+            for (CitationStyleViewModel model : cslStylesTable.getItems()) {
+                if (model.getLayout().equals(viewModel.selectedLayoutProperty().get())) {
+                    cslStylesTable.getSelectionModel().select(model);
+                    break;
+                }
+            }
+        }
     }
 
     private ContextMenu createContextMenu() {
@@ -232,10 +329,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     /**
      * On a new run of JabRef, when Select Style dialog is opened for the first time, the CSL styles list takes a while to load.
      * This function takes care of the case when the list is empty due to the initial loading time.
-     * If the list is empty, the ListChangeListener will handle scrolling when items are added.
      */
     private void onDialogShown(DialogEvent event) {
-        if (!availableListView.getItems().isEmpty()) {
+        if (!cslStylesTable.getItems().isEmpty()) {
             Platform.runLater(this::scrollToCurrentStyle);
         }
     }
@@ -247,34 +343,17 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
         if (currentStyle instanceof CitationStyle currentCitationStyle) {
-            findIndexOfCurrentStyle(currentCitationStyle).ifPresent(index -> {
-                int itemsPerPage = calculateItemsPerPage();
-                int totalItems = availableListView.getItems().size();
-                int scrollToIndex = Math.max(0, Math.min(index, totalItems - itemsPerPage));
-
-                availableListView.scrollTo(scrollToIndex);
-                availableListView.getSelectionModel().select(index);
-
-                Platform.runLater(() -> {
-                    availableListView.scrollTo(Math.max(0, index - 1));
-                    availableListView.scrollTo(index);
-                });
-            });
+            // Find the row index of the current style
+            for (int i = 0; i < cslStylesTable.getItems().size(); i++) {
+                CitationStyleViewModel item = cslStylesTable.getItems().get(i);
+                if (item.getLayout().getFilePath().equals(currentCitationStyle.getFilePath())) {
+                    cslStylesTable.scrollTo(i);
+                    cslStylesTable.getSelectionModel().select(i);
+                    break;
+                }
+            }
         }
     }
-
-    private int calculateItemsPerPage() {
-        double cellHeight = 24.0; // Approximate height of a list cell
-        return (int) (availableListView.getHeight() / cellHeight);
-    }
-
-    private Optional<Integer> findIndexOfCurrentStyle(CitationStyle currentStyle) {
-        return IntStream.range(0, availableListView.getItems().size())
-                        .boxed()
-                        .filter(i -> availableListView.getItems().get(i).getFilePath().equals(currentStyle.getFilePath()))
-                        .findFirst();
-    }
-
 
     /**
      * Method to handle the "Add CSL file" button click in the CSL Styles tab
