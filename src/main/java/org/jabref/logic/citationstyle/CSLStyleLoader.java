@@ -148,21 +148,25 @@ public class CSLStyleLoader {
                     new TypeReference<>() {
                     });
 
-            for (Map<String, Object> info : styleInfoList) {
-                String path = (String) info.get("path");
-                String title = (String) info.get("title");
-                boolean isNumeric = (boolean) info.get("isNumeric");
+            if (!styleInfoList.isEmpty()) {
+                for (Map<String, Object> info : styleInfoList) {
+                    String path = (String) info.get("path");
+                    String title = (String) info.get("title");
+                    boolean isNumeric = (boolean) info.get("isNumeric");
 
-                // We use these metadata and just load the content instead of re-parsing for them
-                try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
-                    if (styleStream != null) {
-                        String source = new String(styleStream.readAllBytes());
-                        CitationStyle style = new CitationStyle(path, title, isNumeric, source, true);
-                        INTERNAL_STYLES.add(style);
+                    // We use these metadata and just load the content instead of re-parsing for them
+                    try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
+                        if (styleStream != null) {
+                            String source = new String(styleStream.readAllBytes());
+                            CitationStyle style = new CitationStyle(path, title, isNumeric, source, true);
+                            INTERNAL_STYLES.add(style);
+                        }
+                    } catch (IOException e) {
+                        LOGGER.error("Error loading style file: {}", path, e);
                     }
-                } catch (IOException e) {
-                    LOGGER.error("Error loading style file: {}", path, e);
                 }
+            } else {
+                LOGGER.error("Citation style catalog is empty");
             }
         } catch (IOException e) {
             LOGGER.error("Error loading citation style catalog", e);
