@@ -7,14 +7,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -67,11 +65,7 @@ public class CitationStyle implements OOStyle {
             String content = new String(source.readAllBytes());
 
             Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
-            if (styleInfo.isEmpty()) {
-                return Optional.empty();
-            }
-
-            return Optional.of(new CitationStyle(filename, styleInfo.get().title(), styleInfo.get().isNumericStyle(), content));
+            return styleInfo.map(info -> new CitationStyle(filename, info.title(), info.isNumericStyle(), content));
         } catch (IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
@@ -151,17 +145,25 @@ public class CitationStyle implements OOStyle {
             return Optional.empty();
         }
 
+        // Check if this is an absolute path (external file)
+        Path filePath = Path.of(styleFile);
+        if (filePath.isAbsolute() && Files.exists(filePath)) {
+            try (InputStream inputStream = Files.newInputStream(filePath)) {
+                return createCitationStyleFromSource(inputStream, styleFile);
+            } catch (IOException e) {
+                LOGGER.error("Error reading source file", e);
+                return Optional.empty();
+            }
+        }
+
+        // If not an absolute path, treat as internal resource
         String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
-        Path internalFilePath = Path.of(internalFile);
-        boolean isExternalFile = Files.exists(internalFilePath);
-        try (InputStream inputStream = isExternalFile ? Files.newInputStream(internalFilePath) : CitationStyle.class.getResourceAsStream(internalFile)) {
+        try (InputStream inputStream = CitationStyle.class.getResourceAsStream(internalFile)) {
             if (inputStream == null) {
                 LOGGER.error("Could not find file: {}", styleFile);
                 return Optional.empty();
             }
             return createCitationStyleFromSource(inputStream, styleFile);
-        } catch (NoSuchFileException e) {
-            LOGGER.error("Could not find file: {}", styleFile, e);
         } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
         }
@@ -184,11 +186,14 @@ public class CitationStyle implements OOStyle {
      * @return list of available citation styles
      */
     public static List<CitationStyle> discoverCitationStyles() {
+        // If we're in a context where OpenOfficePreferences is available,
+        // we should use CSLStyleLoader instead of this method.
+        // This method is kept for backward compatibility (for Previews and tests).
+
         if (!STYLES.isEmpty()) {
             return STYLES;
         }
 
-        // Load built-in styles
         URL url = CitationStyle.class.getResource(STYLES_ROOT + DEFAULT);
         if (url == null) {
             LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT);
@@ -200,24 +205,9 @@ public class CitationStyle implements OOStyle {
             Path path = Path.of(uri).getParent();
             STYLES.addAll(discoverCitationStylesInPath(path));
 
-            try {
-                Preferences prefs = Preferences.userRoot().node("/org/jabref");
-
-                String externalStyles = prefs.get("externalCitationStyles", "");
-                if (!externalStyles.isEmpty()) {
-                    String[] externalStylePaths = externalStyles.split(";");
-
-                    for (String stylePath : externalStylePaths) {
-                        createFromExternalFile(stylePath).ifPresent(STYLES::add);
-                    }
-                }
-            } catch (Exception e) {
-                LOGGER.error("Error loading external citation styles from preferences", e);
-            }
-
             return STYLES;
         } catch (URISyntaxException | IOException e) {
-            LOGGER.error("Something went wrong while searching available CitationStyles", e);
+            LOGGER.error("something went wrong while searching available CitationStyles", e);
             return Collections.emptyList();
         }
     }
@@ -302,36 +292,5 @@ public class CitationStyle implements OOStyle {
     @Override
     public String getPath() {
         return getFilePath();
-    }
-
-    /**
-     * Creates a CitationStyle instance from an external file path
-     *
-     * @param filePath The path to the external CSL file
-     * @return An Optional containing the CitationStyle if successfully loaded
-     */
-    public static Optional<CitationStyle> createFromExternalFile(String filePath) {
-        if (!isCitationStyleFile(filePath)) {
-            LOGGER.error("Can only load citation style files: {}", filePath);
-            return Optional.empty();
-        }
-
-        Path path = Path.of(filePath);
-        if (!Files.exists(path)) {
-            LOGGER.error("External style file does not exist: {}", filePath);
-            return Optional.empty();
-        }
-
-        try (InputStream inputStream = Files.newInputStream(path)) {
-            String filename = path.getFileName().toString();
-            Optional<CitationStyle> style = createCitationStyleFromSource(inputStream, filename);
-
-            // For external files, store the full path instead of just the filename
-            return style.map(citationStyle -> new CitationStyle(filePath, citationStyle.getTitle(),
-                    citationStyle.isNumericStyle(), citationStyle.getSource()));
-        } catch (IOException e) {
-            LOGGER.error("Error reading external style file: {}", filePath, e);
-            return Optional.empty();
-        }
     }
 }

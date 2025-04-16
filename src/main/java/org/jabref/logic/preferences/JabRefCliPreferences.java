@@ -1121,7 +1121,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         OOStyle currentStyle = CitationStyle.getDefault(); // Defaults to IEEE CSL Style
 
-        // Reassign currentStyle if it is not a CSL style
+        // Reassign currentStyle based on actual last used CSL style or JStyle
         if (CitationStyle.isCitationStyleFile(currentStylePath)) {
             currentStyle = CitationStyle.createCitationStyleFromFile(currentStylePath) // Assigns CSL Style
                          .orElse(CitationStyle.getDefault());
