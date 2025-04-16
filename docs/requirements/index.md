@@ -19,13 +19,17 @@ Example:
 
 ```markdown
 ### Example
-`req~ai.example~1`
+` req~ai.example~1`
 ```
 
 It is important that there is no empty line directly after the heading.
 
 {: note}
 One needs to add `<!-- markdownlint-disable-file MD022 -->` to the end of the file, because the ID of the requirement needs to follow the heading directly.
+
+{: note}
+The space has to be absent in real use.
+Above, the space is put to have `traceRequirements` not treating this example as real requirement.
 
 After putting a heading and an identifier, one writes down at the requirement.
 Directly at the end, one writes that it requires an implementation:
@@ -39,7 +43,7 @@ However, typically in JabRef, we go from the requirement directly to the impleme
 
 ## Linking implementations
 
-After wrinting the requirement, at the implementation, a comment is added this implementation is covered:
+After writing the requirement, at the implementation, a comment is added that this implementation is covered:
 
 ```java
 // [impl->req~ai.example~1]
