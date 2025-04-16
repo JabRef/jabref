@@ -29,7 +29,7 @@ public class CitationStyleCatalogGenerator {
         try {
             URL url = CitationStyleCatalogGenerator.class.getResource(STYLES_ROOT + "/" + CSLStyleLoader.DEFAULT_STYLE);
             if (url == null) {
-                LOGGER.error("Could not find citation styles directory");
+                LOGGER.error("Could not find any citation style. Tried with {}.", CSLStyleLoader.DEFAULT_STYLE);
                 return;
             }
 
