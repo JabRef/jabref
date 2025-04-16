@@ -257,12 +257,6 @@ public class CSLStyleLoader {
         if (newStyleOptional.isPresent()) {
             CitationStyle newStyle = newStyleOptional.get();
 
-            // Check if it already exists
-            if (externalStyles.stream().anyMatch(style -> style.getPath().equals(stylePath))) {
-                LOGGER.info("External style file {} already exists.", stylePath);
-                return newStyleOptional; // Return it anyway since it's valid
-            }
-
             // Add it to the list and save to preferences
             externalStyles.add(newStyle);
             storeExternalStyles();
