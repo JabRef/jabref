@@ -593,7 +593,7 @@ class CitationStyleGeneratorTest {
 
         String citation = CitationStyleGenerator.generateBibliography(
                 List.of(entry),
-                CSLStyleLoader.createFromFile(cslFileName).orElseThrow().getSource(),
+                CSLStyleLoader.createCitationStyleFromFile(cslFileName).orElseThrow().getSource(),
                 CitationStyleOutputFormat.TEXT,
                 context,
                 bibEntryTypesManager).getFirst();

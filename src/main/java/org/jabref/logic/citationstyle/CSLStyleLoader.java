@@ -71,7 +71,7 @@ public class CSLStyleLoader {
         return INTERNAL_STYLES.stream()
                               .filter(style -> style.getFilePath().equals(DEFAULT_STYLE))
                               .findFirst()
-                              .orElseGet(() -> createFromFile(DEFAULT_STYLE)
+                              .orElseGet(() -> createCitationStyleFromFile(DEFAULT_STYLE)
                                       .orElse(new CitationStyle("", "Empty", false, "", true)));
     }
 
@@ -183,7 +183,7 @@ public class CSLStyleLoader {
         List<String> stylePaths = openOfficePreferences.getExternalCitationStyles();
         for (String stylePath : stylePaths) {
             try {
-                Optional<CitationStyle> style = createFromFile(stylePath);
+                Optional<CitationStyle> style = createCitationStyleFromFile(stylePath);
                 style.ifPresent(externalStyles::add);
             } catch (Exception e) {
                 LOGGER.info("Problem reading external style file {}", stylePath, e);
@@ -197,7 +197,7 @@ public class CSLStyleLoader {
      * @param styleFile Path to the CSL file
      * @return Optional containing the CitationStyle if valid, empty otherwise
      */
-    public static Optional<CitationStyle> createFromFile(String styleFile) {
+    public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
         if (!CitationStyle.isCitationStyleFile(styleFile)) {
             LOGGER.error("Can only load style files: {}", styleFile);
             return Optional.empty();
@@ -207,7 +207,7 @@ public class CSLStyleLoader {
         Path filePath = Path.of(styleFile);
         if (filePath.isAbsolute() && Files.exists(filePath)) {
             try (InputStream inputStream = Files.newInputStream(filePath)) {
-                return createFromSource(inputStream, styleFile, false);
+                return createCitationStyleFromSource(inputStream, styleFile, false);
             } catch (IOException e) {
                 LOGGER.error("Error reading source file", e);
                 return Optional.empty();
@@ -221,7 +221,7 @@ public class CSLStyleLoader {
                 LOGGER.error("Could not find file: {}", styleFile);
                 return Optional.empty();
             }
-            return createFromSource(inputStream, styleFile, true);
+            return createCitationStyleFromSource(inputStream, styleFile, true);
         } catch (IOException e) {
             LOGGER.error("Error reading source file", e);
         }
@@ -236,7 +236,7 @@ public class CSLStyleLoader {
      * @param isInternal Whether this is an internal style
      * @return Optional containing the CitationStyle if valid, empty otherwise
      */
-    private static Optional<CitationStyle> createFromSource(InputStream source, String filename, boolean isInternal) {
+    private static Optional<CitationStyle> createCitationStyleFromSource(InputStream source, String filename, boolean isInternal) {
         try {
             String content = new String(source.readAllBytes());
 
@@ -257,7 +257,7 @@ public class CSLStyleLoader {
     public Optional<CitationStyle> addStyleIfValid(String stylePath) {
         Objects.requireNonNull(stylePath);
 
-        Optional<CitationStyle> newStyleOptional = createFromFile(stylePath);
+        Optional<CitationStyle> newStyleOptional = createCitationStyleFromFile(stylePath);
         if (newStyleOptional.isPresent()) {
             CitationStyle newStyle = newStyleOptional.get();
 

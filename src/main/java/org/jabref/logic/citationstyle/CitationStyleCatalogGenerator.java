@@ -47,7 +47,7 @@ public class CitationStyleCatalogGenerator {
         try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
             return stream.map(Path::getFileName)
                          .map(Path::toString)
-                         .map(CSLStyleLoader::createFromFile)
+                         .map(CSLStyleLoader::createCitationStyleFromFile)
                          .filter(Optional::isPresent)
                          .map(Optional::get)
                          .collect(Collectors.toList());

@@ -906,7 +906,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                     .map(layout -> {
                         if (CitationStyle.isCitationStyleFile(layout)) {
                             BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-                            return CSLStyleLoader.createFromFile(layout)
+                            return CSLStyleLoader.createCitationStyleFromFile(layout)
                                                  .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))
                                                  .orElse(null);
                         }

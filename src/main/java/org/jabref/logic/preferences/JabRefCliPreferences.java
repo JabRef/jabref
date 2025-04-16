@@ -1124,7 +1124,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // Reassign currentStyle based on actual last used CSL style or JStyle
         if (CitationStyle.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CSLStyleLoader.createFromFile(currentStylePath)
+            currentStyle = CSLStyleLoader.createCitationStyleFromFile(currentStylePath)
                          .orElse(CSLStyleLoader.getDefaultStyle());
         } else {
             // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
