@@ -181,15 +181,12 @@ public class CitationStyle implements OOStyle {
 
     /**
      * Provides the citation styles that come with JabRef.
-     * update: method to discover both built-in and user-added citation styles
+     * Note: If we're in a context where OpenOfficePreferences is available, we should use CSLStyleLoader instead of this method.
+     * This method is kept for backward compatibility (for Previews and tests, where preferences aren't involved).
      *
      * @return list of available citation styles
      */
     public static List<CitationStyle> discoverCitationStyles() {
-        // If we're in a context where OpenOfficePreferences is available,
-        // we should use CSLStyleLoader instead of this method.
-        // This method is kept for backward compatibility (for Previews and tests).
-
         if (!STYLES.isEmpty()) {
             return STYLES;
         }
