@@ -1,8 +1,9 @@
-name: On PR opened
+name: On PR opened/updated
 
 on:
   # _target is required
   pull_request_target:
+  # default: opened, synchronize, reopened
 
 jobs:
   determine_issue_number:
