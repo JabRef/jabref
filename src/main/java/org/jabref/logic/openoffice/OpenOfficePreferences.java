@@ -34,7 +34,7 @@ public class OpenOfficePreferences {
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty cslBibliographyTitle;
     private final StringProperty cslBibliographyHeaderFormat;
-    private final ObservableList<String> externalCitationStyles;
+    private final ObservableList<String> externalCslStyles;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -45,7 +45,7 @@ public class OpenOfficePreferences {
                                  boolean alwaysAddCitedOnPages,
                                  String cslBibliographyTitle,
                                  String cslBibliographyHeaderFormat,
-                                 List<String> externalCitationStyles) {
+                                 List<String> externalCslStyles) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -55,7 +55,7 @@ public class OpenOfficePreferences {
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
-        this.externalCitationStyles = FXCollections.observableArrayList(externalCitationStyles);
+        this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
     }
 
     public void clearConnectionSettings() {
@@ -179,11 +179,11 @@ public class OpenOfficePreferences {
     }
 
     public ObservableList<String> getExternalCslStyles() {
-        return externalCitationStyles;
+        return externalCslStyles;
     }
 
     public void setExternalCslStyles(List<String> paths) {
-        externalCitationStyles.clear();
-        externalCitationStyles.addAll(paths);
+        externalCslStyles.clear();
+        externalCslStyles.addAll(paths);
     }
 }
