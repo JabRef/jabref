@@ -9,7 +9,6 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.commonfxcontrols.FieldFormatterCleanupsPanel;
@@ -70,8 +69,8 @@ public class CleanupPresetPanel extends VBox {
         if (!ConvertMSCCodesCleanup.isConversionPossible()) {
             cleanUpConvertMSCcodes.setDisable(true);
             cleanUpConvertMSCcodes.setSelected(false);
-            cleanUpConvertMSCcodes.setTooltip(new Tooltip("MSC code conversion is not available - the MSC codes file could not be loaded"));
         } 
+
         cleanUpConvertMSCcodes.setText(Localization.lang("Convert MSC Keyword codes to their respective descriptions."));
         cleanUpConvertMSCcodes.setSelected(false);
         

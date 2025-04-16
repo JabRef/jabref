@@ -9,10 +9,8 @@ import javafx.application.Platform;
  */
 public class JavaFXInitializer {
 
-    private static boolean initialized = false;
-
     public static void initialize() {
-        if (!initialized) {
+        if (!Platform.isFxApplicationThread()) {
             CountDownLatch latch = new CountDownLatch(1);
             Platform.startup(() -> {
                 // No-op, just trigger JavaFX
@@ -21,7 +19,6 @@ public class JavaFXInitializer {
 
             try {
                 latch.await();
-                initialized = true;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new RuntimeException("JavaFX initialization interrupted", e);
