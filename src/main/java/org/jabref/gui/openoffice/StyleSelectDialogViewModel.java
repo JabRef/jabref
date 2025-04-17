@@ -78,7 +78,7 @@ public class StyleSelectDialogViewModel {
             selectedItem.setValue(getStyleOrDefault(jStyle.getPath()));
         }
 
-        BackgroundTask.wrap(cslStyleLoader::getStyles)
+        BackgroundTask.wrap(CSLStyleLoader::getStyles)
                       .onSuccess(styles -> {
                           List<CitationStylePreviewLayout> layouts = styles.stream()
                                                                            .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))

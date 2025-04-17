@@ -130,7 +130,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
-        BackgroundTask.wrap(CSLStyleLoader::getInternalStyles)
+        BackgroundTask.wrap(CSLStyleLoader::getStyles)
                       .onSuccess(styles -> styles.stream()
                                                  .map(style -> new CitationStylePreviewLayout(style, entryTypesManager))
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->

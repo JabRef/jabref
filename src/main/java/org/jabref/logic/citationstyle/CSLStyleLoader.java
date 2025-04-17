@@ -24,11 +24,11 @@ public class CSLStyleLoader {
     private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "/citation-style-catalog.json";
     private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
+    private static final List<CitationStyle> EXTERNAL_STYLES = new ArrayList<>();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
 
     private final OpenOfficePreferences openOfficePreferences;
-    private final List<CitationStyle> externalStyles = new ArrayList<>();
 
     public CSLStyleLoader(OpenOfficePreferences openOfficePreferences) {
         this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
@@ -38,9 +38,9 @@ public class CSLStyleLoader {
     /**
      * Returns a list of all available citation styles (both internal and external).
      */
-    public List<CitationStyle> getStyles() {
+    public static List<CitationStyle> getStyles() {
         List<CitationStyle> result = new ArrayList<>(INTERNAL_STYLES);
-        result.addAll(externalStyles);
+        result.addAll(EXTERNAL_STYLES);
         return result;
     }
 
@@ -104,13 +104,13 @@ public class CSLStyleLoader {
      * Loads external CSL styles from the preferences.
      */
     private void loadExternalStyles() {
-        externalStyles.clear();
+        EXTERNAL_STYLES.clear();
 
         List<String> stylePaths = openOfficePreferences.getExternalCslStyles();
         for (String stylePath : stylePaths) {
             try {
                 Optional<CitationStyle> style = CSLStyleUtils.createCitationStyleFromFile(stylePath);
-                style.ifPresent(externalStyles::add);
+                style.ifPresent(EXTERNAL_STYLES::add);
             } catch (Exception e) {
                 LOGGER.info("Problem reading external style file {}", stylePath, e);
             }
@@ -129,7 +129,7 @@ public class CSLStyleLoader {
         if (newStyleOptional.isPresent()) {
             CitationStyle newStyle = newStyleOptional.get();
 
-            externalStyles.add(newStyle);
+            EXTERNAL_STYLES.add(newStyle);
             storeExternalStyles();
             return newStyleOptional;
         }
@@ -141,9 +141,9 @@ public class CSLStyleLoader {
      * Stores the current list of external styles to preferences.
      */
     private void storeExternalStyles() {
-        List<String> stylePaths = externalStyles.stream()
-                                                .map(CitationStyle::getPath)
-                                                .toList();
+        List<String> stylePaths = EXTERNAL_STYLES.stream()
+                                                 .map(CitationStyle::getPath)
+                                                 .toList();
         openOfficePreferences.setExternalCslStyles(stylePaths);
     }
 
@@ -155,7 +155,7 @@ public class CSLStyleLoader {
     public boolean removeStyle(CitationStyle style) {
         Objects.requireNonNull(style);
         if (!style.isInternalStyle()) {
-            boolean result = externalStyles.remove(style);
+            boolean result = EXTERNAL_STYLES.remove(style);
             storeExternalStyles();
             return result;
         }
