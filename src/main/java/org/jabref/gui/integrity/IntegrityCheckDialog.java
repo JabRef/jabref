@@ -180,7 +180,7 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
         }
         List<IntegrityMessage> newWarnings = new ArrayList<>(bibLogSettingsPane.getBlgWarnings());
 
-        if (newWarnings.isEmpty()) {
+        if (newWarnings.isEmpty() && bibLogSettingsPane.wasBlgFileManuallySelected()) {
             dialogService.notify(Localization.lang("No warnings found. Please check if the .blg file matches the current library."));
         }
 

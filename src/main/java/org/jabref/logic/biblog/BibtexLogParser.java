@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.model.biblog.BibWarning;
 import org.jabref.model.biblog.SeverityType;
+import org.jabref.model.entry.field.FieldFactory;
 
 import org.jspecify.annotations.NonNull;
 
@@ -56,6 +57,7 @@ public class BibtexLogParser {
         String fieldName = null;
         if (message.startsWith(EMPTY_FIELD_PREFIX)) {
             fieldName = message.substring(EMPTY_FIELD_PREFIX.length()).trim();
+            fieldName = FieldFactory.parseField(fieldName).getName();
         }
 
         return Optional.of(new BibWarning(

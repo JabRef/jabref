@@ -33,11 +33,6 @@ public class BibLogSettingsPane {
     private Runnable onBlgPathChanged;
 
     public void initializeViewModel(BibDatabaseContext context, Runnable onBlgPathChanged) throws JabRefException {
-        if (context == null || context.getMetaData() == null) {
-            LOGGER.warn("BibLogSettingsPane initialized with null BibDatabaseContext or MetaData");
-            return;
-        }
-
         this.onBlgPathChanged = onBlgPathChanged;
         this.viewModel = new BibLogSettingsViewModel(context.getMetaData(), context.getDatabasePath());
         pathField.textProperty().bindBidirectional(viewModel.pathProperty());
@@ -85,5 +80,9 @@ public class BibLogSettingsPane {
                 .withInitialDirectory(viewModel.getInitialDirectory())
                 .build();
         return config;
+    }
+
+    public boolean wasBlgFileManuallySelected() {
+        return viewModel.wasBlgFileManuallySelected();
     }
 }
