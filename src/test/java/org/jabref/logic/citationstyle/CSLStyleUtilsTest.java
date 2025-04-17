@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,63 +20,42 @@ class CSLStyleUtilsTest {
     private static final String MODIFIED_IEEE = "ieee-bold-author.csl";
     private static final String MODIFIED_APA = "modified-apa.csl";
 
-    @Test
-    void parseStyleInfo() throws IOException {
+    @ParameterizedTest
+    @MethodSource("styleTestData")
+    void parseStyleInfo(String styleName, String expectedTitle, boolean expectedIsNumeric) throws IOException {
         String styleContent;
-        try (InputStream inputStream = CSLStyleUtilsTest.class.getResourceAsStream(MODIFIED_IEEE)) {
+        try (InputStream inputStream = CSLStyleUtilsTest.class.getResourceAsStream(styleName)) {
             styleContent = new String(inputStream.readAllBytes());
         }
 
-        Optional<CSLStyleUtils.StyleInfo> styleInfo = CSLStyleUtils.parseStyleInfo(MODIFIED_IEEE, styleContent);
+        Optional<CSLStyleUtils.StyleInfo> styleInfo = CSLStyleUtils.parseStyleInfo(styleName, styleContent);
 
         assertTrue(styleInfo.isPresent());
-        assertEquals("IEEE - Bold Author", styleInfo.get().title());
-        assertTrue(styleInfo.get().isNumericStyle());
+        assertEquals(expectedTitle, styleInfo.get().title());
+        assertEquals(expectedIsNumeric, styleInfo.get().isNumericStyle());
     }
 
-    @Test
-    void createCitationStyleFromFileReturnsValidCitationStyle() {
+    @ParameterizedTest
+    @MethodSource("styleTestData")
+    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, boolean expectedIsNumeric) {
         // use absolute path to test csl so that it is treated as external file
         Path resourcePath = Path.of("").toAbsolutePath()
                                 .resolve("src/test/resources/org/jabref/logic/citationstyle")
-                                .resolve(MODIFIED_IEEE);
+                                .resolve(styleName);
 
         Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(resourcePath.toString());
 
         assertTrue(citationStyle.isPresent());
-        assertEquals("IEEE - Bold Author", citationStyle.get().getTitle());
-        assertTrue(citationStyle.get().isNumericStyle());
+        assertEquals(expectedTitle, citationStyle.get().getTitle());
+        assertEquals(expectedIsNumeric, citationStyle.get().isNumericStyle());
         assertNotNull(citationStyle.get().getSource());
         assertFalse(citationStyle.get().isInternalStyle());
     }
 
-    @Test
-    void parseStyleInfo2() throws IOException {
-        String styleContent;
-        try (InputStream inputStream = CSLStyleUtilsTest.class.getResourceAsStream(MODIFIED_APA)) {
-            styleContent = new String(inputStream.readAllBytes());
-        }
-
-        Optional<CSLStyleUtils.StyleInfo> styleInfo = CSLStyleUtils.parseStyleInfo(MODIFIED_APA, styleContent);
-
-        assertTrue(styleInfo.isPresent());
-        assertEquals("Modified American Psychological Association 7th edition", styleInfo.get().title());
-        assertFalse(styleInfo.get().isNumericStyle());
-    }
-
-    @Test
-    void createCitationStyleFromFileReturnsValidCitationStyle2() {
-        // use absolute path to test csl so that it is treated as external file
-        Path resourcePath = Path.of("").toAbsolutePath()
-                                .resolve("src/test/resources/org/jabref/logic/citationstyle")
-                                .resolve(MODIFIED_APA);
-
-        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(resourcePath.toString());
-
-        assertTrue(citationStyle.isPresent());
-        assertEquals("Modified American Psychological Association 7th edition", citationStyle.get().getTitle());
-        assertFalse(citationStyle.get().isNumericStyle());
-        assertNotNull(citationStyle.get().getSource());
-        assertFalse(citationStyle.get().isInternalStyle());
+    private static Stream<Arguments> styleTestData() {
+        return Stream.of(
+                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", true),
+                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false)
+        );
     }
 }
