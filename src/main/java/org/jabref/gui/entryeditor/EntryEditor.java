@@ -181,7 +181,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         );
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
-                (obs, oldValue, newValue) -> {
+                (_, _, newValue) -> {
                     if (currentlyEditedEntry != null) {
                         adaptVisibleTabs();
                         Tab tab = tabbed.getSelectionModel().selectedItemProperty().get();
