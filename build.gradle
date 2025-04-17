@@ -133,13 +133,13 @@ sourceSets {
 
 repositories {
     mavenCentral()
-    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public' }
 
     // Required for one.jpro.jproutils:tree-showing
-    maven { url 'https://sandec.jfrog.io/artifactory/repo' }
+    maven { url = 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
 configurations {
@@ -463,7 +463,7 @@ tasks.register('generateSource') {
             "generateLtwaGrammarSource",
             "generateCitaviSource")
     group = 'JabRef'
-    description 'Generates all necessary (Java) source files.'
+    description = 'Generates all necessary (Java) source files.'
 }
 
 tasks.register("generateBstGrammarSource", JavaExec) {
@@ -668,17 +668,17 @@ test {
 testlogger {
     // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
 
-    theme 'standard'
+    theme = 'standard'
 
-    showPassed false
-    showSkipped false
+    showPassed = false
+    showSkipped = false
 
-    showCauses false
-    showStackTraces false
+    showCauses = false
+    showStackTraces = false
 }
 
 tasks.withType(Test).configureEach {
-    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
+    reports.html.outputLocation.set(file("${reporting.baseDirectory}/${name}"))
     // Enable parallel tests (on desktop).
     // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
     if (!providers.environmentVariable("CI").isPresent()) {
@@ -694,7 +694,7 @@ tasks.register('databaseTest', Test) {
     testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED"]
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 
     maxParallelForks = 1
@@ -716,7 +716,7 @@ tasks.register('guiTest', Test) {
     testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED"]
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 
     maxParallelForks = 1
