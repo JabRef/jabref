@@ -169,9 +169,11 @@ public class EntryEditor extends BorderPane implements PreviewControls {
             }
         });
 
-        stateManager.getSelectedEntries().addListener((InvalidationListener) c -> {
+        stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
                     if (stateManager.getSelectedEntries().isEmpty()) {
-                        setCurrentlyEditedEntry(new BibEntry());
+                        // [impl->req~entry-editor.keep-showing~1]
+                        // No change in the entry editor
+                        // We allow users to edit the "old" entry
                     } else {
                         setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
                     }
