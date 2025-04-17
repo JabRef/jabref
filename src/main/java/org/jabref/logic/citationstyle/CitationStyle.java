@@ -8,7 +8,7 @@ import org.jabref.logic.util.StandardFileType;
 
 /**
  * Representation of a CitationStyle. Stores its name, the file path and the style itself.
- * This is a pure model class. For loading/parsing functionality, see {@link CSLStyleLoader}
+ * This is a pure model class. For loading/parsing functionality, see {@link CSLStyleUtils} and {@link CSLStyleLoader}.
  */
 public class CitationStyle implements OOStyle {
 

@@ -17,6 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Generates a catalog of CSL styles internally supported by JabRef.
+ * The catalog contains the list of styles, along with some pre-computed metadata (e.g. numeric nature).
+ * This class is intended to be used for the corresponding build-time task.
+ */
 @AllowedToUseClassGetResource("Required for loading internal CSL styles")
 public class CitationStyleCatalogGenerator {
     private static final String STYLES_ROOT = "/csl-styles";
