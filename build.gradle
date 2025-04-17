@@ -574,6 +574,8 @@ tasks.register('copyCitationStyleCatalog', Copy) {
 }
 compileTestJava.dependsOn('copyCitationStyleCatalog')
 
+generateJournalListMV.dependsOn('copyCitationStyleCatalog')
+
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
     description = "Generates java files for the citavi importer."
