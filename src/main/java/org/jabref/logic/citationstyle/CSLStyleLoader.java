@@ -106,7 +106,6 @@ public class CSLStyleLoader {
     private void loadExternalStyles() {
         externalStyles.clear();
 
-        // Read external lists
         List<String> stylePaths = openOfficePreferences.getExternalCslStyles();
         for (String stylePath : stylePaths) {
             try {
@@ -130,7 +129,6 @@ public class CSLStyleLoader {
         if (newStyleOptional.isPresent()) {
             CitationStyle newStyle = newStyleOptional.get();
 
-            // Add it to the list and save to preferences
             externalStyles.add(newStyle);
             storeExternalStyles();
             return newStyleOptional;
