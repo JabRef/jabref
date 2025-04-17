@@ -49,7 +49,7 @@ public class StyleSelectDialogViewModel {
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final OpenOfficePreferences openOfficePreferences;
-    private final ListProperty<StyleSelectItemViewModel> styles = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<StyleSelectItemViewModel> jStyles = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
     private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
@@ -69,7 +69,7 @@ public class StyleSelectDialogViewModel {
         this.jStyleLoader = jStyleLoader;
         this.cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
 
-        styles.addAll(loadJStyles());
+        jStyles.addAll(loadJStyles());
 
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
 
@@ -122,7 +122,7 @@ public class StyleSelectDialogViewModel {
         path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
             if (jStyleLoader.addStyleIfValid(stylePath)) {
                 openOfficePreferences.setCurrentJStyle(stylePath);
-                styles.setAll(loadJStyles());
+                jStyles.setAll(loadJStyles());
                 selectedItem.setValue(getStyleOrDefault(stylePath));
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
@@ -134,14 +134,14 @@ public class StyleSelectDialogViewModel {
         return jStyleLoader.getStyles().stream().map(this::fromOOBibStyle).toList();
     }
 
-    public ListProperty<StyleSelectItemViewModel> stylesProperty() {
-        return styles;
+    public ListProperty<StyleSelectItemViewModel> jStylesProperty() {
+        return jStyles;
     }
 
     public void deleteJStyle() {
         JStyle jStyle = selectedItem.getValue().getJStyle();
         if (jStyleLoader.removeStyle(jStyle)) {
-            styles.remove(selectedItem.get());
+            jStyles.remove(selectedItem.get());
         }
     }
 
@@ -171,11 +171,11 @@ public class StyleSelectDialogViewModel {
     }
 
     public void storePrefs() {
-        List<String> externalStyles = styles.stream()
-                                            .map(this::toJStyle)
-                                            .filter(style -> !style.isInternalStyle())
-                                            .map(JStyle::getPath)
-                                            .toList();
+        List<String> externalStyles = jStyles.stream()
+                                             .map(this::toJStyle)
+                                             .filter(style -> !style.isInternalStyle())
+                                             .map(JStyle::getPath)
+                                             .toList();
 
         openOfficePreferences.setExternalStyles(externalStyles);
 
@@ -189,7 +189,7 @@ public class StyleSelectDialogViewModel {
     }
 
     private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {
-        return styles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(styles.getFirst());
+        return jStyles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(jStyles.getFirst());
     }
 
     public ObservableList<CitationStylePreviewLayout> getAvailableLayouts() {

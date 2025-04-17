@@ -199,7 +199,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             }
         });
 
-        tvStyles.setItems(viewModel.stylesProperty());
+        tvStyles.setItems(viewModel.jStylesProperty());
 
         add.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 

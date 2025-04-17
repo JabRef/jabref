@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 public class CitationStyleCatalogGenerator {
     private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "src/main/resources/citation-style-catalog.json";
+    private static final String DEFAULT_STYLE = "ieee.csl";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
 
@@ -30,9 +31,9 @@ public class CitationStyleCatalogGenerator {
 
     public static void generateCitationStyleCatalog() {
         try {
-            URL url = CitationStyleCatalogGenerator.class.getResource(STYLES_ROOT + "/" + CSLStyleLoader.DEFAULT_STYLE);
+            URL url = CitationStyleCatalogGenerator.class.getResource(STYLES_ROOT + "/" + DEFAULT_STYLE);
             if (url == null) {
-                LOGGER.error("Could not find any citation style. Tried with {}.", CSLStyleLoader.DEFAULT_STYLE);
+                LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT_STYLE);
                 return;
             }
 
@@ -50,7 +51,7 @@ public class CitationStyleCatalogGenerator {
         try (Stream<Path> stream = Files.find(path, 1, (file, attr) -> file.toString().endsWith("csl"))) {
             return stream.map(Path::getFileName)
                          .map(Path::toString)
-                         .map(CSLStyleLoader::createCitationStyleFromFile)
+                         .map(CSLStyleUtils::createCitationStyleFromFile)
                          .flatMap(Optional::stream)
                          .toList();
         }
