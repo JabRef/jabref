@@ -425,14 +425,12 @@ public class EntryEditor extends BorderPane implements PreviewControls {
             typeSubscription.unsubscribe();
         }
 
-        if (!currentlyEditedEntry.isEmpty()) {
-            typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
-                typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
-                adaptVisibleTabs();
-                setupToolBar();
-                getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
-            });
-        }
+        typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
+            typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+            adaptVisibleTabs();
+            setupToolBar();
+            getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
+        });
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);
