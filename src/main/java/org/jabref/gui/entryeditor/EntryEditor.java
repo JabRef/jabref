@@ -169,9 +169,11 @@ public class EntryEditor extends BorderPane implements PreviewControls {
             }
         });
 
-        stateManager.getSelectedEntries().addListener((InvalidationListener) c -> {
+        stateManager.getSelectedEntries().addListener((InvalidationListener) _ -> {
                     if (stateManager.getSelectedEntries().isEmpty()) {
-                        setCurrentlyEditedEntry(new BibEntry());
+                        // [impl->req~entry-editor.keep-showing~1]
+                        // No change in the entry editor
+                        // We allow users to edit the "old" entry
                     } else {
                         setCurrentlyEditedEntry(stateManager.getSelectedEntries().getFirst());
                     }
@@ -179,7 +181,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         );
 
         EasyBind.listen(preferences.getPreviewPreferences().showPreviewAsExtraTabProperty(),
-                (obs, oldValue, newValue) -> {
+                (_, _, newValue) -> {
                     if (currentlyEditedEntry != null) {
                         adaptVisibleTabs();
                         Tab tab = tabbed.getSelectionModel().selectedItemProperty().get();
@@ -425,14 +427,12 @@ public class EntryEditor extends BorderPane implements PreviewControls {
             typeSubscription.unsubscribe();
         }
 
-        if (!currentlyEditedEntry.isEmpty()) {
-            typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
-                typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
-                adaptVisibleTabs();
-                setupToolBar();
-                getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
-            });
-        }
+        typeSubscription = EasyBind.subscribe(this.currentlyEditedEntry.typeProperty(), _ -> {
+            typeLabel.setText(new TypedBibEntry(currentlyEditedEntry, tabSupplier.get().getBibDatabaseContext().getMode()).getTypeForDisplay());
+            adaptVisibleTabs();
+            setupToolBar();
+            getSelectedTab().notifyAboutFocus(currentlyEditedEntry);
+        });
 
         if (preferences.getEntryEditorPreferences().showSourceTabByDefault()) {
             tabbed.getSelectionModel().select(sourceTab);

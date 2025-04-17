@@ -357,7 +357,16 @@ jobs:
       - uses: gradle/actions/wrapper-validation@v4
 
   mandatory-checks-section-exists:
-    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    if: >
+      github.event_name == 'pull_request' && !(
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     name: Mandatory Checks present
     runs-on: ubuntu-latest
     steps:
@@ -366,14 +375,14 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
-          
+
       - name: Check for existence of Mandatory Checks section
         id: check_mandatory_section
         run: |
           set -e
 
           BODY=$(gh pr view "${{ github.event.number }}" --json body --template '{{.body}}')
-          
+
           if echo "$BODY" | grep -q "### Mandatory checks"; then
             echo "✅ '### Mandatory checks' section found."
           else
@@ -384,7 +393,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   checklist-checked:
-    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    if: >
+      github.event_name == 'pull_request' && !(
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     name: PR checklist OK
     runs-on: ubuntu-latest
     steps:
