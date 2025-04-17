@@ -3,7 +3,7 @@ parent: Requirements
 ---
 # Entry Editor
 
-### Entry Editor should show the last entry
+## Entry Editor should show the last entry
 `req~entry-editor.keep-showing~1`
 
 The Entry Editor should "always" show a valid entry.
