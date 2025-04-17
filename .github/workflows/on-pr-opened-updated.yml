@@ -12,6 +12,12 @@ jobs:
     permissions:
       issues: write
     steps:
+      - name: echo PR data
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          echo "PR Body"
+          echo "${{ github.event.pull_request.body }}"
       - name: Determine issue number
         uses: koppor/ticket-check-action@add-output
         with:
