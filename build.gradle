@@ -716,7 +716,7 @@ tasks.register('guiTest', Test) {
     testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED"]
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 
     maxParallelForks = 1
