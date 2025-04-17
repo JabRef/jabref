@@ -46,6 +46,7 @@ public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
     private final JStyleLoader jStyleLoader;
+    private final CSLStyleLoader cslStyleLoader;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final OpenOfficePreferences openOfficePreferences;
@@ -55,10 +56,10 @@ public class StyleSelectDialogViewModel {
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
-    private final CSLStyleLoader cslStyleLoader;
 
     public StyleSelectDialogViewModel(DialogService dialogService,
                                       JStyleLoader jStyleLoader,
+                                      CSLStyleLoader cslStyleLoader,
                                       GuiPreferences preferences,
                                       TaskExecutor taskExecutor,
                                       BibEntryTypesManager bibEntryTypesManager) {
@@ -67,7 +68,7 @@ public class StyleSelectDialogViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.openOfficePreferences = preferences.getOpenOfficePreferences();
         this.jStyleLoader = jStyleLoader;
-        this.cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
+        this.cslStyleLoader = cslStyleLoader;
 
         jStyles.addAll(loadJStyles());
 

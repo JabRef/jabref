@@ -45,6 +45,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -106,6 +107,7 @@ public class OpenOfficePanel {
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
     private final JStyleLoader jStyleLoader;
+    private final CSLStyleLoader cslStyleLoader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -149,6 +151,8 @@ public class OpenOfficePanel {
                 openOfficePreferences,
                 layoutFormatterPreferences,
                 abbreviationRepository);
+
+        cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
 
         ActionFactory factory = new ActionFactory();
 
@@ -230,7 +234,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(jStyleLoader);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(jStyleLoader, cslStyleLoader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;

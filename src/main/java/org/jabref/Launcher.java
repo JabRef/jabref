@@ -36,7 +36,7 @@ public class Launcher {
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
 
         List<UiCommand> uiCommands = JabKit.processArguments(args, preferences, fileUpdateMonitor);
-        // The method `processArguments` quites the whole JVM if no GUI is needed.
+        // The method `processArguments` quits the whole JVM if no GUI is needed.
 
         PreferencesMigrations.runMigrations(preferences);
 

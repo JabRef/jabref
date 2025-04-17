@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 public class CSLStyleUtils {
     private static final String STYLES_ROOT = "/csl-styles";
     private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
     static {

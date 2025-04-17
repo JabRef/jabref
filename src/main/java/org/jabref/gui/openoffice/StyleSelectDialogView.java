@@ -28,6 +28,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
@@ -51,7 +52,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
-    private final JStyleLoader loader;
+    private final JStyleLoader jStyleLoader;
+    private final CSLStyleLoader cslStyleLoader;
 
     // JStyles TableView
     @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
@@ -122,8 +124,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         }
     }
 
-    public StyleSelectDialogView(JStyleLoader loader) {
-        this.loader = loader;
+    public StyleSelectDialogView(JStyleLoader jStyleLoader, CSLStyleLoader cslStyleLoader) {
+        this.jStyleLoader = jStyleLoader;
+        this.cslStyleLoader = cslStyleLoader;
 
         ViewLoader.view(this)
                   .load()
@@ -141,7 +144,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void initialize() {
-        viewModel = new StyleSelectDialogViewModel(dialogService, loader, preferences, taskExecutor, bibEntryTypesManager);
+        viewModel = new StyleSelectDialogViewModel(dialogService, jStyleLoader, cslStyleLoader, preferences, taskExecutor, bibEntryTypesManager);
 
         setupJStylesTab();
         setupCslStylesTab();
