@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.maintable.BibEntryTableViewModel;
@@ -61,6 +62,7 @@ public class SaveDatabaseAction {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
+    private final StateManager stateManager;
 
     public enum SaveDatabaseMode {
         SILENT, NORMAL
@@ -69,11 +71,13 @@ public class SaveDatabaseAction {
     public SaveDatabaseAction(LibraryTab libraryTab,
                               DialogService dialogService,
                               GuiPreferences preferences,
-                              BibEntryTypesManager entryTypesManager) {
+                              BibEntryTypesManager entryTypesManager,
+                              StateManager stateManager) {
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entryTypesManager = entryTypesManager;
+        this.stateManager = stateManager;
     }
 
     public boolean save() {
@@ -158,6 +162,7 @@ public class SaveDatabaseAction {
             // we managed to successfully save the file
             // thus, we can store the path into the context
             context.setDatabasePath(file);
+            stateManager.setActiveDatabase(context);
             libraryTab.updateTabTitle(false);
 
             // Reset (here: uninstall and install again) AutosaveManager, BackupManager and IndexManager for the new file name

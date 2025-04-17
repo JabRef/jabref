@@ -12,7 +12,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
@@ -36,24 +36,22 @@ public class OtherFieldsTab extends FieldsEditorTab {
     private final List<Field> customTabsFieldNames;
     private final BibEntryTypesManager entryTypesManager;
 
-    public OtherFieldsTab(BibDatabaseContext databaseContext,
-                          SuggestionProviders suggestionProviders,
-                          UndoManager undoManager,
+    public OtherFieldsTab(UndoManager undoManager,
                           UndoAction undoAction,
                           RedoAction redoAction,
                           GuiPreferences preferences,
                           BibEntryTypesManager entryTypesManager,
                           JournalAbbreviationRepository journalAbbreviationRepository,
+                          StateManager stateManager,
                           PreviewPanel previewPanel) {
         super(
                 false,
-                databaseContext,
-                suggestionProviders,
                 undoManager,
                 undoAction,
                 redoAction,
                 preferences,
                 journalAbbreviationRepository,
+                stateManager,
                 previewPanel
         );
 
@@ -68,7 +66,8 @@ public class OtherFieldsTab extends FieldsEditorTab {
 
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
-        BibDatabaseMode mode = databaseContext.getMode();
+        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                           .orElse(BibDatabaseMode.BIBLATEX);
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             // Get all required and optional fields configured for the entry
