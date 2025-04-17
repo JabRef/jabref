@@ -20,7 +20,7 @@
         <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" styleClass="embeddedHyperlink" text="%You can find information about DJL privacy policy here." />
         <HBox spacing="10.0">
             <Button onAction="#onIAgreeButtonClick" text="%I agree"/>
-            <Button onAction="#hideAITabs" text="%Hide 'AI tabs'"/>
+            <Button onAction="#hideAITabs" text="%Hide 'AI' tabs"/>
         </HBox>
     </VBox>
 </fx:root>
