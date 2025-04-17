@@ -57,7 +57,7 @@ class CSLStyleUtilsTest {
         return Stream.of(
                 Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", true),
                 Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false),
-                Arguments.of(LITERATURA, "Literatūra", false) // Literatūra is author-date format, so non-numeric
+                Arguments.of(LITERATURA, "Literatūra", false) // Literatūra uses author-date format, so non-numeric
         );
     }
 }
