@@ -8,7 +8,16 @@ jobs:
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && !github.event.pull_request.merged && github.actor != 'dependabot[bot]'
+    if: >
+      github.event.action == 'closed' && !github.event.pull_request.merged && !(
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     permissions:
       contents: read
       issues: write
@@ -89,7 +98,16 @@ jobs:
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && github.event.pull_request.merged && github.actor != 'dependabot[bot]' && !startsWith(github.event.pull_request.title, 'New Crowdin updates')
+    if: >
+      github.event.action == 'closed' && github.event.pull_request.merged && !(
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     permissions:
       contents: read
       issues: write
