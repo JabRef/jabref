@@ -563,9 +563,17 @@ tasks.register('generateCitationStyleCatalog', JavaExec) {
     mainClass = "org.jabref.logic.citationstyle.CitationStyleCatalogGenerator"
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
+
 jar.dependsOn('generateCitationStyleCatalog')
-compileTestJava.dependsOn('generateCitationStyleCatalog')
-processTestResources.dependsOn('generateCitationStyleCatalog')
+
+// catalog from above task needs to be copied to build output for tests
+tasks.register('copyCitationStyleCatalog', Copy) {
+    from 'src/main/resources/citation-style-catalog.json'
+    into 'build/resources/main'
+    dependsOn 'generateCitationStyleCatalog'
+}
+compileTestJava.dependsOn('copyCitationStyleCatalog')
+test.dependsOn('copyCitationStyleCatalog')
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'

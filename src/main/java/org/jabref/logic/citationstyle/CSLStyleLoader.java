@@ -292,9 +292,6 @@ public class CSLStyleLoader {
     }
 
     public static List<CitationStyle> getInternalStyles() {
-        if (INTERNAL_STYLES.isEmpty()) {
-            loadInternalStyles();
-        }
         return List.copyOf(INTERNAL_STYLES);
     }
 }
