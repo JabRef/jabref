@@ -12,7 +12,7 @@ jobs:
     permissions:
       issues: write
     outputs:
-      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues }}
+      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues || '[]' }}
     steps:
       - name: Unassign stale assignments
         id: unassign
@@ -52,6 +52,10 @@ jobs:
             - Submit a pull request showing your current state. You will be automatically assigned again.
             - Ask a maintainer to assign you again.
             </details>
+      - name: Print unassigned issues
+        run: >
+          echo "Unassigned issues: ${{ steps.unassign.outputs.unassigned_issues }}"
+
   move_unassigned_issues:
     needs: unassign_issues
     if: ${{ needs.unassign_issues.outputs.unassigned_issues != '[]' }}

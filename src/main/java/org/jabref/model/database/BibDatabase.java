@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -28,11 +29,13 @@ import org.jabref.model.database.event.EntriesRemovedEvent;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.Month;
+import org.jabref.model.entry.ParsedEntryLink;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.EntryChangedEvent;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 
@@ -60,6 +63,9 @@ public class BibDatabase {
 
     // Not included in equals, because it is not relevant for the content of the database
     private final EventBus eventBus = new EventBus();
+
+    // Reverse index for citation links
+    private final Map<String, Set<BibEntry>> citationIndex = new ConcurrentHashMap<>();
 
     private String preamble;
 
@@ -192,7 +198,11 @@ public class BibDatabase {
             eventBus.post(new EntriesAddedEvent(newEntries, newEntries.getFirst(), eventSource));
         }
         entries.addAll(newEntries);
-        newEntries.forEach(entry -> entriesId.put(entry.getId(), entry));
+        newEntries.forEach(entry -> {
+                    entriesId.put(entry.getId(), entry);
+                    indexEntry(entry);
+                }
+        );
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
@@ -223,15 +233,70 @@ public class BibDatabase {
     public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        List<String> ids = new ArrayList<>();
+        Collection idsToBeDeleted;
+        if (toBeDeleted.size() > 10) {
+            idsToBeDeleted = new HashSet<>();
+        } else {
+            idsToBeDeleted = new ArrayList<>(toBeDeleted.size());
+        }
+
         for (BibEntry entry : toBeDeleted) {
-            ids.add(entry.getId());
+            idsToBeDeleted.add(entry.getId());
         }
-        boolean anyRemoved = entries.removeIf(entry -> ids.contains(entry.getId()));
-        if (anyRemoved) {
-            toBeDeleted.forEach(entry -> entriesId.remove(entry.getId()));
-            eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
+
+        List<BibEntry> newEntries = new ArrayList<>(entries);
+        newEntries.removeIf(entry -> idsToBeDeleted.contains(entry.getId()));
+
+        toBeDeleted.forEach(entry -> {
+            entriesId.remove(entry.getId());
+            removeEntryFromIndex(entry);
+        });
+
+        entries.setAll(newEntries);
+        eventBus.post(new EntriesRemovedEvent(toBeDeleted, eventSource));
+    }
+
+    private void forEachCitationKey(BibEntry entry, Consumer<String> keyConsumer) {
+        for (Field field : entry.getFields()) {
+            if (field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK) || field.getProperties().contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+                List<ParsedEntryLink> parsedLinks = entry.getEntryLinkList(field, this);
+
+                for (ParsedEntryLink link : parsedLinks) {
+                    String key = link.getKey().trim();
+                    if (!key.isEmpty()) {
+                        keyConsumer.accept(key);
+                    }
+                }
+            }
         }
+    }
+
+    public Set<BibEntry> getEntriesForCitationKey(String citationKey) {
+        return citationIndex.getOrDefault(citationKey, Collections.emptySet());
+    }
+
+    private Set<String> getReferencedCitationKeys(BibEntry entry) {
+        Set<String> keys = new HashSet<>();
+        forEachCitationKey(entry, key -> keys.add(key));
+        return keys;
+    }
+
+    private void indexEntry(BibEntry entry) {
+        forEachCitationKey(entry, key ->
+                citationIndex.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(entry)
+        );
+    }
+
+    private void removeEntryFromIndex(BibEntry entry) {
+        forEachCitationKey(entry, key -> {
+            Set<BibEntry> entriesForKey = citationIndex.get(key);
+            if (entriesForKey != null) {
+                entriesForKey.remove(entry);
+                if (entriesForKey.isEmpty()) {
+                    citationIndex.remove(key);
+                }
+            }
+        });
     }
 
     /**
@@ -626,13 +691,11 @@ public class BibDatabase {
 
     /**
      * @return The index of the given entry in the list of entries, or -1 if the entry is not in the list.
-     *
      * @implNote New entries are always added to the end of the list and always get a higher ID.
-     *           See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
-     *           {@link org.jabref.model.entry.IdGenerator IdGenerator},
-     *           {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
-     *           Therefore, using binary search to find the index.
-     *
+     * See {@link org.jabref.model.entry.BibEntry#BibEntry(org.jabref.model.entry.types.EntryType) BibEntry},
+     * {@link org.jabref.model.entry.IdGenerator IdGenerator},
+     * {@link BibDatabase#insertEntries(List, EntriesEventSource) insertEntries}.
+     * Therefore, using binary search to find the index.
      * @implNote IDs are zero-padded strings, so there is no need to convert them to integers for comparison.
      */
     public int indexOf(BibEntry bibEntry) {

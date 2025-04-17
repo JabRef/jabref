@@ -3,6 +3,7 @@ package org.jabref.gui.libraryproperties.general;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -27,6 +28,11 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.metadata.MetaData;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
+
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BooleanProperty encodingDisableProperty = new SimpleBooleanProperty();
@@ -37,6 +43,10 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty userSpecificFileDirectoryProperty = new SimpleStringProperty("");
     private final StringProperty laTexFileDirectoryProperty = new SimpleStringProperty("");
+
+    private final Validator librarySpecificFileDirectoryValidator;
+    private final Validator userSpecificFileDirectoryValidator;
+    private final Validator laTexFileDirectoryValidator;
 
     private final DialogService dialogService;
     private final CliPreferences preferences;
@@ -49,6 +59,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         this.preferences = preferences;
         this.databaseContext = databaseContext;
         this.metaData = databaseContext.getMetaData();
+
+        librarySpecificFileDirectoryValidator = new FunctionBasedValidator<>(
+                librarySpecificDirectoryProperty,
+                mainDirectoryPath -> validateDirectory(mainDirectoryPath, "Library-specific")
+        );
+
+        userSpecificFileDirectoryValidator = new FunctionBasedValidator<>(
+                userSpecificFileDirectoryProperty,
+                mainDirectoryPath -> validateDirectory(mainDirectoryPath, "User-specific")
+        );
+
+        laTexFileDirectoryValidator = new FunctionBasedValidator<>(
+                laTexFileDirectoryProperty,
+                mainDirectoryPath -> validateDirectory(mainDirectoryPath, "LaTeX")
+        );
     }
 
     @Override
@@ -92,6 +117,29 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         }
 
         databaseContext.setMetaData(newMetaData);
+    }
+
+    ValidationStatus librarySpecificFileDirectoryStatus() {
+        return librarySpecificFileDirectoryValidator.getValidationStatus();
+    }
+
+    ValidationStatus userSpecificFileDirectoryStatus() {
+        return userSpecificFileDirectoryValidator.getValidationStatus();
+    }
+
+    ValidationStatus laTexFileDirectoryStatus() {
+        return laTexFileDirectoryValidator.getValidationStatus();
+    }
+
+    @Override
+    public boolean validateSettings() {
+        ValidationStatus librarySpecificFileDirectoryStatus = librarySpecificFileDirectoryStatus();
+        ValidationStatus userSpecificFileDirectoryStatus = userSpecificFileDirectoryStatus();
+        ValidationStatus laTexFileDirectoryStatus = laTexFileDirectoryStatus();
+
+        return validateAndShowError(librarySpecificFileDirectoryStatus) &&
+                validateAndShowError(userSpecificFileDirectoryStatus) &&
+                validateAndShowError(laTexFileDirectoryStatus);
     }
 
     public void browseLibrarySpecificDir() {
@@ -160,5 +208,31 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             return preferences.getFilePreferences().getWorkingDirectory();
         }
         return foundPath.get();
+    }
+
+    private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
+        try {
+            Path path = Path.of(directoryPath);
+            if (!Files.isDirectory(path)) {
+                return ValidationMessage.error(
+                        Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
+                );
+            }
+        } catch (InvalidPathException ex) {
+            return ValidationMessage.error(
+                    Localization.lang("Invalid path: '%0'.\nCheck \"%1\".", directoryPath, messageKey)
+            );
+        }
+        // Directory is valid
+        return null;
+    }
+
+    private boolean validateAndShowError(ValidationStatus status) {
+        if (!status.isValid()) {
+            status.getHighestMessage().ifPresent(message ->
+                    dialogService.showErrorDialogAndWait(message.getMessage()));
+            return false;
+        }
+        return true;
     }
 }
