@@ -27,10 +27,6 @@ public class CSLStyleLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleLoader.class);
 
-    static {
-        loadInternalStyles();
-    }
-
     private final OpenOfficePreferences openOfficePreferences;
     private final List<CitationStyle> externalStyles = new ArrayList<>();
 
@@ -62,7 +58,7 @@ public class CSLStyleLoader {
     /**
      * Loads the internal (built-in) CSL styles from the catalog generated at build-time.
      */
-    private static void loadInternalStyles() {
+    public static void loadInternalStyles() {
         INTERNAL_STYLES.clear();
 
         try (InputStream is = CSLStyleLoader.class.getResourceAsStream(CATALOG_PATH)) {
@@ -77,6 +73,7 @@ public class CSLStyleLoader {
                     });
 
             if (!styleInfoList.isEmpty()) {
+                int styleCount = styleInfoList.size();
                 for (Map<String, Object> info : styleInfoList) {
                     String path = (String) info.get("path");
                     String title = (String) info.get("title");
@@ -91,8 +88,10 @@ public class CSLStyleLoader {
                         }
                     } catch (IOException e) {
                         LOGGER.error("Error loading style file: {}", path, e);
+                        styleCount--;
                     }
                 }
+            LOGGER.info("Loaded {} CSL styles", styleCount);
             } else {
                 LOGGER.error("Citation style catalog is empty");
             }
@@ -166,6 +165,9 @@ public class CSLStyleLoader {
     }
 
     public static List<CitationStyle> getInternalStyles() {
+        if (INTERNAL_STYLES.isEmpty()) {
+            loadInternalStyles();
+        }
         return List.copyOf(INTERNAL_STYLES);
     }
 }

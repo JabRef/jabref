@@ -170,12 +170,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         colDeleteIcon.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<StyleSelectItemViewModel, Boolean>()
-                .withGraphic(internalStyle -> {
-                    if (!internalStyle) {
-                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-                    }
-                    return null;
-                })
+                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
                 .withTooltip(item -> Localization.lang("Remove style"))
                 .install(colDeleteIcon);
@@ -226,12 +221,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
         new ValueTableCellFactory<CitationStyleViewModel, Boolean>()
-                .withGraphic(internalStyle -> {
-                    if (!internalStyle) {
-                        return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
-                    }
-                    return null;
-                })
+                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent(item -> evt -> {
                     CitationStyleViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
                     if (selectedStyle != null) {

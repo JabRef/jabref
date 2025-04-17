@@ -8,6 +8,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -41,6 +42,8 @@ public class Launcher {
 
         PostgreServer postgreServer = new PostgreServer();
         Injector.setModelOrService(PostgreServer.class, postgreServer);
+
+        CSLStyleLoader.loadInternalStyles();
 
         JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
         JabRefGUI.launch(JabRefGUI.class, args);

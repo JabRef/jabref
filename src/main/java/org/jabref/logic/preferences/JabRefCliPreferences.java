@@ -44,6 +44,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
+import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -1124,8 +1125,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // Reassign currentStyle based on actual last used CSL style or JStyle
         if (CitationStyle.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CSLStyleLoader.createCitationStyleFromFile(currentStylePath)
-                         .orElse(CSLStyleLoader.getDefaultStyle());
+            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
+                                        .orElse(CSLStyleLoader.getDefaultStyle());
         } else {
             // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
