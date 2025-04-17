@@ -8,6 +8,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.groups.GroupTreeView;
 import org.jabref.gui.importer.fetcher.WebSearchPaneView;
 import org.jabref.gui.openoffice.OpenOfficePanel;
@@ -27,6 +28,7 @@ public class SidePaneContentFactory {
     private final DialogService dialogService;
     private final AiService aiService;
     private final StateManager stateManager;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
     private final ClipBoardManager clipBoardManager;
@@ -39,6 +41,7 @@ public class SidePaneContentFactory {
                                   DialogService dialogService,
                                   AiService aiService,
                                   StateManager stateManager,
+                                  AdaptVisibleTabs adaptVisibleTabs,
                                   FileUpdateMonitor fileUpdateMonitor,
                                   BibEntryTypesManager entryTypesManager,
                                   ClipBoardManager clipBoardManager,
@@ -50,6 +53,7 @@ public class SidePaneContentFactory {
         this.dialogService = dialogService;
         this.aiService = aiService;
         this.stateManager = stateManager;
+        this.adaptVisibleTabs = adaptVisibleTabs;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
@@ -61,6 +65,7 @@ public class SidePaneContentFactory {
             case GROUPS -> new GroupTreeView(
                     taskExecutor,
                     stateManager,
+                    adaptVisibleTabs,
                     preferences,
                     dialogService,
                     aiService,

@@ -6,6 +6,7 @@ import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.util.EmbeddingModelGuardedComponent;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
@@ -42,9 +43,10 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                                   DialogService dialogService,
                                   AiPreferences aiPreferences,
                                   ExternalApplicationsPreferences externalApplicationsPreferences,
+                                  AdaptVisibleTabs adaptVisibleTabs,
                                   TaskExecutor taskExecutor
     ) {
-        super(aiService, aiPreferences, externalApplicationsPreferences, dialogService);
+        super(aiService, aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
         this.name = name;
         this.chatHistory = chatHistory;

@@ -169,6 +169,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 SearchType.NORMAL_SEARCH);
 
+        this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
+                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
+                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
+                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
+        Injector.setModelOrService(EntryEditor.class, entryEditor);
+
         this.sidePane = new SidePane(
                 this,
                 this.preferences,
@@ -177,16 +183,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 aiService,
                 stateManager,
+                entryEditor,
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
                 undoManager);
-
-        this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
-                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
-                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
-        Injector.setModelOrService(EntryEditor.class, entryEditor);
 
         this.pushToApplicationCommand = new PushToApplicationCommand(
                 stateManager,
