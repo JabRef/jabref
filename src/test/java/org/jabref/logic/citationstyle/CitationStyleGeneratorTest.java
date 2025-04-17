@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.util.TestEntry;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,19 +20,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 class CitationStyleGeneratorTest {
 
     private final BibEntry testEntry = TestEntry.getTestEntry();
     private final BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(testEntry)));
     private final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
-    private final OpenOfficePreferences openOfficePreferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
-    private final CSLStyleLoader cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
-    private final List<CitationStyle> styleList = cslStyleLoader.getInternalStyles();
+    private final List<CitationStyle> styleList = CSLStyleLoader.getInternalStyles();
 
     @Test
     void aCMCitation() {
