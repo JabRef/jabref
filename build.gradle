@@ -570,13 +570,13 @@ jar.dependsOn('generateCitationStyleCatalog')
 tasks.register('copyCitationStyleCatalog', Copy) {
     from 'src/main/resources/citation-style-catalog.json'
     into 'build/resources/main'
+    mustRunAfter 'checkstyleMain'
     dependsOn 'generateCitationStyleCatalog'
 }
-compileTestJava.dependsOn('copyCitationStyleCatalog')
 
+compileTestJava.dependsOn('copyCitationStyleCatalog')
 generateJournalListMV.dependsOn('copyCitationStyleCatalog')
 generateLtwaListMV.dependsOn('copyCitationStyleCatalog')
-copyCitationStyleCatalog.mustRunAfter('checkstyleMain')
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
