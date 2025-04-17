@@ -13,10 +13,12 @@ jobs:
       contents: read
       issues: write
     steps:
-      - name: Echo PR number and URL
+      - name: echo PR data
         run: |
           echo "PR Number: ${{ github.event.pull_request.number }}"
           echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          echo "PR Body"
+          echo "${{ github.event.pull_request.body }}"
       - name: Determine issue number
         id: get_issue_number
         uses: koppor/ticket-check-action@add-output
@@ -92,10 +94,12 @@ jobs:
       contents: read
       issues: write
     steps:
-      - name: Echo PR number and URL
+      - name: echo PR data
         run: |
           echo "PR Number: ${{ github.event.pull_request.number }}"
           echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          echo "PR Body"
+          echo "${{ github.event.pull_request.body }}"
       - name: Determine issue number
         id: get_issue_number
         uses: koppor/ticket-check-action@add-output
