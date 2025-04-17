@@ -19,6 +19,7 @@ class CSLStyleUtilsTest {
 
     private static final String MODIFIED_IEEE = "ieee-bold-author.csl";
     private static final String MODIFIED_APA = "modified-apa.csl";
+    private static final String LITERATURA = "literatura.csl";
 
     @ParameterizedTest
     @MethodSource("styleTestData")
@@ -55,7 +56,8 @@ class CSLStyleUtilsTest {
     private static Stream<Arguments> styleTestData() {
         return Stream.of(
                 Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", true),
-                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false)
+                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false),
+                Arguments.of(LITERATURA, "Literatūra", false) // Literatūra is author-date format, so non-numeric
         );
     }
 }
