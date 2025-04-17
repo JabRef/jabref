@@ -8,7 +8,7 @@ jobs:
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && !github.event.pull_request.merged
+    if: github.event.action == 'closed' && !github.event.pull_request.merged && github.actor != 'dependabot[bot]'
     permissions:
       contents: read
       issues: write
@@ -87,7 +87,7 @@ jobs:
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && github.event.pull_request.merged
+    if: github.event.action == 'closed' && github.event.pull_request.merged && github.actor != 'dependabot[bot]'
     permissions:
       contents: read
       issues: write
