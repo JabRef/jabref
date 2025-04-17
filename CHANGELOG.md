@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a button in Privacy notice and Mr. DLib Privacy settings notice for hiding related tabs. [#11707](https://github.com/JabRef/jabref/issues/11707)
 - We added buttons "Add example entry" and "Import existing PDFs" when a library is empty, making it easier for new users to get started. [#12662](https://github.com/JabRef/jabref/issues/12662)
 - In the Open/LibreOffice integration, we added the provision to modify the bibliography title and its format for CSL styles, in the "Select style" dialog. [#12663](https://github.com/JabRef/jabref/issues/12663)
 - We added a new Welcome tab which shows a welcome screen if no database is open. [#12272](https://github.com/JabRef/jabref/issues/12272)
@@ -35,6 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We reordered the settings in the 'Entry editor' tab in preferences. [#11707](https://github.com/JabRef/jabref/issues/11707)
 - Added "$" to the citation key generator preferences default list of characters to remove [#12536](https://github.com/JabRef/jabref/issues/12536)
 - We changed the message displayed in the Integrity Check Progress dialog to "Waiting for the check to finish...". [#12694](https://github.com/JabRef/jabref/issues/12694)
 - We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
