@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -142,24 +141,5 @@ public class JStyleLoader {
         // Pick the first internal
         openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
         return internalStyles.getFirst();
-    }
-
-    public OOStyle getUsedStyleUnified() {
-        OOStyle gotStyle = openOfficePreferences.getCurrentStyle();
-
-        if (gotStyle instanceof JStyle jStyle) {
-            String filename = jStyle.getPath();
-            for (JStyle style : getStyles()) {
-                if (filename.equals(style.getPath())) {
-                    return style;
-                }
-            }
-            // Pick the first internal
-            openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
-            return internalStyles.getFirst();
-        } else if (gotStyle instanceof CitationStyle citationStyle) {
-                return citationStyle;
-        }
-        return null;
     }
 }
