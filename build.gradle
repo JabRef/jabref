@@ -573,7 +573,6 @@ tasks.register('copyCitationStyleCatalog', Copy) {
     dependsOn 'generateCitationStyleCatalog'
 }
 compileTestJava.dependsOn('copyCitationStyleCatalog')
-test.dependsOn('copyCitationStyleCatalog')
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
