@@ -87,7 +87,7 @@ jobs:
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && github.event.pull_request.merged && github.actor != 'dependabot[bot]'
+    if: github.event.action == 'closed' && github.event.pull_request.merged && github.actor != 'dependabot[bot]' && !startsWith(github.event.pull_request.title, 'New Crowdin updates')
     permissions:
       contents: read
       issues: write
