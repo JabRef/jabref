@@ -18,6 +18,7 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
 public class LinkedFileNamePatternsPanelViewModel {
+
     public static final String ENTRY_TYPE_DEFAULT_NAME = "default";
 
     public static Comparator<PatternsPanelItemModel> defaultOnTopComparator = (o1, o2) -> {
@@ -75,7 +76,7 @@ public class LinkedFileNamePatternsPanelViewModel {
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern(ENTRY_TYPE_DEFAULT_NAME);
+        defaultItemProperty.getValue().setPattern(filePreferences.getDefaultPattern());
     }
 
     public ListProperty<PatternsPanelItemModel> patternListProperty() {
