@@ -87,6 +87,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
 
+    private enum StyleTabType {
+        CSL_STYLES,
+        JSTYLES;
+    }
+
     /**
      * ViewModel for the CitationStyle entries in the TableView
      */
@@ -150,11 +155,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         setupCslStylesTab();
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
-        if (currentStyle instanceof JStyle) {
-            tabPane.getSelectionModel().select(1);
-        } else {
-            tabPane.getSelectionModel().select(0);
-        }
+        StyleTabType tabType = (currentStyle instanceof JStyle) ? StyleTabType.JSTYLES : StyleTabType.CSL_STYLES;
+        tabPane.getSelectionModel().select(tabType.ordinal());
 
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
         tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.setSelectedTab(newValue));
