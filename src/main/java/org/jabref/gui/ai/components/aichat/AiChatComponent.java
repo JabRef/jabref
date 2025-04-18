@@ -64,8 +64,6 @@ public class AiChatComponent extends VBox {
 
     private final ObservableList<Notification> notifications = FXCollections.observableArrayList();
 
-
-
     @FXML private Loadable uiLoadableChatHistory;
     @FXML private ChatHistoryComponent uiChatHistory;
     @FXML private Button notificationsButton;
