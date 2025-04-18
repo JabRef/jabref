@@ -24,7 +24,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
-import org.jabref.gui.util.DefaultDirectoryMonitor;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
@@ -41,7 +41,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.DirectoryMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -135,7 +134,7 @@ public class JabRefGUI extends Application {
     public void initialize() {
         WebViewStore.init();
 
-        DirectoryMonitor directoryMonitor = new DefaultDirectoryMonitor();
+        DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
 
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
@@ -265,7 +264,10 @@ public class JabRefGUI extends Application {
     }
 
     public void onShowing(WindowEvent event) {
-        Platform.runLater(() -> mainFrame.updateDividerPosition());
+        Platform.runLater(() -> {
+            mainFrame.updateHorizontalDividerPosition();
+            mainFrame.updateVerticalDividerPosition();
+        });
 
         // Open last edited databases
         if (uiCommands.stream().noneMatch(UiCommand.BlankWorkspace.class::isInstance)

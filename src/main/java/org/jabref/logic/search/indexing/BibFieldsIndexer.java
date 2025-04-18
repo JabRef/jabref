@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
@@ -38,6 +39,7 @@ public class BibFieldsIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
     private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
     private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
+    private static final Set<Field> DATE_FIELDS = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
 
     private final BibDatabaseContext databaseContext;
     private final Connection connection;
@@ -215,10 +217,12 @@ public class BibFieldsIndexer {
                 // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
                 // To uncover these flaws, we add the "assert" statement.
                 // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
-                Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-                assert resolvedFieldLatexFree.isPresent();
-                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
-
+                // Skip indexing of date-related fields separately to ensure proper handling later in the process.
+                if (!DATE_FIELDS.contains(field)) {
+                    Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
+                    assert resolvedFieldLatexFree.isPresent();
+                    addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                }
                 // region Handling of known multi-value fields
                 // split and convert to Unicode
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
@@ -239,7 +243,11 @@ public class BibFieldsIndexer {
                 }
                 // endregion
             }
-
+            // ensure all date-related fields are indexed.
+            for (Field dateField : DATE_FIELDS) {
+                Optional<String> resolvedDateValue = bibEntry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
+                resolvedDateValue.ifPresent(dateValue -> addBatch(preparedStatement, entryId, dateField, dateValue));
+            }
             // add entry type
             addBatch(preparedStatement, entryId, TYPE_HEADER, bibEntry.getType().getName());
 
@@ -302,16 +310,46 @@ public class BibFieldsIndexer {
                 FIELD_VALUE_LITERAL,
                 FIELD_VALUE_TRANSFORMED);
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
-            String entryId = entry.getId();
-            String value = entry.getField(field).orElse("");
+        // Inserts or updates date-related fields (e.g., date, year, month, day) into the index.
+        // If a conflict occurs (e.g., the same ENTRY_ID and FIELD_NAME already exist),
+        // the existing values are overwritten with the new ones to ensure the latest data is stored.
+        String insertDateFieldQuery = """
+                INSERT INTO %s ("%s", "%s", "%s", "%s")
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT ("%s", "%s")
+                DO UPDATE SET "%s" = EXCLUDED."%s", "%s" = EXCLUDED."%s"
+                """.formatted(
+                schemaMainTableReference,
+                ENTRY_ID,
+                FIELD_NAME,
+                FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED,
+                ENTRY_ID, FIELD_NAME,
+                FIELD_VALUE_LITERAL, FIELD_VALUE_LITERAL,
+                FIELD_VALUE_TRANSFORMED, FIELD_VALUE_TRANSFORMED);
 
-            Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-            assert resolvedFieldLatexFree.isPresent();
-            addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
-            preparedStatement.executeBatch();
-        } catch (SQLException e) {
-            LOGGER.error("Could not add an entry to the index.", e);
+        String entryId = entry.getId();
+        if (DATE_FIELDS.contains(field)) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertDateFieldQuery)) {
+                for (Field dateField : DATE_FIELDS) {
+                    Optional<String> resolvedDateValue = entry.getResolvedFieldOrAlias(dateField, this.databaseContext.getDatabase());
+                    resolvedDateValue.ifPresent(dateValue -> addBatch(preparedStatement, entryId, dateField, dateValue));
+                }
+                preparedStatement.executeBatch();
+            } catch (SQLException e) {
+                LOGGER.error("Could not add an entry to the index.", e);
+            }
+        } else {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery)) {
+                String value = entry.getField(field).orElse("");
+
+                Optional<String> resolvedFieldLatexFree = entry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
+                assert resolvedFieldLatexFree.isPresent();
+                addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                preparedStatement.executeBatch();
+            } catch (SQLException e) {
+                LOGGER.error("Could not add an entry to the index.", e);
+            }
         }
 
         String insertIntoSplitTable = """
@@ -325,7 +363,6 @@ public class BibFieldsIndexer {
                 FIELD_VALUE_TRANSFORMED);
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertIntoSplitTable)) {
-            String entryId = entry.getId();
             String value = entry.getField(field).orElse("");
 
             if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {

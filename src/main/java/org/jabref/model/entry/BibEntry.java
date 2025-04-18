@@ -1248,7 +1248,28 @@ public class BibEntry implements Cloneable {
                     otherPrioritizedFieldsNames.contains(otherField.getName())) {
                 // As iterator only goes through non-null fields from OTHER, otherFieldValue can never be empty
                 otherFieldValue.ifPresent(s -> this.setField(otherField, s));
+            } else {
+                switch (otherField) {
+                    case StandardField.FILE -> {
+                        List<LinkedFile> currentFiles = this.getFiles();
+                        List<LinkedFile> otherFiles = other.getFiles();
+                        List<LinkedFile> filesToAdd = otherFiles.stream()
+                                                                .filter(file -> !currentFiles.contains(file))
+                                                                .toList();
+                        if (!filesToAdd.isEmpty()) {
+                            this.addFiles(filesToAdd);
+                        }
+                    }
+                    // TODO: Merging of keywords
+                    default -> {
+                        // We keep the data of the current BibEntry
+                    }
+                }
             }
+        }
+
+        if (this.getType().equals(DEFAULT_TYPE)) {
+            this.setType(other.getType());
         }
     }
 

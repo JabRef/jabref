@@ -212,7 +212,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             libraryTab,
                             dialogService,
                             preferences,
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class)
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                            stateManager
                     ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);

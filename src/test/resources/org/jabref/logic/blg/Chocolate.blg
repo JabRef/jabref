@@ -1,0 +1,51 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: paper.aux
+The style file: splncs04.bst
+Database file #1: Chocolate.bib
+Warning--empty journal in Scholey_2013
+Warning--empty year in Scholey_2013
+Warning--empty journal in Tan_2021
+Warning--empty year in Tan_2021
+You've used 2 entries,
+            2850 wiz_defined-function locations,
+            612 strings with 4882 characters,
+and the built_in function-call counts, 1237 in all, are:
+= -- 93
+> -- 39
+< -- 4
++ -- 17
+- -- 14
+* -- 92
+:= -- 151
+add.period$ -- 2
+call.type$ -- 2
+change.case$ -- 13
+chr.to.int$ -- 0
+cite$ -- 6
+duplicate$ -- 106
+empty$ -- 97
+format.name$ -- 16
+if$ -- 258
+int.to.chr$ -- 0
+int.to.str$ -- 2
+missing$ -- 23
+newline$ -- 12
+num.names$ -- 4
+pop$ -- 45
+preamble$ -- 1
+purify$ -- 11
+quote$ -- 0
+skip$ -- 41
+stack$ -- 0
+substring$ -- 63
+swap$ -- 74
+text.length$ -- 4
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 8
+warning$ -- 4
+while$ -- 9
+width$ -- 3
+write$ -- 23
+(There were 4 warnings)
