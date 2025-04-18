@@ -32,11 +32,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to choose whether to open the file explorer in the files directory or in the last opened directory when attaching files. [#12554](https://github.com/JabRef/jabref/issues/12554)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
 - We added a "Preview" header in the JStyles tab in the "Select style" dialog, to make it consistent with the CSL styles tab. [#12838](https://github.com/JabRef/jabref/pull/12838)
-- We added ability to toggle journal abbreviation lists (including built-in and external CSV files) on/off in preferences. [#{Issue Number}](https://github.com/JabRef/jabref/pull/{Issue Number})
 - We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832/)
 - We added a "LTWA" abbreviation feature in the "Quality > Abbreviate journal names > LTWA" menu [#12273](https://github.com/JabRef/jabref/issues/12273/)
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 - We now support usage of custom CSL styles in the Open/LibreOffice integration. [#12337](https://github.com/JabRef/jabref/issues/12337)
+- We added ability to toggle journal abbreviation lists (including built-in and external CSV files) on/off in preferences. [#12468](https://github.com/JabRef/jabref/pull/12468)
 
 ### Changed
 
