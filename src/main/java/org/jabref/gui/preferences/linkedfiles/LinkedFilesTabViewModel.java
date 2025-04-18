@@ -15,7 +15,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
+import org.jabref.gui.commonfxcontrols.PatternsPanelItemModel;
 import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -46,9 +46,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
 
-    private final ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
-            new CitationKeyPatternsPanelItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
+    private final ListProperty<PatternsPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<PatternsPanelItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
+            new PatternsPanelItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
 
     private final Validator mainFileDirValidator;
 
@@ -213,11 +213,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return this.moveToTrashProperty;
     }
 
-    public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {
+    public ListProperty<PatternsPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<CitationKeyPatternsPanelItemModel> defaultNamePatternProperty() {
+    public ObjectProperty<PatternsPanelItemModel> defaultNamePatternProperty() {
         return defaultNamePatternProperty;
     }
 }

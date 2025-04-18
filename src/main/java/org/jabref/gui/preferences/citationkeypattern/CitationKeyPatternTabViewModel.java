@@ -11,7 +11,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelViewModel;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
+import org.jabref.gui.commonfxcontrols.PatternsPanelItemModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
@@ -34,9 +34,9 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
     // The list and the default properties are being overwritten by the bound properties of the tableView, but to
     // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
-    private final ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
-            new CitationKeyPatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
+    private final ListProperty<PatternsPanelItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<PatternsPanelItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
+            new PatternsPanelItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
 
     private final CitationKeyPatternPreferences keyPatternPreferences;
 
@@ -155,11 +155,11 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
         return keyPatternReplacementProperty;
     }
 
-    public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {
+    public ListProperty<PatternsPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<CitationKeyPatternsPanelItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<PatternsPanelItemModel> defaultKeyPatternProperty() {
         return defaultKeyPatternProperty;
     }
 

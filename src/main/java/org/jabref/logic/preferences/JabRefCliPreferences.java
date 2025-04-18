@@ -1337,7 +1337,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private GlobalLinkedFileNamePatterns getGlobalLinkedFileNamePattern() {
         GlobalLinkedFileNamePatterns linkedFileNamePattern = GlobalLinkedFileNamePatterns.fromPattern(get(DEFAULT_LINKED_FILE_NAME_PATTERN));
-        Preferences preferences = PREFS_NODE.node(LINKED_FILE_NAME_PATTERNS_NODE);
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
         try {
             String[] keys = preferences.keys();
             for (String key : keys) {
@@ -1378,7 +1378,7 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private void clearLinkedFileNamePatterns() throws BackingStoreException {
-        Preferences preferences = PREFS_NODE.node(LINKED_FILE_NAME_PATTERNS_NODE);
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
         preferences.clear();
         getLinkedFileNamePatternPreferences().setNamePatterns(getGlobalLinkedFileNamePattern());
     }

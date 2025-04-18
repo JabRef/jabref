@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
+import org.jabref.gui.commonfxcontrols.PatternsPanelItemModel;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
@@ -20,7 +20,7 @@ import org.jabref.model.entry.types.EntryType;
 public class LinkedFileNamePatternsPanelViewModel {
     public static final String ENTRY_TYPE_DEFAULT_NAME = "default";
 
-    public static Comparator<CitationKeyPatternsPanelItemModel> defaultOnTopComparator = (o1, o2) -> {
+    public static Comparator<PatternsPanelItemModel> defaultOnTopComparator = (o1, o2) -> {
         String itemOneName = o1.getEntryType().getName();
         String itemTwoName = o2.getEntryType().getName();
 
@@ -37,8 +37,8 @@ public class LinkedFileNamePatternsPanelViewModel {
 
     private final FilePreferences filePreferences;
 
-    private final ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<CitationKeyPatternsPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
+    private final ListProperty<PatternsPanelItemModel> patternListProperty = new SimpleListProperty<>();
+    private final ObjectProperty<PatternsPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
     public LinkedFileNamePatternsPanelViewModel(FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
@@ -52,7 +52,7 @@ public class LinkedFileNamePatternsPanelViewModel {
             defaultPattern = initialNamePattern.getDefaultValue().stringRepresentation();
         }
 
-        defaultItemProperty.setValue(new CitationKeyPatternsPanelItemModel(new DefaultEntryType(), defaultPattern));
+        defaultItemProperty.setValue(new PatternsPanelItemModel(new DefaultEntryType(), defaultPattern));
         patternListProperty.setValue(FXCollections.observableArrayList());
         patternListProperty.add(defaultItemProperty.getValue());
 
@@ -65,11 +65,11 @@ public class LinkedFileNamePatternsPanelViewModel {
                          } else {
                              pattern = initialNamePattern.getPatterns().get(entryType).stringRepresentation();
                          }
-                         patternListProperty.add(new CitationKeyPatternsPanelItemModel(entryType, pattern));
+                         patternListProperty.add(new PatternsPanelItemModel(entryType, pattern));
                      });
     }
 
-    public void setItemToDefaultPattern(CitationKeyPatternsPanelItemModel item) {
+    public void setItemToDefaultPattern(PatternsPanelItemModel item) {
         item.setPattern(filePreferences.getDefaultPattern());
     }
 
@@ -78,11 +78,11 @@ public class LinkedFileNamePatternsPanelViewModel {
         defaultItemProperty.getValue().setPattern(ENTRY_TYPE_DEFAULT_NAME);
     }
 
-    public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {
+    public ListProperty<PatternsPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<CitationKeyPatternsPanelItemModel> defaultNamePatternProperty() {
+    public ObjectProperty<PatternsPanelItemModel> defaultNamePatternProperty() {
         return defaultItemProperty;
     }
 

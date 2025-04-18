@@ -13,7 +13,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.commonfxcontrols.PatternSuggestionCell;
-import org.jabref.gui.commonfxcontrols.CitationKeyPatternsPanelItemModel;
+import org.jabref.gui.commonfxcontrols.PatternsPanelItemModel;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -26,11 +26,11 @@ import org.jabref.model.entry.types.EntryType;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-public class LinkedFileNamePatternsPanel extends TableView<CitationKeyPatternsPanelItemModel> {
+public class LinkedFileNamePatternsPanel extends TableView<PatternsPanelItemModel> {
 
-    @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> entryTypeColumn;
-    @FXML public TableColumn<CitationKeyPatternsPanelItemModel, String> patternColumn;
-    @FXML public TableColumn<CitationKeyPatternsPanelItemModel, EntryType> actionsColumn;
+    @FXML public TableColumn<PatternsPanelItemModel, EntryType> entryTypeColumn;
+    @FXML public TableColumn<PatternsPanelItemModel, String> patternColumn;
+    @FXML public TableColumn<PatternsPanelItemModel, EntryType> actionsColumn;
 
     @Inject private GuiPreferences preferences;
 
@@ -62,7 +62,7 @@ public class LinkedFileNamePatternsPanel extends TableView<CitationKeyPatternsPa
         entryTypeColumn.setSortable(true);
         entryTypeColumn.setReorderable(false);
         entryTypeColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<CitationKeyPatternsPanelItemModel, EntryType>()
+        new ValueTableCellFactory<PatternsPanelItemModel, EntryType>()
                 .withText(EntryType::getDisplayName)
                 .install(entryTypeColumn);
         this.setOnSort(event ->
@@ -74,13 +74,13 @@ public class LinkedFileNamePatternsPanel extends TableView<CitationKeyPatternsPa
         patternColumn.setCellFactory(_ -> new PatternSuggestionCell(patterns));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<CitationKeyPatternsPanelItemModel, String> event) ->
+                (TableColumn.CellEditEvent<PatternsPanelItemModel, String> event) ->
                         event.getRowValue().setPattern(event.getNewValue()));
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<CitationKeyPatternsPanelItemModel, EntryType>()
+        new ValueTableCellFactory<PatternsPanelItemModel, EntryType>()
                 .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
                 .withTooltip(entryType ->
                         Localization.lang("Reset %s to default value").formatted(entryType.getDisplayName()))
@@ -101,11 +101,11 @@ public class LinkedFileNamePatternsPanel extends TableView<CitationKeyPatternsPa
         viewModel.resetAll();
     }
 
-    public ListProperty<CitationKeyPatternsPanelItemModel> patternListProperty() {
+    public ListProperty<PatternsPanelItemModel> patternListProperty() {
         return viewModel.patternListProperty();
     }
 
-    public ObjectProperty<CitationKeyPatternsPanelItemModel> defaultNamePatternProperty() {
+    public ObjectProperty<PatternsPanelItemModel> defaultNamePatternProperty() {
         return viewModel.defaultNamePatternProperty();
     }
 
@@ -126,9 +126,9 @@ public class LinkedFileNamePatternsPanel extends TableView<CitationKeyPatternsPa
             .findFirst().ifPresent(this::scrollTo);
     }
 
-    private static class HighlightTableRow extends TableRow<CitationKeyPatternsPanelItemModel> {
+    private static class HighlightTableRow extends TableRow<PatternsPanelItemModel> {
         @Override
-        public void updateItem(CitationKeyPatternsPanelItemModel item, boolean empty) {
+        public void updateItem(PatternsPanelItemModel item, boolean empty) {
             super.updateItem(item, empty);
             if (item == null || item.getEntryType() == null) {
                 setStyle("");
