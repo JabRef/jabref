@@ -94,6 +94,8 @@ jobs:
         run: |
           set -e
 
+          echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
+
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
 
           ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --jq '[.assignees[].login]')
