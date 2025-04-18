@@ -242,7 +242,7 @@ public class StyleSelectDialogViewModel {
             if (newStyleOptional.isPresent()) {
                 CitationStyle newStyle = newStyleOptional.get();
 
-                List<CitationStyle> allStyles = cslStyleLoader.getStyles();
+                List<CitationStyle> allStyles = CSLStyleLoader.getStyles();
                 List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
                                                                            .map(style -> new CitationStylePreviewLayout(style, Injector.instantiateModelOrService(BibEntryTypesManager.class)))
                                                                            .toList();
