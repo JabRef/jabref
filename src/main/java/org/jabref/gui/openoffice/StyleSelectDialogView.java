@@ -155,8 +155,8 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         setupCslStylesTab();
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
-        StyleTab tabType = (currentStyle instanceof JStyle) ? StyleTab.JSTYLES : StyleTab.CSL_STYLES;
-        tabPane.getSelectionModel().select(tabType.ordinal());
+        StyleTab tab = (currentStyle instanceof JStyle) ? StyleTab.JSTYLES : StyleTab.CSL_STYLES;
+        tabPane.getSelectionModel().select(tab.ordinal());
 
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
         tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.setSelectedTab(newValue));
