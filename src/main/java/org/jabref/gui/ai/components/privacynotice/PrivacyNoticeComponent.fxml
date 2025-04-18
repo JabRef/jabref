@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 <fx:root type="ScrollPane" styleClass="ai-tab"
@@ -17,6 +18,9 @@
         <GridPane fx:id="aiPolicies" hgap="4" vgap="4" />
         <Text fx:id="embeddingModelText" text="%Additionally, we use Deep Java Library (DJL) embedding models for both chatting and summarization. The embedding model will be downloaded in background (size %0) from Deep Java Library servers anonymously." />
         <Hyperlink wrapText="true" onAction="#onDjlPrivacyPolicyClick" styleClass="embeddedHyperlink" text="%You can find information about DJL privacy policy here." />
-        <Button onAction="#onIAgreeButtonClick" text="%I agree"/>
+        <HBox spacing="10.0">
+            <Button onAction="#onIAgreeButtonClick" text="%I agree"/>
+            <Button onAction="#hideAITabs" text="%Hide 'AI' tabs"/>
+        </HBox>
     </VBox>
 </fx:root>

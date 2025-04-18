@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -24,13 +23,11 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.Tooltip;
@@ -46,7 +43,6 @@ import org.jabref.gui.autosaveandbackup.AutosaveManager;
 import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
-import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -58,8 +54,6 @@ import org.jabref.gui.maintable.MainTableDataModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
-import org.jabref.gui.undo.RedoAction;
-import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.undo.UndoableFieldChange;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.undo.UndoableRemoveEntries;
@@ -92,12 +86,9 @@ import org.jabref.model.entry.BibtexString;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.event.EntriesEventSource;
 import org.jabref.model.entry.event.FieldChangedEvent;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.util.DirectoryMonitor;
-import org.jabref.model.util.DirectoryMonitorManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -113,11 +104,6 @@ import org.slf4j.LoggerFactory;
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
 public class LibraryTab extends Tab {
-    /**
-     * Defines the different modes that the tab can operate in
-     */
-    private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
@@ -132,10 +118,7 @@ public class LibraryTab extends Tab {
     private BibDatabaseContext bibDatabaseContext;
     private MainTableDataModel tableModel;
     private FileAnnotationCache annotationCache;
-    private EntryEditor entryEditor;
     private MainTable mainTable;
-    private PanelMode mode = PanelMode.MAIN_TABLE;
-    private SplitPane splitPane;
     private DatabaseNotification databaseNotificationPane;
 
     // Indicates whether the tab is loading data using a dataloading task
@@ -146,9 +129,6 @@ public class LibraryTab extends Tab {
     private boolean saving = false;
 
     private PersonNameSuggestionProvider searchAutoCompleter;
-
-    // Used to track whether the base has changed since last save.
-    private BibEntry showing;
 
     private SuggestionProviders suggestionProviders;
 
@@ -165,7 +145,6 @@ public class LibraryTab extends Tab {
 
     private final ClipBoardManager clipBoardManager;
     private final TaskExecutor taskExecutor;
-    private final DirectoryMonitorManager directoryMonitorManager;
 
     private ImportHandler importHandler;
     private IndexManager indexManager;
@@ -200,7 +179,6 @@ public class LibraryTab extends Tab {
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
         this.taskExecutor = taskExecutor;
-        this.directoryMonitorManager = new DirectoryMonitorManager(Injector.instantiateModelOrService(DirectoryMonitor.class));
         this.aiService = aiService;
 
         initializeComponentsAndListeners(isDummyContext);
@@ -226,7 +204,7 @@ public class LibraryTab extends Tab {
         bibDatabaseContext.getMetaData().registerListener(this);
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
-        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty(), resultSizeProperty());
+        this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
 
         new CitationStyleCache(bibDatabaseContext);
         annotationCache = new FileAnnotationCache(bibDatabaseContext, preferences.getFilePreferences());
@@ -243,7 +221,6 @@ public class LibraryTab extends Tab {
         setupAutoCompletion();
 
         this.getDatabase().registerListener(new IndexUpdateListener());
-        this.getDatabase().registerListener(new EntriesRemovedListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
@@ -252,8 +229,6 @@ public class LibraryTab extends Tab {
 
         this.getDatabase().registerListener(new UpdateTimestampListener(preferences));
 
-        this.entryEditor = createEntryEditor();
-
         aiService.setupDatabase(bibDatabaseContext);
 
         Platform.runLater(() -> {
@@ -261,14 +236,6 @@ public class LibraryTab extends Tab {
             stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) c ->
                     updateTabTitle(changedProperty.getValue()));
         });
-    }
-
-    private EntryEditor createEntryEditor() {
-        Supplier<LibraryTab> tabSupplier = () -> this;
-        return new EntryEditor(this,
-                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(tabSupplier, undoManager, dialogService, stateManager),
-                new RedoAction(tabSupplier, undoManager, dialogService, stateManager));
     }
 
     private static void addChangedInformation(StringBuilder text, String fileName) {
@@ -372,7 +339,7 @@ public class LibraryTab extends Tab {
     public void installAutosaveManagerAndBackupManager() {
         if (isDatabaseReadyForAutoSave(bibDatabaseContext)) {
             AutosaveManager autosaveManager = AutosaveManager.start(bibDatabaseContext);
-            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager));
+            autosaveManager.registerListener(new AutosaveUiManager(this, dialogService, preferences, entryTypesManager, stateManager));
         }
         if (isDatabaseReadyForBackup(bibDatabaseContext) && preferences.getFilePreferences().shouldCreateBackup()) {
             BackupManager.start(this, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class), preferences);
@@ -479,14 +446,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    public void editEntryAndFocusField(BibEntry entry, Field field) {
-        showAndEdit(entry);
-        Platform.runLater(() -> {
-            // Focus field and entry in main table (async to give entry editor time to load)
-            entryEditor.setFocusToField(field);
-        });
-    }
-
     private void createMainTable() {
         mainTable = new MainTable(tableModel,
                 this,
@@ -500,33 +459,20 @@ public class LibraryTab extends Tab {
                 entryTypesManager,
                 taskExecutor,
                 importHandler);
+
         // Add the listener that binds selection to state manager (TODO: should be replaced by proper JavaFX binding as soon as table is implemented in JavaFX)
         // content binding between StateManager#getselectedEntries and mainTable#getSelectedEntries does not work here as it does not trigger the ActionHelper#needsEntriesSelected checker for the menubar
         mainTable.addSelectionListener(event -> {
             List<BibEntry> entries = event.getList().stream().map(BibEntryTableViewModel::getEntry).toList();
             stateManager.setSelectedEntries(entries);
-            if (!entries.isEmpty()) {
-                // Update entry editor and preview according to selected entries
-                entryEditor.setCurrentlyEditedEntry(entries.getFirst());
-            }
         });
     }
 
     public void setupMainPanel() {
-        splitPane = new SplitPane();
-        splitPane.setOrientation(Orientation.VERTICAL);
-
         createMainTable();
 
-        splitPane.getItems().add(mainTable);
-        databaseNotificationPane = new DatabaseNotification(splitPane);
+        databaseNotificationPane = new DatabaseNotification(mainTable);
         setContent(databaseNotificationPane);
-
-        // Saves the divider position as soon as it changes
-        // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
-        dividerPositionSubscription = EasyBind.valueAt(splitPane.getDividers(), 0)
-                                              .mapObservable(SplitPane.Divider::positionProperty)
-                                              .subscribeToValues(this::saveDividerLocation);
 
         // Add changePane in case a file is present - otherwise just add the splitPane to the panel
         Optional<Path> file = bibDatabaseContext.getDatabasePath();
@@ -563,37 +509,9 @@ public class LibraryTab extends Tab {
         return searchAutoCompleter;
     }
 
-    public EntryEditor getEntryEditor() {
-        return entryEditor;
-    }
-
-    /**
-     * Sets the entry editor as the bottom component in the split pane. If an entry editor already was shown, makes sure that the divider doesn't move. Updates the mode to {@link PanelMode#MAIN_TABLE_AND_ENTRY_EDITOR}.
-     * Then shows the given entry.
-     *
-     * Additionally, selects the entry in the main table - so that the selected entry in the main table always corresponds to the edited entry.
-     *
-     * @param entry The entry to edit.
-     */
     public void showAndEdit(BibEntry entry) {
         this.clearAndSelect(entry);
-        if (!splitPane.getItems().contains(entryEditor)) {
-            splitPane.getItems().addLast(entryEditor);
-            mode = PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR;
-            splitPane.setDividerPositions(preferences.getEntryEditorPreferences().getDividerPosition());
-        }
-
-        // We use != instead of equals because of performance reasons
-        if (entry != showing) {
-            entryEditor.setCurrentlyEditedEntry(entry);
-            showing = entry;
-        }
-        entryEditor.requestFocus();
-    }
-
-    public void closeBottomPane() {
-        mode = PanelMode.MAIN_TABLE;
-        splitPane.getItems().remove(entryEditor);
+        stateManager.getEditorShowing().setValue(true);
     }
 
     /**
@@ -609,25 +527,6 @@ public class LibraryTab extends Tab {
 
     public void selectNextEntry() {
         mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() + 1);
-    }
-
-    /**
-     * This method is called from an EntryEditor when it should be closed. We relay to the selection listener, which takes care of the rest.
-     */
-    public void entryEditorClosing() {
-        closeBottomPane();
-        mainTable.requestFocus();
-    }
-
-    /**
-     * Closes the entry editor if it is showing any of the given entries.
-     */
-    private void ensureNotShowingBottomPanel(List<BibEntry> entriesToCheck) {
-        // This method is not able to close the bottom pane currently
-
-        if ((mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) && (entriesToCheck.contains(entryEditor.getCurrentlyEditedEntry()))) {
-            closeBottomPane();
-        }
     }
 
     /**
@@ -675,15 +574,6 @@ public class LibraryTab extends Tab {
                     optOut -> preferences.getWorkspacePreferences().setConfirmDelete(!optOut));
         } else {
             return true;
-        }
-    }
-
-    /**
-     * Depending on whether a preview or an entry editor is showing, save the current divider location in the correct preference setting.
-     */
-    private void saveDividerLocation(Number position) {
-        if (mode == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
-            preferences.getEntryEditorPreferences().setDividerPosition(position.doubleValue());
         }
     }
 
@@ -737,7 +627,7 @@ public class LibraryTab extends Tab {
 
         if (buttonType.equals(saveChanges)) {
             try {
-                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                SaveDatabaseAction saveAction = new SaveDatabaseAction(this, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);
                 if (saveAction.save()) {
                     return true;
                 }
@@ -783,11 +673,6 @@ public class LibraryTab extends Tab {
             LOGGER.error("Problem when closing change monitor", e);
         }
         try {
-            directoryMonitorManager.unregister();
-        } catch (RuntimeException e) {
-            LOGGER.error("Problem when closing directory monitor", e);
-        }
-        try {
             if (indexManager != null) {
                 indexManager.close();
             }
@@ -826,10 +711,6 @@ public class LibraryTab extends Tab {
 
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
-    }
-
-    public DirectoryMonitorManager getDirectoryMonitorManager() {
-        return directoryMonitorManager;
     }
 
     public boolean isSaving() {
@@ -892,6 +773,7 @@ public class LibraryTab extends Tab {
         importHandler.importCleanedEntries(entries);
         getUndoManager().addEdit(new UndoableInsertEntries(bibDatabaseContext.getDatabase(), entries));
         markBaseChanged();
+        stateManager.setSelectedEntries(entries);
         if (preferences.getEntryEditorPreferences().shouldOpenOnNewEntry()) {
             showAndEdit(entries.getFirst());
         } else {
@@ -1019,7 +901,6 @@ public class LibraryTab extends Tab {
             }
         }
 
-        ensureNotShowingBottomPanel(entries);
         markBaseChanged();
 
         // prevent the main table from loosing focus
@@ -1135,14 +1016,6 @@ public class LibraryTab extends Tab {
         }
     }
 
-    private class EntriesRemovedListener {
-
-        @Subscribe
-        public void listen(EntriesRemovedEvent entriesRemovedEvent) {
-            ensureNotShowingBottomPanel(entriesRemovedEvent.getBibEntries());
-        }
-    }
-
     private class IndexUpdateListener {
 
         @Subscribe
@@ -1191,11 +1064,6 @@ public class LibraryTab extends Tab {
     public String toString() {
         return "LibraryTab{" +
                 "bibDatabaseContext=" + bibDatabaseContext +
-                ", showing=" + showing +
                 '}';
-    }
-
-    public LibraryTabContainer getLibraryTabContainer() {
-        return tabContainer;
     }
 }

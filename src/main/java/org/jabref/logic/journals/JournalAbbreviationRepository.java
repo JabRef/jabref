@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
@@ -40,14 +41,17 @@ public class JournalAbbreviationRepository {
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
     private final StringSimilarity similarity = new StringSimilarity();
-    
+    private final LtwaRepository ltwaRepository;
     private final Map<String, Boolean> enabledSources = new HashMap<>();
     private final Map<Abbreviation, String> abbreviationSources = new HashMap<>();
 
     /**
      * Initializes the internal data based on the abbreviations found in the given MV file
+     *
+     * @param journalList The path to the MV file containing the journal abbreviations.
+     * @param ltwaRepository The LTWA repository to use for abbreviations.
      */
-    public JournalAbbreviationRepository(Path journalList) {
+    public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
         MVMap<String, Abbreviation> mvFullToAbbreviationObject;
         try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
             mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
@@ -67,7 +71,7 @@ public class JournalAbbreviationRepository {
                 abbreviationSources.put(newAbbreviation, BUILTIN_LIST_ID);
             });
         }
-        
+        this.ltwaRepository = ltwaRepository;
         enabledSources.put(BUILTIN_LIST_ID, true);
     }
 
@@ -87,6 +91,7 @@ public class JournalAbbreviationRepository {
         
         abbreviationSources.put(newAbbreviation, BUILTIN_LIST_ID);
         enabledSources.put(BUILTIN_LIST_ID, true);
+        ltwaRepository = new LtwaRepository();
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -145,7 +150,6 @@ public class JournalAbbreviationRepository {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
-
         return get(journalName).isPresent();
     }
 
@@ -416,5 +420,15 @@ public class JournalAbbreviationRepository {
      */
     public String getSourceForAbbreviation(Abbreviation abbreviation) {
         return abbreviationSources.getOrDefault(abbreviation, BUILTIN_LIST_ID);
+    }
+
+    /**
+     * Get the LTWA abbreviation for the given journal name.
+     */
+    public Optional<String> getLtwaAbbreviation(String journalName) {
+        if (QUESTION_MARK.matcher(journalName).find()) {
+            return Optional.of(journalName);
+        }
+        return ltwaRepository.abbreviate(journalName);
     }
 }

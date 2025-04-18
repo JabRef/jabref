@@ -3,6 +3,7 @@ package org.jabref.model.entry;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URL;
 import java.nio.file.Files;
@@ -170,6 +171,7 @@ public class LinkedFile implements Serializable {
     /**
      * Writes serialized object to ObjectOutputStream, automatically called
      */
+    @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeUTF(getFileType());
         out.writeUTF(getLink());
@@ -181,6 +183,7 @@ public class LinkedFile implements Serializable {
     /**
      * Reads serialized object from {@link ObjectInputStream}, automatically called
      */
+    @Serial
     private void readObject(ObjectInputStream in) throws IOException {
         fileType = new SimpleStringProperty(in.readUTF());
         link = new SimpleStringProperty(in.readUTF());
