@@ -157,7 +157,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         }
 
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
-        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> viewModel.setSelectedTab(newValue));
+        tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.setSelectedTab(newValue));
 
         updateCurrentStyleLabel();
         addCslButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
@@ -189,11 +189,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .withContextMenu(item -> createContextMenu())
                 .install(tvStyles);
 
-        tvStyles.getSelectionModel().selectedItemProperty().addListener((observable, oldvalue, newvalue) -> {
-            if (newvalue == null) {
-                viewModel.selectedItemProperty().setValue(oldvalue);
+        tvStyles.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
+            if (newValue == null) {
+                viewModel.selectedItemProperty().setValue(oldValue);
             } else {
-                viewModel.selectedItemProperty().setValue(newvalue);
+                viewModel.selectedItemProperty().setValue(newValue);
             }
         });
 
@@ -246,13 +246,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 })
                 .install(cslStylesTable);
 
-        cslStylesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        cslStylesTable.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 viewModel.selectedLayoutProperty().set(newValue.getLayout());
             }
         });
 
-        searchBox.textProperty().addListener((observable, oldValue, newValue) -> {
+        searchBox.textProperty().addListener((_, _, newValue) -> {
             viewModel.setAvailableLayoutsFilter(newValue);
             updateCslStylesTable();
         });
