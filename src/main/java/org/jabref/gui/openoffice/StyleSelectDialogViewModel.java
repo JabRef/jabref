@@ -105,7 +105,7 @@ public class StyleSelectDialogViewModel {
                       .executeWith(taskExecutor);
     }
 
-    public StyleSelectItemViewModel fromOOBibStyle(JStyle style) {
+    public StyleSelectItemViewModel fromJStyle(JStyle style) {
         return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
     }
 
@@ -132,7 +132,7 @@ public class StyleSelectDialogViewModel {
     }
 
     public List<StyleSelectItemViewModel> loadJStyles() {
-        return jStyleLoader.getStyles().stream().map(this::fromOOBibStyle).toList();
+        return jStyleLoader.getStyles().stream().map(this::fromJStyle).toList();
     }
 
     public ListProperty<StyleSelectItemViewModel> jStylesProperty() {
