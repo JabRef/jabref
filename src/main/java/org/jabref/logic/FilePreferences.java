@@ -32,11 +32,11 @@ public class FilePreferences {
     private final BooleanProperty confirmDeleteLinkedFile = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrash = new SimpleBooleanProperty();
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
-    private final ObjectProperty<GlobalLinkedFileNamePatterns> keyPatterns = new SimpleObjectProperty<>();
-    private final String defaultPattern;
     private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
+    private final ObjectProperty<GlobalLinkedFileNamePatterns> keyPatterns = new SimpleObjectProperty<>();
+    private final String defaultPattern;
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -51,7 +51,7 @@ public class FilePreferences {
                            boolean moveToTrash,
                            boolean shouldKeepDownloadUrl,
                            GlobalLinkedFileNamePatterns keyPatterns,
-                           String defaultPattern) {
+                           String defaultPattern,
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
                            boolean openFileExplorerInLastUsedDirectory) {

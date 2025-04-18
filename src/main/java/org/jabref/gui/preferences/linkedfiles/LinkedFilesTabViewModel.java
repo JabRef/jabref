@@ -228,6 +228,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<PatternsPanelItemModel> defaultNamePatternProperty() {
         return defaultNamePatternProperty;
+    }
 
     public BooleanProperty openFileExplorerInFilesDirectoryProperty() {
         return openFileExplorerInFilesDirectory;

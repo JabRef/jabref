@@ -1656,7 +1656,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
                 getBoolean(KEEP_DOWNLOAD_URL),
                 getGlobalLinkedFileNamePattern(),
-                (String) defaults.get(DEFAULT_LINKED_FILE_NAME_PATTERN));
+                (String) defaults.get(DEFAULT_LINKED_FILE_NAME_PATTERN),
                 getPath(LAST_USED_DIRECTORY, getDefaultPath()),
                 getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY),
                 getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY));
