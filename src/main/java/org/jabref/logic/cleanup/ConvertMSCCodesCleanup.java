@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.msc.MscCodeLoadingException;
 import org.jabref.logic.msc.MscCodeUtils;
 import org.jabref.model.FieldChange;
@@ -37,25 +38,24 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
         URL resourceUrl = ConvertMSCCodesCleanup.class.getClassLoader().getResource("msc_codes.json");
 
         if (resourceUrl == null) {
-            logger.error("Resource not found: msc_codes.json");
+            logger.error(Localization.lang("Resource not found: msc_codes.json"));
             conversionPossible = false;
         } else {
             try {
                 tempMap = MscCodeUtils.loadMscCodesFromJson(resourceUrl).get();
-                // Create reverse mapping
-                tempMap.forEach((code, desc) -> tempReverseMap.put(desc, code));
-
                 if (!tempMap.isEmpty()) {
                     conversionPossible = true;
-                } else {
-                    logger.error("MSC codes file is empty");
-                    conversionPossible = false;
                 }
             } catch (MscCodeLoadingException e) {
-                logger.error("Error loading MSC codes:", e);
+                logger.error(Localization.lang("Error loading MSC codes:", e));
                 conversionPossible = false;
             }
+
+            if (conversionPossible) {
+                tempMap.forEach((code, desc) -> tempReverseMap.put(desc, code));
+            }
         }
+
         MSCMAP = tempMap;
         reverseMSCMAP = tempReverseMap;
     }
@@ -75,7 +75,6 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
         if (!conversionPossible) {
-            logger.error("MSC code conversion was attempted but is not possible because the codes file could not be loaded");
             return new ArrayList<>();
         }
 
