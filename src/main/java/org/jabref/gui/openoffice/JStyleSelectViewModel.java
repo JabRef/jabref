@@ -11,7 +11,7 @@ import javafx.scene.Node;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.logic.openoffice.style.JStyle;
 
-public class StyleSelectItemViewModel {
+public class JStyleSelectViewModel {
 
     private final StringProperty name = new SimpleStringProperty("");
     private final StringProperty journals = new SimpleStringProperty("");
@@ -20,7 +20,7 @@ public class StyleSelectItemViewModel {
     private final JStyle jStyle;
     private final BooleanProperty internalStyle = new SimpleBooleanProperty();
 
-    public StyleSelectItemViewModel(String name, String journals, String file, JStyle jStyle) {
+    public JStyleSelectViewModel(String name, String journals, String file, JStyle jStyle) {
         this.name.setValue(name);
         this.journals.setValue(journals);
         this.file.setValue(file);

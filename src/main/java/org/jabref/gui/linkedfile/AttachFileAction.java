@@ -57,14 +57,23 @@ public class AttachFileAction extends SimpleCommand {
 
         BibEntry entry = stateManager.getSelectedEntries().getFirst();
 
-        Path workingDirectory = databaseContext.getFirstExistingFileDir(filePreferences)
-                                               .orElse(filePreferences.getWorkingDirectory());
+        Path initialDirectory;
+
+        if (filePreferences.shouldOpenFileExplorerInFileDirectory()) {
+            initialDirectory = databaseContext.getFirstExistingFileDir(filePreferences)
+                                              .orElse(filePreferences.getWorkingDirectory());
+        } else if (filePreferences.shouldOpenFileExplorerInLastUsedDirectory()) {
+            initialDirectory = filePreferences.getLastUsedDirectory();
+        } else {
+            initialDirectory = filePreferences.getWorkingDirectory();
+        }
 
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .withInitialDirectory(workingDirectory)
+                .withInitialDirectory(initialDirectory)
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(newFile -> {
+            filePreferences.setLastUsedDirectory(newFile.getParent());
             LinkedFile linkedFile = LinkedFilesEditorViewModel.fromFile(
                     newFile,
                     databaseContext.getFileDirectories(filePreferences),

@@ -34,6 +34,9 @@ public class FilePreferences {
     private final BooleanProperty shouldKeepDownloadUrl = new SimpleBooleanProperty();
     private final ObjectProperty<GlobalLinkedFileNamePatterns> keyPatterns = new SimpleObjectProperty<>();
     private final String defaultPattern;
+    private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
+    private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
+    private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -49,6 +52,9 @@ public class FilePreferences {
                            boolean shouldKeepDownloadUrl,
                            GlobalLinkedFileNamePatterns keyPatterns,
                            String defaultPattern) {
+                           Path lastUsedDirectory,
+                           boolean openFileExplorerInFileDirectory,
+                           boolean openFileExplorerInLastUsedDirectory) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -63,6 +69,9 @@ public class FilePreferences {
         this.shouldKeepDownloadUrl.setValue(shouldKeepDownloadUrl);
         this.keyPatterns.set(keyPatterns);
         this.defaultPattern = defaultPattern;
+        this.lastUsedDirectory.setValue(lastUsedDirectory);
+        this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);
+        this.openFileExplorerInLastUsedDirectory.set(openFileExplorerInLastUsedDirectory);
     }
 
     public String getUserAndHost() {
@@ -227,5 +236,41 @@ public class FilePreferences {
 
     public void setKeepDownloadUrl(boolean shouldKeepDownloadUrl) {
         this.shouldKeepDownloadUrl.set(shouldKeepDownloadUrl);
+    }
+
+    public Path getLastUsedDirectory() {
+        return lastUsedDirectory.get();
+    }
+
+    public ObjectProperty<Path> lastUsedDirectoryProperty() {
+        return lastUsedDirectory;
+    }
+
+    public void setLastUsedDirectory(Path lastUsedDirectory) {
+        this.lastUsedDirectory.set(lastUsedDirectory);
+    }
+
+    public boolean shouldOpenFileExplorerInFileDirectory() {
+        return openFileExplorerInFileDirectory.get();
+    }
+
+    public BooleanProperty openFileExplorerInFileDirectoryProperty() {
+        return openFileExplorerInFileDirectory;
+    }
+
+    public void setOpenFileExplorerInFileDirectory(boolean value) {
+        this.openFileExplorerInFileDirectory.set(value);
+    }
+
+    public boolean shouldOpenFileExplorerInLastUsedDirectory() {
+        return openFileExplorerInLastUsedDirectory.get();
+    }
+
+    public BooleanProperty openFileExplorerInLastUsedDirectoryProperty() {
+        return openFileExplorerInLastUsedDirectory;
+    }
+
+    public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
+        this.openFileExplorerInLastUsedDirectory.set(value);
     }
 }

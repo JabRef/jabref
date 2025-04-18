@@ -42,17 +42,18 @@ class PdfVerbatimBibtexImporterTest {
         Path file = Path.of(PdfVerbatimBibtexImporterTest.class.getResource("mixedMetadata.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
-        BibEntry expected = new BibEntry(StandardEntryType.Article);
-        expected.setCitationKey("jabreftest2021");
-        expected.setField(StandardField.AUTHOR, "Me, myself and I");
-        expected.setField(StandardField.TITLE, "Something");
-        expected.setField(StandardField.VOLUME, "1");
-        expected.setField(StandardField.JOURNAL, "Some Journal");
-        expected.setField(StandardField.YEAR, "2021");
-        expected.setField(StandardField.ISBN, "0134685997");
+        BibEntry expected = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("jabreftest2021")
+                .withField(StandardField.AUTHOR, "Me, myself and I")
+                .withField(StandardField.TITLE, "Something")
+                .withField(StandardField.VOLUME, "1")
+                .withField(StandardField.JOURNAL, "Some Journal")
+                .withField(StandardField.YEAR, "2021")
+                .withField(StandardField.ISBN, "0134685997");
 
         List<BibEntry> resultSecondImport = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Collections.singletonList(expected), result);
-        assertEquals(Collections.singletonList(expected), resultSecondImport);
+
+        assertEquals(List.of(expected), result);
+        assertEquals(List.of(expected), resultSecondImport);
     }
 }

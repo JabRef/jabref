@@ -24,6 +24,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.RowConstraints;
 
+import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldEditors;
@@ -52,7 +54,6 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     protected final Map<Field, FieldEditorFX> editors = new LinkedHashMap<>();
     protected GridPane gridPane;
     private final boolean isCompressed;
-    private final SuggestionProviders suggestionProviders;
     private final UndoAction undoAction;
     private final RedoAction redoAction;
     private final GuiPreferences preferences;
@@ -65,17 +66,15 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     private Subscription dividerPositionSubscription;
 
     public FieldsEditorTab(boolean compressed,
-                           BibDatabaseContext databaseContext,
-                           SuggestionProviders suggestionProviders,
                            UndoManager undoManager,
                            UndoAction undoAction,
                            RedoAction redoAction,
                            GuiPreferences preferences,
                            JournalAbbreviationRepository journalAbbreviationRepository,
+                           StateManager stateManager,
                            PreviewPanel previewPanel) {
-        super(databaseContext, previewPanel);
+        super(stateManager, previewPanel);
         this.isCompressed = compressed;
-        this.suggestionProviders = Objects.requireNonNull(suggestionProviders);
         this.undoManager = Objects.requireNonNull(undoManager);
         this.undoAction = undoAction;
         this.redoAction = redoAction;
@@ -91,7 +90,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         gridPane.addColumn(columnIndex, nodes.toArray(Node[]::new));
     }
 
-    protected void setupPanel(BibEntry entry, boolean compressed) {
+    protected void setupPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed) {
         // The preferences might be not initialized in tests -> return immediately
         // TODO: Replace this ugly workaround by proper injection propagation
         if (preferences == null) {
@@ -107,7 +106,7 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
 
         List<Label> labels = fields
                 .stream()
-                .map(field -> createLabelAndEditor(entry, field))
+                .map(field -> createLabelAndEditor(bibDatabaseContext, entry, field))
                 .toList();
 
         ColumnConstraints columnExpand = new ColumnConstraints();
@@ -138,7 +137,10 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
         }
     }
 
-    protected Label createLabelAndEditor(BibEntry entry, Field field) {
+    protected Label createLabelAndEditor(BibDatabaseContext databaseContext, BibEntry entry, Field field) {
+        SuggestionProviders suggestionProviders = stateManager.activeTabProperty().get()
+                                                              .map(LibraryTab::getSuggestionProviders)
+                                                              .orElse(new SuggestionProviders());
         FieldEditorFX fieldEditor = FieldEditors.getForField(
                 field,
                 journalAbbreviationRepository,
@@ -201,7 +203,8 @@ abstract class FieldsEditorTab extends TabWithPreviewPanel {
     @Override
     protected void bindToEntry(BibEntry entry) {
         initPanel();
-        setupPanel(entry, isCompressed);
+        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
+        setupPanel(bibDatabaseContext, entry, isCompressed);
         super.bindToEntry(entry);
     }
 

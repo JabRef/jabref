@@ -31,6 +31,7 @@ import org.jabref.model.metadata.event.MetaDataChangedEvent;
 import com.google.common.eventbus.EventBus;
 import com.tobiasdiez.easybind.optional.OptionalBinding;
 import com.tobiasdiez.easybind.optional.OptionalWrapper;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,9 +58,8 @@ public class MetaData {
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
-
+    public static final String BLG_FILE_PATH = "blgFilePath";
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaData.class);
-
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
@@ -67,6 +67,7 @@ public class MetaData {
 
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
+    private final Map<String, Path> blgFilePathMap = new HashMap<>();
     private Optional<Version> groupSearchSyntaxVersion = Optional.empty();
 
     private Charset encoding;
@@ -412,5 +413,23 @@ public class MetaData {
     @Override
     public String toString() {
         return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+    }
+
+    public Optional<Path> getBlgFilePath(String user) {
+        return Optional.ofNullable(blgFilePathMap.get(user));
+    }
+
+    public void setBlgFilePath(@NonNull String user, @NonNull Path path) {
+        blgFilePathMap.put(user, path);
+        postChange();
+    }
+
+    public void clearBlgFilePath(String user) {
+        blgFilePathMap.remove(user);
+        postChange();
+    }
+
+    public Map<String, Path> getBlgFilePaths() {
+        return blgFilePathMap;
     }
 }
