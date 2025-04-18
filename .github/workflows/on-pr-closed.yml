@@ -45,6 +45,7 @@ jobs:
           bodyRegexFlags: 'i'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
+      - run: echo "${{ steps.get_issue_number.outputs.issue_number }}"
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
