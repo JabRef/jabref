@@ -24,11 +24,11 @@ import org.jabref.model.entry.types.EntryType;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
+public class CitationKeyPatternsPanel extends TableView<CitationKeyPatternsItemModel> {
 
-    @FXML public TableColumn<PatternsItemModel, EntryType> entryTypeColumn;
-    @FXML public TableColumn<PatternsItemModel, String> patternColumn;
-    @FXML public TableColumn<PatternsItemModel, EntryType> actionsColumn;
+    @FXML public TableColumn<CitationKeyPatternsItemModel, EntryType> entryTypeColumn;
+    @FXML public TableColumn<CitationKeyPatternsItemModel, String> patternColumn;
+    @FXML public TableColumn<CitationKeyPatternsItemModel, EntryType> actionsColumn;
 
     @Inject private CliPreferences preferences;
 
@@ -60,7 +60,7 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
         entryTypeColumn.setSortable(true);
         entryTypeColumn.setReorderable(false);
         entryTypeColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<PatternsItemModel, EntryType>()
+        new ValueTableCellFactory<CitationKeyPatternsItemModel, EntryType>()
                 .withText(EntryType::getDisplayName)
                 .install(entryTypeColumn);
         this.setOnSort(event ->
@@ -72,13 +72,13 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
         patternColumn.setCellFactory(_ -> new PatternSuggestionCell(patterns));
         patternColumn.setEditable(true);
         patternColumn.setOnEditCommit(
-                (TableColumn.CellEditEvent<PatternsItemModel, String> event) ->
+                (TableColumn.CellEditEvent<CitationKeyPatternsItemModel, String> event) ->
                         event.getRowValue().setPattern(event.getNewValue()));
 
         actionsColumn.setSortable(false);
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().entryType());
-        new ValueTableCellFactory<PatternsItemModel, EntryType>()
+        new ValueTableCellFactory<CitationKeyPatternsItemModel, EntryType>()
                 .withGraphic(entryType -> IconTheme.JabRefIcons.REFRESH.getGraphicNode())
                 .withTooltip(entryType ->
                         Localization.lang("Reset %s to default value").formatted(entryType.getDisplayName()))
@@ -99,11 +99,11 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
         viewModel.resetAll();
     }
 
-    public ListProperty<PatternsItemModel> patternListProperty() {
+    public ListProperty<CitationKeyPatternsItemModel> patternListProperty() {
         return viewModel.patternListProperty();
     }
 
-    public ObjectProperty<PatternsItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<CitationKeyPatternsItemModel> defaultKeyPatternProperty() {
         return viewModel.defaultKeyPatternProperty();
     }
 
@@ -124,9 +124,9 @@ public class CitationKeyPatternsPanel extends TableView<PatternsItemModel> {
             .findFirst().ifPresent(this::scrollTo);
     }
 
-    private static class HighlightTableRow extends TableRow<PatternsItemModel> {
+    private static class HighlightTableRow extends TableRow<CitationKeyPatternsItemModel> {
         @Override
-        public void updateItem(PatternsItemModel item, boolean empty) {
+        public void updateItem(CitationKeyPatternsItemModel item, boolean empty) {
             super.updateItem(item, empty);
             if (item == null || item.getEntryType() == null) {
                 setStyle("");

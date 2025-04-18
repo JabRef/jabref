@@ -15,7 +15,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.commonfxcontrols.PatternsItemModel;
+import org.jabref.gui.commonfxcontrols.CitationKeyPatternsItemModel;
 import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -46,9 +46,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
 
-    private final ListProperty<PatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<PatternsItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
-            new PatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
+    private final ListProperty<CitationKeyPatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<CitationKeyPatternsItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
+            new CitationKeyPatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
 
     private final Validator mainFileDirValidator;
 
@@ -213,11 +213,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         return this.moveToTrashProperty;
     }
 
-    public ListProperty<PatternsItemModel> patternListProperty() {
+    public ListProperty<CitationKeyPatternsItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<PatternsItemModel> defaultNamePatternProperty() {
+    public ObjectProperty<CitationKeyPatternsItemModel> defaultNamePatternProperty() {
         return defaultNamePatternProperty;
     }
 }

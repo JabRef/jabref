@@ -9,11 +9,11 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.model.entry.types.EntryType;
 
-public class PatternsItemModel {
+public class CitationKeyPatternsItemModel {
     private final ObjectProperty<EntryType> entryType = new SimpleObjectProperty<>();
     private final StringProperty pattern = new SimpleStringProperty("");
 
-    public PatternsItemModel(EntryType entryType, String pattern) {
+    public CitationKeyPatternsItemModel(EntryType entryType, String pattern) {
         Objects.requireNonNull(entryType);
         Objects.requireNonNull(pattern);
         this.entryType.setValue(entryType);

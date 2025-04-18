@@ -19,7 +19,7 @@ import javafx.stage.Window;
 import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 
-public class PatternSuggestionCell extends TextFieldTableCell<PatternsItemModel, String> {
+public class PatternSuggestionCell extends TextFieldTableCell<CitationKeyPatternsItemModel, String> {
     private final CitationKeyPatternSuggestionTextField searchField;
 
     public PatternSuggestionCell(List<String> citationKeyPatterns) {
