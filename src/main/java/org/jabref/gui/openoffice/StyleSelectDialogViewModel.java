@@ -300,8 +300,8 @@ public class StyleSelectDialogViewModel {
 
     public void addJStyleFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                .addExtensionFilter(Localization.lang("JStyle file"), StandardFileType.JSTYLE)
+                .withDefaultExtension(Localization.lang("JStyle file"), StandardFileType.JSTYLE)
                 .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
