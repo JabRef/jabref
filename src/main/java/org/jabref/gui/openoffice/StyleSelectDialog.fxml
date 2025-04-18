@@ -28,7 +28,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <Label text="%Available" styleClass="sectionHeader"/>
                             <HBox HBox.hgrow="ALWAYS" />
-                            <Button fx:id="addCslButton" onAction="#addCslStyleFile" text="%Add .csl file"/>
+                            <Button fx:id="addCslButton" text="%Add .csl file" onAction="#addCslStyleFile"/>
                         </HBox>
                         <CustomTextField fx:id="searchBox" promptText="%Filter" prefHeight="20.0"/>
                         <TableView fx:id="cslStylesTable" VBox.vgrow="ALWAYS" prefHeight="350.0">
@@ -56,7 +56,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <Label text="%Available" styleClass="sectionHeader"/>
                             <HBox HBox.hgrow="ALWAYS" />
-                            <Button fx:id="addJStyleButton" onAction="#addJStyleFile" text="%Add .jstyle file"/>
+                            <Button fx:id="addJStyleButton" text="%Add .jstyle file" onAction="#addJStyleFile"/>
                         </HBox>
                         <TableView fx:id="jStylesTable" VBox.vgrow="ALWAYS" prefHeight="350.0">
                             <columns>
