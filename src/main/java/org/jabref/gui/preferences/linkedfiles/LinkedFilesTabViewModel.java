@@ -25,6 +25,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.GlobalLinkedFileNamePatterns;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.model.strings.StringUtil;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
@@ -32,6 +33,8 @@ import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 
 public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
+
+    private static final String DEFAULT_ENTRY_TYPE = "default";
 
     private final StringProperty mainFileDirectoryProperty = new SimpleStringProperty("");
     private final BooleanProperty useMainFileDirectoryProperty = new SimpleBooleanProperty();
@@ -114,14 +117,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
                 new GlobalLinkedFileNamePatterns(filePreferences.getKeyPatterns().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
-            if (!"default".equals(item.getEntryType().getName())) {
+            if (!DEFAULT_ENTRY_TYPE.equals(item.getEntryType().getName())) {
                 if (!patternString.trim().isEmpty()) {
                     newKeyPattern.addLinkedFileNamePattern(item.getEntryType(), patternString);
                 }
             }
         });
 
-        if (!defaultNamePatternProperty.getValue().getPattern().trim().isEmpty()) {
+        if (!StringUtil.isNullOrEmpty(defaultNamePatternProperty.getValue().getPattern())) {
             // we do not trim the value at the assignment to enable users to have spaces at the beginning and
             // at the end of the pattern
             newKeyPattern.setDefaultValue(defaultNamePatternProperty.getValue().getPattern());

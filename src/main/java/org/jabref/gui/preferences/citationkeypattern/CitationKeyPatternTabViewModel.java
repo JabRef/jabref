@@ -21,6 +21,8 @@ import org.jabref.model.strings.StringUtil;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
+    private static final String DEFAULT_ENTRY_TYPE = "default";
+
     private final BooleanProperty overwriteAllowProperty = new SimpleBooleanProperty();
     private final BooleanProperty overwriteWarningProperty = new SimpleBooleanProperty();
     private final BooleanProperty generateOnSaveProperty = new SimpleBooleanProperty();
@@ -87,7 +89,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
                 new GlobalCitationKeyPatterns(keyPatternPreferences.getKeyPatterns().getDefaultValue());
         patternListProperty.forEach(item -> {
             String patternString = item.getPattern();
-            if (!"default".equals(item.getEntryType().getName())) {
+            if (!DEFAULT_ENTRY_TYPE.equals(item.getEntryType().getName())) {
                 if (!patternString.trim().isEmpty()) {
                     newKeyPattern.addCitationKeyPattern(item.getEntryType(), patternString);
                 }
