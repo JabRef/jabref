@@ -150,6 +150,22 @@ Fetcher tests can be run locally by executing the Gradle task `fetcherTest`. Thi
 
 Alternatively, if one is using IntelliJ, this can also be done by double-clicking the `fetcherTest` task under the `other` group in the Gradle Tool window (`JabRef > Tasks > other > fetcherTest`).
 
+## "No matching tests found"
+
+In case the output is "No matching tests found", the wrong test category is used.
+
+Check "Run/Debug Configurations"
+
+Example
+
+```gradle
+:databaseTest --tests "org.jabref.logic.importer.fileformat.pdf.PdfMergeMetadataImporterTest.pdfMetadataExtractedFrom2024SPLCBecker"
+```
+
+This tells Gradle that `PdfMergeMetadataImporterTest` should be executed as database test.
+However, it is marked as `@FetcherTest`.
+Thus, change `:databaseTest` to `:fetcherTest` to get the test running.
+
 ## Advanced testing and further reading
 
 On top of basic unit testing, there are more ways to test a software:

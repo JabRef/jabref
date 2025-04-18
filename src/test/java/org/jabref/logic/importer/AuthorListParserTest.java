@@ -79,7 +79,37 @@ class AuthorListParserTest {
                                 new Author("Thomas", "T.", null, "Lai", null)
                         ),
                         "U, Vivian and Lai, Thomas"
-                )
+                ),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("I.", "I.", null, "Podadera", null),
+                                new Author("J. M.", "J. M.", null, "Carmona", null),
+                                new Author("A.", "A.", null, "Ibarra", null),
+                                new Author("J.", "J.", null, "Molla", null)
+                        ),
+                        "I. Podadera      J. M. Carmona     A. Ibarra     J. Molla"),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("Alexander", "A.", null, "Artemenko", null),
+                                new Author("I.", "I.", null, "Podadera", null),
+                                new Author("J. M.", "J. M.", null, "Carmona", null)
+                        ),
+                        """
+                        Alexander Artemenko
+                        I. Podadera
+                        J. M. Carmona
+                        """),
+                Arguments.of(
+                        AuthorList.of(
+                                new Author("First1", "F.", null, "Last1", null),
+                                new Author("First2", "F.", null, "Last2", null),
+                                new Author("First3", "F.", null, "Last3", null)
+                        ),
+                        """
+                        First1 Last1
+                            First2 Last2
+                            First3 Last3
+                        """)
         );
     }
 

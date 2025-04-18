@@ -69,7 +69,7 @@ class PdfGrobidImporterTest {
 
     @Test
     void isRecognizedFormatReject() throws IOException, URISyntaxException {
-        Path file = Path.of(PdfGrobidImporterTest.class.getResource("BibtexImporter.examples.bib").toURI());
+        Path file = Path.of(PdfGrobidImporterTest.class.getResource("../BibtexImporter.examples.bib").toURI());
         assertFalse(importer.isRecognizedFormat(file));
     }
 

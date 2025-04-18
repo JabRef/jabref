@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor;
 
 import java.util.Collections;
 
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -17,7 +18,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
@@ -51,6 +51,8 @@ class SourceTabTest {
         area.appendText("some example\n text to go here\n across a couple of \n lines....");
         StateManager stateManager = mock(StateManager.class);
         when(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)).thenReturn(OptionalObjectProperty.empty());
+        when(stateManager.searchQueryProperty()).thenReturn(mock(StringProperty.class));
+        when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
         KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -58,7 +60,6 @@ class SourceTabTest {
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.emptyObservableList());
 
         sourceTab = new SourceTab(
-                new BibDatabaseContext(),
                 new CountingUndoManager(),
                 fieldPreferences,
                 importFormatPreferences,
@@ -66,7 +67,7 @@ class SourceTabTest {
                 mock(DialogService.class),
                 mock(BibEntryTypesManager.class),
                 keyBindingRepository,
-                OptionalObjectProperty.empty());
+                stateManager);
         pane = new TabPane(
                 new Tab("main area", area),
                 new Tab("other tab", new Label("some text")),

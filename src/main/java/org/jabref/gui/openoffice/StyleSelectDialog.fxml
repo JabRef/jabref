@@ -35,6 +35,7 @@
                             <Label text="%Preview" styleClass="sectionHeader"/>
                             <VBox fx:id="cslPreviewBox" prefHeight="300.0" spacing="4.0"/>
                         </VBox>
+                        <Button text="%Modify bibliography title" alignment="CENTER_RIGHT" onAction="#modifyBibliographyTitle" />
                     </VBox>
                 </Tab>
                 <Tab text="JStyles">
@@ -57,7 +58,13 @@
                                     text="%Add style file" BorderPane.alignment="CENTER"/>
                         </right>
                         <bottom>
-                            <VBox fx:id="jstylePreviewBox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER"/>
+                            <VBox spacing="4.0">
+                                <padding>
+                                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                                </padding>
+                                <Label text="%Preview" styleClass="sectionHeader"/>
+                                <VBox fx:id="jstylePreviewBox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER"/>
+                            </VBox>
                         </bottom>
                     </BorderPane>
                 </Tab>
@@ -66,7 +73,7 @@
                 <padding>
                     <Insets left="10.0" right="10.0" bottom="10.0"/>
                 </padding>
-                <Label text="Currently set style:" styleClass="currentStyleLabel"/>
+                <Label text="%Currently set style:" styleClass="currentStyleLabel"/>
                 <Label fx:id="currentStyleNameLabel" styleClass="currentStyleNameLabel"/>
             </HBox>
         </VBox>

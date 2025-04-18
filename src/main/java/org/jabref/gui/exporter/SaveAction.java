@@ -24,6 +24,7 @@ public class SaveAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final StateManager stateManager;
 
     public SaveAction(SaveMethod saveMethod,
                       Supplier<LibraryTab> tabSupplier,
@@ -34,6 +35,7 @@ public class SaveAction extends SimpleCommand {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
+        this.stateManager = stateManager;
 
         if (saveMethod == SaveMethod.SAVE_SELECTED) {
             this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
@@ -48,7 +50,8 @@ public class SaveAction extends SimpleCommand {
                 tabSupplier.get(),
                 dialogService,
                 preferences,
-                Injector.instantiateModelOrService(BibEntryTypesManager.class));
+                Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                stateManager);
 
         switch (saveMethod) {
             case SAVE -> saveDatabaseAction.save();

@@ -7,8 +7,11 @@ import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Objects;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
@@ -22,7 +25,6 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
@@ -33,6 +35,7 @@ import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
@@ -77,7 +80,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
 
     // Used for resolving strings and pdf directories for links.
@@ -93,20 +96,20 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                          GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
-        this(dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());
+        this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());
     }
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
-                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                         StringProperty searchQueryProperty) {
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
-        this.searchQueryProperty.addListener((queryObservable, queryOldValue, queryNewValue) -> highlightLayoutText());
+        this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -115,7 +118,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.setContextMenuEnabled(false);
         previewView.getEngine().setJavaScriptEnabled(true);
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
@@ -234,11 +237,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         if (layoutText == null) {
             return;
         }
-        if (searchQueryProperty.get().isPresent()) {
-            String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQueryProperty.get().get());
-            previewView.getEngine().loadContent(highlightedHtml);
+
+        if (StringUtil.isNotBlank(searchQueryProperty.get())) {
+            SearchQuery searchQuery = new SearchQuery(searchQueryProperty.get());
+            String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQuery);
+            Platform.runLater(() -> previewView.getEngine().loadContent(highlightedHtml));
         } else {
-            previewView.getEngine().loadContent(layoutText);
+            Platform.runLater(() -> previewView.getEngine().loadContent(layoutText));
         }
     }
 

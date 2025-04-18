@@ -101,7 +101,8 @@ recipeList:
 
   - org.openrewrite.java.migrate.io.ReplaceFileInOrOutputStreamFinalizeWithClose
   - org.openrewrite.java.migrate.net.JavaNetAPIs
-  - org.openrewrite.java.migrate.net.URLConstructorsToURIRecipes
+  - org.openrewrite.java.migrate.net.URLConstructorToURICreate
+  - org.openrewrite.java.migrate.net.URLConstructorsToNewURI
   - org.openrewrite.java.migrate.util.OptionalNotEmptyToIsPresent
   - org.openrewrite.java.migrate.util.OptionalNotPresentToIsEmpty
   - org.openrewrite.java.migrate.util.SequencedCollection
@@ -213,4 +214,10 @@ recipeList:
   # - org.openrewrite.java.testing.junit5.StaticImports
 
   # Logging
-  - org.openrewrite.java.logging.slf4j.Slf4jBestPractices
+  # cannot use "org.openrewrite.java.logging.slf4j.Slf4jBestPractices", because we sometimes really want "LOGGER.debug" instead of "LOGGER.error"
+  #   NOT: https://docs.openrewrite.org/recipes/java/logging/catchblockloglevel
+  # Manual collection of https://docs.openrewrite.org/recipes/java/logging/slf4j/slf4jbestpractices
+  - org.openrewrite.java.logging.slf4j.LoggersNamedForEnclosingClass
+  - org.openrewrite.java.logging.slf4j.ParameterizedLogging
+  - org.openrewrite.java.logging.slf4j.Slf4jLogShouldBeConstant
+  - org.openrewrite.java.logging.slf4j.CompleteExceptionLogging

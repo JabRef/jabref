@@ -10,18 +10,18 @@ If your work is not yet complete, please open a draft pull request. In that case
 ### Mandatory checks
 
 <!--
-Go throgh the checklist below. It is mandatory, even for a draft pull request.
+Go through the checklist below. It is mandatory, even for a draft pull request.
 
-Keep ALL the items. Mark them as follows: 
+Keep ALL the items. Replace the dots inside [.] and mark them as follows: 
 [x] done 
 [ ] not done 
 [/] not applicable
 -->
 
-- [x] I own the copyright of the code submitted and I licence it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
-- [ ] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if change is visible to the user)
-- [ ] Tests created for changes (if applicable)
-- [ ] Manually tested changed features in running JabRef (always required)
-- [ ] Screenshots added in PR description (if change is visible to the user)
-- [ ] [Checked developer's documentation](https://devdocs.jabref.org/): Is the information available and up to date? If not, I outlined it in this pull request.
-- [ ] [Checked documentation](https://docs.jabref.org/): Is the information available and up to date? If not, I created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, I submitted a pull request to the documentation repository.
+- [x] I own the copyright of the code submitted and I license it under the [MIT license](https://github.com/JabRef/jabref/blob/main/LICENSE)
+- [.] Change in `CHANGELOG.md` described in a way that is understandable for the average user (if change is visible to the user)
+- [.] Tests created for changes (if applicable)
+- [.] Manually tested changed features in running JabRef (always required)
+- [.] Screenshots added in PR description (if change is visible to the user)
+- [.] [Checked developer's documentation](https://devdocs.jabref.org/): Is the information available and up to date? If not, I outlined it in this pull request.
+- [.] [Checked documentation](https://docs.jabref.org/): Is the information available and up to date? If not, I created an issue at <https://github.com/JabRef/user-documentation/issues> or, even better, I submitted a pull request to the documentation repository.

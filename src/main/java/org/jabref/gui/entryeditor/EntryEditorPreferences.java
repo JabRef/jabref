@@ -46,7 +46,6 @@ public class EntryEditorPreferences {
     private final BooleanProperty showSourceTabByDefault;
     private final BooleanProperty enableValidation;
     private final BooleanProperty allowIntegerEditionBibtex;
-    private final DoubleProperty dividerPosition;
     private final BooleanProperty autoLinkFiles;
     private final ObjectProperty<JournalPopupEnabled> enablementStatus;
     private final BooleanProperty shouldShowSciteTab;
@@ -63,7 +62,6 @@ public class EntryEditorPreferences {
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
                                   boolean allowIntegerEditionBibtex,
-                                  double dividerPosition,
                                   boolean autolinkFilesEnabled,
                                   JournalPopupEnabled journalPopupEnabled,
                                   boolean showSciteTab,
@@ -80,7 +78,6 @@ public class EntryEditorPreferences {
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
         this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
-        this.dividerPosition = new SimpleDoubleProperty(dividerPosition);
         this.autoLinkFiles = new SimpleBooleanProperty(autolinkFilesEnabled);
         this.enablementStatus = new SimpleObjectProperty<>(journalPopupEnabled);
         this.shouldShowSciteTab = new SimpleBooleanProperty(showSciteTab);
@@ -198,18 +195,6 @@ public class EntryEditorPreferences {
 
     public void setAllowIntegerEditionBibtex(boolean allowIntegerEditionBibtex) {
         this.allowIntegerEditionBibtex.set(allowIntegerEditionBibtex);
-    }
-
-    public double getDividerPosition() {
-        return dividerPosition.get();
-    }
-
-    public DoubleProperty dividerPositionProperty() {
-        return dividerPosition;
-    }
-
-    public void setDividerPosition(double dividerPosition) {
-        this.dividerPosition.set(dividerPosition);
     }
 
     public boolean autoLinkFilesEnabled() {

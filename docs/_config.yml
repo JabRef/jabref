@@ -1,6 +1,6 @@
 repository: JabRef/jabref
 title: "Developer Documentation"
-remote_theme: just-the-docs/just-the-docs@v0.5.0
+remote_theme: just-the-docs/just-the-docs@v0.10.0
 color_scheme: light
 
 exclude: [_config.yml, .dockerignore, .gitignore, CNAME, Dockerfile, Gemfile, Gemfile.lock, README.md, mkdocs-custom.css]
@@ -38,6 +38,12 @@ baseurl: ""
 url: ""
 
 plugins:
+  # from https://github.com/just-the-docs/just-the-docs/blob/main/_config.yml
+  - jekyll-seo-tag
+  - jekyll-github-metadata
+  - jekyll-include-cache
+  - jekyll-sitemap
+  # custom additions
   - jekyll-default-layout
   - jekyll-figure
   - jekyll-remote-theme

@@ -41,6 +41,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final StringProperty fileDirectoryPatternProperty = new SimpleStringProperty();
     private final BooleanProperty confirmLinkedFileDeleteProperty = new SimpleBooleanProperty();
     private final BooleanProperty moveToTrashProperty = new SimpleBooleanProperty();
+    private final BooleanProperty openFileExplorerInFilesDirectory = new SimpleBooleanProperty();
+    private final BooleanProperty openFileExplorerInLastDirectory = new SimpleBooleanProperty();
 
     private final Validator mainFileDirValidator;
 
@@ -84,6 +86,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         fileDirectoryPatternProperty.setValue(filePreferences.getFileDirectoryPattern());
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
+        openFileExplorerInFilesDirectory.setValue(filePreferences.shouldOpenFileExplorerInFileDirectory());
+        openFileExplorerInLastDirectory.setValue(filePreferences.shouldOpenFileExplorerInLastUsedDirectory());
 
         // Autolink preferences
         switch (autoLinkPreferences.getCitationKeyDependency()) {
@@ -103,6 +107,8 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         filePreferences.setFileNamePattern(fileNamePatternProperty.getValue());
         filePreferences.setFileDirectoryPattern(fileDirectoryPatternProperty.getValue());
         filePreferences.setFulltextIndexLinkedFiles(fulltextIndex.getValue());
+        filePreferences.setOpenFileExplorerInFileDirectory(openFileExplorerInFilesDirectory.getValue());
+        filePreferences.setOpenFileExplorerInLastUsedDirectory(openFileExplorerInLastDirectory.getValue());
 
         // Autolink preferences
         if (autolinkFileStartsBibtexProperty.getValue()) {
@@ -191,6 +197,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty moveToTrashProperty() {
         return this.moveToTrashProperty;
+    }
+
+    public BooleanProperty openFileExplorerInFilesDirectoryProperty() {
+        return openFileExplorerInFilesDirectory;
+    }
+
+    public BooleanProperty openFileExplorerInLastDirectoryProperty() {
+        return openFileExplorerInLastDirectory;
     }
 }
 

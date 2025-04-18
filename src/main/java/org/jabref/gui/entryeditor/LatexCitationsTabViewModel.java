@@ -20,12 +20,14 @@ import javafx.scene.input.MouseEvent;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.push.PushToTeXstudio;
 import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
+import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.texparser.DefaultLatexParser;
@@ -35,12 +37,12 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.texparser.Citation;
 import org.jabref.model.texparser.LatexParserResult;
 import org.jabref.model.texparser.LatexParserResults;
-import org.jabref.model.util.DirectoryMonitorManager;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.apache.commons.io.monitor.FileEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,108 +58,38 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(LatexCitationsTabViewModel.class);
     private static final String TEX_EXT = ".tex";
     private static final IOFileFilter FILE_FILTER = FileFilterUtils.or(FileFilterUtils.suffixFileFilter(TEX_EXT), FileFilterUtils.directoryFileFilter());
-    private final BibDatabaseContext databaseContext;
+
     private final GuiPreferences preferences;
     private final DialogService dialogService;
-    private final ObjectProperty<Path> directory;
-    private final ObservableList<Citation> citationList;
-    private final ObjectProperty<Status> status;
-    private final StringProperty searchError;
-    private final BooleanProperty updateStatusOnCreate;
+
+    private final ObjectProperty<Path> directory = new SimpleObjectProperty<>();
+    private final ObservableList<Citation> citationList = FXCollections.observableArrayList();
+    private final ObjectProperty<Status> status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
+    private final StringProperty searchError = new SimpleStringProperty("");
+    private final BooleanProperty updateStatusOnCreate = new SimpleBooleanProperty(false);
+
     private final DefaultLatexParser latexParser;
     private final LatexParserResults latexFiles;
-    private final DirectoryMonitorManager directoryMonitorManager;
+    private final DirectoryMonitor directoryMonitor;
     private final FileAlterationListener listener;
+
     private FileAlterationObserver observer;
     private BibEntry currentEntry;
+    private BibDatabaseContext currentDatabaseContext;
 
-    public LatexCitationsTabViewModel(BibDatabaseContext databaseContext,
-                                      GuiPreferences preferences,
+    public LatexCitationsTabViewModel(GuiPreferences preferences,
                                       DialogService dialogService,
-                                      DirectoryMonitorManager directoryMonitorManager) {
-
-        this.databaseContext = databaseContext;
+                                      DirectoryMonitor directoryMonitor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.directory = new SimpleObjectProperty<>(databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                                                   .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory())));
-
-        this.citationList = FXCollections.observableArrayList();
-        this.status = new SimpleObjectProperty<>(Status.IN_PROGRESS);
-        this.searchError = new SimpleStringProperty("");
-        this.directoryMonitorManager = directoryMonitorManager;
-        this.updateStatusOnCreate = new SimpleBooleanProperty(false);
-        this.listener = getListener();
+        this.directoryMonitor = directoryMonitor;
 
         this.latexParser = new DefaultLatexParser();
         this.latexFiles = new LatexParserResults();
-    }
+        this.listener = new CitationsAlterationListener();
 
-    private FileAlterationListener getListener() {
-        return new FileAlterationListener() {
-            @Override
-            public void onStart(FileAlterationObserver observer) {
-                if (!updateStatusOnCreate.get()) {
-                    UiTaskExecutor.runInJavaFXThread(() -> status.set(Status.IN_PROGRESS));
-                }
-            }
-
-            @Override
-            public void onStop(FileAlterationObserver observer) {
-                if (!updateStatusOnCreate.get()) {
-                    updateStatusOnCreate.set(true);
-                    updateStatus();
-                }
-            }
-
-            @Override
-            public void onFileCreate(File file) {
-                Path path = file.toPath();
-                LatexParserResult result = latexParser.parse(path).get();
-                latexFiles.add(path, result);
-
-                Optional<String> citationKey = currentEntry.getCitationKey();
-                if (citationKey.isPresent()) {
-                    Collection<Citation> citations = result.getCitationsByKey(citationKey.get());
-                    UiTaskExecutor.runInJavaFXThread(() -> citationList.addAll(citations));
-                }
-
-                if (updateStatusOnCreate.get()) {
-                    updateStatus();
-                }
-            }
-
-            @Override
-            public void onFileDelete(File file) {
-                LatexParserResult result = latexFiles.remove(file.toPath());
-
-                Optional<String> citationKey = currentEntry.getCitationKey();
-                if (citationKey.isPresent()) {
-                    Collection<Citation> citations = result.getCitationsByKey(citationKey.get());
-                    UiTaskExecutor.runInJavaFXThread(() -> citationList.removeAll(citations));
-                    updateStatus();
-                }
-            }
-
-            @Override
-            public void onFileChange(File file) {
-                onFileDelete(file);
-                onFileCreate(file);
-                updateStatus();
-            }
-
-            @Override
-            public void onDirectoryChange(File directory) {
-            }
-
-            @Override
-            public void onDirectoryCreate(File directory) {
-            }
-
-            @Override
-            public void onDirectoryDelete(File directory) {
-            }
-        };
+        this.currentDatabaseContext = new BibDatabaseContext();
+        this.directory.set(FileUtil.getInitialDirectory(currentDatabaseContext, preferences.getFilePreferences().getWorkingDirectory()));
     }
 
     public void handleMouseClick(MouseEvent event, CitationsDisplay citationsDisplay) {
@@ -176,16 +108,13 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         }
     }
 
-    public void bindToEntry(BibEntry entry) {
+    public void bindToEntry(LibraryTab libraryTab, BibEntry entry) {
+        currentDatabaseContext = libraryTab.getBibDatabaseContext();
+
         checkAndUpdateDirectory();
 
         currentEntry = entry;
         Optional<String> citationKey = entry.getCitationKey();
-
-        if (observer == null) {
-            observer = new FileAlterationObserver(directory.get().toFile(), FILE_FILTER);
-            directoryMonitorManager.addObserver(observer, listener);
-        }
 
         if (citationKey.isPresent()) {
             citationList.setAll(latexFiles.getCitationsByKey(citationKey.get()));
@@ -203,26 +132,33 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                 .withInitialDirectory(directory.get()).build();
 
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration).ifPresent(selectedDirectory ->
-                databaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
+                currentDatabaseContext.getMetaData().setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), selectedDirectory.toAbsolutePath()));
 
         checkAndUpdateDirectory();
     }
 
     private void checkAndUpdateDirectory() {
-        Path newDirectory = databaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
-                                           .orElse(FileUtil.getInitialDirectory(databaseContext, preferences.getFilePreferences().getWorkingDirectory()));
+        Path newDirectory = currentDatabaseContext.getMetaData().getLatexFileDirectory(preferences.getFilePreferences().getUserAndHost())
+                                                  .orElse(FileUtil.getInitialDirectory(currentDatabaseContext, preferences.getFilePreferences().getWorkingDirectory()));
 
-        if (!newDirectory.equals(directory.get())) {
+        if (!newDirectory.equals(directory.get()) || observer == null) {
             status.set(Status.IN_PROGRESS);
             updateStatusOnCreate.set(false);
             citationList.clear();
             latexFiles.clear();
+            directoryMonitor.removeObserver(observer);
 
-            directoryMonitorManager.removeObserver(observer);
             directory.set(newDirectory);
-            observer = new FileAlterationObserver(directory.get().toFile(), FILE_FILTER);
-            directoryMonitorManager.addObserver(observer, listener);
+            setAlterationObserver();
         }
+    }
+
+    private void setAlterationObserver() {
+        observer = FileAlterationObserver.builder()
+                                         .setRootEntry(new FileEntry(directory.get().toFile()))
+                                         .setFileFilter(FILE_FILTER)
+                                         .getUnchecked();
+        directoryMonitor.addObserver(observer, listener);
     }
 
     private void updateStatus() {
@@ -256,5 +192,70 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
 
     public boolean shouldShow() {
         return preferences.getEntryEditorPreferences().shouldShowLatexCitationsTab();
+    }
+
+    private class CitationsAlterationListener implements FileAlterationListener {
+        @Override
+        public void onStart(FileAlterationObserver observer) {
+            if (!updateStatusOnCreate.get()) {
+                UiTaskExecutor.runInJavaFXThread(() -> status.set(Status.IN_PROGRESS));
+            }
+        }
+
+        @Override
+        public void onStop(FileAlterationObserver observer) {
+            if (!updateStatusOnCreate.get()) {
+                updateStatusOnCreate.set(true);
+                updateStatus();
+            }
+        }
+
+        @Override
+        public void onFileCreate(File file) {
+            Path path = file.toPath();
+            LatexParserResult result = latexParser.parse(path).get();
+            latexFiles.add(path, result);
+
+            Optional<String> citationKey = currentEntry.getCitationKey();
+            if (citationKey.isPresent()) {
+                Collection<Citation> citations = result.getCitationsByKey(citationKey.get());
+                UiTaskExecutor.runInJavaFXThread(() -> citationList.addAll(citations));
+            }
+
+            if (updateStatusOnCreate.get()) {
+                updateStatus();
+            }
+        }
+
+        @Override
+        public void onFileDelete(File file) {
+            LatexParserResult result = latexFiles.remove(file.toPath());
+
+            Optional<String> citationKey = currentEntry.getCitationKey();
+            if (citationKey.isPresent()) {
+                Collection<Citation> citations = result.getCitationsByKey(citationKey.get());
+                UiTaskExecutor.runInJavaFXThread(() -> citationList.removeAll(citations));
+                updateStatus();
+            }
+        }
+
+        @Override
+        public void onFileChange(File file) {
+            onFileDelete(file);
+            onFileCreate(file);
+            updateStatus();
+        }
+
+        @Override
+        public void onDirectoryChange(File directory) {
+        }
+
+        @Override
+        public void onDirectoryCreate(File directory) {
+        }
+
+        @Override
+        public void onDirectoryDelete(File directory) {
+        }
     }
 }

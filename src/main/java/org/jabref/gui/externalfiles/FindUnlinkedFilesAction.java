@@ -4,7 +4,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
+import static org.jabref.gui.actions.ActionHelper.needsSavedLocalDatabase;
 
 public class FindUnlinkedFilesAction extends SimpleCommand {
 
@@ -15,7 +15,7 @@ public class FindUnlinkedFilesAction extends SimpleCommand {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
 
-        this.executable.bind(needsDatabase(this.stateManager));
+        this.executable.bind(needsSavedLocalDatabase(this.stateManager));
     }
 
     @Override

@@ -7,6 +7,12 @@ gem 'jekyll-figure'
 
 gem "just-the-docs", "0.10.0"
 
+# "required" by just-the-docs
+gem 'jekyll-seo-tag'
+gem 'jekyll-github-metadata'
+gem 'jekyll-include-cache'
+gem 'jekyll-sitemap'
+
 gem "jekyll-remote-theme"
 
 # Added, because defualt layout with path "**/*.md" does not work at Jekyll
@@ -20,3 +26,4 @@ gem 'jekyll-titles-from-headings'
 
 # Homepage: https://github.com/benbalter/jekyll-relative-links
 gem 'jekyll-relative-links'
+

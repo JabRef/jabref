@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -20,6 +21,7 @@ import javafx.scene.input.InputMethodRequests;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
@@ -30,7 +32,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
 import org.jabref.gui.undo.UndoableFieldChange;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -49,9 +50,11 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.Range;
 
+import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.ObservableRuleBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
@@ -66,7 +69,6 @@ public class SourceTab extends EntryEditorTab {
     private static final String TEXT_STYLE = "text";
     private static final String SEARCH_STYLE = "search";
     private final FieldPreferences fieldPreferences;
-    private final BibDatabaseMode mode;
     private final UndoManager undoManager;
     private final ObjectProperty<ValidationMessage> sourceIsValid = new SimpleObjectProperty<>();
     private final ObservableRuleBasedValidator sourceValidator = new ObservableRuleBasedValidator();
@@ -75,23 +77,20 @@ public class SourceTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final BibEntryTypesManager entryTypesManager;
     private final KeyBindingRepository keyBindingRepository;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final StateManager stateManager;
     private Map<Field, Range> fieldPositions;
     private CodeArea codeArea;
     private BibEntry previousEntry;
 
-    public SourceTab(BibDatabaseContext bibDatabaseContext,
-                     CountingUndoManager undoManager,
+    public SourceTab(CountingUndoManager undoManager,
                      FieldPreferences fieldPreferences,
                      ImportFormatPreferences importFormatPreferences,
                      FileUpdateMonitor fileMonitor,
                      DialogService dialogService,
                      BibEntryTypesManager entryTypesManager,
                      KeyBindingRepository keyBindingRepository,
-                     OptionalObjectProperty<SearchQuery> searchQueryProperty) {
-        this.mode = bibDatabaseContext.getMode();
-        this.setText(Localization.lang("%0 source", mode.getFormattedName()));
-        this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
+                     StateManager stateManager) {
+        this.stateManager = stateManager;
         this.setGraphic(IconTheme.JabRefIcons.SOURCE.getGraphicNode());
         this.undoManager = undoManager;
         this.fieldPreferences = fieldPreferences;
@@ -100,8 +99,19 @@ public class SourceTab extends EntryEditorTab {
         this.dialogService = dialogService;
         this.entryTypesManager = entryTypesManager;
         this.keyBindingRepository = keyBindingRepository;
-        this.searchQueryProperty = searchQueryProperty;
-        searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightSearchPattern());
+
+        EasyBind.subscribe(stateManager.activeTabProperty(), library -> {
+            if (library.isEmpty()) {
+                this.setText(Localization.lang("Source"));
+                this.setTooltip(new Tooltip(Localization.lang("Show/edit source")));
+            } else {
+                BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                                   .orElse(BibDatabaseMode.BIBLATEX);
+                this.setText(Localization.lang("%0 source", mode.getFormattedName()));
+                this.setTooltip(new Tooltip(Localization.lang("Show/edit %0 source", mode.getFormattedName())));
+            }
+        });
+        stateManager.searchQueryProperty().addListener((_, _, _) -> Platform.runLater(this::highlightSearchPattern));
     }
 
     private void highlightSearchPattern() {
@@ -110,11 +120,12 @@ public class SourceTab extends EntryEditorTab {
         }
 
         codeArea.setStyleClass(0, codeArea.getLength(), TEXT_STYLE);
-        if (searchQueryProperty.get().isEmpty()) {
+        if (StringUtil.isBlank(stateManager.searchQueryProperty().get())) {
             return;
         }
 
-        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQueryProperty.get().get());
+        SearchQuery searchQuery = new SearchQuery(stateManager.searchQueryProperty().get());
+        Map<Optional<Field>, List<String>> searchTermsMap = Highlighter.groupTermsByField(searchQuery);
         searchTermsMap.forEach((optionalField, terms) -> {
             Optional<String> searchPattern = Highlighter.buildSearchPattern(terms);
             if (searchPattern.isEmpty()) {
@@ -241,11 +252,14 @@ public class SourceTab extends EntryEditorTab {
                 setupSourceEditor();
             }
 
+            BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                               .orElse(BibDatabaseMode.BIBLATEX);
+
             codeArea.clear();
             try {
                 codeArea.appendText(getSourceString(currentEntry, mode, fieldPreferences));
                 codeArea.setEditable(true);
-                highlightSearchPattern();
+                Platform.runLater(this::highlightSearchPattern);
             } catch (IOException ex) {
                 codeArea.setEditable(false);
                 codeArea.appendText(ex.getMessage() + "\n\n" +

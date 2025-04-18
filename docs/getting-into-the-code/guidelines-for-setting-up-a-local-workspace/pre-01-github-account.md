@@ -10,7 +10,7 @@ If you do not yet have a GitHub account, please [create one](https://github.com/
 
 Proposals for account names:
 
-* Login similar to your university account. Example: `koppor`
+* Login similar to your university account. Examples: `koppor`, `st342435`.
 * Use your last name prefixed by the first letter of your first name. Example: `okopp`
 * Use `firstname.lastname`. Example: `oliver.kopp`
 
@@ -22,4 +22,4 @@ Examples:
 
 * Same login as in GitHub (see above). Example: `koppor@gmail.com`
 * "`it`" in the name. Example: `kopp.it@gmail.com`
-* Use the university login. Example: `st342435@stud.uni-stuttgart.de`
+* Use the university email: Example: `st342435@stud.uni-stuttgart.de`

@@ -59,9 +59,9 @@ public class XMLUtil {
     /**
      * Gets the content of a subnode.
      * For example,
-     * <item>
+     * <pre>{@code <item>
      *     <nodeName>content</nodeName>
-     * </item>
+     * </item>}</pre>
      */
     public static Optional<String> getNodeContent(Node item, String nodeName) {
         if (item.getNodeType() != Node.ELEMENT_NODE) {
@@ -79,7 +79,7 @@ public class XMLUtil {
     /**
      * Gets the content of an attribute.
      * For example,
-     * <item attributeName="content" />
+     * {@code <item attributeName="content" />}
      */
     public static Optional<String> getAttributeContent(Node item, String attributeName) {
         NamedNodeMap attributes = item.getAttributes();
@@ -89,10 +89,10 @@ public class XMLUtil {
     /**
      * Gets a list of subnodes with the specified tag name.
      * For example,
-     * <item>
+     * <pre>{@code <item>
      *     <node>first hit</node>
      *     <node>second hit</node>
-     * </item>
+     * </item>}</pre>
      */
     public static List<Node> getNodesByName(Node item, String nodeName) {
         if (item.getNodeType() != Node.ELEMENT_NODE) {
@@ -105,10 +105,10 @@ public class XMLUtil {
     /**
      * Gets a the first subnode with the specified tag name.
      * For example,
-     * <item>
+     * <pre>{@code <item>
      *     <node>hit</node>
      *     <node>second hit, but not returned</node>
-     * </item>
+     * </item>}</pre>
      */
     public static Optional<Node> getNode(Node item, String nodeName) {
         return getNodesByName(item, nodeName).stream().findFirst();

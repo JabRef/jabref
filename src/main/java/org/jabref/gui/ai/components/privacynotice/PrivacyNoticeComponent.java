@@ -14,11 +14,15 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiPreferences;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiProvider;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +37,8 @@ public class PrivacyNoticeComponent extends ScrollPane {
     private final Runnable onIAgreeButtonClickCallback;
     private final DialogService dialogService;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
+
+    @Inject private GuiPreferences preferences;
 
     public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
         this.aiPreferences = aiPreferences;
@@ -99,5 +105,13 @@ public class PrivacyNoticeComponent extends ScrollPane {
             LOGGER.error("Error opening the browser to the Privacy Policy page of the AI provider.", e);
             dialogService.showErrorDialogAndWait(e);
         }
+    }
+
+    @FXML
+    private void hideAITabs() {
+        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
+        entryEditorPreferences.setShouldShowAiSummaryTab(false);
+        entryEditorPreferences.setShouldShowAiChatTab(false);
+        dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
     }
 }
