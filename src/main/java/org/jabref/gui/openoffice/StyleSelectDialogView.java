@@ -49,19 +49,12 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private final MenuItem edit = new MenuItem(Localization.lang("Edit"));
     private final MenuItem reload = new MenuItem(Localization.lang("Reload"));
-    private final JStyleLoader jStyleLoader;
+
     private final CSLStyleLoader cslStyleLoader;
+    private final JStyleLoader jStyleLoader;
 
     @FXML private Tab cslStyleTab;
     @FXML private Tab jStyleTab;
-
-    // JStyles TableView
-    @FXML private TableColumn<JStyleSelectViewModel, String> colName;
-    @FXML private TableView<JStyleSelectViewModel> tvStyles;
-    @FXML private TableColumn<JStyleSelectViewModel, String> colJournals;
-    @FXML private TableColumn<JStyleSelectViewModel, String> colFile;
-    @FXML private TableColumn<JStyleSelectViewModel, Boolean> colDeleteIcon;
-    @FXML private Button add;
 
     // CSL Styles TableView
     @FXML private TableView<CSLStyleSelectViewModel> cslStylesTable;
@@ -69,13 +62,23 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     @FXML private TableColumn<CSLStyleSelectViewModel, String> cslPathColumn;
     @FXML private TableColumn<CSLStyleSelectViewModel, Boolean> cslDeleteColumn;
 
-    @FXML private VBox jstylePreviewBox;
+    // JStyles TableView
+    @FXML private TableView<JStyleSelectViewModel> jStylesTable;
+    @FXML private TableColumn<JStyleSelectViewModel, String> jStyleNameColumn;
+    @FXML private TableColumn<JStyleSelectViewModel, String> jStyleJournalColumn;
+    @FXML private TableColumn<JStyleSelectViewModel, String> jStyleFileColumn;
+    @FXML private TableColumn<JStyleSelectViewModel, Boolean> jStyleDeleteColumn;
+
+    @FXML private Button addCslButton;
+    @FXML private Button addJStyleButton;
+
     @FXML private VBox cslPreviewBox;
+    @FXML private VBox jStylePreviewBox;
+
     private final AtomicBoolean initialScrollPerformed = new AtomicBoolean(false);
     @FXML private CustomTextField searchBox;
     @FXML private TabPane tabPane;
     @FXML private Label currentStyleNameLabel;
-    @FXML private Button addCslButton;
 
     @Inject private GuiPreferences preferences;
     @Inject private DialogService dialogService;
@@ -113,14 +116,14 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private void initialize() {
         viewModel = new StyleSelectDialogViewModel(dialogService, jStyleLoader, cslStyleLoader, preferences, taskExecutor, bibEntryTypesManager);
 
-        setupJStylesTab();
         setupCslStylesTab();
+        setupJStylesTab();
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
-        if (currentStyle instanceof JStyle) {
-            tabPane.getSelectionModel().select(jStyleTab);
-        } else {
+        if (currentStyle instanceof CitationStyle) {
             tabPane.getSelectionModel().select(cslStyleTab);
+        } else {
+            tabPane.getSelectionModel().select(jStyleTab);
         }
 
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
@@ -130,61 +133,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         addCslButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
 
         this.setOnShown(this::onDialogShown);
-    }
-
-    private void setupJStylesTab() {
-        // Setup JStyles table columns
-        colName.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
-        colJournals.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());
-        colFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
-        colDeleteIcon.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
-
-        new ValueTableCellFactory<JStyleSelectViewModel, Boolean>()
-                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
-                .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
-                .withTooltip(item -> Localization.lang("Remove style"))
-                .install(colDeleteIcon);
-
-        edit.setOnAction(e -> viewModel.editJStyle());
-
-        new ViewModelTableRowFactory<JStyleSelectViewModel>()
-                .withOnMouseClickedEvent((item, event) -> {
-                    if (event.getClickCount() == 2) {
-                        viewModel.selectedItemProperty().setValue(item);
-                        viewModel.storeStylePreferences();
-                        this.setResult(viewModel.getSelectedStyle());
-                        this.close();
-                    }
-                })
-                .withContextMenu(item -> createContextMenu())
-                .install(tvStyles);
-
-        tvStyles.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
-            if (newValue == null) {
-                viewModel.selectedItemProperty().setValue(oldValue);
-            } else {
-                viewModel.selectedItemProperty().setValue(newValue);
-            }
-        });
-
-        tvStyles.setItems(viewModel.jStylesProperty());
-
-        add.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
-
-        // JStyle previews
-        previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
-        jstylePreviewBox.getChildren().add(previewArticle);
-
-        previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
-        jstylePreviewBox.getChildren().add(previewBook);
-
-        EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
-            if (viewModel.getSelectedStyle() instanceof JStyle) {
-                tvStyles.getSelectionModel().select(style);
-                previewArticle.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Article)));
-                previewBook.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Book)));
-            }
-        });
     }
 
     private void setupCslStylesTab() {
@@ -240,6 +188,78 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         updateCslStylesTable();
     }
 
+    private void setupJStylesTab() {
+        // Setup JStyles table columns
+        jStyleNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        jStyleJournalColumn.setCellValueFactory(cellData -> cellData.getValue().journalsProperty());
+        jStyleFileColumn.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
+        jStyleDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
+
+        new ValueTableCellFactory<JStyleSelectViewModel, Boolean>()
+                .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
+                .withTooltip(item -> Localization.lang("Remove style"))
+                .install(jStyleDeleteColumn);
+
+        edit.setOnAction(e -> viewModel.editJStyle());
+
+        new ViewModelTableRowFactory<JStyleSelectViewModel>()
+                .withOnMouseClickedEvent((item, event) -> {
+                    if (event.getClickCount() == 2) {
+                        viewModel.selectedItemProperty().setValue(item);
+                        viewModel.storeStylePreferences();
+                        this.setResult(viewModel.getSelectedStyle());
+                        this.close();
+                    }
+                })
+                .withContextMenu(item -> createContextMenu())
+                .install(jStylesTable);
+
+        jStylesTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
+            if (newValue == null) {
+                viewModel.selectedItemProperty().setValue(oldValue);
+            } else {
+                viewModel.selectedItemProperty().setValue(newValue);
+            }
+        });
+
+        jStylesTable.setItems(viewModel.jStylesProperty());
+
+        addJStyleButton.setGraphic(IconTheme.JabRefIcons.ADD.getGraphicNode());
+
+        // JStyle previews
+        previewArticle = initializePreviewViewer(TestEntry.getTestEntry());
+        jStylePreviewBox.getChildren().add(previewArticle);
+
+        previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
+        jStylePreviewBox.getChildren().add(previewBook);
+
+        EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
+            if (viewModel.getSelectedStyle() instanceof JStyle) {
+                jStylesTable.getSelectionModel().select(style);
+                previewArticle.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Article)));
+                previewBook.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Book)));
+            }
+        });
+    }
+
+    private PreviewViewer initializePreviewViewer(BibEntry entry) {
+        PreviewViewer viewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
+        viewer.setDatabaseContext(new BibDatabaseContext());
+        viewer.setEntry(entry);
+        return viewer;
+    }
+
+    private ContextMenu createContextMenu() {
+        ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().addAll(edit, reload);
+        return contextMenu;
+    }
+
+    private void updateCurrentStyleLabel() {
+        currentStyleNameLabel.setText(viewModel.getSetStyle().getName());
+    }
+
     private void updateCslStylesTable() {
         cslStylesTable.getItems().clear();
         for (CitationStylePreviewLayout layout : viewModel.getAvailableLayouts()) {
@@ -256,32 +276,20 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         }
     }
 
-    private ContextMenu createContextMenu() {
-        ContextMenu contextMenu = new ContextMenu();
-        contextMenu.getItems().addAll(edit, reload);
-        return contextMenu;
+    @FXML
+    private void addCslStyleFile() {
+        viewModel.addCslStyleFile();
+    }
+
+    @FXML
+    private void addJStyleFile() {
+        viewModel.addJStyleFile();
     }
 
     @FXML
     private void modifyBibliographyTitle() {
         ModifyCSLBibliographyTitleDialogView modifyBibliographyTitleDialogView = new ModifyCSLBibliographyTitleDialogView(preferences.getOpenOfficePreferences());
         dialogService.showCustomDialog(modifyBibliographyTitleDialogView);
-    }
-
-    @FXML
-    private void addStyleFile() {
-        viewModel.addJStyleFile();
-    }
-
-    private PreviewViewer initializePreviewViewer(BibEntry entry) {
-        PreviewViewer viewer = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
-        viewer.setDatabaseContext(new BibDatabaseContext());
-        viewer.setEntry(entry);
-        return viewer;
-    }
-
-    private void updateCurrentStyleLabel() {
-        currentStyleNameLabel.setText(viewModel.getSetStyle().getName());
     }
 
     /**
@@ -310,13 +318,5 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 }
             }
         }
-    }
-
-    /**
-     * Method to handle the "Add CSL file" button click in the CSL Styles tab
-     */
-    @FXML
-    private void addCslStyleFile() {
-        viewModel.addCslStyleFile();
     }
 }

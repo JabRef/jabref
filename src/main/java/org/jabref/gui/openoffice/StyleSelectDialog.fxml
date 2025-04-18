@@ -28,7 +28,7 @@
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <Label text="%Available" styleClass="sectionHeader"/>
                             <HBox HBox.hgrow="ALWAYS" />
-                            <Button fx:id="addCslButton" onAction="#addCslStyleFile" text="%Add CSL file"/>
+                            <Button fx:id="addCslButton" onAction="#addCslStyleFile" text="%Add .csl file"/>
                         </HBox>
                         <CustomTextField fx:id="searchBox" promptText="%Filter" prefHeight="20.0"/>
                         <TableView fx:id="cslStylesTable" VBox.vgrow="ALWAYS" prefHeight="350.0">
@@ -51,12 +51,12 @@
                 <Tab fx:id="jStyleTab" text="JStyles">
                     <BorderPane>
                         <top>
-                            <TableView fx:id="tvStyles" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">
+                            <TableView fx:id="jStylesTable" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">
                                 <columns>
-                                    <TableColumn fx:id="colName" minWidth="100.0" prefWidth="-1.0" text="%Name"/>
-                                    <TableColumn fx:id="colJournals" minWidth="100.0" prefWidth="75.0" text="%Journals"/>
-                                    <TableColumn fx:id="colFile" minWidth="100.0" prefWidth="-1.0" text="%File"/>
-                                    <TableColumn fx:id="colDeleteIcon" minWidth="30.0" maxWidth="30.0" resizable="false"/>
+                                    <TableColumn fx:id="jStyleNameColumn" minWidth="100.0" prefWidth="-1.0" text="%Name"/>
+                                    <TableColumn fx:id="jStyleJournalColumn" minWidth="100.0" prefWidth="75.0" text="%Journals"/>
+                                    <TableColumn fx:id="jStyleFileColumn" minWidth="100.0" prefWidth="-1.0" text="%File"/>
+                                    <TableColumn fx:id="jStyleDeleteColumn" minWidth="30.0" maxWidth="30.0" resizable="false"/>
                                 </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
@@ -64,8 +64,8 @@
                             </TableView>
                         </top>
                         <right>
-                            <Button fx:id="add" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addStyleFile"
-                                    text="%Add style file" BorderPane.alignment="CENTER"/>
+                            <Button fx:id="addJStyleButton" alignment="TOP_RIGHT" mnemonicParsing="false" onAction="#addJStyleFile"
+                                    text="%Add .jstyle file" BorderPane.alignment="CENTER"/>
                         </right>
                         <bottom>
                             <VBox spacing="4.0">
@@ -73,7 +73,7 @@
                                     <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
                                 </padding>
                                 <Label text="%Preview" styleClass="sectionHeader"/>
-                                <VBox fx:id="jstylePreviewBox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER"/>
+                                <VBox fx:id="jStylePreviewBox" prefHeight="84.0" prefWidth="665.0" BorderPane.alignment="CENTER"/>
                             </VBox>
                         </bottom>
                     </BorderPane>
