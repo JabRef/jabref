@@ -170,7 +170,7 @@ public class StyleSelectDialogViewModel {
         OOStyle selectedStyle = getSelectedStyle();
         openOfficePreferences.setCurrentStyle(selectedStyle);
 
-        // handle backward-compatibility with pure JStyle preferences:
+        // Handle backward-compatibility with pure JStyle (formerly OOBibStyle) preferences ("ooBibliographyStyleFile")
         if (selectedStyle instanceof JStyle jStyle) {
             openOfficePreferences.setCurrentJStyle(jStyle.getPath());
         }
