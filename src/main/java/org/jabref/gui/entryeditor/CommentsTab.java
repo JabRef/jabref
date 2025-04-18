@@ -16,7 +16,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
-import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.FieldNameLabel;
 import org.jabref.gui.fieldeditors.MarkdownEditor;
@@ -43,21 +43,19 @@ public class CommentsTab extends FieldsEditorTab {
     private boolean shouldShowHideButton;
 
     public CommentsTab(GuiPreferences preferences,
-                       BibDatabaseContext databaseContext,
-                       SuggestionProviders suggestionProviders,
                        UndoManager undoManager,
                        UndoAction undoAction,
                        RedoAction redoAction,
                        JournalAbbreviationRepository journalAbbreviationRepository,
+                       StateManager stateManager,
                        PreviewPanel previewPanel) {
         super(false,
-                databaseContext,
-                suggestionProviders,
                 undoManager,
                 undoAction,
                 redoAction,
                 preferences,
                 journalAbbreviationRepository,
+                stateManager,
                 previewPanel);
         this.defaultOwner = preferences.getOwnerPreferences().getDefaultOwner().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]", "-");
         setText(Localization.lang("Comments"));
@@ -118,8 +116,8 @@ public class CommentsTab extends FieldsEditorTab {
     }
 
     @Override
-    protected void setupPanel(BibEntry entry, boolean compressed) {
-        super.setupPanel(entry, compressed);
+    protected void setupPanel(BibDatabaseContext bibDatabaseContext, BibEntry entry, boolean compressed) {
+        super.setupPanel(bibDatabaseContext, entry, compressed);
 
         Optional<FieldEditorFX> fieldEditorForUserDefinedComment = editors.entrySet().stream().filter(f -> f.getKey().getName().contains(defaultOwner)).map(Map.Entry::getValue).findFirst();
 
@@ -147,7 +145,7 @@ public class CommentsTab extends FieldsEditorTab {
                         entry.clearField(userSpecificCommentField);
                         shouldShowHideButton = false;
 
-                        setupPanel(entry, false);
+                        setupPanel(bibDatabaseContext, entry, false);
                     });
                     gridPane.add(hideDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
                     setCompressedRowLayout();
@@ -156,7 +154,7 @@ public class CommentsTab extends FieldsEditorTab {
                     Button showDefaultOwnerCommentButton = new Button(Localization.lang("Show user-specific comments field"));
                     showDefaultOwnerCommentButton.setOnAction(e -> {
                         shouldShowHideButton = true;
-                        setupPanel(entry, false);
+                        setupPanel(bibDatabaseContext, entry, false);
                     });
                     gridPane.add(showDefaultOwnerCommentButton, 1, gridPane.getRowCount(), 2, 1);
                     setCompressedRowLayout();

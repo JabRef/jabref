@@ -1,8 +1,9 @@
-name: On PR opened
+name: On PR opened/updated
 
 on:
   # _target is required
   pull_request_target:
+  # default: opened, synchronize, reopened
 
 jobs:
   determine_issue_number:
@@ -11,6 +12,12 @@ jobs:
     permissions:
       issues: write
     steps:
+      - name: echo PR data
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          echo "PR Body"
+          echo "${{ github.event.pull_request.body }}"
       - name: Determine issue number
         uses: koppor/ticket-check-action@add-output
         with:
@@ -20,7 +27,8 @@ jobs:
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
           # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
-          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegexFlags: 'i'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
   move_issue:
@@ -40,7 +48,8 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegexFlags: 'i'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - name: Move issue to "In Progress" in "Good First Issues"
@@ -82,7 +91,8 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '(?i)(fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegexFlags: 'i'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - uses: actions/checkout@v4

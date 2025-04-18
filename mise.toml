@@ -1,2 +1,2 @@
 [tools]
-java = '21'
+java = 'temurin-23'

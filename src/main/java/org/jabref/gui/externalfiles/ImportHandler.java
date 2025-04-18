@@ -155,6 +155,7 @@ public class ImportHandler {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
                             } else {
+                                generateKeys(pdfEntriesInFile);
                                 pdfEntriesInFile.forEach(entry -> {
                                     if (entry.getFiles().size() > 1) {
                                         LOGGER.warn("Entry has more than one file attached. This is not supported.");
