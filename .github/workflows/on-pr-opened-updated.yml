@@ -28,8 +28,10 @@ jobs:
         run: |
           echo "PR Number: ${{ github.event.pull_request.number }}"
           echo "PR URL: ${{ github.event.pull_request.html_url }}"
-          echo "PR Body"
-          echo "${{ github.event.pull_request.body }}"
+          cat <<EOF
+          PR Body:
+          ${{ github.event.pull_request.body }}
+          EOF
       - name: Determine issue number
         id: get_issue_number
         uses: koppor/ticket-check-action@add-output
