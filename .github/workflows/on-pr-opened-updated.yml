@@ -47,7 +47,7 @@ jobs:
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
-      - name: Fail on no ticket number found
+      - name: Issue number present
         if: steps.get_issue_number.outputs.ticketNumber == '-1'
         run: |
           echo "No valid ticket number found!"
