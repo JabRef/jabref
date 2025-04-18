@@ -121,6 +121,7 @@ public class GlobalSearchBar extends HBox {
 
         searchField = SearchTextField.create(keyBindingRepository);
         searchField.disableProperty().bind(needsDatabase(stateManager).not());
+        stateManager.searchQueryProperty().bind(searchField.textProperty());
 
         Label currentResults = new Label();
         // fits the standard "found x entries"-message thus hinders the searchbar to jump around while searching if the tabContainer width is too small

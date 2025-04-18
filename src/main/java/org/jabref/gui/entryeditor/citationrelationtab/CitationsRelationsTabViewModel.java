@@ -19,7 +19,6 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 public class CitationsRelationsTabViewModel {
 
-    private final BibDatabaseContext databaseContext;
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final StateManager stateManager;
@@ -27,8 +26,7 @@ public class CitationsRelationsTabViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TaskExecutor taskExecutor;
 
-    public CitationsRelationsTabViewModel(BibDatabaseContext databaseContext, GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
-        this.databaseContext = databaseContext;
+    public CitationsRelationsTabViewModel(GuiPreferences preferences, UndoManager undoManager, StateManager stateManager, DialogService dialogService, FileUpdateMonitor fileUpdateMonitor, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.undoManager = undoManager;
         this.stateManager = stateManager;
@@ -38,6 +36,8 @@ public class CitationsRelationsTabViewModel {
     }
 
     public void importEntries(List<CitationRelationItem> entriesToImport, CitationFetcher.SearchType searchType, BibEntry existingEntry) {
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
+
         List<BibEntry> entries = entriesToImport.stream()
                                                 .map(CitationRelationItem::entry)
                                                 // We need to have a clone of the entry, because we add the entry to the library (and keep it in the citation relation tab, too)

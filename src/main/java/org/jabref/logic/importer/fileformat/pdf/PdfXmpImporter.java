@@ -17,13 +17,15 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 public class PdfXmpImporter extends PdfImporter {
 
     private final XmpPreferences xmpPreferences;
+    private final XmpUtilReader xmpUtilReader;
 
     public PdfXmpImporter(XmpPreferences xmpPreferences) {
         this.xmpPreferences = xmpPreferences;
+        xmpUtilReader = new XmpUtilReader();
     }
 
     public List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException {
-        return new XmpUtilReader().readXmp(filePath, xmpPreferences);
+        return xmpUtilReader.readXmp(filePath, document, xmpPreferences);
     }
 
     @Override
