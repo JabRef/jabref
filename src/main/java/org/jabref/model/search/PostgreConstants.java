@@ -63,6 +63,10 @@ public enum PostgreConstants {
         return BIB_FIELDS_SCHEME + ".\"" + mainTable + "\"";
     }
 
+    /**
+     * Generates the schema reference for the split table, which is used to store multi-value fields (e.g., authors, keywords)
+     * in a normalized form to facilitate efficient querying and indexing of the data.
+     */
     public static String getSplitTableSchemaReference(String mainTable) {
         return BIB_FIELDS_SCHEME + ".\"" + mainTable + SPLIT_TABLE_SUFFIX + "\"";
     }
