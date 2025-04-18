@@ -7,7 +7,7 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Tests", "On PR opened", "On PR synchronize"]
+    workflows: ["Tests", "On PR opened/updated"]
     # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-a-workflow-based-on-the-conclusion-of-another-workflow
     types: [completed]
   workflow_dispatch:
