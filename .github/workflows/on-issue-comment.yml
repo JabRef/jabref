@@ -9,6 +9,7 @@ jobs:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       issues: write
     steps:
       - name: Assign the user or unassign stale assignments
