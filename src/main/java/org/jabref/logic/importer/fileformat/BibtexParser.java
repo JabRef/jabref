@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -233,10 +234,6 @@ public class BibtexParser implements Parser {
             boolean found = consumeUncritically('@');
             if (!found) {
                 break;
-            }
-
-            if (col > 1) {
-                continue;
             }
 
             skipWhitespace();
@@ -632,11 +629,12 @@ public class BibtexParser implements Parser {
 
     private int read() throws IOException {
         int character = pushbackReader.read();
-        col++;
 
         if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
         }
+
+        col++;
         if (character == '\n') {
             line++;
             col = 0;
@@ -645,12 +643,12 @@ public class BibtexParser implements Parser {
     }
 
     private void unread(int character) throws IOException {
+        col--;
         if (character == '\n') {
             line--;
             col = 0;
         }
         pushbackReader.unread(character);
-        col--;
         if (pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
@@ -1104,6 +1102,20 @@ public class BibtexParser implements Parser {
         return '\\' == character;
     }
 
+    private boolean entryStartsOnNewLine() {
+        Iterator<Character> it = pureTextFromFile.descendingIterator();
+        while (it.hasNext()) {
+            char c = it.next();
+            if (c == '\n' || c == '\r') {
+                return true;
+            }
+            if (c != ' ' && c != '\t') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private StringBuilder parseQuotedFieldExactly() throws IOException {
         StringBuilder value = new StringBuilder();
 
@@ -1141,6 +1153,11 @@ public class BibtexParser implements Parser {
         int character;
         do {
             character = read();
+            if (col == 1 && character != expected) {
+                if (isCommentIndicator(character, peek())) {
+                    consumeUncritically('\n');
+                }
+            }
         } while ((character != expected) && (character != -1) && (character != 65535));
 
         if (isEOFCharacter(character)) {
@@ -1149,6 +1166,14 @@ public class BibtexParser implements Parser {
 
         // Return true if we actually found the character we were looking for:
         return character == expected;
+    }
+
+    private Boolean isCommentIndicator(int c1, int c2) {
+        if (c1 == '%' || c1 == '#' || c1 == '*' || (c1 == c2 && c1 == '-') || (c1 == c2 && c1 == '/')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void consume(char firstOption, char secondOption) throws IOException {
