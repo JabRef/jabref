@@ -12,26 +12,50 @@ jobs:
     permissions:
       issues: write
     outputs:
-      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues }}
+      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues || '[]' }}
     steps:
       - name: Unassign stale assignments
         id: unassign
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 14
+          reminder_comment: |
+              ### ⏰ Assignment Reminder
+
+              Hi @{{ handle }}, this is a friendly reminder about your assignment to this issue.
+
+              > [!WARNING]
+              > This issue will be **automatically unassigned** in **{{ days_remaining }} days** if there's no activity.
+
+              <details open>
+              <summary>How to keep your assignment</summary>
+
+              \
+              If you are working on it, you can prevent automatic unassignment by:
+
+              - Submitting a draft PR with your progress
+              - Asking for the **{{{ pin_label }}}** label if you need more time
+              </details>
+
+              We appreciate your contribution and are here to help if needed!
+          days_until_unassign: 21
           unassigned_comment: |
             ### 📋 Assignment Update
 
             Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
 
-            <details open>
+            <details>
             <summary>Next steps</summary>
 
+            \
             **If you still want to work on this:**
-            - Ask a maintainer to assign you again
-            - If you're making progress, a maintainer can add the pin label to prevent future automatic unassignment
+            - Submit a pull request showing your current state. You will be automatically assigned again.
+            - Ask a maintainer to assign you again.
             </details>
+      - name: Print unassigned issues
+        run: >
+          echo "Unassigned issues: ${{ steps.unassign.outputs.unassigned_issues }}"
+
   move_unassigned_issues:
     needs: unassign_issues
     if: ${{ needs.unassign_issues.outputs.unassigned_issues != '[]' }}
