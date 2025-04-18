@@ -2504,6 +2504,7 @@ journalInfo .grid-cell-b {
     -fx-underline: false !important;
     -fx-text-fill: -fx-text-base-color;
 }
+
 .exampleQuestionStyle:hover {
     -fx-background-color: rgba(0, 0, 0, 0.12);
 }
