@@ -16,6 +16,7 @@ import static org.jabref.model.search.PostgreConstants.BIB_FIELDS_SCHEME;
 
 public class PostgreServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreServer.class);
+
     private final EmbeddedPostgres embeddedPostgres;
     private final DataSource dataSource;
 
@@ -26,6 +27,7 @@ public class PostgreServer {
                                                .setOutputRedirector(ProcessBuilder.Redirect.DISCARD)
                                                .start();
             LOGGER.info("Postgres server started, connection port: {}", embeddedPostgres.getPort());
+            PostgresMetadataWriter.write(embeddedPostgres.getPort());
         } catch (IOException e) {
             LOGGER.error("Could not start Postgres server", e);
             this.embeddedPostgres = null;
