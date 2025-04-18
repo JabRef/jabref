@@ -15,6 +15,7 @@ import javafx.scene.input.KeyEvent;
 import org.jabref.gui.commonfxcontrols.PatternSuggestionCell;
 import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ValueTableCellFactory;
 import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
@@ -23,12 +24,15 @@ import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class LinkedFileNamePatternsPanel extends TableView<PatternsItemModel> {
 
     @FXML public TableColumn<PatternsItemModel, EntryType> entryTypeColumn;
     @FXML public TableColumn<PatternsItemModel, String> patternColumn;
     @FXML public TableColumn<PatternsItemModel, EntryType> actionsColumn;
+
+    @Inject private GuiPreferences preferences;
 
     private LinkedFileNamePatternsPanelViewModel viewModel;
 
@@ -51,7 +55,7 @@ public class LinkedFileNamePatternsPanel extends TableView<PatternsItemModel> {
 
     @FXML
     private void initialize() {
-        viewModel = new LinkedFileNamePatternsPanelViewModel();
+        viewModel = new LinkedFileNamePatternsPanelViewModel(preferences.getFilePreferences());
 
         this.setEditable(true);
 

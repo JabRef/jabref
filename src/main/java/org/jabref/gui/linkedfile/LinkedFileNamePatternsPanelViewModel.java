@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.PatternsItemModel;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
@@ -34,10 +35,14 @@ public class LinkedFileNamePatternsPanelViewModel {
         return 0;
     };
 
+    private final FilePreferences filePreferences;
+
     private final ListProperty<PatternsItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<PatternsItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
-    public LinkedFileNamePatternsPanelViewModel() { }
+    public LinkedFileNamePatternsPanelViewModel(FilePreferences filePreferences) {
+        this.filePreferences = filePreferences;
+    }
 
     public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns initialNamePattern) {
         String defaultPattern;
@@ -65,7 +70,7 @@ public class LinkedFileNamePatternsPanelViewModel {
     }
 
     public void setItemToDefaultPattern(PatternsItemModel item) {
-        item.setPattern(KeyPattern.AUTHOR_YEAR.stringRepresentation());
+        item.setPattern(filePreferences.getDefaultPattern());
     }
 
     public void resetAll() {
