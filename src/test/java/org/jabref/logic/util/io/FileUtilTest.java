@@ -156,7 +156,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameRemovesLatexCommands() {
-        String pattern = "[citationkey] - [fulltitle]";
+        GlobalLinkedFileNamePatterns pattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[citationkey] - [fulltitle]"));
         BibEntry entry = new BibEntry()
                 .withCitationKey("BrayBuildingCommunity")
                 .withField(StandardField.TITLE, "Building \\mkbibquote{Community}");
