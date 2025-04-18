@@ -29,7 +29,7 @@ plugins {
 
     id 'idea'
 
-    id 'org.openrewrite.rewrite' version '7.2.0'
+    id 'org.openrewrite.rewrite' version '7.3.0'
 
     id "org.itsallcode.openfasttrace" version "3.0.1"
 }
@@ -62,6 +62,7 @@ java {
         // - .github/workflows/tests*.yml
         // - .github/workflows/update-gradle-wrapper.yml
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
+        // - mise.toml
         languageVersion = JavaLanguageVersion.of(23)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // vendor = JvmVendorSpec.AMAZON
@@ -132,13 +133,13 @@ sourceSets {
 
 repositories {
     mavenCentral()
-    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    maven { url 'https://jitpack.io' }
-    maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url = 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/groups/public' }
 
     // Required for one.jpro.jproutils:tree-showing
-    maven { url 'https://sandec.jfrog.io/artifactory/repo' }
+    maven { url = 'https://sandec.jfrog.io/artifactory/repo' }
 }
 
 configurations {
@@ -155,7 +156,7 @@ javafx {
 }
 
 jacoco {
-    toolVersion = "0.8.13-SNAPSHOT"
+    toolVersion = "0.8.13"
 }
 
 dependencies {
@@ -174,16 +175,16 @@ dependencies {
         exclude group: 'commons-logging'
     }
 
-    def luceneVersion = "10.1.0"
+    def luceneVersion = "10.2.0"
     implementation "org.apache.lucene:lucene-core:$luceneVersion"
     implementation "org.apache.lucene:lucene-queryparser:$luceneVersion"
     implementation "org.apache.lucene:lucene-queries:$luceneVersion"
     implementation "org.apache.lucene:lucene-analysis-common:$luceneVersion"
     implementation "org.apache.lucene:lucene-highlighter:$luceneVersion"
 
-    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-csv', version: '1.14.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
-    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.0'
+    implementation group: 'org.apache.commons', name: 'commons-text', version: '1.13.1'
     implementation 'commons-logging:commons-logging:1.3.5'
     implementation 'com.h2database:h2-mvstore:2.3.232'
 
@@ -206,10 +207,10 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.13.2'
     implementation 'org.antlr:antlr4-runtime:4.13.2'
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.1.0.202411261347-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '7.2.0.202503040940-r'
 
     implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.18.3'
-    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.2'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
 
     implementation 'com.fasterxml:aalto-xml:1.3.3'
 
@@ -244,9 +245,9 @@ dependencies {
     implementation('org.jabref:easybind:2.2.1-SNAPSHOT') {
         exclude group: 'org.openjfx'
     }
-    implementation 'org.fxmisc.flowless:flowless:0.7.3'
-    implementation 'org.fxmisc.richtext:richtextfx:0.11.4'
-    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.95.0') {
+    implementation 'org.fxmisc.flowless:flowless:0.7.4'
+    implementation 'org.fxmisc.richtext:richtextfx:0.11.5'
+    implementation (group: 'com.dlsc.gemsfx', name: 'gemsfx', version: '2.96.0') {
         exclude module: 'javax.inject' // Split package, use only jakarta.inject
         exclude module: 'commons-lang3'
         exclude group: 'org.apache.commons.validator'
@@ -264,13 +265,13 @@ dependencies {
         exclude group: 'com.squareup.okhttp3'
     }
 
-    implementation 'org.controlsfx:controlsfx:11.2.1'
+    implementation 'org.controlsfx:controlsfx:11.2.2'
 
     // region HTTP clients
     implementation 'org.jsoup:jsoup:1.19.1'
     implementation 'com.konghq:unirest-java-core:4.4.5'
     implementation 'com.konghq:unirest-modules-gson:4.4.5'
-    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.2'
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.3'
     // endregion
 
     implementation 'org.slf4j:slf4j-api:2.0.17'
@@ -360,7 +361,7 @@ dependencies {
     }
 
     implementation 'org.apache.velocity:velocity-engine-core:2.4.1'
-    implementation platform('ai.djl:bom:0.31.1')
+    implementation platform('ai.djl:bom:0.32.0')
     implementation 'ai.djl:api'
     implementation 'ai.djl.huggingface:tokenizers'
     implementation 'ai.djl.pytorch:pytorch-model-zoo'
@@ -370,10 +371,10 @@ dependencies {
         exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20'
     // endregion
 
-    implementation 'commons-io:commons-io:2.18.0'
+    implementation 'commons-io:commons-io:2.19.0'
 
     // Even if "compileOnly" is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use "implementation" instead of "compileOnly"
     implementation 'io.github.adr:e-adr:2.0.0-SNAPSHOT'
@@ -384,10 +385,10 @@ dependencies {
     implementation 'io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8'
 
     testImplementation 'io.github.classgraph:classgraph:4.8.179'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.1'
-    testImplementation 'org.junit.platform:junit-platform-launcher:1.11.4'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testImplementation 'org.junit.platform:junit-platform-launcher:1.12.1'
 
-    testImplementation 'org.mockito:mockito-core:5.16.0'
+    testImplementation 'org.mockito:mockito-core:5.17.0'
     testImplementation 'org.xmlunit:xmlunit-core:2.10.0'
     testImplementation 'org.xmlunit:xmlunit-matchers:2.10.0'
     testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.4.0'
@@ -395,17 +396,17 @@ dependencies {
     testImplementation "org.testfx:testfx-core:4.0.16-alpha"
     testImplementation "org.testfx:testfx-junit5:4.0.16-alpha"
     testImplementation "org.hamcrest:hamcrest-library:3.0"
-    testImplementation "com.github.javaparser:javaparser-symbol-solver-core:3.26.3"
+    testImplementation "com.github.javaparser:javaparser-symbol-solver-core:3.26.4"
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
     testImplementation 'org.wiremock:wiremock-standalone:3.12.1'
 
-    checkstyle 'com.puppycrawl.tools:checkstyle:10.21.4'
+    checkstyle 'com.puppycrawl.tools:checkstyle:10.23.0'
     // xjc needs the runtime as well for the ant task, otherwise it fails
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-xjc', version: '3.0.2'
     xjc group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.2.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -459,14 +460,15 @@ processResources {
 tasks.register('generateSource') {
     dependsOn("generateBstGrammarSource",
             "generateSearchGrammarSource",
+            "generateLtwaGrammarSource",
             "generateCitaviSource")
     group = 'JabRef'
-    description 'Generates all necessary (Java) source files.'
+    description = 'Generates all necessary (Java) source files.'
 }
 
 tasks.register("generateBstGrammarSource", JavaExec) {
     group = "JabRef"
-    description = 'Generates BstLexer.java and BstParser.java from the Bst.g grammar file using antlr4.'
+    description = 'Generates BstLexer.java and BstParser.java from the Bst.g4 grammar file using antlr4.'
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
@@ -478,7 +480,7 @@ tasks.register("generateBstGrammarSource", JavaExec) {
 
 tasks.register("generateSearchGrammarSource", JavaExec) {
     group = 'JabRef'
-    description = "Generates java files for Search.g antlr4."
+    description = "Generates java files for Search.g4 antlr4."
     classpath = configurations.antlr4
     mainClass = "org.antlr.v4.Tool"
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
@@ -486,6 +488,18 @@ tasks.register("generateSearchGrammarSource", JavaExec) {
     inputs.dir("src/main/antlr4/org/jabref/search/")
     outputs.dir("src-gen/main/java/org/jabref/search/")
     args  = ["-o","src-gen/main/java/org/jabref/search" , "-visitor", "-no-listener", "-package", "org.jabref.search", "$projectDir/src/main/antlr4/org/jabref/search/Search.g4"]
+}
+
+tasks.register("generateLtwaGrammarSource", JavaExec) {
+    group = "JabRef"
+    description = 'Generates LtwaLexer.java and LtwaParser.java from the Ltwa.g4 grammar file using antlr4.'
+    classpath = configurations.antlr4
+    mainClass = "org.antlr.v4.Tool"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+
+    inputs.dir('src/main/antlr4/org/jabref/ltwa/')
+    outputs.dir("src-gen/main/java/org/jabref/logic/journals/ltwa/")
+    args = ["-o", "src-gen/main/java/org/jabref/logic/journals/ltwa/", "-no-visitor", "-listener", "-package", "org.jabref.logic.journals.ltwa", "$projectDir/src/main/antlr4/org/jabref/ltwa/Ltwa.g4"]
 }
 
 tasks.register("generateJournalListMV", JavaExec) {
@@ -501,6 +515,68 @@ tasks.register("generateJournalListMV", JavaExec) {
 
 jar.dependsOn("generateJournalListMV")
 compileTestJava.dependsOn("generateJournalListMV")
+
+tasks.register('downloadLtwaFile') {
+    group = "JabRef"
+    description = "Downloads the LTWA file for journal abbreviations"
+    doLast {
+        def ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
+        def ltwaDir = file("build/resources/main/journals")
+        def ltwaCsvFile = file("${ltwaDir}/ltwa_20210702.csv")
+
+        if (!ltwaCsvFile.exists()) {
+            mkdir(ltwaDir)
+            ant.get(src: ltwaUrl, dest: ltwaCsvFile, verbose: true)
+            logger.lifecycle("Downloaded LTWA file to ${ltwaCsvFile}")
+        } else {
+            logger.lifecycle("LTWA file already exists at ${ltwaCsvFile}")
+        }
+    }
+    onlyIf {
+        !file("build/resources/main/journals/ltwa_20210702.csv").exists()
+    }
+}
+
+tasks.register('generateLtwaListMV', JavaExec) {
+    group = "JabRef"
+    description = "Converts the LTWA CSV file to a H2 MVStore"
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = "org.jabref.cli.LtwaListMvGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    dependsOn('downloadLtwaFile')
+    onlyIf {
+        !file("build/resources/main/journals/ltwa-list.mv").exists()
+    }
+}
+
+jar.dependsOn("generateLtwaListMV")
+compileTestJava.dependsOn("generateLtwaListMV")
+
+tasks.register('generateCitationStyleCatalog', JavaExec) {
+    group = "JabRef"
+    description = "Generates a catalog of all available citation styles"
+
+    dependsOn 'processResources'
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = "org.jabref.logic.citationstyle.CitationStyleCatalogGenerator"
+    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+}
+
+jar.dependsOn('generateCitationStyleCatalog')
+
+// catalog from above task needs to be copied to build output for tests
+tasks.register('copyCitationStyleCatalog', Copy) {
+    from 'src/main/resources/citation-style-catalog.json'
+    into 'build/resources/main'
+    mustRunAfter 'checkstyleMain'
+    dependsOn 'generateCitationStyleCatalog'
+}
+
+compileTestJava.dependsOn('copyCitationStyleCatalog')
+generateJournalListMV.dependsOn('copyCitationStyleCatalog')
+generateLtwaListMV.dependsOn('copyCitationStyleCatalog')
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
@@ -618,17 +694,17 @@ test {
 testlogger {
     // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
 
-    theme 'standard'
+    theme = 'standard'
 
-    showPassed false
-    showSkipped false
+    showPassed = false
+    showSkipped = false
 
-    showCauses false
-    showStackTraces false
+    showCauses = false
+    showStackTraces = false
 }
 
 tasks.withType(Test).configureEach {
-    reports.html.outputLocation.set(file("${reporting.baseDir}/${name}"))
+    reports.html.outputLocation.set(file("${reporting.baseDirectory}/${name}"))
     // Enable parallel tests (on desktop).
     // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
     if (!providers.environmentVariable("CI").isPresent()) {
@@ -644,7 +720,7 @@ tasks.register('databaseTest', Test) {
     testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED"]
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 
     maxParallelForks = 1
@@ -666,7 +742,7 @@ tasks.register('guiTest', Test) {
     testLogging {
         // set options for log level LIFECYCLE
         events = ["FAILED"]
-        exceptionFormat "full"
+        exceptionFormat = "full"
     }
 
     maxParallelForks = 1
@@ -955,6 +1031,7 @@ jmh {
     warmupIterations = 5
     iterations = 10
     fork = 2
+    zip64 = true
 }
 
 requirementTracing {

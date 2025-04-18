@@ -134,7 +134,7 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.setAlignment(Pos.TOP_LEFT);
         updateWelcomeRecentLibraries();
 
-        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) change -> updateWelcomeRecentLibraries());
+        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
 
         return createVBoxContainer(recentLabel, recentLibrariesBox);
     }
