@@ -17,6 +17,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.model.strings.StringUtil;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
 
@@ -93,7 +94,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        if (!defaultKeyPatternProperty.getValue().getPattern().trim().isEmpty()) {
+        if (!StringUtil.isNullOrEmpty(defaultKeyPatternProperty.getValue().getPattern())) {
             // we do not trim the value at the assignment to enable users to have spaces at the beginning and
             // at the end of the pattern
             newKeyPattern.setDefaultValue(defaultKeyPatternProperty.getValue().getPattern());

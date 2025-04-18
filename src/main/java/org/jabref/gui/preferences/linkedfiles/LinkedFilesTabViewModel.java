@@ -92,23 +92,14 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
         confirmLinkedFileDeleteProperty.setValue(filePreferences.confirmDeleteLinkedFile());
         moveToTrashProperty.setValue(filePreferences.moveToTrash());
 
-        autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
-
-        GlobalLinkedFileNamePatterns newKeyPattern =
-                new GlobalLinkedFileNamePatterns(filePreferences.fileNamePatternProperty().get().getDefaultValue());
-        patternListProperty.forEach(item -> {
-            String patternString = item.getPattern();
-            if (!"default".equals(item.getEntryType().getName())) {
-                if (!patternString.trim().isEmpty()) {
-                    newKeyPattern.addLinkedFileNamePattern(item.getEntryType(), patternString);
-                }
-            }
-        });
-        if (!defaultNamePatternProperty.getValue().getPattern().trim().isEmpty()) {
-            newKeyPattern.setDefaultValue(defaultNamePatternProperty.getValue().getPattern());
+        // Autolink preferences
+        switch (autoLinkPreferences.getCitationKeyDependency()) {
+            case START -> autolinkFileStartsBibtexProperty.setValue(true);
+            case EXACT -> autolinkFileExactBibtexProperty.setValue(true);
+            case REGEX -> autolinkUseRegexProperty.setValue(true);
         }
 
-        filePreferences.setFileNamePattern(newKeyPattern);
+        autolinkRegexKeyProperty.setValue(autoLinkPreferences.getRegularExpression());
     }
 
     @Override
