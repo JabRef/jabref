@@ -22,16 +22,10 @@ import org.jabref.model.biblog.BibWarning;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-/**
- * 1. Connects MetaData with the view.
- * 2. Wraps .blg warnings as IntegrityMessages.
- * 3. Supports file browsing and reset actions.
- */
+/// 1. Connects MetaData with the view.
+/// 2. Wraps .blg warnings as IntegrityMessages.
+/// 3. Supports file browsing and reset actions.
 public class BibLogSettingsViewModel extends AbstractViewModel {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibLogSettingsViewModel.class);
     private final ObservableList<IntegrityMessage> blgWarnings = FXCollections.observableArrayList();
     private final StringProperty path = new SimpleStringProperty("");
     private final MetaData metaData;
@@ -47,18 +41,20 @@ public class BibLogSettingsViewModel extends AbstractViewModel {
 
         BibLogPathResolver.resolve(metaData, bibPath, user)
                           .ifPresent(resolvedPath -> {
-            this.path.set(resolvedPath.toString());
-            if (metaData.getBlgFilePath(user).isEmpty()) {
-                metaData.setBlgFilePath(user, resolvedPath);
-                this.lastResolvedBlgPath = Optional.of(resolvedPath);
-            }
-        });
+                              this.path.set(resolvedPath.toString());
+                              if (metaData.getBlgFilePath(user).isEmpty()) {
+                                  metaData.setBlgFilePath(user, resolvedPath);
+                                  this.lastResolvedBlgPath = Optional.of(resolvedPath);
+                              }
+                          });
     }
 
     /**
      * Parses the .blg file (if it exists) into the observable list.
      *
      * @param databaseContext the current database context used to resolve citation keys in warnings.
+     * @return An Optional containing the list of integrity messages if the file exists and can be parsed,
+     *         or an empty Optional if the file does not exist.
      * @throws JabRefException if the .blg file cannot be parsed or read
      */
     public Optional<List<IntegrityMessage>> getBlgWarnings(BibDatabaseContext databaseContext) throws JabRefException {

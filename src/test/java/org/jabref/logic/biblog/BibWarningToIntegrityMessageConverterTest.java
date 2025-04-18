@@ -8,6 +8,7 @@ import org.jabref.model.biblog.SeverityType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -34,19 +35,14 @@ public class BibWarningToIntegrityMessageConverterTest {
                 new BibWarning(SeverityType.WARNING, "empty journal", "journal", "Scholey_2013"),
                 new BibWarning(SeverityType.WARNING, "empty year", "year", "Tan_2021")
         );
-        List<IntegrityMessage> messages = BibWarningToIntegrityMessageConverter.convert(warnings, context);
+        List<IntegrityMessage> actualMessages = BibWarningToIntegrityMessageConverter.convert(warnings, context);
 
-        assertEquals(2, messages.size());
+        List<IntegrityMessage> expectedMessages = List.of(
+                new IntegrityMessage("empty journal", firstEntry, FieldFactory.parseField("journal")),
+                new IntegrityMessage("empty year", secondEntry, FieldFactory.parseField("year"))
+        );
 
-        IntegrityMessage msg1 = messages.getFirst();
-        assertEquals("empty journal", msg1.message());
-        assertEquals(firstEntry, msg1.entry());
-        assertEquals("journal", msg1.field().getName());
-
-        IntegrityMessage msg2 = messages.get(1);
-        assertEquals("empty year", msg2.message());
-        assertEquals(secondEntry, msg2.entry());
-        assertEquals("year", msg2.field().getName());
+        assertEquals(expectedMessages, actualMessages);
     }
 
     /**

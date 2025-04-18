@@ -6,13 +6,12 @@ import java.util.Optional;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.metadata.MetaData;
 
-/**
- * Resolves custom or default .blg path for this library.
- *
- * Priority:
- * 1. User-defined path from MetaData
- * 2. Default: same name as .bib file with .blg extension
- */
+/// Resolves custom or default .blg path for this library.
+///
+/// Priority:
+///
+/// 1. User-defined path from MetaData
+/// 2. Default: same name as .bib file with .blg extension
 public class BibLogPathResolver {
 
     /**
