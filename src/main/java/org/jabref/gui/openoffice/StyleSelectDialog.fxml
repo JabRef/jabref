@@ -20,7 +20,7 @@
     <content>
         <VBox spacing="10.0">
             <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-                <Tab text="CSL Styles">
+                <Tab fx:id="cslStyleTab" text="CSL Styles">
                     <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                         <padding>
                             <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
@@ -48,7 +48,7 @@
                         <Button text="%Modify bibliography title" alignment="CENTER_RIGHT" onAction="#modifyBibliographyTitle" />
                     </VBox>
                 </Tab>
-                <Tab text="JStyles">
+                <Tab fx:id="jStyleTab" text="JStyles">
                     <BorderPane>
                         <top>
                             <TableView fx:id="tvStyles" prefHeight="208.0" prefWidth="662.0" BorderPane.alignment="CENTER">

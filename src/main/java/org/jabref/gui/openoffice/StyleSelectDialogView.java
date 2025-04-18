@@ -11,6 +11,7 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -51,6 +52,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private final JStyleLoader jStyleLoader;
     private final CSLStyleLoader cslStyleLoader;
 
+    @FXML private Tab cslStyleTab;
+    @FXML private Tab jStyleTab;
+
     // JStyles TableView
     @FXML private TableColumn<JStyleSelectViewModel, String> colName;
     @FXML private TableView<JStyleSelectViewModel> tvStyles;
@@ -83,11 +87,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private PreviewViewer previewArticle;
     private PreviewViewer previewBook;
 
-    private enum StyleTab {
-        CSL_STYLES,
-        JSTYLES
-    }
-
     /**
      * ViewModel for the CitationStyle entries in the TableView
      */
@@ -118,8 +117,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         setupCslStylesTab();
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
-        StyleTab tab = currentStyle instanceof JStyle ? StyleTab.JSTYLES : StyleTab.CSL_STYLES;
-        tabPane.getSelectionModel().select(tab.ordinal());
+        if (currentStyle instanceof JStyle) {
+            tabPane.getSelectionModel().select(jStyleTab);
+        } else {
+            tabPane.getSelectionModel().select(cslStyleTab);
+        }
 
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
         tabPane.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> viewModel.setSelectedTab(newValue));
