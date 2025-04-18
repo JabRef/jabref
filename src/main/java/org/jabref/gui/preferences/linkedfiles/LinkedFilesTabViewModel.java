@@ -20,6 +20,7 @@ import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanelViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.linkedfile.GlobalLinkedFileNamePatterns;
 import org.jabref.logic.preferences.CliPreferences;
@@ -47,7 +48,7 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     private final ListProperty<PatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<PatternsItemModel> defaultNamePatternProperty = new SimpleObjectProperty<>(
-            new PatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), ""));
+            new PatternsItemModel(new LinkedFileNamePatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
 
     private final Validator mainFileDirValidator;
 

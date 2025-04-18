@@ -16,8 +16,8 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
+import jakarta.inject.Inject;
 
 public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKeyPatternTabViewModel> implements PreferencesTab {
 
@@ -33,6 +33,8 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     @FXML private TextField unwantedCharacters;
     @FXML private Button keyPatternHelp;
     @FXML private CitationKeyPatternsPanel bibtexKeyPatternTable;
+
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     public CitationKeyPatternTab() {
         ViewLoader.view(this)
@@ -69,7 +71,6 @@ public class CitationKeyPatternTab extends AbstractPreferenceTabView<CitationKey
     @Override
     public void setValues() {
         viewModel.setValues();
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         bibtexKeyPatternTable.setValues(
                 entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
                 preferences.getCitationKeyPatternPreferences().getKeyPatterns());

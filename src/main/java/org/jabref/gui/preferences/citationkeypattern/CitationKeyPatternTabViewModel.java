@@ -15,6 +15,7 @@ import org.jabref.gui.commonfxcontrols.PatternsItemModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.importer.ImporterPreferences;
 
 public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
@@ -34,7 +35,7 @@ public class CitationKeyPatternTabViewModel implements PreferenceTabViewModel {
     // prevent an NPE on storing the preferences before lazy-loading of the setValues, they need to be initialized.
     private final ListProperty<PatternsItemModel> patternListProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ObjectProperty<PatternsItemModel> defaultKeyPatternProperty = new SimpleObjectProperty<>(
-            new PatternsItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), ""));
+            new PatternsItemModel(new CitationKeyPatternsPanelViewModel.DefaultEntryType(), KeyPattern.NULL_PATTERN.stringRepresentation()));
 
     private final CitationKeyPatternPreferences keyPatternPreferences;
 

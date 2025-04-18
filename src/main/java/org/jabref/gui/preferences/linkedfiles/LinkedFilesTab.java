@@ -19,9 +19,9 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
 
@@ -34,13 +34,13 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private RadioButton autolinkFileExactBibtex;
     @FXML private RadioButton autolinkUseRegex;
     @FXML private TextField autolinkRegexKey;
-
     @FXML private CheckBox fulltextIndex;
-
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
 
     @FXML private LinkedFileNamePatternsPanel linkedFileNamePatternTable;
+
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -92,7 +92,6 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @Override
     public void setValues() {
         viewModel.setValues();
-        BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         linkedFileNamePatternTable.setValues(
                 entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
                 preferences.getFilePreferences().fileNamePatternProperty().get());
