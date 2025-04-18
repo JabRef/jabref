@@ -117,6 +117,10 @@ public class FilePreferences {
         this.keyPatterns.set(fileNamePattern);
     }
 
+    public String getDefaultPattern() {
+        return defaultPattern;
+    }
+
     public String getFileDirectoryPattern() {
         return fileDirectoryPattern.get();
     }

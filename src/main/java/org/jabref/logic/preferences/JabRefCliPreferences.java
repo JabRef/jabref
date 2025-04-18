@@ -1362,7 +1362,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         // Store overridden definitions to Preferences.
-        Preferences preferences = PREFS_NODE.node(LINKED_FILE_NAME_PATTERNS_NODE);
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
         try {
             preferences.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {

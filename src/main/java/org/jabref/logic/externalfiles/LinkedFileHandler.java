@@ -210,7 +210,7 @@ public class LinkedFileHandler {
      * @return A filename based on the pattern specified in the preferences and valid for the file system.
      */
     public String getSuggestedFileName(String extension) {
-        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.getFileNamePattern()).trim();
+        String targetFileName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, filePreferences.fileNamePatternProperty().get()).trim();
         if (!extension.isEmpty()) {
             targetFileName = targetFileName + '.' + extension;
         }
