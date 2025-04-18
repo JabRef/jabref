@@ -8,6 +8,8 @@ In case, there is no issue present, the pull request implementing the feature is
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+### Added
+- Multi-file support in the linked file context menu of the entry editor. Users can now select multiple files and perform actions like Open file(s), Open folder(s), Download, Redownload, Remove link(s), Copy to folder, Move to file directory, and Permanently delete file(s).
 
 ### Added
 
