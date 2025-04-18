@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
@@ -18,6 +19,8 @@ import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
@@ -30,11 +33,15 @@ import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
+
+    @Inject private StateManager stateManager;
+    @Inject private EntryEditor entryEditor;
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -122,7 +129,7 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                                              }
                                      );
 
-                    this.setOnMouseClicked(event -> {
+                    this.setOnMouseClicked(_ -> {
                         if (!isEmpty()) {
                             TableColumn<ConsistencyMessage, String> clickedColumn = getTableColumn();
 
@@ -132,11 +139,19 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                             boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
 
                             if (field.isStandardField()) {
-                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                                stateManager.getEditorShowing().setValue(true);
+                                Platform.runLater(() -> {
+                                    libraryTab.clearAndSelect(message.bibEntry());
+                                    entryEditor.setFocusToField(field);
+                                });
                             } else if (!message.bibEntry().hasField(field) && isUnsetField) {
                                 libraryTab.showAndEdit(message.bibEntry());
                             } else {
-                                libraryTab.editEntryAndFocusField(message.bibEntry(), field);
+                                stateManager.getEditorShowing().setValue(true);
+                                Platform.runLater(() -> {
+                                    libraryTab.clearAndSelect(message.bibEntry());
+                                    entryEditor.setFocusToField(field);
+                                });
                             }
                         }
                     });

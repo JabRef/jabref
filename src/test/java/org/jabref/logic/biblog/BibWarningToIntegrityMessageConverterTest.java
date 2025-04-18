@@ -46,7 +46,7 @@ public class BibWarningToIntegrityMessageConverterTest {
     }
 
     /**
-     * Gracefully skips warnings for entries not found in the database.
+     * Skips warnings for entries not found in the database.
      */
     @Test
     void skipsWarningsForMissingEntries() {
@@ -65,7 +65,13 @@ public class BibWarningToIntegrityMessageConverterTest {
 
         List<IntegrityMessage> messages = BibWarningToIntegrityMessageConverter.convert(warnings, context);
 
-        assertEquals(1, messages.size());
-        assertEquals("Scholey_2013", messages.getFirst().entry().getCitationKey().orElseThrow());
+        List<IntegrityMessage> expectedMessages = List.of(
+                new IntegrityMessage(
+                        "empty journal",
+                        scholey,
+                        FieldFactory.parseField("journal")
+                )
+        );
+        assertEquals(expectedMessages, messages);
     }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -18,6 +19,8 @@ import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ValueTableCellFactory;
@@ -45,7 +48,9 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
     @FXML private MenuButton messageFilterButton;
     @FXML private VBox dialogVBox;
 
+    @Inject private EntryEditor entryEditor;
     @Inject private ThemeManager themeManager;
+    @Inject private StateManager stateManager;
     private final List<IntegrityMessage> messages;
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -70,7 +75,12 @@ public class IntegrityCheckDialog extends BaseDialog<Void> {
 
     private void handleRowClick(IntegrityMessage message, MouseEvent event) {
         if (event.getButton() == MouseButton.PRIMARY) {
-            libraryTab.editEntryAndFocusField(message.entry(), message.field());
+            libraryTab.clearAndSelect(message.entry());
+
+            stateManager.getEditorShowing().setValue(true);
+
+            // Focus field async to give entry editor time to load
+            Platform.runLater(() -> entryEditor.setFocusToField(message.field()));
             if (event.getClickCount() == 2) {
                 this.close();
             }
