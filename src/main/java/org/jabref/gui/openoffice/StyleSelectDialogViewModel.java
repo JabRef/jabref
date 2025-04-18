@@ -41,37 +41,44 @@ import com.airhacks.afterburner.injection.Injector;
 public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
-    private final JStyleLoader jStyleLoader;
+
     private final CSLStyleLoader cslStyleLoader;
+    private final JStyleLoader jStyleLoader;
+
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final OpenOfficePreferences openOfficePreferences;
-    private final ListProperty<JStyleSelectViewModel> jStyles = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<JStyleSelectViewModel> selectedItem = new SimpleObjectProperty<>();
-    private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
-    private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
-    private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
+
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
 
+    private final ListProperty<JStyleSelectViewModel> jStyles = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<JStyleSelectViewModel> selectedJStyle = new SimpleObjectProperty<>();
+
+    private final ObservableList<CitationStylePreviewLayout> availableCslLayouts = FXCollections.observableArrayList();
+    private final ObjectProperty<CitationStylePreviewLayout> selectedCslLayoutProperty = new SimpleObjectProperty<>();
+    private final FilteredList<CitationStylePreviewLayout> filteredAvailableCslLayouts = new FilteredList<>(availableCslLayouts);
+
     public StyleSelectDialogViewModel(DialogService dialogService,
-                                      JStyleLoader jStyleLoader,
                                       CSLStyleLoader cslStyleLoader,
+                                      JStyleLoader jStyleLoader,
                                       GuiPreferences preferences,
                                       TaskExecutor taskExecutor,
                                       BibEntryTypesManager bibEntryTypesManager) {
         this.dialogService = dialogService;
+
+        this.cslStyleLoader = cslStyleLoader;
+        this.jStyleLoader = jStyleLoader;
+
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.openOfficePreferences = preferences.getOpenOfficePreferences();
-        this.jStyleLoader = jStyleLoader;
-        this.cslStyleLoader = cslStyleLoader;
 
         jStyles.addAll(loadJStyles());
 
         OOStyle currentStyle = openOfficePreferences.getCurrentStyle();
 
         if (currentStyle instanceof JStyle jStyle) {
-            selectedItem.setValue(getStyleOrDefault(jStyle.getPath()));
+            selectedJStyle.setValue(getJStyleOrDefault(jStyle.getPath()));
         }
 
         BackgroundTask.wrap(CSLStyleLoader::getStyles)
@@ -79,81 +86,59 @@ public class StyleSelectDialogViewModel {
                           List<CitationStylePreviewLayout> layouts = styles.stream()
                                                                            .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))
                                                                            .toList();
-                          availableLayouts.setAll(layouts);
+                          availableCslLayouts.setAll(layouts);
 
                           if (currentStyle instanceof CitationStyle citationStyle) {
                               // Find the matching style - first try exact path match for external styles
-                              Optional<CitationStylePreviewLayout> matchingLayout = availableLayouts.stream()
-                                                                                                    .filter(layout -> layout.getFilePath().equals(citationStyle.getFilePath()))
-                                                                                                    .findFirst();
+                              Optional<CitationStylePreviewLayout> matchingLayout = availableCslLayouts.stream()
+                                                                                                       .filter(layout -> layout.getFilePath().equals(citationStyle.getFilePath()))
+                                                                                                       .findFirst();
 
                               // If not found, match by name (for internal style)
                               if (matchingLayout.isEmpty()) {
-                                  matchingLayout = availableLayouts.stream()
-                                                                   .filter(layout -> layout.getDisplayName().equals(citationStyle.getTitle()))
-                                                                   .findFirst();
+                                  matchingLayout = availableCslLayouts.stream()
+                                                                      .filter(layout -> layout.getDisplayName().equals(citationStyle.getTitle()))
+                                                                      .findFirst();
                               }
 
-                              selectedLayoutProperty.set(matchingLayout.orElse(availableLayouts.getFirst()));
+                              selectedCslLayoutProperty.set(matchingLayout.orElse(availableCslLayouts.getFirst()));
                           }
                       })
                       .onFailure(ex -> dialogService.showErrorDialogAndWait("Error discovering citation styles", ex))
                       .executeWith(taskExecutor);
     }
 
-    public JStyleSelectViewModel fromJStyle(JStyle style) {
-        return new JStyleSelectViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
+    // region - general methods
+
+    public Tab getSelectedTab() {
+        return selectedTab.get();
     }
 
-    public JStyle toJStyle(JStyleSelectViewModel item) {
-        return item.getJStyle();
+    public void setSelectedTab(Tab tab) {
+        if (tab != null) {
+            selectedTab.set(tab);
+        }
     }
 
-    public void addJStyleFile() {
-        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
-                .withInitialDirectory(filePreferences.getWorkingDirectory())
-                .build();
-        Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
-        path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
-            if (jStyleLoader.addStyleIfValid(stylePath)) {
-                openOfficePreferences.setCurrentJStyle(stylePath);
-                jStyles.setAll(loadJStyles());
-                selectedItem.setValue(getStyleOrDefault(stylePath));
-            } else {
-                dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
+    public OOStyle getSetStyle() {
+        return openOfficePreferences.getCurrentStyle();
+    }
+
+    public OOStyle getSelectedStyle() {
+        Tab currentTab = getSelectedTab();
+        if (currentTab != null) {
+            String tabText = currentTab.getText();
+            if ("JStyles".equals(tabText)) {
+                if (selectedJStyle.get() != null) {
+                    return selectedJStyle.get().getJStyle();
+                }
+            } else if ("CSL Styles".equals(tabText)) {
+                if (selectedCslLayoutProperty.get() != null) {
+                    return selectedCslLayoutProperty.get().getCitationStyle();
+                }
             }
-        });
-    }
-
-    public List<JStyleSelectViewModel> loadJStyles() {
-        return jStyleLoader.getStyles().stream().map(this::fromJStyle).toList();
-    }
-
-    public ListProperty<JStyleSelectViewModel> jStylesProperty() {
-        return jStyles;
-    }
-
-    public void deleteJStyle() {
-        JStyle jStyle = selectedItem.getValue().getJStyle();
-        if (jStyleLoader.removeStyle(jStyle)) {
-            jStyles.remove(selectedItem.get());
         }
-    }
-
-    public ObjectProperty<JStyleSelectViewModel> selectedItemProperty() {
-        return selectedItem;
-    }
-
-    public void editJStyle() {
-        JStyle jStyle = selectedItem.getValue().getJStyle();
-        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", externalApplicationsPreferences);
-        try {
-            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, jStyle.getPath(), type);
-        } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(e);
-        }
+        return openOfficePreferences.getCurrentStyle();
     }
 
     public void storeStylePreferences() {
@@ -176,52 +161,21 @@ public class StyleSelectDialogViewModel {
         }
     }
 
-    private JStyleSelectViewModel getStyleOrDefault(String stylePath) {
-        return jStyles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(jStyles.getFirst());
+    // endregion
+
+    // region - csl-specific methods
+
+    public ObservableList<CitationStylePreviewLayout> getAvailableCslLayouts() {
+        return filteredAvailableCslLayouts;
     }
 
-    public ObservableList<CitationStylePreviewLayout> getAvailableLayouts() {
-        return filteredAvailableLayouts;
+    public ObjectProperty<CitationStylePreviewLayout> selectedCslLayoutProperty() {
+        return selectedCslLayoutProperty;
     }
 
-    public ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty() {
-        return selectedLayoutProperty;
-    }
-
-    public void setAvailableLayoutsFilter(String searchTerm) {
-        filteredAvailableLayouts.setPredicate(layout ->
+    public void setAvailableCslLayoutsFilter(String searchTerm) {
+        filteredAvailableCslLayouts.setPredicate(layout ->
                 searchTerm.isEmpty() || layout.getDisplayName().toLowerCase().contains(searchTerm.toLowerCase()));
-    }
-
-    public Tab getSelectedTab() {
-        return selectedTab.get();
-    }
-
-    public void setSelectedTab(Tab tab) {
-        if (tab != null) {
-            selectedTab.set(tab);
-        }
-    }
-
-    public OOStyle getSelectedStyle() {
-        Tab currentTab = getSelectedTab();
-        if (currentTab != null) {
-            String tabText = currentTab.getText();
-            if ("JStyles".equals(tabText)) {
-                if (selectedItem.get() != null) {
-                    return selectedItem.get().getJStyle();
-                }
-            } else if ("CSL Styles".equals(tabText)) {
-                if (selectedLayoutProperty.get() != null) {
-                    return selectedLayoutProperty.get().getCitationStyle();
-                }
-            }
-        }
-        return openOfficePreferences.getCurrentStyle();
-    }
-
-    public OOStyle getSetStyle() {
-        return openOfficePreferences.getCurrentStyle();
     }
 
     /**
@@ -247,7 +201,7 @@ public class StyleSelectDialogViewModel {
                                                                            .map(style -> new CitationStylePreviewLayout(style, Injector.instantiateModelOrService(BibEntryTypesManager.class)))
                                                                            .toList();
 
-                availableLayouts.setAll(updatedLayouts);
+                availableCslLayouts.setAll(updatedLayouts);
 
                 Optional<CitationStylePreviewLayout> newLayoutOptional = updatedLayouts.stream()
                                                                                        .filter(layout -> layout.getFilePath().equals(stylePath))
@@ -255,7 +209,7 @@ public class StyleSelectDialogViewModel {
 
                 if (newLayoutOptional.isPresent()) {
                     CitationStylePreviewLayout newLayout = newLayoutOptional.get();
-                    selectedLayoutProperty.set(newLayout);
+                    selectedCslLayoutProperty.set(newLayout);
 
                     openOfficePreferences.setCurrentStyle(newStyle);
 
@@ -287,19 +241,19 @@ public class StyleSelectDialogViewModel {
 
         if (deleteConfirmed) {
             if (cslStyleLoader.removeStyle(style)) {
-                Optional<CitationStylePreviewLayout> layoutToRemove = availableLayouts.stream()
-                                                                                      .filter(layout -> layout.getFilePath().equals(style.getFilePath()))
-                                                                                      .findFirst();
+                Optional<CitationStylePreviewLayout> layoutToRemove = availableCslLayouts.stream()
+                                                                                         .filter(layout -> layout.getFilePath().equals(style.getFilePath()))
+                                                                                         .findFirst();
 
-                layoutToRemove.ifPresent(availableLayouts::remove);
+                layoutToRemove.ifPresent(availableCslLayouts::remove);
 
                 // If the deleted style was the current selection, select another style
-                if (selectedLayoutProperty.get() != null &&
-                        selectedLayoutProperty.get().getFilePath().equals(style.getFilePath())) {
-                    if (!availableLayouts.isEmpty()) {
-                        selectedLayoutProperty.set(availableLayouts.getFirst());
+                if (selectedCslLayoutProperty.get() != null &&
+                        selectedCslLayoutProperty.get().getFilePath().equals(style.getFilePath())) {
+                    if (!availableCslLayouts.isEmpty()) {
+                        selectedCslLayoutProperty.set(availableCslLayouts.getFirst());
                     } else {
-                        selectedLayoutProperty.set(null);
+                        selectedCslLayoutProperty.set(null);
                     }
                 }
 
@@ -315,4 +269,69 @@ public class StyleSelectDialogViewModel {
             }
         }
     }
+
+    // endregion
+
+    // region - jstyle-specific methods
+
+    public JStyleSelectViewModel fromJStyle(JStyle style) {
+        return new JStyleSelectViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
+    }
+
+    public JStyle toJStyle(JStyleSelectViewModel item) {
+        return item.getJStyle();
+    }
+
+    public ListProperty<JStyleSelectViewModel> jStylesProperty() {
+        return jStyles;
+    }
+
+    public ObjectProperty<JStyleSelectViewModel> selectedJStyleProperty() {
+        return selectedJStyle;
+    }
+
+    public List<JStyleSelectViewModel> loadJStyles() {
+        return jStyleLoader.getStyles().stream().map(this::fromJStyle).toList();
+    }
+
+    private JStyleSelectViewModel getJStyleOrDefault(String stylePath) {
+        return jStyles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(jStyles.getFirst());
+    }
+
+    public void addJStyleFile() {
+        FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
+                .addExtensionFilter(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                .withDefaultExtension(Localization.lang("Style file"), StandardFileType.JSTYLE)
+                .withInitialDirectory(filePreferences.getWorkingDirectory())
+                .build();
+        Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
+        path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
+            if (jStyleLoader.addStyleIfValid(stylePath)) {
+                openOfficePreferences.setCurrentJStyle(stylePath);
+                jStyles.setAll(loadJStyles());
+                selectedJStyle.setValue(getJStyleOrDefault(stylePath));
+            } else {
+                dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
+            }
+        });
+    }
+
+    public void editJStyle() {
+        JStyle jStyle = selectedJStyle.getValue().getJStyle();
+        Optional<ExternalFileType> type = ExternalFileTypes.getExternalFileTypeByExt("jstyle", externalApplicationsPreferences);
+        try {
+            NativeDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), externalApplicationsPreferences, filePreferences, jStyle.getPath(), type);
+        } catch (IOException e) {
+            dialogService.showErrorDialogAndWait(e);
+        }
+    }
+
+    public void deleteJStyle() {
+        JStyle jStyle = selectedJStyle.getValue().getJStyle();
+        if (jStyleLoader.removeStyle(jStyle)) {
+            jStyles.remove(selectedJStyle.get());
+        }
+    }
+
+    // endregion
 }

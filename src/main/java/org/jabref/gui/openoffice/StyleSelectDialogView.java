@@ -94,9 +94,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
      * ViewModel for the CitationStyle entries in the TableView
      */
 
-    public StyleSelectDialogView(JStyleLoader jStyleLoader, CSLStyleLoader cslStyleLoader) {
-        this.jStyleLoader = jStyleLoader;
+    public StyleSelectDialogView(CSLStyleLoader cslStyleLoader, JStyleLoader jStyleLoader) {
         this.cslStyleLoader = cslStyleLoader;
+        this.jStyleLoader = jStyleLoader;
 
         ViewLoader.view(this)
                   .load()
@@ -114,7 +114,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void initialize() {
-        viewModel = new StyleSelectDialogViewModel(dialogService, jStyleLoader, cslStyleLoader, preferences, taskExecutor, bibEntryTypesManager);
+        viewModel = new StyleSelectDialogViewModel(dialogService, cslStyleLoader, jStyleLoader, preferences, taskExecutor, bibEntryTypesManager);
 
         setupCslStylesTab();
         setupJStylesTab();
@@ -155,7 +155,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         new ViewModelTableRowFactory<CSLStyleSelectViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
                     if (event.getClickCount() == 2) {
-                        viewModel.selectedLayoutProperty().set(item.getLayout());
+                        viewModel.selectedCslLayoutProperty().set(item.getLayout());
                         viewModel.storeStylePreferences();
                         this.setResult(viewModel.getSelectedStyle());
                         this.close();
@@ -165,20 +165,20 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         cslStylesTable.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
-                viewModel.selectedLayoutProperty().set(newValue.getLayout());
+                viewModel.selectedCslLayoutProperty().set(newValue.getLayout());
             }
         });
 
         searchBox.textProperty().addListener((_, _, newValue) -> {
-            viewModel.setAvailableLayoutsFilter(newValue);
+            viewModel.setAvailableCslLayoutsFilter(newValue);
             updateCslStylesTable();
         });
 
         PreviewViewer cslPreviewViewer = initializePreviewViewer(TestEntry.getTestEntry());
-        EasyBind.subscribe(viewModel.selectedLayoutProperty(), cslPreviewViewer::setLayout);
+        EasyBind.subscribe(viewModel.selectedCslLayoutProperty(), cslPreviewViewer::setLayout);
         cslPreviewBox.getChildren().add(cslPreviewViewer);
 
-        viewModel.getAvailableLayouts().addListener((ListChangeListener<CitationStylePreviewLayout>) c -> {
+        viewModel.getAvailableCslLayouts().addListener((ListChangeListener<CitationStylePreviewLayout>) c -> {
             updateCslStylesTable();
             if (c.next() && c.wasAdded() && !initialScrollPerformed.get()) {
                 Platform.runLater(this::scrollToCurrentStyle); // taking care of slight delay in table population
@@ -206,7 +206,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         new ViewModelTableRowFactory<JStyleSelectViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
                     if (event.getClickCount() == 2) {
-                        viewModel.selectedItemProperty().setValue(item);
+                        viewModel.selectedJStyleProperty().setValue(item);
                         viewModel.storeStylePreferences();
                         this.setResult(viewModel.getSelectedStyle());
                         this.close();
@@ -217,9 +217,9 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         jStylesTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
             if (newValue == null) {
-                viewModel.selectedItemProperty().setValue(oldValue);
+                viewModel.selectedJStyleProperty().setValue(oldValue);
             } else {
-                viewModel.selectedItemProperty().setValue(newValue);
+                viewModel.selectedJStyleProperty().setValue(newValue);
             }
         });
 
@@ -234,7 +234,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         previewBook = initializePreviewViewer(TestEntry.getTestEntryBook());
         jStylePreviewBox.getChildren().add(previewBook);
 
-        EasyBind.subscribe(viewModel.selectedItemProperty(), style -> {
+        EasyBind.subscribe(viewModel.selectedJStyleProperty(), style -> {
             if (viewModel.getSelectedStyle() instanceof JStyle) {
                 jStylesTable.getSelectionModel().select(style);
                 previewArticle.setLayout(new TextBasedPreviewLayout(style.getJStyle().getReferenceFormat(StandardEntryType.Article)));
@@ -262,13 +262,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private void updateCslStylesTable() {
         cslStylesTable.getItems().clear();
-        for (CitationStylePreviewLayout layout : viewModel.getAvailableLayouts()) {
+        for (CitationStylePreviewLayout layout : viewModel.getAvailableCslLayouts()) {
             cslStylesTable.getItems().add(new CSLStyleSelectViewModel(layout));
         }
 
-        if (viewModel.selectedLayoutProperty().get() != null) {
+        if (viewModel.selectedCslLayoutProperty().get() != null) {
             for (CSLStyleSelectViewModel model : cslStylesTable.getItems()) {
-                if (model.getLayout().equals(viewModel.selectedLayoutProperty().get())) {
+                if (model.getLayout().equals(viewModel.selectedCslLayoutProperty().get())) {
                     cslStylesTable.getSelectionModel().select(model);
                     break;
                 }

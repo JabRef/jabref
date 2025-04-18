@@ -234,7 +234,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(jStyleLoader, cslStyleLoader);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;
