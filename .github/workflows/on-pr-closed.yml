@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
     outputs:
-      issue_number: ${{ steps.get_issue_number.outputs.issue_number }}
+      issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
     steps:
       - name: echo PR data
         run: |
