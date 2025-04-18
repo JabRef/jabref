@@ -183,8 +183,8 @@ public class StyleSelectDialogViewModel {
      */
     public void addCslStyleFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(Localization.lang("CSL Style file"), StandardFileType.CITATION_STYLE)
-                .withDefaultExtension(Localization.lang("CSL Style file"), StandardFileType.CITATION_STYLE)
+                .addExtensionFilter(Localization.lang("%0 file", StandardFileType.CITATION_STYLE.getName()), StandardFileType.CITATION_STYLE)
+                .withDefaultExtension(Localization.lang("%0 file", StandardFileType.CITATION_STYLE.getName()), StandardFileType.CITATION_STYLE)
                 .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
 
@@ -300,8 +300,8 @@ public class StyleSelectDialogViewModel {
 
     public void addJStyleFile() {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
-                .addExtensionFilter(Localization.lang("JStyle file"), StandardFileType.JSTYLE)
-                .withDefaultExtension(Localization.lang("JStyle file"), StandardFileType.JSTYLE)
+                .addExtensionFilter(Localization.lang("%0 file", StandardFileType.JSTYLE.getName()), StandardFileType.JSTYLE)
+                .withDefaultExtension(Localization.lang("%0 file", StandardFileType.JSTYLE.getName()), StandardFileType.JSTYLE)
                 .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
