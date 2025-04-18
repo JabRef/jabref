@@ -1,26 +1,23 @@
 package org.jabref.gui.util;
 
-import org.jabref.model.util.DirectoryMonitor;
-
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultDirectoryMonitor implements DirectoryMonitor {
+public class DirectoryMonitor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDirectoryMonitor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryMonitor.class);
     private static final int POLL_INTERVAL = 1000;
 
     private final FileAlterationMonitor monitor;
 
-    public DefaultDirectoryMonitor() {
+    public DirectoryMonitor() {
         monitor = new FileAlterationMonitor(POLL_INTERVAL);
         start();
     }
 
-    @Override
     public void addObserver(FileAlterationObserver observer, FileAlterationListener listener) {
         if (observer != null) {
             observer.addListener(listener);
@@ -28,7 +25,6 @@ public class DefaultDirectoryMonitor implements DirectoryMonitor {
         }
     }
 
-    @Override
     public void removeObserver(FileAlterationObserver observer) {
         if (observer != null) {
             monitor.removeObserver(observer);
@@ -43,7 +39,6 @@ public class DefaultDirectoryMonitor implements DirectoryMonitor {
         }
     }
 
-    @Override
     public void shutdown() {
         try {
             monitor.stop();

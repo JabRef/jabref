@@ -20,12 +20,14 @@ public class SaveAllAction extends SimpleCommand {
     private final Supplier<List<LibraryTab>> tabsSupplier;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
+    private final StateManager stateManager;
 
     public SaveAllAction(Supplier<List<LibraryTab>> tabsSupplier, GuiPreferences preferences, DialogService dialogService, StateManager stateManager) {
         this.tabsSupplier = tabsSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.executable.bind(needsDatabase(stateManager));
+        this.stateManager = stateManager;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class SaveAllAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Saving all libraries..."));
 
         for (LibraryTab libraryTab : tabsSupplier.get()) {
-            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
+            SaveDatabaseAction saveDatabaseAction = new SaveDatabaseAction(libraryTab, dialogService, preferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), stateManager);
             boolean saveResult = saveDatabaseAction.save();
             if (!saveResult) {
                 dialogService.notify(Localization.lang("Could not save file."));

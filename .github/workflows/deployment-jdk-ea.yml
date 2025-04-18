@@ -38,7 +38,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest, buildjet-8vcpu-ubuntu-2204-arm]
         jdk: [23]
-        javafx: [24]
+        javafx: [25]
         include:
           - os: ubuntu-latest
             displayName: linux
@@ -85,12 +85,12 @@ jobs:
           packages: pigz
           version: 1.0
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v3.1.11
+        uses: gittools/actions/gitversion/setup@v3.2.0
         with:
           versionSpec: "5.x"
       - name: Run GitVersion
         id: gitversion
-        uses: gittools/actions/gitversion/execute@v3.1.11
+        uses: gittools/actions/gitversion/execute@v3.2.0
 
       # JDK
       - name: 'Set up JDK ${{ matrix.jdk }}'
@@ -193,8 +193,6 @@ jobs:
           distribution: 'temurin'
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (steps.checksecrets.outputs.secretspresent == 'NO')

@@ -2,7 +2,9 @@ package org.jabref.logic.journals;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,6 +12,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jabref.logic.journals.ltwa.LtwaRepository;
+import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -25,11 +30,16 @@ public class JournalAbbreviationRepository {
     private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
+    private final StringSimilarity similarity = new StringSimilarity();
+    private final LtwaRepository ltwaRepository;
 
     /**
      * Initializes the internal data based on the abbreviations found in the given MV file
+     *
+     * @param journalList The path to the MV file containing the journal abbreviations.
+     * @param ltwaRepository The LTWA repository to use for abbreviations.
      */
-    public JournalAbbreviationRepository(Path journalList) {
+    public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
         MVMap<String, Abbreviation> mvFullToAbbreviationObject;
         try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
             mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
@@ -47,6 +57,7 @@ public class JournalAbbreviationRepository {
                 shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
             });
         }
+        this.ltwaRepository = ltwaRepository;
     }
 
     /**
@@ -62,6 +73,7 @@ public class JournalAbbreviationRepository {
         abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
         dotlessToAbbreviationObject.put("Demo", newAbbreviation);
         shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
+        ltwaRepository = new LtwaRepository();
     }
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
@@ -84,17 +96,23 @@ public class JournalAbbreviationRepository {
     /**
      * Returns true if the given journal name is contained in the list either in its full form
      * (e.g., Physical Review Letters) or its abbreviated form (e.g., Phys. Rev. Lett.).
+     * If the exact match is not found, attempts a fuzzy match to recognize minor input errors.
      */
     public boolean isKnownName(String journalName) {
         if (QUESTION_MARK.matcher(journalName).find()) {
             return false;
         }
-        String journal = journalName.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
-        return customAbbreviations.stream().anyMatch(abbreviation -> isMatched(journal, abbreviation))
-                || fullToAbbreviationObject.containsKey(journal)
-                || abbreviationToAbbreviationObject.containsKey(journal)
-                || dotlessToAbbreviationObject.containsKey(journal)
-                || shortestUniqueToAbbreviationObject.containsKey(journal);
+        return get(journalName).isPresent();
+    }
+
+    /**
+     * Get the LTWA abbreviation for the given journal name.
+     */
+    public Optional<String> getLtwaAbbreviation(String journalName) {
+        if (QUESTION_MARK.matcher(journalName).find()) {
+            return Optional.of(journalName);
+        }
+        return ltwaRepository.abbreviate(journalName);
     }
 
     /**
@@ -114,6 +132,7 @@ public class JournalAbbreviationRepository {
 
     /**
      * Attempts to get the abbreviation of the journal given.
+     * if no exact match is found, attempts a fuzzy match on full journal names.
      *
      * @param input The journal name (either full name or abbreviated name).
      */
@@ -128,10 +147,51 @@ public class JournalAbbreviationRepository {
             return customAbbreviation;
         }
 
-        return Optional.ofNullable(fullToAbbreviationObject.get(journal))
+        Optional<Abbreviation> abbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
                 .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
                 .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
                 .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
+
+        if (abbreviation.isEmpty()) {
+            abbreviation = findAbbreviationFuzzyMatched(journal);
+        }
+
+        return abbreviation;
+    }
+
+    private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
+        Optional<Abbreviation> customMatch = findBestFuzzyMatched(customAbbreviations, input);
+        if (customMatch.isPresent()) {
+            return customMatch;
+        }
+
+        return findBestFuzzyMatched(fullToAbbreviationObject.values(), input);
+    }
+
+    private Optional<Abbreviation> findBestFuzzyMatched(Collection<Abbreviation> abbreviations, String input) {
+        // threshold for edit distance similarity comparison
+        final double SIMILARITY_THRESHOLD = 1.0;
+
+        List<Abbreviation> candidates = abbreviations.stream()
+                .filter(abbreviation -> similarity.isSimilar(input, abbreviation.getName()))
+                .sorted(Comparator.comparingDouble(abbreviation -> similarity.editDistanceIgnoreCase(input, abbreviation.getName())))
+                .toList();
+
+        if (candidates.isEmpty()) {
+            return Optional.empty();
+        }
+
+        if (candidates.size() > 1) {
+            double bestDistance = similarity.editDistanceIgnoreCase(input, candidates.getFirst().getName());
+            double secondDistance = similarity.editDistanceIgnoreCase(input, candidates.get(1).getName());
+
+            // If there is a very close match of two abbreviations, do not use any of them, because they are too close.
+            if (Math.abs(bestDistance - secondDistance) < SIMILARITY_THRESHOLD) {
+                return Optional.empty();
+            }
+        }
+
+        return Optional.of(candidates.getFirst());
     }
 
     public void addCustomAbbreviation(Abbreviation abbreviation) {

@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.Objects;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Worker;
 import javafx.print.PrinterJob;
 import javafx.scene.control.ScrollPane;
@@ -16,10 +20,11 @@ import javafx.scene.web.WebView;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.theme.ThemeManager;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
 import org.jabref.logic.preview.PreviewLayout;
@@ -30,6 +35,7 @@ import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.search.query.SearchQuery;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
@@ -74,7 +80,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
     private final WebView previewView;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
+    private final StringProperty searchQueryProperty;
+    private final GuiPreferences preferences;
 
     // Used for resolving strings and pdf directories for links.
     private @Nullable BibDatabaseContext databaseContext;
@@ -89,20 +96,20 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                          GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor) {
-        this(dialogService, preferences, themeManager, taskExecutor, OptionalObjectProperty.empty());
+        this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());
     }
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
                          ThemeManager themeManager,
                          TaskExecutor taskExecutor,
-                         OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                         StringProperty searchQueryProperty) {
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
-
+        this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
-        this.searchQueryProperty.addListener((queryObservable, queryOldValue, queryNewValue) -> highlightLayoutText());
+        this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
         setFitToHeight(true);
         setFitToWidth(true);
@@ -111,7 +118,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.setContextMenuEnabled(false);
         previewView.getEngine().setJavaScriptEnabled(true);
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
             if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
@@ -144,7 +151,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void setLayout(PreviewLayout newLayout) {
         // Change listeners might set the layout to null while the update method is executing, therefore we need to prevent this here
-        if (newLayout == null || newLayout.equals(layout)) {
+        if ((newLayout == null) || newLayout.equals(layout)) {
             return;
         }
         layout = newLayout;
@@ -186,7 +193,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     private void update() {
-        if (databaseContext == null || entry == null || layout == null) {
+        if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("databaseContext null {}, entry null {}, or layout null {}", databaseContext == null, entry == null, layout == null);
             // Make sure that the preview panel is not completely white, especially with dark theme on
             setPreviewText("");
@@ -230,18 +237,20 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         if (layoutText == null) {
             return;
         }
-        if (searchQueryProperty.get().isPresent()) {
-            String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQueryProperty.get().get());
-            previewView.getEngine().loadContent(highlightedHtml);
+
+        if (StringUtil.isNotBlank(searchQueryProperty.get())) {
+            SearchQuery searchQuery = new SearchQuery(searchQueryProperty.get());
+            String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQuery);
+            Platform.runLater(() -> previewView.getEngine().loadContent(highlightedHtml));
         } else {
-            previewView.getEngine().loadContent(layoutText);
+            Platform.runLater(() -> previewView.getEngine().loadContent(layoutText));
         }
     }
 
     public void print() {
         PrinterJob job = PrinterJob.createPrinterJob();
         boolean proceed = dialogService.showPrintDialog(job);
-        if (!proceed && entry != null) {
+        if (!proceed && (entry != null)) {
             return;
         }
 
@@ -255,13 +264,15 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 .executeWith(taskExecutor);
     }
 
-    public void copyPreviewToClipBoard() {
+    public void copyPreviewHtmlToClipBoard() {
         Document document = previewView.getEngine().getDocument();
+        ClipboardContent content = ClipboardContentGenerator.processHtml(Arrays.asList(document.getElementById("content").getTextContent()));
+        clipBoardManager.setContent(content);
+    }
 
-        ClipboardContent content = new ClipboardContent();
-        content.putString(document.getElementById("content").getTextContent());
-        content.putHtml((String) previewView.getEngine().executeScript("document.documentElement.outerHTML"));
-
+    public void copyPreviewTextToClipBoard() {
+        Document document = previewView.getEngine().getDocument();
+        ClipboardContent content = ClipboardContentGenerator.processText(Arrays.asList(document.getElementById("content").getTextContent()));
         clipBoardManager.setContent(content);
     }
 
@@ -271,6 +282,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         content.putHtml(getSelectionHtmlContent());
 
         clipBoardManager.setContent(content);
+    }
+
+    public void exportToClipBoard(StateManager stateManager) {
+        ExportToClipboardAction exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
+        exportToClipboardAction.execute();
     }
 
     @Override

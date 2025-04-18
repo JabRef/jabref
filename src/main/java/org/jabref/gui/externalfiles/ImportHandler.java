@@ -38,9 +38,13 @@ import org.jabref.logic.importer.ImportFormatReader.UnknownFormatImport;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.URLUtil;
 import org.jabref.logic.util.UpdateField;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.FieldChange;
@@ -151,6 +155,7 @@ public class ImportHandler {
                                 entriesToAdd.add(createEmptyEntryWithLink(file));
                                 addResultToList(file, false, Localization.lang("No BibTeX was found. An empty entry was created with file link."));
                             } else {
+                                generateKeys(pdfEntriesInFile);
                                 pdfEntriesInFile.forEach(entry -> {
                                     if (entry.getFiles().size() > 1) {
                                         LOGGER.warn("Entry has more than one file attached. This is not supported.");
@@ -371,7 +376,7 @@ public class ImportHandler {
             return result;
         } catch (ParseException ex) {
             LOGGER.error("Could not paste", ex);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -397,7 +402,20 @@ public class ImportHandler {
 
     public List<BibEntry> handleStringData(String data) throws FetcherException {
         if ((data == null) || data.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
+        }
+        LOGGER.trace("Checking if URL is a PDF: {}", data);
+
+        if (URLUtil.isURL(data)) {
+            String fileName = data.substring(data.lastIndexOf('/') + 1);
+            if (FileUtil.isPDFFile(Path.of(fileName))) {
+                try {
+                    return handlePdfUrl(data);
+                } catch (IOException ex) {
+                    LOGGER.error("Could not handle PDF URL", ex);
+                    return List.of();
+                }
+            }
         }
 
         if (!CompositeIdFetcher.containsValidId(data)) {
@@ -421,7 +439,7 @@ public class ImportHandler {
             return unknownFormatImport.parserResult().getDatabase().getEntries();
         } catch (ImportException ex) { // ex is already localized
             dialogService.showErrorDialogAndWait(Localization.lang("Import error"), ex);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -442,6 +460,46 @@ public class ImportHandler {
                 LOGGER.debug("not first entry, not pref flag, break will  be used");
                 importEntryWithDuplicateCheck(database, entry);
             }
+        }
+    }
+
+    private List<BibEntry> handlePdfUrl(String pdfUrl) throws IOException {
+        Optional<Path> targetDirectory = bibDatabaseContext.getFirstExistingFileDir(preferences.getFilePreferences());
+        if (targetDirectory.isEmpty()) {
+            LOGGER.warn("File directory not available while downloading {}.", pdfUrl);
+            return List.of();
+        }
+        URLDownload urlDownload = new URLDownload(pdfUrl);
+        String filename = URLUtil.getFileNameFromUrl(pdfUrl);
+        Path targetFile = targetDirectory.get().resolve(filename);
+        try {
+            urlDownload.toFile(targetFile);
+        } catch (FetcherException fe) {
+            LOGGER.error("Error downloading PDF from URL", fe);
+            return List.of();
+        }
+        try {
+            PdfMergeMetadataImporter importer = new PdfMergeMetadataImporter(preferences.getImportFormatPreferences());
+            ParserResult parserResult = importer.importDatabase(targetFile, bibDatabaseContext, preferences.getFilePreferences());
+            if (parserResult.hasWarnings()) {
+                LOGGER.warn("PDF import had warnings: {}", parserResult.getErrorMessage());
+            }
+            List<BibEntry> entries = parserResult.getDatabase().getEntries();
+            if (!entries.isEmpty()) {
+                entries.forEach(entry -> {
+                    if (entry.getFiles().isEmpty()) {
+                        entry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
+                    }
+                });
+            } else {
+                BibEntry emptyEntry = new BibEntry();
+                emptyEntry.addFile(new LinkedFile("", targetFile, StandardFileType.PDF.getName()));
+                entries.add(emptyEntry);
+            }
+            return entries;
+        } catch (IOException ex) {
+            LOGGER.error("Error importing PDF from URL - IO issue", ex);
+            return List.of();
         }
     }
 }

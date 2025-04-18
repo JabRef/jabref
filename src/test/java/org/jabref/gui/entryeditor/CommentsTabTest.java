@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
@@ -68,6 +69,8 @@ class CommentsTabTest {
     @Mock
     private OwnerPreferences ownerPreferences;
     @Mock
+    private StateManager stateManager;
+    @Mock
     private PreviewPanel previewPanel;
 
     @Mock
@@ -87,12 +90,11 @@ class CommentsTabTest {
 
         commentsTab = new CommentsTab(
                 preferences,
-                databaseContext,
-                suggestionProviders,
                 undoManager,
                 mock(UndoAction.class),
                 mock(RedoAction.class),
                 journalAbbreviationRepository,
+                stateManager,
                 previewPanel
         );
     }

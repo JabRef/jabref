@@ -212,7 +212,8 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                             libraryTab,
                             dialogService,
                             preferences,
-                            Injector.instantiateModelOrService(BibEntryTypesManager.class)
+                            Injector.instantiateModelOrService(BibEntryTypesManager.class),
+                            stateManager
                     ).saveAs(Path.of(folder.getValue()));
                 } catch (Throwable e) {
                     LOGGER.error("Error while saving the database", e);
@@ -235,7 +236,7 @@ public class SharedDatabaseLoginDialogViewModel extends AbstractViewModel {
                     ButtonType.OK, openHelp);
 
             result.filter(btn -> btn.equals(openHelp)).ifPresent(btn -> new HelpAction(HelpFile.SQL_DATABASE_MIGRATION, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-            result.filter(btn -> btn.equals(ButtonType.OK)).ifPresent(btn -> openSharedDatabase(connectionProperties));
+            result.filter(btn -> ButtonType.OK.equals(btn)).ifPresent(btn -> openSharedDatabase(connectionProperties));
         }
         loading.set(false);
         return false;

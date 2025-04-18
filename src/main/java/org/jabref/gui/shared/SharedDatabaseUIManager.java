@@ -1,6 +1,7 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -15,7 +16,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.exporter.SaveDatabaseAction;
 import org.jabref.gui.mergeentries.EntriesMergeResult;
 import org.jabref.gui.mergeentries.MergeEntriesDialog;
@@ -114,7 +114,7 @@ public class SharedDatabaseUIManager {
         BibEntry sharedBibEntry = updateRefusedEvent.sharedBibEntry();
 
         String message = Localization.lang("Update could not be performed due to existing change conflicts.") + "\r\n" +
-                Localization.lang("You are not working on the newest version of BibEntry.") + "\r\n" +
+                Localization.lang("You are not working on the newest version of the entry.") + "\r\n" +
                 Localization.lang("Shared version: %0", String.valueOf(sharedBibEntry.getSharedBibEntryData().getVersion())) + "\r\n" +
                 Localization.lang("Local version: %0", String.valueOf(localBibEntry.getSharedBibEntryData().getVersion())) + "\r\n" +
                 Localization.lang("Press \"Merge entries\" to merge the changes and resolve this problem.") + "\r\n" +
@@ -142,16 +142,16 @@ public class SharedDatabaseUIManager {
     @Subscribe
     public void listen(SharedEntriesNotPresentEvent event) {
         LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
-        EntryEditor entryEditor = libraryTab.getEntryEditor();
 
-        libraryTab.getUndoManager().addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
+        if (libraryTab != null) {
+            undoManager.addEdit(new UndoableRemoveEntries(libraryTab.getDatabase(), event.bibEntries()));
 
-        if (entryEditor != null && (event.bibEntries().contains(entryEditor.getCurrentlyEditedEntry()))) {
             dialogService.showInformationDialogAndWait(Localization.lang("Shared entry is no longer present"),
                     Localization.lang("The entry you currently work on has been deleted on the shared side.")
                             + "\n"
                             + Localization.lang("You can restore the entry using the \"Undo\" operation."));
-            libraryTab.closeBottomPane();
+
+            stateManager.setSelectedEntries(Collections.emptyList());
         }
     }
 

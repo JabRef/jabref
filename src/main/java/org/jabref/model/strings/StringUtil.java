@@ -17,6 +17,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 
+@SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
 public class StringUtil {
 
@@ -380,10 +381,11 @@ public class StringUtil {
      * <p>
      * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
-     * <example>
+     * <h4>Example</h4>
+     * <pre>{@code
      * Legacy Macintosh \r -> OS.NEWLINE
      * Windows \r\n -> OS.NEWLINE
-     * </example>
+     * }</pre>
      *
      * @return a String with only OS.NEWLINE as line breaks
      */

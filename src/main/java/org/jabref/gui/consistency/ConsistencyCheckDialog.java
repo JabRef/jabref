@@ -7,8 +7,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -19,21 +19,29 @@ import javafx.stage.Modality;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
+import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.ConsistencyMessage;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.SpecialField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import jakarta.inject.Inject;
 
 public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
     @FXML private TableView<ConsistencyMessage> tableView;
     @FXML private ComboBox<String> entryTypeCombo;
+
+    @Inject private StateManager stateManager;
+    @Inject private EntryEditor entryEditor;
 
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
@@ -62,13 +70,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                   .setAsDialogPane(this);
     }
 
-    private void onSelectionChanged(ListChangeListener.Change<? extends ConsistencyMessage> change) {
-        if (change.next()) {
-            change.getAddedSubList().stream().findFirst().ifPresent(message ->
-                    libraryTab.showAndEdit(message.bibEntry()));
-        }
-    }
-
     public ConsistencyCheckDialogViewModel getViewModel() {
         return viewModel;
     }
@@ -76,8 +77,6 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
     @FXML
     public void initialize() {
         viewModel = new ConsistencyCheckDialogViewModel(dialogService, preferences, entryTypesManager, result);
-
-        tableView.getSelectionModel().getSelectedItems().addListener(this::onSelectionChanged);
 
         entryTypeCombo.getItems().addAll(viewModel.getEntryTypes());
         entryTypeCombo.valueProperty().bindBidirectional(viewModel.selectedEntryTypeProperty());
@@ -96,14 +95,19 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         tableView.setItems(filteredData);
 
-        for (int i = 0; i < viewModel.getColumnNames().size(); i++) {
-            int columnIndex = i;
-            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(viewModel.getColumnNames().get(i));
+        int columnIndex = 0;
+        for (String columnName : viewModel.getColumnNames()) {
+            final int currentIndex = columnIndex;
+            TableColumn<ConsistencyMessage, String> tableColumn = new TableColumn<>(columnName);
 
             tableColumn.setCellValueFactory(row -> {
                 List<String> message = row.getValue().message();
-                return new ReadOnlyStringWrapper(message.get(columnIndex));
+                if (currentIndex < message.size()) {
+                    return new ReadOnlyStringWrapper(message.get(currentIndex));
+                }
+                return new ReadOnlyStringWrapper("");
             });
+            columnIndex++;
 
             tableColumn.setCellFactory(_ -> new TableCell<>() {
                 @Override
@@ -124,6 +128,33 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                                                  setText(item);
                                              }
                                      );
+
+                    this.setOnMouseClicked(_ -> {
+                        if (!isEmpty()) {
+                            TableColumn<ConsistencyMessage, String> clickedColumn = getTableColumn();
+
+                            ConsistencyMessage message = getTableRow().getItem();
+                            String cellValue = getTableColumn().getCellObservableValue(getIndex()).getValue();
+                            Field field = FieldFactory.parseField(clickedColumn.getText());
+                            boolean isUnsetField = cellValue.equals(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText());
+
+                            if (field.isStandardField()) {
+                                stateManager.getEditorShowing().setValue(true);
+                                Platform.runLater(() -> {
+                                    libraryTab.clearAndSelect(message.bibEntry());
+                                    entryEditor.setFocusToField(field);
+                                });
+                            } else if (!message.bibEntry().hasField(field) && isUnsetField) {
+                                libraryTab.showAndEdit(message.bibEntry());
+                            } else {
+                                stateManager.getEditorShowing().setValue(true);
+                                Platform.runLater(() -> {
+                                    libraryTab.clearAndSelect(message.bibEntry());
+                                    entryEditor.setFocusToField(field);
+                                });
+                            }
+                        }
+                    });
                 }
             });
 
@@ -132,7 +163,9 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
 
         EnumSet<ConsistencySymbol> targetSymbols = EnumSet.of(
                 ConsistencySymbol.OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
-                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
+                ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+                ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY,
+                ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY
         );
 
         targetSymbols.stream()

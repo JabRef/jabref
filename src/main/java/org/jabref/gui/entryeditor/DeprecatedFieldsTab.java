@@ -9,7 +9,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.scene.control.Tooltip;
 
-import org.jabref.gui.autocompleter.SuggestionProviders;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.PreviewPanel;
@@ -31,24 +31,22 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
     public static final String NAME = "Deprecated fields";
     private final BibEntryTypesManager entryTypesManager;
 
-    public DeprecatedFieldsTab(BibDatabaseContext databaseContext,
-                               SuggestionProviders suggestionProviders,
-                               UndoManager undoManager,
+    public DeprecatedFieldsTab(UndoManager undoManager,
                                UndoAction undoAction,
                                RedoAction redoAction,
                                GuiPreferences preferences,
                                BibEntryTypesManager entryTypesManager,
                                JournalAbbreviationRepository journalAbbreviationRepository,
+                               StateManager stateManager,
                                PreviewPanel previewPanel) {
         super(
                 false,
-                databaseContext,
-                suggestionProviders,
                 undoManager,
                 undoAction,
                 redoAction,
                 preferences,
                 journalAbbreviationRepository,
+                stateManager,
                 previewPanel
         );
         this.entryTypesManager = entryTypesManager;
@@ -56,7 +54,7 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
         setText(Localization.lang("Deprecated fields"));
         EasyBind.subscribe(preferences.getWorkspacePreferences().showAdvancedHintsProperty(), advancedHints -> {
             if (advancedHints) {
-                setTooltip(new Tooltip(Localization.lang("Shows fields having a successor in biblatex.\nFor instance, the publication month should be part of the date field.\nUse the Cleanup Entries functionality to convert the entry to biblatex.")));
+                setTooltip(new Tooltip(Localization.lang("Shows fields having a successor in biblatex.\nFor instance, the publication month should be part of the date field.\nUse the Clean up Entries functionality to convert the entry to biblatex.")));
             } else {
                 setTooltip(new Tooltip(Localization.lang("Shows fields having a successor in biblatex.")));
             }
@@ -66,7 +64,8 @@ public class DeprecatedFieldsTab extends FieldsEditorTab {
 
     @Override
     protected SequencedSet<Field> determineFieldsToShow(BibEntry entry) {
-        BibDatabaseMode mode = databaseContext.getMode();
+        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                           .orElse(BibDatabaseMode.BIBLATEX);
         Optional<BibEntryType> entryType = entryTypesManager.enrich(entry.getType(), mode);
         if (entryType.isPresent()) {
             return entryType.get().getDeprecatedFields(mode).stream().filter(field -> entry.getField(field).isPresent()).collect(Collectors.toCollection(LinkedHashSet::new));
