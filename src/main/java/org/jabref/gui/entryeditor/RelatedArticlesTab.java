@@ -195,11 +195,16 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vbox.getStyleClass().add("gdpr-notice");
         vbox.setSpacing(20.0);
 
+        HBox hbox = new HBox();
+        hbox.setSpacing(10.0);
+
         Text title = new Text(Localization.lang("Mr. DLib Privacy settings"));
         title.getStyleClass().add("heading");
 
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
+
+        Button hideTab = new Button(Localization.lang("Hide 'Related articles' tab"));
 
         DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(), 88d);
 
@@ -242,7 +247,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
             setContent(getRelatedArticlesPane(entry));
         });
 
-        vbox.getChildren().addAll(title, line1, line2, mdlLink, line3, vb, button);
+        hideTab.setOnAction(event -> {
+            preferences.getEntryEditorPreferences().setShouldShowRecommendationsTab(false);
+            dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
+        });
+
+        hbox.getChildren().addAll(button, hideTab);
+        vbox.getChildren().addAll(title, line1, line2, mdlLink, line3, vb, hbox);
         root.setContent(vbox);
 
         return root;

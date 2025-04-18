@@ -8,7 +8,16 @@ jobs:
   unassign_issue:
     name: Mark issue as available
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && !github.event.pull_request.merged && github.actor != 'dependabot[bot]'
+    if: >
+      github.event.action == 'closed' && !github.event.pull_request.merged && !(
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     permissions:
       contents: read
       issues: write
@@ -29,7 +38,8 @@ jobs:
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
           # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
-          bodyRegex: '(?<action>fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)/i'
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegexFlags: 'i'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - uses: actions/checkout@v4
@@ -89,7 +99,16 @@ jobs:
   comment_on_resolved_issue:
     name: Comment on resolved issue
     runs-on: ubuntu-latest
-    if: github.event.action == 'closed' && github.event.pull_request.merged && github.actor != 'dependabot[bot]' && !startsWith(github.event.pull_request.title, 'New Crowdin updates')
+    if: >
+      github.event.action == 'closed' && github.event.pull_request.merged && !(
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     permissions:
       contents: read
       issues: write
@@ -109,7 +128,8 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '(?<action>fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)/i'
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+#(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegexFlags: 'i'
           bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
           outputOnly: true
       - name: Comment on issue
