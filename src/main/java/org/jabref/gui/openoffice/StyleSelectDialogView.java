@@ -3,10 +3,6 @@ package org.jabref.gui.openoffice;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -56,18 +52,18 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private final CSLStyleLoader cslStyleLoader;
 
     // JStyles TableView
-    @FXML private TableColumn<StyleSelectItemViewModel, String> colName;
-    @FXML private TableView<StyleSelectItemViewModel> tvStyles;
-    @FXML private TableColumn<StyleSelectItemViewModel, String> colJournals;
-    @FXML private TableColumn<StyleSelectItemViewModel, String> colFile;
-    @FXML private TableColumn<StyleSelectItemViewModel, Boolean> colDeleteIcon;
+    @FXML private TableColumn<JStyleSelectViewModel, String> colName;
+    @FXML private TableView<JStyleSelectViewModel> tvStyles;
+    @FXML private TableColumn<JStyleSelectViewModel, String> colJournals;
+    @FXML private TableColumn<JStyleSelectViewModel, String> colFile;
+    @FXML private TableColumn<JStyleSelectViewModel, Boolean> colDeleteIcon;
     @FXML private Button add;
 
     // CSL Styles TableView
-    @FXML private TableView<CitationStyleViewModel> cslStylesTable;
-    @FXML private TableColumn<CitationStyleViewModel, String> cslNameColumn;
-    @FXML private TableColumn<CitationStyleViewModel, String> cslPathColumn;
-    @FXML private TableColumn<CitationStyleViewModel, Boolean> cslDeleteColumn;
+    @FXML private TableView<CSLStyleSelectViewModel> cslStylesTable;
+    @FXML private TableColumn<CSLStyleSelectViewModel, String> cslNameColumn;
+    @FXML private TableColumn<CSLStyleSelectViewModel, String> cslPathColumn;
+    @FXML private TableColumn<CSLStyleSelectViewModel, Boolean> cslDeleteColumn;
 
     @FXML private VBox jstylePreviewBox;
     @FXML private VBox cslPreviewBox;
@@ -95,39 +91,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     /**
      * ViewModel for the CitationStyle entries in the TableView
      */
-    public static class CitationStyleViewModel {
-        private final CitationStylePreviewLayout layout;
-        private final StringProperty nameProperty = new SimpleStringProperty();
-        private final StringProperty pathProperty = new SimpleStringProperty();
-        private final BooleanProperty internalStyleProperty = new SimpleBooleanProperty();
-
-        public CitationStyleViewModel(CitationStylePreviewLayout layout) {
-            this.layout = layout;
-            this.nameProperty.set(layout.getDisplayName());
-            if (layout.getCitationStyle().isInternalStyle()) {
-                this.pathProperty.set(Localization.lang("Internal style"));
-            } else {
-                this.pathProperty.set(layout.getFilePath());
-            }
-            this.internalStyleProperty.set(layout.getCitationStyle().isInternalStyle());
-        }
-
-        public StringProperty nameProperty() {
-            return nameProperty;
-        }
-
-        public StringProperty pathProperty() {
-            return pathProperty;
-        }
-
-        public BooleanProperty internalStyleProperty() {
-            return internalStyleProperty;
-        }
-
-        public CitationStylePreviewLayout getLayout() {
-            return layout;
-        }
-    }
 
     public StyleSelectDialogView(JStyleLoader jStyleLoader, CSLStyleLoader cslStyleLoader) {
         this.jStyleLoader = jStyleLoader;
@@ -139,7 +102,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         setResultConverter(button -> {
             if (button == ButtonType.OK) {
-                viewModel.storePrefs();
+                viewModel.storeStylePreferences();
                 return viewModel.getSelectedStyle();
             }
             return null;
@@ -155,7 +118,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         setupCslStylesTab();
 
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
-        StyleTab tab = (currentStyle instanceof JStyle) ? StyleTab.JSTYLES : StyleTab.CSL_STYLES;
+        StyleTab tab = currentStyle instanceof JStyle ? StyleTab.JSTYLES : StyleTab.CSL_STYLES;
         tabPane.getSelectionModel().select(tab.ordinal());
 
         viewModel.setSelectedTab(tabPane.getSelectionModel().getSelectedItem());
@@ -174,7 +137,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         colFile.setCellValueFactory(cellData -> cellData.getValue().fileProperty());
         colDeleteIcon.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        new ValueTableCellFactory<StyleSelectItemViewModel, Boolean>()
+        new ValueTableCellFactory<JStyleSelectViewModel, Boolean>()
                 .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent(item -> evt -> viewModel.deleteJStyle())
                 .withTooltip(item -> Localization.lang("Remove style"))
@@ -182,10 +145,13 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
         edit.setOnAction(e -> viewModel.editJStyle());
 
-        new ViewModelTableRowFactory<StyleSelectItemViewModel>()
+        new ViewModelTableRowFactory<JStyleSelectViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
                     if (event.getClickCount() == 2) {
-                        viewModel.viewJStyle(item);
+                        viewModel.selectedItemProperty().setValue(item);
+                        viewModel.storeStylePreferences();
+                        this.setResult(viewModel.getSelectedStyle());
+                        this.close();
                     }
                 })
                 .withContextMenu(item -> createContextMenu())
@@ -225,10 +191,10 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         cslPathColumn.setCellValueFactory(cellData -> cellData.getValue().pathProperty());
         cslDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().internalStyleProperty());
 
-        new ValueTableCellFactory<CitationStyleViewModel, Boolean>()
+        new ValueTableCellFactory<CSLStyleSelectViewModel, Boolean>()
                 .withGraphic(internalStyle -> internalStyle ? null : IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withOnMouseClickedEvent(item -> evt -> {
-                    CitationStyleViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
+                    CSLStyleSelectViewModel selectedStyle = cslStylesTable.getSelectionModel().getSelectedItem();
                     if (selectedStyle != null) {
                         viewModel.deleteCslStyle(selectedStyle.getLayout().getCitationStyle());
                     }
@@ -236,12 +202,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
                 .withTooltip(item -> Localization.lang("Remove style"))
                 .install(cslDeleteColumn);
 
-        // Double-click to select a style (Only CSL styles can be selected with a double click, JStyles show a style description instead)
-        new ViewModelTableRowFactory<CitationStyleViewModel>()
+        new ViewModelTableRowFactory<CSLStyleSelectViewModel>()
                 .withOnMouseClickedEvent((item, event) -> {
                     if (event.getClickCount() == 2) {
                         viewModel.selectedLayoutProperty().set(item.getLayout());
-                        viewModel.handleCslStyleSelection();
+                        viewModel.storeStylePreferences();
                         this.setResult(viewModel.getSelectedStyle());
                         this.close();
                     }
@@ -276,11 +241,11 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
     private void updateCslStylesTable() {
         cslStylesTable.getItems().clear();
         for (CitationStylePreviewLayout layout : viewModel.getAvailableLayouts()) {
-            cslStylesTable.getItems().add(new CitationStyleViewModel(layout));
+            cslStylesTable.getItems().add(new CSLStyleSelectViewModel(layout));
         }
 
         if (viewModel.selectedLayoutProperty().get() != null) {
-            for (CitationStyleViewModel model : cslStylesTable.getItems()) {
+            for (CSLStyleSelectViewModel model : cslStylesTable.getItems()) {
                 if (model.getLayout().equals(viewModel.selectedLayoutProperty().get())) {
                     cslStylesTable.getSelectionModel().select(model);
                     break;
@@ -335,7 +300,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
         if (currentStyle instanceof CitationStyle currentCitationStyle) {
             for (int i = 0; i < cslStylesTable.getItems().size(); i++) {
-                CitationStyleViewModel item = cslStylesTable.getItems().get(i);
+                CSLStyleSelectViewModel item = cslStylesTable.getItems().get(i);
                 if (item.getLayout().getFilePath().equals(currentCitationStyle.getFilePath())) {
                     cslStylesTable.scrollTo(i);
                     cslStylesTable.getSelectionModel().select(i);

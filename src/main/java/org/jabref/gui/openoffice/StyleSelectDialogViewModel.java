@@ -12,11 +12,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TextArea;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
@@ -50,8 +46,8 @@ public class StyleSelectDialogViewModel {
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final OpenOfficePreferences openOfficePreferences;
-    private final ListProperty<StyleSelectItemViewModel> jStyles = new SimpleListProperty<>(FXCollections.observableArrayList());
-    private final ObjectProperty<StyleSelectItemViewModel> selectedItem = new SimpleObjectProperty<>();
+    private final ListProperty<JStyleSelectViewModel> jStyles = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ObjectProperty<JStyleSelectViewModel> selectedItem = new SimpleObjectProperty<>();
     private final ObservableList<CitationStylePreviewLayout> availableLayouts = FXCollections.observableArrayList();
     private final ObjectProperty<CitationStylePreviewLayout> selectedLayoutProperty = new SimpleObjectProperty<>();
     private final FilteredList<CitationStylePreviewLayout> filteredAvailableLayouts = new FilteredList<>(availableLayouts);
@@ -105,11 +101,11 @@ public class StyleSelectDialogViewModel {
                       .executeWith(taskExecutor);
     }
 
-    public StyleSelectItemViewModel fromJStyle(JStyle style) {
-        return new StyleSelectItemViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
+    public JStyleSelectViewModel fromJStyle(JStyle style) {
+        return new JStyleSelectViewModel(style.getName(), String.join(", ", style.getJournals()), style.isInternalStyle() ? Localization.lang("Internal style") : style.getPath(), style);
     }
 
-    public JStyle toJStyle(StyleSelectItemViewModel item) {
+    public JStyle toJStyle(JStyleSelectViewModel item) {
         return item.getJStyle();
     }
 
@@ -131,11 +127,11 @@ public class StyleSelectDialogViewModel {
         });
     }
 
-    public List<StyleSelectItemViewModel> loadJStyles() {
+    public List<JStyleSelectViewModel> loadJStyles() {
         return jStyleLoader.getStyles().stream().map(this::fromJStyle).toList();
     }
 
-    public ListProperty<StyleSelectItemViewModel> jStylesProperty() {
+    public ListProperty<JStyleSelectViewModel> jStylesProperty() {
         return jStyles;
     }
 
@@ -146,7 +142,7 @@ public class StyleSelectDialogViewModel {
         }
     }
 
-    public ObjectProperty<StyleSelectItemViewModel> selectedItemProperty() {
+    public ObjectProperty<JStyleSelectViewModel> selectedItemProperty() {
         return selectedItem;
     }
 
@@ -160,18 +156,8 @@ public class StyleSelectDialogViewModel {
         }
     }
 
-    public void viewJStyle(StyleSelectItemViewModel item) {
-        DialogPane pane = new DialogPane();
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-        TextArea styleView = new TextArea(item.getJStyle().getLocalCopy());
-        scrollPane.setContent(styleView);
-        pane.setContent(scrollPane);
-        dialogService.showCustomDialogAndWait(item.getJStyle().getName(), pane, ButtonType.OK);
-    }
-
-    public void storePrefs() {
+    public void storeStylePreferences() {
+        // save external jstyles
         List<String> externalStyles = jStyles.stream()
                                              .map(this::toJStyle)
                                              .filter(style -> !style.isInternalStyle())
@@ -180,16 +166,17 @@ public class StyleSelectDialogViewModel {
 
         openOfficePreferences.setExternalStyles(externalStyles);
 
+        // save the current style selection
         OOStyle selectedStyle = getSelectedStyle();
         openOfficePreferences.setCurrentStyle(selectedStyle);
 
-        // Handle backward-compatibility with pure JStyle preferences (formerly OOBibStyle):
+        // handle backward-compatibility with pure JStyle preferences:
         if (selectedStyle instanceof JStyle jStyle) {
             openOfficePreferences.setCurrentJStyle(jStyle.getPath());
         }
     }
 
-    private StyleSelectItemViewModel getStyleOrDefault(String stylePath) {
+    private JStyleSelectViewModel getStyleOrDefault(String stylePath) {
         return jStyles.stream().filter(style -> style.getStylePath().equals(stylePath)).findFirst().orElse(jStyles.getFirst());
     }
 
@@ -214,11 +201,6 @@ public class StyleSelectDialogViewModel {
         if (tab != null) {
             selectedTab.set(tab);
         }
-    }
-
-    public void handleCslStyleSelection() {
-        CitationStylePreviewLayout selectedLayout = selectedLayoutProperty.get();
-        openOfficePreferences.setCurrentStyle(selectedLayout.getCitationStyle());
     }
 
     public OOStyle getSelectedStyle() {
