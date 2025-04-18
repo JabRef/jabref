@@ -89,7 +89,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     private enum StyleTabType {
         CSL_STYLES,
-        JSTYLES;
+        JSTYLES
     }
 
     /**
