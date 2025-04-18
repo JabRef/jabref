@@ -1,5 +1,8 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,7 +24,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -108,13 +110,38 @@ public class ContextMenuFactoryTest {
 
     @Test
     public void createContextMenuForMultipleFiles() {
-        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
-        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
-        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
+//        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
+//        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
+//        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
+//
+//        ContextMenu menu = factory.createForSelection(files);
+//        assertNotNull(menu);
+//        assertEquals(1, menu.getItems().size());
+        // Arrange: Dynamically create multiple mocked linked files
+        int numberOfFiles = 3; // You can change this to test other sizes
+        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList();
 
+        for (int i = 0; i < numberOfFiles; i++) {
+            files.add(mockFileWithLink("file" + i + ".pdf"));
+        }
+
+        // Act: Generate the context menu for selected files
         ContextMenu menu = factory.createForSelection(files);
+
+        // Assert: Menu is not null and contains at least one item
         assertNotNull(menu);
-        assertEquals(1, menu.getItems().size());
+        assertFalse(menu.getItems().isEmpty());
+
+        // Extract labels of all menu items for flexible keyword-based validation
+        List<String> itemLabels = menu.getItems().stream()
+                                      .map(item -> item.getText() == null ? "" : item.getText().toLowerCase())
+                                      .collect(Collectors.toList());
+
+        // Verify that important menu actions are present
+        assertTrue(itemLabels.stream().anyMatch(label -> label.contains("open file")));
+        assertTrue(itemLabels.stream().anyMatch(label -> label.contains("remove link")));
+        assertTrue(itemLabels.stream().anyMatch(label -> label.contains("delete")));
+
     }
 
     @Test
