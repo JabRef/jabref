@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -24,14 +25,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 
 public class ContextMenuFactoryTest {
 
@@ -128,7 +128,7 @@ public class ContextMenuFactoryTest {
 
         // Extract labels of all menu items for flexible keyword-based validation
         List<String> itemLabels = menu.getItems().stream()
-                                      .map(item -> item.getText() == null ? "" : item.getText().toLowerCase())
+                                      .map(MenuItem::getText)
                                       .collect(Collectors.toList());
 
         // Verify the expected menu labels (order matters here)
