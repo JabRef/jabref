@@ -44,7 +44,7 @@ class CSLStyleUtilsTest {
             "vancouver",
             "nature.",
             "",
-            "chicago.CSL" // testing case sensitivity
+            "chicago.CSL" // case sensitivity - should reject
     })
     void rejectsNonCslExtension(String filename) {
         assertFalse(CSLStyleUtils.isCitationStyleFile(filename));
