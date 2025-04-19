@@ -30,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class ContextMenuFactoryTest {
 
@@ -110,15 +112,7 @@ public class ContextMenuFactoryTest {
 
     @Test
     public void createContextMenuForMultipleFiles() {
-//        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
-//        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
-//        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
-//
-//        ContextMenu menu = factory.createForSelection(files);
-//        assertNotNull(menu);
-//        assertEquals(1, menu.getItems().size());
-        // Arrange: Dynamically create multiple mocked linked files
-        int numberOfFiles = 3; // You can change this to test other sizes
+        int numberOfFiles = 3;
         ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList();
 
         for (int i = 0; i < numberOfFiles; i++) {
@@ -137,10 +131,9 @@ public class ContextMenuFactoryTest {
                                       .map(item -> item.getText() == null ? "" : item.getText().toLowerCase())
                                       .collect(Collectors.toList());
 
-        // Verify that important menu actions are present
-        assertTrue(itemLabels.stream().anyMatch(label -> label.contains("open file")));
-        assertTrue(itemLabels.stream().anyMatch(label -> label.contains("remove link")));
-        assertTrue(itemLabels.stream().anyMatch(label -> label.contains("delete")));
+        // Verify the expected menu labels (order matters here)
+        List<String> expectedLabels = List.of("Open file", "Remove link", "Delete");
+        assertEquals(expectedLabels, itemLabels);
     }
 
     @Test
