@@ -11,6 +11,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -19,6 +20,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -120,14 +122,13 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     private void setUpToggleButton() {
         Button toggleButton = new Button(Localization.lang("Toggle"));
         toggleButton.setOnAction(e -> toggleEnableList());
-        toggleButton.setTooltip(new javafx.scene.control.Tooltip(Localization.lang("Toggle selected list on/off")));
+        toggleButton.setTooltip(new Tooltip(Localization.lang("Toggle selected list on/off")));
         toggleButton.getStyleClass().add("icon-button");
         
-        for (javafx.scene.Node node : getChildren()) {
-            if (node instanceof HBox) {
-                HBox hbox = (HBox) node;
+        for (Node node : getChildren()) {
+            if (node instanceof HBox hbox) {
                 boolean containsComboBox = false;
-                for (javafx.scene.Node child : hbox.getChildren()) {
+                for (Node child : hbox.getChildren()) {
                     if (child == journalFilesBox) {
                         containsComboBox = true;
                         break;
