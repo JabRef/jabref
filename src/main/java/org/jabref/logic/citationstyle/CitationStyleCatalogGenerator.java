@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 @AllowedToUseClassGetResource("Required for loading internal CSL styles")
 public class CitationStyleCatalogGenerator {
     private static final String STYLES_ROOT = "/csl-styles";
-    private static final String CATALOG_PATH = "src/main/resources/citation-style-catalog.json";
+    private static final String CATALOG_PATH = "build/resources/main/citation-style-catalog.json";
     private static final String DEFAULT_STYLE = "ieee.csl";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);
