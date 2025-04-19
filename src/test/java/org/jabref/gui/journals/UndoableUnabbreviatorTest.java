@@ -134,3 +134,4 @@ class UndoableUnabbreviatorTest {
                    "Journal abbreviation should remain unchanged");
     }
 }
+

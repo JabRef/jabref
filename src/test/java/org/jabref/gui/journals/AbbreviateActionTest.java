@@ -120,3 +120,4 @@ class AbbreviateActionTest {
         verify(dialogService, never()).notify(eq(Localization.lang("%cannot unabbreviate: all journal lists are disabled.")));
     }
 } 
+

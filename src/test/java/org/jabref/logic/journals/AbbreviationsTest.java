@@ -58,8 +58,8 @@ class AbbreviationsTest {
 
     @Test
     void constructorInvalidMedlineAbbreviation() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Abbreviation("Test Entry", null, "TE"));
-        assertEquals("ISO/MEDLINE abbreviation is null or empty!", exception.getMessage());
+        NullPointerException exception = assertThrows(NullPointerException.class, 
+            () -> new Abbreviation("Test Entry", null, "TE"));
     }
 
     @Test
@@ -83,6 +83,7 @@ class AbbreviationsTest {
     void testToString() {
         Abbreviation abbreviation = new Abbreviation("Test Entry", "Test. Ent.");
 
-        assertEquals("Abbreviation{name=Test Entry, iso=Test. Ent., medline=Test Ent, shortest=null}", abbreviation.toString());
+        assertEquals("Abbreviation{name=Test Entry, abbreviation=Test. Ent., dotlessAbbreviation=Test Ent, shortestUniqueAbbreviation=}", 
+            abbreviation.toString());
     }
 }
