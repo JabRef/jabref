@@ -331,6 +331,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
+    private static final String ENABLED_EXTERNAL_JOURNAL_LISTS = "enabledExternalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
 
     // Protected terms
@@ -431,8 +432,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
-
-    private static final String ENABLED_EXTERNAL_JOURNAL_LISTS = "enabledExternalJournalLists";
 
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:

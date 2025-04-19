@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 
@@ -38,7 +37,7 @@ public class JournalAbbreviationLoader {
     /**
      * Loads a journal abbreviation repository based on the given preferences.
      * Takes into account enabled/disabled state of journal abbreviation sources.
-     * 
+     *
      * @param journalAbbreviationPreferences The preferences containing journal list paths and enabled states
      * @return A repository with loaded abbreviations
      */
@@ -106,7 +105,6 @@ public class JournalAbbreviationLoader {
                     repository.addCustomAbbreviations(abbreviations, simpleFilename, enabled);
                     
                     repository.addCustomAbbreviations(Collections.emptyList(), prefixedKey, enabled);
-                
                 } catch (IOException | InvalidPathException e) {
                     // invalid path might come from unix/windows mixup of prefs
                     LOGGER.error("Cannot read external journal list file {}", filename, e);

@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -18,12 +18,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.AbbreviationWriter;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +102,7 @@ public class AbbreviationsFileViewModel {
 
     /**
      * Gets the absolute path of this abbreviation file
-     * 
+     *
      * @return The optional absolute path of the file, or empty if it's a built-in list
      */
     public Optional<Path> getAbsolutePath() {
@@ -122,7 +120,7 @@ public class AbbreviationsFileViewModel {
     
     /**
      * Checks if this source is enabled
-     * 
+     *
      * @return true if the source is enabled
      */
     public boolean isEnabled() {
@@ -131,7 +129,7 @@ public class AbbreviationsFileViewModel {
     
     /**
      * Sets the enabled state of this source
-     * 
+     *
      * @param enabled true to enable the source, false to disable it
      */
     public void setEnabled(boolean enabled) {
@@ -140,7 +138,7 @@ public class AbbreviationsFileViewModel {
     
     /**
      * Gets the enabled property for binding
-     * 
+     *
      * @return the enabled property
      */
     public BooleanProperty enabledProperty() {

@@ -6,15 +6,17 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class AbbreviationsTest {
 
-    private JournalAbbreviationRepository repository;
-    
-    private static final Abbreviation TEST_JOURNAL = new Abbreviation("Test Journal", "Test J.");
     private static final Abbreviation DOTTED_JOURNAL = new Abbreviation("Dotted Journal", "Dotted J.");
+    private static final Abbreviation TEST_JOURNAL = new Abbreviation("Test Journal", "Test J.");
+    
+    private JournalAbbreviationRepository repository;
 
     @BeforeEach
     void setUp() {
@@ -47,5 +49,40 @@ class AbbreviationsTest {
         
         Optional<String> abbreviation3 = repository.getNextAbbreviation("Test J");
         assertEquals("Test Journal", abbreviation3.orElse("WRONG"));
+    }
+
+    @Test
+    void constructorValidIsoAbbreviation() {
+        assertDoesNotThrow(() -> new Abbreviation("Test Entry", "Test. Ent."));
+    }
+
+    @Test
+    void constructorInvalidMedlineAbbreviation() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Abbreviation("Test Entry", null, "TE"));
+        assertEquals("ISO/MEDLINE abbreviation is null or empty!", exception.getMessage());
+    }
+
+    @Test
+    void getShortestUniqueAbbreviationDifferentFromIsoAbbreviation() {
+        Abbreviation abbreviation = new Abbreviation("Test Entry", "Test. Ent.", "TE");
+
+        assertEquals("TE", abbreviation.getShortestUniqueAbbreviation());
+        assertNotEquals("Test. Ent.", abbreviation.getShortestUniqueAbbreviation());
+    }
+
+    @Test
+    void getNext() {
+        Abbreviation abbreviation = new Abbreviation("Test Entry", "Test. Ent.");
+
+        assertEquals("Test. Ent.", abbreviation.getNext("Test Entry"));
+        assertEquals("Test Ent", abbreviation.getNext("Test. Ent."));
+        assertEquals("Test Entry", abbreviation.getNext("Test Ent"));
+    }
+
+    @Test
+    void testToString() {
+        Abbreviation abbreviation = new Abbreviation("Test Entry", "Test. Ent.");
+
+        assertEquals("Abbreviation{name=Test Entry, iso=Test. Ent., medline=Test Ent, shortest=null}", abbreviation.toString());
     }
 }

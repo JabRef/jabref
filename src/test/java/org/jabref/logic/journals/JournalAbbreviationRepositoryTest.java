@@ -1,8 +1,6 @@
 package org.jabref.logic.journals;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -10,7 +8,6 @@ import java.util.stream.Stream;
 import javax.swing.undo.CompoundEdit;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.journals.AbbreviationType;
@@ -38,17 +35,17 @@ import static org.mockito.Mockito.when;
 @AllowedToUseSwing("UndoableUnabbreviator and UndoableAbbreviator requires Swing Compound Edit in order test the abbreviation and unabbreviation of journal titles")
 class JournalAbbreviationRepositoryTest {
 
+    private static final Abbreviation ACS_MATERIALS = new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces");
+    private static final Abbreviation AMERICAN_JOURNAL = new Abbreviation("American Journal of Public Health", "Am. J. Public Health");
+    private static final Abbreviation ANTIOXIDANTS = new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling");
+    private static final Abbreviation PHYSICAL_REVIEW = new Abbreviation("Physical Review B", "Phys. Rev. B");
+    
     private JournalAbbreviationRepository repository;
     private JournalAbbreviationPreferences abbreviationPreferences;
     
     private final BibDatabase bibDatabase = new BibDatabase();
     private UndoableUnabbreviator undoableUnabbreviator;
     
-    private static final Abbreviation AMERICAN_JOURNAL = new Abbreviation("American Journal of Public Health", "Am. J. Public Health");
-    private static final Abbreviation ACS_MATERIALS = new Abbreviation("ACS Applied Materials & Interfaces", "ACS Appl. Mater. Interfaces");
-    private static final Abbreviation ANTIOXIDANTS = new Abbreviation("Antioxidants & Redox Signaling", "Antioxid. Redox Signaling");
-    private static final Abbreviation PHYSICAL_REVIEW = new Abbreviation("Physical Review B", "Phys. Rev. B");
-
     /**
      * Creates a test repository with pre-defined abbreviations and all sources enabled
      */

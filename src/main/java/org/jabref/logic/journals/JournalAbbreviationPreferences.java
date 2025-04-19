@@ -21,7 +21,7 @@ public class JournalAbbreviationPreferences {
     
     /**
      * Constructs a new JournalAbbreviationPreferences with the given external journal lists and FJournal field preference
-     * 
+     *
      * @param externalJournalLists List of paths to external journal abbreviation files
      * @param useFJournalField Whether to use the FJournal field
      */
@@ -71,7 +71,7 @@ public class JournalAbbreviationPreferences {
     
     /**
      * Checks if a journal abbreviation source is enabled
-     * 
+     *
      * @param sourcePath Path to the abbreviation source
      * @return true if the source is enabled or has no explicit state (default is enabled)
      */
@@ -84,7 +84,7 @@ public class JournalAbbreviationPreferences {
     
     /**
      * Sets the enabled state for a journal abbreviation source
-     * 
+     *
      * @param sourcePath Path to the abbreviation source
      * @param enabled Whether the source should be enabled
      */
@@ -98,7 +98,7 @@ public class JournalAbbreviationPreferences {
     
     /**
      * Gets all enabled/disabled states for journal abbreviation sources
-     * 
+     *
      * @return Map of source paths to their enabled states
      */
     public Map<String, Boolean> getEnabledExternalLists() {
@@ -107,7 +107,7 @@ public class JournalAbbreviationPreferences {
     
     /**
      * Sets all enabled/disabled states for journal abbreviation sources
-     * 
+     *
      * @param enabledLists Map of source paths to their enabled states
      */
     public void setEnabledExternalLists(Map<String, Boolean> enabledLists) {
@@ -121,7 +121,7 @@ public class JournalAbbreviationPreferences {
     /**
      * Property that changes whenever the enabled states map changes
      * Used for binding/listening to changes
-     * 
+     *
      * @return A boolean property that toggles when enabled states change
      */
     public BooleanProperty enabledListsChangedProperty() {
@@ -130,7 +130,7 @@ public class JournalAbbreviationPreferences {
     
     /**
      * Checks if a specific source has an explicit enabled/disabled setting
-     * 
+     *
      * @param sourcePath Path to check
      * @return True if there is an explicit setting for this source
      */

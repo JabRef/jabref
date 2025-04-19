@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,19 +20,17 @@ import org.jabref.logic.util.strings.StringSimilarity;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
  */
 public class JournalAbbreviationRepository {
-    static final Pattern QUESTION_MARK = Pattern.compile("\\?");
-    
     /**
      * Identifier for the built-in abbreviation list
      */
     public static final String BUILTIN_LIST_ID = "BUILTIN_LIST";
+    
+    static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
     private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
     private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
@@ -255,9 +252,9 @@ public class JournalAbbreviationRepository {
     }
 
     /**
-     * Adds a custom abbreviation to the repository
-     * 
-     * @param abbreviation The abbreviation to add
+     * Adds a journal abbreviation to the list of custom abbreviations.
+     *
+     * @param abbreviation The journal abbreviation to add.
      */
     public void addCustomAbbreviation(Abbreviation abbreviation) {
         Objects.requireNonNull(abbreviation);
@@ -272,7 +269,7 @@ public class JournalAbbreviationRepository {
 
     /**
      * Adds a custom abbreviation to the repository with source tracking
-     * 
+     *
      * @param abbreviation The abbreviation to add
      * @param sourcePath The path or identifier of the source
      * @param enabled Whether the source is enabled
@@ -293,7 +290,7 @@ public class JournalAbbreviationRepository {
 
     /**
      * Adds multiple custom abbreviations to the repository
-     * 
+     *
      * @param abbreviationsToAdd The abbreviations to add
      */
     public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
@@ -302,7 +299,7 @@ public class JournalAbbreviationRepository {
     
     /**
      * Adds abbreviations with a specific source key and enabled state
-     * 
+     *
      * @param abbreviationsToAdd Collection of abbreviations to add
      * @param sourceKey The key identifying the source of these abbreviations
      * @param enabled Whether the source should be enabled initially
@@ -318,7 +315,7 @@ public class JournalAbbreviationRepository {
     
     /**
      * Checks if a journal abbreviation source is enabled
-     * 
+     *
      * @param sourceKey The key identifying the source
      * @return true if the source is enabled or has no explicit state (default is enabled)
      */
@@ -328,7 +325,7 @@ public class JournalAbbreviationRepository {
     
     /**
      * Sets the enabled state for a journal abbreviation source
-     * 
+     *
      * @param sourceKey The key identifying the source
      * @param enabled Whether the source should be enabled
      */
@@ -383,7 +380,7 @@ public class JournalAbbreviationRepository {
     
     /**
      * Gets all abbreviations from both custom and built-in sources with their sources
-     * 
+     *
      * @return List of all abbreviations with their sources
      */
     public List<AbbreviationWithSource> getAllAbbreviationsWithSources() {
@@ -403,7 +400,7 @@ public class JournalAbbreviationRepository {
     
     /**
      * Gets all abbreviations from both custom and built-in sources
-     * 
+     *
      * @return List of all abbreviations
      */
     public List<Abbreviation> getAllAbbreviations() {
@@ -414,7 +411,7 @@ public class JournalAbbreviationRepository {
     
     /**
      * Gets the source identifier for a given abbreviation
-     * 
+     *
      * @param abbreviation The abbreviation to look up
      * @return The source key, or BUILTIN_LIST_ID if not found
      */
