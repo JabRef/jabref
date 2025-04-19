@@ -227,7 +227,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation 'com.google.guava:guava:33.1.0-jre'
+    implementation 'com.google.guava:guava:33.4.8-jre'
 
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
