@@ -43,6 +43,8 @@ import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
+import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
@@ -76,8 +78,8 @@ import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -274,6 +276,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_USE_ALL_OPEN_BASES = "useAllOpenBases";
     public static final String OO_BIBLIOGRAPHY_STYLE_FILE = "ooBibliographyStyleFile";
     public static final String OO_EXTERNAL_STYLE_FILES = "ooExternalStyleFiles";
+    public static final String OO_EXTERNAL_CSL_STYLES = "externalCslStyles";
     public static final String OO_CURRENT_STYLE = "ooCurrentStyle";
     public static final String OO_ALWAYS_ADD_CITED_ON_PAGES = "ooAlwaysAddCitedOnPages";
     public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
@@ -570,11 +573,12 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
         defaults.put(OO_ALWAYS_ADD_CITED_ON_PAGES, Boolean.FALSE);
         defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
-        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
+        defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE, JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
-        defaults.put(OO_CURRENT_STYLE, CitationStyle.getDefault().getPath()); // Default CSL Style is IEEE
+        defaults.put(OO_CURRENT_STYLE, CSLStyleLoader.getDefaultStyle().getPath()); // Default CSL Style is IEEE
         defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");
         defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
+        defaults.put(OO_EXTERNAL_CSL_STYLES, "");
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
@@ -1117,12 +1121,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         String currentStylePath = get(OO_CURRENT_STYLE);
 
-        OOStyle currentStyle = CitationStyle.getDefault(); // Defaults to IEEE CSL Style
+        OOStyle currentStyle = CSLStyleLoader.getDefaultStyle(); // Defaults to IEEE CSL Style
 
-        // Reassign currentStyle if it is not a CSL style
+        // Reassign currentStyle based on actual last used CSL style or JStyle
         if (CitationStyle.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CitationStyle.createCitationStyleFromFile(currentStylePath) // Assigns CSL Style
-                         .orElse(CitationStyle.getDefault());
+            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
+                                        .orElse(CSLStyleLoader.getDefaultStyle());
         } else {
             // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
             try {
@@ -1142,7 +1146,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 currentStyle,
                 getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),
                 get(OO_CSL_BIBLIOGRAPHY_TITLE),
-                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT));
+                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT),
+                getStringList(OO_EXTERNAL_CSL_STYLES));
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
@@ -1151,6 +1156,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
         openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
+        openOfficePreferences.getExternalCslStyles().addListener((InvalidationListener) change ->
+                putStringList(OO_EXTERNAL_CSL_STYLES, openOfficePreferences.getExternalCslStyles()));
         EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
         EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
 

@@ -31,6 +31,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a feature for enabling drag-and-drop of files into groups  [#12540](https://github.com/JabRef/jabref/issues/12540)
 - We added support for reordering keywords via drag and drop, automatic alphabetical ordering, and improved pasting and editing functionalities in the keyword editor. [#10984](https://github.com/JabRef/jabref/issues/10984)
 - We added a new functionality where author names having multiple spaces in-between will be considered as separate user block as it does for " and ". [#12701](https://github.com/JabRef/jabref/issues/12701)
+- We added a set of example questions to guide users in starting meaningful AI chat interactions. [#12702](https://github.com/JabRef/jabref/issues/12702)
 - We added support for loading and displaying BibTeX .blg warnings in the Check integrity dialog, with custom path selection and metadata persistence. [#11998](https://github.com/JabRef/jabref/issues/11998)
 - We added an option to choose whether to open the file explorer in the files directory or in the last opened directory when attaching files. [#12554](https://github.com/JabRef/jabref/issues/12554)
 - We enhanced support for parsing XMP metadata from PDF files. [#12829](https://github.com/JabRef/jabref/issues/12829)
@@ -38,6 +39,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added automatic PubMed URL insertion when importing from PubMed if no URL is present. [#12832](https://github.com/JabRef/jabref/issues/12832/)
 - We added a "LTWA" abbreviation feature in the "Quality > Abbreviate journal names > LTWA" menu [#12273](https://github.com/JabRef/jabref/issues/12273/)
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
+- We now support usage of custom CSL styles in the Open/LibreOffice integration. [#12337](https://github.com/JabRef/jabref/issues/12337)
 
 ### Changed
 
@@ -73,6 +75,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved search in preferences and keybindings. [#12647](https://github.com/JabRef/jabref/issues/12647)
 - We improved the performance of the LibreOffice integration when inserting CSL citations/bibliography. [#12851](https://github.com/JabRef/jabref/pull/12851)
 - 'Affected fields' and 'Do not wrap when saving' are now displayed as tags. [#12550](https://github.com/JabRef/jabref/issues/12550)
+- We revamped the UI of the Select Style dialog (in the LibreOffice panel) for CSL styles. [#12951](https://github.com/JabRef/jabref/pull/12951)
+- We reduced the delay in populating the list of CSL styles in the Select Style dialog of the LibreOffice panel. [#12951](https://github.com/JabRef/jabref/pull/12951)
 
 ### Fixed
 

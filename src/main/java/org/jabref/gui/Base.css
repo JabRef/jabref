@@ -2493,6 +2493,22 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
 }
 
+.exampleQuestionStyle {
+    -fx-background-color: transparent;
+    -fx-padding: 2px 10px;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
+    -fx-border-width: 0.062em;
+    -fx-border-color: -fx-outer-border;
+    -fx-font-weight: bold;
+    -fx-underline: false !important;
+    -fx-text-fill: -fx-text-base-color;
+}
+
+.exampleQuestionStyle:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.12);
+}
+
 .refresh {
     -fx-background-color: transparent;
 }
