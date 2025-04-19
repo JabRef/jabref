@@ -143,7 +143,6 @@ public class ContextMenuFactoryTest {
         assertTrue(itemLabels.stream().anyMatch(label -> label.contains("delete")));
 
     }
-
     @Test
     public void createContextMenuForEmptySelection() {
         ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList();
