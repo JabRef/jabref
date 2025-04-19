@@ -12,6 +12,8 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.jabref.logic.util.StandardFileType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +27,12 @@ public class CSLStyleUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
+    /**
+     * Style information record (title, isNumericStyle) pair for a citation style.
+     */
+    public record StyleInfo(String title, boolean isNumericStyle) {
+    }
+
     static {
         XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_COALESCING, true);
     }
@@ -34,9 +42,64 @@ public class CSLStyleUtils {
     }
 
     /**
-     * Style information record (title, isNumericStyle) pair for a citation style.
+     * Checks if the given style file is a CitationStyle based on its extension
      */
-    public record StyleInfo(String title, boolean isNumericStyle) {
+    public static boolean isCitationStyleFile(String styleFile) {
+        return StandardFileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);
+    }
+
+    /**
+     * Creates a CitationStyle from a file path.
+     *
+     * @param styleFile Path to the CSL file
+     * @return Optional containing the CitationStyle if valid, empty otherwise
+     */
+    public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
+        if (!isCitationStyleFile(styleFile)) {
+            LOGGER.error("Can only load style files: {}", styleFile);
+            return Optional.empty();
+        }
+
+        // Check if this is an absolute path (external file)
+        Path filePath = Path.of(styleFile);
+        if (filePath.isAbsolute() && Files.exists(filePath)) {
+            try (InputStream inputStream = Files.newInputStream(filePath)) {
+                return createCitationStyleFromSource(inputStream, styleFile, false);
+            } catch (IOException e) {
+                LOGGER.error("Error reading source file", e);
+                return Optional.empty();
+            }
+        }
+
+        // If not an absolute path, treat as internal resource
+        String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
+        try (InputStream inputStream = CSLStyleUtils.class.getResourceAsStream(internalFile)) {
+            if (inputStream == null) {
+                LOGGER.error("Could not find file: {}", styleFile);
+                return Optional.empty();
+            }
+            return createCitationStyleFromSource(inputStream, styleFile, true);
+        } catch (IOException e) {
+            LOGGER.error("Error reading source file", e);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Creates a CitationStyle from the input stream.
+     *
+     * @return Optional containing the CitationStyle if valid, empty otherwise
+     */
+    private static Optional<CitationStyle> createCitationStyleFromSource(InputStream source, String filename, boolean isInternal) {
+        try {
+            String content = new String(source.readAllBytes());
+
+            Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
+            return styleInfo.map(info -> new CitationStyle(filename, info.title(), info.isNumericStyle(), content, isInternal));
+        } catch (IOException e) {
+            LOGGER.error("Error while parsing source", e);
+            return Optional.empty();
+        }
     }
 
     /**
@@ -91,60 +154,6 @@ public class CSLStyleUtils {
             }
         } catch (XMLStreamException e) {
             LOGGER.error("Error parsing XML for file {}: {}", filename, e.getMessage(), e);
-            return Optional.empty();
-        }
-    }
-
-    /**
-     * Creates a CitationStyle from a file path.
-     *
-     * @param styleFile Path to the CSL file
-     * @return Optional containing the CitationStyle if valid, empty otherwise
-     */
-    public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
-        if (!CitationStyle.isCitationStyleFile(styleFile)) {
-            LOGGER.error("Can only load style files: {}", styleFile);
-            return Optional.empty();
-        }
-
-        // Check if this is an absolute path (external file)
-        Path filePath = Path.of(styleFile);
-        if (filePath.isAbsolute() && Files.exists(filePath)) {
-            try (InputStream inputStream = Files.newInputStream(filePath)) {
-                return createCitationStyleFromSource(inputStream, styleFile, false);
-            } catch (IOException e) {
-                LOGGER.error("Error reading source file", e);
-                return Optional.empty();
-            }
-        }
-
-        // If not an absolute path, treat as internal resource
-        String internalFile = STYLES_ROOT + (styleFile.startsWith("/") ? "" : "/") + styleFile;
-        try (InputStream inputStream = CSLStyleUtils.class.getResourceAsStream(internalFile)) {
-            if (inputStream == null) {
-                LOGGER.error("Could not find file: {}", styleFile);
-                return Optional.empty();
-            }
-            return createCitationStyleFromSource(inputStream, styleFile, true);
-        } catch (IOException e) {
-            LOGGER.error("Error reading source file", e);
-        }
-        return Optional.empty();
-    }
-
-    /**
-     * Creates a CitationStyle from the input stream.
-     *
-     * @return Optional containing the CitationStyle if valid, empty otherwise
-     */
-    private static Optional<CitationStyle> createCitationStyleFromSource(InputStream source, String filename, boolean isInternal) {
-        try {
-            String content = new String(source.readAllBytes());
-
-            Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
-            return styleInfo.map(info -> new CitationStyle(filename, info.title(), info.isNumericStyle(), content, isInternal));
-        } catch (IOException e) {
-            LOGGER.error("Error while parsing source", e);
             return Optional.empty();
         }
     }
