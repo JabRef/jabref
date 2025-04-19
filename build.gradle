@@ -227,10 +227,7 @@ dependencies {
         exclude module: 'oraclepki'
     }
 
-    implementation ('com.google.guava:guava:33.1.0-jre') {
-        // TODO: Remove this as soon as https://github.com/google/guava/issues/2960 is fixed
-        exclude module: "jsr305"
-    }
+    implementation 'com.google.guava:guava:33.1.0-jre'
 
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation 'jakarta.inject:jakarta.inject-api:2.0.1'
@@ -565,18 +562,7 @@ tasks.register('generateCitationStyleCatalog', JavaExec) {
 }
 
 jar.dependsOn('generateCitationStyleCatalog')
-
-// catalog from above task needs to be copied to build output for tests
-tasks.register('copyCitationStyleCatalog', Copy) {
-    from 'src/main/resources/citation-style-catalog.json'
-    into 'build/resources/main'
-    mustRunAfter 'checkstyleMain'
-    dependsOn 'generateCitationStyleCatalog'
-}
-
-compileTestJava.dependsOn('copyCitationStyleCatalog')
-generateJournalListMV.dependsOn('copyCitationStyleCatalog')
-generateLtwaListMV.dependsOn('copyCitationStyleCatalog')
+compileTestJava.dependsOn("generateCitationStyleCatalog")
 
 tasks.register('generateCitaviSource', XjcTask) {
     group = 'JabRef'
