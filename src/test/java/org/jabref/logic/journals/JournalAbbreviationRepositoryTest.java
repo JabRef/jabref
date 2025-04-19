@@ -657,8 +657,8 @@ class JournalAbbreviationRepositoryTest {
         
         for (Abbreviation abbr : List.of(AMERICAN_JOURNAL, ACS_MATERIALS, ANTIOXIDANTS, PHYSICAL_REVIEW)) {
             boolean found = allWithSources.stream()
-                           .anyMatch(aws -> aws.getSource().equals(JournalAbbreviationRepository.BUILTIN_LIST_ID) && 
-                                     aws.getAbbreviation().getName().equals(abbr.getName()));
+                           .anyMatch(aws -> JournalAbbreviationRepository.BUILTIN_LIST_ID.equals(aws.getSource()) && 
+                                     abbr.getName().equals(aws.getAbbreviation().getName()));
             assertTrue(found, "Should find " + abbr.getName() + " with built-in source");
         }
     }
