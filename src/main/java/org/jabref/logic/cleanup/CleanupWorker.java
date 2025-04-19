@@ -12,14 +12,18 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CleanupWorker {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CleanupWorker.class);
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
     private final BibEntryPreferences bibEntryPreferences;
     private final List<JabRefException> failures;
-
+    
     public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, BibEntryPreferences bibEntryPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
@@ -35,7 +39,9 @@ public class CleanupWorker {
         List<CleanupJob> jobs = determineCleanupActions(preset);
         List<FieldChange> changes = new ArrayList<>();
         for (CleanupJob job : jobs) {
+            
             changes.addAll(job.cleanup(entry));
+            
             if (job instanceof MoveFilesCleanup cleanup) {
                 failures.addAll(cleanup.getIoExceptions());
             }

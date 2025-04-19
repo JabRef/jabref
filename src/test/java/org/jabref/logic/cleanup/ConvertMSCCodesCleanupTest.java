@@ -2,6 +2,7 @@ package org.jabref.logic.cleanup;
 
 import java.util.Optional;
 
+import org.jabref.gui.StateManager;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
@@ -20,6 +21,7 @@ class ConvertMSCCodesCleanupTest {
     @BeforeEach
     void setUp() {
         BibEntryPreferences preferences = mock(BibEntryPreferences.class);
+
         // Simulate default separator
         Mockito.when(preferences.getKeywordSeparator()).thenReturn(',');
         worker = new ConvertMSCCodesCleanup(preferences, true);

@@ -2,8 +2,6 @@ package org.jabref.gui.fieldeditors;
 
 import java.net.URL;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -48,6 +46,7 @@ import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import com.google.common.collect.Comparators;
+import com.google.common.collect.HashBiMap;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,28 +55,28 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
 
-    private static Map<String, String> mscmap;
+    private static HashBiMap<String, String> mscmap;
 
     static {
         URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("msc_codes.json");
 
         if (resourceUrl == null) {
-            LOGGER.error("msc_codes.json not found!");
-            mscmap = new HashMap<>();
+            LOGGER.error(Localization.lang("Resource not found: msc_codes.json"));
+            mscmap = HashBiMap.create();
         }
 
         try {
-            Optional<Map<String, String>> optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
+            Optional<HashBiMap<String, String>> optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
             
             if (optionalMscCodes.isPresent()) {
                 mscmap = optionalMscCodes.get();  // Unwrap the map if present
             } else {
-                LOGGER.warn("No MSC codes found in msc_codes.json.");
-                mscmap = new HashMap<>();
+                LOGGER.warn(Localization.lang("Resource not found: msc_codes.json"));
+                mscmap = HashBiMap.create();
             }
         } catch (MscCodeLoadingException e) {
-            LOGGER.error("Error occurred while loading MSC codes", e);
-            mscmap = new HashMap<>();
+            LOGGER.error(Localization.lang("Error loading MSC codes:", e));
+            mscmap = HashBiMap.create();
         }
     }
 

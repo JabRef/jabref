@@ -2,13 +2,15 @@ package org.jabref.logic.cleanup;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.msc.MscCodeLoadingException;
 import org.jabref.logic.msc.MscCodeUtils;
+import org.jabref.migrations.MSCMigration;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -16,6 +18,8 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.StandardField;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,18 +29,19 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
      */
 
     private static final Logger logger = LoggerFactory.getLogger(ConvertMSCCodesCleanup.class);
-    private static final Map<String, String> MSCMAP;
-    private static final Map<String, String> reverseMSCMAP;
+    private static final BiMap<String, String> MSCMAP;
     private static boolean conversionPossible;
+    private static BooleanProperty isEditorOpen;
     private final Character keywordSeparator;
-
     private final boolean convertToDescriptions;
 
     static {
-        Map<String, String> tempMap = new HashMap<>();
-        Map<String, String> tempReverseMap = new HashMap<>();
+
+        HashBiMap<String, String> tempMap = HashBiMap.create();
+        
         URL resourceUrl = ConvertMSCCodesCleanup.class.getClassLoader().getResource("msc_codes.json");
 
+        // Check for valid mapping of msc codes
         if (resourceUrl == null) {
             logger.error(Localization.lang("Resource not found: msc_codes.json"));
             conversionPossible = false;
@@ -50,14 +55,9 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                 logger.error(Localization.lang("Error loading MSC codes:", e));
                 conversionPossible = false;
             }
-
-            if (conversionPossible) {
-                tempMap.forEach((code, desc) -> tempReverseMap.put(desc, code));
-            }
         }
 
         MSCMAP = tempMap;
-        reverseMSCMAP = tempReverseMap;
     }
 
     public ConvertMSCCodesCleanup(BibEntryPreferences preferences, boolean convertToDescriptions) {
@@ -106,8 +106,8 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                 }
             } else {
                 // Convert descriptions back to codes
-                if (reverseMSCMAP.containsKey(keywordStr)) {
-                    String code = reverseMSCMAP.get(keywordStr);
+                if (MSCMAP.inverse().containsKey(keywordStr)) {
+                    String code = MSCMAP.inverse().get(keywordStr);
                     newKeywords.add(new Keyword(code));
                     hasChanges = true;
                 } else {
@@ -121,9 +121,20 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
 
-            // Update the field directly without JavaFX threading
-            entry.setField(StandardField.KEYWORDS, newValue);
-            changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
+            MSCMigration tool = new MSCMigration();
+            isEditorOpen = tool.isEditorOpen();
+
+            if (!Platform.isFxApplicationThread() && isEditorOpen.get()) {
+                
+                // If the thread is not JavaFX and Editor is showing avoid error by adding to queue
+                Platform.runLater(() -> {
+                    entry.setField(StandardField.KEYWORDS, newValue);
+                    changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
+                });
+            } else {
+                entry.setField(StandardField.KEYWORDS, newValue);
+                changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
+            }
         }
 
         return changes;
