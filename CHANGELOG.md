@@ -11,6 +11,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added multi-file actions in the entry editor context menu, allowing users to select multiple files and apply bulk operations such as Open, Open folder, Download, Redownload, Move to directory, Copy to folder, Remove links, and Permanently delete. [#12567](https://github.com/JabRef/jabref/issues/12567)
+
+### Added
+
 - We added a button in Privacy notice and Mr. DLib Privacy settings notice for hiding related tabs. [#11707](https://github.com/JabRef/jabref/issues/11707)
 - We added buttons "Add example entry" and "Import existing PDFs" when a library is empty, making it easier for new users to get started. [#12662](https://github.com/JabRef/jabref/issues/12662)
 - In the Open/LibreOffice integration, we added the provision to modify the bibliography title and its format for CSL styles, in the "Select style" dialog. [#12663](https://github.com/JabRef/jabref/issues/12663)

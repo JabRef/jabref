@@ -1,11 +1,15 @@
 package org.jabref.gui.fieldeditors.contextmenu;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javafx.application.Platform;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -21,7 +25,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -108,13 +111,40 @@ public class ContextMenuFactoryTest {
 
     @Test
     public void createContextMenuForMultipleFiles() {
-        LinkedFileViewModel file1 = mockFileWithLink("file1.pdf");
-        LinkedFileViewModel file2 = mockFileWithLink("file2.pdf");
-        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList(file1, file2);
+        int numberOfFiles = 3;
+        ObservableList<LinkedFileViewModel> files = FXCollections.observableArrayList();
 
+        for (int i = 0; i < numberOfFiles; i++) {
+            files.add(mockFileWithLink("file" + i + ".pdf"));
+        }
+
+        // Act: Generate the context menu for selected files
         ContextMenu menu = factory.createForSelection(files);
+
+        // Assert: Menu is not null and contains at least one item
         assertNotNull(menu);
-        assertEquals(1, menu.getItems().size());
+        assertFalse(menu.getItems().isEmpty());
+
+        // Extract labels of all menu items for flexible keyword-based validation
+        List<String> itemLabels = menu.getItems().stream()
+                                      .map(MenuItem::getText)
+                                      .filter(label -> label != null)
+                                      .collect(Collectors.toList());
+
+        // Verify the expected menu labels (order matters here)
+        List<String> expectedLabels = List.of(
+                "Open file",
+                "Open folder",
+                "Download file",
+                "Redownload file",
+                "Move file to file directory",
+                "Copy linked file to folder...",
+                "Remove links",
+                "Permanently delete local file"
+        );
+        for (String expected : expectedLabels) {
+            assertTrue(itemLabels.contains(expected), "Missing menu item: " + expected);
+        }
     }
 
     @Test

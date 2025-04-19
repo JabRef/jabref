@@ -51,19 +51,25 @@ public class ContextMenuFactory {
         return new ContextMenu();
     }
 
-    private ContextMenu createContextMenuForMultiFile(ObservableList<LinkedFileViewModel> selectedFiles) {
-        ContextMenu menu = new ContextMenu();
-        ActionFactory factory = new ActionFactory();
+private ContextMenu createContextMenuForMultiFile(ObservableList<LinkedFileViewModel> selectedFiles) {
+    ContextMenu menu = new ContextMenu();
+    ActionFactory factory = new ActionFactory();
 
-        menu.getItems().addAll(
-                factory.createMenuItem(
-                        StandardActions.REMOVE_LINKS,
-                        multiCommandFactory.build(StandardActions.REMOVE_LINKS, selectedFiles)
-                )
-        );
+    menu.getItems().addAll(
+            factory.createMenuItem(StandardActions.OPEN_FILE, multiCommandFactory.build(StandardActions.OPEN_FILE, selectedFiles)),
+            factory.createMenuItem(StandardActions.OPEN_FOLDER, multiCommandFactory.build(StandardActions.OPEN_FOLDER, selectedFiles)),
+            new SeparatorMenuItem(),
+            factory.createMenuItem(StandardActions.DOWNLOAD_FILE, multiCommandFactory.build(StandardActions.DOWNLOAD_FILE, selectedFiles)),
+            factory.createMenuItem(StandardActions.REDOWNLOAD_FILE, multiCommandFactory.build(StandardActions.REDOWNLOAD_FILE, selectedFiles)),
+            factory.createMenuItem(StandardActions.MOVE_FILE_TO_FOLDER, multiCommandFactory.build(StandardActions.MOVE_FILE_TO_FOLDER, selectedFiles)),
+            factory.createMenuItem(StandardActions.COPY_FILE_TO_FOLDER, multiCommandFactory.build(StandardActions.COPY_FILE_TO_FOLDER, selectedFiles)),
+            new SeparatorMenuItem(),
+            factory.createMenuItem(StandardActions.REMOVE_LINKS, multiCommandFactory.build(StandardActions.REMOVE_LINKS, selectedFiles)),
+            factory.createMenuItem(StandardActions.DELETE_FILE, multiCommandFactory.build(StandardActions.DELETE_FILE, selectedFiles))
+    );
 
-        return menu;
-    }
+    return menu;
+}
 
     private ContextMenu createContextMenuForFile(LinkedFileViewModel linkedFile) {
         ContextMenu menu = new ContextMenu();
