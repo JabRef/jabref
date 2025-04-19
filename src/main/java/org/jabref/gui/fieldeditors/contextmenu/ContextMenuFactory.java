@@ -51,19 +51,6 @@ public class ContextMenuFactory {
         return new ContextMenu();
     }
 
-//    private ContextMenu createContextMenuForMultiFile(ObservableList<LinkedFileViewModel> selectedFiles) {
-//        ContextMenu menu = new ContextMenu();
-//        ActionFactory factory = new ActionFactory();
-//
-//        menu.getItems().addAll(
-//                factory.createMenuItem(
-//                        StandardActions.REMOVE_LINKS,
-//                        multiCommandFactory.build(StandardActions.REMOVE_LINKS, selectedFiles)
-//                )
-//        );
-//
-//        return menu;
-//    }
 private ContextMenu createContextMenuForMultiFile(ObservableList<LinkedFileViewModel> selectedFiles) {
     ContextMenu menu = new ContextMenu();
     ActionFactory factory = new ActionFactory();

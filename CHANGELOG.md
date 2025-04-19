@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added multi-file support in the entry editor context menu. [#12567]
+- We added multi-file actions in the entry editor context menu, allowing users to select multiple files and apply bulk operations such as Open, Open folder, Download, Redownload, Move to directory, Copy to folder, Remove links, and Permanently delete. [#12567](https://github.com/JabRef/jabref/issues/12567)
 
 ### Added
 
