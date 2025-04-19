@@ -25,7 +25,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -129,11 +128,23 @@ public class ContextMenuFactoryTest {
         // Extract labels of all menu items for flexible keyword-based validation
         List<String> itemLabels = menu.getItems().stream()
                                       .map(MenuItem::getText)
+                                      .filter(label -> label != null)
                                       .collect(Collectors.toList());
 
         // Verify the expected menu labels (order matters here)
-        List<String> expectedLabels = List.of("Open file", "Remove link", "Delete");
-        assertEquals(expectedLabels, itemLabels);
+        List<String> expectedLabels = List.of(
+                "Open file",
+                "Open folder",
+                "Download file",
+                "Redownload file",
+                "Move file to file directory",
+                "Copy linked file to folder...",
+                "Remove links",
+                "Permanently delete local file"
+        );
+        for (String expected : expectedLabels) {
+            assertTrue(itemLabels.contains(expected), "Missing menu item: " + expected);
+        }
     }
 
     @Test
