@@ -593,7 +593,7 @@ class JournalAbbreviationRepositoryTest {
         
         String abbreviation = "Am. J. Public Health";
         
-        assertEquals(true, testRepo.isAbbreviatedName(abbreviation));
+        assertTrue(testRepo.isAbbreviatedName(abbreviation));
         
         Optional<Abbreviation> result = testRepo.getForUnabbreviation(abbreviation);
         assertEquals("American Journal of Public Health", result.map(Abbreviation::getName).orElse(null));

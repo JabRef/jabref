@@ -508,7 +508,7 @@ class JournalAbbreviationsViewModelTabTest {
 
         // deletion and addition of an entry leads to same size
         assertEquals(5, viewModel.abbreviationsProperty().size());
-        assertEquals(true, viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(ABBREVIATION_6)));
+        assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(ABBREVIATION_6)));
 
         // overwrite all files
         viewModel.saveJournalAbbreviationFiles();
