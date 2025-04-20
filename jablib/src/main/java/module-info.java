@@ -14,9 +14,6 @@ open module org.jabref.jablib {
     requires org.slf4j;
     requires jul.to.slf4j;
     requires org.apache.logging.log4j.to.slf4j;
-    requires org.tinylog.api;
-    requires org.tinylog.api.slf4j;
-    requires org.tinylog.impl;
     // endregion
 
     // Preferences and XML
