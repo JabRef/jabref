@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 
 /**
  * Used for GSON
