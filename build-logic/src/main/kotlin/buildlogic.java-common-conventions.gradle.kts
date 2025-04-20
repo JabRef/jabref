@@ -1,5 +1,13 @@
 plugins {
     java
+
+    id("idea")
+
+    id("checkstyle")
+
+    id("jacoco")
+
+    id("project-report")
 }
 
 repositories {

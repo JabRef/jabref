@@ -3,34 +3,27 @@ plugins {
 
     `java-library`
 
-    id("org.openjfx.javafxplugin") version("0.1.0")
+    id("idea")
 
     id("antlr")
+    id("com.github.edeandrea.xjc-generation") version "1.6"
 
-    id("com.github.andygoossens.modernizer") version "1.10.0"
-
-    id("me.champeau.jmh") version "0.7.3"
+    id("org.openjfx.javafxplugin") version("0.1.0")
 
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
+
+    id("com.github.andygoossens.modernizer") version "1.10.0"
+    id("org.openrewrite.rewrite") version "7.3.0"
 
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id("com.adarshr.test-logger") version "4.0.0"
 
-    id("jacoco")
-
-    id("checkstyle")
-
-    id("project-report")
-
-    id("idea")
-
-    id("org.openrewrite.rewrite") version "7.3.0"
-
     id("org.itsallcode.openfasttrace") version "3.0.1"
 
-    id("com.github.edeandrea.xjc-generation") version "1.6"
+    id("me.champeau.jmh") version "0.7.3"
+
 }
 
 val pdfbox = "3.0.4"
