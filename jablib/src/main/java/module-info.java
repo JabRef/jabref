@@ -1,6 +1,7 @@
 open module org.jabref.jablib {
     requires javafx.base;
     requires com.tobiasdiez.easybind;
+    requires javafx.graphics;
 
     // SQL
     requires java.sql;

@@ -227,7 +227,12 @@ dependencies {
 
 javafx {
     version = "24"
-    modules = listOf("javafx.base")
+    modules = listOf(
+        // properties
+        "javafx.base",
+        // javafx.scene.paint.Color;
+        "javafx.graphics"
+    )
 }
 
 jacoco {
