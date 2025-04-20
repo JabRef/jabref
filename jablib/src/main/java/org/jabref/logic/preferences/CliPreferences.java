@@ -56,8 +56,6 @@ public interface CliPreferences {
 
     FieldPreferences getFieldPreferences();
 
-    OpenOfficePreferences getOpenOfficePreferences();
-
     Map<String, Object> getPreferences();
 
     Map<String, Object> getDefaults();

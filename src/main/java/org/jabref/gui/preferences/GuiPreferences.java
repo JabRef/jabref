@@ -55,4 +55,6 @@ public interface GuiPreferences extends CliPreferences {
     ColumnPreferences getSearchDialogColumnPreferences();
 
     KeyBindingRepository getKeyBindingRepository();
+
+    OpenOfficePreferences getOpenOfficePreferences();
 }
