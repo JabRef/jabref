@@ -106,7 +106,6 @@ import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
 
-import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import com.google.common.annotations.VisibleForTesting;
@@ -2102,7 +2101,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     private Map<String, String> getDefaultFetcherKeys() {
-        BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        // TODO: We do not want to have a depdency on afterburner.fx (because of huge JavaFX depdencny tree). - Should be rewritten to new DI framework
+        // BuildInfo buildInfo = Injector.instantiateModelOrService(BuildInfo.class);
+        BuildInfo buildInfo = new BuildInfo();
         if (buildInfo == null) {
             LOGGER.warn("Could not instantiate BuildInfo.");
             return Collections.emptyMap();
