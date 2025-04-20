@@ -12,9 +12,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.web.WebView;
 
+import org.jabref.gui.util.WebViewStore;
 import org.jabref.logic.ai.summarization.Summary;
 import org.jabref.logic.layout.format.MarkdownFormatter;
-import org.jabref.logic.util.WebViewStore;
 
 import com.airhacks.afterburner.views.ViewLoader;
 

@@ -1,4 +1,4 @@
-package org.jabref.logic.util;
+package org.jabref.gui.util;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

@@ -1,6 +1,9 @@
 plugins {
     id("buildlogic.java-common-conventions")
+
     application
+
+    id("org.openjfx.javafxplugin") version("0.1.0")
 
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
@@ -13,6 +16,7 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
 
     id("org.itsallcode.openfasttrace") version "3.0.1"
+
 }
 
 val luceneVersion = "10.2.0"
@@ -72,4 +76,9 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java")
+}
+
+javafx {
+    version = "24"
+    modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web")
 }

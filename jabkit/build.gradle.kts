@@ -6,8 +6,6 @@ plugins {
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 
-    id("org.openjfx.javafxplugin") version("0.1.0")
-
     id("com.github.andygoossens.modernizer") version "1.10.0"
     id("org.openrewrite.rewrite") version "7.3.0"
 
@@ -28,11 +26,6 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-migrate-java")
-}
-
-javafx {
-    version = "24"
-    modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web")
 }
 
 jacoco {

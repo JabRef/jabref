@@ -7,8 +7,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
+import org.jabref.gui.util.WebViewStore;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.WebViewStore;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.MathSciNetId;
