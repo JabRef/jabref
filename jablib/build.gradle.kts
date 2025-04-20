@@ -259,7 +259,7 @@ jacoco {
 
 tasks.generateGrammarSource {
     maxHeapSize = "64m"
-    arguments = arguments + listOf("-visitor", "-no-listener", "-long-messages")
+    arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
 xjcGeneration {
