@@ -47,11 +47,3 @@ Diagram showing aspects of groups: [Groups.uml](https://github.com/JabRef/jabref
 For new ADRs, please use [adr-template.md](https://github.com/JabRef/jabref/blob/main/docs/decisions/adr-template.md) as basis.
 More information on MADR is available at <https://adr.github.io/madr/>.
 General information about architectural decision records is available at <https://adr.github.io/>.
-
-## FAQ
-
-* Q: I get `java: package org.jabref.logic.journals does not exist`.
-
-  A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
-
-  Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
