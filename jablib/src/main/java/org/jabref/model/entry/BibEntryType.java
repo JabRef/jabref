@@ -9,7 +9,6 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.gui.importer.BibEntryTypePrefsAndFileViewModel;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
@@ -152,7 +151,7 @@ public class BibEntryType implements Comparable<BibEntryType> {
      *
      * See "<a href="https://biratkirat.medium.com/learning-effective-java-item-10-84cc3ab553bc">Effective Java, Item 10</a>" for a discussion on contracts.
      *
-     * We are sure, we are using this method in a) logs (which should use single lines for output) and b) in the UI. For the UI, we use {@link BibEntryTypePrefsAndFileViewModel},
+     * We are sure, we are using this method in a) logs (which should use single lines for output) and b) in the UI. For the UI, we use {@link org.jabref.gui.importer.BibEntryTypePrefsAndFileViewModel},
      * which in turn uses {@link MetaDataSerializer#serializeCustomEntryTypes(BibEntryType)}
      */
     @Override
