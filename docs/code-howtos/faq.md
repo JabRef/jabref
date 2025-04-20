@@ -39,14 +39,14 @@ Read more about the background and format of localization in JabRef [here](https
 
 ### `org.jabref.logic.citationstyle.CitationStyleCatalogGenerator generateCitationStyleCatalog` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
 
-Check the directory `src/main/resources/csl-styles`.
+Check the directory `jablib/src/main/resources/csl-styles`.
 If it is missing or empty, run `git submodule update`.
 Now, check inside if `ieee.csl` exists.
 If it does not, run `git reset --hard` **inside that directory**.
 
 ### `java.lang.IllegalArgumentException`: Unable to load locale en-US <span style="color:red">ERROR: Could not generate BibEntry citation. The CSL engine could not create a preview for your item.</span>
 
-Check the directory `src/main/resources/csl-locales`.
+Check the directory `jablib/src/main/resources/csl-locales`.
 If it is missing or empty, run `git submodule update`.
 If still not fixed, run `git reset --hard` **inside that directory**.
 
@@ -111,7 +111,7 @@ For `csl-styles`:
 
 ```bash
 git merge origin/main
-git checkout main -- src/main/resources/csl-styles
+git checkout main -- jablib/src/main/resources/csl-styles
 ... git commit ... 
 git push
 ```
@@ -129,7 +129,7 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
 
     ```bash
-    cd src/main/resources/csl-styles
+    cd jablib/src/main/resources/csl-styles
     ```
 
 3. Find the latest submodule commit id from remote (github):
