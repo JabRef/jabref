@@ -80,9 +80,11 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
             }
             if (newValue != null) {
                 isFileRemovable.set(!newValue.isBuiltInListProperty().get());
-                abbreviations.bindBidirectional(newValue.abbreviationsProperty());
-                if (!abbreviations.isEmpty()) {
-                    currentAbbreviation.set(abbreviations.getLast());
+                if (newValue.abbreviationsProperty() != null) {
+                    abbreviations.bindBidirectional(newValue.abbreviationsProperty());
+                    if (!abbreviations.isEmpty()) {
+                        currentAbbreviation.set(abbreviations.getLast());
+                    }
                 }
             } else {
                 isFileRemovable.set(false);
