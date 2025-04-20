@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class KeywordListTest {
 
@@ -114,5 +115,14 @@ class KeywordListTest {
     @Test
     void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
         assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+    }
+
+    @Test
+    void parseKeywordWithEscapedComma() {
+        KeywordList list = KeywordList.parse("AI,Machine\\, Learning,Java", ',');
+        assertEquals(3, list.size());
+        assertTrue(list.contains(new Keyword("AI")));
+        assertTrue(list.contains(new Keyword("Machine, Learning")));
+        assertTrue(list.contains(new Keyword("Java")));
     }
 }
