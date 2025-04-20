@@ -93,7 +93,7 @@ public class OOBibBase {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
             OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, initialStyle);
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, initialStyle, Injector.instantiateModelOrService(BibEntryTypesManager.class);
             cslUpdateBibliography = new CSLUpdateBibliography();
             CSLFormatUtils.setBibliographyProperties(openOfficePreferences);
         }
