@@ -3,6 +3,9 @@ open module org.jabref.jablib {
     requires com.tobiasdiez.easybind;
     requires javafx.graphics;
 
+    // for java.awt.geom.Rectangle2D required by org.jabref.logic.pdf.TextExtractor
+    requires java.desktop;
+
     // SQL
     requires java.sql;
     requires java.sql.rowset;
