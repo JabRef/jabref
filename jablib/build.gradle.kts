@@ -238,3 +238,8 @@ javafx {
 jacoco {
     toolVersion = "0.8.13"
 }
+
+tasks.generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments = arguments + listOf("-visitor", "-no-listener", "-long-messages")
+}
