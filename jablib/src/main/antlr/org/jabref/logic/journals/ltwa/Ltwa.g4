@@ -1,6 +1,10 @@
 grammar Ltwa;
 options { caseInsensitive=true; }
 
+@header{
+package org.jabref.logic.journals.ltwa;
+}
+
 @lexer::members {
     private boolean isNextBoundary() {
         int lookAhead = _input.LA(1);
