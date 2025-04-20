@@ -1,4 +1,6 @@
 open module org.jabref {
+    requires org.jabref.jablib;
+
     // Swing
     requires java.desktop;
 

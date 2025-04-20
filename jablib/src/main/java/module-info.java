@@ -67,7 +67,6 @@ open module org.jabref.jablib {
     requires com.google.common;
     requires io.github.javadiffutils;
     requires java.string.similarity;
-    //OK requires org.apache.commons.cli;
     requires org.apache.commons.compress;
     requires org.apache.commons.csv;
     requires org.apache.commons.io;

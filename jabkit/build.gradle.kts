@@ -19,37 +19,9 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":jabkit"))
+    implementation(project(":jablib"))
 
-    implementation("org.jabref:afterburner.fx:2.0.0") {
-        exclude( group = "org.openjfx")
-    }
-    implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
-    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.3.1")
-    implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    implementation("de.saxsys:mvvmfx:1.8.0")
-    implementation("org.fxmisc.flowless:flowless:0.7.4")
-    implementation("org.fxmisc.richtext:richtextfx:0.11.5")
-    implementation("com.dlsc.gemsfx:gemsfx:2.96.0") {
-        exclude(module = "javax.inject") // Split package, use only jakarta.inject
-        exclude(module = "commons-lang3")
-        exclude(group = "org.apache.commons.validator")
-        exclude(group = "org.apache.commons.commons-logging")
-        exclude(module = "kotlin-stdlib-jdk8")
-        exclude(group = "com.squareup.retrofit2")
-        exclude(group = "org.openjfx")
-        exclude(group = "org.apache.logging.log4j")
-        exclude(group = "tech.units")
-    }
-
-    // Required by gemsfx
-    implementation("tech.units:indriya:2.2.2")
-    // Required by gemsfx and langchain4j
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0") {
-        exclude(group = "com.squareup.okhttp3")
-    }
-
-    implementation("org.controlsfx:controlsfx:11.2.2")
+    implementation("commons-cli:commons-cli:1.9.0")
 
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")

@@ -1,8 +1,57 @@
 plugins {
     id("buildlogic.java-common-conventions")
     application
+
+    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
+    id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
+
+    id("com.github.andygoossens.modernizer") version "1.10.0"
+    id("org.openrewrite.rewrite") version "7.3.0"
+
+    // nicer test outputs during running and completion
+    // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
+    id("com.adarshr.test-logger") version "4.0.0"
+
+    id("org.itsallcode.openfasttrace") version "3.0.1"
 }
 
 dependencies {
-    implementation(project(":jabkit"))
+    implementation(project(":jablib"))
+
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.tinylog:tinylog-api:2.7.0")
+    implementation("org.tinylog:slf4j-tinylog:2.7.0")
+    implementation("org.tinylog:tinylog-impl:2.7.0")
+    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
+    implementation("org.slf4j:jul-to-slf4j:2.0.17")
+    // route all requests to log4j to SLF4J
+    implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
+
+    // API
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
+
+    // Implementation of the API
+    implementation("org.glassfish.jersey.core:jersey-server:3.1.10")
+
+    // Injection framework
+    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
+    implementation("org.glassfish.hk2:hk2-api:3.1.1")
+
+    // testImplementation("org.glassfish.hk2:hk2-testing:3.0.4")
+    // implementation("org.glassfish.hk2:hk2-testing-jersey:3.0.4")
+    // testImplementation("org.glassfish.hk2:hk2-junitrunner:3.0.4")
+
+    // HTTP server
+    // implementation("org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1")
+    implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
+    testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
+
+    // Allow objects "magically" to be mapped to JSON using GSON
+    // implementation("org.glassfish.jersey.media:jersey-media-json-gson:3.1.1")
+
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
 }
