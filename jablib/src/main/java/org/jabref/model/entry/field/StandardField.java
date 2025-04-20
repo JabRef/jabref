@@ -7,12 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.jabref.gui.fieldeditors.FieldNameLabel;
-
 /**
  * Standard BibTeX and BibLaTeX fields, as well as "normal" JabRef specific fields.
  * <p>
- * See {@link FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
+ * See {@link org.jabref.gui.fieldeditors.FieldNameLabel#getDescription(org.jabref.model.entry.field.Field)} for a description of each field.
  */
 public enum StandardField implements Field {
     ABSTRACT("abstract", FieldProperty.MULTILINE_TEXT),
