@@ -12,10 +12,12 @@ pluginManagement {
 
     repositories {
         maven {
-            url = 'https://jitpack.io'
+            url = uri("https://jitpack.io")
         }
         gradlePluginPortal()
     }
+
+    includeBuild("build-logic")
 }
 
 plugins {
@@ -23,3 +25,7 @@ plugins {
 }
 
 rootProject.name = "JabRef"
+
+// include("jablib", "jabkit", "jabref", "jabserv")
+
+include("jablib")
