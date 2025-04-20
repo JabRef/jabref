@@ -11,6 +11,22 @@ open module org.jabref.jablib {
     exports org.jabref.model.util;
     exports org.jabref.logic.preferences;
     exports org.jabref.logic.importer;
+    exports org.jabref.logic.bibtex;
+    exports org.jabref.logic.citationkeypattern;
+    exports org.jabref.logic.exporter;
+    exports org.jabref.logic.importer.fileformat;
+    exports org.jabref.logic.journals;
+    exports org.jabref.logic.l10n;
+    exports org.jabref.logic.net;
+    exports org.jabref.logic.os;
+    exports org.jabref.logic.quality.consistency;
+    exports org.jabref.logic.shared.prefs;
+    exports org.jabref.logic.util;
+    exports org.jabref.logic.util.io;
+    exports org.jabref.logic.xmp;
+    exports org.jabref.model.database;
+    exports org.jabref.model.entry;
+    exports org.jabref.model.strings;
 
     requires javafx.base;
     requires com.tobiasdiez.easybind;
