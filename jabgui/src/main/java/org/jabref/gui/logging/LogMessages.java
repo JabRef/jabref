@@ -1,4 +1,4 @@
-package org.jabref.logic.logging;
+package org.jabref.gui.logging;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
