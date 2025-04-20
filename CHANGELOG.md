@@ -92,7 +92,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where BibTeX Strings were not included in the backup file [#12462](https://github.com/JabRef/jabref/issues/12462)
 - We fixed an issue where mixing JStyle and CSL style citations in LibreOffice caused two separate bibliography sections to be generated. [#12262](https://github.com/JabRef/jabref/issues/12262)
 - We fixed an issue in the LibreOffice integration where the formatting of text (e.g. superscript) was lost when using certain numeric CSL styles. [melting-pot#772](https://github.com/JabRef/jabref-issue-melting-pot/issues/772)
-- We fixed an issue where CSL style citations with citation keys having special characters (such as hyphens or colons) would not be recognized as valid by JabRef. [forum#5431](https://discourse.jabref.org/t/error-when-connecting-to-libreoffice/5431)
+- We fixed an issue where CSL style citations with citation keys having special characters (such as hyphens, colons or slashes) would not be recognized as valid by JabRef. [forum#5431](https://discourse.jabref.org/t/error-when-connecting-to-libreoffice/5431)
 - We fixed an issue where the `[authorsAlpha]` pattern in Citation key generator would not behave as per the user documentation. [#12312](https://github.com/JabRef/jabref/issues/12312)
 - We fixed an issue where import at "Search for unlinked local files" would re-add already imported files. [#12274](https://github.com/JabRef/jabref/issues/12274)
 - We fixed an issue where month values 21–24 (ISO 8601-2019 season codes) in Biblatex date fields were not recognized as seasons during parsing. [#12437](https://github.com/JabRef/jabref/issues/12437)
