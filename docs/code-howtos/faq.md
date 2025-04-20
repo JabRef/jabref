@@ -5,6 +5,11 @@ parent: Code Howtos
 
 Following is a list of common errors encountered by developers which lead to failing tests, with their common solutions:
 
+## git hints
+
+* Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
+* Branches and pull requests(🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
+
 ## Failing tests
 
 ### Failing <b>Checkstyle</b> tests
