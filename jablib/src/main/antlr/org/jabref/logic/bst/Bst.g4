@@ -1,5 +1,9 @@
 grammar Bst;
 
+@header {
+package org.jabref.logic.bst;
+}
+
 // Lexer
 
 STRINGS : 'STRINGS';
