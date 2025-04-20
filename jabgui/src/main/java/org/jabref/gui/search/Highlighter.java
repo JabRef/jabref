@@ -1,4 +1,4 @@
-package org.jabref.logic.search.retrieval;
+package org.jabref.gui.search;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

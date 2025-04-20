@@ -15,6 +15,8 @@ plugins {
     id("org.itsallcode.openfasttrace") version "3.0.1"
 }
 
+val luceneVersion = "10.2.0"
+
 dependencies {
     implementation(project(":jablib"))
 
@@ -56,6 +58,14 @@ dependencies {
     }
 
     implementation("org.controlsfx:controlsfx:11.2.2")
+
+    implementation("org.apache.lucene:lucene-core:${luceneVersion}")
+    implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
+    implementation("org.apache.lucene:lucene-queries:${luceneVersion}")
+    implementation("org.apache.lucene:lucene-analysis-common:${luceneVersion}")
+    implementation("org.apache.lucene:lucene-highlighter:${luceneVersion}")
+
+    implementation("org.jsoup:jsoup:1.19.1")
 
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")

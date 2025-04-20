@@ -31,7 +31,6 @@ import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResults;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,14 +46,13 @@ public class IndexManager {
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
 
-    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, CliPreferences preferences) {
+    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, CliPreferences preferences, PostgreServer postgreServer) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
         this.preferencesListener = (observable, oldValue, newValue) -> bindToPreferences(newValue);
         this.shouldIndexLinkedFiles.addListener(preferencesListener);
 
-        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
         bibFieldsIndexer = new BibFieldsIndexer(preferences.getBibEntryPreferences(), databaseContext, postgreServer.getConnection());
 
         LuceneIndexer indexer;

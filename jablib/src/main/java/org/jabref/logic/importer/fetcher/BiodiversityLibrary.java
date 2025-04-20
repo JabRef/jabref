@@ -28,7 +28,8 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
-import org.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetches data from the Biodiversity Heritage Library
@@ -37,6 +38,8 @@ import org.tinylog.Logger;
  */
 public class BiodiversityLibrary implements SearchBasedParserFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Biodiversity Heritage";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BiodiversityLibrary.class);
 
     private static final String BASE_URL = "https://www.biodiversitylibrary.org/api3";
     private static final String RESPONSE_FORMAT = "json";
@@ -91,7 +94,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
     public JSONObject getDetails(URL url) throws FetcherException {
         URLDownload download = new URLDownload(url);
         String response = download.asString();
-        Logger.debug("Response {}", response);
+        LOGGER.debug("Response {}", response);
         return new JSONObject(response).getJSONArray("Result").getJSONObject(0);
     }
 

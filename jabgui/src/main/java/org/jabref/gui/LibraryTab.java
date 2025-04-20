@@ -69,6 +69,7 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.search.IndexManager;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -290,7 +291,7 @@ public class LibraryTab extends Tab {
     }
 
     public void createIndexManager() {
-        indexManager = new IndexManager(bibDatabaseContext, taskExecutor, preferences);
+        indexManager = new IndexManager(bibDatabaseContext, taskExecutor, preferences, Injector.instantiateModelOrService(PostgreServer.class));
         stateManager.setIndexManager(bibDatabaseContext, indexManager);
     }
 

@@ -17,12 +17,15 @@ import org.jabref.model.openoffice.uno.UnoScreenRefresh;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextDocument;
-import org.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Update document: citation marks and bibliography
  */
 public class Update {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Update.class);
 
     private Update() {
     }
@@ -65,7 +68,7 @@ public class Update {
 
             return frontend.citationGroups.getUnresolvedKeys();
         } catch (IOException e) {
-            Logger.warn("Error while updating document", e);
+            LOGGER.warn("Error while updating document", e);
         } finally {
             if (useLockControllers && UnoScreenRefresh.hasControllersLocked(doc)) {
                 UnoScreenRefresh.unlockControllers(doc);

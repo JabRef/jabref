@@ -1,4 +1,16 @@
 open module org.jabref.jablib {
+    exports org.jabref.model;
+    exports org.jabref.logic;
+
+    exports org.jabref.search;
+    exports org.jabref.migrations;
+    exports org.jabref.logic.search;
+    exports org.jabref.logic.search.query;
+    exports org.jabref.model.entry.field;
+    exports org.jabref.model.search;
+    exports org.jabref.model.search.query;
+    exports org.jabref.model.util;
+
     requires javafx.base;
     requires com.tobiasdiez.easybind;
     requires javafx.graphics;
