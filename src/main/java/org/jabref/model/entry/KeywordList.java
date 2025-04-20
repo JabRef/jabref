@@ -51,14 +51,34 @@ public class KeywordList implements Iterable<Keyword> {
         Objects.requireNonNull(delimiter);
         Objects.requireNonNull(hierarchicalDelimiter);
 
-        KeywordList keywordList = new KeywordList();
+        List<String> keywords = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean escaping = false;
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+        for (char ch : keywordString.toCharArray()) {
+            if (escaping) {
+                current.append(ch);
+                escaping = false;
+            } else if (ch == '\\') {
+                escaping = true;
+            } else if (ch == delimiter) {
+                keywords.add(current.toString().trim());
+                current.setLength(0);
+            } else {
+                current.append(ch);
+            }
+        }
+
+        if (current.length() > 0) {
+            keywords.add(current.toString().trim());
+        }
+
+        KeywordList keywordList = new KeywordList();
+        for (String keyword : keywords) {
+            Keyword chainRoot = Keyword.of(keyword.split(hierarchicalDelimiter.toString()));
             keywordList.add(chainRoot);
         }
+
         return keywordList;
     }
 
@@ -67,14 +87,18 @@ public class KeywordList implements Iterable<Keyword> {
      *
      * @param keywordString a String of keywordChains
      * @param delimiter     The delimiter used for separating the keywords
-     * @return an parsed list containing the keywordChains
+     * @return a parsed list containing the keywordChains
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
-        return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));
+        return keywords.stream()
+                .map(keyword -> keyword.get()
+                        .replace("\\", "\\\\") // escape backslashes
+                        .replace(delimiter.toString(), "\\" + delimiter)) // escape delimiters
+                .collect(Collectors.joining(delimiter.toString()));
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
