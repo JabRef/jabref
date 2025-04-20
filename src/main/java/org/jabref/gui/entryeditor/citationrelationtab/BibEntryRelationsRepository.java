@@ -2,8 +2,8 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.List;
 
-import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.citation.SemanticScholarFetcher;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;

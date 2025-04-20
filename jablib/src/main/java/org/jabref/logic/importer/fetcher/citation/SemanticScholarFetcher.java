@@ -1,4 +1,4 @@
-package org.jabref.gui.entryeditor.citationrelationtab.semanticscholar;
+package org.jabref.logic.importer.fetcher.citation;
 
 import java.net.MalformedURLException;
 import java.net.URL;
