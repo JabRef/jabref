@@ -1,4 +1,6 @@
 open module org.jabref.jablib {
+    requires javafx.base;
+
     // SQL
     requires java.sql;
     requires java.sql.rowset;
@@ -25,18 +27,18 @@ open module org.jabref.jablib {
     // endregion
 
     // region: data mapping
-    requires jakarta.xml.bind;
+    //OK requires jakarta.xml.bind;
     requires jdk.xml.dom;
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     // needs to be loaded here as it's otherwise not found at runtime
-    requires org.glassfish.jaxb.runtime;
+    //OK requires org.glassfish.jaxb.runtime;
     // endregion
 
     // dependency injection using HK2
-    requires org.glassfish.hk2.api;
+    //OK requires org.glassfish.hk2.api;
 
     // region HTTP clients
     requires org.apache.httpcomponents.core5.httpcore5;
@@ -58,7 +60,7 @@ open module org.jabref.jablib {
     requires com.google.common;
     requires io.github.javadiffutils;
     requires java.string.similarity;
-    requires org.apache.commons.cli;
+    //OK requires org.apache.commons.cli;
     requires org.apache.commons.compress;
     requires org.apache.commons.csv;
     requires org.apache.commons.io;
