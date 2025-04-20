@@ -44,6 +44,7 @@ open module org.jabref.jablib {
 
     // region HTTP clients
     requires java.net.http;
+    requires jakarta.ws.rs;
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
     requires unirest.java.core;
