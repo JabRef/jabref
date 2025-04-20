@@ -1,10 +1,10 @@
 package org.jabref.migrations;
 
+import javafx.beans.property.BooleanProperty;
+
 import org.jabref.gui.StateManager;
 
 import com.airhacks.afterburner.injection.Injector;
-
-import javafx.beans.property.BooleanProperty;
 
 public class MSCMigration {
     
@@ -14,10 +14,7 @@ public class MSCMigration {
         stateManager = Injector.instantiateModelOrService(StateManager.class);
     }
 
-    public BooleanProperty isEditorOpen(){
+    public BooleanProperty isEditorOpen() {
         return stateManager.getEditorShowing();
     }
-
-
-
 }

@@ -125,7 +125,6 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             isEditorOpen = tool.isEditorOpen();
 
             if (!Platform.isFxApplicationThread() && isEditorOpen.get()) {
-                
                 // If the thread is not JavaFX and Editor is showing avoid error by adding to queue
                 Platform.runLater(() -> {
                     entry.setField(StandardField.KEYWORDS, newValue);

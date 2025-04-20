@@ -38,8 +38,7 @@ public class CleanupWorker {
 
         List<CleanupJob> jobs = determineCleanupActions(preset);
         List<FieldChange> changes = new ArrayList<>();
-        for (CleanupJob job : jobs) {
-            
+        for (CleanupJob job : jobs) { 
             changes.addAll(job.cleanup(entry));
             
             if (job instanceof MoveFilesCleanup cleanup) {
