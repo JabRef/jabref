@@ -1,0 +1,58 @@
+\documentclass[conference,a4paper,english]{IEEEtran}[2015/08/26]
+
+\usepackage{lipsum}
+\usepackage{hyperref}
+\usepackage[keeplastbox]{flushend}
+
+\begin{document}
+\title{Testing Slashes in Citation Keys and Author Names}
+\author{%
+  \IEEEauthorblockN{Your Name}
+  \IEEEauthorblockA{University of Examples, Germany\\
+    \{lastname\}@example.org}
+}
+
+\maketitle
+
+\begin{abstract}
+This document demonstrates the citation of references that contain slashes not only in author names but also in the citation keys themselves. It is meant as a comprehensive test case for reference management systems.
+\end{abstract}
+
+\section{Introduction}
+\lipsum[2]
+
+\section{Testing Slashes in Citation Keys}
+In this section, we test citation keys that contain slashes.
+
+Basic citations with slashed keys:
+\begin{itemize}
+  \item Simple slash in key \cite{pgf/tikz}
+  \item Multiple slashes in key \cite{html/css/js}
+  \item Slash at beginning of key \cite{/leading}
+  \item Slash at end of key \cite{trailing/}
+  \item Slash with special characters \cite{test@/example}
+  \item Slashes and numbers \cite{doi/10.1000/xyz123}
+  \item Slashes and underscores \cite{acm/ieee_joint}
+\end{itemize}
+
+\section{Testing Different Citation Styles}
+Testing different citation command styles with slashed keys:
+\begin{itemize}
+  \item Normal cite: \cite{pgf/tikz}
+  \item Text cite: \citet{r/qtl}
+  \item Parenthetical cite: \citep{java/jakarta}
+  \item Year only: \citeyear{gnu/linux}
+  \item Author only: \citeauthor{ios/android}
+  \item Multiple citations: \cite{pgf/tikz,r/qtl,java/jakarta}
+\end{itemize}
+
+\section{Combining Author Names and Keys with Slashes}
+We also cite references that have both slashes in author names and in their citation keys \cite{w3c/html/css}.
+
+\section{Conclusion}
+\lipsum[4]
+
+\bibliographystyle{IEEEtran}
+\bibliography{slash-keys}
+
+\end{document}
