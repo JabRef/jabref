@@ -26,7 +26,6 @@ java {
         // If this is updated, also update
         // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
         // - .devcontainer/devcontainer.json#L34 and
-        // - .gitpod.Dockerfile
         // - .moderne/moderne.yml
         // - .github/workflows/deployment*.yml
         // - .github/workflows/tests*.yml
