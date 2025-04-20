@@ -40,7 +40,7 @@ open module org.jabref.jablib {
     // endregion
 
     // dependency injection using HK2
-    //OK requires org.glassfish.hk2.api;
+    requires org.glassfish.hk2.api;
 
     // region HTTP clients
     requires java.net.http;
