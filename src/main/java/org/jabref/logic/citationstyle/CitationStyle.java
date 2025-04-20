@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.util.StandardFileType;
 
 /**
  * Representation of a CitationStyle. Stores its name, the file path and the style itself.
@@ -34,13 +33,6 @@ public class CitationStyle implements OOStyle {
      */
     public CitationStyle(String filePath, String title, boolean isNumericStyle, String source) {
         this(filePath, title, isNumericStyle, source, !Path.of(filePath).isAbsolute());
-    }
-
-    /**
-     * Checks if the given style file is a CitationStyle based on its extension
-     */
-    public static boolean isCitationStyleFile(String styleFile) {
-        return StandardFileType.CITATION_STYLE.getExtensions().stream().anyMatch(styleFile::endsWith);
     }
 
     public String getTitle() {
