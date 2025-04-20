@@ -5,6 +5,8 @@ src-gen/
 
 .lycheecache
 
+.kotlin
+
 javafx/javafx-sdk-*
 javafx/javafx-jmods-*
 javafx/javafx.html
