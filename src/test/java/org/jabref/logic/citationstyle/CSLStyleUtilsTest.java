@@ -6,9 +6,11 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,6 +22,39 @@ class CSLStyleUtilsTest {
     private static final String MODIFIED_IEEE = "ieee-bold-author.csl";
     private static final String MODIFIED_APA = "modified-apa.csl";
     private static final String LITERATURA = "literatura.csl";
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "ieee.csl",
+            "apa.csl",
+            "harvard.csl",
+            "vancouver.csl",
+            "/path/to/style/nature.csl",
+            "C:\\Users\\username\\Documents\\styles\\chicago.csl"
+    })
+    void acceptsCslExtension(String filename) {
+        assertTrue(CSLStyleUtils.isCitationStyleFile(filename));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "ieee.txt",
+            "apa.xml",
+            "harvard.css",
+            "vancouver",
+            "nature.",
+            "",
+            "chicago.CSL" // case sensitivity - should reject
+    })
+    void rejectsNonCslExtension(String filename) {
+        assertFalse(CSLStyleUtils.isCitationStyleFile(filename));
+    }
+
+    @Test
+    void acceptsFilenameWithMultipleDots() {
+        assertTrue(CSLStyleUtils.isCitationStyleFile("ieee.modified.csl"));
+        assertTrue(CSLStyleUtils.isCitationStyleFile("apa.v7.csl"));
+    }
 
     @ParameterizedTest
     @MethodSource("styleTestData")

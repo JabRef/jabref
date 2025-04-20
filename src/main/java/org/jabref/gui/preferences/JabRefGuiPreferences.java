@@ -49,7 +49,6 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.logic.bst.BstPreviewLayout;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -905,7 +904,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return cycle.stream()
                     .map(layout -> {
-                        if (CitationStyle.isCitationStyleFile(layout)) {
+                        if (CSLStyleUtils.isCitationStyleFile(layout)) {
                             BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
                             return CSLStyleUtils.createCitationStyleFromFile(layout)
                                                 .map(file -> (PreviewLayout) new CitationStylePreviewLayout(file, entryTypesManager))

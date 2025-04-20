@@ -45,7 +45,6 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.cleanup.CleanupPreferences;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -1124,7 +1123,7 @@ public class JabRefCliPreferences implements CliPreferences {
         OOStyle currentStyle = CSLStyleLoader.getDefaultStyle(); // Defaults to IEEE CSL Style
 
         // Reassign currentStyle based on actual last used CSL style or JStyle
-        if (CitationStyle.isCitationStyleFile(currentStylePath)) {
+        if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
             currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
                                         .orElse(CSLStyleLoader.getDefaultStyle());
         } else {
