@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.Optional;
 
-import org.jabref.http.dto.SimpleHttpResponse;
+import org.jabref.model.http.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.jabref.http.dto.SimpleHttpResponse;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FulltextFetcher;
@@ -17,6 +16,7 @@ import org.jabref.logic.importer.fileformat.CiteSeerParser;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.http.SimpleHttpResponse;
 
 import kong.unirest.core.HttpResponse;
 import kong.unirest.core.JsonNode;

@@ -1,4 +1,4 @@
-package org.jabref.http.dto;
+package org.jabref.model.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;

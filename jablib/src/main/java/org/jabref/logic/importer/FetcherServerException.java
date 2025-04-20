@@ -2,7 +2,7 @@ package org.jabref.logic.importer;
 
 import java.net.URL;
 
-import org.jabref.http.dto.SimpleHttpResponse;
+import org.jabref.model.http.SimpleHttpResponse;
 
 /**
  *  Should be thrown when you encounter a http status code error >= 500
