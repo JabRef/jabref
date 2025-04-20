@@ -9,7 +9,6 @@ import java.util.TreeMap;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import org.jabref.gui.StateManager;
 import org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
@@ -29,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Main class for getting and storing chat history for entries and groups.
  * Use this class <s>in logic and</s> UI.
- * It currently resides in the UI package because it relies on the {@link StateManager} to get the open databases and to find the correct {@link BibDatabaseContext} based on an entry.
+ * It currently resides in the UI package because it relies on the {@link org.jabref.gui.StateManager} to get the open databases and to find the correct {@link BibDatabaseContext} based on an entry.
  * <p>
  * The returned chat history is a {@link ObservableList}. So chat history exists for every possible
  * {@link BibEntry} and {@link AbstractGroup}. The chat history is stored in runtime.
