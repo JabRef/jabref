@@ -6,6 +6,10 @@
 grammar Search;
 options { caseInsensitive = true; }
 
+@header {
+package org.jabref.search;
+}
+
 WS: [ \t\n\r]+ -> skip; // whitespace is ignored/skipped
 
 LPAREN: '(';
