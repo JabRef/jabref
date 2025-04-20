@@ -29,7 +29,7 @@ open module org.jabref.jablib {
     // endregion
 
     // region: data mapping
-    //OK requires jakarta.xml.bind;
+    requires jakarta.xml.bind;
     requires jdk.xml.dom;
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;

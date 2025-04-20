@@ -30,10 +30,12 @@ plugins {
 
     id("org.itsallcode.openfasttrace") version "3.0.1"
 
+    id("com.github.edeandrea.xjc-generation") version "1.6"
 }
 
 val pdfbox = "3.0.4"
 val luceneVersion = "10.2.0"
+val jaxbVersion by extra { "4.0.3" }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
@@ -87,6 +89,9 @@ dependencies {
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3")
+
+    // required by XJC
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 
     implementation("com.fasterxml:aalto-xml:1.3.3")
 
@@ -227,6 +232,15 @@ dependencies {
             select("com.google.guava:guava:0")
        }
     }
+
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
+
+    "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
+    "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }
 
 javafx {
@@ -246,4 +260,16 @@ jacoco {
 tasks.generateGrammarSource {
     maxHeapSize = "64m"
     arguments = arguments + listOf("-visitor", "-no-listener", "-long-messages")
+}
+
+xjcGeneration {
+    // plugin: https://github.com/edeandrea/xjc-generation-gradle-plugin#xjc-generation-gradle-plugin
+    // hint by https://stackoverflow.com/questions/62776832/how-to-generate-java-classes-from-xsd-using-java-11-and-gradle#comment130555840_62776832
+    defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
+    schemas {
+        create("citavi") {
+            schemaFile = "citavi/citavi.xsd"
+            javaPackageName = "org.jabref.logic.importer.fileformat.citavi"
+        }
+    }
 }
