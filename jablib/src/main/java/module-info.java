@@ -1,5 +1,6 @@
 open module org.jabref.jablib {
     requires javafx.base;
+    requires com.tobiasdiez.easybind;
 
     // SQL
     requires java.sql;
@@ -41,6 +42,7 @@ open module org.jabref.jablib {
     //OK requires org.glassfish.hk2.api;
 
     // region HTTP clients
+    requires java.net.http;
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
     requires unirest.java.core;

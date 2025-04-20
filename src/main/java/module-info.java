@@ -22,8 +22,6 @@ open module org.jabref {
     // Provides number input fields for parameters in AI expert settings
     requires com.dlsc.unitfx;
 
-    requires com.tobiasdiez.easybind;
-
     requires de.saxsys.mvvmfx;
     requires de.saxsys.mvvmfx.validation;
 
@@ -70,7 +68,6 @@ open module org.jabref {
     // endregion
 
     // region: http server and client exchange
-    requires java.net.http;
     requires jakarta.ws.rs;
     requires org.glassfish.grizzly;
     // endregion

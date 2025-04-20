@@ -104,6 +104,10 @@ dependencies {
 
     implementation("com.google.guava:guava:33.4.8-jre")
 
+    implementation("org.jabref:easybind:2.2.1-SNAPSHOT") {
+        exclude(group = "org.openjfx")
+    }
+
     implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
 
