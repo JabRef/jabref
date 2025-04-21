@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -23,14 +24,23 @@ import org.slf4j.LoggerFactory;
  * A repository for LTWA (List of Title Word Abbreviations) entries.
  * Provides methods for retrieving and applying abbreviations based on LTWA rules.
  */
-@SuppressWarnings("checkstyle:RegexpMultiline")
 public class LtwaRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaRepository.class);
     private static final Pattern INFLECTION = Pattern.compile("[ieasn'’]{1,3}");
     private static final Pattern BOUNDARY = Pattern.compile("[\\s\\u2013\\u2014_.,:;!|=+*\\\\/\"()&#%@$?]");
+    private static final String PREFIX_MAP_NAME = "Prefixes";
+    private static final String SUFFIX_MAP_NAME = "Suffixes";
 
-    private final PrefixTree<LtwaEntry> prefix = new PrefixTree<>();
-    private final PrefixTree<LtwaEntry> suffix = new PrefixTree<>();
+    private final PrefixTree<LtwaEntry> prefix;
+    private final PrefixTree<LtwaEntry> suffix;
+
+    /**
+     * Creates an empty LtwaRepository.
+     */
+    public LtwaRepository() {
+        this.prefix = new PrefixTree<>();
+        this.suffix = new PrefixTree<>();
+    }
 
     /**
      * Creates a new LtwaRepository from an MV store file.
@@ -38,19 +48,21 @@ public class LtwaRepository {
      * @param ltwaListFile Path to the LTWA MVStore file
      */
     public LtwaRepository(Path ltwaListFile) {
-        try (var store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open()) {
-            MVMap<String, List<LtwaEntry>> prefixMap = store.openMap("Prefixes");
-            MVMap<String, List<LtwaEntry>> suffixMap = store.openMap("Suffixes");
+        this();
+
+        try (MVStore store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open()) {
+            MVMap<String, List<LtwaEntry>> prefixMap = store.openMap(PREFIX_MAP_NAME);
+            MVMap<String, List<LtwaEntry>> suffixMap = store.openMap(SUFFIX_MAP_NAME);
 
             for (String key : prefixMap.keySet()) {
-                var value = prefixMap.get(key);
+                List<LtwaEntry> value = prefixMap.get(key);
                 if (value != null) {
                     prefix.insert(key, value);
                 }
             }
 
             for (String key : suffixMap.keySet()) {
-                var value = suffixMap.get(key);
+                List<LtwaEntry> value = suffixMap.get(key);
                 if (value != null) {
                     suffix.insert(key, value);
                 }
@@ -60,9 +72,6 @@ public class LtwaRepository {
         }
     }
 
-    public LtwaRepository() {
-    }
-
     /**
      * Abbreviates a given title using the ISO4 rules.
      *
@@ -70,7 +79,11 @@ public class LtwaRepository {
      * @return The abbreviated title
      */
     public Optional<String> abbreviate(String title) {
-        return Optional.ofNullable(title)
+        if (title == null || title.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(title)
                        .flatMap(NormalizeUtils::toNFKC)
                        .flatMap(normalizedTitle -> {
                            CharStream charStream = CharStreams.fromString(normalizedTitle);
@@ -164,7 +177,7 @@ public class LtwaRepository {
             }
 
             String remainingTitle = originalTitle.substring(position);
-            Optional<String> normalizedOpt = NormalizeUtils.normalize(originalTitle.substring(position))
+            Optional<String> normalizedOpt = NormalizeUtils.normalize(remainingTitle)
                                                            .map(String::toLowerCase);
 
             if (normalizedOpt.isEmpty()) {
@@ -175,37 +188,50 @@ public class LtwaRepository {
 
             String normalizedRemaining = normalizedOpt.get();
 
-            List<LtwaEntry> matchingEntries = Stream.concat(
-                                                            prefix.search(normalizedRemaining).stream(),
-                                                            suffix.search(reverse(normalizedRemaining)).stream())
-                                                    .filter(e -> matches(normalizedRemaining, e))
-                                                    .toList();
+            List<LtwaEntry> matchingEntries = findMatchingEntries(normalizedRemaining);
 
             if (matchingEntries.isEmpty()) {
                 appendWithSpace(initialText);
                 return;
             }
 
-            Optional<LtwaEntry> bestEntryOpt = matchingEntries.stream()
-                                                              .max(Comparator
-                                                                      .<LtwaEntry>comparingInt(e -> e.word().endsWith("-") ? 1 : 0)
-                                                                      .thenComparingInt(e -> e.word().length())
-                                                                      .thenComparingInt(e -> e.abbreviation() != null ? 1 : 0)
-                                                                      .thenComparingInt(e -> e.languages().contains("eng") ? 1 : 0));
+            LtwaEntry bestEntry = findBestEntry(matchingEntries).get();
 
-            LtwaEntry entry = bestEntryOpt.get();
-            if (entry.abbreviation() == null) {
+            if (bestEntry.abbreviation() == null) {
                 appendWithSpace(initialText);
                 return;
             }
 
-            abbreviatedTitlePosition += entry.word().length();
-            Optional<String> matchedOpt = restoreCapitalizationAndDiacritics(entry.abbreviation(), remainingTitle);
+            abbreviatedTitlePosition += bestEntry.word().length();
+            Optional<String> matchedOpt = restoreCapitalizationAndDiacritics(bestEntry.abbreviation(), remainingTitle);
             if (matchedOpt.isPresent()) {
                 appendWithSpace(matchedOpt.get());
             } else {
                 error = true;
             }
+        }
+
+        /**
+         * Find matching entries from prefix and suffix trees
+         */
+        private List<LtwaEntry> findMatchingEntries(String normalizedText) {
+            return Stream.concat(
+                                 prefix.search(normalizedText).stream(),
+                                 suffix.search(reverse(normalizedText)).stream())
+                         .filter(e -> matches(normalizedText, e))
+                         .toList();
+        }
+
+        /**
+         * Find the best entry based on prioritization criteria
+         */
+        private Optional<LtwaEntry> findBestEntry(List<LtwaEntry> entries) {
+            return entries.stream()
+                          .max(Comparator
+                                  .<LtwaEntry>comparingInt(e -> e.word().endsWith("-") ? 1 : 0)
+                                  .thenComparingInt(e -> e.word().length())
+                                  .thenComparingInt(e -> e.abbreviation() != null ? 1 : 0)
+                                  .thenComparingInt(e -> e.languages().contains("eng") ? 1 : 0));
         }
 
         @Override
@@ -254,7 +280,14 @@ public class LtwaRepository {
         }
     }
 
+    /**
+     * Restore capitalization and diacritics from the original text to the abbreviation
+     */
     private static Optional<String> restoreCapitalizationAndDiacritics(String abbreviation, String original) {
+        if (abbreviation == null || original == null) {
+            return Optional.empty();
+        }
+
         int abbrCodePointCount = abbreviation.codePointCount(0, abbreviation.length());
         int origCodePointCount = original.codePointCount(0, original.length());
 
@@ -269,22 +302,36 @@ public class LtwaRepository {
                                  int[] resultCodePoints = Arrays.copyOf(normalizedAbbrCodePoints,
                                          Math.min(normalizedAbbrCodePoints.length, origCodePoints.length));
                                  IntStream.range(0, resultCodePoints.length)
-                                          .forEach(i -> {
-                                              String normalizedAbbrChar = new String(Character.toChars(normalizedAbbrCodePoints[i]));
-                                              String origChar = new String(Character.toChars(origCodePoints[i]));
-
-                                              NormalizeUtils.toNFKC(origChar)
-                                                            .filter(normalizedOrigChar -> !normalizedOrigChar.isEmpty() &&
-                                                                    normalizedAbbrChar.equalsIgnoreCase(normalizedOrigChar))
-                                                            .ifPresent(_ -> resultCodePoints[i] = origCodePoints[i]);
-                                          });
+                                          .forEach(i -> preserveOriginalCharacterProperties(
+                                                  normalizedAbbrCodePoints[i],
+                                                  origCodePoints[i],
+                                                  resultCodePoints,
+                                                  i));
 
                                  return new String(resultCodePoints, 0, resultCodePoints.length);
                              });
     }
 
+    /**
+     * Helper method to preserve original character properties (case, diacritics)
+     */
+    private static void preserveOriginalCharacterProperties(
+            int normalizedChar, int originalChar, int[] resultCodePoints, int index) {
+
+        String normalizedCharStr = new String(Character.toChars(normalizedChar));
+        String origCharStr = new String(Character.toChars(originalChar));
+
+        NormalizeUtils.toNFKC(origCharStr)
+                      .filter(normalizedOrigChar -> !normalizedOrigChar.isEmpty() &&
+                              normalizedCharStr.equalsIgnoreCase(normalizedOrigChar))
+                      .ifPresent(_ -> resultCodePoints[index] = originalChar);
+    }
+
+    /**
+     * Determines if a title matches an LTWA entry
+     */
     private static boolean matches(String title, LtwaEntry entry) {
-        var word = entry.word();
+        String word = entry.word();
         int margin = (word.startsWith("-") ? 1 : 0) + (word.endsWith("-") ? 1 : 0);
         if (title.length() < word.length() - margin) {
             return false;
@@ -295,38 +342,55 @@ public class LtwaRepository {
             title = reverse(title);
         }
 
+        return matchesInternal(title, word);
+    }
+
+    /**
+     * Internal matching logic after handling special cases
+     */
+    private static boolean matchesInternal(String title, String word) {
         int wordPosition = 0;
         int titlePosition = 0;
-        int wordCp;
-        int titleCp;
+
         while (wordPosition < word.length() && titlePosition < title.length()) {
-            wordCp = word.codePointAt(wordPosition);
-            titleCp = title.codePointAt(titlePosition);
+            int wordCp = word.codePointAt(wordPosition);
+            int titleCp = title.codePointAt(titlePosition);
+
             if (wordCp == '-' && wordPosition == word.length() - 1) {
                 return true;
             }
-            if (Character.toLowerCase(wordCp) != Character.toLowerCase(titleCp)) {
-                var match = INFLECTION.matcher(title.substring(titlePosition));
-                if (match.lookingAt()) {
-                    titlePosition += match.end();
 
-                    match = BOUNDARY.matcher(title.substring(titlePosition));
-                    if (match.lookingAt()) {
-                        titlePosition += match.end();
-                        wordPosition += match.end();
-                        continue;
-                    } else {
-                        return false;
-                    }
-                } else {
+            if (Character.toLowerCase(wordCp) != Character.toLowerCase(titleCp)) {
+                Matcher match = INFLECTION.matcher(title.substring(titlePosition));
+                if (!match.lookingAt()) {
                     return false;
                 }
+
+                titlePosition += match.end();
+                match = BOUNDARY.matcher(title.substring(titlePosition));
+
+                if (!match.lookingAt()) {
+                    return false;
+                }
+
+                int boundaryLength = match.end();
+                titlePosition += boundaryLength;
+                wordPosition += boundaryLength;
+                continue;
             }
+
             wordPosition += Character.charCount(wordCp);
             titlePosition += Character.charCount(titleCp);
         }
 
-        var match = INFLECTION.matcher(title.substring(titlePosition));
+        return handleRemainingText(title, titlePosition);
+    }
+
+    /**
+     * Handle remaining text after initial match
+     */
+    private static boolean handleRemainingText(String title, int titlePosition) {
+        Matcher match = INFLECTION.matcher(title.substring(titlePosition));
         if (match.lookingAt()) {
             titlePosition += match.end();
         }
