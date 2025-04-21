@@ -50,19 +50,19 @@ public class LtwaRepository {
     public LtwaRepository(Path ltwaListFile) {
         this();
 
-        try (var store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open()) {
+        try (MVStore store = new MVStore.Builder().readOnly().fileName(ltwaListFile.toAbsolutePath().toString()).open()) {
             MVMap<String, List<LtwaEntry>> prefixMap = store.openMap(PREFIX_MAP_NAME);
             MVMap<String, List<LtwaEntry>> suffixMap = store.openMap(SUFFIX_MAP_NAME);
 
             for (String key : prefixMap.keySet()) {
-                var value = prefixMap.get(key);
+                List<LtwaEntry> value = prefixMap.get(key);
                 if (value != null) {
                     prefix.insert(key, value);
                 }
             }
 
             for (String key : suffixMap.keySet()) {
-                var value = suffixMap.get(key);
+                List<LtwaEntry> value = suffixMap.get(key);
                 if (value != null) {
                     suffix.insert(key, value);
                 }
