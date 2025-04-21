@@ -21,7 +21,7 @@ public class JournalListMvGenerator {
     public static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
-        Path abbreviationsDirectory = Path.of("buildres", "abbrv.jabref.org", "journals");
+        Path abbreviationsDirectory = Path.of("src", "main", "abbrv.jabref.org", "journals");
         if (!Files.exists(abbreviationsDirectory)) {
             System.out.println("Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist");
             System.exit(0);
