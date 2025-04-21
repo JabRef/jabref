@@ -1,4 +1,4 @@
-import java.util.Calendar
+import java.util.*
 
 plugins {
     id("buildlogic.java-common-conventions")
@@ -386,6 +386,7 @@ tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
 }
 
+/*
 tasks.named<JavaCompile>("compileJava") {
     extensions.configure<org.javamodularity.moduleplugin.extensions.CompileModuleOptions>("moduleOptions") {
         addExports.putAll(
@@ -397,6 +398,7 @@ tasks.named<JavaCompile>("compileJava") {
         )
     }
 }
+*/
 
 tasks.javadoc {
     (options as StandardJavadocDocletOptions).apply {

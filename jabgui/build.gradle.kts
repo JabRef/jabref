@@ -99,6 +99,21 @@ dependencies {
     // implementation("net.java.dev.jna:jna:5.16.0")
     implementation("net.java.dev.jna:jna-platform:5.16.0")
 
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+
+    implementation("com.konghq:unirest-java-core:4.4.5")
+
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.3")
+
+    implementation("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
+
+    implementation("io.github.adr:e-adr:2.0.0-SNAPSHOT")
+
+    implementation("org.libreoffice:unoloader:24.8.4")
+    implementation("org.libreoffice:libreoffice:24.8.4")
+
+    implementation("com.github.javakeyring:java-keyring:1.0.4")
+
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 

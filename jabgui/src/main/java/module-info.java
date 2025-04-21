@@ -89,9 +89,9 @@ open module org.jabref {
     // requires org.glassfish.hk2.api;
 
     // region HTTP clients
-    // requires org.apache.httpcomponents.core5.httpcore5;
+    requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
-    // requires unirest.java.core;
+    requires unirest.java.core;
     // requires unirest.modules.gson;
     // endregion
 
@@ -133,13 +133,13 @@ open module org.jabref {
     // requires com.ibm.icu;
 
     // requires flexmark;
-    // requires flexmark.html2md.converter;
+    requires flexmark.html2md.converter;
     // requires flexmark.util.ast;
     // requires flexmark.util.data;
 
     // requires com.h2database.mvstore;
 
-    // requires java.keyring;
+    requires java.keyring;
     // requires org.freedesktop.dbus;
 
     requires org.jooq.jool;
@@ -177,7 +177,7 @@ open module org.jabref {
     // requires com.sun.jna;
     requires com.sun.jna.platform;
 
-    // requires org.eclipse.jgit;
+    requires org.eclipse.jgit;
     // uses org.eclipse.jgit.transport.SshSessionFactory;
     // uses org.eclipse.jgit.lib.Signer;
 
@@ -186,11 +186,11 @@ open module org.jabref {
     // region: other libraries (alphabetically)
     // requires cuid;
     // requires dd.plist;
-    // requires io.github.adr;
+    requires io.github.adr;
     // required by okhttp and some AI library
     // requires kotlin.stdlib;
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
-    // requires org.libreoffice.uno;
+    requires org.libreoffice.uno;
     // endregion
 }
