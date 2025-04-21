@@ -5,6 +5,8 @@ src-gen/
 
 src/main/resources/csl-styles
 src/main/resources/csl-locales
+buildres/abbrv.jabref.org
+
 jablib/src/main/resources/csl-styles
 jablib/src/main/resources/csl-locales
 
