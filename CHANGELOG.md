@@ -72,7 +72,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved the performance of the LibreOffice integration when inserting CSL citations/bibliography. [#12851](https://github.com/JabRef/jabref/pull/12851)
 - 'Affected fields' and 'Do not wrap when saving' are now displayed as tags. [#12550](https://github.com/JabRef/jabref/issues/12550)
 - We revamped the UI of the Select Style dialog (in the LibreOffice panel) for CSL styles. [#12951](https://github.com/JabRef/jabref/pull/12951)
-- We removed library migrations (users need to use JabRef 6.0-alpha.1 to perform migrations)
 - We reduced the delay in populating the list of CSL styles in the Select Style dialog of the LibreOffice panel. [#12951](https://github.com/JabRef/jabref/pull/12951)
 
 ### Fixed
@@ -126,6 +125,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Removed
 
 - "Web of Science" [journal abbreviation list](https://docs.jabref.org/advanced/journalabbreviations) was removed. [abbrv.jabref.org#176](https://github.com/JabRef/abbrv.jabref.org/issues/176)
+- We removed library migrations (users need to use JabRef 6.0-alpha.1 to perform migrations)
 
 ## [6.0-alpha] – 2024-12-23
 
