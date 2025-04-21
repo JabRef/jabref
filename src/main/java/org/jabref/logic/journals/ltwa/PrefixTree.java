@@ -79,28 +79,7 @@ public class PrefixTree<D> {
         }
     }
 
-    private static class SearchState {
-        private final Node<?> node;
-        private final int index;
-
-        public SearchState(Node<?> node, int index) {
-            this.node = node;
-            this.index = index;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof SearchState)) {
-                return false;
-            }
-            SearchState other = (SearchState) obj;
-            return this.node == other.node && this.index == other.index;
-        }
-
-        @Override
-        public int hashCode() {
-            return 31 * System.identityHashCode(node) + index;
-        }
+    private record SearchState(Node<?> node, int index) {
     }
 
     private static class Node<D> {
