@@ -266,7 +266,7 @@ dependencies {
 
     // region HTTP clients
     implementation 'org.jsoup:jsoup:1.19.1'
-    implementation 'com.konghq:unirest-java-core:4.4.5'
+    implementation 'com.konghq:unirest-java-core:4.4.6'
     implementation 'com.konghq:unirest-modules-gson:4.4.6'
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.4.3'
     // endregion
@@ -281,7 +281,7 @@ dependencies {
     // route all requests to log4j to SLF4J
     implementation 'org.apache.logging.log4j:log4j-to-slf4j:2.24.3'
 
-    implementation('de.undercouch:citeproc-java:3.2.0') {
+    implementation('de.undercouch:citeproc-java:3.2.1') {
         exclude group: 'org.antlr'
     }
 
