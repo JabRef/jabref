@@ -37,6 +37,10 @@ dependencies {
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
 
+    implementation("org.jabref:easybind:2.2.1-SNAPSHOT") {
+        exclude(group = "org.openjfx")
+    }
+
     implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
         exclude(group = "commons-logging")
     }
