@@ -102,13 +102,20 @@ JabRef development is powered by YourKit Java Profiler
 [![YourKit Java Profiler](https://www.yourkit.com/images/yk_logo.svg)](https://www.yourkit.com/java/profiler/)
 
 ## ProductMap File Analysis Result
+### ProductMap - Contact Us
+
+For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
+
+
+<p align="center"><a href="https://product-map.ai" target="_blank"><img src="https://product-map.ai/product_map_logo.png" width="50%"></a></p>
+## ProductMap File Analysis Result
 
 This section contains an analysis of ProductMap files. Each file has a link to its source.
 
 | Github File | ProductMap File URL |
 |-------------|---------------------|
-| [src/main/java/org/jabref/gui/maintable/MainTableTooltip.java](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java) | [View File](https://product-map.ai/app/public?url=https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/gui/maintable/MainTableTooltip.java ) |
+| [src/main/java/org/jabref/gui/icon/IconTheme.java](https://github.com/JabRef/jabref/blob/dependabot/gradle/org.kordamp.ikonli-ikonli-materialdesign2-pack-12.4.0/src/main/java/org/jabref/gui/icon/IconTheme.java) | [View File](https://product-map.ai/app/public?url=https://github.com/JabRef/jabref/blob/dependabot/gradle/org.kordamp.ikonli-ikonli-materialdesign2-pack-12.4.0/src/main/java/org/jabref/gui/icon/IconTheme.java ) |
 
-### ProductMap - Contact Us
-
-For any inquiries, feel free to [contact ProductMap.ai](https://product-map.ai).
+## ProductMap - Contact Us
+For any inquiries, feel free to [contact us](https://product-map.ai).
+\n\n Last updated on Mon Apr 21 19:18:01 UTC 2025
