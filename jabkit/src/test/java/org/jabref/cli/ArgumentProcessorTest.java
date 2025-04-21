@@ -149,7 +149,7 @@ class ArgumentProcessorTest {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("--nogui", "--check-consistency", testBibFile, "--output-format", "txt");
+        List<String> args = List.of("--check-consistency", testBibFile, "--output-format", "txt");
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
@@ -175,7 +175,7 @@ class ArgumentProcessorTest {
         String testBibFile = testBib.toAbsolutePath().toString();
 
         // "txt" is the default output format; thus not provided here
-        List<String> args = List.of("--nogui", "--check-consistency", testBibFile, "--porcelain");
+        List<String> args = List.of("--check-consistency", testBibFile, "--porcelain");
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),
