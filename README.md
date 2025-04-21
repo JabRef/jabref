@@ -59,7 +59,7 @@ Please see our [Installation Guide](https://docs.jabref.org/installation).
 
 We are thankful for any bug reports or other feedback.
 If you have ideas for new features you want to be included in JabRef, tell us in [the feature section](http://discourse.jabref.org/c/features) of our forum!
-If you need support in using JabRef, please read [the documentation](https://docs.jabref.org/) first, the [frequently asked questions (FAQ)](https://docs.jabref.org/faq) and also have a look at our [community forum](https://discourse.jabref.org/c/help/7).
+If you need support in using JabRef, please read the [user documentation](https://docs.jabref.org/), especially the [frequently asked questions (FAQ)](https://docs.jabref.org/faq) and also take a look at our [community forum](https://discourse.jabref.org/c/help/7).
 You can use our [GitHub issue tracker](https://github.com/JabRef/jabref/issues) to file bug reports.
 
 An explanation of donation possibilities and usage of donations is available at our [donations page](https://donations.jabref.org).
@@ -67,7 +67,7 @@ An explanation of donation possibilities and usage of donations is available at 
 ## Contributing
 
 Want to be part of a free and open-source project that tens of thousands of researchers use every day?
-Please have a look at our [guidelines for contributing](CONTRIBUTING.md).
+Please take a look at our [guidelines for contributing](CONTRIBUTING.md).
 
 ## Research and Education
 
