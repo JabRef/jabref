@@ -600,7 +600,15 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
-                new SeparatorMenuItem(),
+                new SeparatorMenuItem()
+        );
+
+        if (group.isAllEntriesGroup()) {
+            contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_SUGGESTED_GROUPS_ADD,
+                    new ContextAction(StandardActions.GROUP_SUGGESTED_GROUPS_ADD, group)));
+        }
+
+        contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
@@ -694,6 +702,8 @@ public class GroupTreeView extends BorderPane {
                                 group.isEditable();
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 group.isEditable() && group.canRemove();
+                        case GROUP_SUGGESTED_GROUPS_ADD ->
+                                !group.hasAllSuggestedGroups();
                         case GROUP_SUBGROUP_ADD ->
                                 group.isEditable() && group.canAddGroupsIn()
                                         || group.isRoot();
@@ -727,6 +737,8 @@ public class GroupTreeView extends BorderPane {
                         viewModel.generateSummaries(group);
                 case GROUP_CHAT ->
                         viewModel.chatWithGroup(group);
+                case GROUP_SUGGESTED_GROUPS_ADD ->
+                        viewModel.addSuggestedGroups(group);
                 case GROUP_SUBGROUP_ADD ->
                         viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
                 case GROUP_SUBGROUP_REMOVE ->
