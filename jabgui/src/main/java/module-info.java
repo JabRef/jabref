@@ -71,7 +71,6 @@ open module org.jabref {
 
     // region: http server and client exchange
     requires jakarta.ws.rs;
-    requires org.glassfish.grizzly;
     // endregion
 
     // region: data mapping
@@ -82,7 +81,7 @@ open module org.jabref {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
     // needs to be loaded here as it's otherwise not found at runtime
-    requires org.glassfish.jaxb.runtime;
+    // requires org.glassfish.jaxb.runtime;
     // endregion
 
     // dependency injection using HK2

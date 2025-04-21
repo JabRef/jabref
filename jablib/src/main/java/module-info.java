@@ -27,6 +27,12 @@ open module org.jabref.jablib {
     exports org.jabref.model.database;
     exports org.jabref.model.entry;
     exports org.jabref.model.strings;
+    exports org.jabref.logic.protectedterms;
+    exports org.jabref.logic.remote;
+    exports org.jabref.logic.remote.client;
+    exports org.jabref.logic.net.ssl;
+    exports org.jabref.logic.citationstyle;
+    exports org.jabref.architecture;
 
     requires javafx.base;
     requires com.tobiasdiez.easybind;
@@ -64,8 +70,8 @@ open module org.jabref.jablib {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime
-    //OK requires org.glassfish.jaxb.runtime;
+    // needs to be loaded here as it's otherwise not found at runtime, related to XJC
+    requires org.glassfish.jaxb.runtime;
     // endregion
 
     // dependency injection using HK2

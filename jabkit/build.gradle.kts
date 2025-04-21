@@ -22,6 +22,9 @@ dependencies {
     // FIXME: Currently is a bridge to the GUI; needs to be separated
     //        Injector needs to be removed, no JavaFX dependencies, etc.
     implementation(project(":jabgui"))
+    implementation("org.jabref:afterburner.fx:2.0.0") {
+        exclude( group = "org.openjfx")
+    }
 
     implementation("commons-cli:commons-cli:1.9.0")
 
@@ -38,6 +41,12 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
 
     implementation("com.google.guava:guava:33.4.8-jre")
+
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
+    implementation("org.slf4j:jul-to-slf4j:2.0.17")
+    // route all requests to log4j to SLF4J
+    implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
 
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")

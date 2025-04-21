@@ -27,7 +27,7 @@ plugins {
 
 val pdfbox = "3.0.4"
 val luceneVersion = "10.2.0"
-val jaxbVersion by extra { "4.0.3" }
+val jaxbVersion by extra { "4.0.5" }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
@@ -120,7 +120,6 @@ dependencies {
     // endregion
 
     implementation("org.slf4j:slf4j-api:2.0.17")
-
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
     implementation("org.slf4j:jul-to-slf4j:2.0.17")
     // route all requests to log4j to SLF4J
@@ -148,6 +147,9 @@ dependencies {
 
     // YAML reading and writing
     implementation("org.yaml:snakeyaml:2.4")
+
+    // XJC related
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // region AI
     implementation("dev.langchain4j:langchain4j:0.36.2")
