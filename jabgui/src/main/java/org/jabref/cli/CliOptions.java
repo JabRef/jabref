@@ -53,6 +53,14 @@ public class CliOptions {
         return commandLine.hasOption("version");
     }
 
+    public boolean isBlank() {
+        return commandLine.hasOption("blank");
+    }
+
+    public boolean isDisableGui() {
+        return commandLine.hasOption("nogui");
+    }
+
     public boolean isCheckConsistency() {
         return commandLine.hasOption("check-consistency");
     }
@@ -124,6 +132,15 @@ public class CliOptions {
     public String getAuxImport() {
         return commandLine.getOptionValue("aux");
     }
+
+    public boolean isImportToOpenBase() {
+        return commandLine.hasOption("importToOpen");
+    }
+
+    public String getImportToOpenBase() {
+        return commandLine.getOptionValue("importToOpen");
+    }
+
     public boolean isDebugLogging() {
         return commandLine.hasOption("debug");
     }
@@ -164,6 +181,14 @@ public class CliOptions {
         return commandLine.hasOption("writeMetadatatoPdf") ? commandLine.getOptionValue("writeMetadataToPdf") :
                 commandLine.hasOption("writeXMPtoPdf") ? commandLine.getOptionValue("writeXmpToPdf") :
                         commandLine.hasOption("embeddBibfileInPdf") ? commandLine.getOptionValue("embeddBibfileInPdf") : null;
+    }
+
+    public String getJumpToKey() {
+        return commandLine.getOptionValue("jumpToKey");
+    }
+
+    public boolean isJumpToKey() {
+        return commandLine.hasOption("jumpToKey");
     }
 
     private static Options getOptions() {

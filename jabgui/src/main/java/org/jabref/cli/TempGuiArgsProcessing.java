@@ -6,9 +6,12 @@ import java.net.Authenticator;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -21,7 +24,6 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -35,16 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tinylog.configuration.Configuration;
 
-/// Entrypoint for a command-line only version of JabRef.
-/// It does not open any dialogs, just parses the command line arguments and outputs text and creates/modifies files.
-///
-/// See [Command Line Interface Guidelines](https://clig.dev/) for general guidelines how to design a good CLI interface.
-///
-/// It does not open any GUI.
-/// For the GUI application see {@link org.jabref.Launcher}.
-///
-/// Does not do any preference migrations.
-public class JabKit {
+public class TempGuiArgsProcessing {
     private static Logger LOGGER;
 
     public static void main(String[] args) {
@@ -55,7 +48,10 @@ public class JabKit {
 
         FileUpdateMonitor fileUpdateMonitor = new DummyFileUpdateMonitor();
 
-        processArguments(args, preferences, fileUpdateMonitor);
+        List<UiCommand> uiCommands = processArguments(args, preferences, fileUpdateMonitor);
+        if (!uiCommands.isEmpty()) {
+            LOGGER.error("No GUI needed, but UI commands were returned. Exiting.");
+        }
     }
 
     private static void systemExit() {
@@ -65,7 +61,7 @@ public class JabKit {
         System.exit(0);
     }
 
-    public static void processArguments(String[] args, JabRefCliPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
+    public static List<UiCommand> processArguments(String[] args, JabRefCliPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
         try {
             Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
@@ -79,9 +75,6 @@ public class JabKit {
 
             Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
-
-            PostgreServer postgreServer = new PostgreServer();
-            Injector.setModelOrService(PostgreServer.class, postgreServer);
 
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
@@ -99,16 +92,23 @@ public class JabKit {
                         fileUpdateMonitor,
                         entryTypesManager);
                 argumentProcessor.processArguments();
+                if (argumentProcessor.shouldShutDown()) {
+                    LOGGER.debug("JabRef shut down after processing command line arguments");
+                    systemExit();
+                    return null;
+                }
 
-                systemExit();
+                return new ArrayList<>(argumentProcessor.getUiCommands());
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
                 CliOptions.printUsage(preferences);
                 systemExit();
+                return null;
             }
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
             systemExit();
+            return null;
         }
     }
 
@@ -137,7 +137,7 @@ public class JabKit {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            LOGGER = LoggerFactory.getLogger(JabKit.class);
+            LOGGER = LoggerFactory.getLogger(TempGuiArgsProcessing.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
@@ -155,7 +155,7 @@ public class JabKit {
                 "writerFile.backups", "30");
         configuration.forEach(Configuration::set);
 
-        LOGGER = LoggerFactory.getLogger(JabKit.class);
+        LOGGER = LoggerFactory.getLogger(TempGuiArgsProcessing.class);
     }
 
     /**

@@ -52,6 +52,7 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;

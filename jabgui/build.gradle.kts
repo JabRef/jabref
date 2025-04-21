@@ -114,6 +114,8 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
+    implementation("commons-cli:commons-cli:1.9.0")
+
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 

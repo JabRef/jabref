@@ -17,6 +17,7 @@ import java.util.prefs.BackingStoreException;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.UiCommand;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -48,7 +49,6 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.logic.search.DatabaseSearcher;
-import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -81,6 +81,9 @@ public class ArgumentProcessor {
     private final CliPreferences cliPreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
+
+    private boolean guiNeeded;
+    private final List<UiCommand> uiCommands = new ArrayList<>();
 
     /**
      * First call the constructor, then call {@link #processArguments()}.
@@ -197,14 +200,19 @@ public class ArgumentProcessor {
     }
 
     public void processArguments() {
+        uiCommands.clear();
+
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
             CliOptions.printUsage(cliPreferences);
+            guiNeeded = false;
             return;
         }
+
+        guiNeeded = true;
 
         // Check if we should reset all preferences to default values:
         if (cli.isPreferencesReset()) {
@@ -218,7 +226,7 @@ public class ArgumentProcessor {
 
         List<ParserResult> loaded = importAndOpenFiles();
 
-        if (cli.isFetcherEngine()) {
+        if (!cli.isBlank() && cli.isFetcherEngine()) {
             fetch(cli.getFetcherEngine()).ifPresent(loaded::add);
         }
 
@@ -270,6 +278,26 @@ public class ArgumentProcessor {
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }
+        }
+
+        if (!cli.isBlank() && cli.isAuxImport()) {
+            doAuxImport(loaded);
+        }
+
+        if (cli.isBlank()) {
+            uiCommands.add(new UiCommand.BlankWorkspace());
+        }
+
+        if (!cli.isBlank() && cli.isJumpToKey()) {
+            uiCommands.add(new UiCommand.JumpToEntryKey(cli.getJumpToKey()));
+        }
+
+        if (!cli.isBlank() && !loaded.isEmpty()) {
+            uiCommands.add(new UiCommand.OpenDatabases(loaded));
+        }
+
+        if (cli.isBlank() && loaded.isEmpty()) {
+            uiCommands.add(new UiCommand.BlankWorkspace());
         }
 
         if (cli.isCheckConsistency()) {
@@ -500,7 +528,7 @@ public class ArgumentProcessor {
         List<BibEntry> matches;
         try {
             // extract current thread task executor from indexManager
-            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), cliPreferences, Injector.instantiateModelOrService(PostgreServer.class)).getMatches();
+            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), cliPreferences).getMatches();
         } catch (IOException e) {
             LOGGER.error("Error occurred when searching", e);
             return false;
@@ -519,6 +547,7 @@ public class ArgumentProcessor {
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
                                                    .concat(Localization.lang("Usage")).concat(": ") + CliOptions.getExportMatchesSyntax());
+                    guiNeeded = false;
                     return false;
                 }
             }
@@ -577,7 +606,7 @@ public class ArgumentProcessor {
     private List<ParserResult> importAndOpenFiles() {
         List<ParserResult> loaded = new ArrayList<>();
         List<String> toImport = new ArrayList<>();
-        if ((!cli.getLeftOver().isEmpty())) {
+        if (!cli.isBlank() && (!cli.getLeftOver().isEmpty())) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // BIB files to open. Other files, and files that could not be opened
@@ -616,7 +645,7 @@ public class ArgumentProcessor {
             }
         }
 
-        if (cli.isFileImport()) {
+        if (!cli.isBlank() && cli.isFileImport()) {
             toImport.add(cli.getFileImport());
         }
 
@@ -624,7 +653,11 @@ public class ArgumentProcessor {
             importFile(filenameString).ifPresent(loaded::add);
         }
 
-        if (cli.isBibtexImport()) {
+        if (!cli.isBlank() && cli.isImportToOpenBase()) {
+            importToOpenBase(cli.getImportToOpenBase()).ifPresent(loaded::add);
+        }
+
+        if (!cli.isBlank() && cli.isBibtexImport()) {
             importBibtexToOpenBase(cli.getBibtexImport(), cliPreferences.getImportFormatPreferences()).ifPresent(loaded::add);
         }
 
@@ -818,5 +851,13 @@ public class ArgumentProcessor {
                 return Optional.empty();
             }
         }
+    }
+
+    public boolean shouldShutDown() {
+        return cli.isDisableGui() || cli.isShowVersion() || !guiNeeded;
+    }
+
+    public List<UiCommand> getUiCommands() {
+        return uiCommands;
     }
 }

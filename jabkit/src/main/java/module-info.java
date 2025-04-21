@@ -8,6 +8,11 @@ module org.jabref.jabkit {
 
     requires com.google.common;
 
+    requires org.apache.lucene.queryparser;
+
+    requires javafx.base;
+    requires afterburner.fx;
+
     requires org.slf4j;
     requires jul.to.slf4j;
     requires org.apache.logging.log4j.to.slf4j;

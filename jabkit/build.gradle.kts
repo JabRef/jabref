@@ -19,12 +19,12 @@ plugins {
     id("org.itsallcode.openfasttrace") version "3.0.1"
 }
 
+val luceneVersion = "10.2.0"
+
 dependencies {
     implementation(project(":jablib"))
 
-    // FIXME: Currently is a bridge to the GUI; needs to be separated
-    //        Injector needs to be removed, no JavaFX dependencies, etc.
-    implementation(project(":jabgui"))
+    // FIXME: Injector needs to be removed, no JavaFX dependencies, etc.
     implementation("org.jabref:afterburner.fx:2.0.0") {
         exclude( group = "org.openjfx")
     }
@@ -55,6 +55,10 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
+    implementation("commons-cli:commons-cli:1.9.0")
+
+    implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
+
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
@@ -70,4 +74,8 @@ javafx {
     version = "24"
     // because of afterburner.fx
     modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
+}
+
+application {
+    mainClass.set("org.jabref.cli.JabKit")
 }
