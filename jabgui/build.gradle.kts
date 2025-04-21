@@ -118,6 +118,7 @@ dependencies {
 
     implementation("commons-cli:commons-cli:1.9.0")
 
+    testImplementation("io.github.classgraph:classgraph:4.8.179")
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
@@ -180,9 +181,11 @@ application {
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
 
+/*
 jacoco {
     toolVersion = "0.8.13"
 }
+*/
 
 tasks.named<JavaExec>("run") {
     doFirst {

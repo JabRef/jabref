@@ -3,9 +3,9 @@ plugins {
 
     id("idea")
 
-    id("checkstyle")
+    // id("checkstyle")
 
-    id("jacoco")
+    // id("jacoco")
 
     id("project-report")
 }

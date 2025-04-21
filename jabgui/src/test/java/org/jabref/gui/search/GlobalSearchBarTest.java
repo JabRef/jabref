@@ -19,7 +19,6 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.testutils.category.GUITest;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +33,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@GUITest
 @ExtendWith(ApplicationExtension.class)
 public class GlobalSearchBarTest {
     private HBox hBox;
