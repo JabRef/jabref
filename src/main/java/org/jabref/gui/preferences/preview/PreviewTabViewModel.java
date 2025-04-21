@@ -33,7 +33,7 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.logic.bst.BstPreviewLayout;
-import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
@@ -130,7 +130,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
 
-        BackgroundTask.wrap(CitationStyle::discoverCitationStyles)
+        BackgroundTask.wrap(CSLStyleLoader::getStyles)
                       .onSuccess(styles -> styles.stream()
                                                  .map(style -> new CitationStylePreviewLayout(style, entryTypesManager))
                                                  .filter(style -> chosenListProperty.getValue().filtered(item ->

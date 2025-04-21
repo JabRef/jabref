@@ -10,7 +10,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
@@ -46,6 +48,11 @@ import org.slf4j.LoggerFactory;
 public class AiChatComponent extends VBox {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatComponent.class);
 
+    // Example Questions
+    private static final String EXAMPLE_QUESTION_1 = Localization.lang("What is the goal of the paper?");
+    private static final String EXAMPLE_QUESTION_2 = Localization.lang("Which methods were used in the research?");
+    private static final String EXAMPLE_QUESTION_3 = Localization.lang("What are the key findings?");
+
     private final AiService aiService;
     private final ObservableList<BibEntry> entries;
     private final BibDatabaseContext bibDatabaseContext;
@@ -62,6 +69,10 @@ public class AiChatComponent extends VBox {
     @FXML private Button notificationsButton;
     @FXML private ChatPromptComponent chatPrompt;
     @FXML private Label noticeText;
+    @FXML private Hyperlink exQuestion1;
+    @FXML private Hyperlink exQuestion2;
+    @FXML private Hyperlink exQuestion3;
+    @FXML private HBox exQuestionBox;
 
     public AiChatComponent(AiService aiService,
                            StringProperty name,
@@ -94,6 +105,8 @@ public class AiChatComponent extends VBox {
         initializeChatPrompt();
         initializeNotice();
         initializeNotifications();
+        sendExampleQuestions();
+        initializeExampleQuestions();
     }
 
     private void initializeNotifications() {
@@ -109,6 +122,35 @@ public class AiChatComponent extends VBox {
                 .replaceAll("%0", aiPreferences.getAiProvider().getLabel() + " " + aiPreferences.getSelectedChatModel());
 
         noticeText.setText(newNotice);
+    }
+
+    private void initializeExampleQuestions() {
+        exQuestion1.setText(EXAMPLE_QUESTION_1);
+        exQuestion2.setText(EXAMPLE_QUESTION_2);
+        exQuestion3.setText(EXAMPLE_QUESTION_3);
+    }
+
+    private void sendExampleQuestions() {
+        addExampleQuestionAction(exQuestion1);
+        addExampleQuestionAction(exQuestion2);
+        addExampleQuestionAction(exQuestion3);
+    }
+
+    private void addExampleQuestionAction(Hyperlink hyperlink) {
+        if (chatPrompt.getHistory().contains(hyperlink.getText())) {
+            exQuestionBox.getChildren().remove(hyperlink);
+            if (exQuestionBox.getChildren().size() == 1) {
+                this.getChildren().remove(exQuestionBox);
+            }
+            return;
+        }
+        hyperlink.setOnAction(event -> {
+            onSendMessage(hyperlink.getText());
+            exQuestionBox.getChildren().remove(hyperlink);
+            if (exQuestionBox.getChildren().size() == 1) {
+                this.getChildren().remove(exQuestionBox);
+            }
+        });
     }
 
     private void initializeChatPrompt() {

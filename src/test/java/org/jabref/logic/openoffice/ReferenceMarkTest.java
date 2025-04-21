@@ -49,6 +49,10 @@ class ReferenceMarkTest {
                 Arguments.of(
                         "JABREF_willberg-forssman:1997b CID_5 yov3b0su",
                         List.of("willberg-forssman:1997b"), List.of(5), "yov3b0su"
+                ),
+                Arguments.of(
+                        "JABREF_PGF/TikZTeam2023 CID_8 kyu75a4s",
+                        List.of("PGF/TikZTeam2023"), List.of(8), "kyu75a4s"
                 )
         );
     }

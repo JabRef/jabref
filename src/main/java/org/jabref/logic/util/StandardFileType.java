@@ -30,7 +30,7 @@ public enum StandardFileType implements FileType {
     JAR("JAR", "jar"),
     JAVA_KEYSTORE("Java Keystore", "jks"),
     JSON("JSON", "json"),
-    JSTYLE("LibreOffice layout style", "jstyle"),
+    JSTYLE("JStyle", "jstyle"),
     LAYOUT("Custom Exporter format", "layout"),
     MARKDOWN("Markdown", "md"),
     MEDLINE("Medline", "nbib", "xml"),

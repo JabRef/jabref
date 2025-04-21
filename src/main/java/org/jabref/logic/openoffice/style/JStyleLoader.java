@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
@@ -16,12 +15,12 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StyleLoader {
+public class JStyleLoader {
 
     public static final String DEFAULT_AUTHORYEAR_STYLE_PATH = "/resource/openoffice/default_authoryear.jstyle";
     public static final String DEFAULT_NUMERICAL_STYLE_PATH = "/resource/openoffice/default_numerical.jstyle";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(StyleLoader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JStyleLoader.class);
 
     // All internal styles
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
@@ -36,9 +35,9 @@ public class StyleLoader {
     private final List<JStyle> internalStyles = new ArrayList<>();
     private final List<JStyle> externalStyles = new ArrayList<>();
 
-    public StyleLoader(OpenOfficePreferences openOfficePreferences,
-                       LayoutFormatterPreferences formatterPreferences,
-                       JournalAbbreviationRepository abbreviationRepository) {
+    public JStyleLoader(OpenOfficePreferences openOfficePreferences,
+                        LayoutFormatterPreferences formatterPreferences,
+                        JournalAbbreviationRepository abbreviationRepository) {
         this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
         this.layoutFormatterPreferences = Objects.requireNonNull(formatterPreferences);
         this.abbreviationRepository = Objects.requireNonNull(abbreviationRepository);
@@ -142,24 +141,5 @@ public class StyleLoader {
         // Pick the first internal
         openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
         return internalStyles.getFirst();
-    }
-
-    public OOStyle getUsedStyleUnified() {
-        OOStyle gotStyle = openOfficePreferences.getCurrentStyle();
-
-        if (gotStyle instanceof JStyle jStyle) {
-            String filename = jStyle.getPath();
-            for (JStyle style : getStyles()) {
-                if (filename.equals(style.getPath())) {
-                    return style;
-                }
-            }
-            // Pick the first internal
-            openOfficePreferences.setCurrentJStyle(internalStyles.getFirst().getPath());
-            return internalStyles.getFirst();
-        } else if (gotStyle instanceof CitationStyle citationStyle) {
-                return citationStyle;
-        }
-        return null;
     }
 }
