@@ -23,14 +23,14 @@ class CitationStyleTest {
 
     @Test
     void getDefault() {
-        assertNotNull(CitationStyle.getDefault());
+        assertNotNull(CSLStyleLoader.getDefaultStyle());
     }
 
     @Test
     void defaultCitation() {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
         context.setMode(BibDatabaseMode.BIBLATEX);
-        String citation = CitationStyleGenerator.generateBibliography(List.of(TestEntry.getTestEntry()), CitationStyle.getDefault().getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager()).getFirst();
+        String citation = CitationStyleGenerator.generateBibliography(List.of(TestEntry.getTestEntry()), CSLStyleLoader.getDefaultStyle().getSource(), CitationStyleOutputFormat.HTML, context, new BibEntryTypesManager()).getFirst();
 
         // if the default citation style changes this has to be modified
         String expected = """
@@ -44,14 +44,14 @@ class CitationStyleTest {
 
     @Test
     void discoverCitationStylesNotNull() {
-        List<CitationStyle> styleList = CitationStyle.discoverCitationStyles();
+        List<CitationStyle> styleList = CSLStyleLoader.getInternalStyles();
         assertNotNull(styleList);
     }
 
     @ParameterizedTest
     @MethodSource
     void citationStylePresent(String cslFileName) {
-        Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
+        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName);
         assertTrue(citationStyle.isPresent());
     }
 
@@ -68,8 +68,8 @@ class CitationStyleTest {
     @ParameterizedTest
     @MethodSource
     void titleMatches(String expectedTitle, String cslFileName) {
-        Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
-        CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
+        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName);
+        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
         assertEquals(expectedTitle, styleInfo.title());
     }
 
@@ -86,8 +86,8 @@ class CitationStyleTest {
     @ParameterizedTest
     @MethodSource
     void numericPropertyMatches(boolean expectedNumericNature, String cslFileName) {
-        Optional<CitationStyle> citationStyle = CitationStyle.createCitationStyleFromFile(cslFileName);
-        CitationStyle.StyleInfo styleInfo = new CitationStyle.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
+        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName);
+        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
         assertEquals(expectedNumericNature, styleInfo.isNumericStyle());
     }
 

@@ -94,7 +94,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         content.getChildren().clear();
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(searchQuery -> {
             SearchResults searchResults = searchQuery.getSearchResults();
-            if (searchResults != null) {
+            if (searchResults != null && entry != null) {
                 Map<String, List<SearchResult>> searchResultsForEntry = searchResults.getFileSearchResultsForEntry(entry);
                 if (searchResultsForEntry.isEmpty()) {
                     content.getChildren().add(new Text(Localization.lang("No search matches.")));

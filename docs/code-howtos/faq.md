@@ -32,7 +32,7 @@ You can always click on the details of the failing test to pinpoint which keys a
 Background: There are localization keys in the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties) that are not used in the code, probably due to the removal of existing code.
 Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
 
-### `org.jabref.logic.citationstyle.CitationStyle discoverCitationStyles` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
+### `org.jabref.logic.citationstyle.CitationStyleCatalogGenerator generateCitationStyleCatalog` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
 
 Check the directory `src/main/resources/csl-styles`.
 If it is missing or empty, run `git submodule update`.

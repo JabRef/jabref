@@ -34,6 +34,7 @@ public class OpenOfficePreferences {
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty cslBibliographyTitle;
     private final StringProperty cslBibliographyHeaderFormat;
+    private final ObservableList<String> externalCslStyles;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -43,7 +44,8 @@ public class OpenOfficePreferences {
                                  OOStyle currentStyle,
                                  boolean alwaysAddCitedOnPages,
                                  String cslBibliographyTitle,
-                                 String cslBibliographyHeaderFormat) {
+                                 String cslBibliographyHeaderFormat,
+                                 List<String> externalCslStyles) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -53,6 +55,7 @@ public class OpenOfficePreferences {
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
+        this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
     }
 
     public void clearConnectionSettings() {
@@ -173,5 +176,14 @@ public class OpenOfficePreferences {
 
     public String getCslBibliographyHeaderFormat() {
         return cslBibliographyHeaderFormat.get();
+    }
+
+    public ObservableList<String> getExternalCslStyles() {
+        return externalCslStyles;
+    }
+
+    public void setExternalCslStyles(List<String> paths) {
+        externalCslStyles.clear();
+        externalCslStyles.addAll(paths);
     }
 }
