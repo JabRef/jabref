@@ -1,4 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
+import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
+import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
 plugins {
     id("buildlogic.java-common-conventions")
@@ -9,6 +11,8 @@ plugins {
 
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
+
+    // id("com.redock.classpathtofile") version "0.1.0"
 
     // id("com.github.andygoossens.modernizer") version "1.10.0"
     // id("org.openrewrite.rewrite") version "7.3.0"
@@ -199,10 +203,11 @@ jacoco {
 tasks.named<JavaExec>("run") {
     doFirst {
         // Clear the default JVM arguments to avoid warnings
-        application.applicationDefaultJvmArgs = emptyList()
+        // application.applicationDefaultJvmArgs = emptyList()
+        application.applicationDefaultJvmArgs = listOf("--enable-native-access=com.sun.jna")
     }
 
-    extensions.configure<org.javamodularity.moduleplugin.extensions.RunModuleOptions>("moduleOptions") {
+    extensions.configure<RunModuleOptions>("moduleOptions") {
         // On a change here, also adapt "application > applicationDefaultJvmArgs"
         addExports.putAll(
             mapOf(
@@ -249,8 +254,8 @@ tasks.named<JavaExec>("run") {
     }
 }
 
-tasks.named<JavaCompile>("compileJava") {
-    extensions.configure<org.javamodularity.moduleplugin.extensions.CompileModuleOptions>("moduleOptions") {
+tasks.compileJava {
+    extensions.configure<CompileModuleOptions> {
         addExports.putAll(
             mapOf(
                 // TODO: Remove access to internal api
