@@ -35,7 +35,6 @@ open module org.jabref.jablib {
     exports org.jabref.architecture;
 
     requires javafx.base;
-    requires com.tobiasdiez.easybind;
     requires javafx.graphics;
 
     // for java.awt.geom.Rectangle2D required by org.jabref.logic.pdf.TextExtractor

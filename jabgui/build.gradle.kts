@@ -17,7 +17,11 @@ plugins {
 
     id("org.itsallcode.openfasttrace") version "3.0.1"
 
+    id("org.beryx.jlink") version "3.1.1"
 }
+
+group = "org.jabref"
+version = project.findProperty("projVersion") ?: "100.0.0"
 
 val luceneVersion = "10.2.0"
 
@@ -62,6 +66,9 @@ dependencies {
     }
 
     implementation("org.controlsfx:controlsfx:11.2.2")
+    implementation("org.jabref:easybind:2.2.1-SNAPSHOT") {
+        exclude(group = "org.openjfx")
+    }
 
     implementation("org.apache.lucene:lucene-core:${luceneVersion}")
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
@@ -73,6 +80,9 @@ dependencies {
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
+
+    testImplementation("org.testfx:testfx-core:4.0.16-alpha")
+    testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
@@ -124,8 +134,64 @@ application {
     )
 }
 
-
 // Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
 // See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
 modularity.disableEffectiveArgumentsAdjustment()
+
+jacoco {
+    toolVersion = "0.8.13"
+}
+
+tasks.named<JavaExec>("run") {
+    doFirst {
+        // Clear the default JVM arguments to avoid warnings
+        application.applicationDefaultJvmArgs = emptyList()
+    }
+
+    extensions.configure<org.javamodularity.moduleplugin.extensions.RunModuleOptions>("moduleOptions") {
+        // On a change here, also adapt "application > applicationDefaultJvmArgs"
+        addExports.putAll(
+            mapOf(
+                // TODO: Remove access to internal API
+                "javafx.base/com.sun.javafx.event" to "org.jabref.merged.module",
+                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
+
+                // ControlsFX compatibility
+                // We need to restate the ControlsFX exports, because we get following error otherwise:
+                //   java.lang.IllegalAccessError:
+                //     class org.controlsfx.control.textfield.AutoCompletionBinding (in module org.controlsfx.controls)
+                //     cannot access class com.sun.javafx.event.EventHandlerManager (in module javafx.base) because
+                //     module javafx.base does not export com.sun.javafx.event to module org.controlsfx.controls
+                // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
+                "javafx.graphics/com.sun.javafx.scene" to "org.controlsfx.controls",
+                "javafx.graphics/com.sun.javafx.scene.traversal" to "org.controlsfx.controls",
+                "javafx.graphics/com.sun.javafx.css" to "org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control" to "org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control.behavior" to "org.controlsfx.controls",
+                "javafx.controls/com.sun.javafx.scene.control.inputmap" to "org.controlsfx.controls",
+                "javafx.base/com.sun.javafx.event" to "org.controlsfx.controls",
+                "javafx.base/com.sun.javafx.collections" to "org.controlsfx.controls",
+                "javafx.base/com.sun.javafx.runtime" to "org.controlsfx.controls",
+                "javafx.web/com.sun.webkit" to "org.controlsfx.controls"
+            )
+        )
+
+        addOpens.putAll(
+            mapOf(
+                "javafx.controls/javafx.scene.control" to "org.jabref",
+                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
+                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref",
+                "org.controlsfx.controls/org.controlsfx.control.textfield" to "org.jabref",
+                "javafx.controls/javafx.scene.control.skin" to "org.controlsfx.controls",
+                "javafx.graphics/javafx.scene" to "org.controlsfx.controls",
+                "javafx.base/javafx.collections" to "org.jabref",
+                "javafx.base/javafx.collections.transformation" to "org.jabref"
+            )
+        )
+
+        addModules.add("jdk.incubator.vector")
+
+        createCommandLineArgumentFile = true
+    }
+}
 

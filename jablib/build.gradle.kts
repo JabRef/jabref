@@ -1,3 +1,5 @@
+import java.util.Calendar
+
 plugins {
     id("buildlogic.java-common-conventions")
 
@@ -104,10 +106,6 @@ dependencies {
     implementation("org.antlr:antlr4-runtime:4.13.2")
 
     implementation("com.google.guava:guava:33.4.8-jre")
-
-    implementation("org.jabref:easybind:2.2.1-SNAPSHOT") {
-        exclude(group = "org.openjfx")
-    }
 
     implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
@@ -217,6 +215,12 @@ dependencies {
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.0")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
 
+    testImplementation("org.hamcrest:hamcrest-library:3.0")
+    testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
+
+    // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
+    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+
     checkstyle("com.puppycrawl.tools:checkstyle:10.23.0")
     configurations.named("checkstyle") {
         resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
@@ -263,4 +267,181 @@ xjcGeneration {
             javaPackageName = "org.jabref.logic.importer.fileformat.citavi"
         }
     }
+}
+
+
+tasks.processResources {
+    filteringCharset = "UTF-8"
+
+    filesMatching("build.properties") {
+        expand(
+            mapOf(
+                "version" to (project.findProperty("projVersionInfo") ?: "100.0.0"),
+                "year" to Calendar.getInstance().get(Calendar.YEAR).toString(),
+                "maintainers" to file("MAINTAINERS")
+                    .readLines()
+                    .filterNot { it.startsWith("#") }
+                    .joinToString(", "),
+                "azureInstrumentationKey" to (System.getenv("AzureInstrumentationKey") ?: ""),
+                "springerNatureAPIKey" to (System.getenv("SpringerNatureAPIKey") ?: ""),
+                "astrophysicsDataSystemAPIKey" to (System.getenv("AstrophysicsDataSystemAPIKey") ?: ""),
+                "ieeeAPIKey" to (System.getenv("IEEEAPIKey") ?: ""),
+                "scienceDirectApiKey" to (System.getenv("SCIENCEDIRECTAPIKEY") ?: ""),
+                "biodiversityHeritageApiKey" to (System.getenv("BiodiversityHeritageApiKey") ?: ""),
+                "semanticScholarApiKey" to (System.getenv("SemanticScholarApiKey") ?: "")
+            )
+        )
+        filteringCharset = "UTF-8"
+    }
+
+    filesMatching(listOf("resources/resource/ods/meta.xml", "resources/resource/openoffice/meta.xml")) {
+        expand(mapOf("version" to project.version))
+    }
+}
+
+tasks.register<JavaExec>("generateJournalListMV") {
+    group = "JabRef"
+    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.jabref.cli.JournalListMvGenerator")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
+    onlyIf {
+        !file("build/resources/main/journals/journal-list.mv").exists()
+    }
+}
+
+tasks.named("jar") {
+    dependsOn("generateJournalListMV")
+}
+
+tasks.named("compileTestJava") {
+    dependsOn("generateJournalListMV")
+}
+
+tasks.register("downloadLtwaFile") {
+    group = "JabRef"
+    description = "Downloads the LTWA file for journal abbreviations"
+
+    val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
+    val ltwaDir = file("build/resources/main/journals")
+    val ltwaCsvFile = ltwaDir.resolve("ltwa_20210702.csv")
+
+    doLast {
+        if (!ltwaCsvFile.exists()) {
+            mkdir(ltwaDir)
+            ant.withGroovyBuilder {
+                "get"(
+                    mapOf(
+                        "src" to ltwaUrl,
+                        "dest" to ltwaCsvFile,
+                        "verbose" to true
+                    )
+                )
+            }
+            logger.lifecycle("Downloaded LTWA file to $ltwaCsvFile")
+        } else {
+            logger.lifecycle("LTWA file already exists at $ltwaCsvFile")
+        }
+    }
+
+    onlyIf {
+        !ltwaCsvFile.exists()
+    }
+}
+
+tasks.register<JavaExec>("generateLtwaListMV") {
+    group = "JabRef"
+    description = "Converts the LTWA CSV file to a H2 MVStore"
+
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.jabref.cli.LtwaListMvGenerator")
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(java.toolchain.languageVersion)
+    })
+
+    dependsOn("downloadLtwaFile")
+
+    onlyIf {
+        !file("build/resources/main/journals/ltwa-list.mv").exists()
+    }
+}
+
+tasks.named("jar") {
+    dependsOn("generateLtwaListMV")
+}
+
+tasks.named("compileTestJava") {
+    dependsOn("generateLtwaListMV")
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+
+    // Hint from https://docs.gradle.org/current/userguide/performance.html#run_the_compiler_as_a_separate_process
+    options.isFork = true
+}
+
+tasks.named<JavaCompile>("compileJava") {
+    extensions.configure<org.javamodularity.moduleplugin.extensions.CompileModuleOptions>("moduleOptions") {
+        addExports.putAll(
+            mapOf(
+                // TODO: Remove access to internal api
+                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
+                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
+            )
+        )
+    }
+}
+
+tasks.javadoc {
+    (options as StandardJavadocDocletOptions).apply {
+        encoding = "UTF-8"
+        version = false
+        // author = false
+
+        addMultilineStringsOption("-add-exports").value = listOf(
+            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
+            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
+        )
+    }
+}
+
+tasks.test {
+    useJUnitPlatform {
+        excludeTags("DatabaseTest", "FetcherTest", "GUITest")
+    }
+
+    extensions.configure<org.javamodularity.moduleplugin.extensions.TestModuleOptions>("moduleOptions") {
+        // TODO: Remove this as soon as ArchUnit is modularized
+        runOnClasspath = true
+    }
+}
+
+testlogger {
+    // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
+
+    theme = com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD
+
+    showPassed = false
+    showSkipped = false
+
+    showCauses = false
+    showStackTraces = false
+}
+
+tasks.withType<Test>().configureEach {
+    reports.html.outputLocation.set(file("${reporting.baseDirectory}/${name}"))
+
+    // Enable parallel tests (on desktop).
+    // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+    if (!providers.environmentVariable("CI").isPresent) {
+        maxParallelForks = maxOf(Runtime.getRuntime().availableProcessors() - 1, 1)
+    }
+}
+
+jmh {
+    warmupIterations = 5
+    iterations = 10
+    fork = 2
+    zip64  = true
 }

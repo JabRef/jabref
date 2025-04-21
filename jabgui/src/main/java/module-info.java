@@ -14,6 +14,7 @@ open module org.jabref {
     requires javafx.controls;
     requires javafx.web;
     requires javafx.fxml;
+    requires com.tobiasdiez.easybind;
 
     requires afterburner.fx;
     provides com.airhacks.afterburner.views.ResourceLocator
