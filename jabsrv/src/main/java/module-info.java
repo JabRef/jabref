@@ -1,4 +1,4 @@
-module org.jabref.jabserv {
+module org.jabref.jabsrv {
     requires org.jabref.jablib;
 
     requires org.slf4j;
