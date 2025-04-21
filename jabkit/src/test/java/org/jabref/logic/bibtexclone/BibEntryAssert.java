@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtex;
+package org.jabref.logic.bibtexclone;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +23,6 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-/**
- * TODO: Make this a "public" class to enable jablib consumers benefitting from it, too.
- */
 public class BibEntryAssert {
 
     /**
