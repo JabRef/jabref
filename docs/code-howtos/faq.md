@@ -5,6 +5,11 @@ parent: Code Howtos
 
 Following is a list of common errors encountered by developers which lead to failing tests, with their common solutions:
 
+## git hints
+
+* Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
+* Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
+
 ## Failing tests
 
 ### Failing <b>Checkstyle</b> tests
@@ -148,5 +153,11 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 ### Prevention
 
 To avoid this, avoid staging using `git add .` from CLI. Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
+
+## Q: I get `java: package org.jabref.logic.journals does not exist`
+
+A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+
+Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
 
 <!-- markdownlint-disable-file MD033 -->
