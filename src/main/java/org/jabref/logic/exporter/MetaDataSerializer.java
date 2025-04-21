@@ -9,8 +9,8 @@ import java.util.StringJoiner;
 import java.util.TreeMap;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.os.OS;
 import org.jabref.model.entry.BibEntryType;
@@ -140,7 +140,7 @@ public class MetaDataSerializer {
                 stringyPattern.put(metaDataKey, data);
             }
         }
-        if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
+        if ((citationKeyPattern.getDefaultValue() != null) && !citationKeyPattern.getDefaultValue().equals(KeyPattern.NULL_PATTERN)) {
             List<String> data = new ArrayList<>();
             data.add(citationKeyPattern.getDefaultValue().stringRepresentation());
             stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);

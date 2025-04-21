@@ -16,13 +16,13 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Window;
 
-import org.jabref.logic.citationkeypattern.CitationKeyPattern;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
 
-public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<CitationKeyPatternsPanelItemModel, String> {
+public class PatternSuggestionCell extends TextFieldTableCell<PatternsPanelItemModel, String> {
     private final CitationKeyPatternSuggestionTextField searchField;
 
-    public CitationKeyPatternSuggestionCell(List<String> citationKeyPatterns) {
+    public PatternSuggestionCell(List<String> citationKeyPatterns) {
         this.searchField = new CitationKeyPatternSuggestionTextField(citationKeyPatterns);
         searchField.setOnAction(event -> commitEdit(searchField.getText()));
     }
@@ -145,10 +145,6 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
             }
 
             Window window = textField.getScene().getWindow();
-            if (window == null) {
-                return 0;
-            }
-
             Bounds bounds = textField.localToScreen(textField.getBoundsInLocal());
             double screenHeight = window.getHeight();
             double textFieldBottom = bounds.getMinY() + textField.getHeight();
@@ -159,26 +155,26 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
         private Menu createPatternsSubMenu() {
             Menu patternsSubMenu = new Menu(Localization.lang("All patterns"));
 
-            Map<CitationKeyPattern.Category, List<CitationKeyPattern>> categorizedPatterns =
-                    CitationKeyPattern.getAllPatterns().stream()
-                                      .collect(Collectors.groupingBy(CitationKeyPattern::getCategory));
+            Map<KeyPattern.Category, List<KeyPattern>> categorizedPatterns =
+                    KeyPattern.getAllPatterns().stream()
+                              .collect(Collectors.groupingBy(KeyPattern::getCategory));
 
-            Map<CitationKeyPattern.Category, String> categoryNames = Map.of(
-                    CitationKeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
-                    CitationKeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
-                    CitationKeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
-                    CitationKeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
-                    CitationKeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields")
+            Map<KeyPattern.Category, String> categoryNames = Map.of(
+                    KeyPattern.Category.AUTHOR_RELATED, Localization.lang("Author related"),
+                    KeyPattern.Category.EDITOR_RELATED, Localization.lang("Editor related"),
+                    KeyPattern.Category.TITLE_RELATED, Localization.lang("Title related"),
+                    KeyPattern.Category.OTHER_FIELDS, Localization.lang("Other fields"),
+                    KeyPattern.Category.BIBENTRY_FIELDS, Localization.lang("Entry fields")
             );
 
-            for (Map.Entry<CitationKeyPattern.Category, String> entry : categoryNames.entrySet()) {
-                CitationKeyPattern.Category category = entry.getKey();
+            for (Map.Entry<KeyPattern.Category, String> entry : categoryNames.entrySet()) {
+                KeyPattern.Category category = entry.getKey();
                 String categoryName = entry.getValue();
 
                 Menu categoryMenu = new Menu(categoryName);
-                List<CitationKeyPattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
+                List<KeyPattern> patterns = categorizedPatterns.getOrDefault(category, List.of());
 
-                for (CitationKeyPattern pattern : patterns) {
+                for (KeyPattern pattern : patterns) {
                     MenuItem menuItem = new MenuItem(pattern.stringRepresentation());
                     menuItem.setOnAction(event -> {
                         setText(pattern.stringRepresentation());

@@ -1,4 +1,4 @@
-package org.jabref.logic.citationkeypattern;
+package org.jabref.logic.linkedfile;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,25 +6,26 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.model.entry.types.EntryType;
 
 /**
  * A small table, where an entry type is associated with a Bibtex key pattern (an
- * <code>ArrayList</code>). A parent CitationKeyPattern can be set.
+ * <code>ArrayList</code>). A parent LinkedFileNamePattern can be set.
  */
-public abstract class AbstractCitationKeyPatterns {
+public abstract class AbstractLinkedFileNamePatterns {
 
     protected KeyPattern defaultPattern = KeyPattern.NULL_PATTERN;
 
     protected Map<EntryType, KeyPattern> data = new HashMap<>();
 
-    public void addCitationKeyPattern(EntryType type, String pattern) {
+    public void addLinkedFileNamePattern(EntryType type, String pattern) {
         data.put(type, new KeyPattern(pattern));
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractCitationKeyPattern{");
+        final StringBuilder sb = new StringBuilder("AbstractLinkedFileNamePattern{");
         sb.append("defaultPattern=").append(defaultPattern);
         sb.append(", data=").append(data);
         sb.append('}');
@@ -39,7 +40,7 @@ public abstract class AbstractCitationKeyPatterns {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        AbstractCitationKeyPatterns that = (AbstractCitationKeyPatterns) o;
+        AbstractLinkedFileNamePatterns that = (AbstractLinkedFileNamePatterns) o;
         return Objects.equals(defaultPattern, that.defaultPattern) && Objects.equals(data, that.data);
     }
 
@@ -49,8 +50,8 @@ public abstract class AbstractCitationKeyPatterns {
     }
 
     /**
-     * Gets an object for a desired key from this CitationKeyPattern or one of it's parents (in the case of
-     * DatabaseCitationKeyPattern). This method first tries to obtain the object from this CitationKeyPattern via the
+     * Gets an object for a desired key from this LinkedFileNamePattern or one of it's parents (in the case of
+     * DatabaseLinkedFileNamePattern). This method first tries to obtain the object from this LinkedFileNamePattern via the
      * <code>get</code> method of <code>Hashtable</code>. If this fails, we try the default.<br /> If that fails, we try
      * the parent.<br /> If that fails, we return the DEFAULT_LABELPATTERN<br />
      *
@@ -66,7 +67,7 @@ public abstract class AbstractCitationKeyPatterns {
             if (result == null || KeyPattern.NULL_PATTERN.equals(result)) {
                 // we are the "last" to ask
                 // we don't have anything left
-                return getLastLevelCitationKeyPattern(entryType);
+                return getLastLevelLinkedFileNamePattern(entryType);
             }
         }
         return result;
@@ -106,5 +107,5 @@ public abstract class AbstractCitationKeyPatterns {
         return data.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public abstract KeyPattern getLastLevelCitationKeyPattern(EntryType key);
+    public abstract KeyPattern getLastLevelLinkedFileNamePattern(EntryType key);
 }

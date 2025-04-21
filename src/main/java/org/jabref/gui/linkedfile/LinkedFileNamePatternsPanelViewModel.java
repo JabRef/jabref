@@ -1,4 +1,4 @@
-package org.jabref.gui.commonfxcontrols;
+package org.jabref.gui.linkedfile;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -9,14 +9,15 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 
-import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.gui.commonfxcontrols.PatternsPanelItemModel;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.linkedfile.AbstractLinkedFileNamePatterns;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.types.EntryType;
 
-public class CitationKeyPatternsPanelViewModel {
+public class LinkedFileNamePatternsPanelViewModel {
 
     public static final String ENTRY_TYPE_DEFAULT_NAME = "default";
 
@@ -35,21 +36,21 @@ public class CitationKeyPatternsPanelViewModel {
         return 0;
     };
 
+    private final FilePreferences filePreferences;
+
     private final ListProperty<PatternsPanelItemModel> patternListProperty = new SimpleListProperty<>();
     private final ObjectProperty<PatternsPanelItemModel> defaultItemProperty = new SimpleObjectProperty<>();
 
-    private final CitationKeyPatternPreferences keyPatternPreferences;
-
-    public CitationKeyPatternsPanelViewModel(CitationKeyPatternPreferences keyPatternPreferences) {
-        this.keyPatternPreferences = keyPatternPreferences;
+    public LinkedFileNamePatternsPanelViewModel(FilePreferences filePreferences) {
+        this.filePreferences = filePreferences;
     }
 
-    public void setValues(Collection<BibEntryType> entryTypeList, AbstractCitationKeyPatterns initialKeyPattern) {
+    public void setValues(Collection<BibEntryType> entryTypeList, AbstractLinkedFileNamePatterns initialNamePattern) {
         String defaultPattern;
-        if ((initialKeyPattern.getDefaultValue() == null) || initialKeyPattern.getDefaultValue().equals(KeyPattern.NULL_PATTERN)) {
+        if ((initialNamePattern.getDefaultValue() == null) || initialNamePattern.getDefaultValue().equals(KeyPattern.NULL_PATTERN)) {
             defaultPattern = "";
         } else {
-            defaultPattern = initialKeyPattern.getDefaultValue().stringRepresentation();
+            defaultPattern = initialNamePattern.getDefaultValue().stringRepresentation();
         }
 
         defaultItemProperty.setValue(new PatternsPanelItemModel(new DefaultEntryType(), defaultPattern));
@@ -60,29 +61,29 @@ public class CitationKeyPatternsPanelViewModel {
                      .map(BibEntryType::getType)
                      .forEach(entryType -> {
                          String pattern;
-                         if (initialKeyPattern.isDefaultValue(entryType)) {
+                         if (initialNamePattern.isDefaultValue(entryType)) {
                              pattern = "";
                          } else {
-                             pattern = initialKeyPattern.getPatterns().get(entryType).stringRepresentation();
+                             pattern = initialNamePattern.getPatterns().get(entryType).stringRepresentation();
                          }
                          patternListProperty.add(new PatternsPanelItemModel(entryType, pattern));
                      });
     }
 
     public void setItemToDefaultPattern(PatternsPanelItemModel item) {
-        item.setPattern(keyPatternPreferences.getDefaultPattern());
+        item.setPattern(filePreferences.getDefaultPattern());
     }
 
     public void resetAll() {
         patternListProperty.forEach(item -> item.setPattern(""));
-        defaultItemProperty.getValue().setPattern(keyPatternPreferences.getDefaultPattern());
+        defaultItemProperty.getValue().setPattern(filePreferences.getDefaultPattern());
     }
 
     public ListProperty<PatternsPanelItemModel> patternListProperty() {
         return patternListProperty;
     }
 
-    public ObjectProperty<PatternsPanelItemModel> defaultKeyPatternProperty() {
+    public ObjectProperty<PatternsPanelItemModel> defaultNamePatternProperty() {
         return defaultItemProperty;
     }
 

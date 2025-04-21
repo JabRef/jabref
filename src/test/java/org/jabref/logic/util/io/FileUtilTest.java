@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.citationkeypattern.KeyPattern;
+import org.jabref.logic.linkedfile.GlobalLinkedFileNamePatterns;
 import org.jabref.logic.os.OS;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -74,7 +76,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameDefaultFullTitle() {
-        String fileNamePattern = "[citationkey] - [fulltitle]";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[citationkey] - [fulltitle]"));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
@@ -85,7 +87,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameDefaultWithLowercaseTitle() {
-        String fileNamePattern = "[citationkey] - [title:lower]";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[citationkey] - [title:lower]"));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
@@ -96,7 +98,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameBibTeXKey() {
-        String fileNamePattern = "[citationkey]";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[citationKey]"));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
@@ -107,7 +109,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameNoPattern() {
-        String fileNamePattern = "";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern(""));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
         entry.setField(StandardField.TITLE, "mytitle");
@@ -117,7 +119,7 @@ class FileUtilTest {
 
     @Test
     void getDefaultFileNameNoPatternNoBibTeXKey() {
-        String fileNamePattern = "";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern(""));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "mytitle");
 
@@ -126,7 +128,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameGetKeyIfEmptyField() {
-        String fileNamePattern = "[title]";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[title]"));
         BibEntry entry = new BibEntry();
         entry.setCitationKey("1234");
 
@@ -135,7 +137,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
-        String fileNamePattern = "[title]";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[title]"));
         BibEntry entry = new BibEntry();
 
         assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern));
@@ -143,7 +145,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameByYearAuthorFirstpage() {
-        String fileNamePattern = "[year]_[auth]_[firstpage]";
+        GlobalLinkedFileNamePatterns fileNamePattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[year]_[auth]_[firstpage]"));
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "O. Kitsune");
         entry.setField(StandardField.YEAR, "1868");
@@ -154,7 +156,7 @@ class FileUtilTest {
 
     @Test
     void getLinkedFileNameRemovesLatexCommands() {
-        String pattern = "[citationkey] - [fulltitle]";
+        GlobalLinkedFileNamePatterns pattern = new GlobalLinkedFileNamePatterns(new KeyPattern("[citationkey] - [fulltitle]"));
         BibEntry entry = new BibEntry()
                 .withCitationKey("BrayBuildingCommunity")
                 .withField(StandardField.TITLE, "Building \\mkbibquote{Community}");

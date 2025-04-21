@@ -15,9 +15,9 @@ import javafx.beans.property.SimpleObjectProperty;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
-import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.DatabaseCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.util.Version;
 import org.jabref.model.database.BibDatabaseMode;
@@ -150,22 +150,22 @@ public class MetaData {
     public void setCiteKeyPattern(AbstractCitationKeyPatterns bibtexKeyPatterns) {
         Objects.requireNonNull(bibtexKeyPatterns);
 
-        CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
-        Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
+        KeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
+        Map<EntryType, KeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 
-    public void setCiteKeyPattern(CitationKeyPattern defaultValue, Map<EntryType, CitationKeyPattern> nonDefaultPatterns) {
+    public void setCiteKeyPattern(KeyPattern defaultValue, Map<EntryType, KeyPattern> nonDefaultPatterns) {
         // Remove all patterns from metadata
         citeKeyPatterns.clear();
 
         // Set new value if it is not a default value
-        for (Map.Entry<EntryType, CitationKeyPattern> pattern : nonDefaultPatterns.entrySet()) {
+        for (Map.Entry<EntryType, KeyPattern> pattern : nonDefaultPatterns.entrySet()) {
             citeKeyPatterns.put(pattern.getKey(), pattern.getValue().stringRepresentation());
         }
 
         // Store default pattern
-        if (defaultValue.equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
+        if (defaultValue.equals(KeyPattern.NULL_PATTERN)) {
             defaultCiteKeyPattern = null;
         } else {
             defaultCiteKeyPattern = defaultValue.stringRepresentation();

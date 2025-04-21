@@ -40,9 +40,9 @@ import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.bibtex.FieldPreferences;
-import org.jabref.logic.citationkeypattern.CitationKeyPattern;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.citationkeypattern.KeyPattern;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CSLStyleUtils;
 import org.jabref.logic.cleanup.CleanupPreferences;
@@ -72,6 +72,8 @@ import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.linkedfile.GlobalLinkedFileNamePatterns;
+import org.jabref.logic.linkedfile.LinkedFileNamePatternPreferences;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -227,6 +229,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String GROBID_PREFERENCE = "grobidPreference";
     public static final String GROBID_URL = "grobidURL";
 
+    public static final String DEFAULT_LINKED_FILE_NAME_PATTERN = "defaultLinkedFileNamePattern";
+
     public static final String DEFAULT_CITATION_KEY_PATTERN = "defaultBibtexKeyPattern";
     public static final String UNWANTED_CITATION_KEY_CHARACTERS = "defaultUnwantedBibtexKeyCharacters";
     public static final String CONFIRM_LINKED_FILE_DELETE = "confirmLinkedFileDelete";
@@ -281,6 +285,8 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
 
+    // Prefs node for LinkedFileNamePatterns
+    public static final String LINKED_FILE_NAME_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
@@ -425,6 +431,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private InternalPreferences internalPreferences;
     private XmpPreferences xmpPreferences;
     private CleanupPreferences cleanupPreferences;
+    private LinkedFileNamePatternPreferences linkedFileNamePatternPreferences;
     private CitationKeyPatternPreferences citationKeyPatternPreferences;
     private JournalAbbreviationPreferences journalAbbreviationPreferences;
     private FieldPreferences fieldPreferences;
@@ -589,8 +596,10 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_LINKED_FILE_DELETE, Boolean.TRUE);
         defaults.put(KEEP_DOWNLOAD_URL, Boolean.TRUE);
+        defaults.put(DEFAULT_LINKED_FILE_NAME_PATTERN, "[auth][year]");
         defaults.put(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, Boolean.TRUE);
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
+
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
         defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
@@ -855,6 +864,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public void clear() throws BackingStoreException {
         clearAllBibEntryTypes();
         clearCitationKeyPatterns();
+        clearLinkedFileNamePatterns();
         clearTruststoreFromCustomCertificates();
         clearCustomFetcherKeys();
         prefs.clear();
@@ -1346,6 +1356,73 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     //*************************************************************************************************************
+    // LinkedFileNamePatternPreferences
+    //*************************************************************************************************************
+
+    private GlobalLinkedFileNamePatterns getGlobalLinkedFileNamePattern() {
+        GlobalLinkedFileNamePatterns linkedFileNamePattern = GlobalLinkedFileNamePatterns.fromPattern(get(DEFAULT_LINKED_FILE_NAME_PATTERN));
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
+        try {
+            String[] keys = preferences.keys();
+            for (String key : keys) {
+                linkedFileNamePattern.addLinkedFileNamePattern(
+                        EntryTypeFactory.parse(key),
+                        preferences.get(key, null));
+            }
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences.getKeyPattern", ex);
+        }
+
+        return linkedFileNamePattern;
+    }
+
+    // public for use in PreferenceMigrations
+    public void storeGlobalLinkedFileNamePattern(GlobalLinkedFileNamePatterns pattern) {
+        if ((pattern.getDefaultValue() == null)
+                || pattern.getDefaultValue().equals(KeyPattern.NULL_PATTERN)) {
+            put(DEFAULT_LINKED_FILE_NAME_PATTERN, "");
+        } else {
+            put(DEFAULT_LINKED_FILE_NAME_PATTERN, pattern.getDefaultValue().stringRepresentation());
+        }
+
+        // Store overridden definitions to Preferences.
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
+        try {
+            preferences.clear(); // We remove all old entries.
+        } catch (BackingStoreException ex) {
+            LOGGER.info("BackingStoreException in JabRefPreferences::putKeyPattern", ex);
+        }
+
+        for (EntryType entryType : pattern.getAllKeys()) {
+            if (!pattern.isDefaultValue(entryType)) {
+                // first entry in the map is the full pattern
+                preferences.put(entryType.getName(), pattern.getValue(entryType).stringRepresentation());
+            }
+        }
+    }
+
+    private void clearLinkedFileNamePatterns() throws BackingStoreException {
+        Preferences preferences = PREFS_NODE.node(IMPORT_FILENAMEPATTERN);
+        preferences.clear();
+        getLinkedFileNamePatternPreferences().setNamePatterns(getGlobalLinkedFileNamePattern());
+    }
+
+    @Override
+    public LinkedFileNamePatternPreferences getLinkedFileNamePatternPreferences() {
+        if (linkedFileNamePatternPreferences != null) {
+            return linkedFileNamePatternPreferences;
+        }
+
+        linkedFileNamePatternPreferences = new LinkedFileNamePatternPreferences(
+                (String) defaults.get(DEFAULT_LINKED_FILE_NAME_PATTERN));
+
+        EasyBind.listen(linkedFileNamePatternPreferences.namePatternsProperty(),
+                (obs, oldValue, newValue) -> storeGlobalLinkedFileNamePattern(newValue));
+
+        return linkedFileNamePatternPreferences;
+    }
+
+    //*************************************************************************************************************
     // CitationKeyPatternPreferences
     //*************************************************************************************************************
 
@@ -1369,7 +1446,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // public for use in PreferenceMigrations
     public void storeGlobalCitationKeyPattern(GlobalCitationKeyPatterns pattern) {
         if ((pattern.getDefaultValue() == null)
-                || pattern.getDefaultValue().equals(CitationKeyPattern.NULL_CITATION_KEY_PATTERN)) {
+                || pattern.getDefaultValue().equals(KeyPattern.NULL_PATTERN)) {
             put(DEFAULT_CITATION_KEY_PATTERN, "");
         } else {
             put(DEFAULT_CITATION_KEY_PATTERN, pattern.getDefaultValue().stringRepresentation());
@@ -1566,7 +1643,6 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInternalPreferences().getUserAndHost(),
                 getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
-                get(IMPORT_FILENAMEPATTERN),
                 get(IMPORT_FILEDIRPATTERN),
                 getBoolean(DOWNLOAD_LINKED_FILES),
                 getBoolean(FULLTEXT_INDEX_LINKED_FILES),
@@ -1578,6 +1654,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 // We make use of the fallback, because we need AWT being initialized, which is not the case at the constructor JabRefPreferences()
                 getBoolean(TRASH_INSTEAD_OF_DELETE, moveToTrashSupported()),
                 getBoolean(KEEP_DOWNLOAD_URL),
+                getGlobalLinkedFileNamePattern(),
+                (String) defaults.get(DEFAULT_LINKED_FILE_NAME_PATTERN),
                 getPath(LAST_USED_DIRECTORY, getDefaultPath()),
                 getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY),
                 getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY));
@@ -1585,7 +1663,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
         EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
-        EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
+        EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> storeGlobalLinkedFileNamePattern(newValue));
         EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
         EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
         EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));

@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
@@ -12,14 +11,17 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.help.HelpAction;
+import org.jabref.gui.linkedfile.LinkedFileNamePatternsPanel;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
+import jakarta.inject.Inject;
 
 public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabViewModel> implements PreferencesTab {
 
@@ -34,13 +36,13 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
     @FXML private RadioButton openFileExplorerInFilesDirectory;
     @FXML private RadioButton openFileExplorerInLastDirectory;
     @FXML private TextField autolinkRegexKey;
-
     @FXML private CheckBox fulltextIndex;
-
-    @FXML private ComboBox<String> fileNamePattern;
-    @FXML private TextField fileDirectoryPattern;
     @FXML private CheckBox confirmLinkedFileDelete;
     @FXML private CheckBox moveToTrash;
+
+    @FXML private LinkedFileNamePatternsPanel linkedFileNamePatternTable;
+
+    @Inject private BibEntryTypesManager entryTypesManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -73,12 +75,12 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
         autolinkRegexKey.textProperty().bindBidirectional(viewModel.autolinkRegexKeyProperty());
         autolinkRegexKey.disableProperty().bind(autolinkUseRegex.selectedProperty().not());
         fulltextIndex.selectedProperty().bindBidirectional(viewModel.fulltextIndexProperty());
-        fileNamePattern.valueProperty().bindBidirectional(viewModel.fileNamePatternProperty());
-        fileNamePattern.itemsProperty().bind(viewModel.defaultFileNamePatternsProperty());
-        fileDirectoryPattern.textProperty().bindBidirectional(viewModel.fileDirectoryPatternProperty());
         confirmLinkedFileDelete.selectedProperty().bindBidirectional(viewModel.confirmLinkedFileDeleteProperty());
         openFileExplorerInFilesDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInFilesDirectoryProperty());
         openFileExplorerInLastDirectory.selectedProperty().bindBidirectional(viewModel.openFileExplorerInLastDirectoryProperty());
+
+        linkedFileNamePatternTable.patternListProperty().bindBidirectional(viewModel.patternListProperty());
+        linkedFileNamePatternTable.defaultNamePatternProperty().bindBidirectional(viewModel.defaultNamePatternProperty());
 
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP_REGEX_SEARCH, new HelpAction(HelpFile.REGEX_SEARCH, dialogService, preferences.getExternalApplicationsPreferences()), autolinkRegexHelp);
@@ -89,5 +91,23 @@ public class LinkedFilesTab extends AbstractPreferenceTabView<LinkedFilesTabView
 
     public void mainFileDirBrowse() {
         viewModel.mainFileDirBrowse();
+    }
+
+    @Override
+    public void setValues() {
+        viewModel.setValues();
+        linkedFileNamePatternTable.setValues(
+                entryTypesManager.getAllTypes(preferences.getLibraryPreferences().getDefaultBibDatabaseMode()),
+                preferences.getFilePreferences().fileNamePatternProperty().get());
+    }
+
+    @Override
+    public void storeSettings() {
+        viewModel.storeSettings();
+    }
+
+    @FXML
+    public void resetAllKeyPatterns() {
+        linkedFileNamePatternTable.resetAll();
     }
 }
