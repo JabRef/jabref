@@ -53,6 +53,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.bibtex.comparator;
     exports org.jabref.logic.groups;
     exports org.jabref.logic.layout;
+    exports org.jabref.logic.openoffice.style;
 
     requires javafx.base;
     requires javafx.graphics;

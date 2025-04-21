@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1232,61 +1231,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return keyBindingRepository;
     }
-
-    @Override
-    public OpenOfficePreferences getOpenOfficePreferences() {
-        if (openOfficePreferences != null) {
-            return openOfficePreferences;
-        }
-
-        String currentStylePath = get(OO_CURRENT_STYLE);
-
-        OOStyle currentStyle = CSLStyleLoader.getDefaultStyle(); // Defaults to IEEE CSL Style
-
-        // Reassign currentStyle based on actual last used CSL style or JStyle
-        if (CSLStyleUtils.isCitationStyleFile(currentStylePath)) {
-            currentStyle = CSLStyleUtils.createCitationStyleFromFile(currentStylePath)
-                                        .orElse(CSLStyleLoader.getDefaultStyle());
-        } else {
-            // For now, must be a JStyle. In future, make separate cases for JStyles (.jstyle) and BibTeX (.bst) styles
-            try {
-                currentStyle = new JStyle(currentStylePath, getLayoutFormatterPreferences(),
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-            } catch (IOException ex) {
-                LOGGER.warn("Could not create JStyle", ex);
-            }
-        }
-
-        openOfficePreferences = new OpenOfficePreferences(
-                get(OO_EXECUTABLE_PATH),
-                getBoolean(OO_USE_ALL_OPEN_BASES),
-                getBoolean(OO_SYNC_WHEN_CITING),
-                getStringList(OO_EXTERNAL_STYLE_FILES),
-                get(OO_BIBLIOGRAPHY_STYLE_FILE),
-                currentStyle,
-                getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),
-                get(OO_CSL_BIBLIOGRAPHY_TITLE),
-                get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT),
-                getStringList(OO_EXTERNAL_CSL_STYLES));
-
-        EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
-        EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
-        EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));
-        EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (obs, oldValue, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
-
-        openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
-                putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
-        openOfficePreferences.getExternalCslStyles().addListener((InvalidationListener) change ->
-                putStringList(OO_EXTERNAL_CSL_STYLES, openOfficePreferences.getExternalCslStyles()));
-        EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
-        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
-
-        EasyBind.listen(openOfficePreferences.cslBibliographyTitleProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_TITLE, newValue));
-        EasyBind.listen(openOfficePreferences.cslBibliographyHeaderFormatProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, newValue));
-
-        return openOfficePreferences;
-    }
-
 
     /**
      * In GUI mode, we can lookup the directory better

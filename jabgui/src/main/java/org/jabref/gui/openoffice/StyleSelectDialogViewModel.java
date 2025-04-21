@@ -25,6 +25,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -71,7 +72,7 @@ public class StyleSelectDialogViewModel {
 
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.filePreferences = preferences.getFilePreferences();
-        this.openOfficePreferences = preferences.getOpenOfficePreferences();
+        this.openOfficePreferences = preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
 
         jStyles.addAll(loadJStyles());
 

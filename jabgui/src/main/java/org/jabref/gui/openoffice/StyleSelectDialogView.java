@@ -28,6 +28,7 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStylePreviewLayout;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
 import org.jabref.logic.openoffice.style.JStyle;
@@ -40,6 +41,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.types.StandardEntryType;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
@@ -119,7 +121,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         setupCslStylesTab();
         setupJStylesTab();
 
-        OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
+        OOStyle currentStyle = preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)).getCurrentStyle();
         if (currentStyle instanceof CitationStyle) {
             tabPane.getSelectionModel().select(cslStyleTab);
         } else {
@@ -288,7 +290,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
 
     @FXML
     private void modifyBibliographyTitle() {
-        ModifyCSLBibliographyTitleDialogView modifyBibliographyTitleDialogView = new ModifyCSLBibliographyTitleDialogView(preferences.getOpenOfficePreferences());
+        ModifyCSLBibliographyTitleDialogView modifyBibliographyTitleDialogView = new ModifyCSLBibliographyTitleDialogView(preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)));
         dialogService.showCustomDialog(modifyBibliographyTitleDialogView);
     }
 
@@ -307,7 +309,7 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
             return; // Scroll has already been performed, exit early
         }
 
-        OOStyle currentStyle = preferences.getOpenOfficePreferences().getCurrentStyle();
+        OOStyle currentStyle = preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)).getCurrentStyle();
         if (currentStyle instanceof CitationStyle currentCitationStyle) {
             for (int i = 0; i < cslStylesTable.getItems().size(); i++) {
                 CSLStyleSelectViewModel item = cslStylesTable.getItems().get(i);

@@ -19,6 +19,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
+
 public class SidePaneContentFactory {
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
@@ -69,7 +71,7 @@ public class SidePaneContentFactory {
             case OPEN_OFFICE -> new OpenOfficePanel(
                     tabContainer,
                     preferences,
-                    preferences.getOpenOfficePreferences(),
+                    preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)),
                     preferences.getExternalApplicationsPreferences(),
                     preferences.getLayoutFormatterPreferences(),
                     preferences.getCitationKeyPatternPreferences(),
