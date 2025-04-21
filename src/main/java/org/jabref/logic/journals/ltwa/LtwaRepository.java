@@ -363,7 +363,7 @@ public class LtwaRepository {
             }
 
             if (Character.toLowerCase(wordCp) != Character.toLowerCase(titleCp)) {
-                return handleMismatch(title, titlePosition, wordPosition);
+                return handleMismatch(title, titlePosition);
             }
 
             wordPosition += Character.charCount(wordCp);
@@ -376,7 +376,7 @@ public class LtwaRepository {
     /**
      * Handle character mismatches during matching
      */
-    private static boolean handleMismatch(String title, int titlePosition, int wordPosition) {
+    private static boolean handleMismatch(String title, int titlePosition) {
         Matcher match = INFLECTION.matcher(title.substring(titlePosition));
         if (!match.lookingAt()) {
             return false;
