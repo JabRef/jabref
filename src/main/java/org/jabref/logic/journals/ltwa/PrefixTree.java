@@ -86,12 +86,12 @@ public class PrefixTree<D> {
         @Override
         public boolean equals(Object obj) {
             if (!(obj instanceof SearchState(
-                    PrefixTree.Node<?> node1,
-                    int index1
+                    PrefixTree.Node<?> otherNode,
+                    int otherIndex
             ))) {
                 return false;
             }
-            return this.node == node1 && this.index == index1;
+            return this.node == otherNode && this.index == otherIndex;
         }
 
         @Override
