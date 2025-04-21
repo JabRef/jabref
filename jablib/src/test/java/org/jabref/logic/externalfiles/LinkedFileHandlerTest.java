@@ -3,8 +3,8 @@ package org.jabref.logic.externalfiles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -24,7 +24,7 @@ class LinkedFileHandlerTest {
     private BibEntry entry;
     private BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences = mock(FilePreferences.class);
-    private final GuiPreferences preferences = mock(GuiPreferences.class);
+    private final CliPreferences preferences = mock(CliPreferences.class);
 
     @BeforeEach
     void setUp(@TempDir Path tempFolder) {

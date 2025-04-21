@@ -11,7 +11,7 @@ import java.util.Objects;
 import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor.Mode;
-import org.jabref.logic.bibtexclone.BibEntryAssert;
+import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;

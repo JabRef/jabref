@@ -4,6 +4,7 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     `java-library`
+    `java-test-fixtures`
 
     id("idea")
 
@@ -37,6 +38,9 @@ dependencies {
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
 
+    implementation("org.jabref:afterburner.fx:2.0.0") {
+        exclude( group = "org.openjfx")
+    }
     implementation("org.jabref:easybind:2.2.1-SNAPSHOT") {
         exclude(group = "org.openjfx")
     }
@@ -216,10 +220,17 @@ dependencies {
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
 
     testImplementation("io.github.classgraph:classgraph:4.8.179")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
+    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.platform:junit-platform-launcher:1.12.1")
 
+    testFixturesImplementation("org.openjfx:javafx-base:24.0.1")
+
     testImplementation("org.mockito:mockito-core:5.17.0")
+    testFixturesImplementation("org.mockito:mockito-core:5.17.0")
+
     testImplementation("org.xmlunit:xmlunit-core:2.10.0")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.0")
