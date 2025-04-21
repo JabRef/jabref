@@ -78,15 +78,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 abbreviations.unbindBidirectional(oldValue.abbreviationsProperty());
                 currentAbbreviation.set(null);
             }
-            if (newValue != null) {
-                isFileRemovable.set(!newValue.isBuiltInListProperty().get());
-                if (newValue.abbreviationsProperty() != null) {
-                    abbreviations.bindBidirectional(newValue.abbreviationsProperty());
-                    if (!abbreviations.isEmpty()) {
-                        currentAbbreviation.set(abbreviations.getLast());
-                    }
-                }
-            } else {
+            
+            if (newValue == null) {
                 isFileRemovable.set(false);
                 if (journalFiles.isEmpty()) {
                     currentAbbreviation.set(null);
@@ -94,6 +87,17 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 } else {
                     currentFile.set(journalFiles.getFirst());
                 }
+                return;
+            }
+            
+            isFileRemovable.set(!newValue.isBuiltInListProperty().get());
+            if (newValue.abbreviationsProperty() == null) {
+                return;
+            }
+            
+            abbreviations.bindBidirectional(newValue.abbreviationsProperty());
+            if (!abbreviations.isEmpty()) {
+                currentAbbreviation.set(abbreviations.getLast());
             }
         });
         journalFiles.addListener((ListChangeListener<AbbreviationsFileViewModel>) lcl -> {
@@ -367,7 +371,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         
                     Injector.setModelOrService(JournalAbbreviationRepository.class, newRepository);
                 })
-                .onFailure(exception -> LOGGER.error("Failed to store journal preferences: {}", exception.getMessage(), exception))
+                .onFailure(exception -> LOGGER.error("Failed to store journal preferences", exception))
                 .executeWith(taskExecutor);
     }
 

@@ -281,30 +281,32 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @FXML
     private void toggleEnableList() {
         AbbreviationsFileViewModel selected = journalFilesBox.getValue();
-        if (selected != null) {
-            boolean newEnabledState = !selected.isEnabled();
-            selected.setEnabled(newEnabledState);
-            
-            refreshComboBoxDisplay();
-            
-            JournalAbbreviationPreferences abbreviationPreferences = preferences.getJournalAbbreviationPreferences();
-                
-            if (selected.isBuiltInListProperty().get()) {
-                abbreviationPreferences.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, newEnabledState);
-            } else if (selected.getAbsolutePath().isPresent()) {
-                String fileName = selected.getAbsolutePath().get().getFileName().toString();
-                abbreviationPreferences.setSourceEnabled(fileName, newEnabledState);
-            }
-            
-            JournalAbbreviationRepository newRepository = 
-                JournalAbbreviationLoader.loadRepository(abbreviationPreferences);
-                
-            Injector.setModelOrService(JournalAbbreviationRepository.class, newRepository);
-            
-            abbreviationRepository = newRepository;
-            
-            viewModel.markAsDirty();
+        if (selected == null) {
+            return;
         }
+        
+        boolean newEnabledState = !selected.isEnabled();
+        selected.setEnabled(newEnabledState);
+        
+        refreshComboBoxDisplay();
+        
+        JournalAbbreviationPreferences abbreviationPreferences = preferences.getJournalAbbreviationPreferences();
+            
+        if (selected.isBuiltInListProperty().get()) {
+            abbreviationPreferences.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, newEnabledState);
+        } else if (selected.getAbsolutePath().isPresent()) {
+            String fileName = selected.getAbsolutePath().get().getFileName().toString();
+            abbreviationPreferences.setSourceEnabled(fileName, newEnabledState);
+        }
+        
+        JournalAbbreviationRepository newRepository = 
+            JournalAbbreviationLoader.loadRepository(abbreviationPreferences);
+            
+        Injector.setModelOrService(JournalAbbreviationRepository.class, newRepository);
+        
+        abbreviationRepository = newRepository;
+        
+        viewModel.markAsDirty();
     }
 
     private void setAnimations() {

@@ -73,6 +73,14 @@ public class AbbreviationsFileViewModel {
         return abbreviations;
     }
 
+    /**
+     * Reads journal abbreviations from the associated file and updates the abbreviations list.
+     * For built-in lists, this method does nothing and returns immediately.
+     * For file-based lists, it attempts to read abbreviations from the CSV file at the specified path.
+     * If the file doesn't exist, a debug message is logged but no exception is propagated.
+     *
+     * @throws IOException If there is an error reading the abbreviation file
+     */
     public void readAbbreviations() throws IOException {
         if (isBuiltInList.get()) {
             return;
@@ -85,10 +93,17 @@ public class AbbreviationsFileViewModel {
                                                                    .collect(Collectors.toCollection(ArrayList::new));
             abbreviations.setAll(viewModels);
         } catch (NoSuchFileException e) {
-            LOGGER.debug("Journal abbreviation list {} does not exist", filePath);
+            LOGGER.debug("Journal abbreviation list {} does not exist", filePath, e);
         }
     }
 
+    /**
+     * Writes the abbreviations to the associated file or creates a new file if it doesn't exist.
+     * For built-in lists, this method does nothing and returns immediately.
+     * For file-based lists, it collects all abbreviations from the property and writes them to the file.
+     * 
+     * @throws IOException If there is an error writing to the file
+     */
     public void writeOrCreate() throws IOException {
         if (isBuiltInList.get()) {
             return;

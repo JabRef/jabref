@@ -83,6 +83,11 @@ public class AbbreviateAction extends SimpleCommand {
 
     @Override
     public void execute() {
+        if (action == StandardActions.UNABBREVIATE && !areAnyJournalSourcesEnabled()) {
+            dialogService.notify(Localization.lang("Cannot unabbreviate: all journal lists are disabled."));
+            return;
+        }
+
         if ((action == StandardActions.ABBREVIATE_DEFAULT)
                 || (action == StandardActions.ABBREVIATE_DOTLESS)
                 || (action == StandardActions.ABBREVIATE_SHORTEST_UNIQUE)
@@ -92,12 +97,7 @@ public class AbbreviateAction extends SimpleCommand {
                     BackgroundTask.wrap(() -> abbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
                                   .onSuccess(dialogService::notify)
                                   .executeWith(taskExecutor));
-        } else if (action == StandardActions.UNABBREVIATE) {            
-            if (!areAnyJournalSourcesEnabled()) {
-                dialogService.notify(Localization.lang("Cannot unabbreviate: all journal lists are disabled."));
-                return;
-            }
-            
+        } else if (action == StandardActions.UNABBREVIATE) {
             dialogService.notify(Localization.lang("Unabbreviating..."));
             stateManager.getActiveDatabase().ifPresent(_ ->
                     BackgroundTask.wrap(() -> unabbreviate(stateManager.getActiveDatabase().get(), stateManager.getSelectedEntries()))
