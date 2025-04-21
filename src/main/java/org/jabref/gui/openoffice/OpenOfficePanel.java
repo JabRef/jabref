@@ -45,6 +45,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -54,8 +55,8 @@ import org.jabref.logic.openoffice.OpenOfficeFileSearch;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.action.Update;
 import org.jabref.logic.openoffice.style.JStyle;
+import org.jabref.logic.openoffice.style.JStyleLoader;
 import org.jabref.logic.openoffice.style.OOStyle;
-import org.jabref.logic.openoffice.style.StyleLoader;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -105,7 +106,8 @@ public class OpenOfficePanel {
     private final UndoManager undoManager;
     private final UiTaskExecutor taskExecutor;
     private final AiService aiService;
-    private final StyleLoader loader;
+    private final JStyleLoader jStyleLoader;
+    private final CSLStyleLoader cslStyleLoader;
     private final LibraryTabContainer tabContainer;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
@@ -143,6 +145,15 @@ public class OpenOfficePanel {
         this.undoManager = undoManager;
         this.currentStyle = openOfficePreferences.getCurrentStyle();
 
+        this.currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
+
+        jStyleLoader = new JStyleLoader(
+                openOfficePreferences,
+                layoutFormatterPreferences,
+                abbreviationRepository);
+
+        cslStyleLoader = new CSLStyleLoader(openOfficePreferences);
+
         ActionFactory factory = new ActionFactory();
 
         connect = new Button();
@@ -168,13 +179,6 @@ public class OpenOfficePanel {
         update.setTooltip(new Tooltip(Localization.lang("Sync OpenOffice/LibreOffice bibliography")));
         update.setMaxWidth(Double.MAX_VALUE);
 
-        loader = new StyleLoader(
-                openOfficePreferences,
-                layoutFormatterPreferences,
-                abbreviationRepository);
-
-        currentStyleProperty = new SimpleObjectProperty<>(currentStyle);
-
         initPanel();
     }
 
@@ -187,16 +191,16 @@ public class OpenOfficePanel {
      * Return true if failed. In this case the dialog is already shown.
      */
     private boolean getOrUpdateTheStyle(String title) {
-        currentStyle = loader.getUsedStyleUnified();
-        currentStyleProperty.set(currentStyle);
         final boolean FAIL = true;
         final boolean PASS = false;
 
         if (currentStyle == null) {
-            currentStyle = loader.getUsedStyleUnified();
+            currentStyle = openOfficePreferences.getCurrentStyle();
+            currentStyleProperty.set(currentStyle);
         } else {
             if (currentStyle instanceof JStyle jStyle) {
                 try {
+                    jStyle = jStyleLoader.getUsedJstyle();
                     jStyle.ensureUpToDate();
                 } catch (IOException ex) {
                     LOGGER.warn("Unable to reload style file '{}'", jStyle.getPath(), ex);
@@ -230,7 +234,7 @@ public class OpenOfficePanel {
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
         setStyleFile.setOnAction(event -> {
-            StyleSelectDialogView styleDialog = new StyleSelectDialogView(loader);
+            StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
                              currentStyle = selectedStyle;

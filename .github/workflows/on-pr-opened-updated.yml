@@ -1,45 +1,64 @@
-name: On PR opened
+name: On PR opened/updated
 
 on:
   # _target is required
   pull_request_target:
+  # default: opened, synchronize, reopened
 
 jobs:
   determine_issue_number:
     name: Determine issue number
     runs-on: ubuntu-latest
+    if: >
+      !(
+        (github.actor == 'dependabot[bot]') ||
+        (
+          startsWith(github.event.pull_request.title, '[Bot] ') ||
+          startsWith(github.event.pull_request.title, 'Bump ') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
+          startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
+        )
+      )
     permissions:
-      issues: write
+      contents: read
+    outputs:
+      issue_number: ${{ steps.get_issue_number.outputs.ticketNumber }}
     steps:
-      - name: Determine issue number
-        uses: koppor/ticket-check-action@add-output
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
-          ticketPrefix: '#'
-          titleRegex: '^#(?<ticketNumber>\d+)'
-          branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
-          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
-          outputOnly: true
-  move_issue:
-    name: Mark issue as in progress
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-    steps:
+      - name: echo PR data
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR URL: ${{ github.event.pull_request.html_url }}"
+          cat <<EOF
+          PR Body:
+          ${{ github.event.pull_request.body }}
+          EOF
       - name: Determine issue number
         id: get_issue_number
         uses: koppor/ticket-check-action@add-output
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
+          ticketLink: 'https://github.com/JabRef/jabref/issues/%ticketNumber%'
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
-          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
+          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!12345\b)\d+)'
+          bodyRegexFlags: 'i'
           outputOnly: true
+      - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
+      - name: Issue number present
+        if: steps.get_issue_number.outputs.ticketNumber == '-1'
+        run: |
+          echo "No valid ticket number found!"
+          exit 1
+  move_issue:
+    name: Mark issue as in progress
+    # after determine_issue_number to ensure that there is only one failure because of no ticket number
+    needs: determine_issue_number
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
       - name: Move issue to "In Progress" in "Good First Issues"
         uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
         with:
@@ -49,7 +68,7 @@ jobs:
           target-column: "In Progress"
           ignored-columns: ""
           default-column: "In Progress"
-          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
       - name: Move issue to "In Progress" in "Candidates for University Projects"
         uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
@@ -60,26 +79,16 @@ jobs:
           target-column: "In Progress"
           ignored-columns: ""
           default-column: "In Progress"
-          issue-number: ${{ steps.get_issue_number.outputs.ticketNumber }}
+          issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
   ensure_assignment:
     name: Ensure that contributor is assigned (fails if not commented on issue)
+    # after determine_issue_number to ensure that there is only one failure because of no ticket number
+    needs: determine_issue_number
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - name: Determine issue number
-        id: get_issue_number
-        uses: koppor/ticket-check-action@add-output
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ticketLink: 'https://github.com/:owner/:repo/issues/%ticketNumber%'
-          ticketPrefix: '#'
-          titleRegex: '^#(?<ticketNumber>\d+)'
-          branchRegex: '^(?<ticketNumber>\d+)'
-          bodyRegex: '#(?!12345\b)(?<ticketNumber>\d+)'
-          bodyURLRegex: 'http(s?):\/\/(github.com)(\/JabRef)(\/jabref)(\/issues)\/(?<ticketNumber>\d+)'
-          outputOnly: true
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
@@ -87,9 +96,11 @@ jobs:
         run: |
           set -e
 
+          echo "Updating issue '${{ needs.determine_issue_number.outputs.issue_number }}'"
+
           # "gh issue edit" cannot be used - workaround found at https://github.com/cli/cli/issues/9620#issuecomment-2703135049
 
-          ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} --jq '[.assignees[].login]')
+          ASSIGNEES=$(gh api /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --jq '[.assignees[].login]')
 
           # Check if the user is already assigned
           if echo "$ASSIGNEES" | jq -e '. | index("${{ github.event.pull_request.user.login }}")' >/dev/null; then
@@ -102,13 +113,13 @@ jobs:
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
           # Update issue with the new assignee list
-          echo "Updating issue #${{ steps.get_issue_number.outputs.ticketNumber }} updated with assignees: $UPDATED_ASSIGNEES..."
-          gh api -X PATCH /repos/JabRef/jabref/issues/${{ steps.get_issue_number.outputs.ticketNumber }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
+          echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
+          gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add label "📌 Pinned"
-        run: gh issue edit ${{ steps.get_issue_number.outputs.ticketNumber }} --add-label "📌 Pinned"
+        run: gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --add-label "📌 Pinned"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   conflicts_with_target:

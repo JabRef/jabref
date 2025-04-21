@@ -4,6 +4,7 @@ import java.util.EnumSet;
 
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -32,15 +33,16 @@ public class BibEntryView {
     public static Node getEntryNode(BibEntry entry) {
         Node entryType = getIcon(entry.getType()).getGraphicNode();
         entryType.getStyleClass().add("type");
-        Label authors = new Label(entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse(""));
+        String authorsText = entry.getFieldOrAliasLatexFree(StandardField.AUTHOR).orElse("");
+        Node authors = createLabel(authorsText);
         authors.getStyleClass().add("authors");
-        authors.setWrapText(true);
-        Label title = new Label(entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse(""));
+        String titleText = entry.getFieldOrAliasLatexFree(StandardField.TITLE).orElse("");
+        Node title = createLabel(titleText);
         title.getStyleClass().add("title");
-        title.setWrapText(true);
         Label year = new Label(entry.getFieldOrAliasLatexFree(StandardField.YEAR).orElse(""));
         year.getStyleClass().add("year");
-        Label journal = new Label(entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse(""));
+        String journalText = entry.getFieldOrAliasLatexFree(StandardField.JOURNAL).orElse("");
+        Node journal = createLabel(journalText);
         journal.getStyleClass().add("journal");
 
         VBox entryContainer = new VBox(
@@ -48,8 +50,9 @@ public class BibEntryView {
                 new HBox(5, year, journal),
                 authors
         );
+
         entry.getFieldOrAliasLatexFree(StandardField.ABSTRACT).ifPresent(summaryText -> {
-            TextFlowLimited summary = new TextFlowLimited(new Text(summaryText));
+            Node summary = createSummary(summaryText);
             summary.getStyleClass().add("summary");
             entryContainer.getChildren().add(summary);
         });
@@ -73,5 +76,65 @@ public class BibEntryView {
             }
         }
         return IconTheme.JabRefIcons.ARTICLE;
+    }
+
+    /**
+     * Checks if text contains right-to-left characters
+     *
+     * @param text Text to check
+     * @return true if text contains RTL characters
+     */
+    private static boolean isRTL(String text) {
+        for (char c : text.toCharArray()) {
+            if (Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT ||
+                    Character.getDirectionality(c) == Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Creates a text node for the summary with horizontal scrolling for RTL text,
+     * avoiding JavaFX bug related to RTL text wrapping
+     *
+     * @param text The summary text content
+     * @return Node with either:
+     *         - ScrollPane (for RTL text)
+     *         - TextFlowLimited (for LTR text)
+     */
+    private static Node createSummary(String text) {
+        if (isRTL(text)) {
+            Text textNode = new Text(text);
+            ScrollPane scrollPane = new ScrollPane(textNode);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.setFitToHeight(true);
+            return scrollPane;
+        } else {
+            return new TextFlowLimited(new Text(text));
+        }
+    }
+
+    /**
+     * Creates a label with horizontal scrolling for RTL text, 
+     * avoiding JavaFX bug related to RTL text wrapping
+     *
+     * @param text The label text content
+     * @return Node with either:
+     *         - ScrollPane (for RTL text)
+     *         - Wrapped Label (for LTR text)
+     */
+    private static Node createLabel(String text) {
+        if (isRTL(text)) {
+            Label label = new Label(text);
+            ScrollPane scrollPane = new ScrollPane(label);
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+            scrollPane.setFitToHeight(true);
+            return scrollPane;
+        } else {
+            Label label = new Label(text);
+            label.setWrapText(true);
+            return label;
+        }
     }
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
@@ -27,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CSLFormatUtilsTest {
 
-    private static final List<CitationStyle> STYLE_LIST = CitationStyle.discoverCitationStyles();
+    private static final List<CitationStyle> STYLE_LIST = CSLStyleLoader.getInternalStyles();
 
     private final BibEntry testEntry = TestEntry.getTestEntry();
     private final BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
