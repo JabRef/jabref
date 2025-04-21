@@ -1,10 +1,9 @@
-package org.jabref.logic.util;
+package org.jabref.gui.util;
 
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.util.IconValidationDecorator;
 
 import org.controlsfx.validation.Severity;
 import org.controlsfx.validation.ValidationMessage;

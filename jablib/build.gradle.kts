@@ -242,6 +242,10 @@ dependencies {
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
     testImplementation("org.wiremock:wiremock-standalone:3.12.1")
 
+    // Required for LocalizationConsistencyTest
+    testImplementation("org.testfx:testfx-core:4.0.16-alpha")
+    testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+
     checkstyle("com.puppycrawl.tools:checkstyle:10.23.0")
     configurations.named("checkstyle") {
         resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
