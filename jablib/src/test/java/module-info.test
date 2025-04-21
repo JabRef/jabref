@@ -1,5 +1,6 @@
 --add-opens
      javafx.base/com.sun.javafx.beans=net.bytebuddy
+
 --add-opens
     // Needed for localization tests
     javafx.fxml/javafx.fxml=org.jabref
@@ -8,4 +9,4 @@
     io.github.classgraph
 
 --add-reads
-    org.jabref=io.github.classgraph
+    org.jabref.jablib=io.github.classgraph

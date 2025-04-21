@@ -265,7 +265,11 @@ javafx {
         // properties
         "javafx.base",
         // javafx.scene.paint.Color;
-        "javafx.graphics"
+        "javafx.graphics",
+
+        // because of afterburner.fx
+        "javafx.controls",
+        "javafx.fxml"
     )
 }
 

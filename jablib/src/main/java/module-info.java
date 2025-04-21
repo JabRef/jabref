@@ -103,6 +103,7 @@ open module org.jabref.jablib {
 
     requires javafx.base;
     requires javafx.graphics;
+    requires afterburner.fx;
     requires com.tobiasdiez.easybind;
 
     // for java.awt.geom.Rectangle2D required by org.jabref.logic.pdf.TextExtractor
