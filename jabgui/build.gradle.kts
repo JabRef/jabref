@@ -118,11 +118,20 @@ dependencies {
 
     implementation("commons-cli:commons-cli:1.9.0")
 
+    implementation("de.undercouch:citeproc-java:3.2.0") {
+        exclude(group = "org.antlr")
+    }
+
     testImplementation("io.github.classgraph:classgraph:4.8.179")
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
     testImplementation("org.mockito:mockito-core:5.17.0")
+
+    // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
+    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+
+    testImplementation(testFixtures(project(":jablib")))
 
     /*
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))

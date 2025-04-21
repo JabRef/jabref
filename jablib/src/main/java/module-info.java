@@ -36,6 +36,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.journals.ltwa;
     exports org.jabref.logic.shared;
     exports org.jabref.model.groups;
+    exports org.jabref.model.groups.event;
     exports org.jabref.logic.preview;
     exports org.jabref.logic.ai;
     exports org.jabref.logic.pdf;
@@ -55,6 +56,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.layout;
     exports org.jabref.logic.openoffice.style;
     exports org.jabref.model.metadata;
+    exports org.jabref.model.metadata.event;
     exports org.jabref.logic.ai.chatting;
     exports org.jabref.logic.ai.util;
     exports org.jabref.logic.ai.ingestion;

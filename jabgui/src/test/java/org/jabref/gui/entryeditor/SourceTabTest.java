@@ -22,7 +22,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.testutils.category.GUITest;
 
 import org.fxmisc.richtext.CodeArea;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,6 @@ import org.testfx.framework.junit5.Start;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@GUITest
 @ExtendWith(ApplicationExtension.class)
 class SourceTabTest {
 
