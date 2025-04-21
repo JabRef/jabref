@@ -283,7 +283,7 @@ tasks.processResources {
             mapOf(
                 "version" to (project.findProperty("projVersionInfo") ?: "100.0.0"),
                 "year" to Calendar.getInstance().get(Calendar.YEAR).toString(),
-                "maintainers" to file("MAINTAINERS")
+                "maintainers" to file("../MAINTAINERS")
                     .readLines()
                     .filterNot { it.startsWith("#") }
                     .joinToString(", "),
