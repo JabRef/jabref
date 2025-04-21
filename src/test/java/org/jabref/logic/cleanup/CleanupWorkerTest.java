@@ -25,6 +25,7 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -69,7 +70,7 @@ class CleanupWorkerTest {
         // Search and store files relative to bib file overwrites all other dirs
         when(fileDirPrefs.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class));
+        worker = new CleanupWorker(context, fileDirPrefs, mock(TimestampPreferences.class), mock(BibEntryPreferences.class));
     }
 
     @Test

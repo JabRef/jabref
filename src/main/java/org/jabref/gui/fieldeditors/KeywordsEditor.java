@@ -1,5 +1,6 @@
 package org.jabref.gui.fieldeditors;
 
+import java.net.URL;
 import java.util.Comparator;
 import java.util.Optional;
 
@@ -13,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -32,6 +34,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.msc.MscCodeLoadingException;
+import org.jabref.logic.msc.MscCodeUtils;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
@@ -42,6 +46,7 @@ import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.gemsfx.TagsField;
 import com.google.common.collect.Comparators;
+import com.google.common.collect.HashBiMap;
 import jakarta.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +54,32 @@ import org.slf4j.LoggerFactory;
 public class KeywordsEditor extends HBox implements FieldEditorFX {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
+
+    private static HashBiMap<String, String> mscmap;
+
+    static {
+        URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("msc_codes.json");
+
+        if (resourceUrl == null) {
+            LOGGER.error(Localization.lang("Resource not found: msc_codes.json"));
+            mscmap = HashBiMap.create();
+        }
+
+        try {
+            Optional<HashBiMap<String, String>> optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
+            
+            if (optionalMscCodes.isPresent()) {
+                mscmap = optionalMscCodes.get();  // Unwrap the map if present
+            } else {
+                LOGGER.warn(Localization.lang("Resource not found: msc_codes.json"));
+                mscmap = HashBiMap.create();
+            }
+        } catch (MscCodeLoadingException e) {
+            LOGGER.error(Localization.lang("Error loading MSC codes:", e));
+            mscmap = HashBiMap.create();
+        }
+    }
+
 
     @FXML private KeywordsEditorViewModel viewModel;
     @FXML private TagsField<Keyword> keywordTagsField;
@@ -123,7 +154,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
-        Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
+        Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());  
     }
 
     private Node createTag(Keyword keyword) {
@@ -153,6 +184,23 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
             event.consume();
         });
+
+        // Checks Keyword for MSC code and displays tooltip with corresponding description
+        if (mscmap.containsKey(tagLabel.getText())) {
+            String mscClassification = mscmap.get(tagLabel.getText());
+            Tooltip tooltip = new Tooltip(mscClassification);
+
+            tagLabel.setOnMouseEntered(event -> {
+                // Show tooltip when mouse enters
+                Tooltip.install(tagLabel, tooltip);
+            });
+
+            tagLabel.setOnMouseExited(event -> {
+                // Uninstall tooltip when mouse exits
+                Tooltip.uninstall(tagLabel, tooltip);
+            });
+        }        
+        
         tagLabel.setOnDragDetected(event -> {
             Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
