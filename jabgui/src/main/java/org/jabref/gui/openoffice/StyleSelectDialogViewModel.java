@@ -37,6 +37,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
+import com.airhacks.afterburner.injection.Injector;
+
 public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
