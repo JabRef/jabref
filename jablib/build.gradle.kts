@@ -128,6 +128,11 @@ dependencies {
     // route all requests to log4j to SLF4J
     implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
 
+    // required by org.jabref.generators
+    implementation("org.tinylog:slf4j-tinylog:2.7.0")
+    implementation("org.tinylog:tinylog-api:2.7.0")
+    implementation("org.tinylog:tinylog-impl:2.7.0")
+
     implementation("de.undercouch:citeproc-java:3.2.0") {
         exclude(group = "org.antlr")
     }
@@ -342,8 +347,6 @@ tasks.named("jar") {
 tasks.named("compileTestJava") {
     dependsOn("generateCitationStyleCatalog")
 }
-
-
 
 tasks.register("downloadLtwaFile") {
     group = "JabRef"
