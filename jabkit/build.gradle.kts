@@ -59,9 +59,11 @@ dependencies {
     testImplementation(testFixtures(project(":jablib")))
 }
 
+/*
 jacoco {
     toolVersion = "0.8.13"
 }
+*/
 
 javafx {
     version = "24"
