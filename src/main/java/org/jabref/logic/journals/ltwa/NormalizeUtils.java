@@ -3,9 +3,6 @@ package org.jabref.logic.journals.ltwa;
 import java.text.Normalizer;
 import java.util.Optional;
 
-/**
- * Utility class for text normalization operations
- */
 public final class NormalizeUtils {
 
     /**
