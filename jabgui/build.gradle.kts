@@ -71,6 +71,9 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.19.1")
 
+    // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
+    implementation("org.jspecify:jspecify:1.0.0")
+
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
@@ -82,3 +85,47 @@ javafx {
     version = "24"
     modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web")
 }
+
+application {
+    mainClass.set("org.jabref.Launcher")
+    mainModule.set("org.jabref")
+
+    applicationDefaultJvmArgs = listOf(
+        // On a change here, also adapt
+        //   1. "run > moduleOptions"
+        //   2. "deployment.yml" (macOS part)
+        //   3. "deployment-arm64.yml"
+
+        // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+
+        // Fix for https://github.com/JabRef/jabref/issues/11188
+        "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
+        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+
+        // Fix for https://github.com/JabRef/jabref/issues/11198
+        "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
+        "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
+        "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+        // fix for https://github.com/JabRef/jabref/issues/11426
+        "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
+
+        // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
+        "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
+        "--add-exports=javafx.base/com.sun.javafx.event=org.jabref",
+        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref",
+        "--add-opens=javafx.graphics/javafx.scene=org.jabref",
+        "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
+        "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref",
+
+        "--add-opens=javafx.base/javafx.collections=org.jabref",
+        "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
+
+        "--enable-native-access=javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+    )
+}
+
+
+// Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
+// See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
+modularity.disableEffectiveArgumentsAdjustment()
+

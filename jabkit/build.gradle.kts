@@ -3,6 +3,9 @@ plugins {
 
     application
 
+    // afterburner.fx
+    id("org.openjfx.javafxplugin") version("0.1.0")
+
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 
@@ -48,6 +51,10 @@ dependencies {
     // route all requests to log4j to SLF4J
     implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
 
+    implementation("org.jabref:afterburner.fx:2.0.0") {
+        exclude( group = "org.openjfx")
+    }
+
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
@@ -57,4 +64,10 @@ dependencies {
 
 jacoco {
     toolVersion = "0.8.13"
+}
+
+javafx {
+    version = "24"
+    // because of afterburner.fx
+    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
 }
