@@ -251,12 +251,6 @@ dependencies {
     }
      */
 
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
-    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
-    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
-    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
-    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
-
     "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
     "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }

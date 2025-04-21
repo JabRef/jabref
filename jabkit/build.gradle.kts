@@ -57,12 +57,6 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.17.0")
 
     testImplementation(testFixtures(project(":jablib")))
-
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
-    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
-    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
-    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
-    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
 }
 
 jacoco {
