@@ -33,7 +33,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /// Displays the entry preview
 ///

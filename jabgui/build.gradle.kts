@@ -24,6 +24,7 @@ group = "org.jabref"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
 val luceneVersion = "10.2.0"
+val pdfbox = "3.0.4"
 
 dependencies {
     implementation(project(":jablib"))
@@ -86,6 +87,17 @@ dependencies {
     implementation("dev.langchain4j:langchain4j:0.36.2")
 
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
+
+    implementation("org.jooq:jool:0.9.15")
+
+    implementation("commons-io:commons-io:2.19.0")
+
+    implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
+        exclude(group = "commons-logging")
+    }
+
+    // implementation("net.java.dev.jna:jna:5.16.0")
+    implementation("net.java.dev.jna:jna-platform:5.16.0")
 
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")

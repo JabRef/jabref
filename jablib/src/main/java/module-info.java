@@ -54,6 +54,17 @@ open module org.jabref.jablib {
     exports org.jabref.logic.groups;
     exports org.jabref.logic.layout;
     exports org.jabref.logic.openoffice.style;
+    exports org.jabref.model.metadata;
+    exports org.jabref.logic.ai.chatting;
+    exports org.jabref.logic.ai.util;
+    exports org.jabref.logic.ai.ingestion.model;
+    exports org.jabref.model.ai;
+    exports org.jabref.logic.ai.processingstatus;
+    exports org.jabref.logic.ai.summarization;
+    exports org.jabref.logic.layout.format;
+    exports org.jabref.logic.auxparser;
+    exports org.jabref.logic.cleanup;
+    exports org.jabref.logic.formatter;
 
     requires javafx.base;
     requires javafx.graphics;

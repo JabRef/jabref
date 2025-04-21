@@ -111,7 +111,7 @@ open module org.jabref {
     // requires org.apache.commons.cli;
     // requires org.apache.commons.compress;
     // requires org.apache.commons.csv;
-    // requires org.apache.commons.io;
+    requires org.apache.commons.io;
     // requires org.apache.commons.lang3;
     // requires org.apache.commons.text;
     // requires org.apache.commons.logging;
@@ -128,7 +128,7 @@ open module org.jabref {
 
     // requires snuggletex.core;
 
-    // requires org.apache.pdfbox;
+    requires org.apache.pdfbox;
     // requires org.apache.xmpbox;
     // requires com.ibm.icu;
 
@@ -142,7 +142,7 @@ open module org.jabref {
     // requires java.keyring;
     // requires org.freedesktop.dbus;
 
-    // requires org.jooq.jool;
+    requires org.jooq.jool;
 
     // region AI
     // requires ai.djl.api;
@@ -175,7 +175,7 @@ open module org.jabref {
 
     // requires net.harawata.appdirs;
     // requires com.sun.jna;
-    // requires com.sun.jna.platform;
+    requires com.sun.jna.platform;
 
     // requires org.eclipse.jgit;
     // uses org.eclipse.jgit.transport.SshSessionFactory;
