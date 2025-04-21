@@ -363,7 +363,22 @@ public class LtwaRepository {
             }
 
             if (Character.toLowerCase(wordCp) != Character.toLowerCase(titleCp)) {
-                return handleMismatch(title, titlePosition);
+                Matcher match = INFLECTION.matcher(title.substring(titlePosition));
+                if (!match.lookingAt()) {
+                    return false;
+                }
+
+                titlePosition += match.end();
+                match = BOUNDARY.matcher(title.substring(titlePosition));
+
+                if (!match.lookingAt()) {
+                    return false;
+                }
+
+                int boundaryLength = match.end();
+                titlePosition += boundaryLength;
+                wordPosition += boundaryLength;
+                continue;
             }
 
             wordPosition += Character.charCount(wordCp);
@@ -371,21 +386,6 @@ public class LtwaRepository {
         }
 
         return handleRemainingText(title, titlePosition);
-    }
-
-    /**
-     * Handle character mismatches during matching
-     */
-    private static boolean handleMismatch(String title, int titlePosition) {
-        Matcher match = INFLECTION.matcher(title.substring(titlePosition));
-        if (!match.lookingAt()) {
-            return false;
-        }
-
-        titlePosition += match.end();
-        match = BOUNDARY.matcher(title.substring(titlePosition));
-
-        return match.lookingAt();
     }
 
     /**
