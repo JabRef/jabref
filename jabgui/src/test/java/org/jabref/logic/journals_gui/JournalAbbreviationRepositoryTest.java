@@ -1,4 +1,4 @@
-package org.jabref.logic.journals;
+package org.jabref.logic.journals_gui;
 
 import java.util.List;
 import java.util.Set;
@@ -10,6 +10,9 @@ import org.jabref.architecture.AllowedToUseSwing;
 import org.jabref.gui.journals.AbbreviationType;
 import org.jabref.gui.journals.UndoableAbbreviator;
 import org.jabref.gui.journals.UndoableUnabbreviator;
+import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.AMSField;
@@ -23,8 +26,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @AllowedToUseSwing("UndoableUnabbreviator and UndoableAbbreviator requires Swing Compound Edit in order test the abbreviation and unabbreviation of journal titles")
 class JournalAbbreviationRepositoryTest {
