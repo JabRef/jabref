@@ -36,8 +36,6 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
-
 public class StyleSelectDialogViewModel {
 
     private final DialogService dialogService;
@@ -48,6 +46,8 @@ public class StyleSelectDialogViewModel {
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final FilePreferences filePreferences;
     private final OpenOfficePreferences openOfficePreferences;
+
+    private final BibEntryTypesManager bibEntryTypesManager;
 
     private final ObjectProperty<Tab> selectedTab = new SimpleObjectProperty<>();
 
@@ -72,6 +72,8 @@ public class StyleSelectDialogViewModel {
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.openOfficePreferences = preferences.getOpenOfficePreferences();
+
+        this.bibEntryTypesManager = bibEntryTypesManager;
 
         jStyles.addAll(loadJStyles());
 
@@ -198,7 +200,7 @@ public class StyleSelectDialogViewModel {
 
                 List<CitationStyle> allStyles = CSLStyleLoader.getStyles();
                 List<CitationStylePreviewLayout> updatedLayouts = allStyles.stream()
-                                                                           .map(style -> new CitationStylePreviewLayout(style, Injector.instantiateModelOrService(BibEntryTypesManager.class)))
+                                                                           .map(style -> new CitationStylePreviewLayout(style, bibEntryTypesManager))
                                                                            .toList();
 
                 availableCslLayouts.setAll(updatedLayouts);
