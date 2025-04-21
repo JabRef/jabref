@@ -176,7 +176,7 @@ public class IconTheme {
         REMOVE(MaterialDesignM.MINUS_BOX),
         REMOVE_NOBOX(MaterialDesignM.MINUS),
         FILE(MaterialDesignF.FILE_OUTLINE),
-        PDF_FILE(MaterialDesignF.FILE_PDF),
+        PDF_FILE(MaterialDesignF.FILE_PDF_BOX),
         DOI(MaterialDesignB.BARCODE_SCAN),
         DUPLICATE(MaterialDesignC.CONTENT_DUPLICATE),
         EDIT(MaterialDesignP.PENCIL),
