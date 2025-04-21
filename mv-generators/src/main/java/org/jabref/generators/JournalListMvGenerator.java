@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref.generators;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;

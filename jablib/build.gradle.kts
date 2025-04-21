@@ -62,6 +62,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.17.0")
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("commons-logging:commons-logging:1.3.5")
+
     implementation("com.h2database:h2-mvstore:2.3.232")
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
@@ -306,8 +307,8 @@ tasks.processResources {
 tasks.register<JavaExec>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("org.jabref.cli.JournalListMvGenerator")
+    classpath = sourceSets["main"].compileClasspath
+    mainClass.set("org.jabref.generators.JournalListMvGenerator")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
     onlyIf {
         !file("build/resources/main/journals/journal-list.mv").exists()

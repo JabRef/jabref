@@ -33,6 +33,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.net.ssl;
     exports org.jabref.logic.citationstyle;
     exports org.jabref.architecture;
+    exports org.jabref.logic.journals.ltwa;
 
     requires javafx.base;
     requires javafx.graphics;
