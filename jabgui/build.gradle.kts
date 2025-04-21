@@ -128,7 +128,8 @@ dependencies {
 
 javafx {
     version = "24"
-    modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web")
+    // javafx.swing required by com.dlsc.gemsfx
+    modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web", "javafx.swing")
 }
 
 application {
