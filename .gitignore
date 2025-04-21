@@ -3,6 +3,9 @@ src/main/gen/
 src/main/generated/
 src-gen/
 
+src/main/resources/csl-styles
+src/main/resources/csl-locales
+
 .lycheecache
 
 .kotlin
