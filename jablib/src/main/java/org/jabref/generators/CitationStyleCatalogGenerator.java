@@ -1,4 +1,4 @@
-package org.jabref.logic.citationstyle;
+package org.jabref.generators;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
+import org.jabref.logic.citationstyle.CSLStyleUtils;
+import org.jabref.logic.citationstyle.CitationStyle;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

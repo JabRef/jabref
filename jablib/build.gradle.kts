@@ -323,6 +323,28 @@ tasks.named("compileTestJava") {
     dependsOn("generateJournalListMV")
 }
 
+tasks.register<JavaExec>("generateCitationStyleCatalog") {
+    group = "JabRef"
+    description = "Generates a catalog of all available citation styles"
+    classpath = sourceSets["main"].runtimeClasspath
+    dependsOn("processResources")
+    mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
+//    onlyIf {
+//        !file("build/resources/main/journals/journal-list.mv").exists()
+//    }
+}
+
+tasks.named("jar") {
+    dependsOn("generateCitationStyleCatalog")
+}
+
+tasks.named("compileTestJava") {
+    dependsOn("generateCitationStyleCatalog")
+}
+
+
+
 tasks.register("downloadLtwaFile") {
     group = "JabRef"
     description = "Downloads the LTWA file for journal abbreviations"
