@@ -134,7 +134,7 @@ class DatabaseSearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, flags), databaseContext, TASK_EXECUTOR, preferences).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, flags), databaseContext, TASK_EXECUTOR, preferences, new PostgreServer()).getMatches();
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }

@@ -57,7 +57,7 @@ public class DatabaseSearcherTest {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
-        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, preferences).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, preferences, new PostgreServer()).getMatches();
         assertEquals(expectedMatches, matches);
     }
 
