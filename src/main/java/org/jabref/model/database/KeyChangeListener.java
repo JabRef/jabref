@@ -14,6 +14,7 @@ import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.InternalField;
 
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.Nullable;
 
 public class KeyChangeListener {
 
@@ -41,7 +42,7 @@ public class KeyChangeListener {
         }
     }
 
-    private void updateEntryLinks(String newKey, String oldKey) {
+    private void updateEntryLinks(String newKey, @Nullable String oldKey) {
         Set<BibEntry> affectedEntries = database.getEntriesForCitationKey(oldKey);
         for (BibEntry entry : affectedEntries) {
             entry.getFields(field -> field.getProperties().contains(FieldProperty.SINGLE_ENTRY_LINK))
