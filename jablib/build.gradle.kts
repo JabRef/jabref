@@ -396,7 +396,7 @@ tasks.named<JavaCompile>("compileJava") {
 tasks.javadoc {
     (options as StandardJavadocDocletOptions).apply {
         encoding = "UTF-8"
-        version = false
+        // version = false
         // author = false
 
         addMultilineStringsOption("-add-exports").value = listOf(
