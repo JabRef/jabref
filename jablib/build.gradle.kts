@@ -307,7 +307,7 @@ tasks.processResources {
 tasks.register<JavaExec>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
-    classpath = sourceSets["main"].compileClasspath
+    classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.JournalListMvGenerator")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
     onlyIf {
