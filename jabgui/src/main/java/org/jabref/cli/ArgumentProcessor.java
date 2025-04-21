@@ -49,6 +49,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.logic.search.DatabaseSearcher;
+import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -528,7 +529,7 @@ public class ArgumentProcessor {
         List<BibEntry> matches;
         try {
             // extract current thread task executor from indexManager
-            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), cliPreferences).getMatches();
+            matches = new DatabaseSearcher(query, databaseContext, new CurrentThreadTaskExecutor(), cliPreferences, Injector.instantiateModelOrService(PostgreServer.class)).getMatches();
         } catch (IOException e) {
             LOGGER.error("Error occurred when searching", e);
             return false;
