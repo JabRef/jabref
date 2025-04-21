@@ -81,6 +81,12 @@ dependencies {
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
 
+    implementation("com.google.guava:guava:33.4.8-jre")
+
+    implementation("dev.langchain4j:langchain4j:0.36.2")
+
+    implementation("io.github.java-diff-utils:java-diff-utils:4.15")
+
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
@@ -195,3 +201,14 @@ tasks.named<JavaExec>("run") {
     }
 }
 
+tasks.named<JavaCompile>("compileJava") {
+    extensions.configure<org.javamodularity.moduleplugin.extensions.CompileModuleOptions>("moduleOptions") {
+        addExports.putAll(
+            mapOf(
+                // TODO: Remove access to internal api
+                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
+                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
+            )
+        )
+    }
+}

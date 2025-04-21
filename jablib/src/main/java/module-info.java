@@ -34,6 +34,25 @@ open module org.jabref.jablib {
     exports org.jabref.logic.citationstyle;
     exports org.jabref.architecture;
     exports org.jabref.logic.journals.ltwa;
+    exports org.jabref.logic.shared;
+    exports org.jabref.model.groups;
+    exports org.jabref.logic.preview;
+    exports org.jabref.logic.ai;
+    exports org.jabref.logic.pdf;
+    exports org.jabref.model.database.event;
+    exports org.jabref.model.entry.event;
+    exports org.jabref.logic.push;
+    exports org.jabref.model.search.event;
+    exports org.jabref.model.search.matchers;
+    exports org.jabref.model.entry.identifier;
+    exports org.jabref.model.entry.types;
+    exports org.jabref.logic.importer.util;
+    exports org.jabref.logic.database;
+    exports org.jabref.logic.externalfiles;
+    exports org.jabref.logic.help;
+    exports org.jabref.logic.bibtex.comparator;
+    exports org.jabref.logic.groups;
+    exports org.jabref.logic.layout;
 
     requires javafx.base;
     requires javafx.graphics;

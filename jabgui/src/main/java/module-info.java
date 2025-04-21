@@ -105,8 +105,8 @@ open module org.jabref {
     // endregion
 
     // region: Apache Commons and other (similar) helper libraries
-    // requires com.google.common;
-    // requires io.github.javadiffutils;
+    requires com.google.common;
+    requires io.github.javadiffutils;
     // requires java.string.similarity;
     // requires org.apache.commons.cli;
     // requires org.apache.commons.compress;
@@ -150,7 +150,7 @@ open module org.jabref {
     // requires ai.djl.tokenizers;
     // requires jvm.openai;
     // requires langchain4j;
-    // requires langchain4j.core;
+    requires langchain4j.core;
     // requires langchain4j.google.ai.gemini;
     // requires langchain4j.hugging.face;
     // requires langchain4j.mistral.ai;
