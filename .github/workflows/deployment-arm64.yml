@@ -101,11 +101,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir (macOS)
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" prepareModulesDir
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
       - name: Build dmg (macOS)
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
+          cd jabgui
           jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
@@ -147,6 +148,7 @@ jobs:
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
+          cd jabgui
           jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
@@ -187,8 +189,8 @@ jobs:
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
-          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
+          mv jabgui/build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg jabgui/build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.dmg
+          mv jabgui/build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg jabgui/build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-arm64.pkg
       - name: Setup rsync (macOS)
         if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'macos-14') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
         run: brew install rsync
@@ -204,7 +206,7 @@ jobs:
         if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-latest') || ((matrix.os == 'macos-14') && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)))) }}
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: (matrix.os == 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         uses: actions/upload-artifact@v4
@@ -246,25 +248,25 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: JabRef-macOS-arm-tbn
-          path: build/distribution/
+          path: jabgui/build/distribution/
       - name: Notarize dmg
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.dmg
+          xcrun notarytool submit jabgui/build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.dmg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple jabgui/build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.dmg
       - name: Notarize pkg
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.pkg
+          xcrun notarytool submit jabgui/build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.pkg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple jabgui/build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}-arm64.pkg
       - name: Upload to builds.jabref.org
         if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/

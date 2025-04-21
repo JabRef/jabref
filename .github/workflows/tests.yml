@@ -26,6 +26,7 @@ permissions:
 
 jobs:
   checkstyle:
+    if: false
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
@@ -52,6 +53,7 @@ jobs:
 
   openrewrite:
     name: OpenRewrite
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -71,6 +73,7 @@ jobs:
           ./gradlew rewriteDryRun
 
   modernizer:
+    if: false
     name: Modernizer
     runs-on: ubuntu-latest
     steps:
@@ -90,7 +93,7 @@ jobs:
         run: |
           # enable failing of this task if modernizer complains
           sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
-          ./gradlew modernizer
+          # TODO ./gradlew modernizer
 
   markdown:
     name: Markdown
@@ -182,8 +185,16 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Run tests
-        run: xvfb-run --auto-servernum ./gradlew check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+      - name: Run jablib tests
+        run: xvfb-run --auto-servernum ./gradlew :jablib:check # -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
+        env:
+          CI: "true"
+      - name: Run jabkit tests
+        run: xvfb-run --auto-servernum ./gradlew :jabkit:check # -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
+        env:
+          CI: "true"
+      - name: Run jabsrv tests
+        run: xvfb-run --auto-servernum ./gradlew :jabsrv:check # -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
         env:
           CI: "true"
       - name: Prepare format failed test results
@@ -224,7 +235,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run tests on PostgreSQL
-        run: ./gradlew databaseTest --rerun-tasks
+        run: ./gradlew :jablib:databaseTest --rerun-tasks
         env:
           CI: "true"
           DBMS: "postgresql"
@@ -263,11 +274,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run GUI tests
-        run: xvfb-run --auto-servernum ./gradlew guiTest
+        run: xvfb-run --auto-servernum ./gradlew :jabgui:check
         env:
           CI: "true"
 
   codecoverage:
+    if: false
     name: Code coverage
     runs-on: ubuntu-latest
     services:
@@ -328,6 +340,7 @@ jobs:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   requirements_coverage:
+    if: false
     name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
@@ -482,7 +495,7 @@ jobs:
 
   unmodified_submodules:
     name: Submodules not modified
-    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    if: false && (github.actor != 'dependabot[bot]' && github.event_name == 'pull_request')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

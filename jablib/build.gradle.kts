@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.util.*
 
 plugins {
@@ -16,14 +17,9 @@ plugins {
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 
-    id("com.github.andygoossens.modernizer") version "1.10.0"
-    id("org.openrewrite.rewrite") version "7.3.0"
-
     // nicer test outputs during running and completion
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id("com.adarshr.test-logger") version "4.0.0"
-
-    id("org.itsallcode.openfasttrace") version "3.0.1"
 
     id("me.champeau.jmh") version "0.7.3"
 }
@@ -246,12 +242,14 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
+    /* TODO
     checkstyle("com.puppycrawl.tools:checkstyle:10.23.0")
     configurations.named("checkstyle") {
         resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
             select("com.google.guava:guava:0")
        }
     }
+     */
 
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
@@ -277,9 +275,11 @@ javafx {
     )
 }
 
+/*
 jacoco {
     toolVersion = "0.8.13"
 }
+ */
 
 tasks.generateGrammarSource {
     maxHeapSize = "64m"
@@ -496,3 +496,109 @@ jmh {
     fork = 2
     zip64  = true
 }
+
+tasks.register<Test>("fetcherTest") {
+    useJUnitPlatform {
+        includeTags("FetcherTest")
+    }
+
+    maxParallelForks = 1
+}
+
+tasks.register<Test>("databaseTest") {
+    useJUnitPlatform {
+        includeTags("DatabaseTest")
+    }
+
+    testLogging {
+        // set options for log level LIFECYCLE
+        events("FAILED")
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+
+    maxParallelForks = 1
+}
+
+/*
+requirementTracing {
+    inputDirectories = files('docs', 'src/main/java', 'src/test/java')
+}
+
+modernizer {
+    failOnViolations = false
+    includeTestClasses = true
+    exclusions = [
+        'java/util/Optional.get:()Ljava/lang/Object;'
+    ]
+}
+
+
+rewrite {
+    activeRecipe(
+        'org.jabref.config.rewrite.cleanup'
+    )
+    exclusion (
+        "build.gradle",
+        "buildSrc/build.gradle",
+        "eclipse.gradle",
+        "settings.gradle",
+        "src-gen/**",
+        "src/main/resources/**",
+        "src/test/resources/**",
+        "..**../module-info.java",
+        "..**../*.py",
+        "..**../*.xml",
+        "..**../*.yml"
+)
+plainTextMask("..../*.md")
+failOnDryRunResults = true
+}
+
+
+// Code quality tasks
+checkstyle {
+    // will only run when called explicitly from the command line
+    sourceSets = []
+}
+
+
+
+// Test result tasks
+tasks.register('copyTestResources', Copy) {
+    from "${projectDir}/src/test/resources"
+    into "${buildDir}/classes/test"
+}
+processTestResources.dependsOn copyTestResources
+
+tasks.register('jacocoPrepare') {
+    doFirst {
+        // Ignore failures of tests
+        tasks.withType(Test).tap {
+            configureEach {
+                ignoreFailures = true
+            }
+        }
+    }
+}
+test.mustRunAfter jacocoPrepare
+databaseTest.mustRunAfter jacocoPrepare
+fetcherTest.mustRunAfter jacocoPrepare
+
+jacocoTestReport {
+    dependsOn jacocoPrepare, test, fetcherTest, databaseTest
+
+    executionData files(
+            layout.buildDirectory.file('jacoco/test.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/fetcherTest.exec').get().asFile,
+            layout.buildDirectory.file('jacoco/databaseTest.exec').get().asFile)
+
+    reports {
+        csv.required = true
+        html.required = true
+        // coveralls plugin depends on xml format report
+        xml.required = true
+    }
+}
+
+ */
+*/

@@ -42,10 +42,10 @@ jobs:
         include:
           - os: ubuntu-latest
             displayName: linux
-            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
+            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
           - os: windows-latest
             displayName: windows
-            archivePortable: 7z a -r build/distribution/JabRef-portable_windows.zip ./build/distribution/JabRef && rm -R build/distribution/JabRef
+            archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
           - os: buildjet-8vcpu-ubuntu-2204-arm
             displayName: "linux-arm"
             archivePortable: "tar -c -C build/distribution JabRef | pigz --rsyncable > build/distribution/JabRef-portable_linux-arm64.tar.gz && rm -R build/distribution/JabRef"
@@ -214,7 +214,7 @@ jobs:
           keychain-password: jabref
       - name: Build runtime image and installer
         shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" jpackage jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage :jabgui:jlinkZip
       - name: Package application image
         shell: bash
         run: ${{ matrix.archivePortable }}
@@ -222,13 +222,13 @@ jobs:
         if: (matrix.os != 'macos-latest')
         shell: pwsh
         run: |
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
-          get-childitem -Path build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
+          get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
+          get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Repack deb file for Debian
         if: (matrix.os == 'ubuntu-latest')
         shell: bash
         run: |
-          cd build/distribution
+          cd jabgui/build/distribution
           ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
           zstd -d < control.tar.zst | xz > control.tar.xz
           zstd -d < data.tar.zst | xz > data.tar.xz
@@ -238,7 +238,7 @@ jobs:
       - name: Rename files with JDK version
         shell: bash
         run: |
-          for file in build/distribution/*.*; do
+          for file in jabgui/build/distribution/*.*; do
             base=${file%.*}
             ext=${file##*.}
             mv "$file" "${base}-jdk${{ matrix.jdk }}-javafx${{ matrix.javafx }}.${ext}"
@@ -265,12 +265,12 @@ jobs:
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/ || true
       - name: Upload to builds.jabref.org (linux, macOS)
         if: (matrix.os != 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES') || (github.ref != 'refs/heads/main')
         uses: actions/upload-artifact@v4
