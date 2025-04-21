@@ -218,11 +218,13 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      * except if there are no more files than the {@code activeFile} property will be set to {@code null}.
      */
     public void removeCurrentFile() {
-        if (isFileRemovable.get()) {
-            journalFiles.remove(currentFile.get());
-            if (journalFiles.isEmpty()) {
-                currentFile.set(null);
-            }
+        if (!isFileRemovable.get()) {
+            return;
+        }
+        
+        journalFiles.remove(currentFile.get());
+        if (journalFiles.isEmpty()) {
+            currentFile.set(null);
         }
     }
 
@@ -253,18 +255,20 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      * Method to change the currentAbbreviation property to a new abbreviation.
      */
     void editAbbreviation(Abbreviation abbreviationObject) {
-        if (isEditableAndRemovable.get()) {
-            AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviationObject);
-            if (abbreviations.contains(abbViewModel)) {
-                if (abbViewModel.equals(currentAbbreviation.get())) {
-                    setCurrentAbbreviationNameAndAbbreviationIfValid(abbreviationObject);
-                } else {
-                    dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
-                            Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName()));
-                }
-            } else {
+        if (!isEditableAndRemovable.get()) {
+            return;
+        }
+        
+        AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviationObject);
+        if (abbreviations.contains(abbViewModel)) {
+            if (abbViewModel.equals(currentAbbreviation.get())) {
                 setCurrentAbbreviationNameAndAbbreviationIfValid(abbreviationObject);
+            } else {
+                dialogService.showErrorDialogAndWait(Localization.lang("Duplicated Journal Abbreviation"),
+                        Localization.lang("Abbreviation '%0' for journal '%1' already defined.", abbreviationObject.getAbbreviation(), abbreviationObject.getName()));
             }
+        } else {
+            setCurrentAbbreviationNameAndAbbreviationIfValid(abbreviationObject);
         }
     }
 
@@ -294,18 +298,20 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      * {@code null} if there are no abbreviations left.
      */
     public void deleteAbbreviation() {
-        if ((currentAbbreviation.get() != null) && !currentAbbreviation.get().isPseudoAbbreviation()) {
-            int index = abbreviations.indexOf(currentAbbreviation.get());
-            if (index > 1) {
-                currentAbbreviation.set(abbreviations.get(index - 1));
-            } else if ((index + 1) < abbreviationsCount.get()) {
-                currentAbbreviation.set(abbreviations.get(index + 1));
-            } else {
-                currentAbbreviation.set(null);
-            }
-            abbreviations.remove(index);
-            shouldWriteLists = true;
+        if ((currentAbbreviation.get() == null) || currentAbbreviation.get().isPseudoAbbreviation()) {
+            return;
         }
+        
+        int index = abbreviations.indexOf(currentAbbreviation.get());
+        if (index > 1) {
+            currentAbbreviation.set(abbreviations.get(index - 1));
+        } else if ((index + 1) < abbreviationsCount.get()) {
+            currentAbbreviation.set(abbreviations.get(index + 1));
+        } else {
+            currentAbbreviation.set(null);
+        }
+        abbreviations.remove(index);
+        shouldWriteLists = true;
     }
 
     public void removeAbbreviation(AbbreviationViewModel abbreviation) {
