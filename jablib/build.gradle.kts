@@ -359,7 +359,7 @@ tasks.register<JavaExec>("generateLtwaListMV") {
     description = "Converts the LTWA CSV file to a H2 MVStore"
 
     classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("org.jabref.cli.LtwaListMvGenerator")
+    mainClass.set("org.jabref.generators.LtwaListMvGenerator")
     javaLauncher.set(javaToolchains.launcherFor {
         languageVersion.set(java.toolchain.languageVersion)
     })
