@@ -42,7 +42,7 @@ jobs:
         include:
           - os: ubuntu-22.04
             displayName: linux
-            archivePortable: tar -c -C build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
+            archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
@@ -215,7 +215,7 @@ jobs:
         if: (matrix.os == 'ubuntu-22.04') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-          cd build/distribution
+          cd jabgui/build/distribution
           ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
           zstd -d < control.tar.zst | xz > control.tar.xz
           zstd -d < data.tar.zst | xz > data.tar.xz
