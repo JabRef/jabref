@@ -147,7 +147,6 @@ public class CopyToTest {
         verify(dialogService).notify(Localization.lang("Entries and cross-references successfully copied to target library"));
     }
 
-
     @Test
     void executeWithCrossRefAndUserExcludes() {
         selectedEntries.add(entryWithCrossRef);
@@ -168,5 +167,4 @@ public class CopyToTest {
         verify(importHandler).importEntriesWithDuplicateCheck(targetDatabaseContext, selectedEntries);
         verify(dialogService).notify(Localization.lang("Entries successfully copied to target library"));
     }
-
 }
