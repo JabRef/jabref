@@ -66,9 +66,9 @@ public class CopyTo extends SimpleCommand {
         if (includeCrossReferences) {
             int before = targetDatabaseContext.getEntries().size();
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."))
+            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."));
             int after = targetDatabaseContext.getEntries().size();
-            if (after > before) {
+            if (after == before) {
                 dialogService.notify(Localization.lang("No new entries were added to the target library."));
                 return;
             }
@@ -106,8 +106,12 @@ public class CopyTo extends SimpleCommand {
     }
 
     public Optional<BibEntry> getCrossRefEntry(BibEntry bibEntryToCheck, BibDatabaseContext sourceDatabaseContext) {
-        return sourceDatabaseContext.getEntries().stream().filter(entry -> bibEntryToCheck.getField(StandardField.CROSSREF).equals(entry.getCitationKey())).findFirst();
+        return bibEntryToCheck.getField(StandardField.CROSSREF)
+                .flatMap(crossRefKey -> sourceDatabaseContext.getEntries().stream()
+                        .filter(entry -> entry.getCitationKey().isPresent() && entry.getCitationKey().get().equals(crossRefKey))
+                        .findFirst());
     }
+
 
     private boolean askForCrossReferencedEntries() {
         if (copyToPreferences.getShouldAskForIncludingCrossReferences()) {
