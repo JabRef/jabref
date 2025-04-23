@@ -13,10 +13,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import org.jspecify.annotations.NonNull;
+
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.strings.StringSimilarity;
+import org.jspecify.annotations.NonNull;
 
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
@@ -211,7 +211,7 @@ public class JournalAbbreviationRepository {
     private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
         Collection<Abbreviation> enabledCustomAbbreviations = customAbbreviations.stream()
                 .filter(abbreviation -> isSourceEnabled(abbreviationSources.getOrDefault(abbreviation, BUILTIN_LIST_ID)))
-                .collect(Collectors.toList());
+                .toList();
                 
         Optional<Abbreviation> customMatch = findBestFuzzyMatched(enabledCustomAbbreviations, input);
         if (customMatch.isPresent()) {
@@ -403,7 +403,7 @@ public class JournalAbbreviationRepository {
     public List<Abbreviation> getAllAbbreviations() {
         return getAllAbbreviationsWithSources().stream()
                .map(AbbreviationWithSource::getAbbreviation)
-               .collect(Collectors.toList());
+               .toList();
     }
     
     /**
