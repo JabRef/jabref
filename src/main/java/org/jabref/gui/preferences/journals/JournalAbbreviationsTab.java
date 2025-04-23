@@ -50,6 +50,9 @@ import org.controlsfx.control.textfield.CustomTextField;
  */
 public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAbbreviationsTabViewModel> implements PreferencesTab {
 
+    private static final String ENABLED_SYMBOL = "✓ ";
+    private static final String DISABLED_SYMBOL = "○ ";
+
     @FXML private Label loadingLabel;
     @FXML private ProgressIndicator progressIndicator;
 
@@ -72,9 +75,6 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
     @Inject private JournalAbbreviationRepository abbreviationRepository;
 
     private Timeline invalidateSearch;
-
-    private static final String ENABLED_SYMBOL = "✓ ";
-    private static final String DISABLED_SYMBOL = "○ ";
 
     public JournalAbbreviationsTab() {
         ViewLoader.view(this)
