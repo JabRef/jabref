@@ -14,12 +14,11 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.h2.mvstore.MVMap;
-import org.h2.mvstore.MVStore;
-
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.strings.StringSimilarity;
 
+import org.h2.mvstore.MVMap;
+import org.h2.mvstore.MVStore;
 import org.jspecify.annotations.NonNull;
 
 /**
