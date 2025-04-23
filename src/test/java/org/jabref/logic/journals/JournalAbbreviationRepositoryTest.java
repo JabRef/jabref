@@ -197,16 +197,18 @@ class JournalAbbreviationRepositoryTest {
     void getFromFullName() {
         repository = createTestRepository();
         
-        assertEquals(AMERICAN_JOURNAL, repository.get("American Journal of Public Health")
-                    .orElseThrow(() -> new AssertionError("Repository should contain American Journal of Public Health")));
+        Optional<Abbreviation> result = repository.get("American Journal of Public Health");
+        assertTrue(result.isPresent());
+        assertEquals(AMERICAN_JOURNAL, result.get());
     }
 
     @Test
     void getFromAbbreviatedName() {
         repository = createTestRepository();
         
-        assertEquals(AMERICAN_JOURNAL, repository.get("Am. J. Public Health")
-                    .orElseThrow(() -> new AssertionError("Repository should find the abbreviation")));
+        Optional<Abbreviation> result = repository.get("Am. J. Public Health");
+        assertTrue(result.isPresent());
+        assertEquals(AMERICAN_JOURNAL, result.get());
     }
 
     @Test
@@ -214,7 +216,9 @@ class JournalAbbreviationRepositoryTest {
         repository = createTestRepository();
         
         // Standard ampersand
-        assertEquals(ACS_MATERIALS, repository.get("ACS Applied Materials & Interfaces").orElseThrow());
+        Optional<Abbreviation> result = repository.get("ACS Applied Materials & Interfaces");
+        assertTrue(result.isPresent());
+        assertEquals(ACS_MATERIALS, result.get());
         
         // Escaped ampersand
         assertEquals(ACS_MATERIALS, repository.get("ACS Applied Materials \\& Interfaces").orElseThrow());
@@ -485,7 +489,8 @@ class JournalAbbreviationRepositoryTest {
         
         assertFalse(repository.isSourceEnabled(sourceKey));
         
-        assertEquals("WRONG", repository.getDefaultAbbreviation("Unique Journal").orElse("WRONG"));
+        Optional<String> abbreviation = repository.getDefaultAbbreviation("Unique Journal");
+        assertTrue(abbreviation.isEmpty());
     }
     
     @Test

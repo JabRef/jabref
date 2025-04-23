@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import org.jspecify.annotations.NonNull;
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 import org.jabref.logic.util.strings.StringSimilarity;
 
@@ -274,10 +274,7 @@ public class JournalAbbreviationRepository {
      * @param sourcePath The path or identifier of the source
      * @param enabled Whether the source is enabled
      */
-    public void addCustomAbbreviation(Abbreviation abbreviation, String sourcePath, boolean enabled) {
-        Objects.requireNonNull(abbreviation);
-        Objects.requireNonNull(sourcePath);
-        
+    public void addCustomAbbreviation(@NonNull Abbreviation abbreviation, @NonNull String sourcePath, boolean enabled) {
         customAbbreviations.add(abbreviation);
         abbreviationSources.put(abbreviation, sourcePath);
         
