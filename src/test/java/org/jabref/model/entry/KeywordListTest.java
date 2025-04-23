@@ -121,8 +121,8 @@ class KeywordListTest {
     void parseKeywordWithEscapedComma() {
         KeywordList list = KeywordList.parse("AI,Machine\\, Learning,Java", ',');
         assertEquals(3, list.size());
-        assertTrue(list.contains(new Keyword("AI")));
-        assertTrue(list.contains(new Keyword("Machine, Learning")));
-        assertTrue(list.contains(new Keyword("Java")));
+        assertEquals(new Keyword("AI"), list.get(0));
+        assertEquals(new Keyword("Machine, Learning"), list.get(1));
+        assertEquals(new Keyword("Java"), list.get(2));
     }
 }
