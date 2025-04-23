@@ -23,44 +23,37 @@ class KeywordListTest {
 
     @Test
     void parseOneWordReturnsOneKeyword() throws Exception {
-        assertEquals(new KeywordList("keywordOne"),
-                KeywordList.parse("keywordOne", ','));
+        assertEquals(new KeywordList("keywordOne"), KeywordList.parse("keywordOne", ','));
     }
 
     @Test
     void parseTwoWordReturnsTwoKeywords() throws Exception {
-        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
-                KeywordList.parse("keywordOne, keywordTwo", ','));
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"), KeywordList.parse("keywordOne, keywordTwo", ','));
     }
 
     @Test
     void parseTwoWordReturnsTwoKeywordsWithoutSpace() throws Exception {
-        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
-                KeywordList.parse("keywordOne,keywordTwo", ','));
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"), KeywordList.parse("keywordOne,keywordTwo", ','));
     }
 
     @Test
     void parseTwoWordReturnsTwoKeywordsWithDifferentDelimiter() throws Exception {
-        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
-                KeywordList.parse("keywordOne| keywordTwo", '|'));
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"), KeywordList.parse("keywordOne| keywordTwo", '|'));
     }
 
     @Test
     void parseWordsWithWhitespaceReturnsOneKeyword() throws Exception {
-        assertEquals(new KeywordList("keyword and one"),
-                KeywordList.parse("keyword and one", ','));
+        assertEquals(new KeywordList("keyword and one"), KeywordList.parse("keyword and one", ','));
     }
 
     @Test
     void parseWordsWithWhitespaceAndCommaReturnsTwoKeyword() throws Exception {
-        assertEquals(new KeywordList("keyword and one", "and two"),
-                KeywordList.parse("keyword and one, and two", ','));
+        assertEquals(new KeywordList("keyword and one", "and two"), KeywordList.parse("keyword and one, and two", ','));
     }
 
     @Test
     void parseIgnoresDuplicates() throws Exception {
-        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
-                KeywordList.parse("keywordOne, keywordTwo, keywordOne", ','));
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"), KeywordList.parse("keywordOne, keywordTwo, keywordOne", ','));
     }
 
     @Test
@@ -82,7 +75,6 @@ class KeywordListTest {
     @Test
     void parseHierarchicalChain() throws Exception {
         Keyword expected = Keyword.of("Parent", "Node", "Child");
-
         assertEquals(new KeywordList(expected), KeywordList.parse("Parent > Node > Child", ',', '>'));
     }
 
@@ -90,7 +82,6 @@ class KeywordListTest {
     void parseTwoHierarchicalChains() throws Exception {
         Keyword expectedOne = Keyword.of("Parent1", "Node1", "Child1");
         Keyword expectedTwo = Keyword.of("Parent2", "Node2", "Child2");
-
         assertEquals(new KeywordList(expectedOne, expectedTwo),
                 KeywordList.parse("Parent1 > Node1 > Child1, Parent2 > Node2 > Child2", ',', '>'));
     }
@@ -113,11 +104,14 @@ class KeywordListTest {
 
     @Test
     void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
-        assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+        assertEquals(
+                new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"),
+                KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ',')
+        );
     }
 
     @Test
-    void parseKeywordWithSinglyEscapedComma() {
+    void parseKeywordListContainingSingleBackslashBeforeComma_ShouldTreatBackslashLiterally() {
         KeywordList list = KeywordList.parse("AI,Machine\\, Learning,Java", ',');
         assertEquals(3, list.size());
         assertEquals(new Keyword("AI"), list.get(0));
