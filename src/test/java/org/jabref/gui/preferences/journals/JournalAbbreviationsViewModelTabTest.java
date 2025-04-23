@@ -550,14 +550,14 @@ class JournalAbbreviationsViewModelTabTest {
         
         AbbreviationsFileViewModel fileViewModel = viewModel.currentFileProperty().get();
         
-        assertEquals(true, fileViewModel.isEnabled());
+        assertTrue(fileViewModel.isEnabled());
         
         fileViewModel.setEnabled(false);
         
-        assertEquals(false, fileViewModel.isEnabled());
+        assertFalse(fileViewModel.isEnabled());
         
         fileViewModel.setEnabled(true);
-        assertEquals(true, fileViewModel.isEnabled());
+        assertTrue(fileViewModel.isEnabled());
         
         viewModel.markAsDirty();
     }

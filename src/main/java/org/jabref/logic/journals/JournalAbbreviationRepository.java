@@ -14,12 +14,13 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.jabref.logic.journals.ltwa.LtwaRepository;
-import org.jabref.logic.util.strings.StringSimilarity;
-import org.jspecify.annotations.NonNull;
-
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
+
+import org.jabref.logic.journals.ltwa.LtwaRepository;
+import org.jabref.logic.util.strings.StringSimilarity;
+
+import org.jspecify.annotations.NonNull;
 
 /**
  * A repository for all journal abbreviations, including add and find methods.
