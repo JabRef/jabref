@@ -73,6 +73,9 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     private Timeline invalidateSearch;
 
+    private static final String ENABLED_SYMBOL = "✓ ";
+    private static final String DISABLED_SYMBOL = "○ ";
+
     public JournalAbbreviationsTab() {
         ViewLoader.view(this)
                   .root(this)
@@ -205,12 +208,12 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 setText(null);
                 setGraphic(null);
             } else {
-                String prefix = item.isEnabled() ? "✓ " : "○ ";
+                String prefix = item.isEnabled() ? ENABLED_SYMBOL : DISABLED_SYMBOL;
                 setText(prefix + item.toString());
                 
                 item.enabledProperty().addListener((obs, oldVal, newVal) -> {
                     if (newVal != null) {
-                        setText((newVal ? "✓ " : "○ ") + item.toString());
+                        setText((newVal ? ENABLED_SYMBOL : DISABLED_SYMBOL) + item.toString());
                     }
                 });
             }
