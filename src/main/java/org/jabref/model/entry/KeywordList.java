@@ -50,6 +50,18 @@ public class KeywordList implements Iterable<Keyword> {
         Objects.requireNonNull(delimiter);
         Objects.requireNonNull(hierarchicalDelimiter);
 
+        List<String> keywords = getKeywordsAsStrings(keywordString, delimiter);
+
+        KeywordList keywordList = new KeywordList();
+        for (String keyword : keywords) {
+            Keyword chainRoot = Keyword.of(keyword.split(hierarchicalDelimiter.toString()));
+            keywordList.add(chainRoot);
+        }
+
+        return keywordList;
+    }
+
+    private static List<String> getKeywordsAsStrings(String keywordString, Character delimiter) {
         List<String> keywords = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaping = false;
@@ -72,13 +84,7 @@ public class KeywordList implements Iterable<Keyword> {
             keywords.add(current.toString().trim());
         }
 
-        KeywordList keywordList = new KeywordList();
-        for (String keyword : keywords) {
-            Keyword chainRoot = Keyword.of(keyword.split(hierarchicalDelimiter.toString()));
-            keywordList.add(chainRoot);
-        }
-
-        return keywordList;
+        return keywords;
     }
 
     /**
