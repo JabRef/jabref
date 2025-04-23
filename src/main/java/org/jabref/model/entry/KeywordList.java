@@ -68,7 +68,7 @@ public class KeywordList implements Iterable<Keyword> {
             }
         }
 
-        if (current.length() > 0) {
+        if (!current.isEmpty()) {
             keywords.add(current.toString().trim());
         }
 
