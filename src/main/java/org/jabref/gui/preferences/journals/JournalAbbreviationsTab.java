@@ -163,12 +163,12 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         journalFilesBox.setCellFactory(listView -> new JournalFileListCell());
         journalFilesBox.setButtonCell(new JournalFileListCell());
         
-        viewModel.journalFilesProperty().addListener((observable, oldValue, newValue) -> {
+        viewModel.journalFilesProperty().addListener((_, _, newValue) -> {
             if (newValue == null) {
                 return;
             }
             for (AbbreviationsFileViewModel fileViewModel : newValue) {
-                fileViewModel.enabledProperty().addListener((obs, oldVal, newVal) -> {
+                fileViewModel.enabledProperty().addListener((_, _, _) -> {
                     refreshComboBoxDisplay();
                 });
             }
