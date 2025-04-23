@@ -119,6 +119,12 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
                 .install(actionsColumn);
     }
 
+    /**
+     * Sets up the toggle button that allows enabling/disabling journal abbreviation lists.
+     * This method creates a button with appropriate styling and tooltip, then adds it
+     * to the UI next to the journal files dropdown. When clicked, the button toggles 
+     * the enabled state of the currently selected abbreviation list.
+     */
     private void setUpToggleButton() {
         Button toggleButton = new Button(Localization.lang("Toggle"));
         toggleButton.setOnAction(e -> toggleEnableList());
@@ -278,6 +284,19 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
         return Localization.lang("Journal abbreviations");
     }
     
+    /**
+     * Toggles the enabled state of the currently selected journal abbreviation list.
+     * This method performs several important operations:
+     * <ul>
+     *   <li>Toggles the enabled state of the selected list in the UI</li>
+     *   <li>Refreshes the ComboBox display to show the updated state</li>
+     *   <li>Updates the JournalAbbreviationPreferences to persist this change</li>
+     *   <li>Reloads the entire JournalAbbreviationRepository with the new settings</li>
+     *   <li>Updates the dependency injection container with the new repository</li>
+     *   <li>Marks the view model as dirty to ensure changes are saved</li>
+     * </ul>
+     * This is called when the user clicks the toggle button next to the journal files dropdown.
+     */
     @FXML
     private void toggleEnableList() {
         AbbreviationsFileViewModel selected = journalFilesBox.getValue();
