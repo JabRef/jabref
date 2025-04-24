@@ -948,6 +948,7 @@ public class OOBibBase {
                     // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
                     // MUST always be paired with an unlockControllers() call
                     doc.lockControllers();
+
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 } catch (NoDocumentException
                          | NoSuchElementException e) {
