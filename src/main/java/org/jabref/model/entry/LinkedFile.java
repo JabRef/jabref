@@ -8,6 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -267,7 +268,7 @@ public class LinkedFile implements Serializable {
     private static String makeAbsoluteIfLocal(String link) {
         if (!isOnlineLink(link)) {
             try {
-                return Path.of(link).toAbsolutePath().toString();
+                return Paths.get(link).toAbsolutePath().toString();
             } catch (InvalidPathException e) {
                 // Log the exception, fallback will be handled by return below
                 LOGGER.warn("Invalid path provided: {}", link, e);
