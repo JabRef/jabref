@@ -498,14 +498,14 @@ class CSLFormatUtilsTest {
      */
     @ParameterizedTest
     @MethodSource
-    void updateSingleNumericCitation(String expected, CitationStyle style) {
+    void updateSingleNumericBibliography(String expected, CitationStyle style) {
         String citation = CitationStyleGenerator.generateBibliography(List.of(TEST_ENTRY), style.getSource(), CSLFormatUtils.HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER).getFirst();
         String transformedCitation = CSLFormatUtils.transformHTML(citation);
         String actual = CSLFormatUtils.updateSingleBibliographyNumber(transformedCitation, 3);
         assertEquals(expected, actual);
     }
 
-    static Stream<Arguments> updateSingleNumericCitation() {
+    static Stream<Arguments> updateSingleNumericBibliography() {
         return Stream.of(
 
                 // Type: "[1]"
