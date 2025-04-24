@@ -93,7 +93,7 @@ public class CSLCitationOOAdapter {
         if (isAlphanumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(citation);
@@ -134,7 +134,7 @@ public class CSLCitationOOAdapter {
             if (isAlphanumericStyle) {
                 inTextCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
             } else {
-                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
             }
 
             String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
@@ -193,7 +193,7 @@ public class CSLCitationOOAdapter {
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
             for (BibEntry entry : entries) {
-                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
+                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
 
@@ -204,7 +204,7 @@ public class CSLCitationOOAdapter {
             }
         } else {
             // Ordering will be according to citeproc item data provider (default)
-            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
 
             for (String bibliographyEntry : bibliographyEntries) {
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
@@ -318,7 +318,7 @@ public class CSLCitationOOAdapter {
                     if (isAlphaNumericStyle) {
                         newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
                     } else {
-                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), CSLFormatUtils.HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
                     }
 
                     String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
@@ -356,7 +356,7 @@ public class CSLCitationOOAdapter {
                     newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
                 } else {
                     newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
-                            CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+                            CSLFormatUtils.HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
                 }
 
                 String formattedCitation = CSLFormatUtils.transformHTML(newCitation);

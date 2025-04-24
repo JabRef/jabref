@@ -46,13 +46,13 @@ public class CSLFormatUtils {
         }
     }
 
-    public static final CitationStyleOutputFormat OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
+    public static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
 
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
-    
+
     private static String bibliographyTitle;
     private static String bibliographyHeaderFormat;
-    
+
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     public static String getBibliographyTitle() {
