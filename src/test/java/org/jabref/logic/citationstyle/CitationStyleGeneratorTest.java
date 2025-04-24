@@ -85,7 +85,7 @@ class CitationStyleGeneratorTest {
     }
 
     @Test
-    void defaulBibliography() {
+    void defaultBibliography() {
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER).getFirst();
 
