@@ -5,10 +5,11 @@
      <![CDATA[
         var fileSystem = new ActiveXObject("Scripting.FileSystemObject");
 
-        // The script is invoked in the "image" folder and not in "config" for some reason
         // DEBUG Output
-        // var shell = new ActiveXObject("WScript.Shell");
-        // shell.Popup(fileSystem.GetFolder("."));
+        var shell = new ActiveXObject("WScript.Shell");
+        shell.Popup(fileSystem.GetFolder("."));
+
+        // The script is invoked in the "image" folder and not in "config" for some reason
         var jabRefRoot = fileSystem.GetFolder(".").ParentFolder.ParentFolder.ParentFolder.ParentFolder.Path;
         var installerConfig = jabRefRoot + "/build/installer/config/";
 
