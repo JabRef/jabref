@@ -111,7 +111,6 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
                 Path correctPath = fileToAdd.resolveSibling(newFilename);
                 try {
                     Files.move(fileToAdd, correctPath);
-                    // link.set(relativize(correctPath));
                     link.set(correctPath.toAbsolutePath().toString());
                     filePreferences.setWorkingDirectory(correctPath.getParent());
                     setExternalFileTypeByExtension(link.getValueSafe());
@@ -121,7 +120,6 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
                 }
             }
         } else {
-            // link.set(relativize(fileToAdd));
             link.set(fileToAdd.toAbsolutePath().toString());
             filePreferences.setWorkingDirectory(fileToAdd.getParent());
             setExternalFileTypeByExtension(link.getValueSafe());
@@ -135,7 +133,6 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
         if (linkedFile.isOnlineLink()) {
             link.setValue(linkedFile.getLink()); // Might be an URL
         } else {
-            // link.setValue(relativize(Path.of(linkedFile.getLink())));
             link.setValue(Path.of(linkedFile.getLink()).toString());
             System.out.println("Set link to: " + link.get());
         }

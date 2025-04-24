@@ -255,6 +255,13 @@ public class LinkedFile implements Serializable {
         }
     }
 
+    /**
+     * Converts a local file path to an absolute path if it's not an online link.
+     * If the link is invalid or an online link, the original link is returned.
+     *
+     * @param link the file path or URL to be converted.
+     * @return the absolute path if the link is a local file path, or the original link if it's not.
+     */
     private static String makeAbsoluteIfLocal(String link) {
         if (!isOnlineLink(link)) {
             try {
