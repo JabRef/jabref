@@ -70,8 +70,9 @@ public class LinkedFile implements Serializable {
         this.sourceURL.setValue(sourceUrl);
     }
 
+    // Constructor changed
     public LinkedFile(String description, String link, String fileType) {
-        this(description, link, fileType, "");
+        this(description, makeAbsoluteIfLocal(link), fileType, "");
     }
 
     public LinkedFile(URL link, String fileType) {
@@ -252,5 +253,17 @@ public class LinkedFile implements Serializable {
         } catch (InvalidPathException ex) {
             return Optional.empty();
         }
+    }
+
+    private static String makeAbsoluteIfLocal(String link) {
+        if (!isOnlineLink(link)) {
+            try {
+                return Path.of(link).toAbsolutePath().toString();
+            } catch (InvalidPathException e) {
+                // fallback to original link if it's not a valid path
+                return link;
+            }
+        }
+        return link;
     }
 }

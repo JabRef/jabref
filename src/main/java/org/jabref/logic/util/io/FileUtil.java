@@ -289,8 +289,11 @@ public class FileUtil {
                           if (entry.hasField(StandardField.FILE)) {
                               List<LinkedFile> updatedLinkedFiles = entry.getFiles().stream().map(linkedFile -> {
                                   if (!linkedFile.isOnlineLink()) {
-                                      String newPath = FileUtil.relativize(Path.of(linkedFile.getLink()), fileDirectories).toString();
-                                      linkedFile.setLink(newPath);
+                                      // String newPath = FileUtil.relativize(Path.of(linkedFile.getLink()), fileDirectories).toString();
+                                      // linkedFile.setLink(newPath);
+                                      // Skip relativizing for debugging absolute path issue
+                                      linkedFile.setLink(linkedFile.getLink());
+                                      System.out.println("Relativizing file: " + linkedFile.getLink());
                                   }
                                   return linkedFile;
                               }).toList();
@@ -394,15 +397,22 @@ public class FileUtil {
      * returning the first found file to match if any.
      */
     public static Optional<Path> find(String fileName, List<Path> directories) {
+        // code added
+        Path filePath = Path.of(fileName);
+
+        // Checking if the given path is absolute and exists
+        if (filePath.isAbsolute() && Files.exists(filePath)) {
+            return Optional.of(filePath);
+        }
+
         if (directories.isEmpty()) {
-            // Fallback, if no directories to resolve are passed
-            Path path = Path.of(fileName);
-            if (path.isAbsolute()) {
-                return Optional.of(path);
+            if (Files.exists(filePath)) {
+                return Optional.of(filePath);
             } else {
                 return Optional.empty();
             }
         }
+        System.out.println("Looking for: " + fileName);
 
         return directories.stream()
                           .flatMap(directory -> find(fileName, directory).stream())

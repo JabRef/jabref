@@ -227,7 +227,7 @@ class FileUtilTest {
                "");
         List<String> uniqPath = List.of("uniquefile.bib",
               "downloads/filename.bib",
-              "C:/mypaper/bib/filename.bib",
+              "mypaper/bib/filename.bib",
               "external/mypaper/bib/filename.bib",
               "");
 
