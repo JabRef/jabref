@@ -15,6 +15,7 @@ import org.jabref.logic.os.OS;
 import jakarta.ws.rs.SeBootstrap;
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -72,13 +73,22 @@ public class Server {
     }
 
     private static void startServer() {
-        SSLContext sslContext = getSslContext();
-        SeBootstrap.Configuration configuration = SeBootstrap.Configuration
-                .builder()
-                .sslContext(sslContext)
-                .protocol("HTTPS")
-                .port(6051)
-                .build();
+        SeBootstrap.Configuration configuration;
+        if (!sslCertExists()) {
+            LOGGER.info("SSL certificate not found. Server starts in non-SSL mode.");
+            configuration = SeBootstrap.Configuration.builder()
+                                                     .protocol("HTTP")
+                                                     .port(6050)
+                                                     .build();
+        } else {
+            LOGGER.info("SSL certificate found. Server starts in SSL mode.");
+            SSLContext sslContext = getSslContext();
+            configuration = SeBootstrap.Configuration.builder()
+                                                     .sslContext(sslContext)
+                                                     .protocol("HTTPS")
+                                                     .port(6051)
+                                                     .build();
+        }
         LOGGER.debug("Starting server...");
         SeBootstrap.start(Application.class, configuration).thenAccept(instance -> {
             LOGGER.debug("Server started.");
@@ -93,14 +103,14 @@ public class Server {
         });
     }
 
+    private static boolean sslCertExists() {
+        Path serverKeyStore = getSslCert();
+        return Files.exists(serverKeyStore);
+    }
+
     private static SSLContext getSslContext() {
         SSLContextConfigurator sslContextConfig = new SSLContextConfigurator();
-        Path serverKeyStore = Path.of(AppDirsFactory.getInstance()
-                                         .getUserDataDir(
-                                                 OS.APP_DIR_APP_NAME,
-                                                 "ssl",
-                                                 OS.APP_DIR_APP_AUTHOR))
-                       .resolve("server.p12");
+        Path serverKeyStore = getSslCert();
         if (Files.exists(serverKeyStore)) {
             sslContextConfig.setKeyStoreFile(serverKeyStore.toString());
             sslContextConfig.setKeyStorePass("changeit");
@@ -109,6 +119,16 @@ public class Server {
             LOGGER.error("One create one by following the steps described in [http-server.md](/docs/code-howtos/http-server.md), which is rendered at <https://devdocs.jabref.org/code-howtos/http-server.html>");
         }
         return sslContextConfig.createSSLContext(false);
+    }
+
+    @NonNull
+    private static Path getSslCert() {
+        return Path.of(AppDirsFactory.getInstance()
+                                     .getUserDataDir(
+                                             OS.APP_DIR_APP_NAME,
+                                             "ssl",
+                                             OS.APP_DIR_APP_AUTHOR))
+                   .resolve("server.p12");
     }
 
     static void stopServer() {

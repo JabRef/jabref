@@ -32,4 +32,6 @@ module org.jabref.jabsrv {
 
     requires jbibtex;
     requires citeproc.java;
+
+    requires transitive org.jspecify;
 }
