@@ -62,7 +62,7 @@ class CSLStyleUtilsTest {
 
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void parseStyleInfo(String styleName, String expectedTitle, boolean expectedIsNumeric) throws IOException {
+    void parseStyleInfo(String styleName, String expectedTitle, boolean expectedNumericNature, boolean expectedBibliographicNature) throws IOException {
         String styleContent;
         try (InputStream inputStream = CSLStyleUtilsTest.class.getResourceAsStream(styleName)) {
             styleContent = new String(inputStream.readAllBytes());
@@ -72,12 +72,13 @@ class CSLStyleUtilsTest {
 
         assertTrue(styleInfo.isPresent());
         assertEquals(expectedTitle, styleInfo.get().title());
-        assertEquals(expectedIsNumeric, styleInfo.get().isNumericStyle());
+        assertEquals(expectedNumericNature, styleInfo.get().isNumericStyle());
+        assertEquals(expectedBibliographicNature, styleInfo.get().hasBibliography());
     }
 
     @ParameterizedTest
     @MethodSource("styleTestData")
-    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, boolean expectedIsNumeric) {
+    void createCitationStyleFromFileReturnsValidCitationStyle(String styleName, String expectedTitle, boolean expectedNumericNature, boolean expectedBibliographicNature) {
         // use absolute path to test csl so that it is treated as external file
         Path resourcePath = Path.of("").toAbsolutePath()
                                 .resolve("src/test/resources/org/jabref/logic/citationstyle")
@@ -87,16 +88,17 @@ class CSLStyleUtilsTest {
 
         assertTrue(citationStyle.isPresent());
         assertEquals(expectedTitle, citationStyle.get().getTitle());
-        assertEquals(expectedIsNumeric, citationStyle.get().isNumericStyle());
+        assertEquals(expectedNumericNature, citationStyle.get().isNumericStyle());
+        assertEquals(expectedBibliographicNature, citationStyle.get().hasBibliography());
         assertNotNull(citationStyle.get().getSource());
         assertFalse(citationStyle.get().isInternalStyle());
     }
 
     private static Stream<Arguments> styleTestData() {
         return Stream.of(
-                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", true),
-                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false),
-                Arguments.of(LITERATURA, "Literatūra", false) // Literatūra uses author-date format, so non-numeric
+                Arguments.of(MODIFIED_IEEE, "IEEE - Bold Author", true, true),
+                Arguments.of(MODIFIED_APA, "Modified American Psychological Association 7th edition", false, true),
+                Arguments.of(LITERATURA, "Literatūra", false, true) // Literatūra uses author-date format, so non-numeric
         );
     }
 
