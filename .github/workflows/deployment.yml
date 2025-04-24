@@ -42,7 +42,7 @@ jobs:
         include:
           - os: ubuntu-22.04
             displayName: linux
-            archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R build/distribution/JabRef
+            archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
