@@ -102,7 +102,6 @@ public class LinkedFilesEditorViewModel extends AbstractEditorViewModel {
                                                               .orElse(new UnknownExternalFileType(fileExtension));
          Path absolutePath = file.toAbsolutePath();
         return new LinkedFile("", absolutePath.toString(), suggestedFileType.getName());
-
     }
 
     private List<LinkedFileViewModel> parseToFileViewModel(String stringValue) {
