@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utility class for handling Citation Style Language (CSL) files.
- * Contains shared functionality used by both runtime ({@link CSLStyleLoader}) and build-time ({@link CitationStyleCatalogGenerator}) components.
+ * Contains shared functionality used by both runtime ({@link CSLStyleLoader}) and build-time ({@link org.jabref.generators.CitationStyleCatalogGenerator}) components.
  */
 public class CSLStyleUtils {
     private static final String STYLES_ROOT = "/csl-styles";
