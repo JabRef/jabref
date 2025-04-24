@@ -35,14 +35,9 @@ class CitationStyleGeneratorTest {
     @Test
     void defaultCitation() {
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
-        String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER).getFirst();
+        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), DEFAULT_STYLE, HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
 
-        // if the default citation style changes this has to be modified
-        String expected = """
-                  <div class="csl-entry">
-                    <div class="csl-left-margin">[1]</div><div class="csl-right-inline">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style="font-style: italic">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, Jul. 2016, doi: 10.1001/bla.blubb.</div>
-                  </div>
-                """;
+        String expected = "[1]";
 
         assertEquals(expected, citation);
     }
@@ -85,6 +80,21 @@ class CitationStyleGeneratorTest {
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
 
         String expected = "B. Smith, B. Jones and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style=\"font-style: italic\">BibTeX Journal</span> 34, no. 3 (July 2016): 45&ndash;67.";
+
+        assertEquals(expected, citation);
+    }
+
+    @Test
+    void defaulBibliography() {
+        testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
+        String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER).getFirst();
+
+        // if the default citation style changes this has to be modified
+        String expected = """
+                  <div class="csl-entry">
+                    <div class="csl-left-margin">[1]</div><div class="csl-right-inline">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style="font-style: italic">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, Jul. 2016, doi: 10.1001/bla.blubb.</div>
+                  </div>
+                """;
 
         assertEquals(expected, citation);
     }
