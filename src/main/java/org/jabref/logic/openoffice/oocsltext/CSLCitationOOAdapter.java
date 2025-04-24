@@ -175,7 +175,7 @@ public class CSLCitationOOAdapter {
      */
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, CreationException {
-        if (selectedStyle.hasBibliography()) {
+        if (!selectedStyle.hasBibliography()) {
             return;
         }
 
