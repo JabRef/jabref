@@ -45,6 +45,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void aCMCitation() {
+        testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = STYLE_LIST.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
 
@@ -66,6 +67,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void clinicalEthicsNoteCitation() {
+        testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         // Non-bibliographic citation style (citation-format="note")
         CitationStyle style = STYLE_LIST.stream().filter(e -> "The Journal of Clinical Ethics".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
@@ -93,6 +95,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void aCMBibliography() {
+        testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = STYLE_LIST.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER).getFirst();
 
