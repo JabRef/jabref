@@ -60,9 +60,9 @@ public class CSLStyleUtils {
             return Optional.empty();
         }
 
-        // Check if this is an absolute path (external file)
+        // Check if exits (typically an absolute path indicating an external file)
         Path filePath = Path.of(styleFile);
-        if (filePath.isAbsolute() && Files.exists(filePath)) {
+        if (Files.exists(filePath)) {
             try (InputStream inputStream = Files.newInputStream(filePath)) {
                 return createCitationStyleFromSource(inputStream, styleFile, false);
             } catch (IOException e) {
