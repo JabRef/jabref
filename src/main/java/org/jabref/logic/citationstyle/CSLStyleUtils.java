@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * Utility class for handling Citation Style Language (CSL) files.
  * Contains shared functionality used by both runtime ({@link CSLStyleLoader}) and build-time ({@link CitationStyleCatalogGenerator}) components.
  */
-public class CSLStyleUtils {
+public final class CSLStyleUtils {
     private static final String STYLES_ROOT = "/csl-styles";
     private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
 
