@@ -106,7 +106,7 @@ class CitationStyleTest {
     void bibliographicPropertyMatches(boolean expectedBibliographicNature, String cslFileName) {
         CitationStyle citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName).get();
         CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.getTitle(), citationStyle.isNumericStyle(), citationStyle.hasBibliography());
-        assertEquals(expectedBibliographicNature, styleInfo.isNumericStyle());
+        assertEquals(expectedBibliographicNature, styleInfo.hasBibliography());
     }
 
     private static Stream<Arguments> bibliographicPropertyMatches() {
