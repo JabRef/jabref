@@ -60,7 +60,7 @@ public class CSLStyleUtils {
             return Optional.empty();
         }
 
-        // Check if exits (typically an absolute path indicating an external file)
+        // Check if exists (typically an absolute path indicating an external file)
         Path filePath = Path.of(styleFile);
         if (Files.exists(filePath)) {
             try (InputStream inputStream = Files.newInputStream(filePath)) {
