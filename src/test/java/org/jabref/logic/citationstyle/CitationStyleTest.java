@@ -69,8 +69,7 @@ class CitationStyleTest {
     @MethodSource
     void titleMatches(String expectedTitle, String cslFileName) {
         CitationStyle citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName).get();
-        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.getTitle(), citationStyle.isNumericStyle(), citationStyle.hasBibliography());
-        assertEquals(expectedTitle, styleInfo.title());
+        assertEquals(expectedTitle, citationStyle.getTitle());
     }
 
     static Stream<Arguments> titleMatches() {
@@ -87,8 +86,7 @@ class CitationStyleTest {
     @MethodSource
     void numericPropertyMatches(boolean expectedNumericNature, String cslFileName) {
         CitationStyle citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName).get();
-        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.getTitle(), citationStyle.isNumericStyle(), citationStyle.hasBibliography());
-        assertEquals(expectedNumericNature, styleInfo.isNumericStyle());
+        assertEquals(expectedNumericNature, citationStyle.isNumericStyle());
     }
 
     private static Stream<Arguments> numericPropertyMatches() {
@@ -105,8 +103,7 @@ class CitationStyleTest {
     @MethodSource
     void bibliographicPropertyMatches(boolean expectedBibliographicNature, String cslFileName) {
         CitationStyle citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName).get();
-        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.getTitle(), citationStyle.isNumericStyle(), citationStyle.hasBibliography());
-        assertEquals(expectedBibliographicNature, styleInfo.hasBibliography());
+        assertEquals(expectedBibliographicNature, citationStyle.hasBibliography());
     }
 
     private static Stream<Arguments> bibliographicPropertyMatches() {
