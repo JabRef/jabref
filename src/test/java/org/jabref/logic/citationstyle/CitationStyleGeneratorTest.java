@@ -34,6 +34,7 @@ class CitationStyleGeneratorTest {
 
     @Test
     void defaultCitation() {
+        // IEEE
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), DEFAULT_STYLE, HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
 
@@ -44,7 +45,6 @@ class CitationStyleGeneratorTest {
 
     @Test
     void aCMCitation() {
-        testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = STYLE_LIST.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
 
@@ -55,20 +55,11 @@ class CitationStyleGeneratorTest {
 
     @Test
     void aPACitation() {
+        testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         CitationStyle style = STYLE_LIST.stream().filter(e -> "ACM SIGGRAPH".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
 
         String expected = "[Smith et al. 2016]";
-
-        assertEquals(expected, citation);
-    }
-
-    @Test
-    void iEEECitation() {
-        CitationStyle style = STYLE_LIST.stream().filter(e -> "IEEE".equals(e.getTitle())).findAny().get();
-        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER);
-
-        String expected = "[1]";
 
         assertEquals(expected, citation);
     }
@@ -86,10 +77,11 @@ class CitationStyleGeneratorTest {
 
     @Test
     void defaultBibliography() {
+        // IEEE
         testEntryContext.setMode(BibDatabaseMode.BIBLATEX);
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), DEFAULT_STYLE, HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER).getFirst();
 
-        // if the default citation style changes this has to be modified
+        // if the default citation style (ieee.csl) changes this has to be modified
         String expected = """
                   <div class="csl-entry">
                     <div class="csl-left-margin">[1]</div><div class="csl-right-inline">B. Smith, B. Jones, and J. Williams, &ldquo;Title of the test entry,&rdquo; <span style="font-style: italic">BibTeX Journal</span>, vol. 34, no. 3, pp. 45&ndash;67, Jul. 2016, doi: 10.1001/bla.blubb.</div>
@@ -105,9 +97,7 @@ class CitationStyleGeneratorTest {
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER).getFirst();
 
         // if the acm-siggraph.csl citation style changes this has to be modified
-        String expected = "  <div class=\"csl-entry\">"
-                + "<span style=\"font-variant: small-caps\">Smith, B., Jones, B., and Williams, J.</span> 2016. Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span> <span style=\"font-style: italic\">34</span>, 3, 45&ndash;67."
-                + "</div>\n";
+        String expected = "  <div class=\"csl-entry\"><span style=\"font-variant: small-caps\">Smith, B., Jones, B., and Williams, J.</span> 2016. Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span> <span style=\"font-style: italic\">34</span>, 3, 45&ndash;67.</div>\n";
 
         assertEquals(expected, citation);
     }
@@ -118,10 +108,8 @@ class CitationStyleGeneratorTest {
         CitationStyle style = STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get();
         String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), HTML_OUTPUT_FORMAT, testEntryContext, BIB_ENTRY_TYPES_MANAGER).getFirst();
 
-        // if the apa-7th-citation.csl citation style changes this has to be modified
-        String expected = "  <div class=\"csl-entry\">"
-                + "Smith, B., Jones, B., &amp; Williams, J. (2016). Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span>, <span style=\"font-style: italic\">34</span>(3), 45&ndash;67. https://doi.org/10.1001/bla.blubb"
-                + "</div>\n";
+        // if the apa.csl citation style changes this has to be modified
+        String expected = "  <div class=\"csl-entry\">Smith, B., Jones, B., &amp; Williams, J. (2016). Title of the test entry. <span style=\"font-style: italic\">BibTeX Journal</span>, <span style=\"font-style: italic\">34</span>(3), 45&ndash;67. https://doi.org/10.1001/bla.blubb</div>\n";
 
         assertEquals(expected, citation);
     }
