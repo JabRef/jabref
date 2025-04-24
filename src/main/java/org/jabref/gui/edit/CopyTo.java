@@ -66,7 +66,7 @@ public class CopyTo extends SimpleCommand {
         if (includeCrossReferences) {
             int before = targetDatabaseContext.getEntries().size();
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."))
+            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."));
             int after = targetDatabaseContext.getEntries().size();
             if (after > before) {
                 dialogService.notify(Localization.lang("No new entries were added to the target library."));
