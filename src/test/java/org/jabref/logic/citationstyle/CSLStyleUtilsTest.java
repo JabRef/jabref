@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,6 +28,8 @@ class CSLStyleUtilsTest {
             "apa.csl",
             "harvard.csl",
             "vancouver.csl",
+            "ieee.modified.csl",
+            "apa.v7.csl",
             "/path/to/style/nature.csl",
             "C:\\Users\\username\\Documents\\styles\\chicago.csl"
     })
@@ -48,12 +49,6 @@ class CSLStyleUtilsTest {
     })
     void rejectsNonCslExtension(String filename) {
         assertFalse(CSLStyleUtils.isCitationStyleFile(filename));
-    }
-
-    @Test
-    void acceptsFilenameWithMultipleDots() {
-        assertTrue(CSLStyleUtils.isCitationStyleFile("ieee.modified.csl"));
-        assertTrue(CSLStyleUtils.isCitationStyleFile("apa.v7.csl"));
     }
 
     @ParameterizedTest

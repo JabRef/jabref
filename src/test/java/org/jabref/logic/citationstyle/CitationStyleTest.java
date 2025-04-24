@@ -68,8 +68,8 @@ class CitationStyleTest {
     @ParameterizedTest
     @MethodSource
     void titleMatches(String expectedTitle, String cslFileName) {
-        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName);
-        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
+        CitationStyle citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName).get();
+        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.getTitle(), citationStyle.isNumericStyle(), citationStyle.hasBibliography());
         assertEquals(expectedTitle, styleInfo.title());
     }
 
@@ -86,8 +86,8 @@ class CitationStyleTest {
     @ParameterizedTest
     @MethodSource
     void numericPropertyMatches(boolean expectedNumericNature, String cslFileName) {
-        Optional<CitationStyle> citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName);
-        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.get().getTitle(), citationStyle.get().isNumericStyle());
+        CitationStyle citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName).get();
+        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.getTitle(), citationStyle.isNumericStyle(), citationStyle.hasBibliography());
         assertEquals(expectedNumericNature, styleInfo.isNumericStyle());
     }
 
@@ -98,6 +98,25 @@ class CitationStyleTest {
                 Arguments.of(true, "vancouver.csl"),
                 Arguments.of(false, "chicago-author-date.csl"),
                 Arguments.of(true, "nature.csl")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void bibliographicPropertyMatches(boolean expectedBibliographicNature, String cslFileName) {
+        CitationStyle citationStyle = CSLStyleUtils.createCitationStyleFromFile(cslFileName).get();
+        CSLStyleUtils.StyleInfo styleInfo = new CSLStyleUtils.StyleInfo(citationStyle.getTitle(), citationStyle.isNumericStyle(), citationStyle.hasBibliography());
+        assertEquals(expectedBibliographicNature, styleInfo.isNumericStyle());
+    }
+
+    private static Stream<Arguments> bibliographicPropertyMatches() {
+        return Stream.of(
+                Arguments.of(true, "ieee.csl"),
+                Arguments.of(true, "apa.csl"),
+                Arguments.of(true, "vancouver.csl"),
+                Arguments.of(true, "chicago-author-date.csl"),
+                Arguments.of(true, "nature.csl"),
+                Arguments.of(false, "the-journal-of-clinical-ethics.csl")
         );
     }
 }

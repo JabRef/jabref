@@ -900,8 +900,10 @@ public class OOBibBase {
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         } else if (style instanceof CitationStyle citationStyle) {
+            if (!citationStyle.hasBibliography()) {
+                return;
+            }
             try {
-
                 OOResult<XTextDocument, OOError> odoc = getXTextDocument();
                 if (testDialog(errorTitle, odoc.asVoidResult())) {
                     return;
@@ -946,7 +948,6 @@ public class OOBibBase {
                     // Lock document controllers - disable refresh during the process (avoids document flicker during writing)
                     // MUST always be paired with an unlockControllers() call
                     doc.lockControllers();
-
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 } catch (NoDocumentException
                          | NoSuchElementException e) {

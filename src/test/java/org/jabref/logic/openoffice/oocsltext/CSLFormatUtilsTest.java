@@ -18,7 +18,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.openoffice.ootext.OOText;
 
-import de.undercouch.citeproc.output.Citation;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -260,16 +259,14 @@ class CSLFormatUtilsTest {
     @ParameterizedTest
     @MethodSource
     void ooHTMLTransformFromCitationWithSingleEntry(String expected, CitationStyle style) throws IOException {
-        Citation citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager);
-        String inTextCitationText = citation.getText();
-        String actual = CSLFormatUtils.transformHTML(inTextCitationText);
+        String citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager);
+        String actual = CSLFormatUtils.transformHTML(citation);
         OOText ooText = OOText.fromString(actual);
         assertEquals(OOText.fromString(expected), ooText);
     }
 
     static Stream<Arguments> ooHTMLTransformFromCitationWithSingleEntry() {
         return Stream.of(
-
                 Arguments.of(
                         "(Smith et al., 2016)",
                         STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
@@ -349,6 +346,12 @@ class CSLFormatUtilsTest {
                 Arguments.of(
                         "<sup>1</sup>",
                         STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                ),
+
+                // Non-bibliographic style (citation-format="note")
+                Arguments.of(
+                        "B. Smith, B. Jones and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i> 34, no. 3 (July 2016): 45–67.",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Clinical Ethics".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -386,9 +389,8 @@ class CSLFormatUtilsTest {
         List<BibEntry> entries = List.of(entry1, entry2);
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
         context.setMode(BibDatabaseMode.BIBLATEX);
-        Citation citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager);
-        String inTextCitationText = citation.getText();
-        String actual = CSLFormatUtils.transformHTML(inTextCitationText);
+        String citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager);
+        String actual = CSLFormatUtils.transformHTML(citation);
         assertEquals(expected, actual);
     }
 
@@ -472,6 +474,12 @@ class CSLFormatUtilsTest {
                 Arguments.of(
                         "<sup>1,2</sup>",
                         STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                ),
+
+                // Non-bibliographic style (citation-format="note")
+                Arguments.of(
+                        "M. Garcia and D. Lee, “Quantum Entanglement in Superconductors,” <i>International Review of Physics</i> 28, no. 6 (2021): 789–810; J. Smith and E. Johnson, “A Study on Machine Learning Algorithms,” <i>Journal of Computer Science</i> 15, no. 4 (2020): 101–20.",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Clinical Ethics".equals(e.getTitle())).findAny().get()
                 )
         );
     }

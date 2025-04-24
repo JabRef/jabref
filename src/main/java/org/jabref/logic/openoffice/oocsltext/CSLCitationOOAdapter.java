@@ -93,7 +93,7 @@ public class CSLCitationOOAdapter {
         if (isAlphanumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+            citation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(citation);
@@ -134,7 +134,7 @@ public class CSLCitationOOAdapter {
             if (isAlphanumericStyle) {
                 inTextCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
             } else {
-                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getText();
+                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, CSLFormatUtils.OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
             }
 
             String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
@@ -175,6 +175,10 @@ public class CSLCitationOOAdapter {
      */
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
             throws WrappedTargetException, CreationException {
+        if (selectedStyle.hasBibliography()) {
+            return;
+        }
+
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
         OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.getBibliographyTitle()), CSLFormatUtils.getBibliographyHeaderFormat());
@@ -314,7 +318,7 @@ public class CSLCitationOOAdapter {
                     if (isAlphaNumericStyle) {
                         newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
                     } else {
-                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager).getText();
+                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
                     }
 
                     String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
@@ -352,7 +356,7 @@ public class CSLCitationOOAdapter {
                     newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
                 } else {
                     newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
-                            CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager).getText();
+                            CSLFormatUtils.OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
                 }
 
                 String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
