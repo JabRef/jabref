@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
-import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
@@ -46,30 +45,12 @@ public final class CSLFormatUtils {
         }
     }
 
-    public static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
-
     public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
-
-    private static String bibliographyTitle;
-    private static String bibliographyHeaderFormat;
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     private CSLFormatUtils() {
         // prevent instantiation
-    }
-
-    public static String getBibliographyTitle() {
-        return bibliographyTitle;
-    }
-
-    public static String getBibliographyHeaderFormat() {
-        return bibliographyHeaderFormat;
-    }
-
-    public static void setBibliographyProperties(OpenOfficePreferences openOfficePreferences) {
-        bibliographyTitle = openOfficePreferences.getCslBibliographyTitle();
-        bibliographyHeaderFormat = openOfficePreferences.getCslBibliographyHeaderFormat();
     }
 
     /**

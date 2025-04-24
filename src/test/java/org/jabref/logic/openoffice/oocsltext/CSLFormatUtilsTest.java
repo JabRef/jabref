@@ -31,6 +31,8 @@ class CSLFormatUtilsTest {
     private static final BibDatabaseContext TEST_ENTRY_CONTEXT = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
     private static final BibEntryTypesManager ENTRY_TYPES_MANAGER = new BibEntryTypesManager();
 
+    private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
+
     private static final List<CitationStyle> STYLE_LIST = CSLStyleLoader.getInternalStyles();
 
     /**
@@ -148,7 +150,7 @@ class CSLFormatUtilsTest {
     @ParameterizedTest
     @MethodSource
     void ooHTMLTransformFromRawBibliography(String expected, CitationStyle style) {
-        String citation = CitationStyleGenerator.generateBibliography(List.of(TEST_ENTRY), style.getSource(), CSLFormatUtils.HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER).getFirst();
+        String citation = CitationStyleGenerator.generateBibliography(List.of(TEST_ENTRY), style.getSource(), HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER).getFirst();
         String actual = CSLFormatUtils.transformHTML(citation);
         assertEquals(expected, actual);
     }
@@ -259,7 +261,7 @@ class CSLFormatUtilsTest {
     @ParameterizedTest
     @MethodSource
     void ooHTMLTransformFromCitationWithSingleEntry(String expected, CitationStyle style) throws IOException {
-        String citation = CitationStyleGenerator.generateCitation(List.of(TEST_ENTRY), style.getSource(), CSLFormatUtils.HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER);
+        String citation = CitationStyleGenerator.generateCitation(List.of(TEST_ENTRY), style.getSource(), HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER);
         String actual = CSLFormatUtils.transformHTML(citation);
         OOText ooText = OOText.fromString(actual);
         assertEquals(OOText.fromString(expected), ooText);
@@ -389,7 +391,7 @@ class CSLFormatUtilsTest {
         List<BibEntry> entries = List.of(entry1, entry2);
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
         context.setMode(BibDatabaseMode.BIBLATEX);
-        String citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), CSLFormatUtils.HTML_OUTPUT_FORMAT, context, ENTRY_TYPES_MANAGER);
+        String citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), HTML_OUTPUT_FORMAT, context, ENTRY_TYPES_MANAGER);
         String actual = CSLFormatUtils.transformHTML(citation);
         assertEquals(expected, actual);
     }
@@ -499,7 +501,7 @@ class CSLFormatUtilsTest {
     @ParameterizedTest
     @MethodSource
     void updateSingleNumericBibliography(String expected, CitationStyle style) {
-        String citation = CitationStyleGenerator.generateBibliography(List.of(TEST_ENTRY), style.getSource(), CSLFormatUtils.HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER).getFirst();
+        String citation = CitationStyleGenerator.generateBibliography(List.of(TEST_ENTRY), style.getSource(), HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER).getFirst();
         String transformedCitation = CSLFormatUtils.transformHTML(citation);
         String actual = CSLFormatUtils.updateSingleBibliographyNumber(transformedCitation, 3);
         assertEquals(expected, actual);

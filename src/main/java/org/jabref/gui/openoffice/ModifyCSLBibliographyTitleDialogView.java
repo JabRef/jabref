@@ -33,8 +33,7 @@ public class ModifyCSLBibliographyTitleDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
-        okButton.setOnAction(event -> {
-            viewModel.updateSettings();
+        okButton.setOnAction(_ -> {
             this.close();
         });
     }

@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleGenerator;
+import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
+import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -41,18 +43,24 @@ import com.sun.star.uno.Exception;
  */
 public class CSLCitationOOAdapter {
 
+    private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
+
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
     private final Supplier<List<BibDatabaseContext>> databasesSupplier;
+    private final OpenOfficePreferences openOfficePreferences;
 
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
 
-    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OOStyle initialStyle) throws WrappedTargetException, NoSuchElementException {
+    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.databasesSupplier = databasesSupplier;
+        this.openOfficePreferences = openOfficePreferences;
+
+        OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
 
         if (initialStyle instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle; // else the currentStyle purposely stays null, still causing a difference with the subsequent style if CSL (valid comparison)
@@ -93,7 +101,7 @@ public class CSLCitationOOAdapter {
         if (isAlphanumericStyle) {
             citation = CSLFormatUtils.generateAlphanumericCitation(entries, bibDatabaseContext);
         } else {
-            citation = CitationStyleGenerator.generateCitation(entries, style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            citation = CitationStyleGenerator.generateCitation(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
         }
 
         String formattedCitation = CSLFormatUtils.transformHTML(citation);
@@ -134,7 +142,7 @@ public class CSLCitationOOAdapter {
             if (isAlphanumericStyle) {
                 inTextCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, bibDatabaseContext);
             } else {
-                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+                inTextCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
             }
 
             String formattedCitation = CSLFormatUtils.transformHTML(inTextCitation);
@@ -181,7 +189,7 @@ public class CSLCitationOOAdapter {
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
 
-        OOText title = OOFormat.paragraph(OOText.fromString(CSLFormatUtils.getBibliographyTitle()), CSLFormatUtils.getBibliographyHeaderFormat());
+        OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
         OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
         OOTextIntoOO.write(document, cursor, ooBreak);
@@ -193,7 +201,7 @@ public class CSLCitationOOAdapter {
             entries.sort(Comparator.comparingInt(entry -> markManager.getCitationNumber(entry.getCitationKey().orElse(""))));
 
             for (BibEntry entry : entries) {
-                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
+                String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
 
@@ -204,7 +212,7 @@ public class CSLCitationOOAdapter {
             }
         } else {
             // Ordering will be according to citeproc item data provider (default)
-            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, CSLFormatUtils.HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
+            List<String> bibliographyEntries = CitationStyleGenerator.generateBibliography(entries, style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager);
 
             for (String bibliographyEntry : bibliographyEntries) {
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
@@ -318,7 +326,7 @@ public class CSLCitationOOAdapter {
                     if (isAlphaNumericStyle) {
                         newCitation = CSLFormatUtils.generateAlphanumericInTextCitation(currentEntry, unifiedBibDatabaseContext);
                     } else {
-                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), CSLFormatUtils.HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+                        newCitation = CitationStyleGenerator.generateCitation(List.of(currentEntry), style.getSource(), HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
                     }
 
                     String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
@@ -356,7 +364,7 @@ public class CSLCitationOOAdapter {
                     newCitation = CSLFormatUtils.generateAlphanumericCitation(entries, unifiedBibDatabaseContext);
                 } else {
                     newCitation = CitationStyleGenerator.generateCitation(entries, style.getSource(),
-                            CSLFormatUtils.HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
+                            HTML_OUTPUT_FORMAT, unifiedBibDatabaseContext, bibEntryTypesManager);
                 }
 
                 String formattedCitation = CSLFormatUtils.transformHTML(newCitation);
