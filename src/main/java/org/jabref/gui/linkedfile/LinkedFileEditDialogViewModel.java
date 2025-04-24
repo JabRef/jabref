@@ -134,7 +134,6 @@ public class LinkedFileEditDialogViewModel extends AbstractViewModel {
             link.setValue(linkedFile.getLink()); // Might be an URL
         } else {
             link.setValue(Path.of(linkedFile.getLink()).toString());
-            System.out.println("Set link to: " + link.get());
         }
 
         // See what is a reasonable selection for the type combobox:

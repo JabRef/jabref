@@ -27,6 +27,8 @@ import org.jabref.model.strings.StringUtil;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import static org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel.LOGGER;
+
 /**
  * Represents the link to an external file (e.g. associated PDF file).
  * This class is {@link Serializable} which is needed for drag and drop in gui
@@ -267,8 +269,8 @@ public class LinkedFile implements Serializable {
             try {
                 return Path.of(link).toAbsolutePath().toString();
             } catch (InvalidPathException e) {
-                // fallback to original link if it's not a valid path
-                return link;
+                // Log the exception, fallback will be handled by return below
+                LOGGER.warn("Invalid path provided: {}", link, e);
             }
         }
         return link;
