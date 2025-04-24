@@ -179,7 +179,7 @@ public class CSLFormatUtils {
      * @return the bibliographic citation with resolved number.
      */
     public static String updateSingleBibliographyNumber(String citation, int currentNumber) {
-        Pattern pattern = Pattern.compile("(\\[|\\()?(\\d+)(\\]|\\))?(\\.)?\\s*");
+        Pattern pattern = Pattern.compile("([\\[(])?(\\d+)([])])?(\\.)?\\s*");
         Matcher matcher = pattern.matcher(citation);
         StringBuilder sb = new StringBuilder();
         boolean numberReplaced = false;
