@@ -24,7 +24,7 @@ class CitationStyleCatalogGeneratorTest {
     }
 
     @Test
-    void testCatalogGenerationContainsEntries() throws IOException {
+    void catalogGenerationContainsEntries() throws IOException {
         Path catalogPath = Path.of(CATALOG_PATH);
 
         assertTrue(Files.exists(catalogPath), "Catalog file should exist at " + CATALOG_PATH);
