@@ -3,6 +3,7 @@ package org.jabref.http.server;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,7 +33,7 @@ public class Server {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        final List<Path> lastFilesOpened = List.of(); // JabRefCliPreferences.getInstance().getGuiPreferences().getLastFilesOpened();
+        final List<Path> lastFilesOpened = new ArrayList<>(); // JabRefCliPreferences.getInstance().getGuiPreferences().getLastFilesOpened();
 
         // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
         // In a testing environment, this might be difficult to handle
