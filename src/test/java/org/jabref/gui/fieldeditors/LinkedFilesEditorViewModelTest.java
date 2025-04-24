@@ -51,4 +51,25 @@ class LinkedFilesEditorViewModelTest {
 
         assertTrue(Files.exists(tempDir.resolve("test.pdf")));
     }
+
+    @Test
+    void linkedFilePathShouldBeAbsolute(@TempDir Path tempDir) {
+        when(preferences.getFilePreferences()).thenReturn(filePreferences);
+        when(filePreferences.getFileNamePattern()).thenReturn("[bibtexkey]");
+        when(filePreferences.getFileDirectoryPattern()).thenReturn("");
+        when(bibDatabaseContext.getFirstExistingFileDir(any())).thenReturn(Optional.of(tempDir));
+
+        viewModel = new LinkedFilesEditorViewModel(StandardField.FILE, new EmptySuggestionProvider(), mock(DialogService.class), bibDatabaseContext,
+                new CurrentThreadTaskExecutor(), mock(FieldCheckers.class), preferences, undoManager);
+
+        BibEntry entry = new BibEntry().withCitationKey("test")
+                                       .withField(StandardField.URL, "https://ceur-ws.org/Vol-847/paper6.pdf");
+        viewModel.entry = entry;
+
+        viewModel.fetchFulltext();
+
+        String fileFieldValue = entry.getField(StandardField.FILE).orElse("");
+        assertTrue(fileFieldValue.contains(tempDir.toAbsolutePath().toString()),
+                "Linked file path should be absolute");
+    }
 }
