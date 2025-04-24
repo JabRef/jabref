@@ -12,13 +12,13 @@ Ensure you have a Java 23 SDK configured by navigating to **File > Project Struc
 **Note:** In some MacBooks, `Project Structure` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
 {% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 23 is missing." %}
-![Plattform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+![Platform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
 {% endfigure %}
 
 If there is another JDK than JDK 23 selected, click on the plus button and choose "Download JDK..."
 
 {% figure caption:"Download JDK..." %}
-![Plattform Settings - SDKs - plus button - Download JDK...](guidelines-select-download-jdk.png)
+![Platform Settings - SDKs - plus button - Download JDK...](guidelines-select-download-jdk.png)
 {% endfigure %}
 
 Select JDK version 23 and then Eclipse Temurin.
@@ -46,7 +46,7 @@ Click "OK" to store the changes.
 Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
 If that does not exist, just select JDK 23.
 
-{% figure caption:"Gradle JVM is project SDK (showing "Projekt SDK temurin-23" as example)" %}
+{% figure caption:"Gradle JVM is project SDK (showing "Project SDK temurin-23" as example)" %}
 ![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
 {% endfigure %}
 

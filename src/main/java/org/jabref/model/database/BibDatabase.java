@@ -41,6 +41,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -233,7 +234,7 @@ public class BibDatabase {
     public synchronized void removeEntries(List<BibEntry> toBeDeleted, EntriesEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        Collection idsToBeDeleted;
+        Collection<String> idsToBeDeleted;
         if (toBeDeleted.size() > 10) {
             idsToBeDeleted = new HashSet<>();
         } else {
@@ -271,19 +272,20 @@ public class BibDatabase {
         }
     }
 
-    public Set<BibEntry> getEntriesForCitationKey(String citationKey) {
-        return citationIndex.getOrDefault(citationKey, Collections.emptySet());
+    public Set<BibEntry> getEntriesForCitationKey(@Nullable String citationKey) {
+        // explicit null check because citationIndex is a ConcurrentHashMap and will throw NPE on null
+        return citationKey != null ? citationIndex.getOrDefault(citationKey, Collections.emptySet()) : Collections.emptySet();
     }
 
     private Set<String> getReferencedCitationKeys(BibEntry entry) {
         Set<String> keys = new HashSet<>();
-        forEachCitationKey(entry, key -> keys.add(key));
+        forEachCitationKey(entry, keys::add);
         return keys;
     }
 
     private void indexEntry(BibEntry entry) {
         forEachCitationKey(entry, key ->
-                citationIndex.computeIfAbsent(key, k -> ConcurrentHashMap.newKeySet()).add(entry)
+                citationIndex.computeIfAbsent(key, _ -> ConcurrentHashMap.newKeySet()).add(entry)
         );
     }
 
@@ -514,9 +516,7 @@ public class BibDatabase {
                 }
                 // If not, log this string's ID now.
                 usedIds.add(string.getId());
-                if (allUsedIds != null) {
-                    allUsedIds.add(string.getId());
-                }
+                allUsedIds.add(string.getId());
 
                 // Ok, we found the string. Now we must make sure we
                 // resolve any references to other strings in this one.
