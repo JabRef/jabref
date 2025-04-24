@@ -934,7 +934,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                                                      } else {
                                                          return layout.getDisplayName();
                                                      }
-                                                 }).collect(Collectors.toList())
+                                                 }).toList()
         );
     }
 
