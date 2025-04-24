@@ -56,7 +56,7 @@ public final class CSLStyleUtils {
      */
     public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
         if (!isCitationStyleFile(styleFile)) {
-            LOGGER.error("Can only load style files: {}", styleFile);
+            LOGGER.error("Not a .csl style file: {}", styleFile);
             return Optional.empty();
         }
 
