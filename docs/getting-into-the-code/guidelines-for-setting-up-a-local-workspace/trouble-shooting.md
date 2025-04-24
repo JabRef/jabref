@@ -6,7 +6,7 @@ nav_order: 99
 
 # Trouble shooting
 
-## Changes in `src/main/resources/csl-styles` are shown
+## Changes in `jablib/src/main/resources/csl-styles` are shown
 
 You need to remove these directories from the "Directory Mappings" in IntelliJ.
 Look for the setting in preferences.
