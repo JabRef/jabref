@@ -8,6 +8,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;
 import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.logic.UiCommand;
+import org.jabref.logic.citationstyle.CSLStyleLoader;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.HeadlessExecutorService;
@@ -35,12 +36,14 @@ public class Launcher {
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
 
         List<UiCommand> uiCommands = JabKit.processArguments(args, preferences, fileUpdateMonitor);
-        // The method `processArguments` quites the whole JVM if no GUI is needed.
+        // The method `processArguments` quits the whole JVM if no GUI is needed.
 
         PreferencesMigrations.runMigrations(preferences);
 
         PostgreServer postgreServer = new PostgreServer();
         Injector.setModelOrService(PostgreServer.class, postgreServer);
+
+        CSLStyleLoader.loadInternalStyles();
 
         JabRefGUI.setup(uiCommands, preferences, fileUpdateMonitor);
         JabRefGUI.launch(JabRefGUI.class, args);

@@ -19,6 +19,7 @@ import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.ImportCleanup;
@@ -29,6 +30,7 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
@@ -45,21 +47,19 @@ public class RelatedArticlesTab extends EntryEditorTab {
 
     private final DialogService dialogService;
     private final BuildInfo buildInfo;
+    private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
-
-    private final BibDatabaseContext databaseContext;
 
     private final GuiPreferences preferences;
 
     public RelatedArticlesTab(BuildInfo buildInfo,
-                              BibDatabaseContext databaseContext,
                               GuiPreferences preferences,
                               DialogService dialogService,
+                              StateManager stateManager,
                               TaskExecutor taskExecutor) {
-        this.databaseContext = databaseContext;
-
         this.dialogService = dialogService;
         this.buildInfo = buildInfo;
+        this.stateManager = stateManager;
         this.taskExecutor = taskExecutor;
 
         this.preferences = preferences;
@@ -80,6 +80,9 @@ public class RelatedArticlesTab extends EntryEditorTab {
         ProgressIndicator progress = new ProgressIndicator();
         progress.setMaxSize(100, 100);
 
+        BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
+                                           .orElse(BibDatabaseMode.BIBLATEX);
+
         MrDLibFetcher fetcher = new MrDLibFetcher(
                 preferences.getWorkspacePreferences().getLanguage().name(),
                 buildInfo.version,
@@ -88,7 +91,8 @@ public class RelatedArticlesTab extends EntryEditorTab {
                 .wrap(() -> fetcher.performSearch(entry))
                 .onRunning(() -> progress.setVisible(true))
                 .onSuccess(relatedArticles -> {
-                    ImportCleanup cleanup = ImportCleanup.targeting(databaseContext.getMode(), preferences.getFieldPreferences());
+
+                    ImportCleanup cleanup = ImportCleanup.targeting(mode, preferences.getFieldPreferences());
                     cleanup.doPostCleanup(relatedArticles);
                     progress.setVisible(false);
                     root.getChildren().add(getRelatedArticleInfo(relatedArticles, fetcher));
@@ -191,11 +195,16 @@ public class RelatedArticlesTab extends EntryEditorTab {
         vbox.getStyleClass().add("gdpr-notice");
         vbox.setSpacing(20.0);
 
+        HBox hbox = new HBox();
+        hbox.setSpacing(10.0);
+
         Text title = new Text(Localization.lang("Mr. DLib Privacy settings"));
         title.getStyleClass().add("heading");
 
         Button button = new Button(Localization.lang("I Agree"));
         button.setDefaultButton(true);
+
+        Button hideTab = new Button(Localization.lang("Hide 'Related articles' tab"));
 
         DoubleBinding rootWidth = Bindings.subtract(root.widthProperty(), 88d);
 
@@ -238,7 +247,13 @@ public class RelatedArticlesTab extends EntryEditorTab {
             setContent(getRelatedArticlesPane(entry));
         });
 
-        vbox.getChildren().addAll(title, line1, line2, mdlLink, line3, vb, button);
+        hideTab.setOnAction(event -> {
+            preferences.getEntryEditorPreferences().setShouldShowRecommendationsTab(false);
+            dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
+        });
+
+        hbox.getChildren().addAll(button, hideTab);
+        vbox.getChildren().addAll(title, line1, line2, mdlLink, line3, vb, hbox);
         root.setContent(vbox);
 
         return root;

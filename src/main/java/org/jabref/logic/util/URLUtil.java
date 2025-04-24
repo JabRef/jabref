@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import org.jabref.logic.util.io.FileUtil;
+
 /**
  * URL utilities for URLs in the JabRef logic.
  * <p>
@@ -29,10 +31,11 @@ public class URLUtil {
 
     /**
      * Cleans URLs returned by Google search.
-     * <example>
+     * <h4>Example</h4>
+     * <pre>{@code
      * If you copy links from search results from Google, all links will be enriched with search meta data, e.g.
      * https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&&url=http%3A%2F%2Fwww.inrg.csie.ntu.edu.tw%2Falgorithm2014%2Fhomework%2FWagner-74.pdf&ei=DifeVYHkDYWqU5W0j6gD&usg=AFQjCNFl638rl5KVta1jIMWLyb4CPSZidg&sig2=0hSSMw9XZXL3HJWwEcJtOg
-     * </example>
+     * }</pre>
      *
      * @param url the Google search URL string
      * @return the cleaned Google URL or @code{url} if no search URL was detected
@@ -120,5 +123,20 @@ public class URLUtil {
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException(e);
         }
+    }
+
+    /**
+     * Extracts the filename from a URL.
+     * If the URL doesn't have a filename (ends with '/'), returns a default name.
+     *
+     * @param url the URL string to extract the filename from
+     * @return the extracted filename or a default name if none found
+     */
+    public static String getFileNameFromUrl(String url) {
+        String fileName = url.substring(url.lastIndexOf('/') + 1);
+        if (fileName.isBlank()) {
+            fileName = "downloaded.pdf";
+        }
+        return FileUtil.getValidFileName(fileName);
     }
 }

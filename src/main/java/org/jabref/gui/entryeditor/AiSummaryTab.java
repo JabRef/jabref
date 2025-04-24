@@ -3,6 +3,7 @@ package org.jabref.gui.entryeditor;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.summary.SummaryComponent;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -14,23 +15,21 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class AiSummaryTab extends EntryEditorTab {
-    private final BibDatabaseContext bibDatabaseContext;
     private final AiService aiService;
     private final DialogService dialogService;
+    private final StateManager stateManager;
     private final AiPreferences aiPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
     private final EntryEditorPreferences entryEditorPreferences;
 
-    public AiSummaryTab(BibDatabaseContext bibDatabaseContext,
-                        AiService aiService,
+    public AiSummaryTab(AiService aiService,
                         DialogService dialogService,
-                        GuiPreferences preferences
-    ) {
-        this.bibDatabaseContext = bibDatabaseContext;
-
+                        StateManager stateManager,
+                        GuiPreferences preferences) {
         this.aiService = aiService;
         this.dialogService = dialogService;
+        this.stateManager = stateManager;
 
         this.aiPreferences = preferences.getAiPreferences();
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
@@ -51,6 +50,7 @@ public class AiSummaryTab extends EntryEditorTab {
      */
     @Override
     protected void bindToEntry(BibEntry entry) {
+        BibDatabaseContext bibDatabaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
         setContent(new SummaryComponent(
                 bibDatabaseContext,
                 entry,

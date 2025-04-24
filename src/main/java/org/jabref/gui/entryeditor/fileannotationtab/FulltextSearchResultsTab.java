@@ -26,7 +26,6 @@ import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.TooltipTextUtil;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -34,7 +33,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.search.SearchFlags;
-import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.search.query.SearchResult;
 import org.jabref.model.search.query.SearchResults;
 
@@ -50,26 +48,20 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
-    private final BibDatabaseContext databaseContext;
     private final TaskExecutor taskExecutor;
     private final TextFlow content;
-    private final OptionalObjectProperty<SearchQuery> searchQueryProperty;
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    BibDatabaseContext databaseContext,
-                                    TaskExecutor taskExecutor,
-                                    OptionalObjectProperty<SearchQuery> searchQueryProperty) {
+                                    TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.databaseContext = databaseContext;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
-        this.searchQueryProperty = searchQueryProperty;
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -79,12 +71,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         setText(Localization.lang("Search results"));
 
         // Rebinding is necessary because of re-rendering of highlighting of matched text
-        searchQueryProperty.addListener((observable, oldValue, newValue) -> bindToEntry(entry));
+        stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).addListener((_, _, _) -> updateSearch());
     }
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return searchQueryProperty.get().map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT)).orElse(false);
+        return stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get()
+                           .map(query -> query.isValid() && query.getSearchFlags().contains(SearchFlags.FULLTEXT))
+                           .orElse(false);
     }
 
     @Override
@@ -93,11 +87,14 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
             return;
         }
         this.entry = entry;
-        content.getChildren().clear();
+        updateSearch();
+    }
 
+    private void updateSearch() {
+        content.getChildren().clear();
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(searchQuery -> {
             SearchResults searchResults = searchQuery.getSearchResults();
-            if (searchResults != null) {
+            if (searchResults != null && entry != null) {
                 Map<String, List<SearchResult>> searchResultsForEntry = searchResults.getFileSearchResultsForEntry(entry);
                 if (searchResultsForEntry.isEmpty()) {
                     content.getChildren().add(new Text(Localization.lang("No search matches.")));
@@ -135,6 +132,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         fileLinkText.setStyle("-fx-font-weight: bold;");
 
         ContextMenu fileContextMenu = getFileContextMenu(linkedFile);
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(new BibDatabaseContext());
         Path resolvedPath = linkedFile.findIn(databaseContext, preferences.getFilePreferences()).orElse(Path.of(linkedFile.getLink()));
         Tooltip fileLinkTooltip = new Tooltip(resolvedPath.toAbsolutePath().toString());
         Tooltip.install(fileLinkText, fileLinkTooltip);

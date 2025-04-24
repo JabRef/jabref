@@ -78,15 +78,14 @@ class CitationsRelationsTabViewModelTest {
         GlobalCitationKeyPatterns patterns = GlobalCitationKeyPatterns.fromPattern("[auth][year]");
         when(citationKeyPatternPreferences.getKeyPatterns()).thenReturn(patterns);
         when(preferences.getCitationKeyPatternPreferences()).thenReturn(citationKeyPatternPreferences);
-
-        bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
-        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
         when(duplicateCheck.isDuplicate(any(), any(), any())).thenReturn(false);
 
         StateManager stateManager = mock(StateManager.class, Answers.RETURNS_DEEP_STUBS);
+        bibDatabaseContext = new BibDatabaseContext(new BibDatabase());
+        bibDatabaseContext.setMode(BibDatabaseMode.BIBTEX);
+        when(stateManager.getActiveDatabase()).thenReturn(Optional.of(bibDatabaseContext));
 
         viewModel = new CitationsRelationsTabViewModel(
-                bibDatabaseContext,
                 preferences,
                 mock(UndoManager.class),
                 stateManager,

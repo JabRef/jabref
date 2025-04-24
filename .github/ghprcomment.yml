@@ -11,8 +11,8 @@
 - jobName: 'Unit tests'
   message: >
     JUnit tests are failing.
-    In the area "Some checks were not successful", locate "Tests / Unit tests (pull_request)" and click on "Details".
-    This brings you to the test output.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
@@ -21,30 +21,35 @@
   message: >
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
-    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Checkstyle (pull_request)" and click on it.
 
 
     In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
     You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
+
+
+    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues, commit, and push.
 - jobName: OpenRewrite
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / OpenRewrite (pull_request)" and click on it.
+
+    
     The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
+    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
 - jobName: Modernizer
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Modernizer (pull_request)" and click on it.
+
+
     Please fix the detected errors, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
-
 
 # CHANGELOG.md and *.md
 
@@ -114,7 +119,7 @@
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
-- jobName: 'Determine issue number'
+- jobName: 'Issue number present'
   always: true
   message: |
     Your pull request needs to link an issue.
