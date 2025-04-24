@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CSLStyleLoaderTest {
@@ -17,6 +17,6 @@ public class CSLStyleLoaderTest {
     void discoverInternalCitationStylesNotNull() {
         List<CitationStyle> styleList = CSLStyleLoader.getInternalStyles();
         assertNotNull(styleList);
-        assertNotEquals(List.of(), styleList);
+        assertFalse(styleList.isEmpty());
     }
 }
