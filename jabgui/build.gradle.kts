@@ -460,50 +460,13 @@ jlink {
             "org.eclipse.jgit.transport.SshSessionFactory"
         )
         uses(
-            "org.mariadb.jdbc.LocalInfileInterceptor"
-        )
-        uses(
-            "org.mariadb.jdbc.authentication.AuthenticationPlugin"
-        )
-        uses(
-            "org.mariadb.jdbc.credential.CredentialPlugin"
-        )
-        uses(
-            "org.mariadb.jdbc.tls.TlsSocketPlugin"
-        )
-        uses(
             "org.postgresql.shaded.com.ongres.stringprep.Profile"
         )
 
         provides(
-            "org.mariadb.jdbc.tls.TlsSocketPlugin"
-        ).with(
-            "org.mariadb.jdbc.internal.protocol.tls.DefaultTlsSocketPlugin"
-        )
-        provides(
             "java.sql.Driver"
         ).with(
             "org.postgresql.Driver"
-        )
-        provides(
-            "org.mariadb.jdbc.authentication.AuthenticationPlugin"
-        )
-            .with(
-                "org.mariadb.jdbc.internal.com.send.authentication.CachingSha2PasswordPlugin",
-                "org.mariadb.jdbc.internal.com.send.authentication.ClearPasswordPlugin",
-                "org.mariadb.jdbc.internal.com.send.authentication.Ed25519PasswordPlugin",
-                "org.mariadb.jdbc.internal.com.send.authentication.NativePasswordPlugin",
-                "org.mariadb.jdbc.internal.com.send.authentication.OldPasswordPlugin",
-                "org.mariadb.jdbc.internal.com.send.authentication.SendGssApiAuthPacket",
-                "org.mariadb.jdbc.internal.com.send.authentication.SendPamAuthPacket",
-                "org.mariadb.jdbc.internal.com.send.authentication.Sha256PasswordPlugin"
-            )
-        provides(
-            "org.mariadb.jdbc.credential.CredentialPlugin"
-        ).with(
-            "org.mariadb.jdbc.credential.aws.AwsIamCredentialPlugin",
-            "org.mariadb.jdbc.credential.env.EnvCredentialPlugin",
-            "org.mariadb.jdbc.credential.system.PropertiesCredentialPlugin"
         )
         provides(
             "java.security.Provider"

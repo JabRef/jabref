@@ -94,18 +94,11 @@ dependencies {
 
     implementation("com.fasterxml:aalto-xml:1.3.3")
 
-    implementation("org.mariadb.jdbc:mariadb-java-client:2.7.12")
-
     implementation("org.postgresql:postgresql:42.7.5")
 
     // Support unix socket connection types
     implementation("com.kohlschutter.junixsocket:junixsocket-core:2.10.1")
     implementation("com.kohlschutter.junixsocket:junixsocket-mysql:2.10.1")
-
-    implementation("com.oracle.ojdbc:ojdbc10:19.3.0.0") {
-        // causing module issues
-        exclude(module = "oraclepki")
-    }
 
     antlr("org.antlr:antlr4:4.13.2")
     implementation("org.antlr:antlr4-runtime:4.13.2")
