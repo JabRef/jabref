@@ -48,7 +48,8 @@ public enum StandardFileType implements FileType {
     XML("XML", "xml"),
     XMP("XMP", "xmp"),
     YAML("YAML Markup", "yaml"),
-    ZIP("Zip Archive", "zip");
+    ZIP("Zip Archive", "zip"),
+    EPUB("ePUB", "epub");
 
     private final List<String> extensions;
     private final String name;
