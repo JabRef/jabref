@@ -49,6 +49,8 @@ java {
         // - mise.toml
         languageVersion = JavaLanguageVersion.of(24)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
-        // vendor = JvmVendorSpec.AMAZON
+        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
+        // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
+        vendor = JvmVendorSpec.AZUL
     }
 }
