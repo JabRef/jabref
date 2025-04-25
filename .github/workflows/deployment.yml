@@ -122,6 +122,8 @@ jobs:
         run: |
           set -e
           cd jabgui
+
+          # Use Java's packaging tool to create "JabRef.app"
           jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
@@ -158,13 +160,22 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
+
+          # Add additional files / directories
           cp buildres/mac/jabrefHost.py build/distribution/JabRef.app/Contents/
           cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/
+
+          # Sign the final artifact
           codesign --force --deep --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" \
             --entitlements buildres/mac/jabref.entitlements \
             --options runtime --timestamp build/distribution/JabRef.app
+
+          # pack dmg and pkg
           hdiutil create -volname "JabRef" -srcfolder build/distribution/JabRef.app -ov -format UDZO build/distribution/JabRef.dmg
           productbuild --component build/distribution/JabRef.app /Applications --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.pkg
+
+          # Cleanup unpacked file
+          rm -rf build/distribution/JabRef.app
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
