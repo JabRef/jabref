@@ -96,10 +96,6 @@ dependencies {
 
     implementation("org.postgresql:postgresql:42.7.5")
 
-    // Support unix socket connection types
-    implementation("com.kohlschutter.junixsocket:junixsocket-core:2.10.1")
-    implementation("com.kohlschutter.junixsocket:junixsocket-mysql:2.10.1")
-
     antlr("org.antlr:antlr4:4.13.2")
     implementation("org.antlr:antlr4-runtime:4.13.2")
 
