@@ -34,6 +34,7 @@ import com.sun.star.uno.Exception;
 /**
  * This class processes CSL citations in JabRef and interacts directly with LibreOffice using an XTextDocument instance.
  * It is tightly coupled with {@link CSLReferenceMarkManager} for management of reference marks tied to the CSL citations.
+ * It uses {@link OpenOfficePreferences} to retrieve the initial style (last selected style), the bibliography title and its paragraph format.
  * Any method in this class is NOT supposed to be moved (OR internally refactored without complete understanding - see implementation note).
  *
  * @implNote UNO API calls are expensive, and any additional operation slows down the net "macro-task" we are trying to achieve in the document.
@@ -276,7 +277,7 @@ public class CSLCitationOOAdapter {
      * Hence, we keep {@link CSLReferenceMarkManager} independent of {@link CitationStyleGenerator} and {@link CitationStyle}, and keep the following two methods here.
      */
     private void updateAllCitationsWithNewStyle(CitationStyle style, boolean isInTextStyle)
-            throws IOException, Exception, CreationException {
+            throws Exception, CreationException {
         boolean isNumericStyle = style.isNumericStyle();
         boolean isAlphaNumericStyle = style.isAlphanumericStyle();
 
