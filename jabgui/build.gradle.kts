@@ -24,6 +24,8 @@ plugins {
     // id("org.itsallcode.openfasttrace") version "3.0.1"
 
     id("org.beryx.jlink") version "3.1.1"
+
+    id("com.redock.classpathtofile") version "0.1.0"
 }
 
 group = "org.jabref"
