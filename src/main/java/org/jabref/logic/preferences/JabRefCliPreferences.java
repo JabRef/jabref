@@ -52,6 +52,7 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.git.GitPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
@@ -120,6 +121,8 @@ import jakarta.inject.Singleton;
 import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.apache.commons.compress.harmony.archive.internal.nls.Messages.getString;
 
 /**
  * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
@@ -430,6 +433,9 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+    private GitPreferences gitPreferences;
+
+    private boolean autoPullEnabled;
 
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
@@ -1848,6 +1854,38 @@ public class JabRefCliPreferences implements CliPreferences {
         return lastFilesOpenedPreferences;
     }
 
+    @Override
+    public GitPreferences getGitPreferences() {
+        if (gitPreferences != null) {
+            return gitPreferences;
+        }
+
+        boolean autoPushEnabled = getBoolean("gitAutoPushEnabled", false);
+
+        String gitHubUsername = getString("gitHubUsername", "");
+        String gitHubPasskey = getString("gitHubPasskey", "");
+
+        gitPreferences = new GitPreferences(autoPushEnabled, gitHubUsername, gitHubPasskey);
+
+        EasyBind.listen(gitPreferences.getAutoPushEnabledProperty(), (obs, oldValue, newValue) ->
+                putBoolean("gitAutoPushEnabled", newValue)
+        );
+
+        EasyBind.listen(gitPreferences.gitHubUsernameProperty(), (obs, oldValue, newValue) ->
+                putString("gitHubUsername", newValue)
+        );
+
+        EasyBind.listen(gitPreferences.gitHubPasskeyProperty(), (obs, oldValue, newValue) ->
+                putString("gitHubPasskey", newValue)
+        );
+
+        return gitPreferences;
+    }
+
+    private void putString(String key, String value) {
+        prefs.put(key, value);
+    }
+
     private FileHistory getFileHistory() {
         return FileHistory.of(getStringList(RECENT_DATABASES).stream()
                                                              .map(Path::of)
@@ -2261,6 +2299,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getXmpPreferences(),
                 getDOIPreferences(),
                 getGrobidPreferences());
+    }
+
+    public boolean shouldAutoPull() {
+        return autoPullEnabled;
     }
 
     // endregion

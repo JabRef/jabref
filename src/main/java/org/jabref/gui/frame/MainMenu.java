@@ -62,6 +62,8 @@ import org.jabref.gui.preview.PreviewControls;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
+import org.jabref.gui.shared.GitPullAction;
+import org.jabref.gui.shared.GitPushAction;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
 import org.jabref.gui.sidepane.SidePane;
 import org.jabref.gui.sidepane.SidePaneType;
@@ -161,6 +163,12 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SAVE_LIBRARY_AS, new SaveAction(SaveAction.SaveMethod.SAVE_AS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.SAVE_ALL, new SaveAllAction(frame::getLibraryTabs, preferences, dialogService, stateManager)),
                 factory.createMenuItem(StandardActions.CLOSE_LIBRARY, new JabRefFrame.CloseDatabaseAction(frame, stateManager)),
+
+                new SeparatorMenuItem(),
+
+               factory.createSubMenu(StandardActions.GIT,
+                       factory.createMenuItem(StandardActions.GIT_PUSH, new GitPushAction(preferences, dialogService, stateManager)),
+                       factory.createMenuItem(StandardActions.GIT_PULL, new GitPullAction(preferences, dialogService, stateManager))),
 
                 new SeparatorMenuItem(),
 
@@ -412,3 +420,5 @@ public class MainMenu extends MenuBar {
         return sendMenu;
     }
 }
+
+
