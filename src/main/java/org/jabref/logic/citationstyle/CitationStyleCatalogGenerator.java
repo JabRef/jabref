@@ -73,6 +73,7 @@ public class CitationStyleCatalogGenerator {
                                                             info.put("path", style.getFilePath());
                                                             info.put("title", style.getTitle());
                                                             info.put("isNumeric", style.isNumericStyle());
+                                                            info.put("hasBibliography", style.hasBibliography());
                                                             return info;
                                                         })
                                                         .toList();

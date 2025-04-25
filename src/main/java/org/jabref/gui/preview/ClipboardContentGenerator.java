@@ -66,7 +66,7 @@ public class ClipboardContentGenerator {
         }
 
         if (styleSource != null) {
-            return CitationStyleGenerator.generateBibliographies(
+            return CitationStyleGenerator.generateBibliography(
                     selectedEntries,
                     styleSource,
                     outputFormat,
