@@ -21,16 +21,16 @@ import org.slf4j.LoggerFactory;
  * Utility class for handling Citation Style Language (CSL) files.
  * Contains shared functionality used by both runtime ({@link CSLStyleLoader}) and build-time ({@link org.jabref.generators.CitationStyleCatalogGenerator}) components.
  */
-public class CSLStyleUtils {
+public final class CSLStyleUtils {
     private static final String STYLES_ROOT = "/csl-styles";
     private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
     /**
-     * Style information record (title, isNumericStyle) pair for a citation style.
+     * Style information record (title, isNumericStyle, hasBibliography) triad for a citation style.
      */
-    public record StyleInfo(String title, boolean isNumericStyle) {
+    public record StyleInfo(String title, boolean isNumericStyle, boolean hasBibliography) {
     }
 
     static {
@@ -56,7 +56,7 @@ public class CSLStyleUtils {
      */
     public static Optional<CitationStyle> createCitationStyleFromFile(String styleFile) {
         if (!isCitationStyleFile(styleFile)) {
-            LOGGER.error("Can only load style files: {}", styleFile);
+            LOGGER.error("Not a .csl style file: {}", styleFile);
             return Optional.empty();
         }
 
@@ -95,7 +95,7 @@ public class CSLStyleUtils {
             String content = new String(source.readAllBytes());
 
             Optional<StyleInfo> styleInfo = parseStyleInfo(filename, content);
-            return styleInfo.map(info -> new CitationStyle(filename, info.title(), info.isNumericStyle(), content, isInternal));
+            return styleInfo.map(info -> new CitationStyle(filename, info.title(), info.isNumericStyle(), info.hasBibliography(), content, isInternal));
         } catch (IOException e) {
             LOGGER.error("Error while parsing source", e);
             return Optional.empty();
@@ -115,6 +115,7 @@ public class CSLStyleUtils {
 
             boolean inInfo = false;
             boolean hasBibliography = false;
+            boolean hasCitation = false;
             String title = "";
             boolean isNumericStyle = false;
 
@@ -126,6 +127,7 @@ public class CSLStyleUtils {
 
                     switch (elementName) {
                         case "bibliography" -> hasBibliography = true;
+                        case "citation" -> hasCitation = true;
                         case "info" -> inInfo = true;
                         case "title" -> {
                             if (inInfo) {
@@ -146,10 +148,10 @@ public class CSLStyleUtils {
                 }
             }
 
-            if (hasBibliography && title != null) {
-                return Optional.of(new StyleInfo(title, isNumericStyle));
+            if (hasCitation && title != null) {
+                return Optional.of(new StyleInfo(title, isNumericStyle, hasBibliography));
             } else {
-                LOGGER.debug("No valid title or bibliography found for file {}", filename);
+                LOGGER.debug("No valid title or citation found for file {}", filename);
                 return Optional.empty();
             }
         } catch (XMLStreamException e) {

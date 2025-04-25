@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -18,7 +17,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.openoffice.ootext.OOText;
 
-import de.undercouch.citeproc.output.Citation;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -28,11 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CSLFormatUtilsTest {
 
-    private static final List<CitationStyle> STYLE_LIST = CSLStyleLoader.getInternalStyles();
+    private static final BibEntry TEST_ENTRY = TestEntry.getTestEntry();
+    private static final BibDatabaseContext TEST_ENTRY_CONTEXT = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
+    private static final BibEntryTypesManager ENTRY_TYPES_MANAGER = new BibEntryTypesManager();
 
-    private final BibEntry testEntry = TestEntry.getTestEntry();
-    private final BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(TestEntry.getTestEntry())));
-    private final BibEntryTypesManager bibEntryTypesManager = new BibEntryTypesManager();
+    private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
+
+    private static final List<CitationStyle> STYLE_LIST = CSLStyleLoader.getInternalStyles();
 
     /**
      * Test to check transformation of raw, unsupported HTML into OO-ready HTML.
@@ -149,7 +149,7 @@ class CSLFormatUtilsTest {
     @ParameterizedTest
     @MethodSource
     void ooHTMLTransformFromRawBibliography(String expected, CitationStyle style) {
-        String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager).getFirst();
+        String citation = CitationStyleGenerator.generateBibliography(List.of(TEST_ENTRY), style.getSource(), HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER).getFirst();
         String actual = CSLFormatUtils.transformHTML(citation);
         assertEquals(expected, actual);
     }
@@ -259,17 +259,15 @@ class CSLFormatUtilsTest {
      */
     @ParameterizedTest
     @MethodSource
-    void ooHTMLTransformFromCitationWithSingleEntry(String expected, CitationStyle style) throws IOException {
-        Citation citation = CitationStyleGenerator.generateCitation(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager);
-        String inTextCitationText = citation.getText();
-        String actual = CSLFormatUtils.transformHTML(inTextCitationText);
+    void ooHTMLTransformFromCitationWithSingleEntry(String expected, CitationStyle style) {
+        String citation = CitationStyleGenerator.generateCitation(List.of(TEST_ENTRY), style.getSource(), HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER);
+        String actual = CSLFormatUtils.transformHTML(citation);
         OOText ooText = OOText.fromString(actual);
         assertEquals(OOText.fromString(expected), ooText);
     }
 
     static Stream<Arguments> ooHTMLTransformFromCitationWithSingleEntry() {
         return Stream.of(
-
                 Arguments.of(
                         "(Smith et al., 2016)",
                         STYLE_LIST.stream().filter(e -> "American Psychological Association 7th edition".equals(e.getTitle())).findAny().get()
@@ -349,6 +347,12 @@ class CSLFormatUtilsTest {
                 Arguments.of(
                         "<sup>1</sup>",
                         STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                ),
+
+                // Non-bibliographic style (citation-format="note")
+                Arguments.of(
+                        "B. Smith, B. Jones and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i> 34, no. 3 (July 2016): 45–67.",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Clinical Ethics".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -360,7 +364,7 @@ class CSLFormatUtilsTest {
      */
     @ParameterizedTest
     @MethodSource
-    void ooHTMLTransformFromCitationWithMultipleEntries(String expected, CitationStyle style) throws IOException {
+    void ooHTMLTransformFromCitationWithMultipleEntries(String expected, CitationStyle style) {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Garcia, Maria and Lee, David")
                 .withField(StandardField.JOURNAL, "International Review of Physics")
@@ -386,9 +390,8 @@ class CSLFormatUtilsTest {
         List<BibEntry> entries = List.of(entry1, entry2);
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(entries));
         context.setMode(BibDatabaseMode.BIBLATEX);
-        Citation citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager);
-        String inTextCitationText = citation.getText();
-        String actual = CSLFormatUtils.transformHTML(inTextCitationText);
+        String citation = CitationStyleGenerator.generateCitation(entries, style.getSource(), HTML_OUTPUT_FORMAT, context, ENTRY_TYPES_MANAGER);
+        String actual = CSLFormatUtils.transformHTML(citation);
         assertEquals(expected, actual);
     }
 
@@ -472,6 +475,12 @@ class CSLFormatUtilsTest {
                 Arguments.of(
                         "<sup>1,2</sup>",
                         STYLE_LIST.stream().filter(e -> "American Institute of Physics 4th edition".equals(e.getTitle())).findAny().get()
+                ),
+
+                // Non-bibliographic style (citation-format="note")
+                Arguments.of(
+                        "M. Garcia and D. Lee, “Quantum Entanglement in Superconductors,” <i>International Review of Physics</i> 28, no. 6 (2021): 789–810; J. Smith and E. Johnson, “A Study on Machine Learning Algorithms,” <i>Journal of Computer Science</i> 15, no. 4 (2020): 101–20.",
+                        STYLE_LIST.stream().filter(e -> "The Journal of Clinical Ethics".equals(e.getTitle())).findAny().get()
                 )
         );
     }
@@ -490,14 +499,14 @@ class CSLFormatUtilsTest {
      */
     @ParameterizedTest
     @MethodSource
-    void updateSingleNumericCitation(String expected, CitationStyle style) {
-        String citation = CitationStyleGenerator.generateBibliography(List.of(testEntry), style.getSource(), CSLFormatUtils.OUTPUT_FORMAT, context, bibEntryTypesManager).getFirst();
+    void updateSingleNumericBibliography(String expected, CitationStyle style) {
+        String citation = CitationStyleGenerator.generateBibliography(List.of(TEST_ENTRY), style.getSource(), HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER).getFirst();
         String transformedCitation = CSLFormatUtils.transformHTML(citation);
         String actual = CSLFormatUtils.updateSingleBibliographyNumber(transformedCitation, 3);
         assertEquals(expected, actual);
     }
 
-    static Stream<Arguments> updateSingleNumericCitation() {
+    static Stream<Arguments> updateSingleNumericBibliography() {
         return Stream.of(
 
                 // Type: "[1]"
