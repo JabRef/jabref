@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -260,7 +259,7 @@ class CSLFormatUtilsTest {
      */
     @ParameterizedTest
     @MethodSource
-    void ooHTMLTransformFromCitationWithSingleEntry(String expected, CitationStyle style) throws IOException {
+    void ooHTMLTransformFromCitationWithSingleEntry(String expected, CitationStyle style) {
         String citation = CitationStyleGenerator.generateCitation(List.of(TEST_ENTRY), style.getSource(), HTML_OUTPUT_FORMAT, TEST_ENTRY_CONTEXT, ENTRY_TYPES_MANAGER);
         String actual = CSLFormatUtils.transformHTML(citation);
         OOText ooText = OOText.fromString(actual);
@@ -365,7 +364,7 @@ class CSLFormatUtilsTest {
      */
     @ParameterizedTest
     @MethodSource
-    void ooHTMLTransformFromCitationWithMultipleEntries(String expected, CitationStyle style) throws IOException {
+    void ooHTMLTransformFromCitationWithMultipleEntries(String expected, CitationStyle style) {
         BibEntry entry1 = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Garcia, Maria and Lee, David")
                 .withField(StandardField.JOURNAL, "International Review of Physics")

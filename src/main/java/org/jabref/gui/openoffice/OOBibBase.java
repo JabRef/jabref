@@ -1,6 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -640,7 +639,6 @@ public class OOBibBase {
             OOError.from(ex).setTitle(errorTitle).showErrorDialog(dialogService);
         } catch (CreationException
                  | WrappedTargetException
-                 | IOException
                  | PropertyVetoException
                  | IllegalTypeException
                  | NotRemoveableException ex) {

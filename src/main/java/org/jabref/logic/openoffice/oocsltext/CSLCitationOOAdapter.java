@@ -1,6 +1,5 @@
 package org.jabref.logic.openoffice.oocsltext;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -84,7 +83,7 @@ public class CSLCitationOOAdapter {
      * Comparable to LaTeX's \cite command.
      */
     public void insertCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws CreationException, IOException, Exception {
+            throws CreationException, Exception {
         setStyle(selectedStyle);
 
         // Placing this at the beginning reduces the number of updates needed by 1 (in the positive case)
@@ -122,7 +121,7 @@ public class CSLCitationOOAdapter {
      * @implNote Very similar to the {@link #insertCitation(XTextCursor, CitationStyle, List, BibDatabaseContext, BibEntryTypesManager) insertCitation} method.
      */
     public void insertInTextCitation(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws IOException, CreationException, Exception {
+            throws CreationException, Exception {
         setStyle(selectedStyle);
 
         if (styleChanged) {
