@@ -611,7 +611,9 @@ public class OOBibBase {
                     }
 
                     // If "Automatically sync bibliography when inserting citations" is enabled
-                    syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
+                    if (citationStyle.hasBibliography()) {
+                        syncOptions.ifPresent(options -> guiActionUpdateDocument(options.databases, citationStyle));
+                    }
                 } finally {
                     // Release controller lock
                     doc.unlockControllers();
