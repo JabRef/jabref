@@ -99,9 +99,9 @@ class IntegrityCheckTest {
         // FIXME: must be set as checkBibtexDatabase only activates title checker based on database mode
         Mockito.when(metaData.getMode()).thenReturn(Optional.of(BibDatabaseMode.BIBTEX));
 
-        assertCorrect(createContext(StandardField.FILE, ":build.gradle:gradle", metaData));
-        assertCorrect(createContext(StandardField.FILE, "description:build.gradle:gradle", metaData));
-        assertWrong(createContext(StandardField.FILE, ":asflakjfwofja:PDF", metaData));
+        assertCorrect(createContext(StandardField.FILE, ":README.md:markdown", metaData));
+        assertCorrect(createContext(StandardField.FILE, "Readme of JabRef:README.md:markdown", metaData));
+        assertWrong(createContext(StandardField.FILE, ":NotFoundFileNameWithoutExtension:PDF", metaData));
     }
 
     @Test

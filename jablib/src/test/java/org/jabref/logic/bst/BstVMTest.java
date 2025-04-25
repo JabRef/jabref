@@ -1,6 +1,5 @@
 package org.jabref.logic.bst;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -31,8 +30,8 @@ public class BstVMTest {
     }
 
     @Test
-    void abbrv() throws RecognitionException, IOException {
-        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
+    void abbrv() throws Exception {
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
         String expected = "\\begin{thebibliography}{1}\\bibitem{canh05}K.~Crowston, H.~Annabi, J.~Howison, and C.~Masango.\\newblock Effective work practices for floss development: A model and  propositions.\\newblock In {\\em Hawaii International Conference On System Sciences (HICSS)}, 2005.\\end{thebibliography}";
@@ -44,8 +43,8 @@ public class BstVMTest {
     }
 
     @Test
-    void ieeetran() throws RecognitionException, IOException {
-        BstVM vm = new BstVM(Path.of("src/main/resources/bst/IEEEtran.bst"));
+    void ieeetran() throws Exception {
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
         List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
 
         String expected = """
@@ -141,8 +140,8 @@ public class BstVMTest {
     }
 
     @Test
-    void hyphenatedName() throws RecognitionException, IOException {
-        BstVM vm = new BstVM(Path.of("src/test/resources/org/jabref/logic/bst/abbrv.bst"));
+    void hyphenatedName() throws Exception {
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
         List<BibEntry> testEntries = List.of(
                 new BibEntry(StandardEntryType.Article)
                         .withCitationKey("canh05")
