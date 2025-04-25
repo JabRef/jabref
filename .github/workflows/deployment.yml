@@ -93,7 +93,7 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '24'
+          java-version: '23'
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
