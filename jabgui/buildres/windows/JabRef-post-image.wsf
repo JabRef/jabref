@@ -8,6 +8,7 @@
         // DEBUG Output
         var shell = new ActiveXObject("WScript.Shell");
         WScript.Echo(fileSystem.GetFolder("."));
+        WScript.Echo("Script running in folder: " + shell.CurrentDirectory);
 
         // The script is invoked in the "image" folder and not in "config" for some reason
         var jabRefRoot = fileSystem.GetFolder(".").ParentFolder.ParentFolder.ParentFolder.ParentFolder.Path;
