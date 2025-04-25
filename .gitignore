@@ -576,3 +576,6 @@ lib/ojdbc.jar
 
 # generated during release process
 CHANGELOG.html
+
+# some strange gradle/IntelliJ extension
+/jablib/extension 'reporting' property 'baseDirectory'/
