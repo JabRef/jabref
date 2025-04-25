@@ -204,6 +204,9 @@ dependencies {
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
 
+    // loading of .fxml files in localization tests requires JabRef's GUI classes
+    testImplementation(project(":jabgui"))
+
     testImplementation("io.github.classgraph:classgraph:4.8.179")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")

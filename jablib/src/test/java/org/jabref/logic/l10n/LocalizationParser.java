@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import javafx.fxml.FXMLLoader;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import org.jooq.lambda.Unchecked;
 import org.mockito.Answers;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -87,25 +88,30 @@ public class LocalizationParser {
         }
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type)
-            throws IOException {
-        try (Stream<Path> pathStream = Files.walk(Path.of("src/main"))) {
-            return pathStream
-                    .filter(LocalizationParser::isJavaFile)
-                    .flatMap(path -> getLanguageKeysInJavaFile(path, type).stream())
-                    .collect(Collectors.toSet());
+    private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundleForTest type) throws IOException {
+        try {
+            return List.of("jablib", "jabkit", "jabsrv", "jabgui")
+                       .stream()
+                       .map(path -> Path.of("..", path, "src", "main", "java").normalize())
+                       .flatMap(Unchecked.function(path -> Files.walk(path)))
+                       .filter(LocalizationParser::isJavaFile)
+                       .flatMap(javaPath -> getLanguageKeysInJavaFile(javaPath, type).stream())
+                       .collect(Collectors.toSet());
         } catch (UncheckedIOException ioe) {
             throw new IOException(ioe);
         }
     }
 
-    private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type)
-            throws IOException {
-        try (Stream<Path> pathStream = Files.walk(Path.of("src/main"))) {
-            return pathStream
-                    .filter(LocalizationParser::isFxmlFile)
-                    .flatMap(path -> getLanguageKeysInFxmlFile(path, type).stream())
-                    .collect(Collectors.toSet());
+    private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundleForTest type) throws IOException {
+        try {
+            return List.of("jablib", "jabkit", "jabsrv", "jabgui")
+                       .stream()
+                       .map(path -> Path.of("..", path, "src", "main", "resources").normalize())
+                       .filter(Files::isDirectory)
+                       .flatMap(Unchecked.function(path -> Files.walk(path)))
+                       .filter(LocalizationParser::isFxmlFile)
+                       .flatMap(fxmlPath -> getLanguageKeysInFxmlFile(fxmlPath, type).stream())
+                       .collect(Collectors.toSet());
         } catch (UncheckedIOException ioe) {
             throw new IOException(ioe);
         }
@@ -174,7 +180,7 @@ public class LocalizationParser {
 
     /**
      * Loads the fxml file and returns all used language resources.
-     *
+     * <p>
      * Note: FXML prefixes localization keys with <code>%</code>.
      */
     private static Collection<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundleForTest type) {
