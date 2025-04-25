@@ -55,6 +55,7 @@ public class BibEntryTableViewModel {
     private final BooleanProperty isVisibleByGroup = new SimpleBooleanProperty(true);
     private final ObjectProperty<MatchCategory> matchCategory = new SimpleObjectProperty<>(MatchCategory.MATCHING_SEARCH_AND_GROUPS);
 
+
     public BibEntryTableViewModel(BibEntry entry, BibDatabaseContext bibDatabaseContext, ObservableValue<MainTableFieldValueFormatter> fieldValueFormatter) {
         this.entry = entry;
         this.bibDatabaseContext = bibDatabaseContext;
@@ -143,6 +144,8 @@ public class BibEntryTableViewModel {
         }
 
         ArrayList<Observable> observables = new ArrayList<>(List.of(entry.getObservables()));
+        Optional<BibEntry> referenced = bibDatabaseContext.getDatabase().getReferencedEntry(entry);
+        referenced.ifPresent(bibEntry -> observables.addAll(List.of(bibEntry.getObservables())));
         observables.add(fieldValueFormatter);
 
         value = Bindings.createStringBinding(() ->
