@@ -45,7 +45,7 @@ public class UndoableUnabbreviator {
         }
         
         if (!journalAbbreviationRepository.isAbbreviatedName(text)) {
-            return false;
+            return false; // Cannot unabbreviate unabbreviated name.
         }
         
         var abbreviationOpt = journalAbbreviationRepository.get(text);
