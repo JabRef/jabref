@@ -1,5 +1,36 @@
 plugins {
+    id("buildlogic.java-common-conventions")
+
     id("checkstyle")
+
+    id("org.openrewrite.rewrite") version "7.5.0"
+}
+
+// OpenRewrite should rewrite all sources
+// This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
+
+dependencies {
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis")
+    rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java")
+}
+
+rewrite {
+    activeRecipe("org.jabref.config.rewrite.cleanup")
+    exclusion(
+        "settings.gradle",
+        "**/generated-sources/**",
+        "**/src/main/resources/**",
+        "**/src/test/resources/**",
+        "**/module-info.java",
+        "**/*.py",
+        "**/*.xml",
+        "**/*.yml"
+    )
+    plainTextMask("**/*.md")
+    failOnDryRunResults = true
 }
 
 subprojects {

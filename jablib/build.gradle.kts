@@ -505,43 +505,7 @@ modernizer {
 }
 
 
-rewrite {
-    activeRecipe(
-        'org.jabref.config.rewrite.cleanup'
-    )
-    exclusion (
-        "build.gradle",
-        "buildSrc/build.gradle",
-        "eclipse.gradle",
-        "settings.gradle",
-        "src-gen/**",
-        "src/main/resources/**",
-        "src/test/resources/**",
-        "..**../module-info.java",
-        "..**../*.py",
-        "..**../*.xml",
-        "..**../*.yml"
-)
-plainTextMask("..../*.md")
-failOnDryRunResults = true
-}
-
-
-// Code quality tasks
-checkstyle {
-    // will only run when called explicitly from the command line
-    sourceSets = []
-}
-
-
-
-// Test result tasks
-tasks.register('copyTestResources', Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test"
-}
-processTestResources.dependsOn copyTestResources
-
+/*
 tasks.register('jacocoPrepare') {
     doFirst {
         // Ignore failures of tests
@@ -571,6 +535,4 @@ jacocoTestReport {
         xml.required = true
     }
 }
-
- */
 */
