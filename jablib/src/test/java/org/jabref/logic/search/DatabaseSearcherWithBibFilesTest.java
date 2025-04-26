@@ -27,6 +27,8 @@ import org.jabref.model.search.query.SearchQuery;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -74,8 +76,20 @@ class DatabaseSearcherWithBibFilesTest {
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
+    private PostgreServer postgreServer;
+
     @TempDir
     private Path indexDir;
+
+    @BeforeEach
+    void setUp() {
+        postgreServer = new PostgreServer();
+    }
+
+    @AfterEach
+    void tearDown() {
+        postgreServer.shutdown();
+    }
 
     private BibDatabaseContext initializeDatabaseFromPath(String testFile) throws Exception {
         return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(DatabaseSearcherWithBibFilesTest.class.getResource(testFile)).toURI()));
@@ -135,7 +149,7 @@ class DatabaseSearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws Exception {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, flags), databaseContext, TASK_EXECUTOR, preferences, new PostgreServer()).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, flags), databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches();
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }

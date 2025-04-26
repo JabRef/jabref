@@ -18,6 +18,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.search.query.SearchQuery;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,6 +36,8 @@ public class DatabaseSearcherTest {
     private final CliPreferences preferences = mock(CliPreferences.class);
     private final FilePreferences filePreferences = mock(FilePreferences.class);
     private final BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
+    private PostgreServer postgreServer;
+
     @TempDir
     private Path indexDir;
 
@@ -49,6 +52,13 @@ public class DatabaseSearcherTest {
         when(filePreferences.fulltextIndexLinkedFilesProperty()).thenReturn(mock(BooleanProperty.class));
         databaseContext = spy(new BibDatabaseContext());
         when(databaseContext.getFulltextIndexPath()).thenReturn(indexDir);
+
+        postgreServer = new PostgreServer();
+    }
+
+    @AfterEach
+    void tearDown() {
+        postgreServer.shutdown();
     }
 
     @ParameterizedTest
@@ -57,7 +67,7 @@ public class DatabaseSearcherTest {
         for (BibEntry entry : entries) {
             databaseContext.getDatabase().insertEntry(entry);
         }
-        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, preferences, new PostgreServer()).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(query, databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches();
         assertEquals(expectedMatches, matches);
     }
 
