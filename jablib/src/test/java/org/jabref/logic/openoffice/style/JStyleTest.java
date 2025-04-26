@@ -83,9 +83,8 @@ class JStyleTest {
         assertTrue(style.isSortByPosition());
     }
 
-    /*
-     * begin helpers
-     */
+    // region: helpers
+
     static String runGetNumCitationMarker2a(JStyle style,
                                             List<Integer> num, int minGroupingCount, boolean inList) {
         return OOBibStyleTestHelper.runGetNumCitationMarker2a(style, num, minGroupingCount, inList);
@@ -155,9 +154,7 @@ class JStyleTest {
                 pageInfo);
     }
 
-    /*
-     * end helpers
-     */
+    // endregion
 
     @Test
     void getNumCitationMarker() throws IOException {
