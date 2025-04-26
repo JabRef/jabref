@@ -5,7 +5,6 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     `java-library`
-    `java-test-fixtures`
 
     id("idea")
 
@@ -135,7 +134,6 @@ dependencies {
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
-    testFixturesImplementation("org.jspecify:jspecify:1.0.0")
 
     // parse plist files
     implementation("com.googlecode.plist:dd-plist:1.28")
@@ -205,6 +203,8 @@ dependencies {
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
 
+    testImplementation(project(":test-support"))
+
     // loading of .fxml files in localization tests requires JabRef's GUI classes
     testImplementation(project(":jabgui"))
 
@@ -212,13 +212,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.platform:junit-platform-launcher:1.12.1")
 
-    testFixturesImplementation("org.openjfx:javafx-base:24.0.1")
-
     testImplementation("org.mockito:mockito-core:5.17.0")
-    testFixturesImplementation("org.mockito:mockito-core:5.17.0")
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.0")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")

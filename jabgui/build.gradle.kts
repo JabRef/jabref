@@ -140,8 +140,6 @@ dependencies {
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
 
-    testImplementation(testFixtures(project(":jablib")))
-
     /*
     rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.5.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")

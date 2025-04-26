@@ -1,4 +1,0 @@
---add-modules
-  org.jabref.jablib.testFixtures
---add-reads
-  org.jabref.jabkit=org.jabref.jablib.testFixtures
