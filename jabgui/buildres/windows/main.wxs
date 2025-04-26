@@ -160,6 +160,6 @@
     <Feature Id="BrowserExtension" Level="1">
       <ComponentRef Id="RegistryJabRefBrowserEntries" />
     </Feature>
-    <WixVariable Id="WixUIBannerBmp" Value="JabRefTopBanner.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="..\..\buldres\windows\JabRefTopBanner.bmp" />
   </Product>
 </Wix>
