@@ -1,4 +1,4 @@
-package org.jabref.model.entry.field;
+package org.jabref.gui.entryeditor;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +10,10 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jabref.model.entry.field.FieldProperty;
+import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParserConfiguration;

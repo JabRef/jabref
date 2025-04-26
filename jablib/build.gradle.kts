@@ -225,7 +225,6 @@ dependencies {
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
-    testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
     testImplementation("org.wiremock:wiremock-standalone:3.12.1")
