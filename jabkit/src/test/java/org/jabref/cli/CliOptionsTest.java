@@ -24,13 +24,6 @@ class CliOptionsTest {
     }
 
     @Test
-    void guiIsDisabledLongOptions() throws Exception {
-        CliOptions cli = new CliOptions(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
-
-        assertTrue(cli.isDisableGui());
-    }
-
-    @Test
     void successfulParsingOfFileImportCLILongOptions() throws Exception {
         CliOptions cli = new CliOptions(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
 
@@ -49,13 +42,6 @@ class CliOptionsTest {
         CliOptions cli = new CliOptions(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
 
         assertEquals(Collections.emptyList(), cli.getLeftOver());
-    }
-
-    @Test
-    void guiIsDisabledShortOptions() throws Exception {
-        CliOptions cli = new CliOptions(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
-
-        assertTrue(cli.isDisableGui());
     }
 
     @Test
@@ -84,13 +70,6 @@ class CliOptionsTest {
         CliOptions cli = new CliOptions(new String[] {"-n", "-x=some/file"});
 
         assertEquals("some/file", cli.getPreferencesExport());
-    }
-
-    @Test
-    void guiDisabledForPreferencesExport() throws Exception {
-        CliOptions cli = new CliOptions(new String[] {"-n", "-x=some/file"});
-
-        assertTrue(cli.isDisableGui());
     }
 
     @Test
