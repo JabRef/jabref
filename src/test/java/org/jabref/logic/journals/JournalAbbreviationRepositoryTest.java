@@ -408,8 +408,8 @@ class JournalAbbreviationRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("provideAbbreviationTestCases")
-    void fuzzyMatch(List<Abbreviation> abbreviationList, String input, String expectedAbbreviation, String expectedDotless, String expectedShortest, String ambiguousInput) {
-        repository.addCustomAbbreviations(Set.copyOf(abbreviationList));
+    void fuzzyMatch(Set<Abbreviation> abbreviationSet, String input, String expectedAbbreviation, String expectedDotless, String expectedShortest, String ambiguousInput) {
+        repository.addCustomAbbreviations(abbreviationSet);
 
         assertEquals(expectedAbbreviation, repository.getDefaultAbbreviation(input).orElse("WRONG"));
 
