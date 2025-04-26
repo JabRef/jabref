@@ -174,7 +174,7 @@ application {
         "--add-opens=javafx.base/javafx.collections=org.jabref",
         "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
 
-        "--enable-native-access=javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+        "--enable-native-access=javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core,com.sun.jna"
     )
 }
 
