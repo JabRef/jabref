@@ -35,7 +35,7 @@ public class XmpExporter extends Exporter {
      * @param entries         a list containing all entries that should be exported
      */
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);

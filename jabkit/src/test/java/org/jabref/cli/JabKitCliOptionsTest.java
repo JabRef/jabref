@@ -6,6 +6,7 @@ import javafx.util.Pair;
 
 import org.jabref.logic.os.OS;
 
+import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,98 +17,98 @@ class JabKitCliOptionsTest {
     private final String bibtex = "@article{test, title=\"test title\"}";
 
     @Test
-    void emptyCLILeftOversLongOptions() throws Exception {
+    void emptyCLILeftOversLongOptions() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
 
         assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
-    void successfulParsingOfFileImportCLILongOptions() throws Exception {
+    void successfulParsingOfFileImportCLILongOptions() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
 
         assertEquals("some/file", cli.getFileImport());
     }
 
     @Test
-    void successfulParsingOfFileExportCLILongOptions() throws Exception {
+    void successfulParsingOfFileExportCLILongOptions() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
 
         assertEquals("some/export/file", cli.getFileExport());
     }
 
     @Test
-    void emptyCLILeftOversShortOptions() throws Exception {
+    void emptyCLILeftOversShortOptions() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
 
         assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
-    void successfulParsingOfFileImportShortOptions() throws Exception {
+    void successfulParsingOfFileImportShortOptions() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
 
         assertEquals("some/file", cli.getFileImport());
     }
 
     @Test
-    void successfulParsingOfFileExportShortOptions() throws Exception {
+    void successfulParsingOfFileExportShortOptions() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
 
         assertEquals("some/export/file", cli.getFileExport());
     }
 
     @Test
-    void emptyPreferencesLeftOver() throws Exception {
+    void emptyPreferencesLeftOver() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-n", "-x=some/file"});
 
         assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
-    void successfulExportOfPreferences() throws Exception {
+    void successfulExportOfPreferences() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-n", "-x=some/file"});
 
         assertEquals("some/file", cli.getPreferencesExport());
     }
 
     @Test
-    void emptyLeftOversCLIShortImportingBibtex() throws Exception {
+    void emptyLeftOversCLIShortImportingBibtex() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-ib", bibtex});
 
         assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
-    void recognizesImportBibtexShort() throws Exception {
+    void recognizesImportBibtexShort() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-ib", bibtex});
 
         assertTrue(cli.isBibtexImport());
     }
 
     @Test
-    void successfulParsingOfBibtexImportShort() throws Exception {
+    void successfulParsingOfBibtexImportShort() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-ib", bibtex});
 
         assertEquals(bibtex, cli.getBibtexImport());
     }
 
     @Test
-    void emptyLeftOversCLILongImportingBibtex() throws Exception {
+    void emptyLeftOversCLILongImportingBibtex() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-importBibtex", bibtex});
 
         assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
-    void recognizesImportBibtexLong() throws Exception {
+    void recognizesImportBibtexLong() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-importBibtex", bibtex});
 
         assertTrue(cli.isBibtexImport());
     }
 
     @Test
-    void successfulParsingOfBibtexImportLong() throws Exception {
+    void successfulParsingOfBibtexImportLong() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"-importBibtex", bibtex});
 
         assertEquals(bibtex, cli.getBibtexImport());
@@ -132,14 +133,14 @@ class JabKitCliOptionsTest {
     }
 
     @Test
-    void checkConsistencyOption() throws Exception {
+    void checkConsistencyOption() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"--check-consistency", "jabref-authors.bib"});
         assertTrue(cli.isCheckConsistency());
         assertEquals("jabref-authors.bib", cli.getCheckConsistency());
     }
 
     @Test
-    void checkConsistencyOutputFormatOption() throws Exception {
+    void checkConsistencyOutputFormatOption() throws ParseException {
         JabKitCliOptions cli = new JabKitCliOptions(new String[] {"--check-consistency", "jabref-authors.bib", "--output-format", "csv"});
         assertEquals("csv", cli.getCheckConsistencyOutputFormat());
     }

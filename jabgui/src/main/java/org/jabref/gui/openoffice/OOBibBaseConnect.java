@@ -1,5 +1,6 @@
 package org.jabref.gui.openoffice;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class OOBibBaseConnect {
     public OOBibBaseConnect(Path loPath, DialogService dialogService)
             throws
             BootstrapException,
-            CreationException {
+            CreationException, IOException, InterruptedException {
 
         this.dialogService = dialogService;
         this.xDesktop = simpleBootstrap(loPath);
@@ -61,7 +62,7 @@ public class OOBibBaseConnect {
     private XDesktop simpleBootstrap(Path loPath)
             throws
             CreationException,
-            BootstrapException {
+            BootstrapException, IOException, InterruptedException {
 
         // Get the office component context:
         XComponentContext context = Bootstrap.bootstrap(loPath);

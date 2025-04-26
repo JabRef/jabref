@@ -131,7 +131,7 @@ class BibtexImporterTest {
     }
 
     @Test
-    void recognizesDatabaseID() throws Exception {
+    void recognizesDatabaseID() throws IOException, URISyntaxException {
         Path file = Path.of(BibtexImporterTest.class.getResource("AutosavedSharedDatabase.bib").toURI());
         String sharedDatabaseID = importer.importDatabase(file).getDatabase().getSharedDatabaseID().get();
         assertEquals("13ceoc8dm42f5g1iitao3dj2ap", sharedDatabaseID);
@@ -149,7 +149,7 @@ class BibtexImporterTest {
 
     @ParameterizedTest
     @MethodSource
-    void parsingOfEncodedFileWithHeader(Charset charset, String fileName) throws Exception {
+    void parsingOfEncodedFileWithHeader(Charset charset, String fileName) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(fileName).toURI()));
         assertEquals(Optional.of(charset), parserResult.getMetaData().getEncoding());
@@ -157,7 +157,7 @@ class BibtexImporterTest {
 
     @ParameterizedTest
     @CsvSource({"encoding-windows-1252-with-header.bib", "encoding-windows-1252-without-header.bib"})
-    void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws Exception {
+    void parsingOfWindows1252EncodedFileReadsDegreeCharacterCorrectly(String filename) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -168,7 +168,7 @@ class BibtexImporterTest {
     @ParameterizedTest
     @CsvSource({"encoding-utf-8-with-header.bib", "encoding-utf-8-without-header.bib",
             "encoding-utf-16BE-with-header.bib", "encoding-utf-16BE-without-header.bib"})
-    void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws Exception {
+    void parsingFilesReadsUmlautCharacterCorrectly(String filename) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(
@@ -187,14 +187,14 @@ class BibtexImporterTest {
 
     @ParameterizedTest
     @MethodSource
-    void encodingExplicitlySuppliedCorrectlyDetermined(String filename, boolean encodingExplicitlySupplied) throws Exception {
+    void encodingExplicitlySuppliedCorrectlyDetermined(String filename, boolean encodingExplicitlySupplied) throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource(filename).toURI()));
         assertEquals(encodingExplicitlySupplied, parserResult.getMetaData().getEncodingExplicitlySupplied());
     }
 
     @Test
-    void wrongEncodingSupplied() throws Exception {
+    void wrongEncodingSupplied() throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource("encoding-windows-1252-but-utf-8-declared--decoding-fails.bib").toURI()));
 
@@ -205,7 +205,7 @@ class BibtexImporterTest {
     }
 
     @Test
-    void encodingNotSupplied() throws Exception {
+    void encodingNotSupplied() throws URISyntaxException, IOException {
         ParserResult parserResult = importer.importDatabase(
                 Path.of(BibtexImporterTest.class.getResource("encoding-utf-8-without-header.bib").toURI()));
         assertFalse(parserResult.getMetaData().getEncodingExplicitlySupplied());

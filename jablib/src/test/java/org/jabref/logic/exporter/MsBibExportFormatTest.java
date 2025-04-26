@@ -20,7 +20,7 @@ public class MsBibExportFormatTest {
     public MSBibExporter msBibExportFormat;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         databaseContext = new BibDatabaseContext();
         msBibExportFormat = new MSBibExporter();
     }

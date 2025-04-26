@@ -47,7 +47,7 @@ class RecursiveTreeItemTest {
     }
 
     @Test
-    void respectsFilter() throws Exception {
+    void respectsFilter() {
         filterPredicate.setValue(item -> item.getName().contains("test"));
 
         assertEquals(List.of(node.getParent().get()), rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));

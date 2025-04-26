@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.support.BibEntryAssert;
@@ -24,7 +25,7 @@ class MarcXmlParserTest {
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
-    private void doTest(String xmlName, String bibName) throws Exception {
+    private void doTest(String xmlName, String bibName) throws IOException, ParseException {
         try (InputStream is = MarcXmlParserTest.class.getResourceAsStream(xmlName)) {
             MarcXmlParser parser = new MarcXmlParser();
             List<BibEntry> entries = parser.parseEntries(is);
@@ -35,7 +36,7 @@ class MarcXmlParserTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws IOException, ParseException {
         String bibName = FileUtil.getBaseName(fileName) + ".bib";
         doTest(fileName, bibName);
     }

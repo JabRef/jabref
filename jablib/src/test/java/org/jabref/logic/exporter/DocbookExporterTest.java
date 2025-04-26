@@ -1,11 +1,15 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -42,13 +46,13 @@ public class DocbookExporterTest {
     }
 
     @Test
-    void corruptedTitleBraces(@TempDir Path testFolder) throws Exception {
+    void corruptedTitleBraces(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Peptidomics of the larval {{{D}rosophila melanogaster}} central nervous system.");
 
-        List<BibEntry> entries = Arrays.asList(entry);
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile, entries);
 
@@ -58,13 +62,13 @@ public class DocbookExporterTest {
     }
 
     @Test
-    void corruptedTitleUnicode(@TempDir Path testFolder) throws Exception {
+    void corruptedTitleUnicode(@TempDir Path testFolder) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path tmpFile = testFolder.resolve("testBraces");
 
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, "Insect neuropeptide bursicon homodimers induce innate immune and stress genes during molting by activating the {NF}-$\\kappa$B transcription factor Relish.");
 
-        List<BibEntry> entries = Arrays.asList(entry);
+        List<BibEntry> entries = List.of(entry);
 
         exportFormat.export(databaseContext, tmpFile, entries);
 

@@ -56,14 +56,14 @@ class FieldWriterTest {
 
     @ParameterizedTest
     @MethodSource
-    void keepHashSignInComment(String text) throws Exception {
+    void keepHashSignInComment(String text) throws InvalidFieldValueException {
         String writeResult = writer.write(StandardField.COMMENT, text);
         String resultWithLfAsNewLineSeparator = StringUtil.unifyLineBreaks(writeResult, "\n");
         assertEquals("{" + text + "}", resultWithLfAsNewLineSeparator);
     }
 
     @Test
-    void noNormalizationOfNewlinesInAbstractField() throws Exception {
+    void noNormalizationOfNewlinesInAbstractField() throws InvalidFieldValueException {
         String text = "lorem" + OS.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
         String result = writer.write(StandardField.ABSTRACT, text);
         // The normalization is done at org.jabref.logic.exporter.BibWriter, so no need to normalize here
@@ -72,7 +72,7 @@ class FieldWriterTest {
     }
 
     @Test
-    void preserveNewlineInAbstractField() throws Exception {
+    void preserveNewlineInAbstractField() throws InvalidFieldValueException {
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.ABSTRACT, text);
@@ -82,7 +82,7 @@ class FieldWriterTest {
     }
 
     @Test
-    void preserveMultipleNewlinesInAbstractField() throws Exception {
+    void preserveMultipleNewlinesInAbstractField() throws InvalidFieldValueException {
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.ABSTRACT, text);
@@ -92,7 +92,7 @@ class FieldWriterTest {
     }
 
     @Test
-    void preserveNewlineInReviewField() throws Exception {
+    void preserveNewlineInReviewField() throws InvalidFieldValueException {
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         String result = writer.write(StandardField.REVIEW, text);
@@ -102,7 +102,7 @@ class FieldWriterTest {
     }
 
     @Test
-    void whitespaceFromNonMultiLineFieldsKept() throws Exception {
+    void whitespaceFromNonMultiLineFieldsKept() throws InvalidFieldValueException {
         // This was a decision on 2024-06-15 when fixing https://github.com/JabRef/jabref/issues/4877
         // We want to have a clean architecture for reading and writing
         // Normalizing is done during write (and not during read)
@@ -133,70 +133,70 @@ class FieldWriterTest {
     }
 
     @Test
-    void tolerateBalancedBrace() throws Exception {
+    void tolerateBalancedBrace() throws InvalidFieldValueException {
         String text = "Incorporating evolutionary {Measures into Conservation Prioritization}";
 
         assertEquals("{" + text + "}", writer.write(new UnknownField("anyfield"), text));
     }
 
     @Test
-    void tolerateEscapeCharacters() throws Exception {
+    void tolerateEscapeCharacters() throws InvalidFieldValueException {
         String text = "Incorporating {\\O}evolutionary {Measures into Conservation Prioritization}";
 
         assertEquals("{" + text + "}", writer.write(new UnknownField("anyfield"), text));
     }
 
     @Test
-    void hashEnclosedWordsGetRealStringsInMonthField() throws Exception {
+    void hashEnclosedWordsGetRealStringsInMonthField() throws InvalidFieldValueException {
         String text = "#jan# - #feb#";
         assertEquals("jan # { - } # feb", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void hashWorksSimple() throws Exception {
+    void hashWorksSimple() throws InvalidFieldValueException {
         String text = "#text";
         assertEquals("{#text}", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void escapedHashWorksSimple() throws Exception {
+    void escapedHashWorksSimple() throws InvalidFieldValueException {
         String text = "\\#text";
         assertEquals("{\\#text}", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void doubleHashesRemoved() throws Exception {
+    void doubleHashesRemoved() throws InvalidFieldValueException {
         String text = "te##xt";
         assertEquals("{text}", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void multipleSpacesNotShrunkOnSingleLineField() throws Exception {
+    void multipleSpacesNotShrunkOnSingleLineField() throws InvalidFieldValueException {
         String text = "t  w  o";
         assertEquals("{t  w  o}", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void doubleSpacesAreKept() throws Exception {
+    void doubleSpacesAreKept() throws InvalidFieldValueException {
         String text = "  text      ";
         assertEquals("{  text      }", writer.write(StandardField.MONTH, text));
     }
 
     @Test
-    void spacesAreNotTrimmedAtMultilineField() throws Exception {
+    void spacesAreNotTrimmedAtMultilineField() throws InvalidFieldValueException {
         String text = "  text      ";
         assertEquals("{  text      }", writer.write(StandardField.COMMENT, text));
         // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions
     }
 
     @Test
-    void multipleSpacesKeptOnMultiLineField() throws Exception {
+    void multipleSpacesKeptOnMultiLineField() throws InvalidFieldValueException {
         String text = "t  w  o";
         assertEquals("{t  w  o}", writer.write(StandardField.COMMENT, text));
     }
 
     @Test
-    void finalNewLineIsKeptAtMultilineField() throws Exception {
+    void finalNewLineIsKeptAtMultilineField() throws InvalidFieldValueException {
         String text = "  text      " + OS.NEWLINE;
         assertEquals("{" + text + "}", writer.write(StandardField.COMMENT, text));
         // Note: Spaces are trimmed at BibDatabaseWriter#applySaveActions

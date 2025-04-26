@@ -138,7 +138,7 @@ class SaveDatabaseActionTest {
     }
 
     @Test
-    void saveKeepsChangedFlag() throws Exception {
+    void saveKeepsChangedFlag() throws IOException {
         BibEntry firstEntry = new BibEntry().withField(StandardField.AUTHOR, "first");
         firstEntry.setChanged(true);
         BibEntry secondEntry = new BibEntry().withField(StandardField.AUTHOR, "second");

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -131,7 +132,7 @@ class MedlineFetcherTest {
     }
 
     @Test
-    void searchByIDWijedasa() throws Exception {
+    void searchByIDWijedasa() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
         assertTrue(fetchedEntry.isPresent());
 
@@ -140,7 +141,7 @@ class MedlineFetcherTest {
     }
 
     @Test
-    void searchByIDEndharti() throws Exception {
+    void searchByIDEndharti() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445");
         assertTrue(fetchedEntry.isPresent());
 
@@ -149,7 +150,7 @@ class MedlineFetcherTest {
     }
 
     @Test
-    void searchByIDIchikawa() throws Exception {
+    void searchByIDIchikawa() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440");
         assertTrue(fetchedEntry.isPresent());
 
@@ -158,7 +159,7 @@ class MedlineFetcherTest {
     }
 
     @Test
-    void searchByIDSari() throws Exception {
+    void searchByIDSari() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355");
         assertTrue(fetchedEntry.isPresent());
 
@@ -167,21 +168,21 @@ class MedlineFetcherTest {
     }
 
     @Test
-    void multipleEntries() throws Exception {
+    void multipleEntries() throws FetcherException {
         List<BibEntry> entryList = fetcher.performSearch("java");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(50, entryList.size());
     }
 
     @Test
-    void withLuceneQueryAuthorDate() throws Exception {
+    void withLuceneQueryAuthorDate() throws FetcherException {
         List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year:2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(18, entryList.size());
     }
 
     @Test
-    void withLuceneQueryAuthorDateRange() throws Exception {
+    void withLuceneQueryAuthorDateRange() throws FetcherException {
         List<BibEntry> entryList = fetcher.performSearch("author:vigmond AND year-range:2020-2021");
         entryList.forEach(entry -> entry.clearField(StandardField.ABSTRACT)); // Remove abstract due to copyright);
         assertEquals(28, entryList.size());
@@ -193,13 +194,13 @@ class MedlineFetcherTest {
     }
 
     @Test
-    void emptyEntryList() throws Exception {
+    void emptyEntryList() throws FetcherException {
         List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ");
         assertEquals(List.of(), entryList);
     }
 
     @Test
-    void emptyInput() throws Exception {
+    void emptyInput() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
     }
 }

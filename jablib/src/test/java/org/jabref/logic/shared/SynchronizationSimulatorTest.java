@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -48,7 +49,7 @@ class SynchronizationSimulatorTest {
     }
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() throws SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         DBMSConnection dbmsConnection = ConnectorTest.getTestDBMSConnection(TestManager.getDBMSTypeTestParameter());
         TestManager.clearTables(dbmsConnection);
 
@@ -70,13 +71,13 @@ class SynchronizationSimulatorTest {
     }
 
     @AfterEach
-    void clear() throws SQLException {
+    void clear() {
         clientContextA.getDBMSSynchronizer().closeSharedDatabase();
         clientContextB.getDBMSSynchronizer().closeSharedDatabase();
     }
 
     @Test
-    void simulateEntryInsertionAndManualPull() throws Exception {
+    void simulateEntryInsertionAndManualPull() {
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1));
         // client A inserts another entry
@@ -88,7 +89,7 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
-    void simulateEntryUpdateAndManualPull() throws Exception {
+    void simulateEntryUpdateAndManualPull() {
         BibEntry bibEntry = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -103,7 +104,7 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
-    void simulateEntryDelitionAndManualPull() throws Exception {
+    void simulateEntryDelitionAndManualPull() {
         BibEntry bibEntry = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntry);
@@ -124,7 +125,7 @@ class SynchronizationSimulatorTest {
     }
 
     @Test
-    void simulateUpdateOnNoLongerExistingEntry() throws Exception {
+    void simulateUpdateOnNoLongerExistingEntry() {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         // client A inserts an entry
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA);

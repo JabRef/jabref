@@ -298,19 +298,19 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void searchEntryByPartOfTitle() throws Exception {
+    void searchEntryByPartOfTitle() throws FetcherException {
         assertEquals(List.of(mainResultPaper),
                 fetcher.performSearch("title:\"the architecture of mr. dLib's\""));
     }
 
     @Test
-    void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
+    void searchEntryByPartOfTitleWithAcuteAccent() throws FetcherException {
         assertEquals(List.of(sliceTheoremPaper),
                 fetcher.performSearch("title:\"slice theorem for Fréchet\""));
     }
 
     @Test
-    void searchEntryByOldId() throws Exception {
+    void searchEntryByOldId() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "{H1 Collaboration}")
                 .withField(StandardField.TITLE, "Multi-Electron Production at High Transverse Momenta in ep Collisions at HERA")
@@ -337,74 +337,74 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void searchEntryByIdWith4DigitsAndVersion() throws Exception {
+    void searchEntryByIdWith4DigitsAndVersion() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249v1"));
     }
 
     @Test
-    void searchEntryByIdWith4Digits() throws Exception {
+    void searchEntryByIdWith4Digits() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("1405.2249"));
     }
 
     @Test
-    void searchEntryByIdWith4DigitsAndPrefix() throws Exception {
+    void searchEntryByIdWith4DigitsAndPrefix() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv:1405.2249"));
     }
 
     @Test
-    void searchEntryByIdWith4DigitsAndPrefixAndNotTrimmed() throws Exception {
+    void searchEntryByIdWith4DigitsAndPrefixAndNotTrimmed() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("arXiv : 1405. 2249"));
     }
 
     @Test
-    void searchEntryByIdWith5Digits() throws Exception {
+    void searchEntryByIdWith5Digits() throws FetcherException {
         assertEquals(Optional.of(
                 "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
                 fetcher.performSearchById("1503.06747").flatMap(entry -> entry.getField(StandardField.TITLE)));
     }
 
     @Test
-    void searchWithMalformedIdReturnsEmpty() throws Exception {
+    void searchWithMalformedIdReturnsEmpty() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById("123412345"));
     }
 
     @Test
-    void searchIdentifierForSlicePaper() throws Exception {
+    void searchIdentifierForSlicePaper() throws FetcherException {
         sliceTheoremPaper.clearField(StandardField.EPRINT);
 
         assertEquals(ArXivIdentifier.parse("1405.2249"), fetcher.findIdentifier(sliceTheoremPaper));
     }
 
     @Test
-    void searchEmptyId() throws Exception {
+    void searchEmptyId() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 
     @Test
-    void searchWithHttpUrl() throws Exception {
+    void searchWithHttpUrl() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("http://arxiv.org/abs/1405.2249"));
     }
 
     @Test
-    void searchWithHttpsUrl() throws Exception {
+    void searchWithHttpsUrl() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https://arxiv.org/abs/1405.2249"));
     }
 
     @Test
-    void searchWithHttpsUrlNotTrimmed() throws Exception {
+    void searchWithHttpsUrlNotTrimmed() throws FetcherException {
         assertEquals(Optional.of(sliceTheoremPaper), fetcher.performSearchById("https : // arxiv . org / abs / 1405 . 2249 "));
     }
 
     @Disabled("Is not supported by the current API")
     @Test
     @Override
-    public void supportsYearSearch() throws Exception {
+    public void supportsYearSearch() {
     }
 
     @Disabled("Is not supported by the current API")
     @Test
     @Override
-    public void supportsYearRangeSearch() throws Exception {
+    public void supportsYearRangeSearch() {
     }
 
     /**
@@ -412,7 +412,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
      * Only documents that contain exactly this sequence are returned.
      */
     @Test
-    void supportsPhraseSearch() throws Exception {
+    void supportsPhraseSearch() throws FetcherException {
         List<BibEntry> resultWithPhraseSearch = fetcher.performSearch("title:\"Taxonomy of Distributed\"");
         List<BibEntry> resultWithOutPhraseSearch = fetcher.performSearch("title:Taxonomy AND title:of AND title:Distributed");
         // Phrase search result has to be subset of the default search result
@@ -424,7 +424,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
      * Only documents that contain exactly this sequence are returned.
      */
     @Test
-    void supportsPhraseSearchAndMatchesExact() throws Exception {
+    void supportsPhraseSearchAndMatchesExact() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Rafrastara, Fauzi Adi and Deyu, Qi")
                 .withField(StandardField.TITLE, "A Survey and Taxonomy of Distributed Data Mining Research Studies: A Systematic Literature Review")
@@ -448,7 +448,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void supportsBooleanANDSearch() throws Exception {
+    void supportsBooleanANDSearch() throws FetcherException {
         // Example of a robust result, with information from both ArXiv-assigned and user-assigned DOIs
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Büscher, Tobias and Diez, Angel L. and Gompper, Gerhard and Elgeti, Jens")
@@ -577,7 +577,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void abstractIsCleanedUp() throws Exception {
+    void abstractIsCleanedUp() throws FetcherException {
         Optional<BibEntry> entry = fetcher.performSearchById("2407.02238");
         String escaped = "{One of the primary areas of interest in High Performance Computing is the improvement of performance of parallel workloads. Nowadays, compilable source code-based optimization tasks that employ deep learning often exploit LLVM Intermediate Representations (IRs) for extracting features from source code. Most such works target specific tasks, or are designed with a pre-defined set of heuristics. So far, pre-trained models are rare in this domain, but the possibilities have been widely discussed. Especially approaches mimicking large-language models (LLMs) have been proposed. But these have prohibitively large training costs. In this paper, we propose MIREncoder, a M}ulti-modal IR-based Auto-Encoder that can be pre-trained to generate a learned embedding space to be used for downstream tasks by machine learning-based approaches. A multi-modal approach enables us to better extract features from compilable programs. It allows us to better model code syntax, semantics and structure. For code-based performance optimizations, these features are very important while making optimization decisions. A pre-trained model/embedding implicitly enables the usage of transfer learning, and helps move away from task-specific trained models. Additionally, a pre-trained model used for downstream performance optimization should itself have reduced overhead, and be easily usable. These considerations have led us to propose a modeling approach that i) understands code semantics and structure, ii) enables use of transfer learning, and iii) is small and simple enough to be easily re-purposed or reused even with low resource availability. Our evaluations will show that our proposed approach can outperform the state of the art while reducing overhead.";
         assertEquals(Optional.of(escaped), entry.get().getField(StandardField.ABSTRACT));

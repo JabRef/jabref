@@ -1,5 +1,6 @@
 package org.jabref.logic.shared;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
+import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -55,7 +58,7 @@ class DBMSSynchronizerTest {
     }
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() throws SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
         this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(this.dbmsConnection);
@@ -161,7 +164,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void initializeDatabases() throws Exception {
+    void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
         dbmsSynchronizer.initializeDatabases();
         assertTrue(dbmsProcessor.checkBaseIntegrity());
         dbmsSynchronizer.initializeDatabases();
@@ -191,7 +194,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void synchronizeLocalDatabaseWithEntryUpdate() throws Exception {
+    void synchronizeLocalDatabaseWithEntryUpdate() throws SQLException, OfflineLockException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());
@@ -210,7 +213,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void updateEntryDoesNotModifyLocalDatabase() throws Exception {
+    void updateEntryDoesNotModifyLocalDatabase() throws SQLException, OfflineLockException {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
         assertEquals(List.of(bibEntry), bibDatabase.getEntries());

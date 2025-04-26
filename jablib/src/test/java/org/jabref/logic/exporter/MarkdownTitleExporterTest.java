@@ -1,8 +1,12 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -43,7 +47,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportForNoEntriesWritesNothing(@TempDir Path tempDir) throws Exception {
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path file = tempDir.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         htmlWebsiteExporter.export(databaseContext, tempDir, List.of());
@@ -51,7 +55,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentArticle(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContentArticle(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -71,7 +75,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInCollection(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContentInCollection(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.InCollection)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -91,7 +95,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentBook(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContentBook(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Book)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -111,7 +115,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInProceeedingsPublisher(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContentInProceeedingsPublisher(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -132,7 +136,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInProceeedingsNoPublisher(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContentInProceeedingsNoPublisher(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -152,7 +156,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentInProceeedingsNoSeries(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContentInProceeedingsNoSeries(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.InProceedings)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -171,7 +175,7 @@ class MarkdownTitleExporterTest {
     }
 
     @Test
-    final void exportsCorrectContentBracketsInTitle(@TempDir Path tempDir) throws Exception {
+    final void exportsCorrectContentBracketsInTitle(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")

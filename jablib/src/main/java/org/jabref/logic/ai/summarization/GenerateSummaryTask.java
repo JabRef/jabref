@@ -86,7 +86,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
     }
 
     @Override
-    public Summary call() throws Exception {
+    public Summary call() {
         LOGGER.debug("Starting summarization task for entry {}", citationKey);
 
         Optional<Summary> savedSummary = Optional.empty();

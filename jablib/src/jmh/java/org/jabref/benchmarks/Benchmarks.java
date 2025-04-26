@@ -53,7 +53,7 @@ public class Benchmarks {
     private String htmlConversionString;
 
     @Setup
-    public void init() throws Exception {
+    public void init() throws IOException {
         Injector.setModelOrService(CliPreferences.class, JabRefCliPreferences.getInstance());
 
         Random randomizer = new Random();
@@ -101,7 +101,7 @@ public class Benchmarks {
     }
 
     @Benchmark
-    public String write() throws Exception {
+    public String write() throws IOException {
         return getOutputWriter().toString();
     }
 

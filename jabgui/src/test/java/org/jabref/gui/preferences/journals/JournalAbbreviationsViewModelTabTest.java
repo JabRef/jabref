@@ -175,7 +175,7 @@ class JournalAbbreviationsViewModelTabTest {
     }
 
     @BeforeEach
-    void setUpViewModel(@TempDir Path tempFolder) throws Exception {
+    void setUpViewModel(@TempDir Path tempFolder) throws IOException {
         JournalAbbreviationPreferences abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
 
         dialogService = mock(DialogService.class);
@@ -476,7 +476,7 @@ class JournalAbbreviationsViewModelTabTest {
 
     @ParameterizedTest
     @MethodSource("provideTestFiles")
-    void saveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(TestData testData) throws Exception {
+    void saveAbbreviationsToFilesCreatesNewFilesWithWrittenAbbreviations(TestData testData) throws IOException {
         Path testFile2 = createTestFile(testData.csvFiles.get(2));
         when(dialogService.showFileSaveDialog(any())).thenReturn(Optional.of(testFile2));
         viewModel.addNewFile();

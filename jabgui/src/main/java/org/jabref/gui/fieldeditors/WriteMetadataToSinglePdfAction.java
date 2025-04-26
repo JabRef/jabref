@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.jabref.gui.DialogService;
@@ -11,6 +12,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -72,13 +74,8 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
             if (file.isEmpty()) {
                 dialogService.notify(Localization.lang("Failed to write metadata, file %1 not found.", file.map(Path::toString).orElse("")));
             } else {
-                    try {
-                        writeMetadataToFile(file.get(), entry, databaseContext, abbreviationRepository, bibEntryTypesManager, fieldPreferences, filePreferences, xmpPreferences);
-                        dialogService.notify(Localization.lang("Success! Finished writing metadata."));
-                    } catch (IOException | TransformerException ex) {
-                        dialogService.notify(Localization.lang("Error while writing metadata. See the error log for details."));
-                        LOGGER.error("Error while writing metadata to {}", file.map(Path::toString).orElse(""), ex);
-                }
+                writeMetadataToFile(file.get(), entry, databaseContext, abbreviationRepository, bibEntryTypesManager, fieldPreferences, filePreferences, xmpPreferences);
+                dialogService.notify(Localization.lang("Success! Finished writing metadata."));
             }
             return null;
         });
@@ -95,7 +92,7 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
                                                         BibEntryTypesManager bibEntryTypesManager,
                                                         FieldPreferences fieldPreferences,
                                                         FilePreferences filePreferences,
-                                                        XmpPreferences xmpPreferences) throws Exception {
+                                                        XmpPreferences xmpPreferences) throws IOException, TransformerException, SaveException, ParserConfigurationException {
         // Similar code can be found at {@link org.jabref.gui.exporter.WriteMetadataToPdfAction.writeMetadataToFile}
         new XmpUtilWriter(xmpPreferences).writeXmp(file, entry, databaseContext.getDatabase());
 

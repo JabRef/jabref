@@ -29,12 +29,12 @@ class CiteSeerTest {
     private CiteSeer fetcher = new CiteSeer();
 
     @BeforeAll
-    static void ensureCiteSeerIsAvailable() throws Exception {
+    static void ensureCiteSeerIsAvailable() throws FetcherException {
         assumeFalse(List.of().equals(new CiteSeer().performSearch("title:\"Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory\" AND pageSize:1")));
     }
 
     @Test
-    void searchByQueryFindsEntryRigorousDerivation() throws Exception {
+    void searchByQueryFindsEntryRigorousDerivation() throws FetcherException {
         String title = "RIGOROUS DERIVATION FROM LANDAU-DE GENNES THEORY TO ERICKSEN-LESLIE THEORY";
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.DOI, "68b3fde1aa6354a34061f8811e2050e1b512af26")
@@ -49,7 +49,7 @@ class CiteSeerTest {
     }
 
     @Test
-    void searchByQueryFindsEntryCopingTheoryAndResearch() throws Exception {
+    void searchByQueryFindsEntryCopingTheoryAndResearch() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.DOI, "c16e0888b17cb2c689e5dfa4e2be4fdffb23869e")
                 .withField(StandardField.AUTHOR, "Lazarus, Richard S.")

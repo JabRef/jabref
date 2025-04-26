@@ -1,5 +1,7 @@
 package org.jabref.logic.bst;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class BstVMTest {
     }
 
     @Test
-    void abbrv() throws Exception {
+    void abbrv() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
         List<BibEntry> testEntries = List.of(defaultTestEntry());
 
@@ -42,7 +44,7 @@ public class BstVMTest {
     }
 
     @Test
-    void ieeetran() throws Exception {
+    void ieeetran() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("IEEEtran.bst").toURI()));
         List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
 
@@ -139,7 +141,7 @@ public class BstVMTest {
     }
 
     @Test
-    void hyphenatedName() throws Exception {
+    void hyphenatedName() throws URISyntaxException, IOException {
         BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
         List<BibEntry> testEntries = List.of(
                 new BibEntry(StandardEntryType.Article)

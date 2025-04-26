@@ -1,5 +1,7 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -41,7 +43,7 @@ public class ModsExportFormatFilesTest {
     private ModsImporter modsImporter;
     private Path importFile;
 
-    public static Stream<String> fileNames() throws Exception {
+    public static Stream<String> fileNames() throws URISyntaxException, IOException {
         resourceDir = Path.of(MSBibExportFormatFilesTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI()).getParent();
         LOGGER.debug("Mods export resouce dir {}", resourceDir);
 
@@ -52,7 +54,7 @@ public class ModsExportFormatFilesTest {
     }
 
     @BeforeEach
-    void setUp(@TempDir Path testFolder) throws Exception {
+    void setUp(@TempDir Path testFolder) throws IOException {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -70,7 +72,7 @@ public class ModsExportFormatFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    final void performExport(String filename) throws Exception {
+    final void performExport(String filename) throws URISyntaxException, IOException, SaveException {
         importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
@@ -85,7 +87,7 @@ public class ModsExportFormatFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    final void exportAsModsAndThenImportAsMods(String filename) throws Exception {
+    final void exportAsModsAndThenImportAsMods(String filename) throws URISyntaxException, IOException, SaveException {
         importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile).getDatabase().getEntries();
 
@@ -95,7 +97,7 @@ public class ModsExportFormatFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    final void importAsModsAndExportAsMods(String filename) throws Exception {
+    final void importAsModsAndExportAsMods(String filename) throws IOException, URISyntaxException, SaveException {
         importFile = Path.of(ModsExportFormatFilesTest.class.getResource(filename).toURI());
         String xmlFileName = filename.replace(".bib", ".xml");
         Path xmlFile = Path.of(ModsExportFormatFilesTest.class.getResource(xmlFileName).toURI());

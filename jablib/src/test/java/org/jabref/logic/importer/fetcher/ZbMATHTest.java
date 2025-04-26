@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -24,7 +25,7 @@ class ZbMATHTest {
     private BibEntry donaldsonEntry;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -48,19 +49,19 @@ class ZbMATHTest {
     }
 
     @Test
-    void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
         assertEquals(List.of(donaldsonEntry), fetchedEntries);
     }
 
     @Test
-    void searchByIdFindsEntry() throws Exception {
+    void searchByIdFindsEntry() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0507.57010");
         assertEquals(Optional.of(donaldsonEntry), fetchedEntry);
     }
 
     @Test
-    void searchByEntryFindsEntry() throws Exception {
+    void searchByEntryFindsEntry() throws FetcherException {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.TITLE, "An application of gauge theory to four dimensional topology");
         searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
@@ -70,7 +71,7 @@ class ZbMATHTest {
     }
 
     @Test
-    void searchByNoneEntryFindsNothing() throws Exception {
+    void searchByNoneEntryFindsNothing() throws FetcherException {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.TITLE, "t");
         searchEntry.setField(StandardField.AUTHOR, "a");
@@ -80,7 +81,7 @@ class ZbMATHTest {
     }
 
     @Test
-    void searchByIdInEntryFindsEntry() throws Exception {
+    void searchByIdInEntryFindsEntry() throws FetcherException {
         BibEntry searchEntry = new BibEntry();
         searchEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
 

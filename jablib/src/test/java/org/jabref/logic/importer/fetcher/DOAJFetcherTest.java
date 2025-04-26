@@ -1,8 +1,10 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -32,7 +34,7 @@ class DOAJFetcherTest {
     }
 
     @Test
-    void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
         .withField(StandardField.AUTHOR, "Nísea de A. Corrêa and Maria P. Foss and Paula R. B. Diniz")
         .withField(StandardField.DOI, "10.11606/issn.2176-7262.v49i6p533-548")
@@ -67,33 +69,33 @@ class DOAJFetcherTest {
     }
 
     @Test
-    void searchByEmptyQuery() throws Exception {
+    void searchByEmptyQuery() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
     }
 
     @Test
-    void appendSingleWord() throws Exception {
+    void appendSingleWord() throws URISyntaxException {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "/example");
         assertEquals("http://example.com/test/example", builder.build().toASCIIString());
     }
 
     @Test
-    void appendSingleWordWithSlash() throws Exception {
+    void appendSingleWordWithSlash() throws URISyntaxException {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "/example");
         assertEquals("http://example.com/test/example", builder.build().toASCIIString());
     }
 
     @Test
-    void appendSlash() throws Exception {
+    void appendSlash() throws URISyntaxException {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "/");
         assertEquals("http://example.com/test", builder.build().toASCIIString());
     }
 
     @Test
-    void appendTwoWords() throws Exception {
+    void appendTwoWords() throws URISyntaxException {
         URIBuilder builder = new URIBuilder("http://example.com/test");
         DOAJFetcher.addPath(builder, "example two");
         assertEquals("http://example.com/test/example%20two", builder.build().toASCIIString());

@@ -474,7 +474,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesFinalSlashAsSlash() throws Exception {
+    void parseRecognizesFinalSlashAsSlash() throws IOException {
         ParserResult result = parser
                 .parse(new StringReader("""
                         @misc{,
@@ -492,7 +492,7 @@ class BibtexParserTest {
      * JabRef's heuristics is not able to parse this special case.
      */
     @Test
-    void parseFailsWithFinalSlashAsSlashWhenSingleLine() throws Exception {
+    void parseFailsWithFinalSlashAsSlashWhenSingleLine() throws IOException {
         ParserResult parserResult = parser.parse(new StringReader("@misc{, test = {wired\\}}"));
         // In case JabRef was more relaxed, `assertFalse` would be provided here.
         assertTrue(parserResult.hasWarnings());
@@ -1402,7 +1402,7 @@ class BibtexParserTest {
      * Checks that BibDesk Static Groups are available after parsing the library
      */
     @Test
-    void integrationTestBibDeskStaticGroup() throws Exception {
+    void integrationTestBibDeskStaticGroup() throws IOException {
         ParserResult result = parser.parse(new StringReader("""
                 @article{Swain:2023aa,
                     author = {Subhashree Swain and P. Shalima and K.V.P. Latha},
@@ -1474,7 +1474,7 @@ class BibtexParserTest {
      */
     @Test
     @Disabled("Not yet supported")
-    void integrationTestBibDeskSmartGroup() throws Exception {
+    void integrationTestBibDeskSmartGroup() throws IOException {
         ParserResult result = parser.parse(new StringReader("""
                 @article{Kraljic:2023aa,
                     author = {Katarina Kraljic and Florent Renaud and Yohan Dubois and Christophe Pichon and Oscar Agertz and Eric Andersson and Julien Devriendt and Jonathan Freundlich and Sugata Kaviraj and Taysun Kimm and Garreth Martin and S{\\'e}bastien Peirani and {\\'A}lvaro Segovia Otero and Marta Volonteri and Sukyoung K. Yi},
@@ -1593,7 +1593,7 @@ class BibtexParserTest {
      */
     @Test
     @Disabled("Not yet supported")
-    void integrationTestBibDeskMultipleGroup() throws Exception {
+    void integrationTestBibDeskMultipleGroup() throws IOException {
         ParserResult result = parser.parse(new StringReader("""
                 @article{Kraljic:2023aa,
                     author = {Katarina Kraljic and Florent Renaud and Yohan Dubois and Christophe Pichon and Oscar Agertz and Eric Andersson and Julien Devriendt and Jonathan Freundlich and Sugata Kaviraj and Taysun Kimm and Garreth Martin and S{\\'e}bastien Peirani and {\\'A}lvaro Segovia Otero and Marta Volonteri and Sukyoung K. Yi},
@@ -1707,7 +1707,7 @@ class BibtexParserTest {
      * Checks that a TexGroup finally gets the required data, after parsing the library.
      */
     @Test
-    void integrationTestTexGroup() throws Exception {
+    void integrationTestTexGroup() throws IOException {
         ParserResult result = parser.parse(new StringReader(
                 "@comment{jabref-meta: grouping:" + OS.NEWLINE
                         + "0 AllEntriesGroup:;" + OS.NEWLINE
@@ -1754,7 +1754,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseReallyUnknownType() throws Exception {
+    void parseReallyUnknownType() throws ParseException {
         String bibtexEntry = """
                 @ReallyUnknownType{test,
                  Comment                  = {testentry}
@@ -1770,7 +1770,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseOtherTypeTest() throws Exception {
+    void parseOtherTypeTest() throws ParseException {
         String bibtexEntry = """
                 @Other{test,
                  Comment                  = {testentry}
@@ -1786,7 +1786,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseRecognizesDatabaseID() throws Exception {
+    void parseRecognizesDatabaseID() throws IOException {
         String expectedDatabaseID = "q1w2e3r4t5z6";
         String sharedDatabaseFileContent = "\\% DBID: " + expectedDatabaseID +
                 OS.NEWLINE +
@@ -1799,7 +1799,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseDoesNotRecognizeDatabaseIDasUserComment() throws Exception {
+    void parseDoesNotRecognizeDatabaseIDasUserComment() throws IOException {
         String sharedDatabaseFileContent = "\\% Encoding: UTF-8" + OS.NEWLINE +
                 "\\% DBID: q1w2e3r4t5z6" + OS.NEWLINE +
                 "@Article{a}";
@@ -2043,28 +2043,28 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseYearWithMonthString() throws Exception {
+    void parseYearWithMonthString() throws ParseException {
         Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003}, month = feb }");
 
         assertEquals(new Date(2003, 2), result.get().getPublicationDate().get());
     }
 
     @Test
-    void parseYearWithIllFormattedMonthString() throws Exception {
+    void parseYearWithIllFormattedMonthString() throws ParseException {
         Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }");
 
         assertEquals(new Date(2003, 2), result.get().getPublicationDate().get());
     }
 
     @Test
-    void parseYearWithMonthNumber() throws Exception {
+    void parseYearWithMonthNumber() throws ParseException {
         Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003}, month = 2 }");
 
         assertEquals(new Date(2003, 2), result.get().getPublicationDate().get());
     }
 
     @Test
-    void parseYear() throws Exception {
+    void parseYear() throws ParseException {
         Optional<BibEntry> result = parser.parseSingleEntry("@ARTICLE{HipKro03, year = {2003} }");
 
         assertEquals(new Date(2003), result.get().getPublicationDate().get());
@@ -2171,7 +2171,7 @@ class BibtexParserTest {
     }
 
     @Test
-    void parseDuplicateKeywordsWithTwoEntries() throws Exception {
+    void parseDuplicateKeywordsWithTwoEntries() throws IOException {
         BibEntry expectedEntryFirst = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.KEYWORDS, "bbb")
                 .withCitationKey("Test2017");

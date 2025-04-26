@@ -34,7 +34,7 @@ class ACMPortalFetcherTest {
     }
 
     @Test
-    void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws FetcherException {
         BibEntry searchEntry = new BibEntry(StandardEntryType.Conference)
                         .withField(StandardField.AUTHOR, "Olsson, Tobias and Ericsson, Morgan and Wingkvist, Anna")
                         .withField(StandardField.YEAR, "2017")
@@ -62,7 +62,7 @@ class ACMPortalFetcherTest {
     }
 
     @Test
-    void getURLForQuery() throws FetcherException, MalformedURLException, URISyntaxException, QueryNodeParseException {
+    void getURLForQuery() throws MalformedURLException, URISyntaxException, QueryNodeParseException {
         String testQuery = "test query url";
         SyntaxParser parser = new StandardSyntaxParser();
         URL url = fetcher.getURLForQuery(parser.parse(testQuery, NO_EXPLICIT_FIELD));

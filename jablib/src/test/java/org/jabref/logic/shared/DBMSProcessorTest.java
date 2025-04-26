@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
 import org.jabref.logic.shared.exception.OfflineLockException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
@@ -40,7 +41,7 @@ class DBMSProcessorTest {
     private DBMSType dbmsType;
 
     @BeforeEach
-    void setup() throws Exception {
+    void setup() throws SQLException, InvalidDBMSConnectionPropertiesException {
         this.dbmsType = TestManager.getDBMSTypeTestParameter();
         this.dbmsConnection = ConnectorTest.getTestDBMSConnection(dbmsType);
         this.dbmsProcessor = DBMSProcessor.getProcessorInstance(ConnectorTest.getTestDBMSConnection(dbmsType));
@@ -125,7 +126,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void updateEntry() throws Exception {
+    void updateEntry() throws SQLException, OfflineLockException {
         BibEntry expectedEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(expectedEntry);
 
@@ -140,7 +141,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void updateEmptyEntry() throws Exception {
+    void updateEmptyEntry() throws SQLException, OfflineLockException {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Article);
         dbmsProcessor.insertEntry(expectedEntry);
 

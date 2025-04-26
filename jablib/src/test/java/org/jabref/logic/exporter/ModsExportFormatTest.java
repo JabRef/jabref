@@ -1,5 +1,7 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -23,7 +25,7 @@ class ModsExportFormatTest {
     private BibDatabaseContext databaseContext;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws URISyntaxException {
         databaseContext = new BibDatabaseContext();
         modsExportFormat = new ModsExporter();
         new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
@@ -31,7 +33,7 @@ class ModsExportFormatTest {
     }
 
     @Test
-    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws IOException, SaveException {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         modsExportFormat.export(databaseContext, tempFile, List.of());

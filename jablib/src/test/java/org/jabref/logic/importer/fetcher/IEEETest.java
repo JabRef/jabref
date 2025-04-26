@@ -1,10 +1,12 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
@@ -53,7 +55,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     private IEEE fetcher;
 
     @BeforeAll
-    static void ensureIeeeIsAvailable() throws Exception {
+    static void ensureIeeeIsAvailable() throws FetcherException {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
@@ -72,7 +74,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @Test
     @Disabled("IEEE seems to block us")
-    void findByDOI() throws Exception {
+    void findByDOI() throws MalformedURLException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1109/ACCESS.2016.2535486");
         assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
@@ -80,7 +82,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @Test
     @Disabled("IEEE seems to block us")
-    void findByDocumentUrl() throws Exception {
+    void findByDocumentUrl() throws MalformedURLException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/document/7421926/");
         assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
@@ -88,7 +90,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @Test
     @Disabled("IEEE seems to block us")
-    void findByURL() throws Exception {
+    void findByURL() throws MalformedURLException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7421926&ref=");
         assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
@@ -96,7 +98,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @Test
     @Disabled("IEEE blocks us - works in browser")
-    void findByOldURL() throws Exception {
+    void findByOldURL() throws MalformedURLException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.URL, "https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7421926");
         assertEquals(Optional.of(URLUtil.create("https://ieeexplore.ieee.org/ielx7/6287639/7419931/07421926.pdf?tp=&arnumber=7421926&isnumber=7419931&ref=")),
                 fetcher.findFullText(entry));
@@ -104,7 +106,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
 
     @Test
     @Disabled("IEEE seems to block us")
-    void findByDOIButNotURL() throws Exception {
+    void findByDOIButNotURL() throws MalformedURLException, FetcherException {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.DOI, "10.1109/ACCESS.2016.2535486")
                 .withField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
@@ -113,19 +115,19 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     }
 
     @Test
-    void notFoundByURL() throws Exception {
+    void notFoundByURL() throws FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.URL, "http://dx.doi.org/10.1109/ACCESS.2016.2535486");
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
 
     @Test
-    void notFoundByDOI() throws Exception {
+    void notFoundByDOI() throws FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1021/bk-2006-WWW.ch014");
         assertEquals(Optional.empty(), fetcher.findFullText(entry));
     }
 
     @Test
-    void searchResultHasNoKeywordTerms() throws Exception {
+    void searchResultHasNoKeywordTerms() throws FetcherException {
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Shatakshi Sharma and Bhim Singh and Sukumar Mishra")
                 .withField(StandardField.DATE, "April 2020")
@@ -148,7 +150,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     }
 
     @Test
-    void searchByPlainQueryFindsEntry() throws Exception {
+    void searchByPlainQueryFindsEntry() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
@@ -156,7 +158,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
     }
 
     @Test
-    void searchByQuotedQueryFindsEntry() throws Exception {
+    void searchByQuotedQueryFindsEntry() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\"");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));

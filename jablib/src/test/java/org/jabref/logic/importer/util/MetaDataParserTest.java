@@ -10,6 +10,7 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.FieldFormatterCleanups;
 import org.jabref.logic.exporter.MetaDataSerializerTest;
 import org.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.model.entry.BibEntryTypeBuilder;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -68,7 +69,7 @@ public class MetaDataParserTest {
     }
 
     @Test
-    void saveActions() throws Exception {
+    void saveActions() throws ParseException {
         Map<String, String> data = Map.of("saveActions", "enabled;title[lower_case]");
         MetaDataParser metaDataParser = new MetaDataParser(new DummyFileUpdateMonitor());
         MetaData parsed = metaDataParser.parse(new MetaData(), data, ',');
@@ -84,7 +85,7 @@ public class MetaDataParserTest {
      * Ensures that the trailing semicolon (used as separator in .bib metadata) is handled and stripped properly.
      */
     @Test
-    void parsesUserSpecificBlgPathSuccessfully() throws Exception {
+    void parsesUserSpecificBlgPathSuccessfully() throws ParseException {
         String user = "testUser";
         String rawKey = "blgFilePath-" + user;
         String rawValue = "/home/user/test.blg;";

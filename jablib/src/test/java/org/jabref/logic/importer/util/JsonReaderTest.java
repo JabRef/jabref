@@ -14,20 +14,16 @@ class JsonReaderTest {
 
     @Test
     void nullStreamThrowsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> {
-            JsonReader.toJsonObject(null);
-        });
+        assertThrows(NullPointerException.class, () -> JsonReader.toJsonObject(null));
     }
 
     @Test
     void invalidJsonThrowsParserException() {
-        assertThrows(ParseException.class, () -> {
-            JsonReader.toJsonObject(new ByteArrayInputStream("invalid JSON".getBytes()));
-        });
+        assertThrows(ParseException.class, () -> JsonReader.toJsonObject(new ByteArrayInputStream("invalid JSON".getBytes())));
     }
 
     @Test
-    void emptyStringResultsInEmptyObject() throws Exception {
+    void emptyStringResultsInEmptyObject() throws ParseException {
         JSONObject result = JsonReader.toJsonObject(new ByteArrayInputStream("".getBytes()));
         assertEquals("{}", result.toString());
     }
@@ -35,13 +31,11 @@ class JsonReaderTest {
     @Test
     void arrayThrowsParserException() {
         // Reason: We expect a JSON object, not a JSON array
-        assertThrows(ParseException.class, () -> {
-            JsonReader.toJsonObject(new ByteArrayInputStream("[]".getBytes()));
-        });
+        assertThrows(ParseException.class, () -> JsonReader.toJsonObject(new ByteArrayInputStream("[]".getBytes())));
     }
 
     @Test
-    void exampleJsonResultsInSameJson() throws Exception {
+    void exampleJsonResultsInSameJson() throws ParseException {
         String input = "{\"name\":\"test\"}";
         JSONObject result = JsonReader.toJsonObject(new ByteArrayInputStream(input.getBytes()));
         assertEquals(input, result.toString());

@@ -10,6 +10,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.github.javakeyring.Keyring;
+import com.github.javakeyring.PasswordAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -199,7 +200,7 @@ class GuiPreferencesMigrationsTest {
     }
 
     @Test
-    void moveApiKeysToKeyRing() throws Exception {
+    void moveApiKeysToKeyRing() throws PasswordAccessException {
         final String V5_9_FETCHER_CUSTOM_KEY_NAMES = "fetcherCustomKeyNames";
         final String V5_9_FETCHER_CUSTOM_KEYS = "fetcherCustomKeys";
         final Keyring keyring = mock(Keyring.class);

@@ -2,6 +2,7 @@ package org.jabref.logic.ai.summarization;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -84,7 +85,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() throws ExecutionException, InterruptedException {
         LOGGER.debug("Starting summaries generation of several files for {}", groupName.get());
 
         List<Pair<? extends Future<?>, BibEntry>> futures = new ArrayList<>();

@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,7 +50,7 @@ public class UnlinkedFilesDialogViewModelTest {
 
     private UnlinkedFilesDialogViewModel viewModel;
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
 
         // Mock a base directory
@@ -71,7 +72,7 @@ public class UnlinkedFilesDialogViewModelTest {
     }
 
     @Test
-    public void startImportWithValidFilesTest() throws Exception {
+    public void startImportWithValidFilesTest() throws IOException {
         // Create temporary test files
         tempDir = Files.createTempDirectory("testDir");
         subDir = tempDir.resolve("subdir");
@@ -105,7 +106,7 @@ public class UnlinkedFilesDialogViewModelTest {
         List<Path> fileList = checkedFileListProperty.stream()
                                                      .map(item -> item.getValue().getPath())
                                                      .filter(path -> path.toFile().isFile())
-                                                     .map(path -> directory.relativize(path))
+                                                     .map(directory::relativize)
                                                      .collect(Collectors.toList());
         assertEquals(
                 List.of(directory.relativize(file1), directory.relativize(file2)),

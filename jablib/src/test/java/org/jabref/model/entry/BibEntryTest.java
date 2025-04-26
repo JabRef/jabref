@@ -1,5 +1,6 @@
 package org.jabref.model.entry;
 
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -255,7 +256,7 @@ class BibEntryTest {
     }
 
     @Test
-    void replaceOfLinkWorks() throws Exception {
+    void replaceOfLinkWorks() throws MalformedURLException {
         List<LinkedFile> files = new ArrayList<>();
         String urlAsString = "https://www.example.org/file.pdf";
         files.add(new LinkedFile(URLUtil.create(urlAsString), ""));

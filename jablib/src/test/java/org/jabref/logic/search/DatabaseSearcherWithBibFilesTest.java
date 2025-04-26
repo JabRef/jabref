@@ -1,5 +1,7 @@
 package org.jabref.logic.search;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.List;
@@ -91,11 +93,11 @@ class DatabaseSearcherWithBibFilesTest {
         postgreServer.shutdown();
     }
 
-    private BibDatabaseContext initializeDatabaseFromPath(String testFile) throws Exception {
+    private BibDatabaseContext initializeDatabaseFromPath(String testFile) throws URISyntaxException, IOException {
         return initializeDatabaseFromPath(Path.of(Objects.requireNonNull(DatabaseSearcherWithBibFilesTest.class.getResource(testFile)).toURI()));
     }
 
-    private BibDatabaseContext initializeDatabaseFromPath(Path testFile) throws Exception {
+    private BibDatabaseContext initializeDatabaseFromPath(Path testFile) throws IOException {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext databaseContext = spy(result.getDatabaseContext());
 
@@ -146,7 +148,7 @@ class DatabaseSearcherWithBibFilesTest {
 
     @ParameterizedTest
     @MethodSource
-    void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws Exception {
+    void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws URISyntaxException, IOException {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, flags), databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches();

@@ -680,7 +680,7 @@ class JStyleTest {
     }
 
     @Test
-    void emptyStringPropertyAndOxfordComma() throws Exception {
+    void emptyStringPropertyAndOxfordComma() throws IOException {
         JStyle style = new JStyle("test.jstyle", layoutFormatterPreferences, abbreviationRepository);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -700,7 +700,7 @@ class JStyleTest {
     }
 
     @Test
-    void isValidWithDefaultSectionAtTheStart() throws Exception {
+    void isValidWithDefaultSectionAtTheStart() throws IOException {
         JStyle style = new JStyle("testWithDefaultAtFirstLIne.jstyle", layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
     }

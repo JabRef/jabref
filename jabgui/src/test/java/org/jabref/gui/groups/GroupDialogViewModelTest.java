@@ -1,5 +1,6 @@
 package org.jabref.gui.groups;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -57,7 +58,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void validateExistingAbsolutePath() throws Exception {
+    void validateExistingAbsolutePath() throws IOException {
         var anAuxFile = temporaryFolder.resolve("auxfile.aux").toAbsolutePath();
 
         Files.createFile(anAuxFile);
@@ -75,7 +76,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void validateExistingRelativePath() throws Exception {
+    void validateExistingRelativePath() throws IOException {
         var anAuxFile = Path.of("auxfile.aux");
 
         // The file needs to exist
@@ -87,7 +88,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void hierarchicalContextFromGroup() throws Exception {
+    void hierarchicalContextFromGroup() {
         GroupHierarchyType groupHierarchyType = GroupHierarchyType.INCLUDING;
         when(group.getHierarchicalContext()).thenReturn(groupHierarchyType);
         viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, group, null, new DummyFileUpdateMonitor(), stateManager);
@@ -96,7 +97,7 @@ class GroupDialogViewModelTest {
     }
 
     @Test
-    void defaultHierarchicalContext() throws Exception {
+    void defaultHierarchicalContext() {
         GroupHierarchyType defaultHierarchicalContext = GroupHierarchyType.REFINING;
         when(preferences.getGroupsPreferences().getDefaultHierarchicalContext()).thenReturn(defaultHierarchicalContext);
         viewModel = new GroupDialogViewModel(dialogService, bibDatabaseContext, preferences, null, null, new DummyFileUpdateMonitor(), stateManager);

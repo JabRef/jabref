@@ -1,5 +1,6 @@
 package org.jabref.gui.openoffice;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,7 +80,7 @@ public class OOBibBase {
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
             BootstrapException,
-            CreationException {
+            CreationException, IOException, InterruptedException {
 
         this.dialogService = dialogService;
         this.connection = new OOBibBaseConnect(loPath, dialogService);

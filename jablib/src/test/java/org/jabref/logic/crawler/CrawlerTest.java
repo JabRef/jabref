@@ -1,5 +1,7 @@
 package org.jabref.logic.crawler;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,9 +12,11 @@ import javafx.collections.FXCollections;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -21,6 +25,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -53,7 +58,7 @@ class CrawlerTest {
      * Set up mocks and copies the study definition file into the test repository
      */
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws GitAPIException, URISyntaxException {
         setUpRepository();
 
         CitationKeyPatternPreferences citationKeyPatternPreferences = new CitationKeyPatternPreferences(
@@ -80,7 +85,7 @@ class CrawlerTest {
         entryTypesManager = new BibEntryTypesManager();
     }
 
-    private void setUpRepository() throws Exception {
+    private void setUpRepository() throws GitAPIException, URISyntaxException {
         Git git = Git.init()
                      .setDirectory(tempRepositoryDirectory.toFile())
                      .call();
@@ -94,14 +99,14 @@ class CrawlerTest {
         git.close();
     }
 
-    private void setUpTestStudyDefinitionFile() throws Exception {
+    private void setUpTestStudyDefinitionFile() throws URISyntaxException {
         Path destination = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
     }
 
     @Test
-    void whetherAllFilesAreCreated() throws Exception {
+    void whetherAllFilesAreCreated() throws IOException, ParseException, GitAPIException, SaveException {
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
                 gitHandler,
                 preferences,

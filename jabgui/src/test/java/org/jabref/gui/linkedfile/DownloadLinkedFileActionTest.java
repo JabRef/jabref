@@ -60,7 +60,7 @@ class DownloadLinkedFileActionTest {
     private WireMockServer wireMockServer;
 
     @BeforeEach
-    void setUp(@TempDir Path tempFolder) throws Exception {
+    void setUp(@TempDir Path tempFolder) throws IOException {
         entry = new BibEntry()
                 .withCitationKey("asdf");
 
@@ -199,7 +199,7 @@ class DownloadLinkedFileActionTest {
     }
 
     @Test
-    void removesHtmlFileLink(@TempDir Path tempFolder) throws Exception {
+    void removesHtmlFileLink(@TempDir Path tempFolder) throws MalformedURLException {
         stubFor(get(urlEqualTo("/html"))
                 .willReturn(aResponse()
                         .withStatus(200)

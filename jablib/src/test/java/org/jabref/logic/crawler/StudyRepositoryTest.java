@@ -1,6 +1,7 @@
 package org.jabref.logic.crawler;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,7 @@ import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.SaveConfiguration;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -30,6 +32,7 @@ import org.jabref.model.study.FetchResult;
 import org.jabref.model.study.QueryResult;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -63,7 +66,7 @@ class StudyRepositoryTest {
      * Set up mocks
      */
     @BeforeEach
-    void setUpMocks() throws Exception {
+    void setUpMocks() throws IOException, URISyntaxException {
         libraryPreferences = mock(LibraryPreferences.class, Answers.RETURNS_DEEP_STUBS);
         saveConfiguration = mock(SaveConfiguration.class, Answers.RETURNS_DEEP_STUBS);
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
@@ -124,14 +127,14 @@ class StudyRepositoryTest {
      * This tests whether the repository returns the stored bib entries correctly.
      */
     @Test
-    void bibEntriesCorrectlyStored() throws Exception {
+    void bibEntriesCorrectlyStored() throws IOException, URISyntaxException {
         setUpTestResultFile();
         List<BibEntry> result = studyRepository.getFetcherResultEntries("Quantum", "ArXiv").getEntries();
         assertEquals(getArXivQuantumMockResults(), result);
     }
 
     @Test
-    void fetcherResultsPersistedCorrectly() throws Exception {
+    void fetcherResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
         List<QueryResult> mockResults = getMockResults();
 
         studyRepository.persist(mockResults);
@@ -142,7 +145,7 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void mergedResultsPersistedCorrectly() throws Exception {
+    void mergedResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
         List<QueryResult> mockResults = getMockResults();
         List<BibEntry> expected = new ArrayList<>();
         expected.addAll(getArXivQuantumMockResults());
@@ -157,13 +160,13 @@ class StudyRepositoryTest {
     }
 
     @Test
-    void studyResultsPersistedCorrectly() throws Exception {
+    void studyResultsPersistedCorrectly() throws GitAPIException, SaveException, IOException, URISyntaxException {
         List<QueryResult> mockResults = getMockResults();
         studyRepository.persist(mockResults);
         assertEquals(new HashSet<>(getNonDuplicateBibEntryResult().getEntries()), new HashSet<>(getTestStudyRepository().getStudyResultEntries().getEntries()));
     }
 
-    private StudyRepository getTestStudyRepository() throws Exception {
+    private StudyRepository getTestStudyRepository() throws IOException, URISyntaxException {
         setUpTestStudyDefinitionFile();
         studyRepository = new StudyRepository(
                 tempRepositoryDirectory,
@@ -177,7 +180,7 @@ class StudyRepositoryTest {
     /**
      * Copies the study definition file into the test repository
      */
-    private void setUpTestStudyDefinitionFile() throws Exception {
+    private void setUpTestStudyDefinitionFile() throws URISyntaxException {
         Path destination = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         URL studyDefinition = this.getClass().getResource(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         FileUtil.copyFile(Path.of(studyDefinition.toURI()), destination, false);
@@ -187,7 +190,7 @@ class StudyRepositoryTest {
      * This overwrites the existing result file in the repository with a result file containing multiple BibEntries.
      * The repository has to exist before this method is called.
      */
-    private void setUpTestResultFile() throws Exception {
+    private void setUpTestResultFile() throws URISyntaxException {
         Path queryDirectory = Path.of(tempRepositoryDirectory.toString(), hashCodeQuantum + " - Quantum");
         Path resultFileLocation = Path.of(queryDirectory.toString(), "ArXiv" + ".bib");
         URL resultFile = this.getClass().getResource("ArXivQuantumMock.bib");

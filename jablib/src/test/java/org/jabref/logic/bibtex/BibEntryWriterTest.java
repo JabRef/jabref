@@ -51,7 +51,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void serialization() throws Exception {
+    void serialization() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 // set required fields
                 .withField(StandardField.AUTHOR, "Foo Bar")
@@ -76,7 +76,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void bibEntryTwoSpacesBeforeAndAfterKept() throws Exception {
+    void bibEntryTwoSpacesBeforeAndAfterKept() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "  two spaces before and after (before)  ")
                 .withChanged(true);
@@ -93,7 +93,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void bibEntryNotModified() throws Exception {
+    void bibEntryNotModified() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "  two spaces before and after  ")
                 .withChanged(true);
@@ -106,7 +106,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void writeOtherTypeTest() throws Exception {
+    void writeOtherTypeTest() throws IOException {
         String expected = """
                 @Other{test,
                   comment = {testentry},
@@ -123,7 +123,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void writeEntryWithFile() throws Exception {
+    void writeEntryWithFile() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         LinkedFile file = new LinkedFile("test", Path.of("/home/uers/test.pdf"), "PDF");
         entry.addFile(file);
@@ -138,7 +138,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void writeEntryWithOrField() throws Exception {
+    void writeEntryWithOrField() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.InBook)
                 // set a required OR field (author/editor)
                 .withField(StandardField.EDITOR, "Foo Bar")
@@ -163,7 +163,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void writeEntryWithOrFieldBothFieldsPresent() throws Exception {
+    void writeEntryWithOrFieldBothFieldsPresent() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.InBook)
                 // set a required OR field with both fields(author/editor)
                 .withField(StandardField.AUTHOR, "Foo Thor")
@@ -190,7 +190,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void writeReallyUnknownTypeTest() throws Exception {
+    void writeReallyUnknownTypeTest() throws IOException {
         String expected = """
                 @Reallyunknowntype{test,
                   comment = {testentry},
@@ -624,7 +624,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void constantMonthApril() throws Exception {
+    void constantMonthApril() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.MONTH, "#apr#");
         // enable writing
@@ -641,7 +641,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void monthApril() throws Exception {
+    void monthApril() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withField(StandardField.MONTH, "apr");
         // enable writing
@@ -658,7 +658,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void filenameIsUnmodifiedDuringWrite() throws Exception {
+    void filenameIsUnmodifiedDuringWrite() throws IOException {
         // source: https://github.com/JabRef/jabref/issues/7012#issuecomment-707788107
         String bibtexEntry = """
                     @Book{Hue17,

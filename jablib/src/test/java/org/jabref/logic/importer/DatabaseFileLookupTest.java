@@ -1,5 +1,6 @@
 package org.jabref.logic.importer;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -24,7 +25,7 @@ class DatabaseFileLookupTest {
     private BibEntry entry2;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws IOException {
         ParserResult result = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor())
                 .importDatabase(ImportDataTest.UNLINKED_FILES_TEST_BIB);
         database = result.getDatabase();

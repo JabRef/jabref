@@ -10,6 +10,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import javafx.scene.input.ClipboardContent;
 
 import org.jabref.gui.ClipBoardManager;
@@ -19,6 +22,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
@@ -99,7 +103,7 @@ public class ExportToClipboardAction extends SimpleCommand {
                                                              .executeWith(taskExecutor));
     }
 
-    private ExportResult exportToClipboard(Exporter exporter) throws Exception {
+    private ExportResult exportToClipboard(Exporter exporter) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         List<Path> fileDirForDatabase = stateManager.getActiveDatabase()
                                                     .map(db -> db.getFileDirectories(preferences.getFilePreferences()))
                                                     .orElse(List.of(preferences.getFilePreferences().getWorkingDirectory()));

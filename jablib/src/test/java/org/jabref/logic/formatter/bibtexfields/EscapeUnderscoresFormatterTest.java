@@ -15,12 +15,12 @@ class EscapeUnderscoresFormatterTest {
     }
 
     @Test
-    void formatReturnsSameTextIfNoUnderscoresPresent() throws Exception {
+    void formatReturnsSameTextIfNoUnderscoresPresent() {
         assertEquals("Lorem ipsum", formatter.format("Lorem ipsum"));
     }
 
     @Test
-    void formatEscapesUnderscoresIfPresent() throws Exception {
+    void formatEscapesUnderscoresIfPresent() {
         assertEquals("Lorem\\_ipsum", formatter.format("Lorem_ipsum"));
     }
 

@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ClipboardContentGeneratorTest {
 
     @Test
-    void processPreviewText() throws Exception {
+    void processPreviewText() {
         String expected = "Article (Smith2016)" + OS.NEWLINE +
                 "Smith, B.; Jones, B. &amp; Williams, J." + OS.NEWLINE +
                 "Taylor, P. (Ed.)" + OS.NEWLINE +
@@ -46,7 +46,7 @@ class ClipboardContentGeneratorTest {
     }
 
     @Test
-    void processPreviewHtml() throws Exception {
+    void processPreviewHtml() {
         String expected = "<font face=\"sans-serif\"><b><i>Article</i><a name=\"Smith2016\"> (Smith2016)</a></b><br>" + OS.NEWLINE +
                 " Smith, B.; Jones, B. &amp; Williams, J.<BR>" + OS.NEWLINE +
                 " Taylor, P. <i>(Ed.)</i><BR>" + OS.NEWLINE +
@@ -98,7 +98,7 @@ class ClipboardContentGeneratorTest {
     }
 
     @Test
-    void processText() throws Exception {
+    void processText() {
         String expected = "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE +
                 "[1]B. Smith, B. Jones, and J. Williams, “Title of the test entry,” BibTeX Journal, vol. 34, no. 3, pp. 45–67, Jul. 2016." + OS.NEWLINE;
 
@@ -110,7 +110,7 @@ class ClipboardContentGeneratorTest {
     }
 
     @Test
-    void processHtmlAsHtml() throws Exception {
+    void processHtmlAsHtml() {
         String expected = "<!DOCTYPE html>" + OS.NEWLINE +
                 "<html>" + OS.NEWLINE +
                 "   <head>" + OS.NEWLINE +

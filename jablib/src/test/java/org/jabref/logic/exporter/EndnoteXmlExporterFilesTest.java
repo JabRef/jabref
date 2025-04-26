@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
@@ -39,7 +42,7 @@ class EndnoteXmlExporterFilesTest {
     private EndnoteXmlImporter endnoteXmlImporter;
 
     @BeforeEach
-    void setUp(@TempDir Path testFolder) throws Exception {
+    void setUp(@TempDir Path testFolder) {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -65,7 +68,7 @@ class EndnoteXmlExporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    final void performExport(String filename) throws Exception {
+    final void performExport(String filename) throws URISyntaxException, IOException, TransformerException, SaveException, ParserConfigurationException {
         bibFileToExport = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(bibFileToExport).getDatabase().getEntries();
         exporter.export(databaseContext, exportFile, entries);
@@ -86,7 +89,7 @@ class EndnoteXmlExporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    final void exportAsEndnoteAndThenImportAsEndnote(String filename) throws Exception {
+    final void exportAsEndnoteAndThenImportAsEndnote(String filename) throws IOException, TransformerException, URISyntaxException, SaveException, ParserConfigurationException {
         bibFileToExport = Path.of(EndnoteXmlExporterFilesTest.class.getResource(filename).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(bibFileToExport).getDatabase().getEntries();
 

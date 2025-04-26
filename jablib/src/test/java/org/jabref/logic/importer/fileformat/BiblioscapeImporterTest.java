@@ -15,7 +15,7 @@ class BiblioscapeImporterTest {
     private BiblioscapeImporter importer;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         importer = new BiblioscapeImporter();
     }
 

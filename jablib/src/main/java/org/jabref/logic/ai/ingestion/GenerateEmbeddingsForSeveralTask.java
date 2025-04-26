@@ -2,6 +2,7 @@ package org.jabref.logic.ai.ingestion;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -72,7 +73,7 @@ public class GenerateEmbeddingsForSeveralTask extends BackgroundTask<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() throws ExecutionException, InterruptedException {
         LOGGER.debug("Starting embeddings generation of several files for {}", groupName.get());
 
         List<Pair<? extends Future<?>, String>> futures = new ArrayList<>();

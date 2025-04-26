@@ -14,6 +14,7 @@ import org.jabref.model.entry.types.UnknownEntryType;
 import org.jabref.support.DisabledOnCIServer;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,7 +57,7 @@ class ResearchGateTest {
     }
 
     @Test
-    void getDocumentByTitle() throws Exception {
+    void getDocumentByTitle() throws FetcherException, IOException {
         Optional<String> source = fetcher.getURLByString(entry.getTitle().get());
         assertTrue(source.isPresent() && source.get().startsWith(URL_PAGE));
     }
@@ -73,7 +74,7 @@ class ResearchGateTest {
     }
 
     @Test
-    void performSearchWithString() throws Exception {
+    void performSearchWithString() throws FetcherException {
         BibEntry master = new BibEntry(StandardEntryType.PhdThesis)
                 .withCitationKey("phdthesis")
                 .withField(StandardField.AUTHOR, "Diez, Tobias")
@@ -85,7 +86,7 @@ class ResearchGateTest {
     }
 
     @Test
-    void performSearchWithLuceneQuery() throws Exception {
+    void performSearchWithLuceneQuery() throws QueryNodeParseException, FetcherException {
         BibEntry master = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("article")
                 .withField(StandardField.TITLE, "Wine Microbiology and Predictive Microbiology: " +

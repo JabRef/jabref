@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -39,7 +40,7 @@ class AutoSetFileLinksUtilTest {
     private Path path = null;
 
     @BeforeEach
-    void setUp(@TempDir Path folder) throws Exception {
+    void setUp(@TempDir Path folder) throws IOException {
         path = folder.resolve("CiteKey.pdf");
         Files.createFile(path);
         entry.setCitationKey("CiteKey");
@@ -48,7 +49,7 @@ class AutoSetFileLinksUtilTest {
     }
 
     @Test
-    void findAssociatedNotLinkedFilesSuccess() throws Exception {
+    void findAssociatedNotLinkedFilesSuccess() throws IOException {
         when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
         List<LinkedFile> expected = List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
@@ -57,7 +58,7 @@ class AutoSetFileLinksUtilTest {
     }
 
     @Test
-    void findAssociatedNotLinkedFilesForEmptySearchDir() throws Exception {
+    void findAssociatedNotLinkedFilesForEmptySearchDir() throws IOException {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);

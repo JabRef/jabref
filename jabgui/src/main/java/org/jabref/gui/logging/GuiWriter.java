@@ -24,7 +24,7 @@ public class GuiWriter extends AbstractFormatPatternWriter {
     }
 
     @Override
-    public void write(LogEntry logEntry) throws Exception {
+    public void write(LogEntry logEntry) {
         LogMessages.getInstance().add(logEntry);
     }
 
@@ -33,6 +33,6 @@ public class GuiWriter extends AbstractFormatPatternWriter {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
     }
 }
