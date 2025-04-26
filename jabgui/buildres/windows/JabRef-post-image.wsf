@@ -16,6 +16,9 @@
         // Copy additional installer resources
         fileSystem.CopyFile(jabRefRoot + "/buildres/windows/JabRefTopBanner.bmp", installerConfig);
 
+        // JDK23: "main.wxs"; wix 3
+        // JDK24: ? - see https://bugs.openjdk.org/browse/JDK-8319457 and https://github.com/JabRef/jabref-issue-melting-pot/issues/867
+
         var wxsFilePath = installerConfig + "main.wxs";
         WScript.Echo("wxsFilePath: " + wxsFilePath);
         wxsFile = fileSystem.OpenTextFile(wxsFilePath, 1);
