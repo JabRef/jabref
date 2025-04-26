@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -28,7 +29,7 @@ class INSPIREFetcherTest {
     }
 
     @Test
-    void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws FetcherException {
         BibEntry master = new BibEntry(StandardEntryType.MastersThesis)
                 .withCitationKey("Diez:2013fdp")
                 .withField(StandardField.AUTHOR, "Diez, Tobias")
@@ -43,7 +44,7 @@ class INSPIREFetcherTest {
     }
 
     @Test
-    void searchByIdentifierFindsEntry() throws Exception {
+    void searchByIdentifierFindsEntry() throws FetcherException {
         BibEntry article = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Melnikov:1998pr")
                 .withField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander")
@@ -61,7 +62,7 @@ class INSPIREFetcherTest {
     }
 
     @Test
-    void searchByExistingEntry() throws Exception {
+    void searchByExistingEntry() throws FetcherException {
         BibEntry article = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("Melnikov:1998pr")
                 .withField(StandardField.AUTHOR, "Melnikov, Kirill and Yelkhovsky, Alexander")

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ public abstract class YearRangeByFilteringQueryTransformerTest<T extends YearRan
 
     @Override
     @Test
-    public void convertYearRangeField() throws Exception {
+    public void convertYearRangeField() throws QueryNodeParseException {
         YearRangeByFilteringQueryTransformer transformer = getTransformer();
 
         String queryString = "year-range:2018-2021";

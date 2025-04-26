@@ -60,7 +60,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @Disabled("Returns a DOI instead of the required link")
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByDOI() throws Exception {
+    void fullTextFindByDOI() throws URISyntaxException, FetcherException, IOException {
         BibEntry entry = new BibEntry().withField(StandardField.DOI, "10.1038/nrn3241");
         assertEquals(
                 Optional.of(new URI("https://europepmc.org/articles/pmc4907333?pdf=render").toURL()),
@@ -71,7 +71,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @DisabledOnCIServer("CI server is unreliable")
     @Disabled("Sometimes, does not find any thing")
-    void fullTextFindByDOIAlternate() throws Exception {
+    void fullTextFindByDOIAlternate() throws FetcherException, IOException, URISyntaxException {
         assertEquals(
                 Optional.of(new URI("https://pdfs.semanticscholar.org/7f6e/61c254bc2df38a784c1228f56c13317caded.pdf").toURL()),
                 fetcher.findFullText(new BibEntry()
@@ -95,7 +95,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @DisabledOnCIServer("CI server is unreliable")
-    void fullTextFindByArXiv() throws Exception {
+    void fullTextFindByArXiv() throws URISyntaxException, IOException, FetcherException {
         BibEntry entry = new BibEntry().withField(StandardField.EPRINT, "1407.3561")
                               .withField(StandardField.ARCHIVEPREFIX, "arXiv");
         assertEquals(
@@ -129,7 +129,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @Disabled("We seem to be blocked")
-    void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws FetcherException {
         BibEntry master = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Tobias Diez")
                 .withField(StandardField.TITLE, "Slice theorem for Fréchet group actions and covariant symplectic field theory")
@@ -145,7 +145,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @Disabled("We seem to be blocked")
-    void searchByPlainQueryFindsEntry() throws Exception {
+    void searchByPlainQueryFindsEntry() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
@@ -154,7 +154,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @Test
     @Disabled("We seem to be blocked")
-    void searchByQuotedQueryFindsEntry() throws Exception {
+    void searchByQuotedQueryFindsEntry() throws FetcherException {
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\"");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
@@ -162,13 +162,13 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    void performSearchByEmptyQuery() throws Exception {
+    void performSearchByEmptyQuery() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
     }
 
     @Test
     @Disabled("We seem to be blocked")
-    void findByEntry() throws Exception {
+    void findByEntry() throws FetcherException {
         BibEntry barrosEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.TITLE, "Formalising BPMN Service Interaction Patterns")
                 .withField(StandardField.AUTHOR, "Chiara Muzi and Luise Pufahl and Lorenzo Rossi and M. Weske and F. Tiezzi")

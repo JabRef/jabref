@@ -1,7 +1,9 @@
 package org.jabref.cli;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -29,6 +31,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
+import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -63,7 +66,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void auxImport(@TempDir Path tempDir) throws Exception {
+    void auxImport(@TempDir Path tempDir) throws URISyntaxException, ParseException {
         String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
         String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
 
@@ -83,7 +86,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void exportMatches(@TempDir Path tempDir) throws Exception {
+    void exportMatches(@TempDir Path tempDir) throws URISyntaxException, IOException, ParseException {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -113,7 +116,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws Exception {
+    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException, ParseException {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -144,7 +147,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void checkConsistency() throws Exception {
+    void checkConsistency() throws URISyntaxException, ParseException {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
@@ -169,7 +172,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void checkConsistencyPorcelain() throws Exception {
+    void checkConsistencyPorcelain() throws URISyntaxException, ParseException {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 

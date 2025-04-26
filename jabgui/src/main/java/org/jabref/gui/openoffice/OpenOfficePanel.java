@@ -436,7 +436,7 @@ public class OpenOfficePanel {
     private void connect() {
         Task<OOBibBase> connectTask = new Task<>() {
             @Override
-            protected OOBibBase call() throws BootstrapException, CreationException {
+            protected OOBibBase call() throws BootstrapException, CreationException, IOException, InterruptedException {
                 updateProgress(ProgressBar.INDETERMINATE_PROGRESS, ProgressBar.INDETERMINATE_PROGRESS);
 
                 Path path = Path.of(openOfficePreferences.getExecutablePath());
@@ -492,7 +492,7 @@ public class OpenOfficePanel {
         taskExecutor.execute(connectTask);
     }
 
-    private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException {
+    private OOBibBase createBibBase(Path loPath) throws BootstrapException, CreationException, IOException, InterruptedException {
         return new OOBibBase(loPath, dialogService, openOfficePreferences);
     }
 

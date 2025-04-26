@@ -19,7 +19,7 @@ class MsBibImporterTest {
     Importer importer = new MsBibImporter();
 
     @Test
-    final void isNotRecognizedFormat() throws Exception {
+    final void isNotRecognizedFormat() throws IOException, URISyntaxException {
         List<String> notAccepted = Arrays.asList("CopacImporterTest1.txt", "IsiImporterTest1.isi",
                 "IsiImporterTestInspec.isi", "emptyFile.xml", "IsiImporterTestWOS.isi");
         for (String s : notAccepted) {

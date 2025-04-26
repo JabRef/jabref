@@ -29,7 +29,7 @@ class EscapeDollarSignFormatterTest {
 
     @ParameterizedTest
     @MethodSource
-    void correctlyFormats(String expected, String input) throws Exception {
+    void correctlyFormats(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
 

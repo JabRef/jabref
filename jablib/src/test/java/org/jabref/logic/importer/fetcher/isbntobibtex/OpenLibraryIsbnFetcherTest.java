@@ -55,7 +55,7 @@ class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @Test
     @Override
-    public void authorsAreCorrectlyFormatted() throws Exception {
+    public void authorsAreCorrectlyFormatted() throws FetcherException {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Repository Eine Einführung")
                 .withField(StandardField.SUBTITLE, "Eine Einführung")
@@ -71,7 +71,7 @@ class OpenLibraryIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
+    void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("9785646216541"));

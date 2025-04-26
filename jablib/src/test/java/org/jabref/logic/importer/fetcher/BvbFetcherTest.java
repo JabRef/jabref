@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Test;
@@ -49,7 +52,7 @@ class BvbFetcherTest {
             .withField(StandardField.PUBLISHER, "{Addison-Wesley}");
 
     @Test
-    void performTest() throws Exception {
+    void performTest() throws FetcherException {
         String searchquery = "effective java author:bloch";
         List<BibEntry> result = fetcher.performSearch(searchquery);
         assertFalse(result.isEmpty());
@@ -61,7 +64,7 @@ class BvbFetcherTest {
     }
 
     @Test
-    void simpleSearchQueryURLCorrect() throws Exception {
+    void simpleSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, QueryNodeParseException {
         String query = "java jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
@@ -69,7 +72,7 @@ class BvbFetcherTest {
     }
 
     @Test
-    void complexSearchQueryURLCorrect() throws Exception {
+    void complexSearchQueryURLCorrect() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
         String query = "title:jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);

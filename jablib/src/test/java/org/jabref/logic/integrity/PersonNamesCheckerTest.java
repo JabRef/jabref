@@ -20,7 +20,7 @@ class PersonNamesCheckerTest {
     private PersonNamesChecker checkerb;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         BibDatabaseContext databaseContext = new BibDatabaseContext();
         databaseContext.setMode(BibDatabaseMode.BIBTEX);
         checker = new PersonNamesChecker(databaseContext);

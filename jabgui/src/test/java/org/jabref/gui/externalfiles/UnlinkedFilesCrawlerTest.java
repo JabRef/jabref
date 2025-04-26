@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class UnlinkedFilesCrawlerTest {
 
     @Test
-    void minimalGitIgnore(@TempDir Path testRoot) throws Exception {
+    void minimalGitIgnore(@TempDir Path testRoot) throws IOException {
         Files.writeString(testRoot.resolve(".gitignore"), """
                 *.png
                 """);

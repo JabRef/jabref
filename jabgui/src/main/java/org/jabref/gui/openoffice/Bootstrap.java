@@ -40,12 +40,15 @@ import com.sun.star.comp.helper.ComponentContextEntry;
 import com.sun.star.comp.loader.JavaLoader;
 import com.sun.star.comp.servicemanager.ServiceManager;
 import com.sun.star.connection.NoConnectException;
+import com.sun.star.container.ElementExistException;
 import com.sun.star.container.XSet;
 import com.sun.star.lang.XInitialization;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.lib.util.NativeLibraryLoader;
+import com.sun.star.loader.CannotActivateFactoryException;
 import com.sun.star.loader.XImplementationLoader;
+import com.sun.star.uno.Exception;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
@@ -74,7 +77,7 @@ public class Bootstrap {
     private static final Random RANDOM_PIPE_NAME = new Random();
     private static boolean M_LOADED_JUH = false;
 
-    private static void insertBasicFactories(XSet xSet, XImplementationLoader xImpLoader) throws Exception {
+    private static void insertBasicFactories(XSet xSet, XImplementationLoader xImpLoader) throws CannotActivateFactoryException, ElementExistException {
         // insert the factory of the loader
         xSet.insert(xImpLoader.activate("com.sun.star.comp.loader.JavaLoader", null, null, null));
 
@@ -177,7 +180,7 @@ public class Bootstrap {
      * <code>cppuhelper/defaultBootstrap_InitialComponentContext()</code>.
      * @throws Exception if things go awry.
      */
-    public static XComponentContext defaultBootstrap_InitialComponentContext() throws Exception {
+    public static XComponentContext defaultBootstrap_InitialComponentContext() {
         return defaultBootstrap_InitialComponentContext((String) null, (Map<String, String>) null);
     }
 
@@ -189,7 +192,7 @@ public class Bootstrap {
      * @return a freshly bootstrapped component context.
      * @throws Exception if things go awry.
      */
-    public static XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Hashtable<String, String> bootstrap_parameters) throws Exception {
+    public static XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Hashtable<String, String> bootstrap_parameters) {
         return defaultBootstrap_InitialComponentContext(ini_file, (Map<String, String>) bootstrap_parameters);
     }
 
@@ -204,7 +207,7 @@ public class Bootstrap {
      * @return a freshly bootstrapped component context.
      * @throws Exception if things go awry.
      */
-    public static XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Map<String, String> bootstrap_parameters) throws Exception {
+    public static XComponentContext defaultBootstrap_InitialComponentContext(String ini_file, Map<String, String> bootstrap_parameters) {
         // jni convenience: easier to iterate over array than calling Hashtable
         String pairs[] = null;
         if (null != bootstrap_parameters) {
@@ -245,7 +248,7 @@ public class Bootstrap {
         return UnoRuntime.queryInterface(XComponentContext.class, cppuhelper_bootstrap(ini_file, pairs, Bootstrap.class.getClassLoader()));
     }
 
-    private static native Object cppuhelper_bootstrap(String ini_file, String bootstrap_parameters[], ClassLoader loader) throws Exception;
+    private static native Object cppuhelper_bootstrap(String ini_file, String bootstrap_parameters[], ClassLoader loader);
 
     /**
      * Bootstraps the component context from a UNO installation.
@@ -254,7 +257,7 @@ public class Bootstrap {
      * @throws BootstrapException if things go awry.
      * @since UDK 3.1.0
      */
-    public static XComponentContext bootstrap(Path ooPath) throws BootstrapException {
+    public static XComponentContext bootstrap(Path ooPath) throws BootstrapException, IOException, InterruptedException {
         String[] defaultArgArray = getDefaultOptions();
         return bootstrap(defaultArgArray, ooPath);
     }
@@ -268,7 +271,7 @@ public class Bootstrap {
      * @see #getDefaultOptions()
      * @since LibreOffice 5.1
      */
-    public static XComponentContext bootstrap(String[] argArray, Path path) throws BootstrapException {
+    public static XComponentContext bootstrap(String[] argArray, Path path) throws BootstrapException, IOException, InterruptedException {
 
         XComponentContext xContext = null;
 
@@ -323,7 +326,7 @@ public class Bootstrap {
                     Thread.sleep(500);
                 }
             }
-        } catch (BootstrapException | RuntimeException e) {
+        } catch (BootstrapException | RuntimeException | InterruptedException | IOException e) {
             throw e;
         } catch (Exception e) {
             throw new BootstrapException(e);

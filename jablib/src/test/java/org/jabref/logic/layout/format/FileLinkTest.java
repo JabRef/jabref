@@ -17,7 +17,7 @@ class FileLinkTest {
     private ParamLayoutFormatter fileLinkLayoutFormatter;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         fileLinkLayoutFormatter = new FileLink(List.of(), "");
     }
 

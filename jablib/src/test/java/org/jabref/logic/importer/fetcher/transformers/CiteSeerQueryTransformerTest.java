@@ -29,7 +29,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
     @Override
     @Test
-    public void convertYearField() throws Exception {
+    public void convertYearField() throws QueryNodeParseException {
         String queryString = "year:2023";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -43,7 +43,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
     @Override
     @Test
-    public void convertYearRangeField() throws Exception {
+    public void convertYearRangeField() throws QueryNodeParseException {
         String queryString = "year-range:2019-2023";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -56,7 +56,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    void convertPageField() throws Exception {
+    void convertPageField() throws QueryNodeParseException {
         String queryString = "page:2";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -67,7 +67,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    void convertPageSizeField() throws Exception {
+    void convertPageSizeField() throws QueryNodeParseException {
         String queryString = "pageSize:20";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -78,7 +78,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    void convertSortByField() throws Exception {
+    void convertSortByField() throws QueryNodeParseException {
         String queryString = "sortBy:relevance";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -89,7 +89,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
     }
 
     @Test
-    void convertMultipleAuthors() throws Exception {
+    void convertMultipleAuthors() throws QueryNodeParseException {
         String queryString = "author:\"Wang Wei\" author:\"Zhang Pingwen\" author:\"Zhang Zhifei\"";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         CiteSeerQueryTransformer transformer = getTransformer();
@@ -100,7 +100,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
         assertEquals(authorsExpected, authorsActual);
     }
 
-    private static Stream<Arguments> getJSONWithYearVariations() throws FetcherException {
+    private static Stream<Arguments> getJSONWithYearVariations() {
         String baseString = "title:Ericksen-Leslie page:1 pageSize:20 must_have_pdf:false sortBy:relevance";
         List<String> withYearAndYearRange = List.of(
                 StringUtil.join(new String[]{baseString, "year:2020"}, " ", 0, 2),
@@ -116,7 +116,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
         List<JSONObject> actualJSONObjects = new ArrayList<>();
         withYearAndYearRange.forEach(requestStr -> {
-            QueryNode luceneQuery = null;
+            QueryNode luceneQuery;
             try {
                 luceneQuery = new StandardSyntaxParser().parse(requestStr, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
             } catch (QueryNodeParseException e) {
@@ -136,7 +136,7 @@ class CiteSeerQueryTransformerTest extends InfixTransformerTest<CiteSeerQueryTra
 
     @ParameterizedTest
     @MethodSource("getJSONWithYearVariations")
-    void compareJSONRequestsWithYearVariations(JSONObject expected, Integer yearStart, Integer yearEnd, JSONObject actual) throws Exception {
+    void compareJSONRequestsWithYearVariations(JSONObject expected, Integer yearStart, Integer yearEnd, JSONObject actual) {
         expected.put("yearStart", yearStart);
         expected.put("yearEnd", yearEnd);
         assertEquals(expected, actual);

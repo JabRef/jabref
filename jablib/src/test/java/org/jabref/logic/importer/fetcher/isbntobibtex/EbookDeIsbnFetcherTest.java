@@ -63,7 +63,7 @@ class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @Test
     @Override
-    public void authorsAreCorrectlyFormatted() throws Exception {
+    public void authorsAreCorrectlyFormatted() throws FetcherException {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withCitationKey("9783662585856")
                 .withField(StandardField.TITLE, "Fundamentals of Business Process Management")
@@ -85,7 +85,7 @@ class EbookDeIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * not available on ebook.de.
      */
     @Test
-    void searchForValidButNotFoundISBN() throws Exception {
+    void searchForValidButNotFoundISBN() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("3728128155"));
     }
 }

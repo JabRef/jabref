@@ -1,5 +1,6 @@
 package org.jabref.logic.util.io;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -30,7 +31,7 @@ class RegExpBasedFileFinderTest {
     private BibEntry entry;
 
     @BeforeEach
-    void setUp(@TempDir Path tempDir) throws Exception {
+    void setUp(@TempDir Path tempDir) throws IOException {
         entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setCitationKey("HipKro03");
@@ -55,7 +56,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void findFiles() throws Exception {
+    void findFiles() throws IOException {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article).withCitationKey("pdfInDatabase");
 
@@ -70,7 +71,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void yearAuthFirstPageFindFiles() throws Exception {
+    void yearAuthFirstPageFindFiles() throws IOException {
         // given
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("**/[year]_[auth]_[firstpage].*\\\\.[extension]", ',');
 
@@ -83,7 +84,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void findAssociatedFilesFindFileContainingBracketsFromBracketedExpression() throws Exception {
+    void findAssociatedFilesFindFileContainingBracketsFromBracketedExpression() throws IOException {
         var bibEntry = new BibEntry().withField(StandardField.TITLE, "Regexp from [A-Z]");
 
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[TITLE]\\\\.[extension]", ',');
@@ -95,7 +96,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void findAssociatedFilesFindCleanedFileFromBracketedExpression() throws Exception {
+    void findAssociatedFilesFindCleanedFileFromBracketedExpression() throws IOException {
         var bibEntry = new BibEntry().withField(StandardField.JOURNAL, "ACM/IEEE-CS");
 
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[JOURNAL]\\\\.[extension]", ',');
@@ -107,7 +108,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void findAssociatedFilesFindFileContainingParenthesizesFromBracketedExpression() throws Exception {
+    void findAssociatedFilesFindFileContainingParenthesizesFromBracketedExpression() throws IOException {
         var bibEntry = new BibEntry().withCitationKey("Guo_ICC_2010")
                                      .withField(StandardField.TITLE, "Ferroelectric Metal Organic Framework (MOF)")
                                      .withField(StandardField.AUTHOR, "Guo, M. and Cai, H.-L. and Xiong, R.-G.")
@@ -123,7 +124,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void authorWithDiacritics() throws Exception {
+    void authorWithDiacritics() throws IOException {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article).withCitationKey("Grazulis2017");
         localEntry.setField(StandardField.YEAR, "2017");
@@ -141,7 +142,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void findFileInSubdirectory() throws Exception {
+    void findFileInSubdirectory() throws IOException {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCitationKey("pdfInSubdirectory");
@@ -158,7 +159,7 @@ class RegExpBasedFileFinderTest {
     }
 
     @Test
-    void findFileNonRecursive() throws Exception {
+    void findFileNonRecursive() throws IOException {
         // given
         BibEntry localEntry = new BibEntry(StandardEntryType.Article);
         localEntry.setCitationKey("pdfInSubdirectory");

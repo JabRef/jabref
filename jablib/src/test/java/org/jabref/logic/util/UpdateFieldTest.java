@@ -25,7 +25,7 @@ class UpdateFieldTest {
     private BibEntry entry;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         entry = new BibEntry();
         entry.setChanged(false);
     }

@@ -1,5 +1,6 @@
 package org.jabref.logic.quality.consistency;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -27,7 +28,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     private BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
     @Test
-    void checkSimpleLibrary(@TempDir Path tempDir) throws Exception {
+    void checkSimpleLibrary(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
@@ -57,7 +58,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
-    void checkDifferentOutputSymbols(@TempDir Path tempDir) throws Exception {
+    void checkDifferentOutputSymbols(@TempDir Path tempDir) throws IOException {
         UnknownField customField = new UnknownField("custom");
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One") // required
@@ -88,7 +89,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
-    void checkComplexLibrary(@TempDir Path tempDir) throws Exception {
+    void checkComplexLibrary(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
@@ -134,7 +135,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
-    void checkLibraryWithoutIssuesWithOutPorcelain(@TempDir Path tempDir) throws Exception {
+    void checkLibraryWithoutIssuesWithOutPorcelain(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
@@ -156,7 +157,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
-    void checkLibraryWithoutIssuesWithPorcelain(@TempDir Path tempDir) throws Exception {
+    void checkLibraryWithoutIssuesWithPorcelain(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
@@ -175,7 +176,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
     @Test
     @Disabled("This test is only for manual generation of a report")
-    void checkManualInput() throws Exception {
+    void checkManualInput() throws IOException {
         Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
         Path txtFile = file.resolveSibling("biblio-cited.txt");
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();

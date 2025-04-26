@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FieldComparatorTest {
     @Test
-    void compareMonthFieldIdentity() throws Exception {
+    void compareMonthFieldIdentity() {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);
         BibEntry equal = new BibEntry()
                 .withField(StandardField.MONTH, "1");
@@ -26,7 +26,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareMonthFieldEquality() throws Exception {
+    void compareMonthFieldEquality() {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);
         BibEntry equal = new BibEntry()
                 .withField(StandardField.MONTH, "1");
@@ -37,7 +37,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareMonthFieldBiggerAscending() throws Exception {
+    void compareMonthFieldBiggerAscending() {
         FieldComparator comparator = new FieldComparator(StandardField.MONTH);
         BibEntry smaller = new BibEntry()
                 .withField(StandardField.MONTH, "jan");
@@ -48,7 +48,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareMonthFieldBiggerDescending() throws Exception {
+    void compareMonthFieldBiggerDescending() {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.MONTH), true);
         BibEntry smaller = new BibEntry()
                 .withField(StandardField.MONTH, "feb");
@@ -59,7 +59,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareYearFieldIdentity() throws Exception {
+    void compareYearFieldIdentity() {
         FieldComparator comparator = new FieldComparator(StandardField.YEAR);
         BibEntry equal = new BibEntry()
                 .withField(StandardField.YEAR, "2016");
@@ -68,7 +68,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareYearFieldEquality() throws Exception {
+    void compareYearFieldEquality() {
         FieldComparator comparator = new FieldComparator(StandardField.YEAR);
         BibEntry equal = new BibEntry()
                 .withField(StandardField.YEAR, "2016");
@@ -79,7 +79,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareYearFieldBiggerAscending() throws Exception {
+    void compareYearFieldBiggerAscending() {
         FieldComparator comparator = new FieldComparator(StandardField.YEAR);
         BibEntry smaller = new BibEntry()
                 .withField(StandardField.YEAR, "2000");
@@ -90,7 +90,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareYearFieldBiggerDescending() throws Exception {
+    void compareYearFieldBiggerDescending() {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.YEAR), true);
         BibEntry smaller = new BibEntry()
                 .withField(StandardField.YEAR, "2016");
@@ -101,7 +101,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareTypeFieldIdentity() throws Exception {
+    void compareTypeFieldIdentity() {
         FieldComparator comparator = new FieldComparator(InternalField.TYPE_HEADER);
         BibEntry equal = new BibEntry(StandardEntryType.Article);
 
@@ -109,7 +109,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareTypeFieldEquality() throws Exception {
+    void compareTypeFieldEquality() {
         FieldComparator comparator = new FieldComparator(InternalField.TYPE_HEADER);
         BibEntry equal = new BibEntry(StandardEntryType.Article);
         equal.setId("1");
@@ -120,7 +120,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareTypeFieldBiggerAscending() throws Exception {
+    void compareTypeFieldBiggerAscending() {
         FieldComparator comparator = new FieldComparator(InternalField.TYPE_HEADER);
         BibEntry smaller = new BibEntry(StandardEntryType.Article);
         BibEntry bigger = new BibEntry(StandardEntryType.Book);
@@ -129,7 +129,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareTypeFieldBiggerDescending() throws Exception {
+    void compareTypeFieldBiggerDescending() {
         FieldComparator comparator = new FieldComparator(new OrFields(InternalField.TYPE_HEADER), true);
         BibEntry bigger = new BibEntry(StandardEntryType.Article);
         BibEntry smaller = new BibEntry(StandardEntryType.Book);
@@ -138,7 +138,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareStringFieldsIdentity() throws Exception {
+    void compareStringFieldsIdentity() {
         FieldComparator comparator = new FieldComparator(StandardField.TITLE);
         BibEntry equal = new BibEntry()
                 .withField(StandardField.TITLE, "title");
@@ -147,7 +147,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareStringFieldsEquality() throws Exception {
+    void compareStringFieldsEquality() {
         FieldComparator comparator = new FieldComparator(StandardField.TITLE);
         BibEntry equal = new BibEntry()
                 .withField(StandardField.TITLE, "title");
@@ -158,7 +158,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareStringFieldsBiggerAscending() throws Exception {
+    void compareStringFieldsBiggerAscending() {
         FieldComparator comparator = new FieldComparator(StandardField.TITLE);
         BibEntry bigger = new BibEntry()
                 .withField(StandardField.TITLE, "b");
@@ -169,7 +169,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareStringFieldsBiggerDescending() throws Exception {
+    void compareStringFieldsBiggerDescending() {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.TITLE), true);
         BibEntry bigger = new BibEntry()
                 .withField(StandardField.TITLE, "a");
@@ -180,7 +180,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareNumericFieldsBiggerDescending() throws Exception {
+    void compareNumericFieldsBiggerDescending() {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.PMID), true);
         BibEntry smaller = new BibEntry()
                 .withField(StandardField.PMID, "234567");
@@ -191,7 +191,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareParsableWithNonParsableNumericFieldDescending() throws Exception {
+    void compareParsableWithNonParsableNumericFieldDescending() {
         FieldComparator comparator = new FieldComparator(new OrFields(StandardField.PMID), true);
         BibEntry parsable = new BibEntry()
                 .withField(StandardField.PMID, "123456");
@@ -252,7 +252,7 @@ class FieldComparatorTest {
     }
 
     @Test
-    void compareAuthorField() throws Exception {
+    void compareAuthorField() {
         FieldComparator comparator = new FieldComparator(StandardField.AUTHOR);
         BibEntry bigger = new BibEntry()
                 .withField(StandardField.AUTHOR, "Freund, Lucas");

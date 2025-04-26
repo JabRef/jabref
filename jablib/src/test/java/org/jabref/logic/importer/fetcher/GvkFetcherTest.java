@@ -1,5 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +68,7 @@ class GvkFetcherTest {
     }
 
     @Test
-    void simpleSearchQueryURLCorrect() throws Exception {
+    void simpleSearchQueryURLCorrect() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
         String query = "java jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);
@@ -73,7 +76,7 @@ class GvkFetcherTest {
     }
 
     @Test
-    void complexSearchQueryURLCorrect() throws Exception {
+    void complexSearchQueryURLCorrect() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
         String query = "kon:java tit:jdk";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         URL url = fetcher.getURLForQuery(luceneQuery);

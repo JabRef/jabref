@@ -1,5 +1,6 @@
 package org.jabref.logic.bst;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 
 import org.jabref.model.database.BibDatabase;
@@ -18,7 +19,7 @@ class BstPreviewLayoutTest {
     private final BibDatabaseContext bibDatabaseContext = new BibDatabaseContext();
 
     @Test
-    void generatePreviewForSimpleEntryUsingAbbr() throws Exception {
+    void generatePreviewForSimpleEntryUsingAbbr() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development");
@@ -28,7 +29,7 @@ class BstPreviewLayoutTest {
     }
 
     @Test
-    void monthMayIsCorrectlyRendered() throws Exception {
+    void monthMayIsCorrectlyRendered() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         BibEntry entry = new BibEntry().withField(StandardField.AUTHOR, "Oliver Kopp")
                                        .withField(StandardField.TITLE, "Thoughts on Development")
@@ -39,14 +40,14 @@ class BstPreviewLayoutTest {
     }
 
     @Test
-    void generatePreviewForSliceTheoremPaperUsingAbbr() throws Exception {
+    void generatePreviewForSliceTheoremPaperUsingAbbr() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("abbrv.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
         assertEquals("T. Diez. Slice theorem for fréchet group actions and covariant symplectic field theory. May 2014.", preview);
     }
 
     @Test
-    void generatePreviewForSliceTheoremPaperUsingIEEE() throws Exception {
+    void generatePreviewForSliceTheoremPaperUsingIEEE() throws URISyntaxException {
         BstPreviewLayout bstPreviewLayout = new BstPreviewLayout(Path.of(BstPreviewLayoutTest.class.getResource("IEEEtran.bst").toURI()));
         String preview = bstPreviewLayout.generatePreview(getSliceTheoremPaper(), bibDatabaseContext);
         assertEquals("T. Diez, \"Slice theorem for fréchet group actions and covariant symplectic field theory\" May 2014.", preview);

@@ -49,7 +49,7 @@ public class MSBibExportFormatFilesTest {
     }
 
     @BeforeEach
-    void setUp(@TempDir Path testFolder) throws Exception {
+    void setUp(@TempDir Path testFolder) throws IOException {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         exporter = new MSBibExporter();

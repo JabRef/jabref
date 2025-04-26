@@ -1,8 +1,12 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -28,7 +32,7 @@ class EndnoteXmlExporterTest {
     private BibEntry bookEntry;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences()).thenReturn(mock(BibEntryPreferences.class));
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
@@ -48,7 +52,7 @@ class EndnoteXmlExporterTest {
     }
 
     @Test
-    void exportForEmptyEntryList(@TempDir Path tempDir) throws Exception {
+    void exportForEmptyEntryList(@TempDir Path tempDir) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path file = tempDir.resolve("EmptyFile.xml");
 
         exporter.export(databaseContext, file, List.of());

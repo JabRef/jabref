@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -33,7 +34,7 @@ class LibraryOfCongressTest {
     }
 
     @Test
-    void performSearchById() throws Exception {
+    void performSearchById() throws FetcherException {
         BibEntry expected = new BibEntry()
                 .withField(StandardField.ADDRESS, "mau, Burlington, MA")
                 .withField(StandardField.AUTHOR, "West, Matthew")
@@ -53,7 +54,7 @@ class LibraryOfCongressTest {
     }
 
     @Test
-    void performSearchByEmptyId() throws Exception {
+    void performSearchByEmptyId() throws FetcherException {
         assertEquals(Optional.empty(), fetcher.performSearchById(""));
     }
 

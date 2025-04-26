@@ -1,11 +1,13 @@
 package org.jabref.logic.importer.fetcher;
 
+import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.util.URLUtil;
@@ -57,13 +59,13 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
             .withField(StandardField.YEAR, "2006");
 
     @Test
-    void searchByTitle() throws Exception {
+    void searchByTitle() throws FetcherException {
         List<BibEntry> entries = fetcher.performSearch("title: \"Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test\"");
         assertEquals(List.of(bibEntry), entries);
     }
 
     @Test
-    void searchById() throws Exception {
+    void searchById() throws FetcherException {
         Optional<BibEntry> actual = fetcher.performSearchById("90002164");
         // The URL date is always the current date in the US. No need to properly check it.
         actual.ifPresent(entry -> entry.clearField(StandardField.URLDATE));
@@ -71,13 +73,13 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     }
 
     @Test
-    void searchByUrlUsingId() throws Exception {
+    void searchByUrlUsingId() throws FetcherException {
         doiEntry.setField(StandardField.URLDATE, LocalDate.now().format(DateTimeFormatter.ISO_DATE));
         assertEquals(Optional.of(doiEntry), fetcher.performSearchById("https://www.jstor.org/stable/10.1086/501484?seq=1"));
     }
 
     @Test
-    void fetchPDF() throws Exception {
+    void fetchPDF() throws FetcherException, IOException {
         Optional<URL> url = fetcher.findFullText(bibEntry);
         assertEquals(Optional.of(URLUtil.create("https://www.jstor.org/stable/pdf/90002164.pdf")), url);
     }

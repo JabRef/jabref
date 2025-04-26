@@ -15,12 +15,12 @@ class EscapeAmpersandsFormatterTest {
     }
 
     @Test
-    void formatReturnsSameTextIfNoAmpersandsPresent() throws Exception {
+    void formatReturnsSameTextIfNoAmpersandsPresent() {
         assertEquals("Lorem ipsum", formatter.format("Lorem ipsum"));
     }
 
     @Test
-    void formatEscapesAmpersandsIfPresent() throws Exception {
+    void formatEscapesAmpersandsIfPresent() {
         assertEquals("Lorem\\&ipsum", formatter.format("Lorem&ipsum"));
     }
 
@@ -30,12 +30,12 @@ class EscapeAmpersandsFormatterTest {
     }
 
     @Test
-    void formatReturnsSameTextInNewUserDefinedLatexCommandIfNoAmpersandsPresent() throws Exception {
+    void formatReturnsSameTextInNewUserDefinedLatexCommandIfNoAmpersandsPresent() {
         assertEquals("\\newcommand[1]{Lorem ipsum}", formatter.format("\\newcommand[1]{Lorem ipsum}"));
     }
 
     @Test
-    void formatReturnsSameTextInLatexCommandIfOneAmpersandPresent() throws Exception {
+    void formatReturnsSameTextInLatexCommandIfOneAmpersandPresent() {
         assertEquals("\\textbf{Lorem\\&ipsum}", formatter.format("\\textbf{Lorem\\&ipsum}"));
     }
 }

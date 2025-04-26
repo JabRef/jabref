@@ -1,7 +1,10 @@
 package org.jabref.logic.xmp;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+
+import javax.xml.transform.TransformerException;
 
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Date;
@@ -86,7 +89,7 @@ class XmpUtilWriterTest {
     /**
      * Test for writing a PDF file with a single DublinCore metadata entry.
      */
-    void singleEntryWorks(BibEntry entry) throws Exception {
+    void singleEntryWorks(BibEntry entry) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeSingle.pdf", tempDir);
 
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entry, null);
@@ -101,22 +104,22 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void olly2018Works() throws Exception {
+    void olly2018Works() throws IOException, TransformerException {
         singleEntryWorks(olly2018);
     }
 
     @Test
-    void toral2006Works() throws Exception {
+    void toral2006Works() throws IOException, TransformerException {
         singleEntryWorks(toral2006);
     }
 
     @Test
-    void vapnik2000Works() throws Exception {
+    void vapnik2000Works() throws IOException, TransformerException {
         singleEntryWorks(vapnik2000);
     }
 
     @Test
-    void writeTwoBibEntries(@TempDir Path tempDir) throws Exception {
+    void writeTwoBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeTwo.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, toral2006);
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
@@ -131,7 +134,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void writeThreeBibEntries(@TempDir Path tempDir) throws Exception {
+    void writeThreeBibEntries(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeThree.pdf", tempDir);
         List<BibEntry> entries = List.of(olly2018, vapnik2000, toral2006);
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), entries, null);
@@ -146,7 +149,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void proctingBracesAreRemovedAtTitle(@TempDir Path tempDir) throws Exception {
+    void proctingBracesAreRemovedAtTitle(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
         BibEntry original = new BibEntry()
                 .withField(StandardField.TITLE, "Some {P}rotected {T}erm");
@@ -161,7 +164,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void proctingBracesAreKeptAtPages(@TempDir Path tempDir) throws Exception {
+    void proctingBracesAreKeptAtPages(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
         BibEntry original = new BibEntry()
                 .withField(StandardField.PAGES, "{55}-{99}");
@@ -174,7 +177,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void doubleDashAtPageNumberIsKept(@TempDir Path tempDir) throws Exception {
+    void doubleDashAtPageNumberIsKept(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef_writeBraces.pdf", tempDir);
         BibEntry original = new BibEntry()
                 .withField(StandardField.PAGES, "2--33");
@@ -187,7 +190,7 @@ class XmpUtilWriterTest {
     }
 
     @Test
-    void singleEntry(@TempDir Path tempDir) throws Exception {
+    void singleEntry(@TempDir Path tempDir) throws IOException, TransformerException {
         Path pdfFile = this.createDefaultFile("JabRef.pdf", tempDir);
         new XmpUtilWriter(xmpPreferences).writeXmp(pdfFile.toAbsolutePath(), List.of(vapnik2000), null);
         List<BibEntry> entryList = new XmpUtilReader().readXmp(pdfFile.toAbsolutePath(), xmpPreferences);
@@ -200,7 +203,7 @@ class XmpUtilWriterTest {
     /**
      * Creates a temporary PDF-file with a single empty page.
      */
-    private Path createDefaultFile(String fileName, Path tempDir) throws Exception {
+    private Path createDefaultFile(String fileName, Path tempDir) throws IOException {
         // create a default PDF
         Path pdfFile = tempDir.resolve(fileName);
         try (PDDocument pdf = new PDDocument()) {

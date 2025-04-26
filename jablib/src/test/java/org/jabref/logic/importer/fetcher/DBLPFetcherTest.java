@@ -65,7 +65,7 @@ class DBLPFetcherTest {
     }
 
     @Test
-    void findNothing() throws Exception {
+    void findNothing() throws FetcherException {
         assertEquals(List.of(), dblpFetcher.performSearch(""));
     }
 }

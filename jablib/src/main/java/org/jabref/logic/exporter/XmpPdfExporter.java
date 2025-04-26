@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import javax.xml.transform.TransformerException;
+
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -32,7 +34,7 @@ public class XmpPdfExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path pdfFile, List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path pdfFile, List<BibEntry> entries) throws IOException, TransformerException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(pdfFile);
         Objects.requireNonNull(entries);

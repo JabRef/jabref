@@ -16,27 +16,27 @@ class RemoveBracketsTest {
     }
 
     @Test
-    void bracePairCorrectlyRemoved() throws Exception {
+    void bracePairCorrectlyRemoved() {
         assertEquals("some text", formatter.format("{some text}"));
     }
 
     @Test
-    void singleOpeningBraceCorrectlyRemoved() throws Exception {
+    void singleOpeningBraceCorrectlyRemoved() {
         assertEquals("some text", formatter.format("{some text"));
     }
 
     @Test
-    void singleClosingBraceCorrectlyRemoved() throws Exception {
+    void singleClosingBraceCorrectlyRemoved() {
         assertEquals("some text", formatter.format("some text}"));
     }
 
     @Test
-    void bracePairWithEscapedBackslashCorrectlyRemoved() throws Exception {
+    void bracePairWithEscapedBackslashCorrectlyRemoved() {
         assertEquals("\\some text\\", formatter.format("\\{some text\\}"));
     }
 
     @Test
-    void withoutBracketsUnmodified() throws Exception {
+    void withoutBracketsUnmodified() {
         assertEquals("some text", formatter.format("some text"));
     }
 }

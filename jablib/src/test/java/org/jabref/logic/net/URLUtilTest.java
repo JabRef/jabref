@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class URLUtilTest {
 
     @Test
-    void cleanGoogleSearchURL() throws Exception {
+    void cleanGoogleSearchURL() {
         // empty text
         assertEquals("", URLUtil.cleanGoogleSearchURL(""));
         assertEquals(" ", URLUtil.cleanGoogleSearchURL(" "));

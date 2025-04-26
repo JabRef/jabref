@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -35,7 +36,7 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws FetcherException {
         BibEntry firstArticle = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.AUTHOR, "Nichols, Cathrine and Blume, Eugen and DruckVerlag Kettler GmbH")
                 .withField(StandardField.PUBLISHER, "Verlag Kettler")
@@ -82,7 +83,7 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     }
 
     @Test
-    void searchByEmptyQueryFindsNothing() throws Exception {
+    void searchByEmptyQueryFindsNothing() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
     }
 

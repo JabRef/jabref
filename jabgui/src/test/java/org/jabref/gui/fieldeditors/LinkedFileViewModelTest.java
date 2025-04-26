@@ -71,7 +71,7 @@ class LinkedFileViewModelTest {
     private CookieManager cookieManager;
 
     @BeforeEach
-    void setUp(@TempDir Path tempFolder) throws Exception {
+    void setUp(@TempDir Path tempFolder) throws IOException {
         entry = new BibEntry()
                 .withCitationKey("asdf");
 

@@ -1,5 +1,6 @@
 package org.jabref.logic.integrity;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -44,28 +45,28 @@ import static org.mockito.Mockito.when;
 class IntegrityCheckTest {
 
     @Test
-    void bibTexAcceptsStandardEntryType() throws Exception {
+    void bibTexAcceptsStandardEntryType() {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    void bibTexDoesNotAcceptIEEETranEntryType() throws Exception {
+    void bibTexDoesNotAcceptIEEETranEntryType() {
         assertWrong(withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBTEX));
     }
 
     @Test
-    void bibLaTexAcceptsIEEETranEntryType() throws Exception {
+    void bibLaTexAcceptsIEEETranEntryType() {
         assertCorrect((withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBLATEX)));
     }
 
     @Test
-    void bibLaTexAcceptsStandardEntryType() throws Exception {
+    void bibLaTexAcceptsStandardEntryType() {
         assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", StandardEntryType.Article), BibDatabaseMode.BIBLATEX));
     }
 
     @ParameterizedTest
     @MethodSource("provideCorrectFormat")
-    void authorNameChecksCorrectFormat(String input) throws Exception {
+    void authorNameChecksCorrectFormat(String input) {
         for (Field field : FieldFactory.getPersonNameFields()) {
             assertCorrect(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
         }
@@ -73,7 +74,7 @@ class IntegrityCheckTest {
 
     @ParameterizedTest
     @MethodSource("provideIncorrectFormat")
-    void authorNameChecksIncorrectFormat(String input) throws Exception {
+    void authorNameChecksIncorrectFormat(String input) {
         for (Field field : FieldFactory.getPersonNameFields()) {
             assertWrong(withMode(createContext(field, input), BibDatabaseMode.BIBLATEX));
         }
@@ -91,7 +92,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void fileChecks() throws Exception {
+    void fileChecks() {
         MetaData metaData = mock(MetaData.class);
         Mockito.when(metaData.getLibrarySpecificFileDirectory()).thenReturn(Optional.of("."));
         Mockito.when(metaData.getUserFileDirectory(any(String.class))).thenReturn(Optional.empty());
@@ -105,7 +106,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws Exception {
+    void fileCheckFindsFilesRelativeToBibFile(@TempDir Path testFolder) throws IOException {
         Path bibFile = testFolder.resolve("lit.bib");
         Files.createFile(bibFile);
         Path pdfFile = testFolder.resolve("file.pdf");

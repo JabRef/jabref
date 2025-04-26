@@ -1,9 +1,13 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -57,9 +61,9 @@ public abstract class Exporter {
      * @param file            the file to write to
      * @param entries         a list containing all entries that should be exported
      */
-    public abstract void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception;
+    public abstract void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws IOException, TransformerException, ParserConfigurationException, SaveException;
 
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries, List<Path> fileDirForDatabase, JournalAbbreviationRepository abbreviationRepository) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries, List<Path> fileDirForDatabase, JournalAbbreviationRepository abbreviationRepository) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         export(databaseContext, file, entries);
     }
 
@@ -72,13 +76,13 @@ public abstract class Exporter {
      * @param entriesToWrite         the content that we want to export to the pdfs
      * @param abbreviationRepository the opened repository of journal abbreviations
      * @return whether any file was written on
-     * @throws Exception if the writing fails
+     * @throws IOException if the writing fails
      */
     public boolean exportToAllFilesOfEntry(BibDatabaseContext databaseContext,
                                            FilePreferences filePreferences,
                                            BibEntry entryToWriteOn,
                                            List<BibEntry> entriesToWrite,
-                                           JournalAbbreviationRepository abbreviationRepository) throws Exception {
+                                           JournalAbbreviationRepository abbreviationRepository) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         boolean writtenToAFile = false;
 
         for (LinkedFile file : entryToWriteOn.getFiles()) {
@@ -105,12 +109,12 @@ public abstract class Exporter {
      * @param filePath               the path to the file we want to write on
      * @param abbreviationRepository the opened repository of journal abbreviations
      * @return whether the file was written on at least once
-     * @throws Exception if the writing fails
+     * @throws IOException if the writing fails
      */
     public boolean exportToFileByPath(BibDatabaseContext databaseContext,
                                       FilePreferences filePreferences,
                                       Path filePath,
-                                      JournalAbbreviationRepository abbreviationRepository) throws Exception {
+                                      JournalAbbreviationRepository abbreviationRepository) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         if (!Files.exists(filePath)) {
             return false;
         }

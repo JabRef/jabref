@@ -71,7 +71,7 @@ class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @Test
     @Override
-    public void authorsAreCorrectlyFormatted() throws Exception {
+    public void authorsAreCorrectlyFormatted() throws FetcherException {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Repository")
                 .withField(StandardField.SUBTITLE, "Eine Einführung")
@@ -96,14 +96,14 @@ class GVKIsbnFetcherTest extends AbstractIsbnFetcherTest {
      * Checks whether the given ISBN is <emph>NOT</emph> available at any ISBN fetcher
      */
     @Test
-    void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws Exception {
+    void isbnNeitherAvailableOnEbookDeNorOrViaOpenLibrary() throws FetcherException {
         // In this test, the ISBN needs to be a valid (syntax+checksum) ISBN number
         // However, the ISBN number must not be assigned to a real book
        assertEquals(Optional.empty(), fetcher.performSearchById("9785646216541"));
     }
 
     @Test
-    void eResourceIsbnIsReturnedAsBoook() throws Exception {
+    void eResourceIsbnIsReturnedAsBoook() throws FetcherException {
         assertEquals(Optional.of(StandardEntryType.Book), fetcher.performSearchById("978-0-8229-4557-4").map(BibEntry::getType));
     }
 }

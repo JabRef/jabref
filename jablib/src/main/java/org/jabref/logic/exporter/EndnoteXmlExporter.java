@@ -11,9 +11,11 @@ import java.util.SequencedMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -101,7 +103,7 @@ public class EndnoteXmlExporter extends Exporter {
     }
 
     @Override
-    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
+    public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws ParserConfigurationException, TransformerException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(file);
         Objects.requireNonNull(entries);

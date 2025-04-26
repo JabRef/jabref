@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +50,7 @@ class EndnoteXmlImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws ImportException, IOException {
         ImporterTestEngine.testImportEntries(new EndnoteXmlImporter(importFormatPreferences), fileName, FILE_ENDING);
     }
 }

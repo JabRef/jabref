@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -40,7 +41,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     }
 
     @Test
-    void searchByQueryFindsEntry() throws Exception {
+    void searchByQueryFindsEntry() throws FetcherException {
 
         BibEntry articleTagThatIssue = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Santos, Fabio and Vargovich, Joseph and Trinkenreich, Bianca and Santos, Italo and Penney, Jacob and Britto, Ricardo and Pimentel, João Felipe and Wiese, Igor and Steinmacher, Igor and Sarma, Anita and Gerosa, Marco A.")
@@ -153,7 +154,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     }
 
     @Test
-    void searchByEmptyQueryFindsNothing() throws Exception {
+    void searchByEmptyQueryFindsNothing() throws FetcherException {
         assertEquals(List.of(), fetcher.performSearch(""));
     }
 
@@ -183,7 +184,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Test
     @Disabled("401 as of 2024-08-18")
-    void supportsPhraseSearch() throws Exception {
+    void supportsPhraseSearch() throws FetcherException {
         // Normal search should match due to Redmiles, Elissa M., phrase search on the other hand should not find it.
         BibEntry expected = new BibEntry(StandardEntryType.InCollection)
                 .withField(StandardField.AUTHOR, "Booth, Kayla M. and Dosono, Bryan and Redmiles, Elissa M. and Morales, Miraida and Depew, Michael and Farzan, Rosta and Herman, Everett and Trahan, Keith and Tananis, Cindy")
@@ -209,7 +210,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Test
     @Disabled("401 as of 2024-08-18")
-    void supportsBooleanANDSearch() throws Exception {
+    void supportsBooleanANDSearch() throws FetcherException {
         List<BibEntry> resultJustByAuthor = fetcher.performSearch("author:\"Redmiles, David\"");
         List<BibEntry> result = fetcher.performSearch("author:\"Redmiles, David\" AND journal:\"Computer Supported Cooperative Work\"");
 

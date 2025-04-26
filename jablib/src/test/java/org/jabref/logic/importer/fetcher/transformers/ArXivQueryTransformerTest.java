@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 
 import java.util.Optional;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ class ArXivQueryTransformerTest extends YearRangeByFilteringQueryTransformerTest
 
     @Override
     @Test
-    public void convertYearField() throws Exception {
+    public void convertYearField() throws QueryNodeParseException {
         ArXivQueryTransformer transformer = getTransformer();
         String queryString = "year:2018";
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);

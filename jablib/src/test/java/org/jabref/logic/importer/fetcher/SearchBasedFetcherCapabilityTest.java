@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.database.BibDatabaseMode;
@@ -34,7 +35,7 @@ interface SearchBasedFetcherCapabilityTest {
      * Test whether the library API supports author field search.
      */
     @Test
-    default void supportsAuthorSearch() throws Exception {
+    default void supportsAuthorSearch() throws FetcherException {
         StringJoiner queryBuilder = new StringJoiner("\" AND author:\"", "author:\"", "\"");
         getTestAuthors().forEach(queryBuilder::add);
 
@@ -56,7 +57,7 @@ interface SearchBasedFetcherCapabilityTest {
      * Test whether the library API supports year field search.
      */
     @Test
-    default void supportsYearSearch() throws Exception {
+    default void supportsYearSearch() throws FetcherException {
         List<BibEntry> result = getFetcher().performSearch("year:" + getTestYear());
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
@@ -75,7 +76,7 @@ interface SearchBasedFetcherCapabilityTest {
      * Test whether the library API supports year range search.
      */
     @Test
-    default void supportsYearRangeSearch() throws Exception {
+    default void supportsYearRangeSearch() throws FetcherException {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
         List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
@@ -99,7 +100,7 @@ interface SearchBasedFetcherCapabilityTest {
      * is related to a failed read by the Bibtex Parser (title is formatted in a weird way)
      */
     @Test
-    default void supportsJournalSearch() throws Exception {
+    default void supportsJournalSearch() throws FetcherException {
         List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());

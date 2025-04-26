@@ -37,7 +37,7 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearch
     }
 
     @Test
-    void linkFound() throws Exception {
+    void linkFound() throws IOException, FetcherException {
         entry.setField(StandardField.TITLE, "Towards Application Portability in Platform as a Service");
 
         assertEquals(

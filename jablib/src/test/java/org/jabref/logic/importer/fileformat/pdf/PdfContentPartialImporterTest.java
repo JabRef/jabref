@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -22,14 +23,14 @@ class PdfContentPartialImporterTest {
     private final PdfContentImporter importer = new PdfContentImporter();
 
     @Test
-    void doesNotHandleEncryptedPdfs() throws Exception {
+    void doesNotHandleEncryptedPdfs() throws URISyntaxException {
         Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(List.of(), result);
     }
 
     @Test
-    void importTwiceWorksAsExpected() throws Exception {
+    void importTwiceWorksAsExpected() throws URISyntaxException {
         Path file = Path.of(PdfContentImporter.class.getResource("/pdfs/minimal.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
@@ -167,7 +168,7 @@ class PdfContentPartialImporterTest {
 
     @ParameterizedTest
     @MethodSource("providePdfData")
-    void pdfTitleExtraction(String expectedTitle, String filePath) throws Exception {
+    void pdfTitleExtraction(String expectedTitle, String filePath) throws URISyntaxException {
         Path file = Path.of(Objects.requireNonNull(PdfContentImporter.class.getResource(filePath)).toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(Optional.of(expectedTitle), result.getFirst().getTitle());

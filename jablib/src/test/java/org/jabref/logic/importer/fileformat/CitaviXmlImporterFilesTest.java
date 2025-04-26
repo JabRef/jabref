@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ImportException;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -36,7 +38,7 @@ class CitaviXmlImporterFilesTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws ImportException, IOException {
         ImporterTestEngine.testImportEntries(citaviXmlImporter, fileName, FILE_ENDING);
     }
 }

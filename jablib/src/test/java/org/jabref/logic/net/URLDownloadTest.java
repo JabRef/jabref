@@ -1,12 +1,14 @@
 package org.jabref.logic.net;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.support.DisabledOnCIServer;
@@ -35,21 +37,21 @@ class URLDownloadTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(URLDownloadTest.class);
 
     @Test
-    void stringDownloadWithSetEncoding() throws Exception {
+    void stringDownloadWithSetEncoding() throws MalformedURLException, FetcherException {
         URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.asString().contains("Google"), "google.com should contain google");
     }
 
     @Test
-    void stringDownload() throws Exception {
+    void stringDownload() throws MalformedURLException, FetcherException {
         URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.asString(StandardCharsets.UTF_8).contains("Google"), "google.com should contain google");
     }
 
     @Test
-    void fileDownload() throws Exception {
+    void fileDownload() throws IOException, FetcherException {
         File destination = File.createTempFile("jabref-test", ".html");
         try {
             URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
@@ -64,14 +66,14 @@ class URLDownloadTest {
     }
 
     @Test
-    void determineMimeType() throws Exception {
+    void determineMimeType() throws MalformedURLException {
         URLDownload dl = new URLDownload(URLUtil.create("http://www.google.com"));
 
         assertTrue(dl.getMimeType().get().startsWith("text/html"));
     }
 
     @Test
-    void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws Exception {
+    void downloadToTemporaryFilePathWithoutFileSavesAsTmpFile() throws MalformedURLException, FetcherException {
         URLDownload google = new URLDownload(URLUtil.create("http://www.google.com"));
 
         String path = google.toTemporaryFile().toString();
@@ -79,7 +81,7 @@ class URLDownloadTest {
     }
 
     @Test
-    void downloadToTemporaryFileKeepsName() throws Exception {
+    void downloadToTemporaryFileKeepsName() throws MalformedURLException, FetcherException {
         URLDownload google = new URLDownload(URLUtil.create("https://github.com/JabRef/jabref/blob/main/LICENSE"));
 
         String path = google.toTemporaryFile().toString();
@@ -88,7 +90,7 @@ class URLDownloadTest {
 
     @Test
     @DisabledOnCIServer("CI Server is apparently blocked")
-    void downloadOfFTPSucceeds() throws Exception {
+    void downloadOfFTPSucceeds() throws MalformedURLException, FetcherException {
         URLDownload ftp = new URLDownload(URLUtil.create("ftp://ftp.informatik.uni-stuttgart.de/pub/library/ncstrl.ustuttgart_fi/INPROC-2016-15/INPROC-2016-15.pdf"));
 
         Path path = ftp.toTemporaryFile();
@@ -96,7 +98,7 @@ class URLDownloadTest {
     }
 
     @Test
-    void downloadOfHttpSucceeds() throws Exception {
+    void downloadOfHttpSucceeds() throws MalformedURLException, FetcherException {
         URLDownload ftp = new URLDownload(URLUtil.create("http://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
@@ -104,7 +106,7 @@ class URLDownloadTest {
     }
 
     @Test
-    void downloadOfHttpsSucceeds() throws Exception {
+    void downloadOfHttpsSucceeds() throws MalformedURLException, FetcherException {
         URLDownload ftp = new URLDownload(URLUtil.create("https://www.jabref.org"));
 
         Path path = ftp.toTemporaryFile();
@@ -135,19 +137,19 @@ class URLDownloadTest {
     }
 
     @Test
-    void test503ErrorThrowsFetcherServerException() throws Exception {
+    void test503ErrorThrowsFetcherServerException() throws MalformedURLException {
         URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/503"));
         assertThrows(FetcherServerException.class, urlDownload::asString);
     }
 
     @Test
-    void test429ErrorThrowsFetcherClientException() throws Exception {
+    void test429ErrorThrowsFetcherClientException() throws MalformedURLException {
         URLDownload urlDownload = new URLDownload(URLUtil.create("http://httpstat.us/429"));
         assertThrows(FetcherClientException.class, urlDownload::asString);
     }
 
     @Test
-    void redirectWorks(@TempDir Path tempDir) throws Exception {
+    void redirectWorks(@TempDir Path tempDir) throws IOException, FetcherException {
         WireMockServer wireMockServer = new WireMockServer(2222);
         wireMockServer.start();
         configureFor("localhost", 2222);

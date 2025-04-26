@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.util;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -36,14 +37,14 @@ class GroupsParserTest {
     private MetaData metaData;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         fileMonitor = new DummyFileUpdateMonitor();
         metaData = new MetaData();
     }
 
     @Test
     // For https://github.com/JabRef/jabref/issues/1681
-    void fromStringParsesExplicitGroupWithEscapedCharacterInName() throws Exception {
+    void fromStringParsesExplicitGroupWithEscapedCharacterInName() throws ParseException {
         ExplicitGroup expected = new ExplicitGroup("B{\\\"{o}}hmer", GroupHierarchyType.INDEPENDENT, ',');
         AbstractGroup parsed = GroupsParser.fromString("ExplicitGroup:B{\\\\\"{o}}hmer;0;", ',', fileMonitor, metaData);
 
@@ -51,26 +52,26 @@ class GroupsParserTest {
     }
 
     @Test
-    void keywordDelimiterThatNeedsToBeEscaped() throws Exception {
+    void keywordDelimiterThatNeedsToBeEscaped() throws ParseException {
         AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ';', '>');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;\\;;>;1;;;;;", ';', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 
     @Test
-    void hierarchicalDelimiterThatNeedsToBeEscaped() throws Exception {
+    void hierarchicalDelimiterThatNeedsToBeEscaped() throws ParseException {
         AutomaticGroup expected = new AutomaticKeywordGroup("group1", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', ';');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:group1;0;keywords;,;\\;;1;;;;;", ';', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 
     @Test
-    void fromStringThrowsParseExceptionForNotEscapedGroupName() throws Exception {
+    void fromStringThrowsParseExceptionForNotEscapedGroupName() {
         assertThrows(ParseException.class, () -> GroupsParser.fromString("ExplicitGroup:slit\\\\;0\\;mertsch_slit2_2007\\;;", ',', fileMonitor, metaData));
     }
 
     @Test
-    void importSubGroups() throws Exception {
+    void importSubGroups() throws ParseException {
 
         List<String> orderedData = Arrays.asList("0 AllEntriesGroup:", "1 ExplicitGroup:1;0;",
                 "2 ExplicitGroup:2;0;", "0 ExplicitGroup:3;0;");
@@ -97,7 +98,7 @@ class GroupsParserTest {
     }
 
     @Test
-    void fromStringParsesExplicitGroupWithIconAndDescription() throws Exception {
+    void fromStringParsesExplicitGroupWithIconAndDescription() throws ParseException {
         ExplicitGroup expected = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         expected.setIconName("test icon");
         expected.setExpanded(true);
@@ -109,33 +110,33 @@ class GroupsParserTest {
     }
 
     @Test
-    void fromStringParsesAutomaticKeywordGroup() throws Exception {
+    void fromStringParsesAutomaticKeywordGroup() throws ParseException {
         AutomaticGroup expected = new AutomaticKeywordGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
         AbstractGroup parsed = GroupsParser.fromString("AutomaticKeywordGroup:myAutomaticGroup;0;keywords;,;>;1;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 
     @Test
-    void fromStringParsesAutomaticPersonGroup() throws Exception {
+    void fromStringParsesAutomaticPersonGroup() throws ParseException {
         AutomaticPersonsGroup expected = new AutomaticPersonsGroup("myAutomaticGroup", GroupHierarchyType.INDEPENDENT, StandardField.AUTHOR);
         AbstractGroup parsed = GroupsParser.fromString("AutomaticPersonsGroup:myAutomaticGroup;0;author;1;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 
     @Test
-    void fromStringParsesTexGroup() throws Exception {
+    void fromStringParsesTexGroup() throws ParseException, IOException {
         TexGroup expected = TexGroup.create("myTexGroup", GroupHierarchyType.INDEPENDENT, Path.of("path", "To", "File"), new DefaultAuxParser(new BibDatabase()), metaData);
         AbstractGroup parsed = GroupsParser.fromString("TexGroup:myTexGroup;0;path/To/File;1;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);
     }
 
     @Test
-    void fromStringUnknownGroupThrowsException() throws Exception {
+    void fromStringUnknownGroupThrowsException() {
         assertThrows(ParseException.class, () -> GroupsParser.fromString("0 UnknownGroup:myUnknownGroup;0;;1;;;;", ',', fileMonitor, metaData));
     }
 
     @Test
-    void fromStringParsesSearchGroup() throws Exception {
+    void fromStringParsesSearchGroup() throws ParseException {
         SearchGroup expected = new SearchGroup("Data", GroupHierarchyType.INCLUDING, "project=data|number|quant*", EnumSet.of(SearchFlags.REGULAR_EXPRESSION));
         AbstractGroup parsed = GroupsParser.fromString("SearchGroup:Data;2;project=data|number|quant*;0;1;1;;;;;", ',', fileMonitor, metaData);
         assertEquals(expected, parsed);

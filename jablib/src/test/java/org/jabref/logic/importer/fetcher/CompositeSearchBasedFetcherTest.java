@@ -48,7 +48,7 @@ class CompositeSearchBasedFetcherTest {
     }
 
     @Test
-    void performSearchWithoutFetchers() throws Exception {
+    void performSearchWithoutFetchers() throws FetcherException {
         Set<SearchBasedFetcher> empty = new HashSet<>();
         CompositeSearchBasedFetcher fetcher = new CompositeSearchBasedFetcher(empty, importerPreferences, Integer.MAX_VALUE);
 
@@ -59,7 +59,7 @@ class CompositeSearchBasedFetcherTest {
 
     @ParameterizedTest(name = "Perform Search on empty query.")
     @MethodSource("performSearchParameters")
-    void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
+    void performSearchOnEmptyQuery(Set<SearchBasedFetcher> fetchers) throws FetcherException {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
@@ -70,7 +70,7 @@ class CompositeSearchBasedFetcherTest {
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
-    void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws Exception {
+    void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws FetcherException {
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());

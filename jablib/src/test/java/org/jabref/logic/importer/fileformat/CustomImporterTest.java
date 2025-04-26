@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fileformat;
 import java.nio.file.Path;
 import java.util.Arrays;
 
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.Importer;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ class CustomImporterTest {
     private CustomImporter importer;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws ImportException {
         importer = asCustomImporter(new CopacImporter());
     }
 
@@ -59,14 +60,14 @@ class CustomImporterTest {
     }
 
     @Test
-    void compareToSmaller() throws Exception {
+    void compareToSmaller() throws ImportException {
         CustomImporter ovidImporter = asCustomImporter(new OvidImporter());
 
         assertTrue(importer.compareTo(ovidImporter) < 0);
     }
 
     @Test
-    void compareToEven() throws Exception {
+    void compareToEven() throws ImportException {
         assertEquals(0, importer.compareTo(asCustomImporter(new CopacImporter())));
     }
 
@@ -76,7 +77,7 @@ class CustomImporterTest {
     }
 
     @Test
-    void classicConstructor() throws Exception {
+    void classicConstructor() throws ImportException {
         CustomImporter customImporter = new CustomImporter(
                 "src/main/java/org/jabref/logic/importer/fileformat/CopacImporter.java",
                 "org.jabref.logic.importer.fileformat.CopacImporter");
@@ -84,7 +85,7 @@ class CustomImporterTest {
         assertEquals(importer, customImporter);
     }
 
-    private CustomImporter asCustomImporter(Importer importer) throws Exception {
+    private CustomImporter asCustomImporter(Importer importer) throws ImportException {
         return new CustomImporter(
                 "src/main/java/org/jabref/logic/importer/fileformat/" + importer.getName() + "Importer.java",
                 importer.getClass().getName());

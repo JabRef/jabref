@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -113,7 +114,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEncodingUsAsciiWhenSetInPreferencesAndHeader() throws Exception {
+    void writeEncodingUsAsciiWhenSetInPreferencesAndHeader() throws IOException {
         metaData.setEncoding(StandardCharsets.US_ASCII);
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -122,7 +123,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEncodingWindows1252WhenSetInPreferencesAndHeader() throws Exception {
+    void writeEncodingWindows1252WhenSetInPreferencesAndHeader() throws IOException {
         metaData.setEncoding(Charset.forName("windows-1252"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -131,7 +132,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writePreamble() throws Exception {
+    void writePreamble() throws IOException {
         database.setPreamble("Test preamble");
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -140,7 +141,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writePreambleAndEncoding() throws Exception {
+    void writePreambleAndEncoding() throws IOException {
         metaData.setEncoding(StandardCharsets.US_ASCII);
         database.setPreamble("Test preamble");
 
@@ -151,7 +152,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEntry() throws Exception {
+    void writeEntry() throws IOException {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         database.insertEntry(entry);
@@ -164,7 +165,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEntryWithDuplicateKeywords() throws Exception {
+    void writeEntryWithDuplicateKeywords() throws IOException {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         entry.setField(StandardField.KEYWORDS, "asdf,asdf,asdf");
@@ -179,7 +180,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void putKeyWordsRemovesDuplicateKeywordsIsVisibleDuringWrite() throws Exception {
+    void putKeyWordsRemovesDuplicateKeywordsIsVisibleDuringWrite() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
         entry.putKeywords(List.of("asdf", "asdf", "asdf"), ',');
 
@@ -194,7 +195,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEncodingAndEntry() throws Exception {
+    void writeEncodingAndEntry() throws IOException {
         BibEntry entry = new BibEntry();
         entry.setType(StandardEntryType.Article);
         database.insertEntry(entry);
@@ -210,7 +211,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEpilogue() throws Exception {
+    void writeEpilogue() throws IOException {
         database.setEpilog("Test epilog");
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -219,7 +220,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEpilogueAndEncoding() throws Exception {
+    void writeEpilogueAndEncoding() throws IOException {
         database.setEpilog("Test epilog");
         metaData.setEncoding(StandardCharsets.US_ASCII);
 
@@ -230,7 +231,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void utf8EncodingWrittenIfExplicitlyDefined() throws Exception {
+    void utf8EncodingWrittenIfExplicitlyDefined() throws IOException {
         metaData.setEncoding(StandardCharsets.UTF_8);
         metaData.setEncodingExplicitlySupplied(true);
 
@@ -241,7 +242,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void utf8EncodingNotWrittenIfNotExplicitlyDefined() throws Exception {
+    void utf8EncodingNotWrittenIfNotExplicitlyDefined() throws IOException {
         metaData.setEncoding(StandardCharsets.UTF_8);
         metaData.setEncodingExplicitlySupplied(false);
 
@@ -251,7 +252,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeMetadata() throws Exception {
+    void writeMetadata() throws IOException {
         DatabaseCitationKeyPatterns bibtexKeyPattern = new DatabaseCitationKeyPatterns(mock(GlobalCitationKeyPatterns.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
@@ -263,7 +264,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeMetadataAndEncoding() throws Exception {
+    void writeMetadataAndEncoding() throws IOException {
         DatabaseCitationKeyPatterns bibtexKeyPattern = new DatabaseCitationKeyPatterns(mock(GlobalCitationKeyPatterns.class));
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setCiteKeyPattern(bibtexKeyPattern);
@@ -277,7 +278,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeGroups() throws Exception {
+    void writeGroups() throws IOException {
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ','));
         metaData.setGroups(groupRoot);
@@ -293,7 +294,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeGroupsAndEncoding() throws Exception {
+    void writeGroupsAndEncoding() throws IOException {
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
         groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ',')));
         metaData.setGroups(groupRoot);
@@ -313,7 +314,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeString() throws Exception {
+    void writeString() throws IOException {
         database.addString(new BibtexString("name", "content"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -322,7 +323,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeStringWithQuotes() throws Exception {
+    void writeStringWithQuotes() throws IOException {
         String parsedSerialization = "@String{name = \"content\"}";
         BibtexString bibtexString = new BibtexString("name", "content", parsedSerialization);
         database.addString(bibtexString);
@@ -333,7 +334,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeStringAndEncoding() throws Exception {
+    void writeStringAndEncoding() throws IOException {
         metaData.setEncoding(StandardCharsets.US_ASCII);
         database.addString(new BibtexString("name", "content"));
 
@@ -344,7 +345,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void doNotWriteUtf8StringAndEncoding() throws Exception {
+    void doNotWriteUtf8StringAndEncoding() throws IOException {
         database.addString(new BibtexString("name", "content"));
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -353,7 +354,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws Exception {
+    void writeEntryWithCustomizedTypeAlsoWritesTypeDeclaration() throws IOException {
         EntryType customizedType = new UnknownEntryType("customizedType");
         BibEntryType customizedBibType = new BibEntryType(
                 customizedType,
@@ -385,7 +386,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeCustomizedTypesInAlphabeticalOrder() throws Exception {
+    void writeCustomizedTypesInAlphabeticalOrder() throws IOException {
         EntryType customizedType = new UnknownEntryType("customizedType");
         EntryType otherCustomizedType = new UnknownEntryType("otherCustomizedType");
         BibEntryType customizedBibType = new BibEntryType(
@@ -417,7 +418,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithArticleMonths() throws Exception {
+    void roundtripWithArticleMonths() throws IOException {
         Path testBibtexFile = Path.of("src/test/resources/testbib/articleWithMonths.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
@@ -433,7 +434,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripUtf8EncodingHeaderRemoved() throws Exception {
+    void roundtripUtf8EncodingHeaderRemoved() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "% Encoding: UTF8" + OS.NEWLINE +
                 OS.NEWLINE +
@@ -459,7 +460,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws Exception {
+    void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws IOException, URISyntaxException {
         Path testFile = Path.of(BibtexDatabaseWriterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
@@ -483,7 +484,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws Exception {
+    void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws URISyntaxException, IOException {
         Path testFile = Path.of(BibtexDatabaseWriterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
@@ -507,7 +508,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws Exception {
+    void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws URISyntaxException, IOException {
         Path testFile = Path.of(BibtexDatabaseWriterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
@@ -531,7 +532,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithComplexBib() throws Exception {
+    void roundtripWithComplexBib() throws IOException {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
@@ -550,7 +551,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithUserComment() throws Exception {
+    void roundtripWithUserComment() throws IOException {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
@@ -566,7 +567,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithOneUserCommentAndEntryChange() throws Exception {
+    void roundtripWithOneUserCommentAndEntryChange() throws IOException {
         String bibEntry = "@Comment this in an unbracketed comment that should be preserved as well\n" +
                 "\n" +
                 "This is some arbitrary user comment that should be preserved\n" +
@@ -597,7 +598,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithTwoEntriesAndOneUserCommentAndEntryChange() throws Exception {
+    void roundtripWithTwoEntriesAndOneUserCommentAndEntryChange() throws IOException {
         String bibEntry = "@Article{test,}\n" +
                 "\n" +
                 "@Comment this in an unbracketed comment that should be preserved as well\n" +
@@ -630,7 +631,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithUserCommentAndEntryChange() throws Exception {
+    void roundtripWithUserCommentAndEntryChange() throws IOException {
         Path testBibtexFile = Path.of("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
@@ -649,7 +650,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
+    void roundtripWithUserCommentBeforeStringAndChange() throws IOException {
         Path testBibtexFile = Path.of("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
@@ -671,7 +672,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithUnknownMetaData() throws Exception {
+    void roundtripWithUnknownMetaData() throws IOException {
         Path testBibtexFile = Path.of("src/test/resources/testbib/unknownMetaData.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Importer.getReader(testBibtexFile));
@@ -687,7 +688,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeSavedSerializationOfEntryIfUnchanged() throws Exception {
+    void writeSavedSerializationOfEntryIfUnchanged() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Mr. author");
         entry.setParsedSerialization("presaved serialization");
@@ -700,7 +701,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void reformatEntryIfAskedToDoSo() throws Exception {
+    void reformatEntryIfAskedToDoSo() throws IOException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Mr. author");
         entry.setParsedSerialization("wrong serialization");
@@ -717,7 +718,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeSavedSerializationOfStringIfUnchanged() throws Exception {
+    void writeSavedSerializationOfStringIfUnchanged() throws IOException {
         BibtexString string = new BibtexString("name", "content", "serialization");
         database.addString(string);
 
@@ -727,7 +728,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void reformatStringIfAskedToDoSo() throws Exception {
+    void reformatStringIfAskedToDoSo() throws IOException {
         BibtexString string = new BibtexString("name", "content", "wrong serialization");
         database.addString(string);
 
@@ -739,7 +740,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeSaveActions() throws Exception {
+    void writeSaveActions() throws IOException {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Arrays.asList(
                         new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter()),
@@ -760,7 +761,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeSaveOrderConfig() throws Exception {
+    void writeSaveOrderConfig() throws IOException {
         SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.SPECIFIED,
                 List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
                         new SaveOrder.SortCriterion(StandardField.YEAR, true),
@@ -774,7 +775,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeCustomKeyPattern() throws Exception {
+    void writeCustomKeyPattern() throws IOException {
         AbstractCitationKeyPatterns pattern = new DatabaseCitationKeyPatterns(mock(GlobalCitationKeyPatterns.class));
         pattern.setDefaultValue("test");
         pattern.addCitationKeyPattern(StandardEntryType.Article, "articleTest");
@@ -788,7 +789,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeBiblatexMode() throws Exception {
+    void writeBiblatexMode() throws IOException {
         metaData.setMode(BibDatabaseMode.BIBLATEX);
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -798,7 +799,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeProtectedFlag() throws Exception {
+    void writeProtectedFlag() throws IOException {
         metaData.markAsProtected();
 
         databaseWriter.savePartOfDatabase(bibtexContext, List.of());
@@ -808,7 +809,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeFileDirectories() throws Exception {
+    void writeFileDirectories() throws IOException {
         metaData.setLibrarySpecificFileDirectory("\\Literature\\");
         metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");
         metaData.setLatexFileDirectory("defaultOwner-user", Path.of("D:\\Latex"));
@@ -821,7 +822,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEntriesSorted() throws Exception {
+    void writeEntriesSorted() throws IOException {
         SaveOrder saveOrder = new SaveOrder(SaveOrder.OrderType.SPECIFIED,
                 List.of(new SaveOrder.SortCriterion(StandardField.AUTHOR, false),
                         new SaveOrder.SortCriterion(StandardField.YEAR, true),
@@ -865,7 +866,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void writeEntriesInOriginalOrderWhenNoSaveOrderConfigIsSetInMetadata() throws Exception {
+    void writeEntriesInOriginalOrderWhenNoSaveOrderConfigIsSetInMetadata() throws IOException {
         BibEntry firstEntry = new BibEntry();
         firstEntry.setType(StandardEntryType.Article);
         firstEntry.setField(StandardField.AUTHOR, "A");
@@ -904,7 +905,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void normalizeWhitespacesCleanupOnlyInTextFields() throws Exception {
+    void normalizeWhitespacesCleanupOnlyInTextFields() throws IOException {
         BibEntry firstEntry = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Firstname1 Lastname1   and   Firstname2 Lastname2")
                 .withField(StandardField.FILE, "some  --  filename  -- spaces.pdf")
@@ -938,7 +939,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void newlineAtEndOfAbstractFieldIsDeleted() throws Exception {
+    void newlineAtEndOfAbstractFieldIsDeleted() throws IOException {
         String text = "lorem ipsum lorem ipsum" + OS.NEWLINE + "lorem ipsum lorem ipsum";
 
         BibEntry entry = new BibEntry(StandardEntryType.Article);
@@ -954,7 +955,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWithContentSelectorsAndUmlauts() throws Exception {
+    void roundtripWithContentSelectorsAndUmlauts() throws IOException {
         String encodingHeader = "% Encoding: UTF-8" + OS.NEWLINE + OS.NEWLINE;
         String commentEntry = "@Comment{jabref-meta: selector_journal:Test {\\\\\"U}mlaut;}" + OS.NEWLINE;
         String fileContent = encodingHeader + commentEntry;
@@ -970,7 +971,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void saveAlsoSavesSecondModification() throws Exception {
+    void saveAlsoSavesSecondModification() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -1018,7 +1019,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchanged() throws Exception {
+    void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchanged() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -1048,7 +1049,7 @@ class BibtexDatabaseWriterTest {
     }
 
     @Test
-    void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchangedEvenInThePresenceOfSavedModifications() throws Exception {
+    void saveReturnsToOriginalEntryWhenEntryIsFlaggedUnchangedEvenInThePresenceOfSavedModifications() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +

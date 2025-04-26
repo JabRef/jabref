@@ -2,6 +2,7 @@ package org.jabref.gui.entryeditor.citationrelationtab;
 
 import java.util.List;
 
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -36,7 +37,7 @@ class BibEntryRelationsRepositoryTest {
     }
 
     @Test
-    void getCitations() throws Exception {
+    void getCitations() throws FetcherException {
         SemanticScholarFetcher semanticScholarFetcher = mock(SemanticScholarFetcher.class);
         when(semanticScholarFetcher.searchCitedBy(any(BibEntry.class))).thenAnswer(invocation -> {
             BibEntry entry = invocation.getArgument(0);

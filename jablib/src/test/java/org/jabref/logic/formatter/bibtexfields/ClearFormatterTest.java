@@ -21,7 +21,7 @@ class ClearFormatterTest {
      * Check whether the clear formatter really returns the empty string for the empty string
      */
     @Test
-    void formatReturnsEmptyForEmptyString() throws Exception {
+    void formatReturnsEmptyForEmptyString() {
         assertEquals("", formatter.format(""));
     }
 
@@ -29,7 +29,7 @@ class ClearFormatterTest {
      * Check whether the clear formatter really returns the empty string for some string
      */
     @Test
-    void formatReturnsEmptyForSomeString() throws Exception {
+    void formatReturnsEmptyForSomeString() {
         assertEquals("", formatter.format("test"));
     }
 

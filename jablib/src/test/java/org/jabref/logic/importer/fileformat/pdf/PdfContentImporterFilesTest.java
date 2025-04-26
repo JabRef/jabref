@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.fileformat.ImporterTestEngine;
 
 import org.junit.jupiter.api.Disabled;
@@ -29,7 +30,7 @@ class PdfContentImporterFilesTest {
     @ParameterizedTest
     @MethodSource("fileNames")
     @Disabled("bib file does not contain linked file")
-    void importEntries(String fileName) throws Exception {
+    void importEntries(String fileName) throws ImportException, IOException {
         ImporterTestEngine.testImportEntries(new PdfContentImporter(), fileName, FILE_ENDING);
     }
 }

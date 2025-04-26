@@ -59,7 +59,7 @@ public class GenerateEmbeddingsTask extends BackgroundTask<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         LOGGER.debug("Starting embeddings generation task for file \"{}\"", linkedFile.getLink());
 
         try {

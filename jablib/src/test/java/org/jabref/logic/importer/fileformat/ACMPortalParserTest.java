@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -66,7 +67,7 @@ class ACMPortalParserTest {
     }
 
     @Test
-    void parseEntries() throws Exception {
+    void parseEntries() throws FetcherException, ParseException {
         CookieHandler.setDefault(new CookieManager());
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(searchUrl).asInputStream());
         for (BibEntry bibEntry : bibEntries) {
@@ -76,7 +77,7 @@ class ACMPortalParserTest {
     }
 
     @Test
-    void parseDoiSearchPage() throws Exception {
+    void parseDoiSearchPage() throws FetcherException, ParseException {
         String testDoi = "10.1145/3129790.3129810";
         CookieHandler.setDefault(new CookieManager());
         List<String> doiList = parser.parseDoiSearchPage(new URLDownload(searchUrl).asInputStream());
@@ -136,7 +137,7 @@ class ACMPortalParserTest {
     }
 
     @Test
-    void noEntryFound() throws Exception {
+    void noEntryFound() throws URISyntaxException, FetcherException, MalformedURLException, ParseException {
         CookieHandler.setDefault(new CookieManager());
         URL url = new URIBuilder("https://dl.acm.org/action/doSearch?AllField=10.1145/3129790.31298").build().toURL();
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(url).asInputStream());

@@ -59,7 +59,7 @@ class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherTest {
 
     @Test
     @Override
-    public void authorsAreCorrectlyFormatted() throws Exception {
+    public void authorsAreCorrectlyFormatted() throws FetcherException {
         BibEntry bibEntry = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.TITLE, "Repository")
                 .withField(StandardField.ISBN, "9783110702125")
@@ -83,7 +83,7 @@ class DoiToBibtexConverterComIsbnFetcherTest extends AbstractIsbnFetcherTest {
     }
 
     @Test
-    void searchByIdFailedWithShortISBN() throws FetcherException {
+    void searchByIdFailedWithShortISBN() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("0321356683"));
     }
 }

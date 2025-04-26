@@ -1,5 +1,6 @@
 package org.jabref.gui.externalfiles;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
@@ -75,7 +76,7 @@ class FileFilterUtilsTest {
 
         /* Initialize the directory and files used in the sorting tests, and change their last edited dates. */
         @BeforeEach
-        void setUp(@TempDir Path tempDir) throws Exception {
+        void setUp(@TempDir Path tempDir) throws IOException {
 
             Path firstPath = tempDir.resolve("firstFile.pdf");
             Path secondPath = tempDir.resolve("secondFile.pdf");
@@ -164,7 +165,7 @@ class FileFilterUtilsTest {
         private final Set<String> ignoreFileSet = new HashSet<>();
 
         @BeforeEach
-        void setUp(@TempDir Path tempDir) throws Exception {
+        void setUp(@TempDir Path tempDir) throws IOException {
             ignoreFileSet.add(".DS_Store");
             ignoreFileSet.add("Thumbs.db");
 

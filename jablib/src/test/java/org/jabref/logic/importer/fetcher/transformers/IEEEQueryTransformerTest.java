@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher.transformers;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.apache.lucene.queryparser.flexible.core.QueryNodeParseException;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 import org.apache.lucene.queryparser.flexible.standard.parser.StandardSyntaxParser;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
 
     @Override
     @Test
-    public void convertJournalFieldPrefix() throws Exception {
+    public void convertJournalFieldPrefix() throws QueryNodeParseException {
         IEEEQueryTransformer transformer = getTransformer();
 
         String queryString = "journal:Nature";
@@ -53,7 +54,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
 
     @Override
     @Test
-    public void convertYearField() throws Exception {
+    public void convertYearField() throws QueryNodeParseException {
         // IEEE does not support year range
         // Thus, a generic test does not work
 
@@ -69,7 +70,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
 
     @Override
     @Test
-    public void convertYearRangeField() throws Exception {
+    public void convertYearRangeField() throws QueryNodeParseException {
         IEEEQueryTransformer transformer = getTransformer();
 
         String queryString = "year-range:2018-2021";
@@ -90,7 +91,7 @@ class IEEEQueryTransformerTest extends InfixTransformerTest<IEEEQueryTransformer
 
     @ParameterizedTest
     @MethodSource("getTitleTestData")
-    void stopWordRemoval(String expected, String queryString) throws Exception {
+    void stopWordRemoval(String expected, String queryString) throws QueryNodeParseException {
         QueryNode luceneQuery = new StandardSyntaxParser().parse(queryString, AbstractQueryTransformer.NO_EXPLICIT_FIELD);
         Optional<String> result = getTransformer().transformLuceneQuery(luceneQuery);
         assertEquals(Optional.ofNullable(expected), result);

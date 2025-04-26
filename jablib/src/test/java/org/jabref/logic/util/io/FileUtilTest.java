@@ -407,7 +407,7 @@ class FileUtilTest {
     }
 
     @Test
-    void findsFileInDirectory(@TempDir Path temp) throws Exception {
+    void findsFileInDirectory(@TempDir Path temp) throws IOException {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -416,7 +416,7 @@ class FileUtilTest {
     }
 
     @Test
-    void findsFileStartingWithTheSameDirectory(@TempDir Path temp) throws Exception {
+    void findsFileStartingWithTheSameDirectory(@TempDir Path temp) throws IOException {
         Path firstFilePath = temp.resolve("files");
         Files.createDirectories(firstFilePath);
         Path firstFile = Files.createFile(firstFilePath.resolve("test.pdf"));
@@ -425,7 +425,7 @@ class FileUtilTest {
     }
 
     @Test
-    void doesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws Exception {
+    void doesNotFindsFileStartingWithTheSameDirectoryHasASubdirectory(@TempDir Path temp) throws IOException {
         Path firstFilesPath = temp.resolve("files");
         Path secondFilesPath = firstFilesPath.resolve("files");
         Files.createDirectories(secondFilesPath);
@@ -434,6 +434,7 @@ class FileUtilTest {
         assertEquals(Optional.of(testFile.toAbsolutePath()), FileUtil.find("files/test.pdf", firstFilesPath));
     }
 
+    @Test
     public void testCTemp() {
         String fileName = "c:\\temp.pdf";
         if (OS.WINDOWS) {

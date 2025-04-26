@@ -57,7 +57,7 @@ class MedlinePlainImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void isRecognizedFormat(String fileName) throws Exception {
+    void isRecognizedFormat(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 

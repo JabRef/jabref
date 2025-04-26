@@ -22,7 +22,7 @@ class MedlineImporterTest {
     private MedlineImporter importer;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         this.importer = new MedlineImporter();
     }
 

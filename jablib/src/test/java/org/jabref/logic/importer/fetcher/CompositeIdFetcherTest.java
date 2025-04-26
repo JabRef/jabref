@@ -109,7 +109,7 @@ class CompositeIdFetcherTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         // Needed for ArXiv Fetcher keyword processing
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');

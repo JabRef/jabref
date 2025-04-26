@@ -1,8 +1,12 @@
 package org.jabref.logic.exporter;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
 import org.jabref.logic.util.StandardFileType;
@@ -41,7 +45,7 @@ class YamlExporterTest {
     }
 
     @Test
-    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
+    final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
         yamlExporter.export(databaseContext, tempFile, List.of());
@@ -49,7 +53,7 @@ class YamlExporterTest {
     }
 
     @Test
-    final void exportsCorrectContent(@TempDir Path tempFile) throws Exception {
+    final void exportsCorrectContent(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -77,7 +81,7 @@ class YamlExporterTest {
     }
 
     @Test
-    final void formatsContentCorrect(@TempDir Path tempFile) throws Exception {
+    final void formatsContentCorrect(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Misc)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Test Author")
@@ -105,7 +109,7 @@ class YamlExporterTest {
     }
 
     @Test
-    void passesModifiedCharset(@TempDir Path tempFile) throws Exception {
+    void passesModifiedCharset(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
             .withCitationKey("test")
             .withField(StandardField.AUTHOR, "谷崎 潤一郎")
@@ -133,7 +137,7 @@ class YamlExporterTest {
     }
 
     @Test
-    void passesModifiedCharsetNull(@TempDir Path tempFile) throws Exception {
+    void passesModifiedCharsetNull(@TempDir Path tempFile) throws IOException, SaveException, ParserConfigurationException, TransformerException {
         BibEntry entry = new BibEntry(StandardEntryType.Article)
             .withCitationKey("test")
             .withField(StandardField.AUTHOR, "谷崎 潤一郎")

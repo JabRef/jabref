@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Stream;
@@ -143,7 +144,7 @@ class BibliographyFromPdfImporterTest {
     }
 
     @Test
-    void tua3i2refpage() throws Exception {
+    void tua3i2refpage() throws URISyntaxException {
         Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/tua3i2refpage.pdf").toURI());
         ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
         BibEntry entry02 = new BibEntry(StandardEntryType.Article)
@@ -262,7 +263,7 @@ class BibliographyFromPdfImporterTest {
     }
 
     @Test
-    void ieeePaper() throws Exception {
+    void ieeePaper() throws URISyntaxException {
         Path file = Path.of(BibliographyFromPdfImporterTest.class.getResource("/pdfs/IEEE/ieee-paper.pdf").toURI());
         ParserResult parserResult = bibliographyFromPdfImporter.importDatabase(file);
         assertEquals(List.of(ALVER2007, ALVER2007A, KOPP2012, KOPPP2018, KOENIG2023), parserResult.getDatabase().getEntries());

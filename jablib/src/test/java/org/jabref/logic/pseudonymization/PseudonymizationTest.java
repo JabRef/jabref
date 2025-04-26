@@ -1,6 +1,8 @@
 package org.jabref.logic.pseudonymization;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -93,7 +95,7 @@ class PseudonymizationTest {
     }
 
     @Test
-    void pseudonymizeLibrary() throws Exception {
+    void pseudonymizeLibrary() throws URISyntaxException, IOException {
         Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
         BibDatabaseContext databaseContext = importer.importDatabase(path).getDatabaseContext();
 
@@ -109,7 +111,7 @@ class PseudonymizationTest {
      * This test can be used to anonymize a library.
      */
     @Test
-    void pseudonymizeLibraryFile(@TempDir Path tempDir) throws Exception {
+    void pseudonymizeLibraryFile(@TempDir Path tempDir) throws URISyntaxException, IOException {
         // modify path to the file to be anonymized
         Path path = Path.of(PseudonymizationTest.class.getResource("Chocolate.bib").toURI());
         // modify target to the files to be created

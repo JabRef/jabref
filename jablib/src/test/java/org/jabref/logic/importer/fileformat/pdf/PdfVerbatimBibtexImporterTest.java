@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -30,14 +31,14 @@ class PdfVerbatimBibtexImporterTest {
     }
 
     @Test
-    void doesNotHandleEncryptedPdfs() throws Exception {
+    void doesNotHandleEncryptedPdfs() throws URISyntaxException {
         Path file = Path.of(PdfVerbatimBibtexImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
         assertEquals(List.of(), result);
     }
 
     @Test
-    void importTwiceWorksAsExpected() throws Exception {
+    void importTwiceWorksAsExpected() throws URISyntaxException {
         Path file = Path.of(PdfVerbatimBibtexImporterTest.class.getResource("mixedMetadata.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 

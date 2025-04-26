@@ -43,7 +43,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
         super("oocalc", "Old OpenOffice/LibreOffice Calc format", StandardFileType.SXC);
     }
 
-    private static void storeOpenOfficeFile(Path file, InputStream source) throws Exception {
+    private static void storeOpenOfficeFile(Path file, InputStream source) throws IOException {
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(file)))) {
             ZipEntry zipEntry = new ZipEntry("content.xml");
             out.putNextEntry(zipEntry);
@@ -62,7 +62,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
         }
     }
 
-    private static void exportOpenOfficeCalc(Path file, BibDatabase database, List<BibEntry> entries) throws Exception {
+    private static void exportOpenOfficeCalc(Path file, BibDatabase database, List<BibEntry> entries) throws IOException {
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("oocalc", null);
         OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, entries);
@@ -80,7 +80,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
 
     @Override
     public void export(final BibDatabaseContext databaseContext, final Path file,
-                       List<BibEntry> entries) throws Exception {
+                       List<BibEntry> entries) throws IOException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Do not export if no entries

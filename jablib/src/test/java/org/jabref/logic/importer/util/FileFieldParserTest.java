@@ -1,5 +1,6 @@
 package org.jabref.logic.importer.util;
 
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ class FileFieldParserTest {
         assertEquals(expected, FileFieldParser.convert(new ArrayList<>(input)));
     }
 
-    private static Stream<Arguments> stringsToParseTest() throws Exception {
+    private static Stream<Arguments> stringsToParseTest() throws MalformedURLException {
         return Stream.of(
                 // null string
                 Arguments.of(

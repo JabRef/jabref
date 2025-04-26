@@ -25,7 +25,7 @@ class BibliographyConsistencyCheckTest {
     private BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
     @Test
-    void checkSimpleLibrary(@TempDir Path tempDir) throws Exception {
+    void checkSimpleLibrary(@TempDir Path tempDir) {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
@@ -40,7 +40,7 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
-    void checkDifferentOutputSymbols(@TempDir Path tempDir) throws Exception {
+    void checkDifferentOutputSymbols(@TempDir Path tempDir) {
         UnknownField customField = new UnknownField("custom");
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One") // required
@@ -57,7 +57,7 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
-    void checkComplexLibrary(@TempDir Path tempDir) throws Exception {
+    void checkComplexLibrary(@TempDir Path tempDir) {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
@@ -90,7 +90,7 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
-    void checkLibraryWithoutIssues(@TempDir Path tempDir) throws Exception {
+    void checkLibraryWithoutIssues(@TempDir Path tempDir) {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");

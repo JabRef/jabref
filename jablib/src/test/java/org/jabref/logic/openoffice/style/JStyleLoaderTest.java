@@ -1,7 +1,7 @@
 package org.jabref.logic.openoffice.style;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ class JStyleLoaderTest {
     private Path jStyleFile;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws IOException {
         preferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
         layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
@@ -94,7 +94,7 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void initalizeWithOneExternalFile() throws URISyntaxException {
+    void initalizeWithOneExternalFile() {
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
@@ -109,7 +109,7 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void initalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
+    void initalizeWithOneExternalFileRemoveStyle() {
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
@@ -128,7 +128,7 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
+    void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() {
         when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
