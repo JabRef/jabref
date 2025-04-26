@@ -310,11 +310,11 @@ public class StyleSelectDialogViewModel {
                 .withInitialDirectory(filePreferences.getWorkingDirectory())
                 .build();
         Optional<Path> path = dialogService.showFileOpenDialog(fileDialogConfiguration);
-        path.map(Path::toAbsolutePath).map(Path::toString).ifPresent(stylePath -> {
+        path.map(Path::toAbsolutePath).ifPresent(stylePath -> {
             if (jStyleLoader.addStyleIfValid(stylePath)) {
-                openOfficePreferences.setCurrentJStyle(stylePath);
+                openOfficePreferences.setCurrentJStyle(stylePath.toString());
                 jStyles.setAll(loadJStyles());
-                selectedJStyle.setValue(getJStyleOrDefault(stylePath));
+                selectedJStyle.setValue(getJStyleOrDefault(stylePath.toString()));
             } else {
                 dialogService.showErrorDialogAndWait(Localization.lang("Invalid style selected"), Localization.lang("You must select a valid style file. Your style is probably missing a line for the type \"default\"."));
             }

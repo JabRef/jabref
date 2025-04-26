@@ -1,6 +1,8 @@
 package org.jabref.logic.openoffice.style;
 
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +16,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,17 +29,28 @@ import static org.mockito.Mockito.when;
 class JStyleLoaderTest {
 
     private static final int NUMBER_OF_INTERNAL_STYLES = 2;
+    private static final String JSTYLE_NAME = "test.jstyle";
+
     private JStyleLoader loader;
 
     private OpenOfficePreferences preferences;
     private LayoutFormatterPreferences layoutPreferences;
     private JournalAbbreviationRepository abbreviationRepository;
 
+    @TempDir
+    private Path styleFolder;
+
+    private Path jStyleFile;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         preferences = mock(OpenOfficePreferences.class, Answers.RETURNS_DEEP_STUBS);
         layoutPreferences = mock(LayoutFormatterPreferences.class, Answers.RETURNS_DEEP_STUBS);
         abbreviationRepository = mock(JournalAbbreviationRepository.class);
+        try (InputStream stream = JStyleLoader.class.getResourceAsStream(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH)) {
+            jStyleFile = styleFolder.resolve(JSTYLE_NAME);
+            Files.copy(stream, jStyleFile);
+        }
     }
 
     @Test
@@ -67,9 +81,7 @@ class JStyleLoaderTest {
         preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
-        String filename = Path.of(JStyleLoader.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                              .toFile().getPath();
-        loader.addStyleIfValid(filename);
+        loader.addStyleIfValid(jStyleFile);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
 
@@ -78,7 +90,7 @@ class JStyleLoaderTest {
         preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
-        loader.addStyleIfValid("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky");
+        loader.addStyleIfValid(Path.of("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
         assertEquals(beforeAdding, loader.getStyles().size());
     }
 

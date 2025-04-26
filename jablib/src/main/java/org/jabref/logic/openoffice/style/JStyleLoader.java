@@ -55,10 +55,10 @@ public class JStyleLoader {
      * @param filename The filename of the style
      * @return True if the added style is valid, false otherwise
      */
-    public boolean addStyleIfValid(String filename) {
+    public boolean addStyleIfValid(Path filename) {
         Objects.requireNonNull(filename);
         try {
-            JStyle newStyle = new JStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
+            JStyle newStyle = new JStyle(filename, layoutFormatterPreferences, abbreviationRepository);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file {} already existing.", filename);
             } else if (newStyle.isValid()) {
