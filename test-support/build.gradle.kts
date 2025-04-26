@@ -25,6 +25,8 @@ dependencies {
 
     implementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     implementation("org.mockito:mockito-core:5.17.0")
+
+    implementation("org.jspecify:jspecify:1.0.0")
 }
 
 javafx {
