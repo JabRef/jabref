@@ -73,7 +73,7 @@ public class WriteMetadataToSinglePdfAction extends SimpleCommand {
             Optional<Path> file = linkedFile.findIn(databaseContext, filePreferences);
             if (file.isEmpty()) {
                 dialogService.notify(Localization.lang("Failed to write metadata, file %1 not found.", file.map(Path::toString).orElse("")));
-            } else  {
+            } else {
                 try {
                     writeMetadataToFile(file.get(), entry, databaseContext, abbreviationRepository, bibEntryTypesManager, fieldPreferences, filePreferences, xmpPreferences);
                     dialogService.notify(Localization.lang("Success! Finished writing metadata."));
