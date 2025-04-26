@@ -1,4 +1,9 @@
 module org.jabref.jabsrv {
+    exports org.jabref.http.server;
+    opens org.jabref.http.server
+            to org.glassfish.hk2.utilities,
+            org.glassfish.hk2.locator;
+
     requires org.jabref.jablib;
 
     requires org.slf4j;
