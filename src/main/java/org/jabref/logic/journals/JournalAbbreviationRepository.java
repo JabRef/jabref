@@ -337,6 +337,42 @@ public class JournalAbbreviationRepository {
         enabledSources.put(sourceKey, enabled);
     }
 
+    /**
+     * Specialized method for abbreviation that checks if a journal name is already in its
+     * full form and requires abbreviation from an enabled source.
+     *
+     * @param input The journal name to check and abbreviate.
+     * @return Optional containing the abbreviation object if the input is a full journal name 
+     *         from an enabled source, empty otherwise.
+     */
+    public Optional<Abbreviation> getForAbbreviation(String input) {
+        String journal = input.trim().replaceAll(Matcher.quoteReplacement("\\&"), "&");
+        
+        Optional<Abbreviation> customAbbreviation = customAbbreviations.stream()
+                .filter(abbreviation -> isSourceEnabled(abbreviationSources.getOrDefault(abbreviation, BUILTIN_LIST_ID)))
+                .filter(abbreviation -> isMatched(journal, abbreviation))
+                .findFirst();
+                
+        if (customAbbreviation.isPresent()) {
+            return customAbbreviation;
+        }
+        
+        if (!isSourceEnabled(BUILTIN_LIST_ID)) {
+            return Optional.empty();
+        }
+        
+        Optional<Abbreviation> builtInAbbreviation = Optional.ofNullable(fullToAbbreviationObject.get(journal))
+                .or(() -> Optional.ofNullable(abbreviationToAbbreviationObject.get(journal)))
+                .or(() -> Optional.ofNullable(dotlessToAbbreviationObject.get(journal)))
+                .or(() -> Optional.ofNullable(shortestUniqueToAbbreviationObject.get(journal)));
+                
+        if (builtInAbbreviation.isPresent()) {
+            return builtInAbbreviation;
+        }
+        
+        return findAbbreviationFuzzyMatched(journal);
+    }
+    
     public Optional<String> getNextAbbreviation(String text) {
         return get(text).map(abbreviation -> abbreviation.getNext(text));
     }

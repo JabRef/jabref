@@ -17,9 +17,9 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.journals.Abbreviation;
-import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalAbbreviationRepositoryManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -108,9 +108,10 @@ public class AbbreviateAction extends SimpleCommand {
     }
 
     private String abbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
-        // Reload repository to ensure latest preferences are used
-        abbreviationRepository = JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences);
-            
+        // Use the repository manager to get a cached repository or build a new one if needed
+        abbreviationRepository = JournalAbbreviationRepositoryManager.getInstance()
+                                .getRepository(journalAbbreviationPreferences);
+                                
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 abbreviationRepository,
                 abbreviationType,
@@ -139,7 +140,8 @@ public class AbbreviateAction extends SimpleCommand {
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<BibEntry> filteredEntries = new ArrayList<>();
         
-        JournalAbbreviationRepository freshRepository = JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences);
+        JournalAbbreviationRepository freshRepository = JournalAbbreviationRepositoryManager.getInstance()
+                                                      .getRepository(journalAbbreviationPreferences);
         
         Map<String, Boolean> sourceEnabledStates = new HashMap<>();
         String builtInId = JournalAbbreviationRepository.BUILTIN_LIST_ID;
