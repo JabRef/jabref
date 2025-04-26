@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -45,8 +44,8 @@ class YamlExporterTest {
     final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, tempFile, Collections.emptyList());
-        assertEquals(Collections.emptyList(), Files.readAllLines(file));
+        yamlExporter.export(databaseContext, tempFile, List.of());
+        assertEquals(List.of(), Files.readAllLines(file));
     }
 
     @Test
@@ -60,7 +59,7 @@ class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -88,7 +87,7 @@ class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -116,7 +115,7 @@ class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -144,7 +143,7 @@ class YamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        yamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        yamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",

@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -867,7 +866,7 @@ public class LibraryTab extends Tab {
     }
 
     public void deleteEntry(BibEntry entry) {
-        doDeleteEntry(StandardActions.DELETE_ENTRY, Collections.singletonList(entry));
+        doDeleteEntry(StandardActions.DELETE_ENTRY, List.of(entry));
     }
 
     /**

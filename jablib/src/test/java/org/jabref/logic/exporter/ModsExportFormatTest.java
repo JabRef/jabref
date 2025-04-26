@@ -2,7 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -34,7 +34,7 @@ class ModsExportFormatTest {
     final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        modsExportFormat.export(databaseContext, tempFile, Collections.emptyList());
-        assertEquals(Collections.emptyList(), Files.readAllLines(file));
+        modsExportFormat.export(databaseContext, tempFile, List.of());
+        assertEquals(List.of(), Files.readAllLines(file));
     }
 }

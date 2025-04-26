@@ -1,7 +1,6 @@
 package org.jabref.logic.pdf;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ class EntryAnnotationImporterTest {
     @BeforeEach
     void setUp() {
         entry = new BibEntry();
-        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(Path.of("src/test/resources/pdfs/")));
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(Path.of("src/test/resources/pdfs/")));
     }
 
     @Test

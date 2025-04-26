@@ -3,7 +3,6 @@ package org.jabref.model.database;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -69,7 +68,7 @@ class BibDatabaseTest {
         database.insertEntry(entry);
 
         database.removeEntry(entry);
-        assertEquals(Collections.emptyList(), database.getEntries());
+        assertEquals(List.of(), database.getEntries());
         assertFalse(database.containsEntryWithId(entry.getId()));
     }
 
@@ -82,7 +81,7 @@ class BibDatabaseTest {
         database.insertEntries(allEntries);
         List<BibEntry> entriesToDelete = Arrays.asList(entry1, entry3);
         database.removeEntries(entriesToDelete);
-        assertEquals(Collections.singletonList(entry2), database.getEntries());
+        assertEquals(List.of(entry2), database.getEntries());
         assertFalse(database.containsEntryWithId(entry1.getId()));
         assertTrue(database.containsEntryWithId(entry2.getId()));
         assertFalse(database.containsEntryWithId(entry3.getId()));
@@ -99,7 +98,7 @@ class BibDatabaseTest {
         allEntries.add(entry3);
 
         database.removeEntries(allEntries);
-        assertEquals(Collections.emptyList(), database.getEntries());
+        assertEquals(List.of(), database.getEntries());
         assertFalse(database.containsEntryWithId(entry1.getId()));
         assertFalse(database.containsEntryWithId(entry2.getId()));
         assertFalse(database.containsEntryWithId(entry3.getId()));
@@ -117,7 +116,7 @@ class BibDatabaseTest {
 
     @Test
     void emptyDatabaseHasNoStrings() {
-        assertEquals(Collections.emptySet(), database.getStringKeySet());
+        assertEquals(Set.of(), database.getStringKeySet());
         assertTrue(database.hasNoStrings());
     }
 
@@ -274,7 +273,7 @@ class BibDatabaseTest {
         EventListenerTest tel = new EventListenerTest();
         database.registerListener(tel);
         database.insertEntry(expectedEntry);
-        assertEquals(Collections.singletonList(expectedEntry), tel.getAddedEntries());
+        assertEquals(List.of(expectedEntry), tel.getAddedEntries());
         assertEquals(expectedEntry, tel.getFirstInsertedEntry());
     }
 
@@ -406,7 +405,7 @@ class BibDatabaseTest {
         database.addString(tripleC);
         database.insertEntry(entry);
 
-        Set<BibtexString> usedStrings = new HashSet<>(database.getUsedStrings(Collections.singletonList(entry)));
+        Set<BibtexString> usedStrings = new HashSet<>(database.getUsedStrings(List.of(entry)));
         assertEquals(stringSet, usedStrings);
     }
 
@@ -423,7 +422,7 @@ class BibDatabaseTest {
         database.addString(tripleB);
         database.insertEntry(entry);
 
-        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Collections.singletonList(entry));
+        List<BibtexString> usedStrings = database.getUsedStrings(List.of(entry));
         assertEquals(strings, usedStrings);
     }
 
@@ -434,8 +433,8 @@ class BibDatabaseTest {
         BibtexString string = new BibtexString("AAA", "Some other text");
         database.addString(string);
         database.insertEntry(entry);
-        Collection<BibtexString> usedStrings = database.getUsedStrings(Collections.singletonList(entry));
-        assertEquals(Collections.emptyList(), usedStrings);
+        Collection<BibtexString> usedStrings = database.getUsedStrings(List.of(entry));
+        assertEquals(List.of(), usedStrings);
     }
 
     @Test

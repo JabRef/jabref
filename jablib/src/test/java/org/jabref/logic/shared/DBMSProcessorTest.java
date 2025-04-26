@@ -4,7 +4,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +154,7 @@ class DBMSProcessorTest {
     }
 
     @Test
-    void getEntriesByIdList() throws Exception {
+    void getEntriesByIdList() {
         BibEntry firstEntry = getBibEntryExample();
         firstEntry.setField(InternalField.INTERNAL_ID_FIELD, "00001");
         BibEntry secondEntry = getBibEntryExample();
@@ -236,7 +235,7 @@ class DBMSProcessorTest {
     void removeSingleEntry() throws SQLException {
         BibEntry entryToRemove = getBibEntryExample();
         dbmsProcessor.insertEntry(entryToRemove);
-        dbmsProcessor.removeEntries(Collections.singletonList(entryToRemove));
+        dbmsProcessor.removeEntries(List.of(entryToRemove));
 
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(entryResultSet.next());
@@ -250,7 +249,7 @@ class DBMSProcessorTest {
 
     @Test
     void removeEmptyEntryList() throws SQLException {
-        dbmsProcessor.removeEntries(Collections.emptyList());
+        dbmsProcessor.removeEntries(List.of());
 
         try (ResultSet entryResultSet = selectFrom("ENTRY", dbmsConnection, dbmsProcessor)) {
             assertFalse(entryResultSet.next());

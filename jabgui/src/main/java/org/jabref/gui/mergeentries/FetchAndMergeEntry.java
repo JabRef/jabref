@@ -1,7 +1,6 @@
 package org.jabref.gui.mergeentries;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -67,7 +66,7 @@ public class FetchAndMergeEntry {
     }
 
     public void fetchAndMerge(BibEntry entry, Field field) {
-        fetchAndMerge(entry, Collections.singletonList(field));
+        fetchAndMerge(entry, List.of(field));
     }
 
     public void fetchAndMerge(BibEntry entry, List<Field> fields) {
@@ -75,30 +74,28 @@ public class FetchAndMergeEntry {
             Optional<String> fieldContent = entry.getField(field);
             if (fieldContent.isPresent()) {
                 Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, preferences.getImportFormatPreferences());
-                if (fetcher.isPresent()) {
-                    BackgroundTask.wrap(() -> fetcher.get().performSearchById(fieldContent.get()))
-                                  .onSuccess(fetchedEntry -> {
-                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
-                                      String type = field.getDisplayName();
-                                      if (fetchedEntry.isPresent()) {
-                                          cleanup.doPostCleanup(fetchedEntry.get());
-                                          showMergeDialog(entry, fetchedEntry.get(), fetcher.get());
-                                      } else {
-                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
-                                      }
-                                  })
-                                  .onFailure(exception -> {
-                                      LOGGER.error("Error while fetching bibliographic information", exception);
-                                      if (exception instanceof FetcherClientException) {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("No data was found for the identifier"));
-                                      } else if (exception instanceof FetcherServerException) {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Server not available"));
-                                      } else {
-                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", fetcher.get().getName()), Localization.lang("Error occurred %0", exception.getMessage()));
-                                      }
-                                  })
-                                  .executeWith(taskExecutor);
-                }
+                fetcher.ifPresent(idBasedFetcher -> BackgroundTask.wrap(() -> idBasedFetcher.performSearchById(fieldContent.get()))
+                                                                  .onSuccess(fetchedEntry -> {
+                                                                      ImportCleanup cleanup = ImportCleanup.targeting(bibDatabaseContext.getMode(), preferences.getFieldPreferences());
+                                                                      String type = field.getDisplayName();
+                                                                      if (fetchedEntry.isPresent()) {
+                                                                          cleanup.doPostCleanup(fetchedEntry.get());
+                                                                          showMergeDialog(entry, fetchedEntry.get(), idBasedFetcher);
+                                                                      } else {
+                                                                          dialogService.notify(Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
+                                                                      }
+                                                                  })
+                                                                  .onFailure(exception -> {
+                                                                      LOGGER.error("Error while fetching bibliographic information", exception);
+                                                                      if (exception instanceof FetcherClientException) {
+                                                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("No data was found for the identifier"));
+                                                                      } else if (exception instanceof FetcherServerException) {
+                                                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Server not available"));
+                                                                      } else {
+                                                                          dialogService.showInformationDialogAndWait(Localization.lang("Fetching information using %0", idBasedFetcher.getName()), Localization.lang("Error occurred %0", exception.getMessage()));
+                                                                      }
+                                                                  })
+                                                                  .executeWith(taskExecutor));
             } else {
                 dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
             }

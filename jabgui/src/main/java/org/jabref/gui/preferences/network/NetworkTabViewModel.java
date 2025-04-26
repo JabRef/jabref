@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.network;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -261,7 +260,7 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         if (sslCertificatesChanged.get()) {
             return List.of(Localization.lang("SSL configuration changed"));
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 

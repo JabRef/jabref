@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.util.Collections;
 import java.util.List;
 
 import javafx.util.Pair;
@@ -20,7 +19,7 @@ class CliOptionsTest {
     void emptyCLILeftOversLongOptions() throws Exception {
         CliOptions cli = new CliOptions(new String[] {"--nogui", "--import=some/file", "--output=some/export/file"});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
+        assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
@@ -48,7 +47,7 @@ class CliOptionsTest {
     void emptyCLILeftOversShortOptions() throws Exception {
         CliOptions cli = new CliOptions(new String[] {"-n", "-i=some/file", "-o=some/export/file"});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
+        assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
@@ -76,7 +75,7 @@ class CliOptionsTest {
     void emptyPreferencesLeftOver() throws Exception {
         CliOptions cli = new CliOptions(new String[] {"-n", "-x=some/file"});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
+        assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
@@ -97,7 +96,7 @@ class CliOptionsTest {
     void emptyLeftOversCLIShortImportingBibtex() throws Exception {
         CliOptions cli = new CliOptions(new String[] {"-ib", bibtex});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
+        assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test
@@ -118,7 +117,7 @@ class CliOptionsTest {
     void emptyLeftOversCLILongImportingBibtex() throws Exception {
         CliOptions cli = new CliOptions(new String[] {"-importBibtex", bibtex});
 
-        assertEquals(Collections.emptyList(), cli.getLeftOver());
+        assertEquals(List.of(), cli.getLeftOver());
     }
 
     @Test

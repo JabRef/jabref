@@ -1,7 +1,7 @@
 package org.jabref.model.entry;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Disabled;
@@ -32,7 +32,7 @@ public class AuthorListTest {
             new Author("Kurt", "K.", null, "G{\\\"{o}}del", null);
     private static final Author BANU_MOSA =
             new Author(null, null, null, "{The Ban\\={u} M\\={u}s\\={a} brothers}", null);
-    private static final AuthorList EMPTY_AUTHOR = AuthorList.of(Collections.emptyList());
+    private static final AuthorList EMPTY_AUTHOR = AuthorList.of(List.of());
     private static final AuthorList ONE_AUTHOR_WITH_LATEX = AuthorList.of(MUHAMMAD_ALKHWARIZMI);
     private static final AuthorList TWO_AUTHORS_WITH_LATEX = AuthorList.of(MUHAMMAD_ALKHWARIZMI, CORRADO_BOHM);
     private static final AuthorList THREE_AUTHORS_WITH_LATEX = AuthorList.of(MUHAMMAD_ALKHWARIZMI, CORRADO_BOHM, KURT_GODEL);
@@ -1003,44 +1003,44 @@ public class AuthorListTest {
     }
 
     @Test
-    void parseNameWithBracesAroundFirstName() throws Exception {
+    void parseNameWithBracesAroundFirstName() {
         // TODO: Be more intelligent and abbreviate the first name correctly
         Author expected = new Author("Tse-tung", "{Tse-tung}.", null, "Mao", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("{Tse-tung} Mao"));
     }
 
     @Test
-    void parseNameWithBracesAroundLastName() throws Exception {
+    void parseNameWithBracesAroundLastName() {
         Author expected = new Author("Hans", "H.", null, "van den Bergen", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("{van den Bergen}, Hans"));
     }
 
     @Test
-    void parseNameWithHyphenInFirstName() throws Exception {
+    void parseNameWithHyphenInFirstName() {
         Author expected = new Author("Tse-tung", "T.-t.", null, "Mao", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("Tse-tung Mao"));
     }
 
     @Test
-    void parseNameWithHyphenInLastName() throws Exception {
+    void parseNameWithHyphenInLastName() {
         Author expected = new Author("Firstname", "F.", null, "Bailey-Jones", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("Firstname Bailey-Jones"));
     }
 
     @Test
-    void parseNameWithHyphenInLastNameWithInitials() throws Exception {
+    void parseNameWithHyphenInLastNameWithInitials() {
         Author expected = new Author("E. S.", "E. S.", null, "El-{M}allah", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("E. S. El-{M}allah"));
     }
 
     @Test
-    void parseNameWithHyphenInLastNameWithEscaped() throws Exception {
+    void parseNameWithHyphenInLastNameWithEscaped() {
         Author expected = new Author("E. S.", "E. S.", null, "{K}ent-{B}oswell", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("E. S. {K}ent-{B}oswell"));
     }
 
     @Test
-    void parseNameWithHyphenInLastNameWhenLastNameGivenFirst() throws Exception {
+    void parseNameWithHyphenInLastNameWhenLastNameGivenFirst() {
         // TODO: Fix abbreviation to be "A."
         Author expected = new Author("ʿAbdallāh", "ʿ.", null, "al-Ṣāliḥ", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("al-Ṣāliḥ, ʿAbdallāh"));
@@ -1048,7 +1048,7 @@ public class AuthorListTest {
 
     @Test
     @Disabled("Has issues with space character in W-P.")
-    void parseWithDash() throws Exception {
+    void parseWithDash() {
         assertEquals(
                 AuthorList.of(
                         new Author("Z.", "Z.", null, "Yao", null),
@@ -1060,47 +1060,47 @@ public class AuthorListTest {
     }
 
     @Test
-    void parseNameWithBraces() throws Exception {
+    void parseNameWithBraces() {
         Author expected = new Author("H{e}lene", "H.", null, "Fiaux", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("H{e}lene Fiaux"));
     }
 
     @Test
-    void parseFirstNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
+    void parseFirstNameFromFirstAuthorMultipleAuthorsWithLatexNames() {
         assertEquals("Mu{\\d{h}}ammad",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
                           .getAuthor(0).getGivenName().orElse(null));
     }
 
     @Test
-    void parseFirstNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
+    void parseFirstNameFromSecondAuthorMultipleAuthorsWithLatexNames() {
         assertEquals("Corrado",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
                           .getAuthor(1).getGivenName().orElse(null));
     }
 
     @Test
-    void parseLastNameFromFirstAuthorMultipleAuthorsWithLatexNames() throws Exception {
+    void parseLastNameFromFirstAuthorMultipleAuthorsWithLatexNames() {
         assertEquals("al-Khw{\\={a}}rizm{\\={i}}",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
                           .getAuthor(0).getFamilyName().orElse(null));
     }
 
     @Test
-    void parseLastNameFromSecondAuthorMultipleAuthorsWithLatexNames() throws Exception {
+    void parseLastNameFromSecondAuthorMultipleAuthorsWithLatexNames() {
         assertEquals("B{\\\"o}hm",
                 AuthorList.parse("Mu{\\d{h}}ammad al-Khw{\\={a}}rizm{\\={i}} and Corrado B{\\\"o}hm")
                           .getAuthor(1).getFamilyName().orElse(null));
     }
 
     @Test
-    void parseInstitutionAuthorWithLatexNames() throws Exception {
+    void parseInstitutionAuthorWithLatexNames() {
         assertEquals("{The Ban\\={u} M\\={u}s\\={a} brothers}",
                 AuthorList.parse("{The Ban\\={u} M\\={u}s\\={a} brothers}").getAuthor(0).getFamilyName().orElse(null));
     }
 
     @Test
-    void parseRetrieveCachedAuthorListAfterGarbageCollection() throws Exception {
+    void parseRetrieveCachedAuthorListAfterGarbageCollection() {
         final String uniqueAuthorName = "Osvaldo Iongi";
         AuthorList author = AuthorList.parse(uniqueAuthorName);
         System.gc();
@@ -1108,19 +1108,19 @@ public class AuthorListTest {
     }
 
     @Test
-    void parseGarbageCollectAuthorListForUnreachableKey() throws Exception {
+    void parseGarbageCollectAuthorListForUnreachableKey() {
         final String uniqueAuthorName = "Fleur Hornbach";
         // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
-        AuthorList uniqueAuthor = AuthorList.parse(new String(uniqueAuthorName));
+        AuthorList uniqueAuthor = AuthorList.parse(uniqueAuthorName);
         System.gc();
         assertNotSame(uniqueAuthor, AuthorList.parse(uniqueAuthorName));
     }
 
     @Test
-    void parseGarbageCollectUnreachableInstitution() throws Exception {
+    void parseGarbageCollectUnreachableInstitution() {
         final String uniqueInstitutionName = "{Unique LLC}";
         // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
-        AuthorList uniqueInstitution = AuthorList.parse(new String(uniqueInstitutionName));
+        AuthorList uniqueInstitution = AuthorList.parse(uniqueInstitutionName);
         System.gc();
         assertNotSame(uniqueInstitution, AuthorList.parse(uniqueInstitutionName));
     }
@@ -1129,7 +1129,7 @@ public class AuthorListTest {
      * This tests an unreachable key issue addressed in [#6552](https://github.com/JabRef/jabref/pull/6552). The test is incorrect BibTeX but is handled by the parser and common in practice.
      */
     @Test
-    void parseCacheAuthorsWithTwoOrMoreCommasAndWithSpaceInAllParts() throws Exception {
+    void parseCacheAuthorsWithTwoOrMoreCommasAndWithSpaceInAllParts() {
         final String uniqueAuthorsNames = "Basil Dankworth, Gianna Birdwhistle, Cosmo Berrycloth";
         AuthorList uniqueAuthors = AuthorList.parse(uniqueAuthorsNames);
         System.gc();
@@ -1140,7 +1140,7 @@ public class AuthorListTest {
      * This tests an unreachable key issue addressed in [#6552](https://github.com/JabRef/jabref/pull/6552).
      */
     @Test
-    void parseCacheAuthorsWithTwoOrMoreCommasAndWithoutSpaceInAllParts() throws Exception {
+    void parseCacheAuthorsWithTwoOrMoreCommasAndWithoutSpaceInAllParts() {
         final String uniqueAuthorsNames = "Dankworth, Jr., Braelynn";
         AuthorList uniqueAuthors = AuthorList.parse(uniqueAuthorsNames);
         System.gc();
@@ -1151,7 +1151,7 @@ public class AuthorListTest {
      * This tests the issue described at https://github.com/JabRef/jabref/pull/2669#issuecomment-288519458
      */
     @Test
-    void correctNamesWithOneComma() throws Exception {
+    void correctNamesWithOneComma() {
         Author expected = new Author("Alexander der Große", "A. d. G.", null, "Canon der Barbar", null);
         assertEquals(AuthorList.of(expected), AuthorList.parse("Canon der Barbar, Alexander der Große"));
 

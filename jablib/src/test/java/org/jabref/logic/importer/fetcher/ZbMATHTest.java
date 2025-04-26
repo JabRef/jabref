@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +50,7 @@ class ZbMATHTest {
     @Test
     void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
-        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+        assertEquals(List.of(donaldsonEntry), fetchedEntries);
     }
 
     @Test
@@ -67,7 +66,7 @@ class ZbMATHTest {
         searchEntry.setField(StandardField.AUTHOR, "S. K. {Donaldson}");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+        assertEquals(List.of(donaldsonEntry), fetchedEntries);
     }
 
     @Test
@@ -77,7 +76,7 @@ class ZbMATHTest {
         searchEntry.setField(StandardField.AUTHOR, "a");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(Collections.emptyList(), fetchedEntries);
+        assertEquals(List.of(), fetchedEntries);
     }
 
     @Test
@@ -86,6 +85,6 @@ class ZbMATHTest {
         searchEntry.setField(StandardField.ZBL_NUMBER, "0507.57010");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
-        assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
+        assertEquals(List.of(donaldsonEntry), fetchedEntries);
     }
 }

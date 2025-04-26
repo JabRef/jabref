@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +31,7 @@ public class IssnFetcher implements EntryBasedFetcher, IdBasedFetcher {
             Optional<JournalInformation> journalInformation = journalInformationFetcher.getJournalInformation(issn.get(), "");
             return journalInformation.map(journalInfo -> journalInformationToBibEntry(journalInfo, issn.get())).stream().toList();
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     @Override

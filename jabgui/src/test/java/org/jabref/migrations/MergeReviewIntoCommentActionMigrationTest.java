@@ -1,6 +1,6 @@
 package org.jabref.migrations;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -28,7 +28,7 @@ class MergeReviewIntoCommentActionMigrationTest {
 
     @Test
     void noFields() {
-        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
+        ParserResult actualParserResult = new ParserResult(List.of(entry));
 
         action.performMigration(actualParserResult);
 
@@ -38,7 +38,7 @@ class MergeReviewIntoCommentActionMigrationTest {
     @Test
     void reviewField() {
         entry.setField(StandardField.REVIEW, "My Review");
-        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
+        ParserResult actualParserResult = new ParserResult(List.of(entry));
 
         expectedEntry.setField(StandardField.COMMENT, "My Review");
 
@@ -50,7 +50,7 @@ class MergeReviewIntoCommentActionMigrationTest {
     @Test
     void commentField() {
         entry.setField(StandardField.COMMENT, "My Comment");
-        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
+        ParserResult actualParserResult = new ParserResult(List.of(entry));
 
         action.performMigration(actualParserResult);
 
@@ -62,7 +62,7 @@ class MergeReviewIntoCommentActionMigrationTest {
         String commentString = "My Review\n\nSecond Paragraph\n\nThird Paragraph";
 
         entry.setField(StandardField.REVIEW, commentString);
-        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
+        ParserResult actualParserResult = new ParserResult(List.of(entry));
 
         expectedEntry.setField(StandardField.COMMENT, commentString);
 
@@ -77,7 +77,7 @@ class MergeReviewIntoCommentActionMigrationTest {
         entry.setField(StandardField.REVIEW, "My Review");
         entry.setField(StandardField.COMMENT, "My Comment");
 
-        ParserResult actualParserResult = new ParserResult(Collections.singletonList(entry));
+        ParserResult actualParserResult = new ParserResult(List.of(entry));
 
         expectedEntry.setField(StandardField.COMMENT, "My Comment\n" + Localization.lang("Review") + ":\nMy Review");
 

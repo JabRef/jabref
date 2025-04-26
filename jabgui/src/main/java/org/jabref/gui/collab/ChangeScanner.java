@@ -1,7 +1,6 @@
 package org.jabref.gui.collab;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -33,7 +32,7 @@ public class ChangeScanner {
 
     public List<DatabaseChange> scanForChanges() {
         if (database.getDatabasePath().isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         try {
@@ -46,7 +45,7 @@ public class ChangeScanner {
             return DatabaseChangeList.compareAndGetChanges(database, databaseOnDisk, databaseChangeResolverFactory);
         } catch (IOException e) {
             LOGGER.warn("Error while parsing changed file.", e);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 }

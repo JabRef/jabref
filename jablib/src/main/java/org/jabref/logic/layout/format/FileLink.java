@@ -1,7 +1,6 @@
 package org.jabref.logic.layout.format;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.util.FileFieldParser;
@@ -53,7 +52,7 @@ public class FileLink implements ParamLayoutFormatter {
 
         List<Path> dirs;
         if (fileDirectories.isEmpty()) {
-            dirs = Collections.singletonList(Path.of(mainFileDirectory));
+            dirs = List.of(Path.of(mainFileDirectory));
         } else {
             dirs = fileDirectories;
         }

@@ -1,6 +1,5 @@
 package org.jabref.logic.bst;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
@@ -75,7 +74,7 @@ class BstVMVisitor extends BstBaseVisitor<Integer> {
 
     @Override
     public Integer visitReadCommand(BstParser.ReadCommandContext ctx) {
-        FieldWriter fieldWriter = new FieldWriter(new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList()));
+        FieldWriter fieldWriter = new FieldWriter(new FieldPreferences(true, List.of(StandardField.MONTH), List.of()));
         for (BstEntry e : bstVMContext.entries()) {
             for (Map.Entry<String, String> mEntry : e.fields.entrySet()) {
                 Field field = FieldFactory.parseField(mEntry.getKey());

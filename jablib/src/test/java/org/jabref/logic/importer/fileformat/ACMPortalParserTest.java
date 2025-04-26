@@ -5,7 +5,6 @@ import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -141,6 +140,6 @@ class ACMPortalParserTest {
         CookieHandler.setDefault(new CookieManager());
         URL url = new URIBuilder("https://dl.acm.org/action/doSearch?AllField=10.1145/3129790.31298").build().toURL();
         List<BibEntry> bibEntries = parser.parseEntries(new URLDownload(url).asInputStream());
-        assertEquals(Collections.emptyList(), bibEntries);
+        assertEquals(List.of(), bibEntries);
     }
 }

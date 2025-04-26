@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
@@ -20,7 +19,7 @@ class TypeCheckerTest {
     void inProceedingsHasPagesNumbers() {
         entry = new BibEntry(StandardEntryType.InProceedings);
         entry.setField(StandardField.PAGES, "11--15");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test

@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -113,7 +112,7 @@ class EmbeddedBibFilePdfExporterTest {
         FieldPreferences fieldPreferences = new FieldPreferences(
                 true,
                 List.of(StandardField.MONTH),
-                Collections.emptyList());
+                List.of());
 
         exporter = new EmbeddedBibFilePdfExporter(bibDatabaseMode, bibEntryTypesManager, fieldPreferences);
 
@@ -199,7 +198,7 @@ class EmbeddedBibFilePdfExporterTest {
                 .withField(StandardField.DATE, "2020-10-14");
         expected.setChanged(true);
 
-        List<BibEntry> expectedEntries = Collections.singletonList(expected);
+        List<BibEntry> expectedEntries = List.of(expected);
 
         exporter.export(databaseContext, path, expectedEntries);
 

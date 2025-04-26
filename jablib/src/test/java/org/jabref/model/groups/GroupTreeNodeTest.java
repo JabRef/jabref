@@ -2,7 +2,6 @@ package org.jabref.model.groups;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -165,7 +164,7 @@ public class GroupTreeNodeTest {
 
     @Test
     void findMatchesReturnsEmptyForEmptyList() {
-        assertEquals(Collections.emptyList(), getNodeInSimpleTree().findMatches(Collections.emptyList()));
+        assertEquals(List.of(), getNodeInSimpleTree().findMatches(List.of()));
     }
 
     @Test
@@ -308,7 +307,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode child = parent.addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING, ','));
 
         BibEntry newEntry = new BibEntry().withField(StandardField.AUTHOR, "Stephen King");
-        child.addEntriesToGroup(Collections.singletonList(newEntry));
+        child.addEntriesToGroup(List.of(newEntry));
         entries.add(newEntry);
 
         assertEquals(rootNode.getContainingGroups(entries, false), Arrays.asList(rootNode, child));
@@ -324,7 +323,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode secondChild = parent.addSubgroup(new ExplicitGroup("ExplicitSecondNode", GroupHierarchyType.REFINING, ','));
         GroupTreeNode grandChild = secondChild.addSubgroup(new ExplicitGroup("ExplicitNodeThirdLevel", GroupHierarchyType.REFINING, ','));
 
-        parent.addEntriesToGroup(Collections.singletonList(entry));
+        parent.addEntriesToGroup(List.of(entry));
         firstChild.addEntriesToGroup(entries);
         secondChild.addEntriesToGroup(entries);
         grandChild.addEntriesToGroup(entries);
@@ -336,7 +335,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
         List<FieldChange> fieldChanges = searchGroup.addEntriesToGroup(entries);
 
-        assertEquals(Collections.emptyList(), fieldChanges);
+        assertEquals(List.of(), fieldChanges);
     }
 
     @Test
@@ -344,6 +343,6 @@ public class GroupTreeNodeTest {
         GroupTreeNode searchGroup = new GroupTreeNode(new SearchGroup("Search A", GroupHierarchyType.INCLUDING, "searchExpression", EnumSet.of(SearchFlags.CASE_SENSITIVE)));
         List<FieldChange> fieldChanges = searchGroup.removeEntriesFromGroup(entries);
 
-        assertEquals(Collections.emptyList(), fieldChanges);
+        assertEquals(List.of(), fieldChanges);
     }
 }

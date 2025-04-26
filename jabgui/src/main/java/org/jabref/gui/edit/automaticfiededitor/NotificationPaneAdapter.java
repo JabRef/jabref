@@ -1,6 +1,6 @@
 package org.jabref.gui.edit.automaticfiededitor;
 
-import java.util.Collections;
+import java.util.List;
 
 import javafx.scene.Node;
 import javafx.util.Duration;
@@ -18,6 +18,6 @@ public class NotificationPaneAdapter extends LibraryTab.DatabaseNotification {
         String notificationMessage = "%d/%d affected entries".formatted(affectedEntries, totalEntries);
         Node notificationGraphic = IconTheme.JabRefIcons.INTEGRITY_INFO.getGraphicNode();
 
-        notify(notificationGraphic, notificationMessage, Collections.emptyList(), Duration.seconds(2));
+        notify(notificationGraphic, notificationMessage, List.of(), Duration.seconds(2));
     }
 }

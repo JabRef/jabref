@@ -1,7 +1,6 @@
 package org.jabref.logic.importer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +27,7 @@ public interface PagedSearchBasedFetcher extends SearchBasedFetcher {
      */
     default Page<BibEntry> performSearchPaged(String searchQuery, int pageNumber) throws FetcherException {
         if (searchQuery.isBlank()) {
-            return new Page<>(searchQuery, pageNumber, Collections.emptyList());
+            return new Page<>(searchQuery, pageNumber, List.of());
         }
         SyntaxParser parser = new StandardSyntaxParser();
         final String NO_EXPLICIT_FIELD = "default";

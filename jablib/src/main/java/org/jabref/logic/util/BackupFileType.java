@@ -1,6 +1,5 @@
 package org.jabref.logic.util;
 
-import java.util.Collections;
 import java.util.List;
 
 public enum BackupFileType implements FileType {
@@ -16,7 +15,7 @@ public enum BackupFileType implements FileType {
     private final String name;
 
     BackupFileType(String name, String extension) {
-        this.extensions = Collections.singletonList(extension);
+        this.extensions = List.of(extension);
         this.name = name;
     }
 

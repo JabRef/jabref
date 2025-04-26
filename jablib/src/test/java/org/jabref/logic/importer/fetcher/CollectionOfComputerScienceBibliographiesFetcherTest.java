@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -46,7 +45,7 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
     }
 
     @Test
-    void getUrlForQueryReturnsCorrectUrl() throws MalformedURLException, URISyntaxException, FetcherException, QueryNodeParseException {
+    void getUrlForQueryReturnsCorrectUrl() throws MalformedURLException, URISyntaxException, QueryNodeParseException {
         String query = "java jdk";
         URL url = fetcher.getURLForQuery(new StandardSyntaxParser().parse(query, AbstractQueryTransformer.NO_EXPLICIT_FIELD));
         assertEquals("http://liinwww.ira.uka.de/bibliography/rss?query=java+jdk&sort=score", url.toString());
@@ -109,6 +108,6 @@ class CollectionOfComputerScienceBibliographiesFetcherTest {
     @Test
     void performSearchReturnsEmptyListForEmptySearch() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
-        assertEquals(Collections.emptyList(), searchResult);
+        assertEquals(List.of(), searchResult);
     }
 }

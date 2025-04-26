@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.util.StandardFileType;
 
@@ -43,7 +43,7 @@ class BiblioscapeImporterTest {
     @Test
     void importEntriesAbortion() throws Throwable {
         Path file = Path.of(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
-        assertEquals(Collections.emptyList(),
+        assertEquals(List.of(),
                 importer.importDatabase(file).getDatabase().getEntries());
     }
 }

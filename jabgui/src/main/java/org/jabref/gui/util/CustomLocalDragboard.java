@@ -1,6 +1,5 @@
 package org.jabref.gui.util;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +64,7 @@ public class CustomLocalDragboard {
         if (hasBibEntries()) {
             return getValue(BIB_ENTRIES);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     public boolean hasBibEntries() {
@@ -90,6 +89,6 @@ public class CustomLocalDragboard {
         if (hasType(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS)) {
             return getValue(DragAndDropDataFormats.PREVIEWLAYOUT_LIST_CLASS);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

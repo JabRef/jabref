@@ -1,7 +1,6 @@
 package org.jabref.logic.exporter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,22 +47,20 @@ public class MetaDataSerializer {
         metaData.getSaveActions().ifPresent(
                 saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, getAsStringList(saveActions, OS.NEWLINE)));
         if (metaData.isProtected()) {
-            stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
+            stringyMetaData.put(MetaData.PROTECTED_FLAG_META, List.of("true"));
         }
         stringyMetaData.putAll(serializeCiteKeyPatterns(metaData, globalCiteKeyPatterns));
         metaData.getMode().ifPresent(
-                mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getAsString())));
+                mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, List.of(mode.getAsString())));
         metaData.getLibrarySpecificFileDirectory().ifPresent(
-                path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
+                path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, List.of(path.trim())));
         metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
-                .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
+                .put(MetaData.FILE_DIRECTORY + '-' + user, List.of(path.trim())));
         metaData.getLatexFileDirectories().forEach((user, path) -> stringyMetaData
-                .put(MetaData.FILE_DIRECTORY_LATEX + '-' + user, Collections.singletonList(path.toString().trim())));
+                .put(MetaData.FILE_DIRECTORY_LATEX + '-' + user, List.of(path.toString().trim())));
         metaData.getVersionDBStructure().ifPresent(
-                versionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, Collections.singletonList(versionDBStructure.trim())));
-        metaData.getBlgFilePaths().forEach((user, path) -> {
-            stringyMetaData.put(MetaData.BLG_FILE_PATH + "-" + user, Collections.singletonList(path.toString().trim()));
-        });
+                versionDBStructure -> stringyMetaData.put(MetaData.VERSION_DB_STRUCT, List.of(versionDBStructure.trim())));
+        metaData.getBlgFilePaths().forEach((user, path) -> stringyMetaData.put(MetaData.BLG_FILE_PATH + "-" + user, List.of(path.toString().trim())));
 
         for (ContentSelector selector : metaData.getContentSelectorsSorted()) {
             stringyMetaData.put(MetaData.SELECTOR_META_PREFIX + selector.getField().getName(), selector.getValues());

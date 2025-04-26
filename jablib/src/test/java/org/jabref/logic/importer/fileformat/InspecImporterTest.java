@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -68,7 +67,7 @@ class InspecImporterTest {
         expectedEntry.setField(StandardField.PAGES, "20");
         expectedEntry.setField(StandardField.VOLUME, "19");
 
-        BibEntryAssert.assertEquals(Collections.singletonList(expectedEntry),
+        BibEntryAssert.assertEquals(List.of(expectedEntry),
                 InspecImporterTest.class.getResource("InspecImportTest2.txt"), importer);
     }
 
@@ -83,7 +82,7 @@ class InspecImporterTest {
 
         try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
             List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
-            assertEquals(Collections.singletonList(expectedEntry), entries);
+            assertEquals(List.of(expectedEntry), entries);
         }
     }
 

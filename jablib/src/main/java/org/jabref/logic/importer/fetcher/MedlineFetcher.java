@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -194,14 +193,14 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
         Optional<String> transformedQuery = transformer.transformLuceneQuery(luceneQuery);
 
         if (transformedQuery.isEmpty() || transformedQuery.get().isBlank()) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             // searching for pubmed ids matching the query
             List<String> idList = getPubMedIdsFromQuery(transformedQuery.get());
 
             if (idList.isEmpty()) {
                 LOGGER.info("No results found.");
-                return Collections.emptyList();
+                return List.of();
             }
             if (numberOfResultsFound > NUMBER_TO_FETCH) {
                 LOGGER.info("{} results found. Only 50 relevant results will be fetched by default.", numberOfResultsFound);

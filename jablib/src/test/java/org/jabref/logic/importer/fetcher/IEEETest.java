@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -145,7 +144,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
         List<BibEntry> fetchedEntries = fetcher.performSearch("article_number:8801912");
         // Abstract should not be included in JabRef tests (copyrighted)
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
-        assertEquals(Collections.singletonList(expected), fetchedEntries);
+        assertEquals(List.of(expected), fetchedEntries);
     }
 
     @Test
@@ -153,7 +152,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
         List<BibEntry> fetchedEntries = fetcher.performSearch("Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
-        assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
+        assertEquals(List.of(IGOR_NEWCOMERS), fetchedEntries);
     }
 
     @Test
@@ -161,7 +160,7 @@ class IEEETest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTe
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\"");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
-        assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
+        assertEquals(List.of(IGOR_NEWCOMERS), fetchedEntries);
     }
 
     @Override

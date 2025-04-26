@@ -3,7 +3,6 @@ package org.jabref.logic.msbib;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,7 +79,7 @@ public class MSBibDatabase {
             inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.warn("Could not parse document", e);
-            return Collections.emptyList();
+            return List.of();
         }
         NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         if (rootList.getLength() == 0) {

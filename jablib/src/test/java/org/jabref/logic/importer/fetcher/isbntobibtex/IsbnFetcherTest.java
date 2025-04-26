@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher.isbntobibtex;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,7 +86,7 @@ class IsbnFetcherTest {
         BibEntry input = new BibEntry().withField(StandardField.ISBN, "0134685997");
 
         List<BibEntry> fetchedEntry = fetcher.performSearch(input);
-        assertEquals(Collections.singletonList(bibEntry), fetchedEntry);
+        assertEquals(List.of(bibEntry), fetchedEntry);
     }
 
     /**

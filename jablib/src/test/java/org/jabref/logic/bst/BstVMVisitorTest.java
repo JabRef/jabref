@@ -1,6 +1,5 @@
 package org.jabref.logic.bst;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +23,7 @@ class BstVMVisitorTest {
     void visitStringsCommand() {
         BstVM vm = new BstVM("STRINGS { test.string1 test.string2 test.string3 }");
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         Map<String, String> strList = vm.latestContext.strings();
         assertTrue(strList.containsKey("test.string1"));
@@ -39,7 +38,7 @@ class BstVMVisitorTest {
     void visitIntegersCommand() {
         BstVM vm = new BstVM("INTEGERS { variable.a variable.b variable.c }");
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         Map<String, Integer> integersList = vm.latestContext.integers();
         assertTrue(integersList.containsKey("variable.a"));
@@ -57,7 +56,7 @@ class BstVMVisitorTest {
                 EXECUTE { test.func }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("test.func"));
@@ -71,7 +70,7 @@ class BstVMVisitorTest {
                 EXECUTE { jan }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("jan"));
@@ -125,7 +124,7 @@ class BstVMVisitorTest {
                 EXECUTE { init.state.consts }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(5, vm.latestContext.integers().get("variable.a"));
     }
@@ -236,7 +235,7 @@ class BstVMVisitorTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(3, vm.getStack().pop());
         assertInstanceOf(ParseTree.class, vm.getStack().pop());

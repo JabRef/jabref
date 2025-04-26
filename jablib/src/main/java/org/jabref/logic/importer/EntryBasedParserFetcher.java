@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,7 +40,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher, ParserFetche
         URL urlForEntry;
         try {
             if ((urlForEntry = getURLForEntry(entry)) == null) {
-                return Collections.emptyList();
+                return List.of();
             }
         } catch (MalformedURLException | URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);

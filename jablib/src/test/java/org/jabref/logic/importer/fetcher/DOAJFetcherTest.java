@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,7 +49,7 @@ class DOAJFetcherTest {
         .withField(StandardField.ABSTRACT, "Objective: Based on Magnetic Resonance Imaging (MRI), verify the structural and functional changes related to memory deficits in non-demented elderly individuals in comparison with young adults. Methodology: Proceeded a systematic review based on Preferred Reporting Items for Systematic Review and Meta-Analysis (PRISMA) fluxogram. The search was done on PubMed, Scopus and EBSCO databases using JabRef 2.10, and Web of Science. It was included in the analysis quasi-experimental, cross-sectional, cohort and case-control studies published between 2005 and 2014 in national and international indexed periodicals that had as sample: non-demented individuals older than 60 years old, who were submitted to MRI investigation of their for any brain structural and functional changes associated with memory deficits, identified in neuropsychologicals tests. Results: About the imaging technique, we reviewed studies that used structural MRIs (two articles), functional MRIs (six articles), both techniques (four articles). In the 12 studies, 38 distinct neuropsychological tests were used, an average of five different tests for each study (variation of 1-12). The most used tests were WAIS Digit Span Backwards (seven articles), Trail Making Test A and B (four articles) and Wechsler Memory Scale (four articles). Conclusion: The review showed that in normal aging the parahippocampal white substance, the hippocampus volume and entorhinal cortex slightly shrink, causing verbal memory reduction, possibly due to fiber demyelination; reduced connections between temporal and frontal lobes contributing to an impairement of episodic, working memory and verbal fluency; reduction suppression of irrelevant information, affecting the register of information; changes on frontal and parietal areas, compromising recognition memory; modifications in activity and connectivity of the default mode network; reorganization of cognitive functions and also a slower response, probably due to reduction of pre-frontal cortex activation");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef MRI");
-        assertEquals(Collections.singletonList(expected), fetchedEntries);
+        assertEquals(List.of(expected), fetchedEntries);
     }
 
     @Test
@@ -69,7 +68,7 @@ class DOAJFetcherTest {
 
     @Test
     void searchByEmptyQuery() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+        assertEquals(List.of(), fetcher.performSearch(""));
     }
 
     @Test

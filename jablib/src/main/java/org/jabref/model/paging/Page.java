@@ -2,6 +2,7 @@ package org.jabref.model.paging;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 public class Page<T> {
 
@@ -16,7 +17,7 @@ public class Page<T> {
     }
 
     public Page(String query, int pageNumber) {
-        this(query, pageNumber, Collections.emptyList());
+        this(query, pageNumber, List.of());
     }
 
     public Collection<T> getContent() {

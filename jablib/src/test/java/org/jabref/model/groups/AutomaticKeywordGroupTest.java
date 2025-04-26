@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class AutomaticKeywordGroupTest {
 
     @Test
-    void createSubgroupsForTwoKeywords() throws Exception {
+    void createSubgroupsForTwoKeywords() {
         AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "A, B");
 
@@ -23,7 +23,7 @@ class AutomaticKeywordGroupTest {
     }
 
     @Test
-    void createSubgroupsIgnoresEmptyKeyword() throws Exception {
+    void createSubgroupsIgnoresEmptyKeyword() {
         AutomaticKeywordGroup keywordsGroup = new AutomaticKeywordGroup("Keywords", GroupHierarchyType.INDEPENDENT, StandardField.KEYWORDS, ',', '>');
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "A, ,B");
 

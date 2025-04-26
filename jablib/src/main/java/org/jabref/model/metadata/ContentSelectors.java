@@ -2,7 +2,6 @@ package org.jabref.model.metadata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class ContentSelectors {
             }
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 
     public SortedSet<ContentSelector> getContentSelectors() {

@@ -2,8 +2,8 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -105,7 +105,7 @@ class XmpPdfExporterTest {
         when(filePreferences.getUserAndHost()).thenReturn(tempDir.toAbsolutePath().toString());
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
 
-        xmpPreferences = new XmpPreferences(false, Collections.emptySet(), new SimpleObjectProperty<>(','));
+        xmpPreferences = new XmpPreferences(false, Set.of(), new SimpleObjectProperty<>(','));
         exporter = new XmpPdfExporter(xmpPreferences);
 
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);

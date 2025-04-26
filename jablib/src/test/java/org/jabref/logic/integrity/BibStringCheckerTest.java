@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -29,9 +28,9 @@ class BibStringCheckerTest {
 
     private static Stream<Arguments> provideAcceptedInputs() {
         return Stream.of(
-                Arguments.of(Collections.emptyList(), StandardField.TITLE, "Not a single hash mark"),
-                Arguments.of(Collections.emptyList(), StandardField.MONTH, "#jan#"),
-                Arguments.of(Collections.emptyList(), StandardField.AUTHOR, "#einstein# and #newton#")
+                Arguments.of(List.of(), StandardField.TITLE, "Not a single hash mark"),
+                Arguments.of(List.of(), StandardField.MONTH, "#jan#"),
+                Arguments.of(List.of(), StandardField.AUTHOR, "#einstein# and #newton#")
         );
     }
 

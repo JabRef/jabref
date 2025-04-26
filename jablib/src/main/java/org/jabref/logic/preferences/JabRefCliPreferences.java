@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -725,7 +724,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @VisibleForTesting
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
@@ -2110,7 +2109,7 @@ public class JabRefCliPreferences implements CliPreferences {
         BuildInfo buildInfo = new BuildInfo();
         if (buildInfo == null) {
             LOGGER.warn("Could not instantiate BuildInfo.");
-            return Collections.emptyMap();
+            return Map.of();
         }
 
         Map<String, String> keys = new HashMap<>();

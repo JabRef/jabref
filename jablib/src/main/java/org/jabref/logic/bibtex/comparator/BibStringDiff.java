@@ -1,7 +1,6 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +23,7 @@ public class BibStringDiff {
 
     public static List<BibStringDiff> compare(BibDatabase originalDatabase, BibDatabase newDatabase) {
         if (originalDatabase.hasNoStrings() && newDatabase.hasNoStrings()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<BibStringDiff> differences = new ArrayList<>();

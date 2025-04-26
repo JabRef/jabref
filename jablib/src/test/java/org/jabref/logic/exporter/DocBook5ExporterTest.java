@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -62,7 +61,7 @@ public class DocBook5ExporterTest {
                 .withField(StandardField.ISBN, "1-2-34")
                 .withCitationKey("mykey")
                 .withDate(new Date(myDate));
-        entries = Collections.singletonList(entry);
+        entries = List.of(entry);
     }
 
     @Test

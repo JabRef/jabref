@@ -1,7 +1,7 @@
 package org.jabref.migrations;
 
-import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ParserResult;
@@ -20,7 +20,7 @@ class ConvertMarkingToGroupsTest {
     void performMigrationForSingleEntry() {
         BibEntry entry = new BibEntry()
                 .withField(InternalField.MARKED_INTERNAL, "[Nicolas:6]");
-        ParserResult parserResult = new ParserResult(Collections.singleton(entry));
+        ParserResult parserResult = new ParserResult(Set.of(entry));
 
         new ConvertMarkingToGroups().performMigration(parserResult);
 

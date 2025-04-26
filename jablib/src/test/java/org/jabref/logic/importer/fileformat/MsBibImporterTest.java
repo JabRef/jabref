@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.Importer;
@@ -33,7 +32,7 @@ class MsBibImporterTest {
     final void importEntriesEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(MsBibImporter.class.getResource("EmptyMsBib_Test.xml").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Collections.emptyList(), entries);
+        assertEquals(List.of(), entries);
     }
 
     @Test

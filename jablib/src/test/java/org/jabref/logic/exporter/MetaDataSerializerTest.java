@@ -1,10 +1,10 @@
 package org.jabref.logic.exporter;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
@@ -49,18 +49,18 @@ public class MetaDataSerializerTest {
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
                 List.of(new BibField(StandardField.AUTHOR, FieldPriority.IMPORTANT)),
-                Collections.emptySet());
+                Set.of());
     }
 
     @Test
     void serializeNewMetadataReturnsEmptyMap() {
-        assertEquals(Collections.emptyMap(), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
+        assertEquals(Map.of(), MetaDataSerializer.getSerializedStringMap(metaData, pattern));
     }
 
     @Test
     void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
+                List.of(new FieldFormatterCleanup(StandardField.TITLE, new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 
         Map<String, String> expectedSerialization = new TreeMap<>();
@@ -88,19 +88,19 @@ public class MetaDataSerializerTest {
     void parsingEmptyOrFieldsReturnsEmptyCollections() {
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
-        assertEquals(Collections.emptySet(), type.get().getRequiredFields());
+        assertEquals(Set.of(), type.get().getRequiredFields());
     }
 
     @Test
     void parsingEmptyOptionalFieldsFieldsReturnsEmptyCollections() {
         newCustomType = new BibEntryType(
                 CUSTOM_TYPE,
-                Collections.emptySet(),
-                Collections.singleton(new OrFields(StandardField.AUTHOR)));
+                Set.of(),
+                Set.of(new OrFields(StandardField.AUTHOR)));
 
         String serialized = MetaDataSerializer.serializeCustomEntryTypes(newCustomType);
         Optional<BibEntryType> type = MetaDataParser.parseCustomEntryType(serialized);
-        assertEquals(Collections.emptySet(), type.get().getOptionalFields());
+        assertEquals(Set.of(), type.get().getOptionalFields());
     }
 
     /**

@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -48,6 +47,6 @@ class DoiDuplicationCheckerTest {
     void noDuplicateDOI() {
         List<BibEntry> entries = List.of(doiA_entry1, doiB_entry1, doiC_entry1);
         BibDatabase database = new BibDatabase(entries);
-        assertEquals(Collections.emptyList(), checker.check(database));
+        assertEquals(List.of(), checker.check(database));
     }
 }

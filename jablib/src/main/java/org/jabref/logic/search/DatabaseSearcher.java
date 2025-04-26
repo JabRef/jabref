@@ -1,7 +1,6 @@
 package org.jabref.logic.search;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +37,7 @@ public class DatabaseSearcher {
         if (!query.isValid()) {
             LOGGER.warn("Search failed: invalid search expression");
             indexManager.closeAndWait();
-            return Collections.emptyList();
+            return List.of();
         }
         List<BibEntry> matchEntries = indexManager.search(query)
                                                   .getMatchedEntries()

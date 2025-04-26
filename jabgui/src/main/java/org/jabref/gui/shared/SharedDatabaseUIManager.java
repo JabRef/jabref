@@ -1,7 +1,7 @@
 package org.jabref.gui.shared;
 
 import java.sql.SQLException;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
@@ -151,7 +151,7 @@ public class SharedDatabaseUIManager {
                             + "\n"
                             + Localization.lang("You can restore the entry using the \"Undo\" operation."));
 
-            stateManager.setSelectedEntries(Collections.emptyList());
+            stateManager.setSelectedEntries(List.of());
         }
     }
 

@@ -3,7 +3,6 @@ package org.jabref.benchmarks;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -82,7 +81,7 @@ public class Benchmarks {
         StringWriter outputWriter = new StringWriter();
         BibWriter bibWriter = new BibWriter(outputWriter, OS.NEWLINE);
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        FieldPreferences fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
+        FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(), List.of());
         CitationKeyPatternPreferences citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
         BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
@@ -148,7 +147,7 @@ public class Benchmarks {
         return group.containsAll(database.getEntries());
     }
 
-    public static void main(String[] args) throws IOException, RunnerException {
+    public static void main(String[] args) throws IOException {
         Main.main(args);
     }
 }

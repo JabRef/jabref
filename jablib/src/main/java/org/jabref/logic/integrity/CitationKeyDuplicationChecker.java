@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,14 +21,14 @@ public class CitationKeyDuplicationChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         Optional<String> citeKey = entry.getCitationKey();
         if (citeKey.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         boolean isDuplicate = database.isDuplicateCitationKeyExisting(citeKey.get());
         if (isDuplicate) {
-            return Collections.singletonList(
+            return List.of(
                     new IntegrityMessage(Localization.lang("Duplicate citation key"), entry, StandardField.KEY));
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

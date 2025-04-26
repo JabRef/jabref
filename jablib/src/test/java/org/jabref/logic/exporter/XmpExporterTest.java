@@ -3,8 +3,8 @@ package org.jabref.logic.exporter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 
@@ -40,7 +40,7 @@ class XmpExporterTest {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.AUTHOR, "Alan Turing");
 
-        exporter.export(databaseContext, file, Collections.singletonList(entry));
+        exporter.export(databaseContext, file, List.of(entry));
         String actual = String.join("\n", Files.readAllLines(file)); // we are using \n to join, so we need it in the expected string as well, \r\n would fail
         String expected = """
                   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
@@ -132,7 +132,7 @@ class XmpExporterTest {
 
         // Nothing written in given file
         List<String> lines = Files.readAllLines(file);
-        assertEquals(Collections.emptyList(), lines);
+        assertEquals(List.of(), lines);
 
         // turing contains the turing entry only
         Path fileTuring = Path.of(file.getParent().toString(), entryTuring.getId() + "_null.xmp");
@@ -188,7 +188,7 @@ class XmpExporterTest {
 
     @Test
     void exportSingleEntryWithPrivacyFilter(@TempDir Path testFolder) throws Exception {
-        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(Collections.singleton(StandardField.AUTHOR)));
+        when(xmpPreferences.getXmpPrivacyFilter()).thenReturn(FXCollections.observableSet(Set.of(StandardField.AUTHOR)));
         when(xmpPreferences.shouldUseXmpPrivacyFilter()).thenReturn(true);
 
         Path file = testFolder.resolve("ThisIsARandomlyNamedFile");
@@ -197,7 +197,7 @@ class XmpExporterTest {
         BibEntry entry = new BibEntry()
                 .withField(StandardField.AUTHOR, "Alan Turing");
 
-        exporter.export(databaseContext, file, Collections.singletonList(entry));
+        exporter.export(databaseContext, file, List.of(entry));
 
         String actual = String.join("\n", Files.readAllLines(file));
         String expected = """

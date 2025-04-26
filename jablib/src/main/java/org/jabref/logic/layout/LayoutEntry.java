@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -118,7 +117,7 @@ class LayoutEntry {
                        JournalAbbreviationRepository abbreviationRepository) {
         this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;
-        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, Collections.emptyList());
+        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, List.of());
 
         type = si.i;
         switch (type) {
@@ -141,7 +140,7 @@ class LayoutEntry {
                        JournalAbbreviationRepository abbreviationRepository) {
         this.preferences = preferences;
         this.abbreviationRepository = abbreviationRepository;
-        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, Collections.emptyList());
+        this.fileDirForDatabase = Objects.requireNonNullElse(fileDirForDatabase, List.of());
 
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         String blockStart = parsedEntries.getFirst().s;
@@ -610,11 +609,11 @@ class LayoutEntry {
                         }
                     } else {
                         // Incorrectly terminated open brace
-                        result.add(Collections.singletonList(method));
+                        result.add(List.of(method));
                     }
                 } else {
                     String method = calls.substring(start, i);
-                    result.add(Collections.singletonList(method));
+                    result.add(List.of(method));
                 }
             }
             i++;

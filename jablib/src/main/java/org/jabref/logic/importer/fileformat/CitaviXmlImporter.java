@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -443,7 +442,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         } catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {

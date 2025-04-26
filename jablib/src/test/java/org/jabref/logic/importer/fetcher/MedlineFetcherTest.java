@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -189,18 +188,18 @@ class MedlineFetcherTest {
     }
 
     @Test
-    void invalidSearchTerm() throws Exception {
+    void invalidSearchTerm() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher"));
     }
 
     @Test
     void emptyEntryList() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ");
-        assertEquals(Collections.emptyList(), entryList);
+        assertEquals(List.of(), entryList);
     }
 
     @Test
     void emptyInput() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+        assertEquals(List.of(), fetcher.performSearch(""));
     }
 }

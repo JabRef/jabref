@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +18,7 @@ public class FileLinksCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         Optional<String> oldValue = entry.getField(StandardField.FILE);
         if (oldValue.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<LinkedFile> fileList = entry.getFiles();
@@ -29,8 +28,8 @@ public class FileLinksCleanup implements CleanupJob {
         if (!oldValue.get().equals(newValue)) {
             entry.setField(StandardField.FILE, newValue);
             FieldChange change = new FieldChange(entry, StandardField.FILE, oldValue.get(), newValue);
-            return Collections.singletonList(change);
+            return List.of(change);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

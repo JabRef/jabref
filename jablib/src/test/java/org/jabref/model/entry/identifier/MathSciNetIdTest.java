@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class MathSciNetIdTest {
 
     @Test
-    void parseRemovesNewLineCharacterAtEnd() throws Exception {
+    void parseRemovesNewLineCharacterAtEnd() {
         Optional<MathSciNetId> id = MathSciNetId.parse("3014184\n");
         assertEquals(Optional.of(new MathSciNetId("3014184")), id);
     }

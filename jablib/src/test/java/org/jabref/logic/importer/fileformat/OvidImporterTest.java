@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -42,13 +41,13 @@ class OvidImporterTest {
 
     @ParameterizedTest
     @MethodSource("fileNames")
-    void isRecognizedFormatAccept(String fileName) throws IOException, URISyntaxException {
+    void isRecognizedFormatAccept(String fileName) throws IOException {
         ImporterTestEngine.testIsRecognizedFormat(importer, fileName);
     }
 
     @ParameterizedTest
     @MethodSource("invalidFileNames")
-    void isRecognizedFormatRejected(String fileName) throws IOException, URISyntaxException {
+    void isRecognizedFormatRejected(String fileName) throws IOException {
         ImporterTestEngine.testIsNotRecognizedFormat(importer, fileName);
     }
 
@@ -56,7 +55,7 @@ class OvidImporterTest {
     void importEmpty() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Collections.emptyList(), entries);
+        assertEquals(List.of(), entries);
     }
 
     @Test
@@ -116,7 +115,7 @@ class OvidImporterTest {
     void importEntries2() throws IOException, URISyntaxException {
         Path file = Path.of(OvidImporter.class.getResource("OvidImporterTest2Invalid.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Collections.emptyList(), entries);
+        assertEquals(List.of(), entries);
     }
 
     @Test

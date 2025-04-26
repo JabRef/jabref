@@ -5,7 +5,6 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -57,7 +56,7 @@ public class LayoutHelper {
     public LayoutHelper(Reader in,
                         LayoutFormatterPreferences preferences,
                         JournalAbbreviationRepository abbreviationRepository) {
-        this(in, Collections.emptyList(), preferences, abbreviationRepository);
+        this(in, List.of(), preferences, abbreviationRepository);
     }
 
     public Layout getLayoutFromText() throws IOException {
@@ -352,7 +351,7 @@ public class LayoutHelper {
         return annotation;
     }
 
-    private boolean validChar(int c) throws IOException {
+    private boolean validChar(int c) {
         boolean character = Character.isLetter((char) c) || (c == '_');
 
         return character;

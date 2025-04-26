@@ -1,6 +1,5 @@
 package org.jabref.logic.cleanup;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,7 @@ public class ISSNCleanup implements CleanupJob {
     public List<FieldChange> cleanup(BibEntry entry) {
         Optional<String> issnString = entry.getField(StandardField.ISSN);
         if (issnString.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         ISSN issn = new ISSN(issnString.get());
@@ -23,8 +22,8 @@ public class ISSNCleanup implements CleanupJob {
             String newValue = issn.getCleanedISSN();
             FieldChange change = new FieldChange(entry, StandardField.ISSN, issnString.get(), newValue);
             entry.setField(StandardField.ISSN, newValue);
-            return Collections.singletonList(change);
+            return List.of(change);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

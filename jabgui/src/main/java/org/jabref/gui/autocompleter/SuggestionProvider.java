@@ -27,7 +27,6 @@
 package org.jabref.gui.autocompleter;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,7 +54,7 @@ public abstract class SuggestionProvider<T> {
                               .sorted(comparator)
                               .collect(Collectors.toList());
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 

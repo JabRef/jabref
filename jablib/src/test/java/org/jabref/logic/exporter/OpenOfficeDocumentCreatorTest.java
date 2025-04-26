@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -58,7 +57,7 @@ public class OpenOfficeDocumentCreatorTest {
         entry.setField(StandardField.VOLUME, "34");
         entry.setField(StandardField.YEAR, "2002");
 
-        entries = Collections.singletonList(entry);
+        entries = List.of(entry);
     }
 
     @Test

@@ -1,5 +1,6 @@
 package org.jabref.gui.linkedfile;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.TreeSet;
@@ -39,7 +40,7 @@ class LinkedFileEditDialogViewModelTest {
     }
 
     @Test
-    void badFilenameCharWillBeReplacedByUnderscore(@TempDir Path tempDir) throws Exception {
+    void badFilenameCharWillBeReplacedByUnderscore(@TempDir Path tempDir) throws IOException {
 
         Path invalidFile = tempDir.resolve("?invalid.pdf");
         Files.createFile(invalidFile);

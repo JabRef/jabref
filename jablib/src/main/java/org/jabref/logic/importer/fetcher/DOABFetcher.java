@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -59,7 +58,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
             // created a similar method suitable for this case "toJsonArray"
             JSONArray response = JsonReader.toJsonArray(InputStream);
             if (response.isEmpty()) {
-                return Collections.emptyList();
+                return List.of();
             }
             if (response.length() == 1) {
                 // the information used for bibtex entries are in an array inside the resulting jsonarray
@@ -67,7 +66,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
                 JSONArray metadataArray = response.getJSONObject(0).getJSONArray("metadata");
                 JSONArray bitstreamArray = response.getJSONObject(0).getJSONArray("bitstreams");
                 BibEntry entry = jsonToBibEntry(metadataArray, bitstreamArray);
-                return Collections.singletonList(entry);
+                return List.of(entry);
             }
             List<BibEntry> entries = new ArrayList<>(response.length());
             for (int i = 0; i < response.length(); i++) {

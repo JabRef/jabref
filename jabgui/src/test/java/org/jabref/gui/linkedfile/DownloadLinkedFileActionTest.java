@@ -1,8 +1,10 @@
 package org.jabref.gui.linkedfile;
 
+import java.io.IOException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -90,7 +92,7 @@ class DownloadLinkedFileActionTest {
     }
 
     @Test
-    void replacesLinkedFiles(@TempDir Path tempFolder) throws Exception {
+    void replacesLinkedFiles(@TempDir Path tempFolder) throws MalformedURLException {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
         LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
@@ -115,7 +117,7 @@ class DownloadLinkedFileActionTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void doesntReplaceSourceURL(boolean keepHtml) throws Exception {
+    void doesntReplaceSourceURL(boolean keepHtml) throws IOException {
         String url = "http://arxiv.org/pdf/1207.0408v1";
 
         LinkedFile linkedFile = new LinkedFile(URLUtil.create(url), "");
@@ -161,7 +163,7 @@ class DownloadLinkedFileActionTest {
     }
 
     @Test
-    void keepsHtmlFileLink(@TempDir Path tempFolder) throws Exception {
+    void keepsHtmlFileLink(@TempDir Path tempFolder) throws MalformedURLException {
         stubFor(get(urlEqualTo("/html"))
                 .willReturn(aResponse()
                         .withStatus(200)

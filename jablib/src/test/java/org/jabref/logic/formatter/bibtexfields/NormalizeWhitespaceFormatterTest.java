@@ -1,6 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.model.entry.field.StandardField;
@@ -19,8 +19,8 @@ class NormalizeWhitespaceFormatterTest {
     void setUp() {
         parser = new NormalizeWhitespaceFormatter(new FieldPreferences(
                 false,
-                Collections.emptyList(),
-                Collections.emptyList()));
+                List.of(),
+                List.of()));
     }
 
     @Test

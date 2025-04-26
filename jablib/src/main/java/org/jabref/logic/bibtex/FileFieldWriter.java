@@ -1,7 +1,6 @@
 package org.jabref.logic.bibtex;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,7 @@ public class FileFieldWriter {
     }
 
     public static String getStringRepresentation(LinkedFile field) {
-        return getStringRepresentation(Collections.singletonList(field));
+        return getStringRepresentation(List.of(field));
     }
 
     /**

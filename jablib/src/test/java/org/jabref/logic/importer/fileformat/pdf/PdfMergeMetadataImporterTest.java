@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,7 +52,7 @@ class PdfMergeMetadataImporterTest {
     void doesNotHandleEncryptedPdfs() throws Exception {
         Path file = Path.of(PdfMergeMetadataImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test

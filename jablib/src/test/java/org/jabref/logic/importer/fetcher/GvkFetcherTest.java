@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
@@ -91,18 +90,18 @@ class GvkFetcherTest {
     @Test
     void performSearch591166003() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:591166003");
-        assertEquals(Collections.singletonList(bibEntryPPN591166003), searchResult);
+        assertEquals(List.of(bibEntryPPN591166003), searchResult);
     }
 
     @Test
     void performSearch66391437X() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("ppn:66391437X");
-        assertEquals(Collections.singletonList(bibEntryPPN66391437X), searchResult);
+        assertEquals(List.of(bibEntryPPN66391437X), searchResult);
     }
 
     @Test
     void performSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
-        assertEquals(Collections.emptyList(), searchResult);
+        assertEquals(List.of(), searchResult);
     }
 }

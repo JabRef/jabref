@@ -3,7 +3,6 @@ package org.jabref.model.groups;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -141,6 +140,6 @@ public class TexGroup extends AbstractGroup implements FileUpdateListener {
     private List<Path> getFileDirectoriesAsPaths() {
         return metaData.getLatexFileDirectory(user)
                        .map(List::of)
-                       .orElse(Collections.emptyList());
+                       .orElse(List.of());
     }
 }

@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
@@ -54,7 +53,7 @@ class DBLPFetcherTest {
         String query = "Process Engine Benchmarking with Betsy in the Context of \"{ISO/IEC}\" Quality Standards";
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        assertEquals(Collections.singletonList(entry), result);
+        assertEquals(List.of(entry), result);
     }
 
     @Test
@@ -62,11 +61,11 @@ class DBLPFetcherTest {
         String query = "geiger harrer betsy$ softw.trends"; // -wirtz Negative operators do no longer work,  see issue https://github.com/JabRef/jabref/issues/2890
         List<BibEntry> result = dblpFetcher.performSearch(query);
 
-        assertEquals(Collections.singletonList(entry), result);
+        assertEquals(List.of(entry), result);
     }
 
     @Test
     void findNothing() throws Exception {
-        assertEquals(Collections.emptyList(), dblpFetcher.performSearch(""));
+        assertEquals(List.of(), dblpFetcher.performSearch(""));
     }
 }

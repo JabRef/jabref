@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -155,7 +154,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
 
     @Test
     void searchByEmptyQueryFindsNothing() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+        assertEquals(List.of(), fetcher.performSearch(""));
     }
 
     @Test
@@ -205,7 +204,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
         // Phrase search should be a subset of the normal search result.
         assertTrue(result.containsAll(resultPhrase));
         result.removeAll(resultPhrase);
-        assertEquals(Collections.singletonList(expected), result);
+        assertEquals(List.of(expected), result);
     }
 
     @Test

@@ -1,7 +1,6 @@
 package org.jabref.gui.groups;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -163,7 +162,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
             rootGroup.setValue(newRoot);
             if (stateManager.getSelectedGroups(newDatabase.get()).isEmpty()) {
-                stateManager.setSelectedGroups(newDatabase.get(), Collections.singletonList(newRoot.getGroupNode()));
+                stateManager.setSelectedGroups(newDatabase.get(), List.of(newRoot.getGroupNode()));
             }
             selectedGroups.setAll(
                     stateManager.getSelectedGroups(newDatabase.get()).stream()

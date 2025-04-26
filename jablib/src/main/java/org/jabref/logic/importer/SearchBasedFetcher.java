@@ -1,6 +1,5 @@
 package org.jabref.logic.importer;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
@@ -37,7 +36,7 @@ public interface SearchBasedFetcher extends WebFetcher {
      */
     default List<BibEntry> performSearch(String searchQuery) throws FetcherException {
         if (searchQuery.isBlank()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         SyntaxParser parser = new StandardSyntaxParser();

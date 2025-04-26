@@ -3,7 +3,6 @@ package org.jabref.logic.pseudonymization;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ class PseudonymizationTest {
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, "\n");
         saveConfiguration = new SelfContainedSaveConfiguration(SaveOrder.getDefaultSaveOrder(), false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
-        fieldPreferences = new FieldPreferences(true, Collections.emptyList(), Collections.emptyList());
+        fieldPreferences = new FieldPreferences(true, List.of(), List.of());
         citationKeyPatternPreferences = mock(CitationKeyPatternPreferences.class, Answers.RETURNS_DEEP_STUBS);
         entryTypesManager = new BibEntryTypesManager();
 
@@ -65,7 +64,7 @@ class PseudonymizationTest {
     }
 
     @Test
-    void pseudonymizeTwoEntries() throws Exception {
+    void pseudonymizeTwoEntries() {
         BibEntry first = new BibEntry("first")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");

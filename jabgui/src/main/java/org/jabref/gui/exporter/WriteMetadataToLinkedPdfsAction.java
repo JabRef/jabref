@@ -142,7 +142,7 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
         }
 
         @Override
-        public Void call() throws Exception {
+        public Void call() {
             if (stateManager.getActiveDatabase().isEmpty()) {
                 return null;
             }

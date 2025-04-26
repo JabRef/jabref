@@ -1,6 +1,6 @@
 package org.jabref.gui.util;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -24,7 +24,7 @@ class RecursiveTreeItemTest {
     private TreeNodeTestData.TreeNodeMock node;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         root = new TreeNodeTestData.TreeNodeMock();
         node = TreeNodeTestData.getNodeInSimpleTree(root);
         node.setName("test node");
@@ -35,12 +35,12 @@ class RecursiveTreeItemTest {
     }
 
     @Test
-    void addsAllChildrenNodes() throws Exception {
+    void addsAllChildrenNodes() {
         assertEquals(root.getChildren(), rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
     }
 
     @Test
-    void addsAllChildrenOfChildNode() throws Exception {
+    void addsAllChildrenOfChildNode() {
         assertEquals(
                 root.getChildAt(1).get().getChildren(),
                 rootTreeItem.getChildren().get(1).getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
@@ -50,9 +50,9 @@ class RecursiveTreeItemTest {
     void respectsFilter() throws Exception {
         filterPredicate.setValue(item -> item.getName().contains("test"));
 
-        assertEquals(Collections.singletonList(node.getParent().get()), rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
+        assertEquals(List.of(node.getParent().get()), rootTreeItem.getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
         assertEquals(
-                Collections.singletonList(node),
+                List.of(node),
                 rootTreeItem.getChildren().getFirst().getChildren().stream().map(TreeItem::getValue).collect(Collectors.toList()));
     }
 }

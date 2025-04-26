@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +45,7 @@ class CiteSeerTest {
                 .withField(StandardField.URL, "http://arxiv.org/pdf/1307.0986.pdf");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:\"Rigorous Derivation from Landau-de Gennes Theory to Ericksen-leslie Theory\" AND pageSize:1");
-        assertEquals(Collections.singletonList(expected), fetchedEntries);
+        assertEquals(List.of(expected), fetchedEntries);
     }
 
     @Test
@@ -61,7 +60,7 @@ class CiteSeerTest {
                 .withField(StandardField.URL, "http://intl.psychosomaticmedicine.org/content/55/3/234.full.pdf");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("title:\"Coping Theory and Research: Past Present and Future\" AND pageSize:1");
-        assertEquals(Collections.singletonList(expected), fetchedEntries);
+        assertEquals(List.of(expected), fetchedEntries);
     }
 
     /*
@@ -89,8 +88,8 @@ class CiteSeerTest {
         while (fetchedEntriesIter.hasNext()) {
             BibEntry laterEntry = fetchedEntriesIter.next();
             if (recentEntry.hasField(StandardField.YEAR) && laterEntry.hasField(StandardField.YEAR)) {
-                Integer recentYear = Integer.parseInt(recentEntry.getField(StandardField.YEAR).orElse("0"));
-                Integer laterYear = Integer.parseInt(laterEntry.getField(StandardField.YEAR).orElse("0"));
+                int recentYear = Integer.parseInt(recentEntry.getField(StandardField.YEAR).orElse("0"));
+                int laterYear = Integer.parseInt(laterEntry.getField(StandardField.YEAR).orElse("0"));
                 assertFalse(recentYear < laterYear);
             }
             recentEntry = laterEntry;

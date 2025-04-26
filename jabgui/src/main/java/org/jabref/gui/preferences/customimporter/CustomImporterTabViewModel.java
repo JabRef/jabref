@@ -2,7 +2,7 @@ package org.jabref.gui.preferences.customimporter;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -64,7 +64,7 @@ public class CustomImporterTabViewModel implements PreferenceTabViewModel {
      * @return class name
      */
     private static String pathToClass(String basePath, Path path) {
-        String className = FileUtil.relativize(path, Collections.singletonList(Path.of(basePath))).toString();
+        String className = FileUtil.relativize(path, List.of(Path.of(basePath))).toString();
         if (className != null) {
             int lastDot = className.lastIndexOf('.');
             if (lastDot < 0) {

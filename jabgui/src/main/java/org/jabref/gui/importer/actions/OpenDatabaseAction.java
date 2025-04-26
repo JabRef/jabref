@@ -242,7 +242,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         tabContainer.addTab(newTab, true);
     }
 
-    private ParserResult loadDatabase(Path file) throws Exception {
+    private ParserResult loadDatabase(Path file) throws NotASharedDatabaseException, SQLException, InvalidDBMSConnectionPropertiesException, DatabaseNotSupportedException {
         Path fileToLoad = file.toAbsolutePath();
 
         dialogService.notify(Localization.lang("Opening") + ": '" + file + "'");

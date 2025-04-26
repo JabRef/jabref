@@ -1,7 +1,6 @@
 package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -62,14 +61,14 @@ public class CitationStyleGenerator {
             return CSL_ADAPTER.makeBibliography(bibEntries, style, outputFormat, databaseContext, entryTypesManager);
         } catch (IllegalArgumentException e) {
             LOGGER.error("Could not generate BibEntry bibliography. The CSL engine could not create a bibliography output for your item.", e);
-            return Collections.singletonList(Localization.lang("Cannot generate bibliography based on selected citation style."));
+            return List.of(Localization.lang("Cannot generate bibliography based on selected citation style."));
         } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry bibliography", e);
-            return Collections.singletonList(Localization.lang("Cannot generate bibliography based on selected citation style."));
+            return List.of(Localization.lang("Cannot generate bibliography based on selected citation style."));
         } catch (TokenMgrException e) {
             LOGGER.error("Bad character inside BibEntry", e);
             // sadly one cannot easily retrieve the bad char from the TokenMgrError
-            return Collections.singletonList(Localization.lang("Cannot generate bibliography based on selected citation style.") +
+            return List.of(Localization.lang("Cannot generate bibliography based on selected citation style.") +
                     outputFormat.getLineSeparator() +
                     Localization.lang("Bad character inside entry") +
                     outputFormat.getLineSeparator() +

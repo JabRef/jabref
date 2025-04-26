@@ -1,7 +1,6 @@
 package org.jabref.model;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -41,14 +40,14 @@ class TreeNodeTest {
     void newTreeNodeHasNoParentOrChildren() {
         TreeNodeTestData.TreeNodeMock treeNode = new TreeNodeTestData.TreeNodeMock();
         assertEquals(Optional.empty(), treeNode.getParent());
-        assertEquals(Collections.emptyList(), treeNode.getChildren());
+        assertEquals(List.of(), treeNode.getChildren());
         assertNotNull(treeNode);
     }
 
     @Test
     void getIndexedPathFromRootReturnsEmptyListForRoot() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock();
-        assertEquals(Collections.emptyList(), root.getIndexedPathFromRoot());
+        assertEquals(List.of(), root.getIndexedPathFromRoot());
     }
 
     @Test
@@ -401,7 +400,7 @@ class TreeNodeTest {
         TreeNodeTestData.getNodeAsChild(root);
 
         root.removeAllChildren();
-        assertEquals(Collections.emptyList(), root.getChildren());
+        assertEquals(List.of(), root.getChildren());
     }
 
     @Test
@@ -614,7 +613,7 @@ class TreeNodeTest {
     }
 
     @Test
-    void findChildrenWithSameName() throws Exception {
+    void findChildrenWithSameName() {
         TreeNodeTestData.TreeNodeMock root = new TreeNodeTestData.TreeNodeMock("A");
         TreeNodeTestData.TreeNodeMock childB = root.addChild(new TreeNodeTestData.TreeNodeMock("B"));
         TreeNodeTestData.TreeNodeMock node = childB.addChild(new TreeNodeTestData.TreeNodeMock("A"));

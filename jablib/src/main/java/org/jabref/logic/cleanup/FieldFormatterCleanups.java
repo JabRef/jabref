@@ -131,7 +131,7 @@ public class FieldFormatterCleanups {
         if (enabled) {
             return applyAllActions(entry);
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -148,7 +148,7 @@ public class FieldFormatterCleanups {
     public static List<FieldFormatterCleanup> parse(String formatterString) {
         if ((formatterString == null) || formatterString.isEmpty()) {
             // no save actions defined in the meta data
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<FieldFormatterCleanup> result = new ArrayList<>();

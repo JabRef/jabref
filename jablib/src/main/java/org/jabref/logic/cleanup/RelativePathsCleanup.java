@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class RelativePathsCleanup implements CleanupJob {
 
         for (LinkedFile fileEntry : fileList) {
             String oldFileName = fileEntry.getLink();
-            String newFileName = null;
+            String newFileName;
             if (fileEntry.isOnlineLink()) {
                 // keep online link untouched
                 newFileName = oldFileName;
@@ -52,13 +51,9 @@ public class RelativePathsCleanup implements CleanupJob {
 
         if (changed) {
             Optional<FieldChange> change = entry.setFiles(newFileList);
-            if (change.isPresent()) {
-                return Collections.singletonList(change.get());
-            } else {
-                return Collections.emptyList();
-            }
+            return change.map(List::of).orElseGet(List::of);
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 }

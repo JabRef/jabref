@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +54,7 @@ class CompositeSearchBasedFetcherTest {
 
         List<BibEntry> result = fetcher.performSearch("quantum");
 
-        assertEquals(result, Collections.emptyList());
+        assertEquals(result, List.of());
     }
 
     @ParameterizedTest(name = "Perform Search on empty query.")
@@ -65,7 +64,7 @@ class CompositeSearchBasedFetcherTest {
 
         List<BibEntry> queryResult = compositeFetcher.performSearch("");
 
-        assertEquals(queryResult, Collections.emptyList());
+        assertEquals(queryResult, List.of());
     }
 
     @ParameterizedTest(name = "Perform search on query \"quantum\". Using the CompositeFetcher of the following " +

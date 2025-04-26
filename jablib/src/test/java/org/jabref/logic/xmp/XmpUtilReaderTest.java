@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,7 +89,7 @@ class XmpUtilReaderTest {
     @Test
     void readEmtpyMetadata() throws IOException, URISyntaxException {
         List<BibEntry> entries = xmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("empty_metadata.pdf").toURI()), xmpPreferences);
-        assertEquals(Collections.emptyList(), entries);
+        assertEquals(List.of(), entries);
     }
 
     /**
@@ -117,6 +116,6 @@ class XmpUtilReaderTest {
     @Test
     void readNoDescriptionMetadata() throws IOException, URISyntaxException {
         List<BibEntry> entries = xmpUtilReader.readXmp(Path.of(XmpUtilShared.class.getResource("no_description_metadata.pdf").toURI()), xmpPreferences);
-        assertEquals(Collections.emptyList(), entries);
+        assertEquals(List.of(), entries);
     }
 }

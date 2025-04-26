@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fileformat.pdf;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -34,7 +33,7 @@ class PdfVerbatimBibtexImporterTest {
     void doesNotHandleEncryptedPdfs() throws Exception {
         Path file = Path.of(PdfVerbatimBibtexImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test

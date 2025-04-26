@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,12 +35,12 @@ class PicaXmlParserTest {
 
     @Test
     void emptyResult() throws Exception {
-        doTest("gvk_empty_result_because_of_bad_query.xml", 0, Collections.emptyList());
+        doTest("gvk_empty_result_because_of_bad_query.xml", 0, List.of());
     }
 
     @Test
     void resultFor797485368() throws Exception {
-        doTest("gvk_result_for_797485368.xml", 1, Collections.singletonList("gvk_result_for_797485368.bib"));
+        doTest("gvk_result_for_797485368.xml", 1, List.of("gvk_result_for_797485368.bib"));
     }
 
     @Test

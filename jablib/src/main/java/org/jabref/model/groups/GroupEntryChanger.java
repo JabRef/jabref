@@ -1,7 +1,6 @@
 package org.jabref.model.groups;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.FieldChange;
@@ -22,7 +21,7 @@ public interface GroupEntryChanger {
     List<FieldChange> add(Collection<BibEntry> entriesToAdd);
 
     default List<FieldChange> add(BibEntry entryToAdd) {
-        return add(Collections.singletonList(entryToAdd));
+        return add(List.of(entryToAdd));
     }
 
     /**
@@ -34,6 +33,6 @@ public interface GroupEntryChanger {
     List<FieldChange> remove(List<BibEntry> entriesToRemove);
 
     default List<FieldChange> remove(BibEntry entryToAdd) {
-        return remove(Collections.singletonList(entryToAdd));
+        return remove(List.of(entryToAdd));
     }
 }

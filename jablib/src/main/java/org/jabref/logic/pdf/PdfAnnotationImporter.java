@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +37,7 @@ public class PdfAnnotationImporter implements AnnotationImporter {
     public List<FileAnnotation> importAnnotations(final Path path) {
         if (!validatePath(path)) {
             // Path could not be validated, return default result
-            return Collections.emptyList();
+            return List.of();
         }
 
         List<FileAnnotation> annotationsList = new LinkedList<>();

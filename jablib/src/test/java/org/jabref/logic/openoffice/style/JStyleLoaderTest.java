@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -77,7 +76,7 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void addStyleLeadsToOneMoreStyle() throws URISyntaxException {
+    void addStyleLeadsToOneMoreStyle() {
         preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
@@ -103,7 +102,7 @@ class JStyleLoaderTest {
 
     @Test
     void initalizeWithIncorrectExternalFile() {
-        preferences.setExternalStyles(Collections.singletonList("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
+        preferences.setExternalStyles(List.of("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
@@ -148,7 +147,7 @@ class JStyleLoaderTest {
     }
 
     @Test
-    void addSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
+    void addSameStyleTwiceLeadsToOneMoreStyle() {
         preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();

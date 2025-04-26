@@ -3,7 +3,6 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +27,7 @@ public class ParserResult {
     private boolean changedOnMigration = false;
 
     public ParserResult() {
-        this(Collections.emptyList());
+        this(List.of());
     }
 
     public ParserResult(Collection<BibEntry> entries) {

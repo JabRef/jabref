@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -119,7 +118,7 @@ class MedlinePlainImporterTest {
     @Test
     void emptyFileImport() throws IOException {
         List<BibEntry> emptyEntries = importer.importDatabase(readerForString("")).getDatabase().getEntries();
-        assertEquals(Collections.emptyList(), emptyEntries);
+        assertEquals(List.of(), emptyEntries);
     }
 
     @ParameterizedTest
@@ -192,7 +191,7 @@ class MedlinePlainImporterTest {
                             Comment14
                             Comment15
                             Comment16""");
-            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+            assertEquals(List.of(expectedEntry), actualEntries);
         }
     }
 
@@ -208,7 +207,7 @@ class MedlinePlainImporterTest {
             expectedEntry.setField(StandardField.PMID, "22664795");
             expectedEntry.setField(StandardField.KEYWORDS, "Female, Male");
 
-            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+            assertEquals(List.of(expectedEntry), actualEntries);
         }
     }
 
@@ -236,11 +235,11 @@ class MedlinePlainImporterTest {
 
         List<BibEntry> entries = importer.importDatabase(file).getDatabase().getEntries();
 
-        assertEquals(Collections.emptyList(), entries);
+        assertEquals(List.of(), entries);
     }
 
     @Test
-    void nullReader() throws IOException {
+    void nullReader() {
         Executable fail = () -> {
             try (BufferedReader reader = null) {
                 importer.importDatabase(reader);
@@ -266,7 +265,7 @@ class MedlinePlainImporterTest {
                     .withField(StandardField.KEYWORDS, "Female")
                     .withField(StandardField.PMID, "22664795");
 
-            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+            assertEquals(List.of(expectedEntry), actualEntries);
         }
     }
 

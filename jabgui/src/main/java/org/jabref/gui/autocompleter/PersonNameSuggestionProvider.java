@@ -1,8 +1,8 @@
 package org.jabref.gui.autocompleter;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -26,7 +26,7 @@ public class PersonNameSuggestionProvider extends SuggestionProvider<Author> {
     private final BibDatabase database;
 
     PersonNameSuggestionProvider(Field field, BibDatabase database) {
-        this(Collections.singletonList(Objects.requireNonNull(field)), database);
+        this(List.of(Objects.requireNonNull(field)), database);
     }
 
     public PersonNameSuggestionProvider(Collection<Field> fields, BibDatabase database) {

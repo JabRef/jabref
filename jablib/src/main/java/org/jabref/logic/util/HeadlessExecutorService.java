@@ -1,7 +1,6 @@
 package org.jabref.logic.util;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Timer;
@@ -94,7 +93,7 @@ public class HeadlessExecutorService implements Executor {
             return executorService.invokeAll(tasks);
         } catch (InterruptedException exception) {
             // Ignored
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -104,7 +103,7 @@ public class HeadlessExecutorService implements Executor {
             return executorService.invokeAll(tasks, timeout, timeUnit);
         } catch (InterruptedException exception) {
             // Ignored
-            return Collections.emptyList();
+            return List.of();
         }
     }
 

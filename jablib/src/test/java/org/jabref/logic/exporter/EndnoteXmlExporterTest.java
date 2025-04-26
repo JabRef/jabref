@@ -2,7 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,7 +51,7 @@ class EndnoteXmlExporterTest {
     void exportForEmptyEntryList(@TempDir Path tempDir) throws Exception {
         Path file = tempDir.resolve("EmptyFile.xml");
 
-        exporter.export(databaseContext, file, Collections.emptyList());
+        exporter.export(databaseContext, file, List.of());
         assertFalse(Files.exists(file));
     }
 
@@ -60,13 +60,13 @@ class EndnoteXmlExporterTest {
         Path file = tempDir.resolve("NullDB");
 
         assertThrows(NullPointerException.class, () ->
-                exporter.export(null, file, Collections.singletonList(bookEntry)));
+                exporter.export(null, file, List.of(bookEntry)));
     }
 
     @Test
     void exportForNullExportPathThrowsException(@TempDir Path tempDir) {
         assertThrows(NullPointerException.class, () ->
-                exporter.export(databaseContext, null, Collections.singletonList(bookEntry)));
+                exporter.export(databaseContext, null, List.of(bookEntry)));
     }
 
     @Test

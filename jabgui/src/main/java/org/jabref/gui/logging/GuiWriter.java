@@ -1,7 +1,6 @@
 package org.jabref.gui.logging;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -16,7 +15,7 @@ public class GuiWriter extends AbstractFormatPatternWriter {
     }
 
     public GuiWriter() {
-        this(Collections.emptyMap());
+        this(Map.of());
     }
 
     @Override
@@ -30,7 +29,7 @@ public class GuiWriter extends AbstractFormatPatternWriter {
     }
 
     @Override
-    public void flush() throws Exception {
+    public void flush() {
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.jabref.gui.keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public class KeyBindingRepository {
     private final MapProperty<KeyBinding, String> bindings;
 
     public KeyBindingRepository() {
-        this(Collections.emptyList(), Collections.emptyList());
+        this(List.of(), List.of());
     }
 
     public KeyBindingRepository(SortedMap<KeyBinding, String> bindings) {

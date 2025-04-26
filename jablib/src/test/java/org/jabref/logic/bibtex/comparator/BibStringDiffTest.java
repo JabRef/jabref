@@ -1,6 +1,5 @@
 package org.jabref.logic.bibtex.comparator;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
@@ -62,7 +61,7 @@ class BibStringDiffTest {
 
     @Test
     void compareToDifferentClassIsFalse() {
-        assertNotEquals(diff, new Object());
+        assertNotEquals(new Object(), diff);
     }
 
     @Test
@@ -79,7 +78,7 @@ class BibStringDiffTest {
         when(originalDataBase.hasNoStrings()).thenReturn(true);
         when(newDataBase.hasNoStrings()).thenReturn(true);
 
-        assertEquals(Collections.emptyList(), BibStringDiff.compare(originalDataBase, newDataBase));
+        assertEquals(List.of(), BibStringDiff.compare(originalDataBase, newDataBase));
     }
 
     @Test
@@ -98,13 +97,13 @@ class BibStringDiffTest {
         when(newDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
 
         List<BibStringDiff> result = BibStringDiff.compare(originalDataBase, newDataBase);
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
     void compareRemovedString() {
         when(originalDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
-        when(newDataBase.getStringValues()).thenReturn(Collections.emptyList());
+        when(newDataBase.getStringValues()).thenReturn(List.of());
 
         List<BibStringDiff> result = BibStringDiff.compare(originalDataBase, newDataBase);
         BibStringDiff expectedDiff = new BibStringDiff(new BibtexString("name", "content"), null);
@@ -113,7 +112,7 @@ class BibStringDiffTest {
 
     @Test
     void compareAddString() {
-        when(originalDataBase.getStringValues()).thenReturn(Collections.emptyList());
+        when(originalDataBase.getStringValues()).thenReturn(List.of());
         when(newDataBase.getStringValues()).thenReturn(List.of(new BibtexString("name", "content")));
 
         List<BibStringDiff> result = BibStringDiff.compare(originalDataBase, newDataBase);

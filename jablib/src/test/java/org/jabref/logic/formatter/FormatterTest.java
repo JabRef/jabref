@@ -1,6 +1,6 @@
 package org.jabref.logic.formatter;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,8 +29,8 @@ class FormatterTest {
     @BeforeAll
     static void setUp() {
         protectedTermsLoader = new ProtectedTermsLoader(
-                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
-                        Collections.emptyList(), Collections.emptyList()));
+                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), List.of(),
+                        List.of(), List.of()));
     }
 
     /**
@@ -40,14 +40,14 @@ class FormatterTest {
     @Test
     void allFormatterKeysAreUnique() {
         // idea for uniqueness checking by https://stackoverflow.com/a/44032568/873282
-        assertEquals(Collections.emptyList(),
+        assertEquals(List.of(),
                 getFormatters().collect(Collectors.groupingBy(
                                        Formatter::getKey,
                         Collectors.counting()))
                                .entrySet().stream()
                                .filter(e -> e.getValue() > 1)
                                .map(Map.Entry::getKey)
-                               .collect(Collectors.toList()));
+                               .toList());
     }
 
     @ParameterizedTest

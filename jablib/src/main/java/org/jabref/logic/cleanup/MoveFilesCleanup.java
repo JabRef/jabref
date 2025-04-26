@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public class MoveFilesCleanup implements CleanupJob {
             return OptionalUtil.toList(changes);
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 
     public List<JabRefException> getIoExceptions() {

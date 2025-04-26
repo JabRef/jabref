@@ -2,7 +2,6 @@ package org.jabref.gui.frame;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -233,7 +232,7 @@ public class FrameDndHandler {
 
     private List<Path> getBibFiles(Dragboard dragboard) {
         if (!dragboard.hasFiles()) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             return dragboard.getFiles().stream().map(File::toPath).filter(FileUtil::isBibFile).collect(Collectors.toList());
         }
@@ -245,7 +244,7 @@ public class FrameDndHandler {
 
     private List<String> getGroups(Dragboard dragboard) {
         if (!dragboard.hasContent(DragAndDropDataFormats.GROUP)) {
-            return Collections.emptyList();
+            return List.of();
         } else {
             return (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
         }

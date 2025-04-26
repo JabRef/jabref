@@ -47,7 +47,7 @@ class ExplicitGroupTest {
     }
 
     @Test
-    void addDuplicateGroupDoesNotChangeGroupsField() throws Exception {
+    void addDuplicateGroupDoesNotChangeGroupsField() {
         entry.setField(StandardField.GROUPS, "myExplicitGroup");
         group.add(entry);
         assertEquals(Optional.of("myExplicitGroup"), entry.getField(StandardField.GROUPS));
@@ -55,7 +55,7 @@ class ExplicitGroupTest {
 
     @Test
         // For https://github.com/JabRef/jabref/issues/2334
-    void removeDoesNotChangeFieldIfContainsNameAsPart() throws Exception {
+    void removeDoesNotChangeFieldIfContainsNameAsPart() {
         entry.setField(StandardField.GROUPS, "myExplicitGroup_alternative");
         group.remove(entry);
         assertEquals(Optional.of("myExplicitGroup_alternative"), entry.getField(StandardField.GROUPS));
@@ -63,7 +63,7 @@ class ExplicitGroupTest {
 
     @Test
         // For https://github.com/JabRef/jabref/issues/2334
-    void removeDoesNotChangeFieldIfContainsNameAsWord() throws Exception {
+    void removeDoesNotChangeFieldIfContainsNameAsWord() {
         entry.setField(StandardField.GROUPS, "myExplicitGroup alternative");
         group.remove(entry);
 
@@ -72,14 +72,14 @@ class ExplicitGroupTest {
 
     @Test
         // For https://github.com/JabRef/jabref/issues/1873
-    void containsOnlyMatchesCompletePhraseWithWhitespace() throws Exception {
+    void containsOnlyMatchesCompletePhraseWithWhitespace() {
         entry.setField(StandardField.GROUPS, "myExplicitGroup b");
         assertFalse(group.contains(entry));
     }
 
     @Test
         // For https://github.com/JabRef/jabref/issues/1873
-    void containsOnlyMatchesCompletePhraseWithSlash() throws Exception {
+    void containsOnlyMatchesCompletePhraseWithSlash() {
         entry.setField(StandardField.GROUPS, "myExplicitGroup/b");
 
         assertFalse(group.contains(entry));
@@ -87,7 +87,7 @@ class ExplicitGroupTest {
 
     @Test
         // For https://github.com/JabRef/jabref/issues/2394
-    void containsMatchesPhraseWithBrackets() throws Exception {
+    void containsMatchesPhraseWithBrackets() {
         entry.setField(StandardField.GROUPS, "[aa] Subgroup1");
         ExplicitGroup explicitGroup = new ExplicitGroup("[aa] Subgroup1", GroupHierarchyType.INCLUDING, ',');
 

@@ -1,7 +1,7 @@
 package org.jabref.logic.bibtex.comparator;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.model.database.BibDatabase;
@@ -17,66 +17,66 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class BibDatabaseDiffTest {
 
     @Test
-    void compareOfEmptyDatabasesReportsNoDifferences() throws Exception {
+    void compareOfEmptyDatabasesReportsNoDifferences() {
         BibDatabaseDiff diff = BibDatabaseDiff.compare(new BibDatabaseContext(), new BibDatabaseContext());
 
         assertEquals(Optional.empty(), diff.getPreambleDifferences());
         assertEquals(Optional.empty(), diff.getMetaDataDifferences());
-        assertEquals(Collections.emptyList(), diff.getBibStringDifferences());
-        assertEquals(Collections.emptyList(), diff.getEntryDifferences());
+        assertEquals(List.of(), diff.getBibStringDifferences());
+        assertEquals(List.of(), diff.getEntryDifferences());
     }
 
     @Test
-    void compareOfSameEntryReportsNoDifferences() throws Exception {
+    void compareOfSameEntryReportsNoDifferences() {
         BibEntry entry = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
 
         BibDatabaseDiff diff = compareEntries(entry, entry);
 
-        assertEquals(Collections.emptyList(), diff.getEntryDifferences());
+        assertEquals(List.of(), diff.getEntryDifferences());
     }
 
     @Test
-    void compareOfDifferentEntriesWithSameDataReportsNoDifferences() throws Exception {
+    void compareOfDifferentEntriesWithSameDataReportsNoDifferences() {
         BibEntry entryOne = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
         BibEntry entryTwo = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
 
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
-        assertEquals(Collections.emptyList(), diff.getEntryDifferences());
+        assertEquals(List.of(), diff.getEntryDifferences());
     }
 
     @Test
-    void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences() throws Exception {
+    void compareOfTwoEntriesWithSameContentAndLfEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
 
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
-        assertEquals(Collections.emptyList(), diff.getEntryDifferences());
+        assertEquals(List.of(), diff.getEntryDifferences());
     }
 
     @Test
-    void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences() throws Exception {
+    void compareOfTwoEntriesWithSameContentAndCrLfEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
         BibEntry entryTwo = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
 
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
-        assertEquals(Collections.emptyList(), diff.getEntryDifferences());
+        assertEquals(List.of(), diff.getEntryDifferences());
     }
 
     @Test
-    void compareOfTwoEntriesWithSameContentAndMixedLineEndingsReportsNoDifferences() throws Exception {
+    void compareOfTwoEntriesWithSameContentAndMixedLineEndingsReportsNoDifferences() {
         BibEntry entryOne = new BibEntry().withField(StandardField.COMMENT, "line1\n\nline3\n\nline5");
         BibEntry entryTwo = new BibEntry().withField(StandardField.COMMENT, "line1\r\n\r\nline3\r\n\r\nline5");
 
         BibDatabaseDiff diff = compareEntries(entryOne, entryTwo);
 
-        assertEquals(Collections.emptyList(), diff.getEntryDifferences());
+        assertEquals(List.of(), diff.getEntryDifferences());
     }
 
     @Test
-    void compareOfTwoDifferentEntriesWithDifferentDataReportsDifferences() throws Exception {
+    void compareOfTwoDifferentEntriesWithDifferentDataReportsDifferences() {
         BibEntry entryOne = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
         BibEntry entryTwo = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "another test");
 
@@ -92,11 +92,11 @@ class BibDatabaseDiffTest {
     }
 
     @Test
-    void compareOfThreeDifferentEntriesWithDifferentDataReportsDifferences() throws Exception {
+    void compareOfThreeDifferentEntriesWithDifferentDataReportsDifferences() {
         BibEntry entryOne = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "test");
         BibEntry entryTwo = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "another test");
         BibEntry entryThree = new BibEntry(BibEntry.DEFAULT_TYPE).withField(StandardField.TITLE, "again another test");
-        BibDatabaseContext databaseOne = new BibDatabaseContext(new BibDatabase(Collections.singletonList(entryOne)));
+        BibDatabaseContext databaseOne = new BibDatabaseContext(new BibDatabase(List.of(entryOne)));
         BibDatabaseContext databaseTwo = new BibDatabaseContext(new BibDatabase(Arrays.asList(entryTwo, entryThree)));
 
         BibDatabaseDiff diff = BibDatabaseDiff.compare(databaseOne, databaseTwo);
@@ -135,8 +135,8 @@ class BibDatabaseDiffTest {
     }
 
     private BibDatabaseDiff compareEntries(BibEntry entryOne, BibEntry entryTwo) {
-        BibDatabaseContext databaseOne = new BibDatabaseContext(new BibDatabase(Collections.singletonList(entryOne)));
-        BibDatabaseContext databaseTwo = new BibDatabaseContext(new BibDatabase(Collections.singletonList(entryTwo)));
+        BibDatabaseContext databaseOne = new BibDatabaseContext(new BibDatabase(List.of(entryOne)));
+        BibDatabaseContext databaseTwo = new BibDatabaseContext(new BibDatabase(List.of(entryTwo)));
 
         return BibDatabaseDiff.compare(databaseOne, databaseTwo);
     }

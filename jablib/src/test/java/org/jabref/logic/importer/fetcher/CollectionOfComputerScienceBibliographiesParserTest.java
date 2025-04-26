@@ -2,7 +2,6 @@ package org.jabref.logic.importer.fetcher;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.bibtex.BibEntryAssert;
@@ -25,13 +24,13 @@ class CollectionOfComputerScienceBibliographiesParserTest {
 
     @Test
     void parseEntriesReturnsEmptyListIfXmlHasNoResults() throws Exception {
-        parseXmlAndCheckResults("collection_of_computer_science_bibliographies_empty_result.xml", Collections.emptyList());
+        parseXmlAndCheckResults("collection_of_computer_science_bibliographies_empty_result.xml", List.of());
     }
 
     @Disabled("Parse/fetcher remote side does not return anything valid for the link")
     @Test
     void parseEntriesReturnsOneBibEntryInListIfXmlHasSingleResult() throws Exception {
-        parseXmlAndCheckResults("collection_of_computer_science_bibliographies_single_result.xml", Collections.singletonList("collection_of_computer_science_bibliographies_single_result.bib"));
+        parseXmlAndCheckResults("collection_of_computer_science_bibliographies_single_result.xml", List.of("collection_of_computer_science_bibliographies_single_result.bib"));
     }
 
     @Test

@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -156,12 +155,12 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             JSONObject response = JsonReader.toJsonObject(inputStream);
             LOGGER.debug("Response for Parser: {}", response);
             if (response.isEmpty()) {
-                return Collections.emptyList();
+                return List.of();
             }
 
             int total = response.getInt("total");
             if (total == 0) {
-                return Collections.emptyList();
+                return List.of();
             } else if (response.has("next")) {
                 total = Math.min(total, response.getInt("next") - response.getInt("offset"));
             }

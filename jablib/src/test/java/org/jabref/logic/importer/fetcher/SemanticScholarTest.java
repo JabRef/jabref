@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -121,7 +120,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     }
 
     @Test
-    void getURLForQueryWithLucene() throws QueryNodeParseException, MalformedURLException, FetcherException, URISyntaxException {
+    void getURLForQueryWithLucene() throws QueryNodeParseException, MalformedURLException, URISyntaxException {
         String query = "Software engineering";
         SyntaxParser parser = new StandardSyntaxParser();
         URL url = fetcher.getURLForQuery(parser.parse(query, "default"), 0);
@@ -141,7 +140,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Slice theorem for Fréchet group actions and covariant symplectic");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
-        assertEquals(Collections.singletonList(master), fetchedEntries);
+        assertEquals(List.of(master), fetchedEntries);
     }
 
     @Test
@@ -150,7 +149,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Overcoming Open Source Project Entry Barriers with a Portal for Newcomers");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
-        assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
+        assertEquals(List.of(IGOR_NEWCOMERS), fetchedEntries);
     }
 
     @Test
@@ -159,12 +158,12 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"Overcoming Open Source Project Entry Barriers with a Portal for Newcomers\"");
         // Abstract should not be included in JabRef tests
         fetchedEntries.forEach(entry -> entry.clearField(StandardField.ABSTRACT));
-        assertEquals(Collections.singletonList(IGOR_NEWCOMERS), fetchedEntries);
+        assertEquals(List.of(IGOR_NEWCOMERS), fetchedEntries);
     }
 
     @Test
     void performSearchByEmptyQuery() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+        assertEquals(List.of(), fetcher.performSearch(""));
     }
 
     @Test
@@ -188,7 +187,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
     @Test
     @Override
     @DisabledOnCIServer("Unstable on CI")
-    public void pageSearchReturnsUniqueResultsPerPage() throws Exception {
+    public void pageSearchReturnsUniqueResultsPerPage() {
         // Implementation is done in the interface
     }
 }

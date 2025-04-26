@@ -43,7 +43,7 @@ class BackupManagerDiscardedTest {
     private Path backupDir;
 
     @BeforeEach
-    void setup(@TempDir Path tempDir) throws Exception {
+    void setup(@TempDir Path tempDir) throws IOException {
         this.backupDir = tempDir.resolve("backups");
         Files.createDirectories(backupDir);
 
@@ -85,14 +85,14 @@ class BackupManagerDiscardedTest {
     }
 
     @Test
-    void noDiscardingAChangeLeadsToNewerBackupBeReported() throws Exception {
+    void noDiscardingAChangeLeadsToNewerBackupBeReported() {
         databaseModification();
         makeBackup();
         assertTrue(BackupManager.backupFileDiffers(testBib, backupDir));
     }
 
     @Test
-    void noDiscardingASavedChange() throws Exception {
+    void noDiscardingASavedChange() throws IOException {
         databaseModification();
         makeBackup();
         saveDatabase();
@@ -100,7 +100,7 @@ class BackupManagerDiscardedTest {
     }
 
     @Test
-    void discardingAChangeLeadsToNewerBackupToBeIgnored() throws Exception {
+    void discardingAChangeLeadsToNewerBackupToBeIgnored() {
         databaseModification();
         makeBackup();
         backupManager.discardBackup(backupDir);

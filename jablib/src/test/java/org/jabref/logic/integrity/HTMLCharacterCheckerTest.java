@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,25 +31,25 @@ class HTMLCharacterCheckerTest {
     @Test
     void titleAcceptsNonHTMLEncodedCharacters() {
         entry.setField(StandardField.TITLE, "Not a single {HTML} character");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
     void monthAcceptsNonHTMLEncodedCharacters() {
         entry.setField(StandardField.MONTH, "#jan#");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
     void authorAcceptsNonHTMLEncodedCharacters() {
         entry.setField(StandardField.AUTHOR, "A. Einstein and I. Newton");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
     void urlAcceptsNonHTMLEncodedCharacters() {
         entry.setField(StandardField.URL, "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test

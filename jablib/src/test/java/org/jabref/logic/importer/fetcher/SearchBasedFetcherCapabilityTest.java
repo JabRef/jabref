@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -69,7 +68,7 @@ interface SearchBasedFetcherCapabilityTest {
                                                     .distinct()
                                                     .collect(Collectors.toList());
 
-        assertEquals(Collections.singletonList(getTestYear().toString()), differentYearsInResult);
+        assertEquals(List.of(getTestYear().toString()), differentYearsInResult);
     }
 
     /**
@@ -88,7 +87,7 @@ interface SearchBasedFetcherCapabilityTest {
                                                     .filter(Optional::isPresent)
                                                     .map(Optional::get)
                                                     .distinct()
-                                                    .collect(Collectors.toList());
+                                                    .toList();
         assertFalse(result.isEmpty());
         assertTrue(yearsInYearRange.containsAll(differentYearsInResult));
     }

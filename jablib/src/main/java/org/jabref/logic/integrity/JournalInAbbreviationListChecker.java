@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,14 +23,14 @@ public class JournalInAbbreviationListChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         Optional<String> value = entry.getFieldOrAliasLatexFree(field);
         if (value.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         final String journal = value.get();
         if (!abbreviationRepository.isKnownName(journal)) {
-            return Collections.singletonList(new IntegrityMessage(Localization.lang("journal not found in abbreviation list"), entry, field));
+            return List.of(new IntegrityMessage(Localization.lang("journal not found in abbreviation list"), entry, field));
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 }

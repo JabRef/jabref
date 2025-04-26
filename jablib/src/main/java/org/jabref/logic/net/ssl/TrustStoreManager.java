@@ -87,7 +87,7 @@ public class TrustStoreManager {
         } catch (KeyStoreException e) {
             LOGGER.warn("Error while reading aliases", e);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 
     public int certsCount() {

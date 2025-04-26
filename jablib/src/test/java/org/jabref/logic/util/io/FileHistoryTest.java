@@ -2,7 +2,7 @@ package org.jabref.logic.util.io;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ class FileHistoryTest {
 
     @BeforeEach
     void setUp() {
-        history = FileHistory.of(Collections.emptyList());
+        history = FileHistory.of(List.of());
     }
 
     @Test

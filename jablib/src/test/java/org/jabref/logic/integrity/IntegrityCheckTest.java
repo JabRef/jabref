@@ -2,7 +2,6 @@ package org.jabref.logic.integrity;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -118,7 +117,7 @@ class IntegrityCheckTest {
     }
 
     @Test
-    void entryIsUnchangedAfterChecks() throws Exception {
+    void entryIsUnchangedAfterChecks() {
         BibEntry entry = new BibEntry();
 
         // populate with all known fields
@@ -167,7 +166,7 @@ class IntegrityCheckTest {
         return createContext(field, value, metaData);
     }
 
-    private void assertWrong(BibDatabaseContext context) throws Exception {
+    private void assertWrong(BibDatabaseContext context) {
         List<IntegrityMessage> messages;
 
         messages = new IntegrityCheck(context,
@@ -177,10 +176,10 @@ class IntegrityCheckTest {
                 false)
                 .check();
 
-        assertNotEquals(Collections.emptyList(), messages);
+        assertNotEquals(List.of(), messages);
     }
 
-    private void assertCorrect(BibDatabaseContext context) throws Exception {
+    private void assertCorrect(BibDatabaseContext context) {
         FilePreferences filePreferencesMock = mock(FilePreferences.class);
         when(filePreferencesMock.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
         List<IntegrityMessage> messages;
@@ -192,7 +191,7 @@ class IntegrityCheckTest {
                 false)
                 .check();
 
-        assertEquals(Collections.emptyList(), messages);
+        assertEquals(List.of(), messages);
     }
 
     private CitationKeyPatternPreferences createCitationKeyPatternPreferences() {

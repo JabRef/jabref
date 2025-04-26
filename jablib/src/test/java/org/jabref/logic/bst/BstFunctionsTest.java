@@ -1,7 +1,6 @@
 package org.jabref.logic.bst;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +48,7 @@ class BstFunctionsTest {
                 EXECUTE { test.compare }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(BstVM.FALSE, vm.getStack().pop());
         assertEquals(BstVM.TRUE, vm.getStack().pop());
@@ -74,7 +73,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(3, vm.getStack().pop());
         assertEquals(2, vm.getStack().pop());
@@ -90,7 +89,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        assertThrows(BstVMException.class, () -> vm.render(Collections.emptyList()));
+        assertThrows(BstVMException.class, () -> vm.render(List.of()));
     }
 
     @Test
@@ -111,7 +110,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("Johnny.}", vm.getStack().pop());
         assertEquals("Johnny?}", vm.getStack().pop());
@@ -161,7 +160,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(2, vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
@@ -184,7 +183,7 @@ class BstFunctionsTest {
                 } EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("78", vm.getStack().pop());
         assertEquals("789", vm.getStack().pop());
@@ -254,7 +253,7 @@ class BstFunctionsTest {
                 FUNCTION { format }{ "Charles Louis Xavier Joseph de la Vall{\\'e}e Poussin" #1 "{vv~}{ll}{, jj}{, f}?" format.name$ }
                 EXECUTE { format }
                 """);
-        List<BibEntry> v = Collections.emptyList();
+        List<BibEntry> v = List.of();
 
         vm.render(v);
 
@@ -306,7 +305,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("{A}{D}/{C}ycle: {I}{B}{M}'s {F}ramework for {A}pplication {D}evelopment and {C}ase",
                 vm.getStack().pop());
@@ -332,7 +331,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(11, vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
@@ -352,7 +351,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("9999", vm.getStack().pop());
         assertEquals("3", vm.getStack().pop());
@@ -366,7 +365,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(72, vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
@@ -379,7 +378,7 @@ class BstFunctionsTest {
                 EXECUTE {test}
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("H", vm.getStack().pop());
         assertEquals(0, vm.getStack().size());
@@ -444,7 +443,7 @@ class BstFunctionsTest {
                 EXECUTE { a }
                 """);
 
-        List<BibEntry> v = Collections.emptyList();
+        List<BibEntry> v = List.of();
         vm.render(v);
 
         assertEquals(3, vm.getStack().pop());
@@ -460,7 +459,7 @@ class BstFunctionsTest {
                 EXECUTE { test.func }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         Map<String, BstFunctions.BstFunction> functions = vm.latestContext.functions();
         assertTrue(functions.containsKey("test.func"));
@@ -480,7 +479,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(0, vm.getStack().pop());
         assertEquals(1, vm.getStack().pop());
@@ -504,7 +503,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(1, vm.getStack().pop());
         assertEquals(2, vm.getStack().pop());
@@ -549,7 +548,7 @@ class BstFunctionsTest {
                 }
                 EXECUTE { n.dashify }
                 """);
-        List<BibEntry> v = Collections.emptyList();
+        List<BibEntry> v = List.of();
 
         vm.render(v);
 
@@ -578,7 +577,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(BstVM.FALSE, vm.getStack().pop());
         assertEquals(BstVM.TRUE, vm.getStack().pop());
@@ -654,7 +653,7 @@ class BstFunctionsTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("{\\em Hello}", vm.getStack().pop());
         assertEquals("", vm.getStack().pop());
@@ -679,7 +678,7 @@ class BstFunctionsTest {
         BibDatabase testDatabase = new BibDatabase();
         testDatabase.setPreamble("A Preamble");
 
-        String result = vm.render(Collections.emptyList(), testDatabase);
+        String result = vm.render(List.of(), testDatabase);
 
         assertEquals("A Preamble\nhello\"quoted\"", result);
     }

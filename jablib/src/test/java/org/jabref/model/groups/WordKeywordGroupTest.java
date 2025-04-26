@@ -35,63 +35,63 @@ class WordKeywordGroupTest {
     }
 
     @Test
-    void containsFindsWordInSentence() throws Exception {
+    void containsFindsWordInSentence() {
         entry.setField(StandardField.KEYWORDS, "Some sentence containing test word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
-    void containsFindsWordInCommaSeparatedList() throws Exception {
+    void containsFindsWordInCommaSeparatedList() {
         entry.setField(StandardField.KEYWORDS, "Some,list,containing,test,word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
-    void containsFindsWordInSemicolonSeparatedList() throws Exception {
+    void containsFindsWordInSemicolonSeparatedList() {
         entry.setField(StandardField.KEYWORDS, "Some;list;containing;test;word");
 
         assertTrue(testGroup.contains(entry));
     }
 
     @Test
-    void containsFindsSameComplexWord() throws Exception {
+    void containsFindsSameComplexWord() {
         entry.setField(StandardField.KEYWORDS, "\\H2O");
 
         assertTrue(waterGroup.contains(entry));
     }
 
     @Test
-    void containsFindsComplexWordInSentence() throws Exception {
+    void containsFindsComplexWordInSentence() {
         entry.setField(StandardField.KEYWORDS, "Some sentence containing \\H2O word");
 
         assertTrue(waterGroup.contains(entry));
     }
 
     @Test
-    void containsDoesNotFindWordIfCaseDiffers() throws Exception {
+    void containsDoesNotFindWordIfCaseDiffers() {
         entry.setField(StandardField.KEYWORDS, "Test");
 
         assertFalse(testCaseSensitiveGroup.contains(entry));
     }
 
     @Test
-    void containsDoesNotFindsWordInSentenceIfCaseDiffers() throws Exception {
+    void containsDoesNotFindsWordInSentenceIfCaseDiffers() {
         entry.setField(StandardField.KEYWORDS, "Some sentence containing Test word");
 
         assertFalse(testCaseSensitiveGroup.contains(entry));
     }
 
     @Test
-    void addChangesFieldIfEmptyBefore() throws Exception {
+    void addChangesFieldIfEmptyBefore() {
         testGroup.add(entry);
 
         assertEquals(Optional.of("test"), entry.getField(StandardField.KEYWORDS));
     }
 
     @Test
-    void addChangesFieldIfNotEmptyBefore() throws Exception {
+    void addChangesFieldIfNotEmptyBefore() {
         entry.setField(StandardField.KEYWORDS, "bla, blubb");
         testGroup.add(entry);
 
@@ -99,7 +99,7 @@ class WordKeywordGroupTest {
     }
 
     @Test
-    void addDoesNotAddDuplicate() throws Exception {
+    void addDoesNotAddDuplicate() {
         entry.setField(StandardField.KEYWORDS, "test, blubb");
         testGroup.add(entry);
 
@@ -107,7 +107,7 @@ class WordKeywordGroupTest {
     }
 
     @Test
-    void removeDoesNothingIfEntryNotMatched() throws Exception {
+    void removeDoesNothingIfEntryNotMatched() {
         entry.setField(StandardField.KEYWORDS, "something");
         testGroup.remove(entry);
 
@@ -115,7 +115,7 @@ class WordKeywordGroupTest {
     }
 
     @Test
-    void removeRemovesNameFromField() throws Exception {
+    void removeRemovesNameFromField() {
         entry.setField(StandardField.KEYWORDS, "test, blubb");
         testGroup.remove(entry);
 

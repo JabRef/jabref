@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -217,7 +216,7 @@ public class ImportHandler {
     private BibEntry createEmptyEntryWithLink(Path file) {
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, file.getFileName().toString());
-        fileLinker.linkFilesToEntry(entry, Collections.singletonList(file));
+        fileLinker.linkFilesToEntry(entry, List.of(file));
         return entry;
     }
 

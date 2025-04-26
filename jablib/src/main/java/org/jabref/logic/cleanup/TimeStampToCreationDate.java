@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,7 +69,7 @@ public class TimeStampToCreationDate implements CleanupJob {
             Optional<String> formattedTimeStamp = formatTimeStamp(entry.getField(timeStampField).get());
             if (formattedTimeStamp.isEmpty()) {
                 // In case the timestamp could not be parsed, do nothing to not lose data
-                return Collections.emptyList();
+                return List.of();
             }
             // Setting the EventSource is necessary to circumvent the update of the modification date during timestamp migration
             entry.clearField(timeStampField, EntriesEventSource.CLEANUP_TIMESTAMP);
@@ -83,6 +82,6 @@ public class TimeStampToCreationDate implements CleanupJob {
             changeList.add(changeTo);
             return changeList;
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

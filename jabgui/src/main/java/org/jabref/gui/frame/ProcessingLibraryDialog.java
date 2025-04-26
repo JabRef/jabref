@@ -24,7 +24,7 @@ public class ProcessingLibraryDialog {
         if (libraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
             Task<Void> waitForSaveFinished = new Task<>() {
                 @Override
-                protected Void call() throws Exception {
+                protected Void call() throws InterruptedException {
                     while (libraryTabs.stream().anyMatch(LibraryTab::isSaving)) {
                         if (isCancelled()) {
                             return null;

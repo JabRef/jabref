@@ -4,7 +4,6 @@ import java.math.BigInteger;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -295,7 +294,7 @@ public class BracketedPattern {
 
         if (!foundClosingBracket) {
             LOGGER.warn("Missing closing bracket ']' in '{}'", pattern);
-        } else if (bracketContent.length() == 0) {
+        } else if (bracketContent.isEmpty()) {
             LOGGER.warn("Found empty brackets \"[]\" in '{}'", pattern);
         }
         return bracketContent.toString();
@@ -456,7 +455,7 @@ public class BracketedPattern {
             } else if ("shorttitleINI".equals(pattern)) {
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")),
-                                Collections.singletonList("abbr"), 0, Function.identity()));
+                                List.of("abbr"), 0, Function.identity()));
             } else if ("veryshorttitle".equals(pattern)) {
                 return getTitleWords(1,
                         removeSmallWords(entry.getResolvedFieldOrAlias(StandardField.TITLE, database).orElse("")));
@@ -634,7 +633,7 @@ public class BracketedPattern {
             }
 
             // If we get here, the word was accepted.
-            if (stringBuilder.length() > 0) {
+            if (!stringBuilder.isEmpty()) {
                 stringBuilder.append(' ');
             }
             stringBuilder.append(word);
@@ -661,7 +660,7 @@ public class BracketedPattern {
                 // Camelize the word
                 word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
 
-                if (stringBuilder.length() > 0) {
+                if (!stringBuilder.isEmpty()) {
                     stringBuilder.append(' ');
                 }
                 stringBuilder.append(word);
@@ -689,7 +688,7 @@ public class BracketedPattern {
                 // Camelize the word
                 word = word.substring(0, 1).toUpperCase(Locale.ROOT) + word.substring(1);
 
-                if (stringBuilder.length() > 0) {
+                if (!stringBuilder.isEmpty()) {
                     stringBuilder.append(' ');
                 }
                 stringBuilder.append(word);

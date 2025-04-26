@@ -2,7 +2,6 @@ package org.jabref.gui.frame;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -432,7 +431,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 // All databases are closed or an unknown tab is selected
                 stateManager.setActiveDatabase(null);
                 stateManager.activeTabProperty().set(Optional.empty());
-                stateManager.setSelectedEntries(Collections.emptyList());
+                stateManager.setSelectedEntries(List.of());
                 mainStage.titleProperty().unbind();
                 mainStage.setTitle(FRAME_TITLE);
             }

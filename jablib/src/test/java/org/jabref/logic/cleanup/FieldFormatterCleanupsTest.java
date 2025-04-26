@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -54,7 +53,7 @@ public class FieldFormatterCleanupsTest {
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, FieldFormatterCleanups.parse("title[identity]"));
 
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup(StandardField.TITLE, new IdentityFormatter());
-        assertEquals(Collections.singletonList(identityInTitle), actions.getConfiguredActions());
+        assertEquals(List.of(identityInTitle), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 
@@ -65,7 +64,7 @@ public class FieldFormatterCleanupsTest {
     void invalidSaveActionSting() {
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, FieldFormatterCleanups.parse("title"));
 
-        assertEquals(Collections.emptyList(), actions.getConfiguredActions());
+        assertEquals(List.of(), actions.getConfiguredActions());
 
         actions.applySaveActions(entry);
 

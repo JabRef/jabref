@@ -2,7 +2,6 @@ package org.jabref.model.groups;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -173,7 +172,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      * Determines all groups in the subtree starting at this node which contain the given entry.
      */
     public List<GroupTreeNode> getMatchingGroups(BibEntry entry) {
-        return getMatchingGroups(Collections.singletonList(entry));
+        return getMatchingGroups(List.of(entry));
     }
 
     /**
@@ -308,7 +307,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         if (getGroup() instanceof GroupEntryChanger) {
             return ((GroupEntryChanger) getGroup()).add(entries);
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -319,7 +318,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         if (getGroup() instanceof GroupEntryChanger) {
             return ((GroupEntryChanger) getGroup()).remove(entries);
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 

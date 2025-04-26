@@ -3,7 +3,6 @@ package org.jabref.gui.entryeditor;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -449,7 +448,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         typeLabel.setText(typedEntry.getTypeForDisplay());
 
         // Add type change menu
-        ContextMenu typeMenu = new ChangeEntryTypeMenu(Collections.singletonList(currentlyEditedEntry), tabSupplier.get().getBibDatabaseContext(), undoManager, bibEntryTypesManager).asContextMenu();
+        ContextMenu typeMenu = new ChangeEntryTypeMenu(List.of(currentlyEditedEntry), tabSupplier.get().getBibDatabaseContext(), undoManager, bibEntryTypesManager).asContextMenu();
         typeLabel.setOnMouseClicked(event -> typeMenu.show(typeLabel, Side.RIGHT, 0, 0));
         typeChangeButton.setOnMouseClicked(event -> typeMenu.show(typeChangeButton, Side.RIGHT, 0, 0));
 

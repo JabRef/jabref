@@ -1,7 +1,6 @@
 package org.jabref.logic.layout.format;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatter;
@@ -17,7 +16,7 @@ public class CompositeFormat implements LayoutFormatter {
      * If called with this constructor, this formatter does nothing.
      */
     public CompositeFormat() {
-        formatters = Collections.emptyList();
+        formatters = List.of();
     }
 
     public CompositeFormat(LayoutFormatter first, LayoutFormatter second) {

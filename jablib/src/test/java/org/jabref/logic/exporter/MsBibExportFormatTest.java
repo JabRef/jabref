@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabaseContext;
@@ -30,8 +29,8 @@ public class MsBibExportFormatTest {
     final void performExportWithNoEntry(@TempDir Path tempFile) throws IOException, SaveException {
         Path path = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(path);
-        List<BibEntry> entries = Collections.emptyList();
+        List<BibEntry> entries = List.of();
         msBibExportFormat.export(databaseContext, path, entries);
-        assertEquals(Collections.emptyList(), Files.readAllLines(path));
+        assertEquals(List.of(), Files.readAllLines(path));
     }
 }

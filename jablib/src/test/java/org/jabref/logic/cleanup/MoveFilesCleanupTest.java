@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -147,6 +146,6 @@ class MoveFilesCleanupTest {
         databaseContext.setMetaData(new MetaData());
         when(filePreferences.getFileDirectoryPattern()).thenReturn("");
         List<FieldChange> changes = cleanup.cleanup(entry);
-        assertEquals(Collections.emptyList(), changes);
+        assertEquals(List.of(), changes);
     }
 }

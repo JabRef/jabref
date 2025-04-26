@@ -9,7 +9,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -75,7 +74,7 @@ class LocalizationConsistencyTest {
 
             List<String> duplicates = properties.getDuplicates();
 
-            assertEquals(Collections.emptyList(), duplicates, "Duplicate keys inside bundle " + bundle + "_" + lang.getId());
+            assertEquals(List.of(), duplicates, "Duplicate keys inside bundle " + bundle + "_" + lang.getId());
         }
     }
 
@@ -96,7 +95,7 @@ class LocalizationConsistencyTest {
                 .stream()
                 .filter(key -> key.getKey().contains("\\_"))
                 .collect(Collectors.toList());
-        assertEquals(Collections.emptyList(), quotedEntries,
+        assertEquals(List.of(), quotedEntries,
                 "Language keys must not use underscores for spaces! Use \"This is a message\" instead of \"This_is_a_message\".\n" +
                         "Please correct the following entries:\n" +
                         quotedEntries
@@ -112,7 +111,7 @@ class LocalizationConsistencyTest {
                 .stream()
                 .filter(key -> key.getKey().contains("<br>") || key.getKey().contains("<p>"))
                 .collect(Collectors.toList());
-        assertEquals(Collections.emptyList(), entriesWithHtml,
+        assertEquals(List.of(), entriesWithHtml,
                 "Language keys must not contain HTML <br> or <p>. Use \\n for a line break.\n" +
                         "Please correct the following entries:\n" +
                         entriesWithHtml
@@ -124,7 +123,7 @@ class LocalizationConsistencyTest {
     @Test
     void findMissingLocalizationKeys() throws IOException {
         List<LocalizationEntry> missingKeys = new ArrayList<>(LocalizationParser.findMissingKeys(LocalizationBundleForTest.LANG));
-        assertEquals(Collections.emptyList(), missingKeys,
+        assertEquals(List.of(), missingKeys,
                 missingKeys.stream()
                            .map(key -> LocalizationKey.fromKey(key.getKey()))
                            .map(key -> "%s=%s".formatted(
@@ -145,7 +144,7 @@ class LocalizationConsistencyTest {
     @Test
     void findObsoleteLocalizationKeys() throws IOException {
         Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundleForTest.LANG);
-        assertEquals(Collections.emptySet(), obsoleteKeys,
+        assertEquals(Set.of(), obsoleteKeys,
                 obsoleteKeys.stream().collect(Collectors.joining("\n",
                         "Obsolete keys found in language properties file: \n\n",
                         """

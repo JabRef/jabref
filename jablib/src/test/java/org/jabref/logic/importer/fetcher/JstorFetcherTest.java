@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,7 +59,7 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
     @Test
     void searchByTitle() throws Exception {
         List<BibEntry> entries = fetcher.performSearch("title: \"Test Anxiety Analysis of Chinese College Students in Computer-based Spoken English Test\"");
-        assertEquals(Collections.singletonList(bibEntry), entries);
+        assertEquals(List.of(bibEntry), entries);
     }
 
     @Test
@@ -101,16 +100,16 @@ public class JstorFetcherTest implements SearchBasedFetcherCapabilityTest {
 
     @Disabled("jstor does not support search only based on year")
     @Override
-    public void supportsYearRangeSearch() throws Exception {
+    public void supportsYearRangeSearch() {
     }
 
     @Disabled("jstor does not provide articles with journals")
     @Override
-    public void supportsJournalSearch() throws Exception {
+    public void supportsJournalSearch() {
     }
 
     @Disabled("jstor does not support search only based on year")
     @Override
-    public void supportsYearSearch() throws Exception {
+    public void supportsYearSearch() {
     }
 }

@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -41,7 +40,7 @@ class NoBibTexFieldCheckerTest {
     @MethodSource("nonBiblatexOnlyFields")
     void nonBiblatexOnlyField(Field field) {
         BibEntry entry = new BibEntry().withField(field, "test");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @ParameterizedTest(name = "field={0}")
@@ -54,6 +53,6 @@ class NoBibTexFieldCheckerTest {
         BibEntry entry = new BibEntry().withField(field, "test");
         IntegrityMessage message = new IntegrityMessage("biblatex field only", entry, field);
         List<IntegrityMessage> messages = checker.check(entry);
-        assertEquals(Collections.singletonList(message), messages);
+        assertEquals(List.of(message), messages);
     }
 }

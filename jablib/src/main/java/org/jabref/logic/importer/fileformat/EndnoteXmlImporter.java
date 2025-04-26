@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -454,6 +453,6 @@ public class EndnoteXmlImporter extends Importer implements Parser {
         } catch (IOException e) {
             LOGGER.error("Could not import file", e);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

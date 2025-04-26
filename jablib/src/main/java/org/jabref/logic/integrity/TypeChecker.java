@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,14 +14,14 @@ public class TypeChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         Optional<String> value = entry.getField(StandardField.PAGES);
         if (value.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         if (StandardEntryType.Proceedings == entry.getType()) {
-            return Collections.singletonList(new IntegrityMessage(
+            return List.of(new IntegrityMessage(
                     Localization.lang("wrong entry type as proceedings has page numbers"), entry, StandardField.PAGES));
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 }

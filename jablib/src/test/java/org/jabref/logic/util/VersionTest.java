@@ -1,7 +1,6 @@
 package org.jabref.logic.util;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -330,6 +329,6 @@ class VersionTest {
     @FetcherTest
     @DisabledOnCIServer("GitHub puts a low rate limit on unauthenticated calls")
     void getAllAvailableVersionsReturnsSomething() throws Exception {
-        assertNotEquals(Collections.emptyList(), Version.getAllAvailableVersions());
+        assertNotEquals(List.of(), Version.getAllAvailableVersions());
     }
 }

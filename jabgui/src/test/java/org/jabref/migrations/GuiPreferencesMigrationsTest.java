@@ -1,7 +1,6 @@
 package org.jabref.migrations;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -142,10 +141,10 @@ class GuiPreferencesMigrationsTest {
         when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
         when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
 
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(List.of());
 
         PreferencesMigrations.changeColumnVariableNamesFor51(preferences);
 
@@ -166,10 +165,10 @@ class GuiPreferencesMigrationsTest {
         when(preferences.getStringList("mainTableColumnSortTypes")).thenReturn(columnNames);
         when(preferences.getStringList("mainTableColumnSortOrder")).thenReturn(columnWidths);
 
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(Collections.emptyList());
-        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(Collections.emptyList());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_NAMES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_WIDTHS)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_TYPES)).thenReturn(List.of());
+        when(preferences.getStringList(JabRefGuiPreferences.COLUMN_SORT_ORDER)).thenReturn(List.of());
 
         PreferencesMigrations.upgradeColumnPreferences(preferences);
 

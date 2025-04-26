@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -173,10 +172,10 @@ public class AstrophysicsDataSystem
     @Override
     public List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
         if (entry.getFieldOrAlias(StandardField.TITLE).isEmpty() && entry.getFieldOrAlias(StandardField.AUTHOR).isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
-        URL urlForEntry = null;
+        URL urlForEntry;
         try {
             urlForEntry = getURLForEntry(entry);
         } catch (URISyntaxException | MalformedURLException e) {
@@ -204,7 +203,7 @@ public class AstrophysicsDataSystem
             return bibcodes;
         } catch (JSONException e) {
             LOGGER.error("Error while parsing JSON", e);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -241,7 +240,7 @@ public class AstrophysicsDataSystem
     private List<BibEntry> performSearchByIds(Collection<String> identifiers) throws FetcherException {
         List<String> ids = identifiers.stream().filter(identifier -> !StringUtil.isBlank(identifier)).collect(Collectors.toList());
         if (ids.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         URL urLforExport;
@@ -263,7 +262,7 @@ public class AstrophysicsDataSystem
             try {
                 List<BibEntry> fetchedEntries = getParser().parseEntries(obj.optString("export"));
                 if (fetchedEntries.isEmpty()) {
-                    return Collections.emptyList();
+                    return List.of();
                 }
                 // Post-cleanup
                 fetchedEntries.forEach(this::doPostCleanup);
@@ -271,7 +270,7 @@ public class AstrophysicsDataSystem
                 return fetchedEntries;
             } catch (JSONException e) {
                 LOGGER.error("Error while parsing JSON", e);
-                return Collections.emptyList();
+                return List.of();
             }
         } catch (ParseException e) {
             throw new FetcherException(urLforExport, "An internal parser error occurred", e);

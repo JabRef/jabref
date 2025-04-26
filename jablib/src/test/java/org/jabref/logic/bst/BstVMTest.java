@@ -1,7 +1,6 @@
 package org.jabref.logic.bst;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.util.TestEntry;
@@ -106,7 +105,7 @@ public class BstVMTest {
     void quote() throws RecognitionException {
         BstVM vm = new BstVM("FUNCTION { a }{ quote$ quote$ * } EXECUTE { a }");
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
         assertEquals("\"\"", vm.latestContext.stack().pop());
     }
 
@@ -114,7 +113,7 @@ public class BstVMTest {
     void buildIn() throws RecognitionException {
         BstVM vm = new BstVM("EXECUTE { global.max$ }");
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(Integer.MAX_VALUE, vm.latestContext.stack().pop());
         assertTrue(vm.latestContext.stack().isEmpty());
@@ -134,7 +133,7 @@ public class BstVMTest {
                 EXECUTE { n.dashify }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals(BstVM.TRUE, vm.latestContext.stack().pop());
     }
@@ -182,7 +181,7 @@ public class BstVMTest {
                 EXECUTE { test }
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("A Colorful Morning", vm.latestContext.stack().pop());
         assertEquals("Colorful Morning", vm.latestContext.stack().pop());
@@ -228,7 +227,7 @@ public class BstVMTest {
                 EXECUTE {test}
                 """);
 
-        vm.render(Collections.emptyList());
+        vm.render(List.of());
 
         assertEquals("colorful morning", vm.latestContext.stack().pop());
     }

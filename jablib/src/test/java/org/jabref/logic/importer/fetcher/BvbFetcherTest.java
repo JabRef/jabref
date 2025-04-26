@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
@@ -86,6 +85,6 @@ class BvbFetcherTest {
     @Test
     void performSearchEmpty() throws FetcherException {
         List<BibEntry> searchResult = fetcher.performSearch("");
-        assertEquals(Collections.emptyList(), searchResult);
+        assertEquals(List.of(), searchResult);
     }
 }

@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -521,7 +520,7 @@ public class ModsImporter extends Importer implements Parser {
 
     private void putIfListIsNotEmpty(Map<Field, String> fields, List<String> list, Field key, String separator) {
         if (!list.isEmpty()) {
-            fields.put(key, list.stream().collect(Collectors.joining(separator)));
+            fields.put(key, String.join(separator, list));
         }
     }
 
@@ -616,6 +615,6 @@ public class ModsImporter extends Importer implements Parser {
         } catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

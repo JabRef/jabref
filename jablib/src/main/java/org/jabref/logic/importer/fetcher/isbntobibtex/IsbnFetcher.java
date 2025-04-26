@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher.isbntobibtex;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -95,7 +94,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
         if (isbn.isPresent()) {
             return OptionalUtil.toList(performSearchById(isbn.get()));
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 

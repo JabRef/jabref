@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -113,7 +112,7 @@ public class BibEntryAssert {
      */
     public static void assertEquals(InputStream expected, BibEntry actual)
             throws IOException {
-        assertEquals(expected, Collections.singletonList(actual));
+        assertEquals(expected, List.of(actual));
     }
 
     /**

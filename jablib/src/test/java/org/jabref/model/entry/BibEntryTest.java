@@ -3,7 +3,6 @@ package org.jabref.model.entry;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -252,7 +251,7 @@ class BibEntryTest {
         List<LinkedFile> files = entry.getFiles();
         files.add(new LinkedFile("", Path.of(""), ""));
         entry.setFiles(files);
-        assertEquals(Arrays.asList(new LinkedFile("", Path.of(""), "")), entry.getFiles());
+        assertEquals(List.of(new LinkedFile("", Path.of(""), "")), entry.getFiles());
     }
 
     @Test
@@ -374,7 +373,7 @@ class BibEntryTest {
 
     @Test
     void compareToDifferentClassIsFalse() {
-        assertNotEquals(entry, new Object());
+        assertNotEquals(new Object(), entry);
     }
 
     @Test
@@ -503,39 +502,39 @@ class BibEntryTest {
     @Test
     void putKeywordsPutEmpyListErasesPreviousKeywords() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
-        entry.putKeywords(Collections.emptyList(), ',');
+        entry.putKeywords(List.of(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
     void putKeywordsPutEmpyListHasChanged() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
-        entry.putKeywords(Collections.emptyList(), ',');
+        entry.putKeywords(List.of(), ',');
         assertTrue(entry.hasChanged());
     }
 
     @Test
     void putKeywordsPutEmpyListToEmptyBibentry() {
-        entry.putKeywords(Collections.emptyList(), ',');
+        entry.putKeywords(List.of(), ',');
         assertTrue(entry.getKeywords(',').isEmpty());
     }
 
     @Test
     void putKeywordsPutEmpyListToEmptyBibentryNotChanged() {
-        entry.putKeywords(Collections.emptyList(), ',');
+        entry.putKeywords(List.of(), ',');
         assertFalse(entry.hasChanged());
     }
 
     @Test
     void putKeywordsToEmptyReturnsNoChange() {
-        Optional<FieldChange> change = entry.putKeywords(Collections.emptyList(), ',');
+        Optional<FieldChange> change = entry.putKeywords(List.of(), ',');
         assertEquals(Optional.empty(), change);
     }
 
     @Test
     void clearKeywordsReturnsChange() {
         entry.setField(StandardField.KEYWORDS, "Foo, Bar");
-        Optional<FieldChange> change = entry.putKeywords(Collections.emptyList(), ',');
+        Optional<FieldChange> change = entry.putKeywords(List.of(), ',');
         assertEquals(Optional.of(new FieldChange(entry, StandardField.KEYWORDS, "Foo, Bar", null)), change);
     }
 

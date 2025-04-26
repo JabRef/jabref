@@ -177,7 +177,7 @@ public class BibDatabase {
      * @param eventSource source the event is sent from
      */
     public synchronized void insertEntry(BibEntry entry, EntriesEventSource eventSource) {
-        insertEntries(Collections.singletonList(entry), eventSource);
+        insertEntries(List.of(entry), eventSource);
     }
 
     public synchronized void insertEntries(BibEntry... entries) {
@@ -207,11 +207,11 @@ public class BibDatabase {
     }
 
     public synchronized void removeEntry(BibEntry bibEntry) {
-        removeEntries(Collections.singletonList(bibEntry));
+        removeEntries(List.of(bibEntry));
     }
 
     public synchronized void removeEntry(BibEntry bibEntry, EntriesEventSource eventSource) {
-        removeEntries(Collections.singletonList(bibEntry), eventSource);
+        removeEntries(List.of(bibEntry), eventSource);
     }
 
     /**
@@ -274,7 +274,7 @@ public class BibDatabase {
 
     public Set<BibEntry> getEntriesForCitationKey(@Nullable String citationKey) {
         // explicit null check because citationIndex is a ConcurrentHashMap and will throw NPE on null
-        return citationKey != null ? citationIndex.getOrDefault(citationKey, Collections.emptySet()) : Collections.emptySet();
+        return citationKey != null ? citationIndex.getOrDefault(citationKey, Set.of()) : Set.of();
     }
 
     private Set<String> getReferencedCitationKeys(BibEntry entry) {

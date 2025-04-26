@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.customentrytypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -136,7 +135,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
 
     public EntryTypeViewModel addNewCustomEntryType() {
         EntryType newentryType = new UnknownEntryType(entryTypeToAdd.getValue());
-        BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), Collections.emptyList());
+        BibEntryType type = new BibEntryType(newentryType, new ArrayList<>(), List.of());
         EntryTypeViewModel viewModel = new CustomEntryTypeViewModel(type, isMultiline);
         this.entryTypesWithFields.add(viewModel);
         this.entryTypeToAdd.setValue("");

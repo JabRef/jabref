@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,8 +42,8 @@ class CffExporterTest {
     final void exportForNoEntriesWritesNothing(@TempDir Path tempDir) throws Exception {
         Path file = tempDir.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        cffExporter.export(databaseContext, tempDir, Collections.emptyList());
-        assertEquals(Collections.emptyList(), Files.readAllLines(file));
+        cffExporter.export(databaseContext, tempDir, List.of());
+        assertEquals(List.of(), Files.readAllLines(file));
     }
 
     @Test
@@ -57,7 +56,7 @@ class CffExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+        cffExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
@@ -86,7 +85,7 @@ class CffExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+        cffExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
@@ -111,7 +110,7 @@ class CffExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+        cffExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
@@ -138,7 +137,7 @@ class CffExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+        cffExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
@@ -163,7 +162,7 @@ class CffExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+        cffExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
@@ -188,7 +187,7 @@ class CffExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+        cffExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "cff-version: 1.2.0",
@@ -218,7 +217,7 @@ class CffExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        cffExporter.export(databaseContext, file, Collections.singletonList(entry));
+        cffExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "cff-version: 1.2.0",

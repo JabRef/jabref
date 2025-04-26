@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -47,9 +47,9 @@ public class Medra implements IdBasedParserFetcher {
         return inputStream -> {
             JSONObject response = JsonReader.toJsonObject(inputStream);
             if (response.isEmpty()) {
-                return Collections.emptyList();
+                return List.of();
             }
-            return Collections.singletonList(jsonItemToBibEntry(response));
+            return List.of(jsonItemToBibEntry(response));
         };
     }
 

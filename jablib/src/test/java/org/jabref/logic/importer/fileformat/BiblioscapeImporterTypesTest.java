@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -50,6 +49,6 @@ class BiblioscapeImporterTypesTest {
         entry.setField(StandardField.YEAR, "1999");
         entry.setType(bibtexType);
 
-        assertEquals(Collections.singletonList(entry), bibEntries);
+        assertEquals(List.of(entry), bibEntries);
     }
 }

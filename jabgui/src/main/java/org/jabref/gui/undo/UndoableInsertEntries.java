@@ -1,6 +1,5 @@
 package org.jabref.gui.undo;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -24,7 +23,7 @@ public class UndoableInsertEntries extends AbstractUndoableJabRefEdit {
     private final boolean paste;
 
     public UndoableInsertEntries(BibDatabase database, BibEntry entry) {
-        this(database, Collections.singletonList(entry));
+        this(database, List.of(entry));
     }
 
     public UndoableInsertEntries(BibDatabase database, List<BibEntry> entries) {

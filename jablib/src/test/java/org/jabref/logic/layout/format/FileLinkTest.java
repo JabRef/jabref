@@ -1,6 +1,6 @@
 package org.jabref.logic.layout.format;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.jabref.logic.layout.ParamLayoutFormatter;
@@ -18,7 +18,7 @@ class FileLinkTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        fileLinkLayoutFormatter = new FileLink(Collections.emptyList(), "");
+        fileLinkLayoutFormatter = new FileLink(List.of(), "");
     }
 
     @ParameterizedTest

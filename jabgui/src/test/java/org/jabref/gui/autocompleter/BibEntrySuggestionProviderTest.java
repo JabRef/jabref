@@ -2,7 +2,7 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
@@ -20,7 +20,7 @@ class BibEntrySuggestionProviderTest {
     private BibDatabase database;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         database = new BibDatabase();
         autoCompleter = new BibEntrySuggestionProvider(database);
     }
@@ -28,7 +28,7 @@ class BibEntrySuggestionProviderTest {
     @Test
     void completeWithoutAddingAnythingReturnsNothing() {
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest("test"));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -37,7 +37,7 @@ class BibEntrySuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest("test"));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -47,7 +47,7 @@ class BibEntrySuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest("testKey"));
-        assertEquals(Collections.singletonList(entry), result);
+        assertEquals(List.of(entry), result);
     }
 
     @Test
@@ -57,7 +57,7 @@ class BibEntrySuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest("test"));
-        assertEquals(Collections.singletonList(entry), result);
+        assertEquals(List.of(entry), result);
     }
 
     @Test
@@ -67,7 +67,7 @@ class BibEntrySuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest("testkey"));
-        assertEquals(Collections.singletonList(entry), result);
+        assertEquals(List.of(entry), result);
     }
 
     @Test
@@ -86,7 +86,7 @@ class BibEntrySuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest(""));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -109,6 +109,6 @@ class BibEntrySuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<BibEntry> result = autoCompleter.provideSuggestions(getRequest("k"));
-        assertEquals(Collections.singletonList(entry), result);
+        assertEquals(List.of(entry), result);
     }
 }

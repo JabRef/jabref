@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -409,7 +408,7 @@ public class GroupTreeView extends BorderPane {
                     dialogService,
                     taskExecutor);
             List<Path> files = dragboard.getFiles().stream().map(File::toPath).collect(Collectors.toList());
-            stateManager.setSelectedGroups(database, Collections.singletonList(row.getItem().getGroupNode()));
+            stateManager.setSelectedGroups(database, List.of(row.getItem().getGroupNode()));
             importHandler.importFilesInBackground(files, database, preferences.getFilePreferences(), event.getTransferMode())
                          .executeWith(taskExecutor);
             success = true;

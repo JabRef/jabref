@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -44,7 +43,7 @@ class LayoutTest {
     }
 
     private String layout(String layout, BibEntry entry) throws IOException {
-        return layout(layout, Collections.emptyList(), entry);
+        return layout(layout, List.of(), entry);
     }
 
     @Test
@@ -147,7 +146,7 @@ class LayoutTest {
 
         String layoutText = layout(
                 "\\begin{file}\\format[WrapFileLinks(\\i. \\d (\\p))]{\\file}\\end{file}",
-                Collections.singletonList(Path.of("src/test/resources/pdfs/")),
+                List.of(Path.of("src/test/resources/pdfs/")),
                 entry);
 
         assertEquals(
@@ -167,7 +166,7 @@ class LayoutTest {
     @Test
     void customNameFormatter() throws IOException {
         when(layoutFormatterPreferences.getNameFormatterPreferences()).thenReturn(
-                new NameFormatterPreferences(Collections.singletonList("DCA"), Collections.singletonList("1@*@{ll}@@2@1..1@{ff}{ll}@2..2@ and {ff}{l}@@*@*@more")));
+                new NameFormatterPreferences(List.of("DCA"), List.of("1@*@{ll}@@2@1..1@{ff}{ll}@2..2@ and {ff}{l}@@*@*@more")));
         BibEntry entry = new BibEntry(StandardEntryType.Article).withField(StandardField.AUTHOR, "Joe Doe and Mary Jane");
 
         String layoutText = layout("\\begin{author}\\format[DCA]{\\author}\\end{author}", entry);

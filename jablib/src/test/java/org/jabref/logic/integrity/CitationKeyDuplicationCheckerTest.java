@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -23,7 +22,7 @@ class CitationKeyDuplicationCheckerTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(entry));
         CitationKeyDuplicationChecker checker = new CitationKeyDuplicationChecker(bibDatabase);
 
-        List<IntegrityMessage> expected = Collections.emptyList();
+        List<IntegrityMessage> expected = List.of();
         assertEquals(expected, checker.check(entry));
     }
 
@@ -38,7 +37,7 @@ class CitationKeyDuplicationCheckerTest {
         BibDatabase bibDatabase = new BibDatabase(List.of(entry, entry2));
         CitationKeyDuplicationChecker checker = new CitationKeyDuplicationChecker(bibDatabase);
 
-        List<IntegrityMessage> expected = Collections.singletonList(
+        List<IntegrityMessage> expected = List.of(
                 new IntegrityMessage(Localization.lang("Duplicate citation key"), entry, StandardField.KEY));
         assertEquals(expected, checker.check(entry));
     }

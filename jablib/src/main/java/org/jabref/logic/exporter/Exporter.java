@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -86,7 +85,7 @@ public abstract class Exporter {
             if (file.getFileType().equals(fileType.getName())) {
                 Optional<Path> filePath = file.findIn(databaseContext, filePreferences);
                 if (filePath.isPresent()) {
-                    export(databaseContext, filePath.get(), entriesToWrite, Collections.emptyList(), abbreviationRepository);
+                    export(databaseContext, filePath.get(), entriesToWrite, List.of(), abbreviationRepository);
                     writtenToAFile = true;
                 }
             }
@@ -121,7 +120,7 @@ public abstract class Exporter {
                 if (linkedFile.getFileType().equals(fileType.getName())) {
                     Optional<Path> linkedFilePath = linkedFile.findIn(databaseContext.getFileDirectories(filePreferences));
                     if (linkedFilePath.isPresent() && Files.exists(linkedFilePath.get()) && Files.isSameFile(linkedFilePath.get(), filePath)) {
-                        export(databaseContext, filePath, List.of(entry), Collections.emptyList(), abbreviationRepository);
+                        export(databaseContext, filePath, List.of(entry), List.of(), abbreviationRepository);
                         writtenABibEntry = true;
                     }
                 }

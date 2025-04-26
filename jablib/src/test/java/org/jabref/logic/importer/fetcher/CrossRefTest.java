@@ -1,11 +1,10 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherClientException;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -143,14 +142,14 @@ class CrossRefTest {
 
     @Test
     void performSearchByEmptyQuery() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+        assertEquals(List.of(), fetcher.performSearch(""));
     }
 
     /**
      * reveal fetching error on crossref performSearchById
      */
     @Test
-    void performSearchValidReturnNothingDOI() throws FetcherException {
+    void performSearchValidReturnNothingDOI() {
         assertThrows(FetcherClientException.class, () -> fetcher.performSearchById("10.1392/BC1.0"));
     }
 }

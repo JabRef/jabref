@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -47,7 +46,7 @@ class BibEntryWriterTest {
     @BeforeEach
     void setUpWriter() {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList());
+        FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), List.of());
         bibEntryWriter = new BibEntryWriter(new FieldWriter(fieldPreferences), new BibEntryTypesManager());
     }
 

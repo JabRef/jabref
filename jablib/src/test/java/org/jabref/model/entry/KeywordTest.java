@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class KeywordTest {
 
     @Test
-    void getPathFromRootAsStringForSimpleChain() throws Exception {
+    void getPathFromRootAsStringForSimpleChain() {
         Keyword keywordChain = Keyword.of("A", "B", "C");
         assertEquals("A > B", keywordChain.getChild().get().getPathFromRootAsString('>'));
     }
 
     @Test
-    void getAllSubchainsAsStringForSimpleChain() throws Exception {
+    void getAllSubchainsAsStringForSimpleChain() {
         Keyword keywordChain = Keyword.of("A", "B", "C");
         Set<String> expected = new HashSet<>();
         expected.add("A");

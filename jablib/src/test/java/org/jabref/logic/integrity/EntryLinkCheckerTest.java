@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.database.BibDatabase;
@@ -35,13 +34,13 @@ class EntryLinkCheckerTest {
 
     @Test
     void checkNoFields() {
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
     void checkNonRelatedFieldsOnly() {
         entry.setField(StandardField.YEAR, "2016");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
@@ -61,7 +60,7 @@ class EntryLinkCheckerTest {
         database.insertEntry(entry2);
 
         List<IntegrityMessage> message = checker.check(entry);
-        assertEquals(Collections.emptyList(), message);
+        assertEquals(List.of(), message);
     }
 
     @Test
@@ -77,7 +76,7 @@ class EntryLinkCheckerTest {
         database.insertEntry(entry3);
 
         List<IntegrityMessage> message = checker.check(entry);
-        assertEquals(Collections.emptyList(), message);
+        assertEquals(List.of(), message);
     }
 
     @Test

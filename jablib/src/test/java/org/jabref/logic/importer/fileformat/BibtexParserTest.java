@@ -7,10 +7,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 
@@ -111,14 +111,14 @@ class BibtexParserTest {
     @Test
     void fromStringReturnsEmptyListFromEmptyString() throws ParseException {
         Collection<BibEntry> parsed = parser.parseEntries("");
-        assertEquals(Collections.emptyList(), parsed);
+        assertEquals(List.of(), parsed);
     }
 
     @Test
     void fromStringReturnsEmptyListIfNoEntryRecognized() throws ParseException {
         Collection<BibEntry> parsed = parser
                 .parseEntries("@@article@@{{{{{{}");
-        assertEquals(Collections.emptyList(), parsed);
+        assertEquals(List.of(), parsed);
     }
 
     @Test
@@ -1331,7 +1331,7 @@ class BibtexParserTest {
                         new OrFields(StandardField.TITLE)
                 ));
 
-        assertEquals(Collections.singleton(expectedEntryType), result.getEntryTypes());
+        assertEquals(Set.of(expectedEntryType), result.getEntryTypes());
     }
 
     @Test
@@ -2224,7 +2224,7 @@ class BibtexParserTest {
                 """));
         BibDatabase database = result.getDatabase();
 
-        assertEquals(Collections.singletonList(expectedEntry), database.getEntries());
+        assertEquals(List.of(expectedEntry), database.getEntries());
     }
 
     @Test

@@ -27,7 +27,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -253,7 +252,7 @@ public class URLDownload {
             return cookieManager.getCookieStore().get(this.source.toURI());
         } catch (URISyntaxException e) {
             LOGGER.error("Unable to convert download URL to URI", e);
-            return Collections.emptyList();
+            return List.of();
         }
     }
 
@@ -314,7 +313,7 @@ public class URLDownload {
         String extension = "." + FileUtil.getFileExtension(fileNameWithExtension).orElse("tmp");
 
         // Create temporary file and download to it
-        Path file = null;
+        Path file;
         try {
             file = Files.createTempFile(fileName, extension);
         } catch (IOException e) {

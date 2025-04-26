@@ -1,10 +1,11 @@
 package org.jabref.gui.autosaveandbackup;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,13 +54,13 @@ class BackupManagerTest {
     }
 
     @Test
-    void backupFileIsEqualForNonExistingBackup() throws Exception {
+    void backupFileIsEqualForNonExistingBackup() throws URISyntaxException {
         Path originalFile = Path.of(BackupManagerTest.class.getResource("no-autosave.bib").toURI());
         assertFalse(BackupManager.backupFileDiffers(originalFile, backupDir));
     }
 
     @Test
-    void backupFileIsEqual() throws Exception {
+    void backupFileIsEqual() throws URISyntaxException, IOException {
         // Prepare test: Create backup file on "right" path
         Path source = Path.of(BackupManagerTest.class.getResource("no-changes.bib.bak").toURI());
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI()), BackupFileType.BACKUP, backupDir);
@@ -70,7 +71,7 @@ class BackupManagerTest {
     }
 
     @Test
-    void backupFileDiffers() throws Exception {
+    void backupFileDiffers() throws URISyntaxException, IOException {
         // Prepare test: Create backup file on "right" path
         Path source = Path.of(BackupManagerTest.class.getResource("changes.bib.bak").toURI());
         Path target = BackupFileUtil.getPathForNewBackupFileAndCreateDirectory(Path.of(BackupManagerTest.class.getResource("changes.bib").toURI()), BackupFileType.BACKUP, backupDir);
@@ -81,7 +82,7 @@ class BackupManagerTest {
     }
 
     @Test
-    void correctBackupFileDeterminedForMultipleBakFiles() throws Exception {
+    void correctBackupFileDeterminedForMultipleBakFiles() throws URISyntaxException, IOException {
         Path noChangesBib = Path.of(BackupManagerTest.class.getResource("no-changes.bib").toURI());
         Path noChangesBibBak = Path.of(BackupManagerTest.class.getResource("no-changes.bib.bak").toURI());
 
@@ -94,7 +95,7 @@ class BackupManagerTest {
         for (int i = 0; i < 10; i++) {
             Path changesBibBak = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
             Path directory = backupDir;
-            String timeSuffix = "2020-02-03--00.00.0" + Integer.toString(i);
+            String timeSuffix = "2020-02-03--00.00.0" + i;
             String fileName = BackupFileUtil.getUniqueFilePrefix(noChangesBib) + "--no-changes.bib--" + timeSuffix + ".bak";
             target = directory.resolve(fileName);
             Files.copy(changesBibBak, target, StandardCopyOption.REPLACE_EXISTING);
@@ -105,7 +106,7 @@ class BackupManagerTest {
     }
 
     @Test
-    void bakFileWithNewerTimeStampLeadsToDiff() throws Exception {
+    void bakFileWithNewerTimeStampLeadsToDiff() throws URISyntaxException, IOException {
         Path changesBib = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
         Path changesBibBak = Path.of(BackupManagerTest.class.getResource("changes.bib.bak").toURI());
 
@@ -116,7 +117,7 @@ class BackupManagerTest {
     }
 
     @Test
-    void bakFileWithOlderTimeStampDoesNotLeadToDiff() throws Exception {
+    void bakFileWithOlderTimeStampDoesNotLeadToDiff() throws URISyntaxException, IOException {
         Path changesBib = Path.of(BackupManagerTest.class.getResource("changes.bib").toURI());
         Path changesBibBak = Path.of(BackupManagerTest.class.getResource("changes.bib.bak").toURI());
 
@@ -130,7 +131,7 @@ class BackupManagerTest {
     }
 
     @Test
-    void shouldNotCreateABackup(@TempDir Path customDir) throws Exception {
+    void shouldNotCreateABackup(@TempDir Path customDir) throws URISyntaxException, IOException {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
 
@@ -153,11 +154,11 @@ class BackupManagerTest {
         BackupManager.shutdown(database, filePreferences.getBackupDirectory(), filePreferences.shouldCreateBackup());
 
         List<Path> files = Files.list(backupDir).toList();
-        assertEquals(Collections.emptyList(), files);
+        assertEquals(List.of(), files);
     }
 
     @Test
-    void shouldCreateABackup(@TempDir Path customDir) throws Exception {
+    void shouldCreateABackup(@TempDir Path customDir) throws IOException {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
 

@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.journals.Abbreviation;
@@ -33,7 +32,7 @@ class JournalInAbbreviationListCheckerTest {
     @Test
     void journalAcceptsNameInTheList() {
         entry.setField(StandardField.JOURNAL, "IEEE Software");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test

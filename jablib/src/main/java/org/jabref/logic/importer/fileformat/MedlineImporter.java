@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1236,6 +1235,6 @@ public class MedlineImporter extends Importer implements Parser {
         } catch (IOException e) {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
-        return Collections.emptyList();
+        return List.of();
     }
 }

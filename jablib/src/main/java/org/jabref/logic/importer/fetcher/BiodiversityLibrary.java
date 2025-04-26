@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -119,7 +118,7 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
             }
 
             if ("Item".equals(item.getString("BHLType"))) {
-                URL url = null;
+                URL url;
                 try {
                     url = getItemMetadataURL(item.getString("ItemID"));
                 } catch (URISyntaxException | MalformedURLException e) {
@@ -182,12 +181,12 @@ public class BiodiversityLibrary implements SearchBasedParserFetcher, Customizab
         return inputStream -> {
             JSONObject response = JsonReader.toJsonObject(inputStream);
             if (response.isEmpty()) {
-                return Collections.emptyList();
+                return List.of();
             }
 
             String errorMessage = response.getString("ErrorMessage");
             if (!errorMessage.isBlank()) {
-                return Collections.emptyList();
+                return List.of();
             }
 
             JSONArray items = response.getJSONArray("Result");

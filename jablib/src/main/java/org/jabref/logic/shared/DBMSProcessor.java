@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -151,7 +150,7 @@ public abstract class DBMSProcessor {
      * @param bibEntry {@link BibEntry} to be inserted.
      */
     public void insertEntry(BibEntry bibEntry) {
-        insertEntries(Collections.singletonList(bibEntry));
+        insertEntries(List.of(bibEntry));
     }
 
     /**
@@ -475,7 +474,7 @@ public abstract class DBMSProcessor {
      * @return instance of {@link BibEntry}
      */
     public Optional<BibEntry> getSharedEntry(int sharedID) {
-        List<BibEntry> sharedEntries = getSharedEntries(Collections.singletonList(sharedID));
+        List<BibEntry> sharedEntries = getSharedEntries(List.of(sharedID));
         if (sharedEntries.isEmpty()) {
             return Optional.empty();
         } else {
@@ -565,14 +564,14 @@ public abstract class DBMSProcessor {
         } catch (SQLException e) {
             LOGGER.error("Executed >{}<", query);
             LOGGER.error("SQL Error", e);
-            return Collections.emptyList();
+            return List.of();
         }
 
         return sharedEntries;
     }
 
     public List<BibEntry> getSharedEntries() {
-        return getSharedEntries(Collections.emptyList());
+        return getSharedEntries(List.of());
     }
 
     /**

@@ -2,7 +2,6 @@ package org.jabref.logic.openoffice.style;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,17 +254,17 @@ class JStyleTest {
 
         assertEquals("[Boström et al., 2006]",
                 getCitationMarker2(style,
-                        Collections.singletonList(entry), entryDBMap,
+                        List.of(entry), entryDBMap,
                         true, null, null, null));
 
         assertEquals("Boström et al. [2006]",
                 getCitationMarker2(style,
-                        Collections.singletonList(entry), entryDBMap,
+                        List.of(entry), entryDBMap,
                         false, null, new Boolean[]{false}, null));
 
         assertEquals("[Boström, Wäyrynen, Bodén, Beznosov & Kruchten, 2006]",
                 getCitationMarker2(style,
-                        Collections.singletonList(entry), entryDBMap,
+                        List.of(entry), entryDBMap,
                         true,
                         null,
                         new Boolean[]{true},

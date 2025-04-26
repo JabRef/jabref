@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor.citationrelationtab;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +14,11 @@ public class BibEntryRelationsCache {
     private static final Map<String, List<BibEntry>> REFERENCES_MAP = new LRUMap<>(MAX_CACHED_ENTRIES, MAX_CACHED_ENTRIES);
 
     public List<BibEntry> getCitations(BibEntry entry) {
-        return CITATIONS_MAP.getOrDefault(entry.getDOI().map(DOI::asString).orElse(""), Collections.emptyList());
+        return CITATIONS_MAP.getOrDefault(entry.getDOI().map(DOI::asString).orElse(""), List.of());
     }
 
     public List<BibEntry> getReferences(BibEntry entry) {
-        return REFERENCES_MAP.getOrDefault(entry.getDOI().map(DOI::asString).orElse(""), Collections.emptyList());
+        return REFERENCES_MAP.getOrDefault(entry.getDOI().map(DOI::asString).orElse(""), List.of());
     }
 
     public void cacheOrMergeCitations(BibEntry entry, List<BibEntry> citations) {

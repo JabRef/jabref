@@ -2,7 +2,6 @@ package org.jabref.logic.util.io;
 
 import java.io.StringWriter;
 import java.util.AbstractList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.RandomAccess;
@@ -53,7 +52,7 @@ public class XMLUtil {
     }
 
     public static List<Node> asList(NodeList n) {
-        return n.getLength() == 0 ? Collections.emptyList() : new NodeListWrapper(n);
+        return n.getLength() == 0 ? List.of() : new NodeListWrapper(n);
     }
 
     /**
@@ -96,7 +95,7 @@ public class XMLUtil {
      */
     public static List<Node> getNodesByName(Node item, String nodeName) {
         if (item.getNodeType() != Node.ELEMENT_NODE) {
-            return Collections.emptyList();
+            return List.of();
         }
         NodeList nodes = ((Element) item).getElementsByTagName(nodeName);
         return asList(nodes);

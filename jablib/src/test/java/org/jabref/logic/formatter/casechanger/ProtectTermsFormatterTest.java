@@ -1,6 +1,6 @@
 package org.jabref.logic.formatter.casechanger;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
@@ -21,7 +21,7 @@ class ProtectTermsFormatterTest {
     void setUp() {
         formatter = new ProtectTermsFormatter(
                 new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
-                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
+                        List.of(), List.of(), List.of())));
     }
 
     @Test

@@ -2,7 +2,6 @@ package org.jabref.gui.autocompleter;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +40,7 @@ class FieldValueSuggestionProviderTest {
     @Test
     void completeWithoutAddingAnythingReturnsNothing() {
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -50,7 +49,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -60,7 +59,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("test"));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -77,7 +76,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("testValue"));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -126,7 +125,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest(""));
-        assertEquals(Collections.emptyList(), result);
+        assertEquals(List.of(), result);
     }
 
     @Test
@@ -149,7 +148,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("va"));
-        assertEquals(Collections.singletonList("val"), result);
+        assertEquals(List.of("val"), result);
     }
 
     @Test
@@ -159,7 +158,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("val"));
-        assertEquals(Collections.singletonList("test value"), result);
+        assertEquals(List.of("test value"), result);
     }
 
     @Test
@@ -169,7 +168,7 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("lue"));
-        assertEquals(Collections.singletonList("test value"), result);
+        assertEquals(List.of("test value"), result);
     }
 
     @Test
@@ -179,6 +178,6 @@ class FieldValueSuggestionProviderTest {
         database.insertEntry(entry);
 
         Collection<String> result = autoCompleter.provideSuggestions(getRequest("te"));
-        assertEquals(Collections.singletonList("test value"), result);
+        assertEquals(List.of("test value"), result);
     }
 }

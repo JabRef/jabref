@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,6 +57,6 @@ public class RenamePdfCleanup implements CleanupJob {
             return OptionalUtil.toList(changes);
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 }

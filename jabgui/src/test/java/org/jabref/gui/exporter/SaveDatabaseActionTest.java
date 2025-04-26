@@ -3,7 +3,6 @@ package org.jabref.gui.exporter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -152,7 +151,7 @@ class SaveDatabaseActionTest {
         assertEquals(database
                         .getEntries().stream()
                         .map(BibEntry::hasChanged).filter(changed -> false).collect(Collectors.toList()),
-                Collections.emptyList());
+                List.of());
     }
 
     @Test

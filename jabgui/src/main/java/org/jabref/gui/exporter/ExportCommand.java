@@ -2,7 +2,6 @@ package org.jabref.gui.exporter;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -109,7 +108,7 @@ public class ExportCommand extends SimpleCommand {
             // All entries
             entries = stateManager.getActiveDatabase()
                                   .map(BibDatabaseContext::getEntries)
-                                  .orElse(Collections.emptyList());
+                                  .orElse(List.of());
         }
 
         List<Path> fileDirForDatabase = stateManager.getActiveDatabase()

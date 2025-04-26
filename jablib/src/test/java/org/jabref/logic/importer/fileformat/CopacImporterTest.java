@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fileformat;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.util.StandardFileType;
@@ -35,6 +34,6 @@ class CopacImporterTest {
     void importEmptyEntries() throws Exception {
         Path path = Path.of(CopacImporterTest.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(path).getDatabase().getEntries();
-        assertEquals(Collections.emptyList(), entries);
+        assertEquals(List.of(), entries);
     }
 }

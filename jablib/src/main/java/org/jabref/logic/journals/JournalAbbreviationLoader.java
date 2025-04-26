@@ -91,6 +91,6 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        return loadRepository(new JournalAbbreviationPreferences(Collections.emptyList(), true));
+        return loadRepository(new JournalAbbreviationPreferences(List.of(), true));
     }
 }

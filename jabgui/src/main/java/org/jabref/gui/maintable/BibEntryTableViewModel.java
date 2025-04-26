@@ -2,7 +2,6 @@ package org.jabref.gui.maintable;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +59,7 @@ public class BibEntryTableViewModel {
         this.bibDatabaseContext = bibDatabaseContext;
         this.fieldValueFormatter = fieldValueFormatter;
 
-        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(Collections.emptyList());
+        this.linkedFiles = getField(StandardField.FILE).mapOpt(FileFieldParser::parse).orElseOpt(List.of());
         this.linkedIdentifiers = createLinkedIdentifiersBinding(entry);
         this.matchedGroups = createMatchedGroupsBinding(bibDatabaseContext, entry);
     }
@@ -95,7 +94,7 @@ public class BibEntryTableViewModel {
                                                      .map(GroupTreeNode::getGroup)
                                                      .filter(Predicate.not(Predicate.isEqual(groupTreeNode.getGroup())))
                                                      .collect(Collectors.toList()))
-                                .orElse(Collections.emptyList())));
+                                .orElse(List.of())));
     }
 
     public OptionalBinding<String> getField(Field field) {

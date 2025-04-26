@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
@@ -44,7 +43,7 @@ class CitationKeyDeviationCheckerTest {
         BibEntry entry = new BibEntry().withField(InternalField.KEY_FIELD, "Knuth2014")
                                        .withField(StandardField.AUTHOR, "Knuth")
                                        .withField(StandardField.YEAR, "2014");
-        List<IntegrityMessage> expected = Collections.singletonList(new IntegrityMessage(
+        List<IntegrityMessage> expected = List.of(new IntegrityMessage(
                 Localization.lang("Citation key deviates from generated key"), entry, InternalField.KEY_FIELD));
         assertEquals(expected, checker.check(entry));
     }

@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.ImporterPreferences;
@@ -84,7 +83,7 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
 
     @Test
     void searchByEmptyQueryFindsNothing() throws Exception {
-        assertEquals(Collections.emptyList(), fetcher.performSearch(""));
+        assertEquals(List.of(), fetcher.performSearch(""));
     }
 
     @Test

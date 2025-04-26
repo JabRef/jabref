@@ -1,6 +1,5 @@
 package org.jabref.gui.undo;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
@@ -27,7 +26,7 @@ public class UndoableRemoveEntries extends AbstractUndoableJabRefEdit {
     private final boolean cut;
 
     public UndoableRemoveEntries(BibDatabase base, BibEntry entry) {
-        this(base, Collections.singletonList(entry));
+        this(base, List.of(entry));
     }
 
     public UndoableRemoveEntries(BibDatabase base, List<BibEntry> entries) {

@@ -1,7 +1,6 @@
 package org.jabref.logic.shared;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -81,7 +80,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void entryAddedEventListener() throws Exception {
+    void entryAddedEventListener() {
         BibEntry expectedEntry = createExampleBibEntry(1);
         BibEntry furtherEntry = createExampleBibEntry(1);
 
@@ -95,7 +94,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void twoLocalFieldChangesAreSynchronizedCorrectly() throws Exception {
+    void twoLocalFieldChangesAreSynchronizedCorrectly() {
         BibEntry expectedEntry = createExampleBibEntry(1);
         expectedEntry.registerListener(dbmsSynchronizer);
 
@@ -104,11 +103,11 @@ class DBMSSynchronizerTest {
         expectedEntry.setField(StandardField.TITLE, "The micro multiplexer");
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
-        assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+        assertEquals(List.of(expectedEntry), actualEntries);
     }
 
     @Test
-    void oneLocalAndOneSharedFieldChangeIsSynchronizedCorrectly() throws Exception {
+    void oneLocalAndOneSharedFieldChangeIsSynchronizedCorrectly() {
         BibEntry exampleBibEntry = createExampleBibEntry(1);
         exampleBibEntry.registerListener(dbmsSynchronizer);
 
@@ -122,11 +121,11 @@ class DBMSSynchronizerTest {
         BibEntry expectedBibEntry = createExampleBibEntry(1)
                 .withField(StandardField.AUTHOR, "Brad L and Gilson");
 
-        assertEquals(Collections.singletonList(expectedBibEntry), actualEntries);
+        assertEquals(List.of(expectedBibEntry), actualEntries);
     }
 
     @Test
-    void entriesRemovedEventListener() throws Exception {
+    void entriesRemovedEventListener() {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 
@@ -148,7 +147,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void metaDataChangedEventListener() throws Exception {
+    void metaDataChangedEventListener() {
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
@@ -170,7 +169,7 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void synchronizeLocalDatabaseWithEntryRemoval() throws Exception {
+    void synchronizeLocalDatabaseWithEntryRemoval() {
         List<BibEntry> expectedBibEntries = Arrays.asList(createExampleBibEntry(1), createExampleBibEntry(2));
 
         dbmsProcessor.insertEntry(expectedBibEntries.getFirst());
@@ -182,9 +181,9 @@ class DBMSSynchronizerTest {
 
         assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
-        dbmsProcessor.removeEntries(Collections.singletonList(expectedBibEntries.getFirst()));
+        dbmsProcessor.removeEntries(List.of(expectedBibEntries.getFirst()));
 
-        expectedBibEntries = Collections.singletonList(expectedBibEntries.get(1));
+        expectedBibEntries = List.of(expectedBibEntries.get(1));
 
         dbmsSynchronizer.synchronizeLocalDatabase();
 
@@ -228,12 +227,12 @@ class DBMSSynchronizerTest {
     }
 
     @Test
-    void applyMetaData() throws Exception {
+    void applyMetaData() {
         BibEntry bibEntry = createExampleBibEntry(1);
         bibDatabase.insertEntry(bibEntry);
 
         MetaData testMetaData = new MetaData();
-        testMetaData.setSaveActions(new FieldFormatterCleanups(true, Collections.singletonList(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
+        testMetaData.setSaveActions(new FieldFormatterCleanups(true, List.of(new FieldFormatterCleanup(StandardField.AUTHOR, new LowerCaseFormatter()))));
         dbmsSynchronizer.setMetaData(testMetaData);
 
         dbmsSynchronizer.applyMetaData();

@@ -1,7 +1,6 @@
 package org.jabref.gui.actions;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +57,7 @@ public class ActionHelper {
     }
 
     public static BooleanExpression isFieldSetForSelectedEntry(Field field, StateManager stateManager) {
-        return isAnyFieldSetForSelectedEntry(Collections.singletonList(field), stateManager);
+        return isAnyFieldSetForSelectedEntry(List.of(field), stateManager);
     }
 
     public static BooleanExpression isAnyFieldSetForSelectedEntry(List<Field> fields, StateManager stateManager) {

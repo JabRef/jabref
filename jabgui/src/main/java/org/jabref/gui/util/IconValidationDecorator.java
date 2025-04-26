@@ -1,7 +1,7 @@
 package org.jabref.gui.util;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.List;
 
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -47,7 +47,7 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
         label.setTooltip(createTooltip(message));
         label.setAlignment(position);
         // Prevent label from stretching
-        label.setMaxHeight(Control.USE_PREF_SIZE); 
+        label.setMaxHeight(Control.USE_PREF_SIZE);
         return label;
     }
 
@@ -60,6 +60,6 @@ public class IconValidationDecorator extends GraphicValidationDecoration {
 
     @Override
     protected Collection<Decoration> createValidationDecorations(ValidationMessage message) {
-        return Collections.singletonList(new GraphicDecoration(createDecorationNode(message), position));
+        return List.of(new GraphicDecoration(createDecorationNode(message), position));
     }
 }

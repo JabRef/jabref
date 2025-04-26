@@ -2,7 +2,6 @@ package org.jabref.logic.util.io;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RegExpBasedFileFinderTest {
-    private static final List<String> PDF_EXTENSION = Collections.singletonList("pdf");
+    private static final List<String> PDF_EXTENSION = List.of("pdf");
     private static final List<String> FILE_NAMES = List.of(
             "ACM_IEEE-CS.pdf",
             "pdfInDatabase.pdf",

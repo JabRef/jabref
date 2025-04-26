@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -43,7 +42,7 @@ class CitationKeyBasedFileFinder implements FileFinder {
         Optional<String> citeKeyOptional = entry.getCitationKey();
         if (StringUtil.isBlank(citeKeyOptional)) {
             LOGGER.debug("No citation key found in entry {}", entry);
-            return Collections.emptyList();
+            return List.of();
         }
         String citeKey = citeKeyOptional.get();
 

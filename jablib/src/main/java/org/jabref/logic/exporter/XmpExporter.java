@@ -3,7 +3,6 @@ package org.jabref.logic.exporter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,7 +56,7 @@ public class XmpExporter extends Exporter {
                 } else {
                     entryFile = Path.of(file.getParent() + "/" + suffix);
                 }
-                this.writeBibToXmp(entryFile, Collections.singletonList(entry));
+                this.writeBibToXmp(entryFile, List.of(entry));
             }
         } else {
             this.writeBibToXmp(file, entries);

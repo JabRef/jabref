@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -45,8 +44,8 @@ class HayagrivaYamlExporterTest {
     final void exportForNoEntriesWritesNothing(@TempDir Path tempFile) throws Exception {
         Path file = tempFile.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(databaseContext, tempFile, Collections.emptyList());
-        assertEquals(Collections.emptyList(), Files.readAllLines(file));
+        hayagrivaYamlExporter.export(databaseContext, tempFile, List.of());
+        assertEquals(List.of(), Files.readAllLines(file));
     }
 
     @Test
@@ -60,7 +59,7 @@ class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -87,7 +86,7 @@ class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -115,7 +114,7 @@ class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -142,7 +141,7 @@ class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -169,7 +168,7 @@ class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",
@@ -196,7 +195,7 @@ class HayagrivaYamlExporterTest {
 
         Path file = tempFile.resolve("RandomFileName");
         Files.createFile(file);
-        hayagrivaYamlExporter.export(databaseContext, file, Collections.singletonList(entry));
+        hayagrivaYamlExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "---",

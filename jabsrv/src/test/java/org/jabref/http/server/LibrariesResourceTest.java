@@ -7,6 +7,8 @@ import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class LibrariesResourceTest extends ServerTest {
 
     @Override
@@ -17,7 +19,7 @@ class LibrariesResourceTest extends ServerTest {
     }
 
     @Test
-    void defaultOneTestLibrary() throws Exception {
+    void defaultOneTestLibrary() {
         assertEquals("[\"" + TestBibFile.GENERAL_SERVER_TEST.id + "\"]", target("/libraries").request().get(String.class));
     }
 

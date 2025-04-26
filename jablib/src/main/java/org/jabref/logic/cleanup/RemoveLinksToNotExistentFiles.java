@@ -2,7 +2,6 @@ package org.jabref.logic.cleanup;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -47,6 +46,6 @@ public class RemoveLinksToNotExistentFiles implements CleanupJob {
             return OptionalUtil.toList(changes);
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 }

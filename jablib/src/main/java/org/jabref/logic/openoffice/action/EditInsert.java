@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice.action;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,7 +76,7 @@ public class EditInsert {
         List<CitationMarkerEntry> citations = new ArrayList<>(totalEntries);
         for (int i = 0; i < totalEntries; i++) {
             Citation cit = new Citation(citationKeys.get(i));
-            cit.lookupInDatabases(Collections.singletonList(database));
+            cit.lookupInDatabases(List.of(database));
             cit.setPageInfo(pageInfos.get(i));
             citations.add(cit);
         }

@@ -1,6 +1,6 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -32,36 +32,36 @@ class AbbreviationCheckerTest {
     @Test
     void checkEntryComplainsAboutAbbreviatedJournalName() {
         entry.setField(StandardField.BOOKTITLE, "T. J.");
-        assertNotEquals(Collections.emptyList(), checker.check(entry));
+        assertNotEquals(List.of(), checker.check(entry));
     }
 
     @Test
     void checkEntryDoesNotComplainAboutJournalNameThatHasSameAbbreviation() {
         entry.setField(StandardField.BOOKTITLE, "Journal");
         abbreviationRepository.addCustomAbbreviation(new Abbreviation("Journal", "Journal"));
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
-    void checkEntryDoesNotComplainAboutJournalNameThatHasΝοAbbreviation() {
+    void checkEntryDoesNotComplainAboutJournalNameThatHasNoAbbreviation() {
         entry.setField(StandardField.BOOKTITLE, "Non-Abbreviated-Title");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
-    void checkEntryDoesNotComplainAboutJournalNameThatHasΝοInput() {
-        assertEquals(Collections.emptyList(), checker.check(entry));
+    void checkEntryDoesNotComplainAboutJournalNameThatHasNoInput() {
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
     void checkEntryWorksForLaTeXField() {
         entry.setField(StandardField.BOOKTITLE, "Reducing Complexity and Power of Digital Multibit Error-Feedback $\\Delta$$\\Sigma$ Modulators");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
     void checkEntryWorksForLaTeXFieldStilContainingIllegalChars() {
         entry.setField(StandardField.BOOKTITLE, "Proceedings of the 5\\({}^{\\mbox{th}}\\) Central-European Workshop on Services and their Composition, Rostock, Germany, February 21-22, 2013");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 }

@@ -3,7 +3,6 @@ package org.jabref.logic.integrity;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +27,7 @@ class UTF8CheckerTest {
     void fieldAcceptsUTF8() {
         UTF8Checker checker = new UTF8Checker(StandardCharsets.UTF_8);
         entry.setField(StandardField.TITLE, "Only ascii characters!'@12");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     /**
@@ -37,11 +36,9 @@ class UTF8CheckerTest {
      * environment is Non UTF-8.
      * Finally, we need to reset the environment charset.
      *
-     * @throws UnsupportedEncodingException initial a String in charset GBK
-     * Demo: new String(StringDemo.getBytes(), "GBK");
      */
     @Test
-    void fieldDoesNotAcceptUmlauts() throws UnsupportedEncodingException {
+    void fieldDoesNotAcceptUmlauts() {
         UTF8Checker checker = new UTF8Checker(Charset.forName("GBK"));
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);
         entry.setField(StandardField.MONTH, NonUTF8);
@@ -52,11 +49,9 @@ class UTF8CheckerTest {
      * To check the UTF8Checker.UTF8EncodingChecker
      * in NonUTF8 char array (should return false)
      *
-     * @throws UnsupportedEncodingException initial a String in charset GBK
-     * Demo: new String(StringDemo.getBytes(), "GBK");
      */
     @Test
-    void NonUTF8EncodingCheckerTest() throws UnsupportedEncodingException {
+    void NonUTF8EncodingCheckerTest() {
         String NonUTF8 = new String("你好，这条语句使用GBK字符集".getBytes(StandardCharsets.UTF_8), GBK);
             assertFalse(UTF8Checker.UTF8EncodingChecker(NonUTF8.getBytes(GBK)));
     }

@@ -300,7 +300,7 @@ public class DownloadLinkedFileAction extends SimpleCommand {
         }
 
         @Override
-        public Path call() throws Exception {
+        public Path call() throws FetcherException, IOException {
             URLDownload download = new URLDownload(source);
             try (ProgressInputStream inputStream = download.asInputStream()) {
                 EasyBind.subscribe(

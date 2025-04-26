@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -193,7 +192,7 @@ public class TemplateExporter extends Exporter {
 
     @Override
     public void export(BibDatabaseContext databaseContext, Path file, List<BibEntry> entries) throws Exception {
-        export(databaseContext, file, entries, Collections.emptyList(), JournalAbbreviationLoader.loadBuiltInRepository());
+        export(databaseContext, file, entries, List.of(), JournalAbbreviationLoader.loadBuiltInRepository());
     }
 
     @Override

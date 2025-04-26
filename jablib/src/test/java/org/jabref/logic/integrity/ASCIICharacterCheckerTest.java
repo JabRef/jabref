@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
@@ -18,7 +17,7 @@ class ASCIICharacterCheckerTest {
     @Test
     void fieldAcceptsAsciiCharacters() {
         entry.setField(StandardField.TITLE, "Only ascii characters!'@12");
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test
@@ -40,7 +39,7 @@ class ASCIICharacterCheckerTest {
             field.append(Character.toString(i));
         }
         entry.setField(StandardField.TITLE, field.toString());
-        assertEquals(Collections.emptyList(), checker.check(entry));
+        assertEquals(List.of(), checker.check(entry));
     }
 
     @Test

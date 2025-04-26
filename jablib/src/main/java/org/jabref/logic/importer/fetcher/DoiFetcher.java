@@ -7,7 +7,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -209,7 +208,7 @@ public class DoiFetcher implements IdBasedFetcher, EntryBasedFetcher {
         if (doi.isPresent()) {
             return OptionalUtil.toList(performSearchById(doi.get()));
         } else {
-            return Collections.emptyList();
+            return List.of();
         }
     }
 

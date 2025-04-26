@@ -3,7 +3,6 @@ package org.jabref.model.entry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1014,7 +1013,7 @@ public class BibEntry implements Cloneable {
 
     public List<ParsedEntryLink> getEntryLinkList(Field field, BibDatabase database) {
         return getField(field).map(fieldValue -> EntryLinkList.parse(fieldValue, database))
-                              .orElse(Collections.emptyList());
+                              .orElse(List.of());
     }
 
     public Optional<FieldChange> setEntryLinkList(Field field, List<ParsedEntryLink> list) {
@@ -1028,7 +1027,7 @@ public class BibEntry implements Cloneable {
         } else {
             String fieldValue = fields.get(field);
             if (fieldValue == null) {
-                return Collections.emptySet();
+                return Set.of();
             } else {
                 HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
                 fieldsAsWords.put(field, words);

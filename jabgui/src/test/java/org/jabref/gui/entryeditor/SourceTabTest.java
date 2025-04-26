@@ -1,6 +1,6 @@
 package org.jabref.gui.entryeditor;
 
-import java.util.Collections;
+import java.util.List;
 
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -51,7 +51,7 @@ class SourceTabTest {
         when(stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH)).thenReturn(OptionalObjectProperty.empty());
         when(stateManager.searchQueryProperty()).thenReturn(mock(StringProperty.class));
         when(stateManager.activeTabProperty()).thenReturn(OptionalObjectProperty.empty());
-        KeyBindingRepository keyBindingRepository = new KeyBindingRepository(Collections.emptyList(), Collections.emptyList());
+        KeyBindingRepository keyBindingRepository = new KeyBindingRepository(List.of(), List.of());
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);

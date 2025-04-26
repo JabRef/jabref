@@ -1,6 +1,6 @@
 package org.jabref.gui.autocompleter;
 
-import java.util.Collections;
+import java.util.Set;
 
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.model.entry.Author;
@@ -67,7 +67,7 @@ class PersonNameStringConverterTest {
                 shouldAutoComplete,
                 firstNameMode,
                 nameFormat,
-                Collections.emptySet());
+                Set.of());
         PersonNameStringConverter converter = new PersonNameStringConverter(preferences);
         String formattedStr = converter.toString(author);
         assertEquals(expectedResult, formattedStr);

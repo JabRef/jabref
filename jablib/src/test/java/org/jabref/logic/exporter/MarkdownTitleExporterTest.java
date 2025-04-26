@@ -2,7 +2,6 @@ package org.jabref.logic.exporter;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.layout.LayoutFormatterPreferences;
@@ -47,8 +46,8 @@ class MarkdownTitleExporterTest {
     final void exportForNoEntriesWritesNothing(@TempDir Path tempDir) throws Exception {
         Path file = tempDir.resolve("ThisIsARandomlyNamedFile");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, tempDir, Collections.emptyList());
-        assertEquals(Collections.emptyList(), Files.readAllLines(file));
+        htmlWebsiteExporter.export(databaseContext, tempDir, List.of());
+        assertEquals(List.of(), Files.readAllLines(file));
     }
 
     @Test
@@ -63,7 +62,7 @@ class MarkdownTitleExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
+        htmlWebsiteExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "* Test Title. Journal of this &amp; that 2020");
@@ -83,7 +82,7 @@ class MarkdownTitleExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
+        htmlWebsiteExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "* Test Title. Test book, PRESS 2020");
@@ -103,7 +102,7 @@ class MarkdownTitleExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
+        htmlWebsiteExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "* Test Title. PRESS 2020");
@@ -124,7 +123,7 @@ class MarkdownTitleExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
+        htmlWebsiteExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "* Test Title. ACM CONF'20");
@@ -144,7 +143,7 @@ class MarkdownTitleExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
+        htmlWebsiteExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "* Test Title. CONF'20");
@@ -163,7 +162,7 @@ class MarkdownTitleExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
+        htmlWebsiteExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "* Test Title. Test Conference 2020");
@@ -182,7 +181,7 @@ class MarkdownTitleExporterTest {
 
         Path file = tempDir.resolve("RandomFileName");
         Files.createFile(file);
-        htmlWebsiteExporter.export(databaseContext, file, Collections.singletonList(entry));
+        htmlWebsiteExporter.export(databaseContext, file, List.of(entry));
 
         List<String> expected = List.of(
                 "* This is JabRef. Journal of this &amp; that 2020");

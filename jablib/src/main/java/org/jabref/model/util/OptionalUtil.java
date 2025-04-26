@@ -1,7 +1,6 @@
 package org.jabref.model.util;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -13,26 +12,14 @@ import java.util.stream.Stream;
 public class OptionalUtil {
 
     public static <T, U> boolean equals(Optional<T> left, Optional<U> right, BiPredicate<T, U> equality) {
-        if (left.isEmpty()) {
-            return right.isEmpty();
-        } else {
-            if (right.isPresent()) {
-                return equality.test(left.get(), right.get());
-            } else {
-                return false;
-            }
-        }
+        return left.map(t -> right.filter(u -> equality.test(t, u)).isPresent()).orElseGet(right::isEmpty);
     }
 
     /**
      * @return An immutable list containing the value - if no value: empty immutable list
      */
     public static <T> List<T> toList(Optional<T> value) {
-        if (value.isPresent()) {
-            return Collections.singletonList(value.get());
-        } else {
-            return Collections.emptyList();
-        }
+        return value.map(List::of).orElseGet(List::of);
     }
 
     /**

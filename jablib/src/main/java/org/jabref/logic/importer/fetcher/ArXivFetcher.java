@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -431,7 +430,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         private Optional<ArXivEntry> searchForEntry(String searchQuery) throws FetcherException {
-            List<ArXivEntry> entries = queryApi(searchQuery, Collections.emptyList(), 0, 1);
+            List<ArXivEntry> entries = queryApi(searchQuery, List.of(), 0, 1);
             if (entries.size() == 1) {
                 return Optional.of(entries.getFirst());
             } else {
@@ -445,7 +444,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 return Optional.empty();
             }
 
-            List<ArXivEntry> entries = queryApi("", Collections.singletonList(identifier.get()), 0, 1);
+            List<ArXivEntry> entries = queryApi("", List.of(identifier.get()), 0, 1);
             if (!entries.isEmpty()) {
                 return Optional.of(entries.getFirst());
             } else {
@@ -495,11 +494,11 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 }
             }
 
-            return Collections.emptyList();
+            return List.of();
         }
 
         private List<ArXivEntry> searchForEntries(String searchQuery, int pageNumber) throws FetcherException {
-            return queryApi(searchQuery, Collections.emptyList(), getPageSize() * pageNumber, getPageSize());
+            return queryApi(searchQuery, List.of(), getPageSize() * pageNumber, getPageSize());
         }
 
         private List<ArXivEntry> queryApi(String searchQuery, List<ArXivIdentifier> ids, int start, int maxResults)
@@ -781,7 +780,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
                 getDate().ifPresent(date -> bibEntry.setField(StandardField.DATE, date));
                 primaryCategory.ifPresent(category -> bibEntry.setField(StandardField.EPRINTCLASS, category));
                 journalReferenceText.ifPresent(journal -> bibEntry.setField(StandardField.JOURNAL, journal));
-                getPdfUrl().ifPresent(url -> bibEntry.setFiles(Collections.singletonList(new LinkedFile(url, "PDF"))));
+                getPdfUrl().ifPresent(url -> bibEntry.setFiles(List.of(new LinkedFile(url, "PDF"))));
                 return bibEntry;
             }
         }

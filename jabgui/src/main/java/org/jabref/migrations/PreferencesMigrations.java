@@ -1,7 +1,6 @@
 package org.jabref.migrations;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -448,7 +447,7 @@ public class PreferencesMigrations {
         if (!fieldColumnNames.isEmpty()) {
             preferences.putStringList("columnNames", fieldColumnNames);
 
-            List<String> fieldColumnWidths = new ArrayList<>(Collections.emptyList());
+            List<String> fieldColumnWidths = new ArrayList<>(List.of());
             for (int i = 0; i < fieldColumnNames.size(); i++) {
                 fieldColumnWidths.add("100");
             }

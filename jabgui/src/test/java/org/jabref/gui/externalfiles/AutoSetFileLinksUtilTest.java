@@ -2,7 +2,6 @@ package org.jabref.gui.externalfiles;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -50,8 +49,8 @@ class AutoSetFileLinksUtilTest {
 
     @Test
     void findAssociatedNotLinkedFilesSuccess() throws Exception {
-        when(databaseContext.getFileDirectories(any())).thenReturn(Collections.singletonList(path.getParent()));
-        List<LinkedFile> expected = Collections.singletonList(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
+        when(databaseContext.getFileDirectories(any())).thenReturn(List.of(path.getParent()));
+        List<LinkedFile> expected = List.of(new LinkedFile("", Path.of("CiteKey.pdf"), "PDF"));
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(expected, actual);
@@ -62,6 +61,6 @@ class AutoSetFileLinksUtilTest {
         when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
-        assertEquals(Collections.emptyList(), actual);
+        assertEquals(List.of(), actual);
     }
 }

@@ -1,6 +1,5 @@
 package org.jabref.logic.integrity;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,7 +25,7 @@ public class CitationKeyDeviationChecker implements EntryChecker {
     public List<IntegrityMessage> check(BibEntry entry) {
         Optional<String> valuekey = entry.getCitationKey();
         if (valuekey.isEmpty()) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         String key = valuekey.get();
@@ -35,10 +34,10 @@ public class CitationKeyDeviationChecker implements EntryChecker {
         String generatedKey = new CitationKeyGenerator(bibDatabaseContext, citationKeyPatternPreferences).generateKey(entry);
 
         if (!Objects.equals(key, generatedKey)) {
-            return Collections.singletonList(new IntegrityMessage(
+            return List.of(new IntegrityMessage(
                     Localization.lang("Citation key deviates from generated key"), entry, InternalField.KEY_FIELD));
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 }

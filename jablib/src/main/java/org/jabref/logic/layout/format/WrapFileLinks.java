@@ -2,7 +2,6 @@ package org.jabref.logic.layout.format;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +129,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                 } else if (WrapFileLinks.ESCAPE_SEQ.containsKey(c)) {
                     // Ok, we have the code. Add the previous string (if any) and
                     // the entry indicated by the escape sequence:
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         l.add(new FormatEntry(sb.toString()));
                         // Clear the buffer:
                         sb = new StringBuilder();
@@ -151,7 +150,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
             }
         }
         // Finished scanning the string. If we collected text at the end, add an entry for it:
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             l.add(new FormatEntry(sb.toString()));
         }
 
@@ -197,7 +196,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         case FILE_PATH:
                             List<Path> dirs;
                             if (fileDirectories.isEmpty()) {
-                                dirs = Collections.singletonList(Path.of(mainFileDirectory));
+                                dirs = List.of(Path.of(mainFileDirectory));
                             } else {
                                 dirs = fileDirectories;
                             }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
@@ -108,7 +107,7 @@ public class ImportCommand extends SimpleCommand {
 
         Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
         BackgroundTask<ParserResult> task = BackgroundTask.wrap(
-                () -> doImport(Collections.singletonList(file), format.orElse(null)));
+                () -> doImport(List.of(file), format.orElse(null)));
 
         if (importMethod == ImportMethod.AS_NEW) {
             task.onSuccess(parserResult -> {

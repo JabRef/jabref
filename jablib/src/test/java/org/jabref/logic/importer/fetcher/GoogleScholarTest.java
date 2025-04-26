@@ -1,7 +1,6 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +65,7 @@ class GoogleScholarTest implements SearchBasedFetcherCapabilityTest, PagedSearch
 
         List<BibEntry> foundEntries = finder.performSearch("Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models");
 
-        assertEquals(Collections.singletonList(entry), foundEntries);
+        assertEquals(List.of(entry), foundEntries);
     }
 
     @Test

@@ -1,6 +1,5 @@
 package org.jabref.logic.bibtex;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -51,7 +50,7 @@ class FieldWriterTest {
 
     @BeforeEach
     void setUp() {
-        FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), Collections.emptyList());
+        FieldPreferences fieldPreferences = new FieldPreferences(true, List.of(StandardField.MONTH), List.of());
         writer = new FieldWriter(fieldPreferences);
     }
 
@@ -120,14 +119,14 @@ class FieldWriterTest {
     }
 
     @Test
-    void reportUnbalancedBracing() throws Exception {
+    void reportUnbalancedBracing() {
         String unbalanced = "{";
 
         assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));
     }
 
     @Test
-    void reportUnbalancedBracingWithEscapedBraces() throws Exception {
+    void reportUnbalancedBracingWithEscapedBraces() {
         String unbalanced = "{\\}";
 
         assertThrows(InvalidFieldValueException.class, () -> writer.write(new UnknownField("anyfield"), unbalanced));

@@ -1,5 +1,6 @@
 package org.jabref.model.strings;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class StringUtilTest {
 
     @Test
-    void StringUtilClassIsSmall() throws Exception {
+    void StringUtilClassIsSmall() throws IOException {
         Path path = Path.of("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 

@@ -1,6 +1,6 @@
 package org.jabref.model.entry.event;
 
-import java.util.Collections;
+import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
@@ -14,7 +14,7 @@ public class EntryChangedEvent extends EntriesEvent {
      * @param bibEntry <code>BibEntry</code> object the changes were applied on.
      */
     public EntryChangedEvent(BibEntry bibEntry) {
-        super(Collections.singletonList(bibEntry));
+        super(List.of(bibEntry));
     }
 
     /**
@@ -22,7 +22,7 @@ public class EntryChangedEvent extends EntriesEvent {
      * @param location Location affected by this event
      */
     public EntryChangedEvent(BibEntry bibEntry, EntriesEventSource location) {
-        super(Collections.singletonList(bibEntry), location);
+        super(List.of(bibEntry), location);
     }
 
     public BibEntry getBibEntry() {

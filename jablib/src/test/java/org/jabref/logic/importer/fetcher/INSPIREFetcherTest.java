@@ -1,6 +1,5 @@
 package org.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -40,7 +39,7 @@ class INSPIREFetcherTest {
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(StandardField.PRIMARYCLASS, "math-ph");
         List<BibEntry> fetchedEntries = fetcher.performSearch("Fréchet group actions field");
-        assertEquals(Collections.singletonList(master), fetchedEntries);
+        assertEquals(List.of(master), fetchedEntries);
     }
 
     @Test
@@ -58,7 +57,7 @@ class INSPIREFetcherTest {
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
         List<BibEntry> fetchedEntries = fetcher.performSearch("\"hep-ph/9802379\"");
-        assertEquals(Collections.singletonList(article), fetchedEntries);
+        assertEquals(List.of(article), fetchedEntries);
     }
 
     @Test
@@ -76,6 +75,6 @@ class INSPIREFetcherTest {
                 .withField(StandardField.ARCHIVEPREFIX, "arXiv")
                 .withField(new UnknownField("reportnumber"), "BUDKER-INP-1998-7, TTP-98-10");
         List<BibEntry> fetchedEntries = fetcher.performSearch(article);
-        assertEquals(Collections.singletonList(article), fetchedEntries);
+        assertEquals(List.of(article), fetchedEntries);
     }
 }

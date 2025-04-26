@@ -1,7 +1,6 @@
 package org.jabref.logic.openoffice.style;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -428,7 +427,7 @@ class JStyleGetCitationMarker {
                 stringBuilder.append(citationSeparator);
             }
 
-            StringBuilder pageInfoPart = new StringBuilder("");
+            StringBuilder pageInfoPart = new StringBuilder();
             if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
                 Optional<OOText> pageInfo =
                     PageInfo.normalizePageInfo(entry.getPageInfo());
@@ -470,10 +469,7 @@ class JStyleGetCitationMarker {
                 }
 
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
-                    String uniqueLetter = entry.getUniqueLetter().orElse(null);
-                    if (uniqueLetter != null) {
-                        stringBuilder.append(uniqueLetter);
-                    }
+                    entry.getUniqueLetter().ifPresent(stringBuilder::append);
                 }
 
                 if (purpose != AuthorYearMarkerPurpose.NORMALIZED) {
@@ -547,7 +543,7 @@ class JStyleGetCitationMarker {
         CitationMarkerEntry entry = new CitationMarkerNormEntryWrap(normEntry);
         return getAuthorYearParenthesisMarker2(style,
                                                AuthorYearMarkerPurpose.NORMALIZED,
-                                               Collections.singletonList(entry),
+                                               List.of(entry),
                                                startsNewGroup,
                                                maxAuthorsOverride);
     }
