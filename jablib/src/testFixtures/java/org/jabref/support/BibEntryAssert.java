@@ -1,4 +1,4 @@
-package org.jabref.logic.bibtex;
+package org.jabref.support;
 
 import java.io.IOException;
 import java.io.InputStream;

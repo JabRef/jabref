@@ -135,6 +135,7 @@ dependencies {
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
+    testFixturesImplementation("org.jspecify:jspecify:1.0.0")
 
     // parse plist files
     implementation("com.googlecode.plist:dd-plist:1.28")
