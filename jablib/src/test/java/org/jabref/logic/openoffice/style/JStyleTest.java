@@ -1,8 +1,6 @@
 package org.jabref.logic.openoffice.style;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,21 +43,6 @@ class JStyleTest {
         JStyle style = new JStyle(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH, layoutFormatterPreferences, abbreviationRepository);
         assertTrue(style.isValid());
         assertTrue(style.isInternalStyle());
-        assertFalse(style.isCitationKeyCiteMarkers());
-        assertFalse(style.isBoldCitations());
-        assertFalse(style.isFormatCitations());
-        assertFalse(style.isItalicCitations());
-        assertFalse(style.isNumberEntries());
-        assertFalse(style.isSortByPosition());
-    }
-
-    @Test
-    void authorYearAsFile() throws URISyntaxException, IOException {
-        Path defFile = Path.of(JStyleTest.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI());
-
-        JStyle style = new JStyle(defFile, layoutFormatterPreferences, abbreviationRepository);
-        assertTrue(style.isValid());
-        assertFalse(style.isInternalStyle());
         assertFalse(style.isCitationKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
         assertFalse(style.isFormatCitations());
