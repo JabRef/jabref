@@ -13,13 +13,6 @@ plugins {
 
     id("org.openjfx.javafxplugin") version("0.1.0")
 
-    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
-    id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
-
-    // nicer test outputs during running and completion
-    // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id("com.adarshr.test-logger") version "4.0.0"
-
     id("me.champeau.jmh") version "0.7.3"
 }
 
@@ -437,28 +430,6 @@ tasks.test {
     extensions.configure<org.javamodularity.moduleplugin.extensions.TestModuleOptions>("moduleOptions") {
         // TODO: Remove this as soon as ArchUnit is modularized
         runOnClasspath = true
-    }
-}
-
-testlogger {
-    // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
-
-    theme = com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD
-
-    showPassed = false
-    showSkipped = false
-
-    showCauses = false
-    showStackTraces = false
-}
-
-tasks.withType<Test>().configureEach {
-    reports.html.outputLocation.set(file("${reporting.baseDirectory}/${name}"))
-
-    // Enable parallel tests (on desktop).
-    // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-    if (!providers.environmentVariable("CI").isPresent) {
-        maxParallelForks = maxOf(Runtime.getRuntime().availableProcessors() - 1, 1)
     }
 }
 

@@ -7,6 +7,11 @@ plugins {
     id("org.openrewrite.rewrite") version "7.5.0"
 
     id("org.itsallcode.openfasttrace") version "3.0.1"
+
+    id("com.adarshr.test-logger") version "4.0.0"
+
+    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
+    id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 }
 
 // OpenRewrite should rewrite all sources
@@ -52,6 +57,8 @@ requirementTracing {
 subprojects {
     plugins.apply("checkstyle")
     plugins.apply("com.github.andygoossens.modernizer")
+    plugins.apply("com.adarshr.test-logger")
+    plugins.apply("com.github.koppor.gradle-modules-plugin")
 
     checkstyle {
         toolVersion = "10.23.0"
@@ -78,5 +85,27 @@ subprojects {
         exclusions = setOf(
             "java/util/Optional.get:()Ljava/lang/Object;"
         )
+    }
+
+    testlogger {
+        // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
+
+        theme = com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD
+
+        showPassed = false
+        showSkipped = false
+
+        showCauses = false
+        showStackTraces = false
+    }
+
+    tasks.withType<Test>().configureEach {
+        reports.html.outputLocation.set(file("${reporting.baseDirectory}/${name}"))
+
+        // Enable parallel tests (on desktop).
+        // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
+        if (!providers.environmentVariable("CI").isPresent) {
+            maxParallelForks = maxOf(Runtime.getRuntime().availableProcessors() - 1, 1)
+        }
     }
 }
