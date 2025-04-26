@@ -64,14 +64,14 @@ public class FieldRowView {
             toggleMergeUnmergeButton.setCanMerge(!viewModel.hasEqualLeftAndRightValues());
             fieldNameCell.addSideButton(toggleMergeUnmergeButton);
 
-            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), ((observableValue, old, fieldState) -> {
+            EasyBind.listen(toggleMergeUnmergeButton.fieldStateProperty(), (observableValue, old, fieldState) -> {
                 LOGGER.debug("Field merge state is {} for field {}", fieldState, field);
                 if (fieldState == ToggleMergeUnmergeButton.FieldState.MERGED) {
                     viewModel.mergeFields();
                 } else {
                     viewModel.unmergeFields();
                 }
-            }));
+            });
         }
 
         toggleGroup.getToggles().addAll(leftValueCell, rightValueCell);

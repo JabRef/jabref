@@ -133,7 +133,7 @@ class PdfMergeMetadataImporterTest {
                 .withField(StandardField.FILE, ":http\\://arxiv.org/pdf/2408.06224v2:PDF;:" + file.toString().replace("\\", "/").replace(":", "\\:") + ":PDF")
                 .withField(StandardField.EPRINTCLASS, "cs.SE")
                 .withField(new UnknownField("copyright"), "Creative Commons Attribution Share Alike 4.0 International")
-                .withField((InternalField.KEY_FIELD), "https://doi.org/10.48550/arxiv.2408.06224")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.2408.06224")
                 .withField(StandardField.YEAR, "2024")
                 .withField(StandardField.KEYWORDS, "Software Engineering (cs.SE), FOS: Computer and information sciences, FOS: Computer and information sciences")
                 .withField(StandardField.MONTH, "1")

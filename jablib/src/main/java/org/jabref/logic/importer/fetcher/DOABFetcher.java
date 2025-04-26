@@ -42,7 +42,7 @@ public class DOABFetcher implements SearchBasedParserFetcher {
         String query = new DefaultQueryTransformer().transformLuceneQuery(luceneQuery).orElse("");
         // adding quotations for the query for more specified results
         // without the quotation the results returned are not relevant to the query
-        query = ("\"".concat(query)).concat("\"");
+        query = "\"".concat(query).concat("\"");
         builder.addParameter("query", query);
         // bitstreams included in URL building to acquire ISBN's.
         builder.addParameter("expand", "metadata,bitstreams");

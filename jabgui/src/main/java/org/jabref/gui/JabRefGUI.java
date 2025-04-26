@@ -349,7 +349,7 @@ public class JabRefGUI extends Application {
         double bottomY = coreGuiPreferences.getPositionY() + coreGuiPreferences.getSizeY();
         LOGGER.debug("left x: {}, bottom y: {}", leftX, bottomY);
 
-        boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(leftX, bottomY)));
+        boolean inBounds = Screen.getScreens().stream().anyMatch(screen -> screen.getBounds().contains(leftX, bottomY));
         LOGGER.debug("lower left corner is in bounds: {}", inBounds);
         return inBounds;
     }
@@ -361,7 +361,7 @@ public class JabRefGUI extends Application {
         double topY = coreGuiPreferences.getPositionY();
         LOGGER.debug("right x: {}, top y: {}", rightX, topY);
 
-        boolean inBounds = Screen.getScreens().stream().anyMatch((screen -> screen.getBounds().contains(rightX, topY)));
+        boolean inBounds = Screen.getScreens().stream().anyMatch(screen -> screen.getBounds().contains(rightX, topY));
         LOGGER.debug("upper right corner is in bounds: {}", inBounds);
         return inBounds;
     }

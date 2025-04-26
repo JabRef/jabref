@@ -99,7 +99,7 @@ class ArXivFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
                 // StandardField.JOURNALTITLE // INFO NOT APPLICABLE TO THIS ENTRY
                 // ArXiv-issue DOI fields
                 .withField(new UnknownField("copyright"), "arXiv.org perpetual, non-exclusive license")
-                .withField((InternalField.KEY_FIELD), "https://doi.org/10.48550/arxiv.1811.10364")
+                .withField(InternalField.KEY_FIELD, "https://doi.org/10.48550/arxiv.1811.10364")
                 .withField(StandardField.YEAR, "2018")
                 .withField(StandardField.KEYWORDS, "Information Retrieval (cs.IR), Artificial Intelligence (cs.AI), Digital Libraries (cs.DL), Machine Learning (cs.LG), FOS: Computer and information sciences")
                 .withField(StandardField.AUTHOR, "Beel, Joeran and Collins, Andrew and Aizawa, Akiko")

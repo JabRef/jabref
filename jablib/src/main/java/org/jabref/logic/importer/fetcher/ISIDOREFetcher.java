@@ -181,7 +181,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
             }
             stringJoiner.add(next);
         }
-        return (stringJoiner.toString().substring(0, stringJoiner.length())).trim().replaceAll("\\s+", " ");
+        return stringJoiner.toString().substring(0, stringJoiner.length()).trim().replaceAll("\\s+", " ");
     }
 
     /**

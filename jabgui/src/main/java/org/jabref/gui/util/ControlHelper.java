@@ -25,10 +25,10 @@ public class ControlHelper {
 
     public static void setAction(ButtonType buttonType, DialogPane dialogPane, Consumer<Event> consumer) {
         Button button = (Button) dialogPane.lookupButton(buttonType);
-        button.addEventFilter(ActionEvent.ACTION, (event -> {
+        button.addEventFilter(ActionEvent.ACTION, event -> {
             consumer.accept(event);
             event.consume();
-        }));
+        });
     }
 
     public static boolean childIsFocused(Parent node) {

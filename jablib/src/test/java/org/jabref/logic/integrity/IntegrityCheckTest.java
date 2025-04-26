@@ -55,7 +55,7 @@ class IntegrityCheckTest {
 
     @Test
     void bibLaTexAcceptsIEEETranEntryType() throws Exception {
-        assertCorrect((withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBLATEX)));
+        assertCorrect(withMode(createContext(StandardField.TITLE, "sometitle", IEEETranEntryType.Patent), BibDatabaseMode.BIBLATEX));
     }
 
     @Test

@@ -180,7 +180,7 @@ public abstract class DBMSProcessor {
                 .append(escape("TYPE"))
                 .append(") VALUES(?)");
         // Number of commas is bibEntries.size() - 1
-        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, (bibEntries.size() - 1))));
+        insertIntoEntryQuery.append(", (?)".repeat(Math.max(0, bibEntries.size() - 1)));
 
         try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
                 new String[]{"SHARED_ID"})) {
@@ -271,7 +271,7 @@ public abstract class DBMSProcessor {
             }
 
             // Number of commas is fields.size() - 1
-            insertFieldQuery.append(", (?, ?, ?)".repeat(Math.max(0, (numFields - 1))));
+            insertFieldQuery.append(", (?, ?, ?)".repeat(Math.max(0, numFields - 1)));
             try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
                 int fieldsCompleted = 0;
                 for (int entryIndex = 0; entryIndex < fields.size(); entryIndex++) {

@@ -578,7 +578,7 @@ public class ArgumentProcessor {
     private List<ParserResult> importAndOpenFiles() {
         List<ParserResult> loaded = new ArrayList<>();
         List<String> toImport = new ArrayList<>();
-        if ((!cli.getLeftOver().isEmpty())) {
+        if (!cli.getLeftOver().isEmpty()) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // BIB files to open. Other files, and files that could not be opened

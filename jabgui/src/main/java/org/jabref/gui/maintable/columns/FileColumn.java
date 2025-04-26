@@ -123,7 +123,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                 menuItem.setOnAction(e -> linkedFileViewModel.open());
                                 contextMenu.getItems().add(menuItem);
                             }
-                            contextMenu.show(((Node) event.getSource()), event.getScreenX(), event.getScreenY());
+                            contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
                         }
                     }
                 })

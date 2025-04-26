@@ -134,7 +134,7 @@ class PdfContentPartialImporterTest {
                 .withField(StandardField.TITLE, "A Multi-Year Grey Literature Review on AI-assisted Test Automation")
                 .withField(StandardField.EPRINT, "2408.06224v1")
                 .withField(StandardField.EPRINTTYPE, "arXiv")
-                .withField((StandardField.KEYWORDS), "Test Automation Artificial Intelligence AI-assisted Test Automation Grey Literature Automated Test Generation Self-Healing Test Scripts");
+                .withField(StandardField.KEYWORDS, "Test Automation Artificial Intelligence AI-assisted Test Automation Grey Literature Automated Test Generation Self-Healing Test Scripts");
 
         // This is from https://arxiv.org/abs/2408.06224
         String firstPageContent = """

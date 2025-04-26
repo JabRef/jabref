@@ -56,7 +56,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
         availableFieldsProperty.clear();
         availableFieldsProperty.addAll(FieldFactory.getCommonFields());
-        availableFieldsProperty.sort((Comparator.comparing(Field::getDisplayName)));
+        availableFieldsProperty.sort(Comparator.comparing(Field::getDisplayName));
     }
 
     @Override

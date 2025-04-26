@@ -1121,7 +1121,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
                 getBoolean(LOCAL_AUTO_SAVE));
 
-        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, (newValue == BibDatabaseMode.BIBLATEX)));
+        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));
         EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(libraryPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
 
@@ -1406,7 +1406,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(KEYWORD_SEPARATOR).charAt(0)
         );
 
-        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), ((observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue))));
+        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue)));
 
         return bibEntryPreferences;
     }

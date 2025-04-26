@@ -750,9 +750,9 @@ class JStyleGetCitationMarker {
         }
 
         return getAuthorYearParenthesisMarker2(style,
-                                               (inParenthesis
+                                               inParenthesis
                                                ? AuthorYearMarkerPurpose.IN_PARENTHESIS
-                                               : AuthorYearMarkerPurpose.IN_TEXT),
+                                               : AuthorYearMarkerPurpose.IN_TEXT,
                                               filteredCitationMarkerEntries,
                                               startsNewGroup,
                                               Optional.empty());
