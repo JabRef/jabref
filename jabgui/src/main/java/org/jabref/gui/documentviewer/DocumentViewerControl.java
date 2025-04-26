@@ -103,7 +103,7 @@ public class DocumentViewerControl extends StackPane {
                 inMiddleOfViewport = Optional.of(hit.getCell());
             }
         } catch (NoSuchElementException exception) {
-            // Sometimes if no page is found -> ignore
+            // Sometimes throws exception if no page is found -> ignore
         }
 
         if (inMiddleOfViewport.isPresent()) {
