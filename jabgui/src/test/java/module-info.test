@@ -15,9 +15,11 @@
 
 --add-modules
     io.github.classgraph
-
 --add-reads
     org.jabref=io.github.classgraph
 
 --add-modules
    org.kordamp.ikonli.core,org.kordamp.ikonli.javafx,org.kordamp.ikonli.materialdesign2
+
+--add-reads
+    org.mockito=java.prefs
