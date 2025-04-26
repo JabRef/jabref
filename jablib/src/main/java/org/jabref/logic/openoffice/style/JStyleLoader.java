@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,8 +22,7 @@ public class JStyleLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(JStyleLoader.class);
 
     // All internal styles
-    private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
-            DEFAULT_NUMERICAL_STYLE_PATH);
+    private final List<String> internalStyleFiles = List.of(DEFAULT_AUTHORYEAR_STYLE_PATH, DEFAULT_NUMERICAL_STYLE_PATH);
 
     private final OpenOfficePreferences openOfficePreferences;
     private final LayoutFormatterPreferences layoutFormatterPreferences;
