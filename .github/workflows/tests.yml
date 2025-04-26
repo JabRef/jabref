@@ -71,7 +71,6 @@ jobs:
           ./gradlew rewriteDryRun
 
   modernizer:
-    if: false
     name: Modernizer
     runs-on: ubuntu-latest
     steps:
@@ -90,8 +89,8 @@ jobs:
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
-          sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle
-          # TODO ./gradlew modernizer
+          # sed -i "s/failOnViolations = false/failOnViolations = true/" build.gradle.kts
+          ./gradlew modernizer
 
   markdown:
     name: Markdown
