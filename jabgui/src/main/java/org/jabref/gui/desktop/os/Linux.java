@@ -39,8 +39,7 @@ public class Linux extends NativeDesktop {
     private void nativeOpenFile(String filePath) {
         HeadlessExecutorService.INSTANCE.execute(() -> {
             try {
-                File file = new File(filePath);
-                Desktop.getDesktop().open(file);
+                Desktop.getDesktop().open(Path.of(filePath).toFile());
                 LoggerFactory.getLogger(Linux.class).debug("Open file in default application with Desktop integration");
             } catch (IllegalArgumentException e) {
                 LoggerFactory.getLogger(Linux.class).debug("Fail back to xdg-open");
@@ -161,7 +160,7 @@ public class Linux extends NativeDesktop {
                 LoggerFactory.getLogger(Linux.class).debug("Opening terminal using {}", String.join(" ", cmd));
 
                 ProcessBuilder builder = new ProcessBuilder(cmd);
-                builder.directory(new File(absolutePath));
+                builder.directory(Path.of(absolutePath).toFile());
                 Process processTerminal = builder.start();
 
                 StreamGobbler streamGobblerInput = new StreamGobbler(processTerminal.getInputStream(), LoggerFactory.getLogger(Linux.class)::debug);

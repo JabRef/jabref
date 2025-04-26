@@ -1,7 +1,6 @@
 package org.jabref.gui.entryeditor;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +93,7 @@ public class FieldEditorsMultilinePropertyTest {
     private static Map<Path, List<FieldProperty>> getEditorsWithPropertiesInFieldEditors() throws Exception {
         final String filePath = "src/main/java/org/jabref/gui/fieldeditors/FieldEditors.java";
         Map<Path, List<FieldProperty>> result = new HashMap<>();
-        CompilationUnit cu = PARSER.parse(Paths.get(filePath))
+        CompilationUnit cu = PARSER.parse(Path.of(filePath))
                                    .getResult()
                                    .orElseThrow(() ->
                                            new NullPointerException("Failed to parse FieldEditors.java"));
@@ -150,10 +149,10 @@ public class FieldEditorsMultilinePropertyTest {
                                     .findFirst()
                                     .ifPresentOrElse(importDeclaration -> {
                                         String classPath = importDeclaration.getNameAsString();
-                                        Path classFilePath = Paths.get("src/main/java/" + classPath.replace(".", "/") + ".java");
+                                        Path classFilePath = Path.of("src/main/java/" + classPath.replace(".", "/") + ".java");
                                         result.put(classFilePath, properties);
                                     }, () -> {
-                                        Path classFilePath = Paths.get("src/main/java/org/jabref/gui/fieldeditors/" + createdClassName + ".java");
+                                        Path classFilePath = Path.of("src/main/java/org/jabref/gui/fieldeditors/" + createdClassName + ".java");
                                         result.put(classFilePath, properties);
                                     });
                             });

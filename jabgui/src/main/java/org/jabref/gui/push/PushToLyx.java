@@ -1,10 +1,10 @@
 package org.jabref.gui.push;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -70,23 +70,20 @@ public class PushToLyx extends AbstractPushToApplication {
             return;
         }
 
-        if (!commandPath.endsWith(".in")) {
-            commandPath = commandPath + ".in";
-        }
-        File lp = new File(commandPath); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
-        if (!lp.exists() || !lp.canWrite()) {
+        Path lp = Path.of(commandPath); // this needs to fixed because it gives "asdf" when going prefs.get("lyxpipe")
+        if (!Files.exists(lp) || !Files.isWritable(lp)) {
             // See if it helps to append ".in":
-            lp = new File(commandPath + ".in");
-            if (!lp.exists() || !lp.canWrite()) {
+            lp = Path.of(commandPath + ".in");
+            if (!Files.exists(lp) || !Files.isWritable(lp)) {
                 couldNotPush = true;
                 return;
             }
         }
 
-        final File lyxpipe = lp;
+        final Path lyxPipe = lp;
 
         HeadlessExecutorService.INSTANCE.executeAndWait(() -> {
-            try (FileWriter fw = new FileWriter(lyxpipe, StandardCharsets.UTF_8); BufferedWriter lyxOut = new BufferedWriter(fw)) {
+            try (BufferedWriter lyxOut = Files.newBufferedWriter(lyxPipe, StandardCharsets.UTF_8)) {
                 String citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                 lyxOut.write(citeStr + "\n");
             } catch (IOException excep) {

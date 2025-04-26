@@ -24,12 +24,12 @@ public class DefaultDesktop extends NativeDesktop {
 
     @Override
     public void openFile(String filePath, String fileType, ExternalApplicationsPreferences externalApplicationsPreferences) throws IOException {
-        Desktop.getDesktop().open(new File(filePath));
+        Desktop.getDesktop().open(Path.of(filePath).toFile());
     }
 
     @Override
     public void openFileWithApplication(String filePath, String application) throws IOException {
-        Desktop.getDesktop().open(new File(filePath));
+        Desktop.getDesktop().open(Path.of(filePath).toFile());
     }
 
     @Override

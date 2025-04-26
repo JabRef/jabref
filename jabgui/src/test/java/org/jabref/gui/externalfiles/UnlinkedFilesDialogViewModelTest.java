@@ -3,7 +3,6 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,7 +55,7 @@ public class UnlinkedFilesDialogViewModelTest {
         // Mock a base directory
         FilePreferences filePreferences = mock(FilePreferences.class);
         when(guiPreferences.getFilePreferences()).thenReturn(filePreferences);
-        when(filePreferences.getWorkingDirectory()).thenReturn(Paths.get("C:/test/base"));
+        when(filePreferences.getWorkingDirectory()).thenReturn(Path.of("C:/test/base"));
 
         // Mock the state manager to provide an active database
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(bibDatabaseContext));

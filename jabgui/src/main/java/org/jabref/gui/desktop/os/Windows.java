@@ -1,6 +1,5 @@
 package org.jabref.gui.desktop.os;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -78,7 +77,7 @@ public class Windows extends NativeDesktop {
     @Override
     public void openConsole(String absolutePath, DialogService dialogService) throws IOException {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
-        process.directory(new File(absolutePath));
+        process.directory(Path.of(absolutePath).toFile());
         process.start();
     }
 }
