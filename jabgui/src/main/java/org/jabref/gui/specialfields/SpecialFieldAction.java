@@ -106,9 +106,8 @@ public class SpecialFieldAction extends SimpleCommand {
             // Single value fields can be toggled only
             return Localization.lang("Toggled '%0' for %1 entries", viewModel.getLocalization(), params[0]);
         } else if (!field.isSingleValueField() && (params.length == 2) && (params[0] != null) && (params[1] != null)) {
-            // setting a multi value special field - the setted value is displayed, too
-            String[] allParams = {viewModel.getLocalization(), params[0], params[1]};
-            return Localization.lang("Set '%0' to '%1' for %2 entries", allParams);
+            // setting a multi value special field - the set value is displayed, too
+            return Localization.lang("Set '%0' to '%1' for %2 entries", viewModel.getLocalization(), params[0], params[1]);
         } else if (!field.isSingleValueField() && (params.length == 1) && (params[0] != null)) {
             // clearing a multi value specialfield
             return Localization.lang("Cleared '%0' for %1 entries", viewModel.getLocalization(), params[0]);
