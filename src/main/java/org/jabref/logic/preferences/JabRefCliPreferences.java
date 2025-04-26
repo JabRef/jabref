@@ -689,6 +689,9 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
 
         // endregion
+
+        // region:Journal abbreviations
+        defaults.put(JournalAbbreviationPreferences.ENABLED_EXTERNAL_JOURNAL_LISTS, Boolean.FALSE);
     }
 
     public void setLanguageDependentDefaultValues() {

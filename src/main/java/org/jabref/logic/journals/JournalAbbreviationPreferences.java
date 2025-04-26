@@ -14,10 +14,12 @@ import javafx.collections.ObservableList;
  */
 public class JournalAbbreviationPreferences {
 
+    public static final String ENABLED_EXTERNAL_JOURNAL_LISTS = "enabledExternalJournalLists";
+
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
     private final Map<String, Boolean> enabledExternalLists = new HashMap<>();
-    private final BooleanProperty enabledListsChanged = new SimpleBooleanProperty(false);
+    private final BooleanProperty enabledListsChanged = new SimpleBooleanProperty();
     
     /**
      * Constructs a new JournalAbbreviationPreferences with the given external journal lists and FJournal field preference
