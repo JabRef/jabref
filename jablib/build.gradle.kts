@@ -496,14 +496,6 @@ requirementTracing {
     inputDirectories = files('docs', 'src/main/java', 'src/test/java')
 }
 
-modernizer {
-    failOnViolations = false
-    includeTestClasses = true
-    exclusions = [
-        'java/util/Optional.get:()Ljava/lang/Object;'
-    ]
-}
-
 
 /*
 tasks.register('jacocoPrepare') {

@@ -3,6 +3,7 @@ plugins {
 
     id("checkstyle")
 
+    id("com.github.andygoossens.modernizer") version "1.11.0"
     id("org.openrewrite.rewrite") version "7.5.0"
 }
 
@@ -34,7 +35,8 @@ rewrite {
 }
 
 subprojects {
-    apply(plugin = "checkstyle")
+    plugins.apply("checkstyle")
+    plugins.apply("com.github.andygoossens.modernizer")
 
     checkstyle {
         toolVersion = "10.23.0"
@@ -53,5 +55,13 @@ subprojects {
         resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
             select("com.google.guava:guava:0")
         }
+    }
+
+    modernizer {
+        failOnViolations = true
+        includeTestClasses = true
+        exclusions = setOf(
+            "java/util/Optional.get:()Ljava/lang/Object;"
+        )
     }
 }
