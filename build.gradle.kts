@@ -5,6 +5,8 @@ plugins {
 
     id("com.github.andygoossens.modernizer") version "1.11.0"
     id("org.openrewrite.rewrite") version "7.5.0"
+
+    id("org.itsallcode.openfasttrace") version "3.0.1"
 }
 
 // OpenRewrite should rewrite all sources
@@ -33,6 +35,18 @@ rewrite {
     plainTextMask("**/*.md")
     failOnDryRunResults = true
 }
+
+requirementTracing {
+    inputDirectories.setFrom(files("docs",
+            "jablib/src/main/java", "jablib/src/test/java",
+            "jabkit/src/main/java", "jabkit/src/test/java",
+            "jabgui/src/main/java", "jabgui/src/test/java",
+            "jabsrv/src/main/java", "jabsrv/src/test/java"
+        )
+    )
+    // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
+}
+
 
 subprojects {
     plugins.apply("checkstyle")

@@ -18,8 +18,6 @@ plugins {
     // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
     id("com.adarshr.test-logger") version "4.0.0"
 
-    // id("org.itsallcode.openfasttrace") version "3.0.1"
-
     id("org.beryx.jlink") version "3.1.1"
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)

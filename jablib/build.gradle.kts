@@ -492,12 +492,6 @@ tasks.register<Test>("databaseTest") {
 }
 
 /*
-requirementTracing {
-    inputDirectories = files('docs', 'src/main/java', 'src/test/java')
-}
-
-
-/*
 tasks.register('jacocoPrepare') {
     doFirst {
         // Ignore failures of tests
