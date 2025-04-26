@@ -18,6 +18,7 @@
 
         // JDK23: "main.wxs"; wix 3
         // JDK24: ? - see https://bugs.openjdk.org/browse/JDK-8319457 and https://github.com/JabRef/jabref-issue-melting-pot/issues/867
+        //          - https://github.com/openjdk/jdk/commit/ba67ad63ae7d7d399e41ab258576123fb6d9502c#diff-490c3f0a156b28da9b1eea68702f170b37a40bd69836ce48ea5084d11a9b264a
 
         var wxsFilePath = installerConfig + "main.wxs";
         WScript.Echo("wxsFilePath: " + wxsFilePath);
