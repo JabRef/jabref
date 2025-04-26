@@ -2,9 +2,6 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     id("org.openjfx.javafxplugin") version("0.1.0")
-
-    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
-    id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 }
 
 dependencies {

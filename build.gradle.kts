@@ -9,6 +9,9 @@ plugins {
     id("org.itsallcode.openfasttrace") version "3.0.1"
 
     id("com.adarshr.test-logger") version "4.0.0"
+
+    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
+    id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 }
 
 // OpenRewrite should rewrite all sources
@@ -55,6 +58,7 @@ subprojects {
     plugins.apply("checkstyle")
     plugins.apply("com.github.andygoossens.modernizer")
     plugins.apply("com.adarshr.test-logger")
+    plugins.apply("com.github.koppor.gradle-modules-plugin")
 
     checkstyle {
         toolVersion = "10.23.0"
