@@ -90,7 +90,7 @@ public class AbbreviationsFileViewModel {
             
             List<AbbreviationViewModel> viewModels = abbreviationsFromFile.stream()
                                                                    .map(AbbreviationViewModel::new)
-                                                                   .collect(Collectors.toCollection(ArrayList::new));
+                                                                   .toList();
             abbreviations.setAll(viewModels);
         } catch (NoSuchFileException e) {
             LOGGER.debug("Journal abbreviation list {} does not exist", filePath, e);

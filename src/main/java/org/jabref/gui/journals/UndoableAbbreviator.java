@@ -27,6 +27,8 @@ public class UndoableAbbreviator {
 
     /**
      * Abbreviate the journal name of the given entry.
+     * This method respects the enabled/disabled state of journal abbreviation sources.
+     * If a journal name comes from a disabled source, it will not be abbreviated.
      *
      * @param database  The database the entry belongs to, or null if no database.
      * @param entry     The entry to be treated.
