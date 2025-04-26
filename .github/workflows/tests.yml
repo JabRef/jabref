@@ -26,7 +26,6 @@ permissions:
 
 jobs:
   checkstyle:
-    if: false
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
