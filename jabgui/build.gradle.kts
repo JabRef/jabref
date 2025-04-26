@@ -12,6 +12,7 @@ plugins {
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 
+    // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
 
     // nicer test outputs during running and completion
@@ -19,9 +20,6 @@ plugins {
     id("com.adarshr.test-logger") version "4.0.0"
 
     id("org.beryx.jlink") version "3.1.1"
-
-    // Do not activate; causes issues with the modularity plugin (no tests found etc)
-    // id("com.redock.classpathtofile") version "0.1.0"
 }
 
 group = "org.jabref"
