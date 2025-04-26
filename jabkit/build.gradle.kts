@@ -54,9 +54,8 @@ dependencies {
 
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
+    testImplementation(project(":test-support"))
     testImplementation("org.mockito:mockito-core:5.17.0")
-
-    testImplementation(testFixtures(project(":jablib")))
 }
 
 /*

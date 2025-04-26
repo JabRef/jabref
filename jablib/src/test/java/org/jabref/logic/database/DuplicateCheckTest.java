@@ -316,9 +316,9 @@ public class DuplicateCheckTest {
         String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
         String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
 
-        assertEquals(1.0, (DuplicateCheck.correlateByWords(d1, d2)), 0.01);
-        assertEquals(0.78, (DuplicateCheck.correlateByWords(d1, d3)), 0.01);
-        assertEquals(0.78, (DuplicateCheck.correlateByWords(d2, d3)), 0.01);
+        assertEquals(1.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
+        assertEquals(0.78, DuplicateCheck.correlateByWords(d1, d3), 0.01);
+        assertEquals(0.78, DuplicateCheck.correlateByWords(d2, d3), 0.01);
     }
 
     @Test

@@ -21,5 +21,4 @@ public class PerformLoadDatabaseMigrations {
             migration.performMigration(parserResult);
         }
     }
-
 }

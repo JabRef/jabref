@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.Optional;
 
-import org.jabref.model.http.SimpleHttpResponse;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.util.GrobidPreferences;
 import org.jabref.logic.importer.util.GrobidService;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.http.SimpleHttpResponse;
 
 import org.jsoup.HttpStatusException;
 import org.slf4j.Logger;

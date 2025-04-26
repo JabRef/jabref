@@ -153,6 +153,6 @@ public class GenerateCitationKeyAction extends SimpleCommand {
 
     private String formatOutputMessage(String start, int count) {
         return "%s %d %s.".formatted(start, count,
-                (count > 1 ? Localization.lang("entries") : Localization.lang("entry")));
+                count > 1 ? Localization.lang("entries") : Localization.lang("entry"));
     }
 }

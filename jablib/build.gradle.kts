@@ -5,7 +5,6 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     `java-library`
-    `java-test-fixtures`
 
     id("idea")
 
@@ -135,7 +134,6 @@ dependencies {
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
-    testFixturesImplementation("org.jspecify:jspecify:1.0.0")
 
     // parse plist files
     implementation("com.googlecode.plist:dd-plist:1.28")
@@ -205,6 +203,8 @@ dependencies {
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
 
+    testImplementation(project(":test-support"))
+
     // loading of .fxml files in localization tests requires JabRef's GUI classes
     testImplementation(project(":jabgui"))
 
@@ -212,13 +212,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
-    testFixturesImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.platform:junit-platform-launcher:1.12.1")
 
-    testFixturesImplementation("org.openjfx:javafx-base:24.0.1")
-
     testImplementation("org.mockito:mockito-core:5.17.0")
-    testFixturesImplementation("org.mockito:mockito-core:5.17.0")
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.0")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
@@ -233,15 +229,6 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
-
-    /* TODO
-    checkstyle("com.puppycrawl.tools:checkstyle:10.23.0")
-    configurations.named("checkstyle") {
-        resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
-            select("com.google.guava:guava:0")
-       }
-    }
-     */
 
     "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
     "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
@@ -283,7 +270,6 @@ xjcGeneration {
         }
     }
 }
-
 
 tasks.processResources {
     filteringCharset = "UTF-8"
@@ -506,56 +492,6 @@ tasks.register<Test>("databaseTest") {
 }
 
 /*
-requirementTracing {
-    inputDirectories = files('docs', 'src/main/java', 'src/test/java')
-}
-
-modernizer {
-    failOnViolations = false
-    includeTestClasses = true
-    exclusions = [
-        'java/util/Optional.get:()Ljava/lang/Object;'
-    ]
-}
-
-
-rewrite {
-    activeRecipe(
-        'org.jabref.config.rewrite.cleanup'
-    )
-    exclusion (
-        "build.gradle",
-        "buildSrc/build.gradle",
-        "eclipse.gradle",
-        "settings.gradle",
-        "src-gen/**",
-        "src/main/resources/**",
-        "src/test/resources/**",
-        "..**../module-info.java",
-        "..**../*.py",
-        "..**../*.xml",
-        "..**../*.yml"
-)
-plainTextMask("..../*.md")
-failOnDryRunResults = true
-}
-
-
-// Code quality tasks
-checkstyle {
-    // will only run when called explicitly from the command line
-    sourceSets = []
-}
-
-
-
-// Test result tasks
-tasks.register('copyTestResources', Copy) {
-    from "${projectDir}/src/test/resources"
-    into "${buildDir}/classes/test"
-}
-processTestResources.dependsOn copyTestResources
-
 tasks.register('jacocoPrepare') {
     doFirst {
         // Ignore failures of tests
@@ -585,6 +521,4 @@ jacocoTestReport {
         xml.required = true
     }
 }
-
- */
 */

@@ -103,13 +103,13 @@ public class ThreeWayMergeToolbar extends AnchorPane {
         highlightWordsRadioButton.disableProperty().bind(notShowDiffProperty());
         highlightCharactersRadioButtons.disableProperty().bind(notShowDiffProperty());
 
-        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener((observable -> {
+        diffHighlightingMethodToggleGroup.selectedToggleProperty().addListener(observable -> {
             if (diffHighlightingMethodToggleGroup.getSelectedToggle().equals(highlightCharactersRadioButtons)) {
                 diffHighlightingMethod.set(BasicDiffMethod.CHARS);
             } else {
                 diffHighlightingMethod.set(BasicDiffMethod.WORDS);
             }
-        }));
+        });
 
         onlyShowChangedFieldsCheck.selectedProperty().bindBidirectional(preferences.getMergeDialogPreferences().mergeShowChangedFieldOnlyProperty());
         onlyShowChangedFields.bind(onlyShowChangedFieldsCheck.selectedProperty());

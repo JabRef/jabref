@@ -1111,7 +1111,7 @@ public class AuthorListTest {
     void parseGarbageCollectAuthorListForUnreachableKey() {
         final String uniqueAuthorName = "Fleur Hornbach";
         // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
-        AuthorList uniqueAuthor = AuthorList.parse(uniqueAuthorName);
+        AuthorList uniqueAuthor = AuthorList.parse(new String(uniqueAuthorName));
         System.gc();
         assertNotSame(uniqueAuthor, AuthorList.parse(uniqueAuthorName));
     }
@@ -1119,8 +1119,8 @@ public class AuthorListTest {
     @Test
     void parseGarbageCollectUnreachableInstitution() {
         final String uniqueInstitutionName = "{Unique LLC}";
-        // Note that "new String()" is needed, uniqueAuthorName is a reference to a String literal
-        AuthorList uniqueInstitution = AuthorList.parse(uniqueInstitutionName);
+        // Note that "new String()" is needed, uniqueInstitutionName is a reference to a String literal
+        AuthorList uniqueInstitution = AuthorList.parse(new String(uniqueInstitutionName));
         System.gc();
         assertNotSame(uniqueInstitution, AuthorList.parse(uniqueInstitutionName));
     }

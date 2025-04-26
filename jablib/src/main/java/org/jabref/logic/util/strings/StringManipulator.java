@@ -42,9 +42,9 @@ public class StringManipulator {
         }
 
         String result = switch (targetCase) {
-            case UPPER -> (new UpperCaseFormatter()).format(text.substring(wordStartPosition, nextWordBoundary));
-            case LOWER -> (new LowerCaseFormatter()).format(text.substring(wordStartPosition, nextWordBoundary));
-            case CAPITALIZED -> (new CapitalizeFormatter()).format(text.substring(wordStartPosition, nextWordBoundary));
+            case UPPER -> new UpperCaseFormatter().format(text.substring(wordStartPosition, nextWordBoundary));
+            case LOWER -> new LowerCaseFormatter().format(text.substring(wordStartPosition, nextWordBoundary));
+            case CAPITALIZED -> new CapitalizeFormatter().format(text.substring(wordStartPosition, nextWordBoundary));
         };
 
         return new ResultingStringState(
@@ -90,7 +90,7 @@ public class StringManipulator {
 
         if (direction == Direction.PREVIOUS) {
             // Swallow whitespaces
-            while (i > 0 && Character.isWhitespace((text.charAt(i + direction.OFFSET)))) {
+            while (i > 0 && Character.isWhitespace(text.charAt(i + direction.OFFSET))) {
                 i += direction.OFFSET;
             }
 
@@ -105,7 +105,7 @@ public class StringManipulator {
             }
 
             // Read next word
-            while (i < text.length() && !Character.isWhitespace((text.charAt(i)))) {
+            while (i < text.length() && !Character.isWhitespace(text.charAt(i))) {
                 i += direction.OFFSET;
             }
         }

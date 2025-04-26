@@ -36,7 +36,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                                       .filter(searchBasedFetcher -> searchBasedFetcher != this)
                                       // Remove any unselected Fetcher instance
                                       .filter(searchBasedFetcher -> importerPreferences.getCatalogs().stream()
-                                                                                       .anyMatch((name -> name.equals(searchBasedFetcher.getName()))))
+                                                                                       .anyMatch(name -> name.equals(searchBasedFetcher.getName())))
                                       .collect(Collectors.toSet());
         this.maximumNumberOfReturnedResults = maximumNumberOfReturnedResults;
     }

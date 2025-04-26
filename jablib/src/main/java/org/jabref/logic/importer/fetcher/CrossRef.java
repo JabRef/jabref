@@ -12,7 +12,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.IdParserFetcher;
 import org.jabref.logic.importer.ParseException;
@@ -170,7 +169,6 @@ public class CrossRef implements IdParserFetcher<DOI>, EntryBasedParserFetcher, 
 
     @Override
     public Optional<DOI> extractIdentifier(BibEntry inputEntry, List<BibEntry> fetchedEntries) {
-
         final String entryTitle = REMOVE_BRACES_FORMATTER.format(inputEntry.getFieldLatexFree(StandardField.TITLE).orElse(""));
         final StringSimilarity stringSimilarity = new StringSimilarity();
 

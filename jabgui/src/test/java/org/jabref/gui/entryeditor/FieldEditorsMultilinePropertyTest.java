@@ -1,6 +1,5 @@
 package org.jabref.gui.entryeditor;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;

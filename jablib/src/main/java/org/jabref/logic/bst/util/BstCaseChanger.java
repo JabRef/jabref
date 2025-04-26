@@ -77,7 +77,7 @@ public final class BstCaseChanger {
      * @param format the format
      */
     public static String changeCase(String s, FormatMode format) {
-        return (new BstCaseChanger()).doChangeCase(s, format);
+        return new BstCaseChanger().doChangeCase(s, format);
     }
 
     private String doChangeCase(String s, FormatMode format) {
