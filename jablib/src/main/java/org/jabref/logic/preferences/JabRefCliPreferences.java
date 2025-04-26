@@ -2211,7 +2211,6 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // endregion
 
-
     @Override
     public OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository) {
         if (openOfficePreferences != null) {
