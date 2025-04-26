@@ -8,10 +8,6 @@ plugins {
 
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
-
-    // nicer test outputs during running and completion
-    // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 val luceneVersion = "10.2.0"

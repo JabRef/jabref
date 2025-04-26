@@ -15,10 +15,6 @@ plugins {
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
 
-    // nicer test outputs during running and completion
-    // Homepage: https://github.com/radarsh/gradle-test-logger-plugin
-    id("com.adarshr.test-logger") version "4.0.0"
-
     id("org.beryx.jlink") version "3.1.1"
 }
 
