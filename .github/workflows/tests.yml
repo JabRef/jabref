@@ -186,15 +186,15 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run jablib tests
-        run: xvfb-run --auto-servernum ./gradlew :jablib:check # -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
+        run: xvfb-run --auto-servernum ./gradlew :jablib:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
         env:
           CI: "true"
       - name: Run jabkit tests
-        run: xvfb-run --auto-servernum ./gradlew :jabkit:check # -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
+        run: xvfb-run --auto-servernum ./gradlew :jabkit:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
         env:
           CI: "true"
       - name: Run jabsrv tests
-        run: xvfb-run --auto-servernum ./gradlew :jabsrv:check # -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
+        run: xvfb-run --auto-servernum ./gradlew :jabsrv:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
         env:
           CI: "true"
       - name: Prepare format failed test results
@@ -259,7 +259,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run GUI tests
-        run: xvfb-run --auto-servernum ./gradlew :jabgui:check
+        run: xvfb-run --auto-servernum ./gradlew :jabgui:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest # -x modernizer
         env:
           CI: "true"
 

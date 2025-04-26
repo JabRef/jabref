@@ -230,15 +230,6 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
-    /* TODO
-    checkstyle("com.puppycrawl.tools:checkstyle:10.23.0")
-    configurations.named("checkstyle") {
-        resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
-            select("com.google.guava:guava:0")
-       }
-    }
-     */
-
     "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
     "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }
@@ -279,7 +270,6 @@ xjcGeneration {
         }
     }
 }
-
 
 tasks.processResources {
     filteringCharset = "UTF-8"

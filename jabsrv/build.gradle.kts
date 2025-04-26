@@ -67,6 +67,8 @@ dependencies {
     implementation("de.undercouch:citeproc-java:3.2.0") {
         exclude(group = "org.antlr")
     }
+
+    testImplementation("org.mockito:mockito-core:5.17.0")
 }
 
 javafx {
