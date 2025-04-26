@@ -57,12 +57,12 @@ subprojects {
         configFile = rootProject.file("config/checkstyle/checkstyle.xml")
     }
 
-    tasks.withType<Checkstyle> {
+    tasks.withType<Checkstyle>().configureEach {
         reports {
             xml.required.set(false)
             html.required.set(true)
         }
-        exclude("**/generated-sources/**")
+        source = fileTree("src") { include("**/*.java") }
     }
 
     configurations.named("checkstyle") {
