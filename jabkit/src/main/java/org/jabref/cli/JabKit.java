@@ -103,7 +103,7 @@ public class JabKit {
                 systemExit();
             } catch (ParseException e) {
                 LOGGER.error("Problem parsing arguments", e);
-                CliOptions.printUsage(preferences);
+                JabKitCliOptions.printUsage(preferences);
                 systemExit();
             }
         } catch (Exception ex) {
@@ -125,8 +125,8 @@ public class JabKit {
         // argument parsing workflow to parse logging options .e.g. --debug
         boolean isDebugEnabled;
         try {
-            CliOptions cliOptions = new CliOptions(args);
-            isDebugEnabled = cliOptions.isDebugLogging();
+            JabKitCliOptions jabKitCliOptions = new JabKitCliOptions(args);
+            isDebugEnabled = jabKitCliOptions.isDebugLogging();
         } catch (ParseException e) {
             isDebugEnabled = false;
         }

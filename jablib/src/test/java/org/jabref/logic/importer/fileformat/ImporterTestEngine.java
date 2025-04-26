@@ -11,11 +11,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.support.BibEntryAssert;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

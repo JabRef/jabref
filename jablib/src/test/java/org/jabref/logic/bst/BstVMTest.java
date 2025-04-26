@@ -43,7 +43,7 @@ public class BstVMTest {
 
     @Test
     void ieeetran() throws Exception {
-        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("abbrv.bst").toURI()));
+        BstVM vm = new BstVM(Path.of(BstVMTest.class.getResource("IEEEtran.bst").toURI()));
         List<BibEntry> testEntries = List.of(TestEntry.getTestEntry());
 
         String expected = """

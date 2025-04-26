@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;

@@ -11,7 +11,6 @@ import java.util.Objects;
 import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor.Mode;
-import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -28,6 +27,7 @@ import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
+import org.jabref.support.BibEntryAssert;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,13 +64,12 @@ class ArgumentProcessorTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws Exception {
-        String auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
-        String originBib = Path.of(AuxCommandLineTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
 
-        Path outputBib = tempDir.resolve("output.bisb").toAbsolutePath();
-        String outputBibFile = outputBib.toAbsolutePath().toString();
+        Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
-        List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib);
+        List<String> args = List.of("--aux", auxFile + "," + outputBib, fullBib);
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),

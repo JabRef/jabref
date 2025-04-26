@@ -4,9 +4,9 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.logic.bibtex.BibEntryAssert;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.support.BibEntryAssert;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.Disabled;
