@@ -96,9 +96,7 @@ class JStyleLoaderTest {
 
     @Test
     void initalizeWithOneExternalFile() throws URISyntaxException {
-        String filename = Path.of(JStyleLoader.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                              .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
+        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
@@ -113,9 +111,7 @@ class JStyleLoaderTest {
 
     @Test
     void initalizeWithOneExternalFileRemoveStyle() throws URISyntaxException {
-        String filename = Path.of(JStyleLoader.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                              .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
+        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         List<JStyle> toremove = new ArrayList<>();
@@ -134,9 +130,7 @@ class JStyleLoaderTest {
 
     @Test
     void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() throws URISyntaxException {
-        String filename = Path.of(JStyleLoader.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                              .toFile().getPath();
-        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(filename));
+        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         List<JStyle> toremove = new ArrayList<>();
@@ -158,10 +152,8 @@ class JStyleLoaderTest {
         preferences.setExternalStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
-        String filename = Path.of(JStyleLoader.class.getResource(JStyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
-                              .toFile().getPath();
-        loader.addStyleIfValid(filename);
-        loader.addStyleIfValid(filename);
+        loader.addStyleIfValid(jStyleFile);
+        loader.addStyleIfValid(jStyleFile);
         assertEquals(beforeAdding + 1, loader.getStyles().size());
     }
 
