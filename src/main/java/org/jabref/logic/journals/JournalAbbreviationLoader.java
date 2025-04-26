@@ -5,9 +5,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.jabref.logic.journals.ltwa.LtwaRepository;
 
@@ -29,7 +29,14 @@ public class JournalAbbreviationLoader {
     private static final boolean USE_FJOURNAL_FIELD = true;
     private static final boolean BUILTIN_LIST_ENABLED_BY_DEFAULT = true;
 
-    public static Collection<Abbreviation> readAbbreviationsFromCsvFile(Path file) throws IOException {
+    /**
+     * Reads journal abbreviations from a CSV file.
+     *
+     * @param file Path to the CSV file containing journal abbreviations
+     * @return A set of abbreviations read from the file
+     * @throws IOException If an I/O error occurs while reading the file
+     */
+    public static Set<Abbreviation> readAbbreviationsFromCsvFile(Path file) throws IOException {
         LOGGER.debug("Reading journal list from file {}", file);
         AbbreviationParser parser = new AbbreviationParser();
         parser.readJournalListFromFile(file);
@@ -102,11 +109,11 @@ public class JournalAbbreviationLoader {
                             simpleFilename, enabled);
                     }
                     
-                    Collection<Abbreviation> abbreviations = readAbbreviationsFromCsvFile(filePath);
+                    Set<Abbreviation> abbreviations = readAbbreviationsFromCsvFile(filePath);
                     
                     repository.addCustomAbbreviations(abbreviations, simpleFilename, enabled);
                     
-                    repository.addCustomAbbreviations(Collections.emptyList(), prefixedKey, enabled);
+                    repository.addCustomAbbreviations(Set.of(), prefixedKey, enabled);
                 } catch (IOException | InvalidPathException e) {
                     // invalid path might come from unix/windows mixup of prefs
                     LOGGER.error("Cannot read external journal list file {}", filename, e);
@@ -134,7 +141,7 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        JournalAbbreviationPreferences prefs = new JournalAbbreviationPreferences(Collections.emptyList(), USE_FJOURNAL_FIELD);
+        JournalAbbreviationPreferences prefs = new JournalAbbreviationPreferences(List.of(), USE_FJOURNAL_FIELD);
         
         prefs.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, BUILTIN_LIST_ENABLED_BY_DEFAULT);
         return loadRepository(prefs);

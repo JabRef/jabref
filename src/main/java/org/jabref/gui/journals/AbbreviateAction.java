@@ -2,7 +2,6 @@ package org.jabref.gui.journals;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,7 +173,7 @@ public class AbbreviateAction extends SimpleCommand {
                 
                 String text = entry.getFieldLatexFree(journalField).orElse("");
                 List<JournalAbbreviationRepository.AbbreviationWithSource> possibleSources = 
-                    textToSourceMap.getOrDefault(text, Collections.emptyList());
+                    textToSourceMap.getOrDefault(text, List.of());
                 
                 if (!possibleSources.isEmpty()) {
                     boolean allSourcesDisabled = true;

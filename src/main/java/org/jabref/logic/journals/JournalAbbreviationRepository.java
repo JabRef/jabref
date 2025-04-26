@@ -209,7 +209,7 @@ public class JournalAbbreviationRepository {
     }
 
     private Optional<Abbreviation> findAbbreviationFuzzyMatched(String input) {
-        Collection<Abbreviation> enabledCustomAbbreviations = customAbbreviations.stream()
+        List<Abbreviation> enabledCustomAbbreviations = customAbbreviations.stream()
                 .filter(abbreviation -> isSourceEnabled(abbreviationSources.getOrDefault(abbreviation, BUILTIN_LIST_ID)))
                 .toList();
                 
@@ -225,6 +225,13 @@ public class JournalAbbreviationRepository {
         return findBestFuzzyMatched(fullToAbbreviationObject.values(), input);
     }
 
+    /**
+     * Finds the best matching abbreviation by fuzzy matching from a collection of abbreviations
+     *
+     * @param abbreviations Collection of abbreviations to search
+     * @param input The input string to match against
+     * @return Optional containing the best matching abbreviation, or empty if no good match is found
+     */
     private Optional<Abbreviation> findBestFuzzyMatched(Collection<Abbreviation> abbreviations, String input) {
         // threshold for edit distance similarity comparison
         final double SIMILARITY_THRESHOLD = 1.0;
@@ -281,27 +288,27 @@ public class JournalAbbreviationRepository {
         enabledSources.put(sourcePath, enabled);
     }
 
-    public Collection<Abbreviation> getCustomAbbreviations() {
+    public Set<Abbreviation> getCustomAbbreviations() {
         return customAbbreviations;
     }
 
     /**
      * Adds multiple custom abbreviations to the repository
      *
-     * @param abbreviationsToAdd The abbreviations to add
+     * @param abbreviationsToAdd The set of abbreviations to add
      */
-    public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd) {
+    public void addCustomAbbreviations(Set<Abbreviation> abbreviationsToAdd) {
         abbreviationsToAdd.forEach(this::addCustomAbbreviation);
     }
     
     /**
      * Adds abbreviations with a specific source key and enabled state
      *
-     * @param abbreviationsToAdd Collection of abbreviations to add
+     * @param abbreviationsToAdd Set of abbreviations to add
      * @param sourceKey The key identifying the source of these abbreviations
      * @param enabled Whether the source should be enabled initially
      */
-    public void addCustomAbbreviations(Collection<Abbreviation> abbreviationsToAdd, String sourceKey, boolean enabled) {
+    public void addCustomAbbreviations(Set<Abbreviation> abbreviationsToAdd, String sourceKey, boolean enabled) {
         enabledSources.put(sourceKey, enabled);
         
         for (Abbreviation abbreviation : abbreviationsToAdd) {
@@ -350,8 +357,8 @@ public class JournalAbbreviationRepository {
         return fullToAbbreviationObject.keySet();
     }
 
-    public Collection<Abbreviation> getAllLoaded() {
-        return fullToAbbreviationObject.values();
+    public Set<Abbreviation> getAllLoaded() {
+        return Set.copyOf(fullToAbbreviationObject.values());
     }
     
     /**

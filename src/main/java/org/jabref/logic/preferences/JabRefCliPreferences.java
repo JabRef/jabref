@@ -730,7 +730,7 @@ public class JabRefCliPreferences implements CliPreferences {
     @VisibleForTesting
     static List<String> convertStringToList(String toConvert) {
         if (StringUtil.isBlank(toConvert)) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return Splitter.on(STRINGLIST_DELIMITER).splitToList(toConvert);
@@ -1565,10 +1565,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
                                                          .map(FieldFactory::parseField)
-                                                         .collect(Collectors.toList()),
+                                                         .toList(),
                 getStringList(NON_WRAPPABLE_FIELDS).stream()
                                                    .map(FieldFactory::parseField)
-                                                   .collect(Collectors.toList()));
+                                                   .toList());
 
         EasyBind.listen(fieldPreferences.resolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
         fieldPreferences.getResolvableFields().addListener((InvalidationListener) change ->
@@ -1810,7 +1810,7 @@ public class JabRefCliPreferences implements CliPreferences {
                         FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) c ->
-                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
+                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).toList()));
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (fieldFormatters, oldValue, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
@@ -2017,7 +2017,7 @@ public class JabRefCliPreferences implements CliPreferences {
         xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) c ->
                 putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
                                                                  .map(Field::getName)
-                                                                 .collect(Collectors.toList())));
+                                                                 .toList()));
 
         return xmpPreferences;
     }

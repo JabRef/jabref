@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -150,7 +149,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                     isLoading.setValue(false);
                     List<AbbreviationViewModel> builtInViewModels = result.stream()
                                                                           .map(AbbreviationViewModel::new)
-                                                                          .collect(Collectors.toList());
+                                                                          .toList();
                     AbbreviationsFileViewModel builtInListModel = new AbbreviationsFileViewModel(builtInViewModels, Localization.lang("JabRef built in list"));
                     
                     boolean isEnabled = abbreviationsPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID);
@@ -352,7 +351,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                                                                  .filter(path -> !path.isBuiltInListProperty().get())
                                                                  .filter(path -> path.getAbsolutePath().isPresent())
                                                                  .map(path -> path.getAbsolutePath().get().toAbsolutePath().toString())
-                                                                 .collect(Collectors.toList());
+                                                                 .toList();
 
                     abbreviationsPreferences.setExternalJournalLists(journalStringList);
                     abbreviationsPreferences.setUseFJournalField(useFJournal.get());

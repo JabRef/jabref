@@ -5,10 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
@@ -86,7 +86,7 @@ public class AbbreviationsFileViewModel {
             return;
         }
         try {
-            Collection<Abbreviation> abbreviationsFromFile = JournalAbbreviationLoader.readAbbreviationsFromCsvFile(filePath);
+            Set<Abbreviation> abbreviationsFromFile = JournalAbbreviationLoader.readAbbreviationsFromCsvFile(filePath);
             
             List<AbbreviationViewModel> viewModels = abbreviationsFromFile.stream()
                                                                    .map(AbbreviationViewModel::new)
@@ -111,7 +111,7 @@ public class AbbreviationsFileViewModel {
         
         List<Abbreviation> abbreviationList = abbreviationsProperty().stream()
                                                                       .map(AbbreviationViewModel::getAbbreviationObject)
-                                                                      .collect(Collectors.toList());
+                                                                      .toList();
         AbbreviationWriter.writeOrCreate(filePath, abbreviationList);
     }
 
