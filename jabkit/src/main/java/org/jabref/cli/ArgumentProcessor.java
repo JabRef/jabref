@@ -69,12 +69,13 @@ import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+///  TODO: This is a clone of {@link org.jabref.cli.ArgumentProcessor} in jabgui - should be unified
 public class ArgumentProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
     public enum Mode { INITIAL_START, REMOTE_START }
 
-    private final CliOptions cli;
+    private final JabKitCliOptions cli;
 
     private final Mode startupMode;
 
@@ -84,9 +85,6 @@ public class ArgumentProcessor {
 
     /**
      * First call the constructor, then call {@link #processArguments()}.
-     * Afterward, you can access the {@link #getUiCommands()}.
-     *
-     * @implNote both cli and gui preferences are passed to make the dependency to GUI parts explicit
      */
     public ArgumentProcessor(String[] args,
                              Mode startupMode,
@@ -94,7 +92,7 @@ public class ArgumentProcessor {
                              FileUpdateMonitor fileUpdateMonitor,
                              BibEntryTypesManager entryTypesManager)
             throws org.apache.commons.cli.ParseException {
-        this.cli = new CliOptions(args);
+        this.cli = new JabKitCliOptions(args);
         this.startupMode = startupMode;
         this.cliPreferences = cliPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -202,7 +200,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isHelp()) {
-            CliOptions.printUsage(cliPreferences);
+            JabKitCliOptions.printUsage(cliPreferences);
             return;
         }
 
@@ -270,6 +268,10 @@ public class ArgumentProcessor {
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }
+        }
+
+        if (cli.isAuxImport()) {
+            doAuxImport(loaded);
         }
 
         if (cli.isCheckConsistency()) {
@@ -518,7 +520,7 @@ public class ArgumentProcessor {
                         formatName = "bib";
                 default -> {
                     System.err.println(Localization.lang("Output file missing").concat(". \n \t ")
-                                                   .concat(Localization.lang("Usage")).concat(": ") + CliOptions.getExportMatchesSyntax());
+                                                   .concat(Localization.lang("Usage")).concat(": ") + JabKitCliOptions.getExportMatchesSyntax());
                     return false;
                 }
             }
@@ -631,6 +633,12 @@ public class ArgumentProcessor {
         return loaded;
     }
 
+    /**
+     * Generates a new library being a subset of the given library
+     *
+     * @param loaded The library used as base
+     * @param data [0]: the .aux file; [1]: the target .bib file
+     */
     private boolean generateAux(List<ParserResult> loaded, String[] data) {
         if (data.length == 2) {
             ParserResult pr = loaded.getFirst();

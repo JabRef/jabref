@@ -64,13 +64,12 @@ class ArgumentProcessorTest {
 
     @Test
     void auxImport(@TempDir Path tempDir) throws Exception {
-        String auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
-        String originBib = Path.of(AuxCommandLineTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
+        String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
 
-        Path outputBib = tempDir.resolve("output.bisb").toAbsolutePath();
-        String outputBibFile = outputBib.toAbsolutePath().toString();
+        Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
-        List<String> args = List.of("--nogui", "--debug", "--aux", auxFile + "," + outputBibFile, originBib);
+        List<String> args = List.of("--aux", auxFile + "," + outputBib, fullBib);
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 args.toArray(String[]::new),

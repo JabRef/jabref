@@ -70,6 +70,7 @@ import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+///  TODO: This is a clone of {@link org.jabref.cli.ArgumentProcessor} in jabkit - should be unified
 public class ArgumentProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
@@ -89,8 +90,6 @@ public class ArgumentProcessor {
     /**
      * First call the constructor, then call {@link #processArguments()}.
      * Afterward, you can access the {@link #getUiCommands()}.
-     *
-     * @implNote both cli and gui preferences are passed to make the dependency to GUI parts explicit
      */
     public ArgumentProcessor(String[] args,
                              Mode startupMode,

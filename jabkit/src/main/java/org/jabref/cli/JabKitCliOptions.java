@@ -24,7 +24,7 @@ import org.apache.commons.cli.ParseException;
 /**
  * Holds the command line options. It parses it using Apache Commons CLI.
  */
-public class CliOptions {
+public class JabKitCliOptions {
     private static final int WIDTH = 100; // Number of characters per line before a line break must be added.
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
     private static final String STRING_TABLE_DELIMITER = " : ";
@@ -32,7 +32,7 @@ public class CliOptions {
     private final CommandLine commandLine;
     private final List<String> leftOver;
 
-    public CliOptions(String[] args) throws ParseException {
+    public JabKitCliOptions(String[] args) throws ParseException {
         Options options = getOptions();
         this.commandLine = new DefaultParser().parse(options, args, true);
         this.leftOver = commandLine.getArgList();
@@ -124,6 +124,7 @@ public class CliOptions {
     public String getAuxImport() {
         return commandLine.getOptionValue("aux");
     }
+
     public boolean isDebugLogging() {
         return commandLine.hasOption("debug");
     }
