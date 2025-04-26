@@ -52,7 +52,7 @@ public class CSLStyleLoader {
                               .filter(style -> DEFAULT_STYLE.equals(style.getFilePath()))
                               .findFirst()
                               .orElseGet(() -> CSLStyleUtils.createCitationStyleFromFile(DEFAULT_STYLE)
-                                                            .orElse(new CitationStyle("", "Empty", false, "", true)));
+                                                            .orElse(new CitationStyle("", "Empty", false, false, "", true)));
     }
 
     /**
@@ -78,12 +78,13 @@ public class CSLStyleLoader {
                     String path = (String) info.get("path");
                     String title = (String) info.get("title");
                     boolean isNumeric = (boolean) info.get("isNumeric");
+                    boolean hasBibliography = (boolean) info.get("hasBibliography");
 
                     // We use these metadata and just load the content instead of re-parsing for them
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
-                            CitationStyle style = new CitationStyle(path, title, isNumeric, source, true);
+                            CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography, source, true);
                             INTERNAL_STYLES.add(style);
                         }
                     } catch (IOException e) {
@@ -91,7 +92,7 @@ public class CSLStyleLoader {
                         styleCount--;
                     }
                 }
-            LOGGER.info("Loaded {} CSL styles", styleCount);
+                LOGGER.info("Loaded {} CSL styles", styleCount);
             } else {
                 LOGGER.error("Citation style catalog is empty");
             }
