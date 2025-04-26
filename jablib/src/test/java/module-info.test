@@ -7,6 +7,10 @@
 
 --add-modules
     io.github.classgraph
-
 --add-reads
     org.jabref.jablib=io.github.classgraph
+
+--add-modules
+  org.jabref.testsupport
+--add-reads
+  org.jabref.jablib=org.jabref.testsupport
