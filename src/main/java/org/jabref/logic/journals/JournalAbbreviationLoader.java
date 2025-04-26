@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 public class JournalAbbreviationLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalAbbreviationLoader.class);
+    private static final boolean USE_FJOURNAL_FIELD = true;
+    private static final boolean BUILTIN_LIST_ENABLED_BY_DEFAULT = true;
 
     public static Collection<Abbreviation> readAbbreviationsFromCsvFile(Path file) throws IOException {
         LOGGER.debug("Reading journal list from file {}", file);
@@ -132,9 +134,9 @@ public class JournalAbbreviationLoader {
     }
 
     public static JournalAbbreviationRepository loadBuiltInRepository() {
-        JournalAbbreviationPreferences prefs = new JournalAbbreviationPreferences(Collections.emptyList(), true);
+        JournalAbbreviationPreferences prefs = new JournalAbbreviationPreferences(Collections.emptyList(), USE_FJOURNAL_FIELD);
         
-        prefs.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, true);
+        prefs.setSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID, BUILTIN_LIST_ENABLED_BY_DEFAULT);
         return loadRepository(prefs);
     }
 }
