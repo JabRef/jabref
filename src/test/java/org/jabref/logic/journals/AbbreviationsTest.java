@@ -1,7 +1,7 @@
 package org.jabref.logic.journals;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class AbbreviationsTest {
     void setUp() {
         repository = new JournalAbbreviationRepository();
         
-        repository.addCustomAbbreviations(List.of(TEST_JOURNAL, DOTTED_JOURNAL), 
+        repository.addCustomAbbreviations(Set.of(TEST_JOURNAL, DOTTED_JOURNAL), 
                                          JournalAbbreviationRepository.BUILTIN_LIST_ID, 
                                          true);
     }

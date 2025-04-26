@@ -226,7 +226,7 @@ public class JournalAbbreviationRepository {
     }
 
     /**
-     * Finds the best matching abbreviation by fuzzy matching from a collection of abbreviations
+     * Finds the best matching abbreviation by fuzzy matching from a collection of abbreviations.
      *
      * @param abbreviations Collection of abbreviations to search
      * @param input The input string to match against

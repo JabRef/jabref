@@ -1,6 +1,6 @@
 package org.jabref.gui.journals;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.swing.undo.CompoundEdit;
 
@@ -37,11 +37,11 @@ class UndoableUnabbreviatorTest {
     @BeforeEach
     void setUp() {
         repository = new JournalAbbreviationRepository();
-        repository.addCustomAbbreviations(List.of(BUILT_IN_1, BUILT_IN_2), 
+        repository.addCustomAbbreviations(Set.of(BUILT_IN_1, BUILT_IN_2), 
                                          JournalAbbreviationRepository.BUILTIN_LIST_ID, 
                                          true);
         
-        repository.addCustomAbbreviations(List.of(CUSTOM_1, CUSTOM_2), 
+        repository.addCustomAbbreviations(Set.of(CUSTOM_1, CUSTOM_2), 
                                          CUSTOM_SOURCE, 
                                          true);
         

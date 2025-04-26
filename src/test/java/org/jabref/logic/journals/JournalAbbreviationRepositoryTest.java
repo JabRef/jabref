@@ -52,7 +52,7 @@ class JournalAbbreviationRepositoryTest {
     private JournalAbbreviationRepository createTestRepository() {
         JournalAbbreviationRepository testRepo = new JournalAbbreviationRepository();
         
-        testRepo.addCustomAbbreviations(List.of(
+        testRepo.addCustomAbbreviations(Set.of(
             AMERICAN_JOURNAL,
             ACS_MATERIALS,
             ANTIOXIDANTS,
@@ -409,7 +409,7 @@ class JournalAbbreviationRepositoryTest {
     @ParameterizedTest
     @MethodSource("provideAbbreviationTestCases")
     void fuzzyMatch(List<Abbreviation> abbreviationList, String input, String expectedAbbreviation, String expectedDotless, String expectedShortest, String ambiguousInput) {
-        repository.addCustomAbbreviations(abbreviationList);
+        repository.addCustomAbbreviations(Set.copyOf(abbreviationList));
 
         assertEquals(expectedAbbreviation, repository.getDefaultAbbreviation(input).orElse("WRONG"));
 
@@ -423,7 +423,7 @@ class JournalAbbreviationRepositoryTest {
     static Stream<Arguments> provideAbbreviationTestCases() {
         return Stream.of(
                 Arguments.of(
-                        List.of(
+                        Set.of(
                                 new Abbreviation("Journal of Physics A", "J. Phys. A", "JPA"),
                                 new Abbreviation("Journal of Physics B", "J. Phys. B", "JPB"),
                                 new Abbreviation("Journal of Physics C", "J. Phys. C", "JPC")
@@ -435,7 +435,7 @@ class JournalAbbreviationRepositoryTest {
                         "Journal of Physics"
                 ),
                 Arguments.of(
-                        List.of(
+                        Set.of(
                                 new Abbreviation("中国物理学报", "物理学报", "ZWP"),
                                 new Abbreviation("中国物理学理", "物理学报报", "ZWP"),
                                 new Abbreviation("中国科学: 物理学", "中科物理", "ZKP")
@@ -447,7 +447,7 @@ class JournalAbbreviationRepositoryTest {
                         "中国物理学"
                 ),
                 Arguments.of(
-                        List.of(
+                        Set.of(
                                 new Abbreviation("Zeitschrift für Chem", "Z. Phys. Chem.", "ZPC"),
                                 new Abbreviation("Zeitschrift für Chys", "Z. Angew. Chem.", "ZAC")
                         ),
@@ -464,7 +464,7 @@ class JournalAbbreviationRepositoryTest {
     void addCustomAbbreviationsWithEnabledState() {
         String sourceKey = "test-source";
         
-        repository.addCustomAbbreviations(List.of(
+        repository.addCustomAbbreviations(Set.of(
             new Abbreviation("Journal One", "J. One"),
             new Abbreviation("Journal Two", "J. Two")
         ), sourceKey, true);
@@ -479,7 +479,7 @@ class JournalAbbreviationRepositoryTest {
     void disablingSourcePreventsAccessToAbbreviations() {
         String sourceKey = "test-source";
         
-        repository.addCustomAbbreviations(List.of(
+        repository.addCustomAbbreviations(Set.of(
             new Abbreviation("Unique Journal", "U. J.")
         ), sourceKey, true);
         
@@ -497,7 +497,7 @@ class JournalAbbreviationRepositoryTest {
     void reenablingSourceRestoresAccessToAbbreviations() {
         String sourceKey = "test-source";
         
-        repository.addCustomAbbreviations(List.of(
+        repository.addCustomAbbreviations(Set.of(
             new Abbreviation("Disabled Journal", "D. J.")
         ), sourceKey, true);
         
@@ -545,11 +545,11 @@ class JournalAbbreviationRepositoryTest {
         String sourceKey1 = "source-1-special";
         String sourceKey2 = "source-2-special";
         
-        testRepo.addCustomAbbreviations(List.of(
+        testRepo.addCustomAbbreviations(Set.of(
             new Abbreviation("Unique Journal Source One XYZ", "UniqueJS1")
         ), sourceKey1, true);
         
-        testRepo.addCustomAbbreviations(List.of(
+        testRepo.addCustomAbbreviations(Set.of(
             new Abbreviation("Unique Journal Source Two ABC", "UniqueJS2")
         ), sourceKey2, true);
         
@@ -624,7 +624,7 @@ class JournalAbbreviationRepositoryTest {
         
         testRepo.getCustomAbbreviations().clear();
         
-        testRepo.addCustomAbbreviations(List.of(
+        testRepo.addCustomAbbreviations(Set.of(
             AMERICAN_JOURNAL,
             ACS_MATERIALS,
             ANTIOXIDANTS,
@@ -632,7 +632,7 @@ class JournalAbbreviationRepositoryTest {
         ), JournalAbbreviationRepository.BUILTIN_LIST_ID, true);
         
         String customSource = "test-custom";
-        testRepo.addCustomAbbreviations(List.of(
+        testRepo.addCustomAbbreviations(Set.of(
             new Abbreviation("Custom Journal", "Cust. J.")
         ), customSource, true);
         
@@ -657,7 +657,7 @@ class JournalAbbreviationRepositoryTest {
         assertTrue(customAbbr.isPresent(), "Should find custom abbreviation with source");
         assertEquals("Custom Journal", customAbbr.get().getAbbreviation().getName());
         
-        for (Abbreviation abbr : List.of(AMERICAN_JOURNAL, ACS_MATERIALS, ANTIOXIDANTS, PHYSICAL_REVIEW)) {
+        for (Abbreviation abbr : Set.of(AMERICAN_JOURNAL, ACS_MATERIALS, ANTIOXIDANTS, PHYSICAL_REVIEW)) {
             boolean found = allWithSources.stream()
                            .anyMatch(aws -> JournalAbbreviationRepository.BUILTIN_LIST_ID.equals(aws.getSource()) && 
                                      abbr.getName().equals(aws.getAbbreviation().getName()));
