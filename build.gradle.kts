@@ -24,6 +24,7 @@ rewrite {
     activeRecipe("org.jabref.config.rewrite.cleanup")
     exclusion(
         "settings.gradle",
+        "**/build.gradle.kts",
         "**/generated-sources/**",
         "**/src/main/resources/**",
         "**/src/test/resources/**",
