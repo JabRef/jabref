@@ -24,14 +24,14 @@ import picocli.CommandLine;
 
 public class ArgumentProcessor {
     private static final String JABREF_BANNER = """
-    
+
        &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
        &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
        &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&&
+       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&& %s
        &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
        &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
-    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&  %s
+    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
 
     Staying on top of your literature since 2003 - https://www.jabref.org/
     Please report issues at https://github.com/JabRef/jabref/issues
