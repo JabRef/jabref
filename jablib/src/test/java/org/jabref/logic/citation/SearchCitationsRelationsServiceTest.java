@@ -3,8 +3,8 @@ package org.jabref.logic.citation;
 import java.util.HashMap;
 import java.util.List;
 
-import org.jabref.logic.citation.repository.BibEntryRelationsRepositoryHelpersForTest;
-import org.jabref.logic.importer.fetcher.CitationFetcherHelpersForTest;
+import org.jabref.logic.citation.repository.BibEntryRelationsRepositoryTestHelpers;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcherHelpersForTest;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Nested;
@@ -22,7 +22,7 @@ class SearchCitationsRelationsServiceTest {
             // GIVEN
             var cited = new BibEntry();
             var citationsToReturn = List.of(new BibEntry());
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 e -> citationsToReturn, null, null, null, entry -> false, entry -> false
             );
             var searchService = new SearchCitationsRelationsService(null, repository);
@@ -50,7 +50,7 @@ class SearchCitationsRelationsServiceTest {
                 },
                 null
             );
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 e -> citationsToReturn,
                 citationsDatabase::put,
                 List::of,
@@ -84,7 +84,7 @@ class SearchCitationsRelationsServiceTest {
                 },
                 null
             );
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 citationsDatabase, null
             );
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
@@ -105,7 +105,7 @@ class SearchCitationsRelationsServiceTest {
             var fetcher = CitationFetcherHelpersForTest.Mocks.from(
                 entry -> List.of(), null
             );
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 citationsDatabase, null
             );
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
@@ -127,7 +127,7 @@ class SearchCitationsRelationsServiceTest {
             // GIVEN
             var referencer = new BibEntry();
             var referencesToReturn = List.of(new BibEntry());
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 null, null, e -> referencesToReturn, null, e -> false, e -> false
             );
             var searchService = new SearchCitationsRelationsService(null, repository);
@@ -152,7 +152,7 @@ class SearchCitationsRelationsServiceTest {
                 }
                 return List.of();
             });
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 List::of,
                 (e, c) -> { },
                 e -> referencesToReturn,
@@ -186,7 +186,7 @@ class SearchCitationsRelationsServiceTest {
                     return List.of();
                 }
             );
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 null, referencesDatabase
             );
             var searchService = new SearchCitationsRelationsService(fetcher, repository);
@@ -207,7 +207,7 @@ class SearchCitationsRelationsServiceTest {
             var fetcher = CitationFetcherHelpersForTest.Mocks.from(
                 null, entry -> List.of()
             );
-            var repository = BibEntryRelationsRepositoryHelpersForTest.Mocks.from(
+            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                 null, referenceDatabase
             );
             var searchService = new SearchCitationsRelationsService(fetcher, repository);

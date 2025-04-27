@@ -10,7 +10,7 @@ import org.jabref.model.entry.BibEntry;
 /**
  * Provide helpers methods and classes for tests to manage {@link BibEntryCitationsAndReferencesRepository} mocks.
  */
-public class BibEntryRelationsRepositoryHelpersForTest {
+public class BibEntryRelationsRepositoryTestHelpers {
 
     /**
      * Provide mocks factories for {@link BibEntryCitationsAndReferencesRepository} mocks.

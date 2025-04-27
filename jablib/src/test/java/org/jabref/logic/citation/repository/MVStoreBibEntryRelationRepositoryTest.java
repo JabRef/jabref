@@ -14,7 +14,7 @@ import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.jabref.model.citation.semanticscholar.PaperDetails;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
-class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
+class MVStoreBibEntryRelationRepositoryTest {
 
     private final static String MV_STORE_NAME = "test-relations.mv";
     private final static String MAP_NAME = "test-relations";
@@ -39,7 +39,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest::createBibEntry);
+            .mapToObj(MVStoreBibEntryRelationRepositoryTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
@@ -79,7 +79,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     void DAOShouldMergeRelationsWhenInserting(BibEntry bibEntry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
+        var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7);
         assertFalse(dao.containsKey(bibEntry));
         var firstRelations = createRelations(bibEntry);
         var secondRelations = createRelations(bibEntry);
@@ -107,7 +107,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     void containsKeyShouldReturnFalseIfNothingWasInserted(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
+        var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7);
 
         // THEN
         assertFalse(dao.containsKey(entry));
@@ -118,7 +118,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     void containsKeyShouldReturnTrueIfRelationsWereInserted(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
+        var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7);
         var relations = createRelations(entry);
 
         // WHEN
@@ -133,7 +133,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     void isUpdatableShouldReturnTrueBeforeInsertionsAndFalseAfterInsertions(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
+        var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7);
         var relations = createRelations(entry);
         Assertions.assertTrue(dao.isUpdatable(entry));
 
@@ -149,7 +149,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     void isUpdatableShouldReturnTrueAfterOneWeek(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7);
+        var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7);
         var relations = createRelations(entry);
         var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
         Assertions.assertTrue(dao.isUpdatable(entry, clock));
@@ -171,7 +171,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     void isUpdatableShouldReturnFalseAfterOneWeekWhenTTLisSetTo30(BibEntry entry) throws IOException {
         // GIVEN
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 30);
+        var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 30);
         var relations = createRelations(entry);
         var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
         Assertions.assertTrue(dao.isUpdatable(entry, clock));
@@ -192,8 +192,8 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
     @MethodSource("createBibEntries")
     void deserializerErrorShouldReturnEmptyList(BibEntry entry) throws IOException {
         // GIVEN
-        var serializer = new MVStoreBibEntryRelationDAO.BibEntryHashSetSerializer(
-            new MVStoreBibEntryRelationDAO.BibEntrySerializer() {
+        var serializer = new MVStoreBibEntryRelationRepository.BibEntryHashSetSerializer(
+            new MVStoreBibEntryRelationRepository.BibEntrySerializer() {
                 @Override
                 public BibEntry read(ByteBuffer buffer) {
                     // Fake the return after an exception
@@ -202,7 +202,7 @@ class SimpleBibEntryCitationsAndReferencesRepositoryRepositoryTest {
             }
         );
         var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        var dao = new MVStoreBibEntryRelationDAO(file.toAbsolutePath(), MAP_NAME, 7, serializer);
+        var dao = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
         var relations = createRelations(entry);
         dao.addRelations(entry, relations);
 

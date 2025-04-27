@@ -6,17 +6,20 @@ import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 
-public class SimpleBibEntryCitationsAndReferencesRepository implements BibEntryCitationsAndReferencesRepository {
+public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCitationsAndReferencesRepository {
 
     private static final String CITATIONS_STORE = "citations";
     private static final String REFERENCES_STORE = "references";
 
-    private final BibEntryRelationDAO citationsDao;
-    private final BibEntryRelationDAO referencesDao;
+    private final BibEntryRelationRepository citationsDao;
+    private final BibEntryRelationRepository referencesDao;
 
-    public SimpleBibEntryCitationsAndReferencesRepository(Path citationsStore, Path relationsStore, int storeTTL) {
-        this.citationsDao = new MVStoreBibEntryRelationDAO(citationsStore, CITATIONS_STORE, storeTTL);
-        this.referencesDao = new MVStoreBibEntryRelationDAO(relationsStore, REFERENCES_STORE, storeTTL);
+    public BibEntryCitationsAndReferencesRepositoryShell(
+        BibEntryRelationRepository citationsDao,
+        BibEntryRelationRepository referencesDao
+    ) {
+        this.citationsDao = citationsDao;
+        this.referencesDao = referencesDao;
     }
 
     @Override
@@ -69,9 +72,12 @@ public class SimpleBibEntryCitationsAndReferencesRepository implements BibEntryC
         return referencesDao.isUpdatable(entry);
     }
 
-    public static SimpleBibEntryCitationsAndReferencesRepository of(Path citationsRelationsDirectory, int storeTTL) {
+    public static BibEntryCitationsAndReferencesRepositoryShell of(Path citationsRelationsDirectory, int storeTTL) {
         var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
         var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
-        return new SimpleBibEntryCitationsAndReferencesRepository(citationsPath, relationsPath, storeTTL);
+        return new BibEntryCitationsAndReferencesRepositoryShell(
+            new MVStoreBibEntryRelationRepository(citationsPath, CITATIONS_STORE, storeTTL),
+            new MVStoreBibEntryRelationRepository(relationsPath, REFERENCES_STORE, storeTTL)
+        );
     }
 }

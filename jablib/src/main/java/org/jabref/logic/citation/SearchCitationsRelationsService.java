@@ -3,7 +3,7 @@ package org.jabref.logic.citation;
 import java.util.List;
 
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
-import org.jabref.logic.citation.repository.SimpleBibEntryCitationsAndReferencesRepository;
+import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepositoryShell;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
@@ -25,7 +25,7 @@ public class SearchCitationsRelationsService {
 
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences) {
         this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);
-        this.relationsRepository = SimpleBibEntryCitationsAndReferencesRepository.of(
+        this.relationsRepository = BibEntryCitationsAndReferencesRepositoryShell.of(
             Directories.getCitationsRelationsDirectory(),
             importerPreferences.getCitationsRelationsStoreTTL()
         );

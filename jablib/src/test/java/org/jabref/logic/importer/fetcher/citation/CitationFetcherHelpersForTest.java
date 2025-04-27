@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fetcher;
+package org.jabref.logic.importer.fetcher.citation;
 
 import java.util.List;
 import java.util.function.Function;
