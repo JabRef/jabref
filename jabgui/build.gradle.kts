@@ -55,7 +55,7 @@ dependencies {
     }
 
     // Required by gemsfx
-    implementation("tech.units:indriya:2.2.2")
+    implementation("tech.units:indriya:2.2.3")
     // Required by gemsfx and langchain4j
     implementation ("com.squareup.retrofit2:retrofit:2.11.0") {
         exclude(group = "com.squareup.okhttp3")
@@ -96,7 +96,7 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
 
-    implementation("com.konghq:unirest-java-core:4.4.5")
+    implementation("com.konghq:unirest-java-core:4.4.6")
 
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
 
