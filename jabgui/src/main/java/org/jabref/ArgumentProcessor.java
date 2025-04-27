@@ -24,6 +24,7 @@ import picocli.CommandLine;
 
 public class ArgumentProcessor {
     private static final String JABREF_BANNER = """
+    
        &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
        &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
        &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
@@ -58,7 +59,7 @@ public class ArgumentProcessor {
         this.preferences = preferences;
         this.guiCli = new GuiCommandLine();
 
-        cli = new CommandLine(new GuiCommandLine());
+        cli = new CommandLine(this.guiCli);
         cli.parseArgs(args);
     }
 
@@ -73,7 +74,7 @@ public class ArgumentProcessor {
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isUsageHelpRequested()) {
-            System.out.printf(JABREF_BANNER + "%n%n", new BuildInfo().version);
+            System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
             System.out.println(cli.getUsageMessage());
 
             System.out.println(Localization.lang("Available import formats"));
@@ -97,7 +98,7 @@ public class ArgumentProcessor {
             uiCommands.add(new UiCommand.JumpToEntryKey(guiCli.jumpToKey));
         }
 
-        if (!guiCli.libraries.isEmpty()) {
+        if (guiCli.libraries != null && !guiCli.libraries.isEmpty()) {
             if (guiCli.append) {
                 uiCommands.add(new UiCommand.AppendToCurrentLibrary(guiCli.libraries));
             } else {
