@@ -167,7 +167,7 @@ application {
         "--add-opens=javafx.base/javafx.collections=org.jabref",
         "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
     )
 }
 
@@ -185,7 +185,7 @@ tasks.named<JavaExec>("run") {
     doFirst {
         // Clear the default JVM arguments to avoid warnings
         // application.applicationDefaultJvmArgs = emptyList()
-        application.applicationDefaultJvmArgs = listOf("--enable-native-access=com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core")
+        application.applicationDefaultJvmArgs = listOf("--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core")
     }
 
     extensions.configure<RunModuleOptions>("moduleOptions") {
