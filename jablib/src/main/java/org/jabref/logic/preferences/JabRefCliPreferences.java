@@ -434,7 +434,7 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     protected JabRefCliPreferences() {
         try {
-            if (Files.exists(Paths.get("jabref.xml"))) {
+            if (Files.exists(Path.of("jabref.xml"))) {
                 importPreferences(Path.of("jabref.xml"));
             }
         } catch (JabRefException e) {
