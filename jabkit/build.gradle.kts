@@ -71,6 +71,11 @@ javafx {
 application {
     mainClass.set("org.jabref.cli.JabKit")
     mainModule.set("org.jabref.jabkit")
+
+    // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
+    applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=org.jabref.jabkit.merged.module,com.sun.jna,javafx.graphics,org.apache.lucene.core"
+    )
 }
 
 // This is more or less a clone of jabgui/build.gradle.kts -> jlink
@@ -288,20 +293,7 @@ jlink {
                 )
             )
 
-            installerType = "msi"
-
-            installerOptions.addAll(
-                listOf(
-                    "--vendor", "JabRef",
-                    "--app-version",  "$version",
-                    "--verbose",
-                    "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
-                    "--win-dir-chooser",
-                    "--win-console",
-                    "--temp",  "$buildDir/installer",
-                    "--license-file", "$projectDir/../jabgui/buildres/LICENSE_with_Privacy.md"
-                )
-            )
+           skipInstaller = true
         } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
             imageOptions.addAll(
                 listOf(
@@ -310,17 +302,7 @@ jlink {
                 )
             )
 
-            installerOptions.addAll(
-                listOf(
-                    "--verbose",
-                    "--vendor",  "JabRef",
-                    "--app-version", "$version",
-                    // "--temp", "$buildDir/installer",
-                    "--linux-rpm-license-type", "MIT",
-                    // "--license-file", "$projectDir/LICENSE.md",
-                    "--description", "jabkit is JabRef's CLI tool for BibTeX."
-                )
-            )
+            skipInstaller = true
         } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
             skipInstaller = true
         }
