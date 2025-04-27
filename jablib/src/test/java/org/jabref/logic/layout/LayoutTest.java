@@ -150,7 +150,7 @@ class LayoutTest {
                 entry);
 
         assertEquals(
-                "1. Test file (" + Paths.get("src/test/resources/pdfs/encrypted.pdf").toRealPath() + ")",
+                "1. Test file (" + Path.of("src/test/resources/pdfs/encrypted.pdf").toRealPath() + ")",
                 layoutText);
     }
 
