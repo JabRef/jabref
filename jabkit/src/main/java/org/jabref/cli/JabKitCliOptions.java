@@ -346,11 +346,11 @@ public class JabKitCliOptions {
         String footer = '\n' + importFormatsList + outFormatsList + "\nPlease report issues at https://github.com/JabRef/jabref/issues.";
 
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(WIDTH, "jabref [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
+        formatter.printHelp(WIDTH, "jabkit [OPTIONS] [BIBTEX_FILE]\n\nOptions:", header, getOptions(), footer, true);
     }
 
     private String getVersionInfo() {
-        return "JabRef %s".formatted(new BuildInfo().version);
+        return "jabkit %s".formatted(new BuildInfo().version);
     }
 
     public List<String> getLeftOver() {
