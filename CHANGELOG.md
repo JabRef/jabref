@@ -10,8 +10,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+- We introduced a settings parameters to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 
 ### Changed
+- We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 
 ### Fixed
 
@@ -34,7 +36,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new CLI that supports txt, csv, and console-based output for consistency in BibTeX entries. [#11984](https://github.com/JabRef/jabref/issues/11984)
 - We added a new dialog for bibliography consistency check. [#11950](https://github.com/JabRef/jabref/issues/11950)
 - We added a feature for copying entries to libraries, available via the context menu, with an option to include cross-references. [#12374](https://github.com/JabRef/jabref/pull/12374)
-- We introduced a settings parameters to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We added a new "Copy citation (text)" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added a new "Export to clipboard" button in the context menu of the preview. [#12551](https://github.com/JabRef/jabref/issues/12551)
 - We added an integrity check if a URL appears in a title. [#12354](https://github.com/JabRef/jabref/issues/12354)
@@ -60,7 +61,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We moved the "Generate a new key for imported entries" option from the "Web search" tab to the "Citation key generator" tab in preferences. [#12436](https://github.com/JabRef/jabref/pull/12436)
 - We improved the offline parsing of BibTeX data from PDF-documents. [#12278](https://github.com/JabRef/jabref/issues/12278)
 - The tab bar is now hidden when only one library is open. [#9971](https://github.com/JabRef/jabref/issues/9971)
-- We improved the citations relations caching by implementing a two levels cache aside strategy including offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We renamed "Rename file to a given name" to "Rename files to configured filename format pattern" in the entry editor. [#12587](https://github.com/JabRef/jabref/pull/12587)
 - We renamed "Move DOIs from note and URL field to DOI field and remove http prefix" to "Move DOIs from 'note' field and 'URL' field to 'DOI' field and remove http prefix" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
 - We renamed "Move preprint information from 'URL' and 'journal' field to the 'eprint' field" to "Move preprint information from 'URL' field and 'journal' field to the 'eprint' field" in the Cleanup entries. [#12587](https://github.com/JabRef/jabref/pull/12587)
