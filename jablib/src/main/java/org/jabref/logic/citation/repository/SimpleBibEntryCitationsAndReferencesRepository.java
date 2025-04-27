@@ -6,23 +6,17 @@ import java.util.Objects;
 
 import org.jabref.model.entry.BibEntry;
 
-public class BibEntryRelationsRepositoryChain implements BibEntryRelationsRepository {
+public class SimpleBibEntryCitationsAndReferencesRepository implements BibEntryCitationsAndReferencesRepository {
 
     private static final String CITATIONS_STORE = "citations";
     private static final String REFERENCES_STORE = "references";
 
-    private final BibEntryRelationRepository citationsDao;
-    private final BibEntryRelationRepository referencesDao;
+    private final BibEntryRelationDAO citationsDao;
+    private final BibEntryRelationDAO referencesDao;
 
-    public BibEntryRelationsRepositoryChain(Path citationsStore, Path relationsStore, int storeTTL) {
-        this.citationsDao = BibEntryRelationRepositoryChain.of(
-            LRUCacheBibEntryRelationsRepository.CITATIONS,
-            new MVStoreBibEntryRelationRepository(citationsStore, CITATIONS_STORE, storeTTL)
-        );
-        this.referencesDao = BibEntryRelationRepositoryChain.of(
-            LRUCacheBibEntryRelationsRepository.REFERENCES,
-            new MVStoreBibEntryRelationRepository(relationsStore, REFERENCES_STORE, storeTTL)
-        );
+    public SimpleBibEntryCitationsAndReferencesRepository(Path citationsStore, Path relationsStore, int storeTTL) {
+        this.citationsDao = new MVStoreBibEntryRelationDAO(citationsStore, CITATIONS_STORE, storeTTL);
+        this.referencesDao = new MVStoreBibEntryRelationDAO(relationsStore, REFERENCES_STORE, storeTTL);
     }
 
     @Override
@@ -75,9 +69,9 @@ public class BibEntryRelationsRepositoryChain implements BibEntryRelationsReposi
         return referencesDao.isUpdatable(entry);
     }
 
-    public static BibEntryRelationsRepositoryChain of(Path citationsRelationsDirectory, int storeTTL) {
+    public static SimpleBibEntryCitationsAndReferencesRepository of(Path citationsRelationsDirectory, int storeTTL) {
         var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
         var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
-        return new BibEntryRelationsRepositoryChain(citationsPath, relationsPath, storeTTL);
+        return new SimpleBibEntryCitationsAndReferencesRepository(citationsPath, relationsPath, storeTTL);
     }
 }

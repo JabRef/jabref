@@ -35,9 +35,9 @@ import org.slf4j.LoggerFactory;
  * This class is responsible for storing and retrieving relations between BibEntry objects.
  * It uses an MVStore to store the relations.
  */
-public class MVStoreBibEntryRelationRepository implements BibEntryRelationRepository {
+public class MVStoreBibEntryRelationDAO implements BibEntryRelationDAO {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationRepository.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationDAO.class);
 
     private final static ZoneId TIME_STAMP_ZONE_ID = ZoneId.of("UTC");
     private final static String TIME_STAMP_SUFFIX = "-insertion-timestamp";
@@ -48,16 +48,16 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     private final int storeTTLInDays;
     private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration;
 
-    MVStoreBibEntryRelationRepository(Path path, String mapName, int storeTTLInDays) {
+    MVStoreBibEntryRelationDAO(Path path, String mapName, int storeTTLInDays) {
         this(
             path,
             mapName,
             storeTTLInDays,
-            new MVStoreBibEntryRelationRepository.BibEntryHashSetSerializer()
+            new MVStoreBibEntryRelationDAO.BibEntryHashSetSerializer()
         );
     }
 
-    MVStoreBibEntryRelationRepository(
+    MVStoreBibEntryRelationDAO(
         Path path, String mapName, int storeTTLInDays, BasicDataType<LinkedHashSet<BibEntry>> serializer
     ) {
         try {

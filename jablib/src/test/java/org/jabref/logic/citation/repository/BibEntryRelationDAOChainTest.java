@@ -17,12 +17,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class BibEntryRelationRepositoryChainTest {
+class BibEntryRelationDAOChainTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(BibEntryRelationRepositoryChainTest::createBibEntry);
+            .mapToObj(BibEntryRelationDAOChainTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {
@@ -67,7 +67,7 @@ class BibEntryRelationRepositoryChainTest {
             });
     }
 
-    private static class RepositoryMock implements BibEntryRelationRepository {
+    private static class DAOMock implements BibEntryRelationDAO {
 
         Map<BibEntry, List<BibEntry>> table = new HashMap<>();
 
@@ -94,11 +94,11 @@ class BibEntryRelationRepositoryChainTest {
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void theChainShouldReadFromFirstNode(BibEntryRelationRepository dao, BibEntry entry) {
+    void theChainShouldReadFromFirstNode(BibEntryRelationDAO dao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
         dao.addRelations(entry, relations);
-        var secondDao = new RepositoryMock();
+        var secondDao = new DAOMock();
         var doaChain = BibEntryRelationRepositoryChain.of(dao, secondDao);
 
         // WHEN
@@ -111,11 +111,11 @@ class BibEntryRelationRepositoryChainTest {
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void theChainShouldReadFromSecondNode(BibEntryRelationRepository dao, BibEntry entry) {
+    void theChainShouldReadFromSecondNode(BibEntryRelationDAO dao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
         dao.addRelations(entry, relations);
-        var firstDao = new RepositoryMock();
+        var firstDao = new DAOMock();
         var doaChain = BibEntryRelationRepositoryChain.of(firstDao, dao);
 
         // WHEN
@@ -128,10 +128,10 @@ class BibEntryRelationRepositoryChainTest {
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void theChainShouldReadFromSecondNodeAndRecopyToFirstNode(BibEntryRelationRepository dao, BibEntry entry) {
+    void theChainShouldReadFromSecondNodeAndRecopyToFirstNode(BibEntryRelationDAO dao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
-        var firstDao = new RepositoryMock();
+        var firstDao = new DAOMock();
         var doaChain = BibEntryRelationRepositoryChain.of(firstDao, dao);
 
         // WHEN
@@ -146,10 +146,10 @@ class BibEntryRelationRepositoryChainTest {
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void theChainShouldContainAKeyEvenIfItWasOnlyInsertedInLastNode(BibEntryRelationRepository secondDao, BibEntry entry) {
+    void theChainShouldContainAKeyEvenIfItWasOnlyInsertedInLastNode(BibEntryRelationDAO secondDao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
-        var firstDao = new RepositoryMock();
+        var firstDao = new DAOMock();
         var doaChain = BibEntryRelationRepositoryChain.of(firstDao, secondDao);
 
         // WHEN
@@ -162,10 +162,10 @@ class BibEntryRelationRepositoryChainTest {
 
     @ParameterizedTest
     @MethodSource("createCacheAndBibEntry")
-    void theChainShouldNotBeUpdatableBeforeInsertionAndNotAfterAnInsertion(BibEntryRelationRepository dao, BibEntry entry) {
+    void theChainShouldNotBeUpdatableBeforeInsertionAndNotAfterAnInsertion(BibEntryRelationDAO dao, BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
-        var lastDao = new RepositoryMock();
+        var lastDao = new DAOMock();
         var daoChain = BibEntryRelationRepositoryChain.of(dao, lastDao);
         Assertions.assertTrue(daoChain.isUpdatable(entry));
 

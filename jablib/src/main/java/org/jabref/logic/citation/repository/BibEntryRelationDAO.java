@@ -7,7 +7,7 @@ import org.jabref.model.entry.BibEntry;
 /**
  * Generic interface for a repository that stores relations between BibEntries.
  */
-public interface BibEntryRelationRepository {
+public interface BibEntryRelationDAO {
 
     List<BibEntry> getRelations(BibEntry entry);
 

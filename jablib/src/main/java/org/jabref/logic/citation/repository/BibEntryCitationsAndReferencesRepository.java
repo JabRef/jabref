@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jabref.model.entry.BibEntry;
 
-public interface BibEntryRelationsRepository {
+public interface BibEntryCitationsAndReferencesRepository {
 
     void insertCitations(BibEntry entry, List<BibEntry> citations);
 

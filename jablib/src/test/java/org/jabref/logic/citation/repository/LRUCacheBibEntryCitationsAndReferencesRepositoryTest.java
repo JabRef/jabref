@@ -23,12 +23,12 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class LRUCacheBibEntryRelationsRepositoryTest {
+class LRUCacheBibEntryCitationsAndReferencesRepositoryTest {
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)
-            .mapToObj(LRUCacheBibEntryRelationsRepositoryTest::createBibEntry);
+            .mapToObj(LRUCacheBibEntryCitationsAndReferencesRepositoryTest::createBibEntry);
     }
 
     private static BibEntry createBibEntry(int i) {

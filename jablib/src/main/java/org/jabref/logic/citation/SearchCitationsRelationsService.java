@@ -2,8 +2,8 @@ package org.jabref.logic.citation;
 
 import java.util.List;
 
-import org.jabref.logic.citation.repository.BibEntryRelationsRepository;
-import org.jabref.logic.citation.repository.BibEntryRelationsRepositoryChain;
+import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
+import org.jabref.logic.citation.repository.SimpleBibEntryCitationsAndReferencesRepository;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
@@ -21,11 +21,11 @@ public class SearchCitationsRelationsService {
         .getLogger(SearchCitationsRelationsService.class);
 
     private final CitationFetcher citationFetcher;
-    private final BibEntryRelationsRepository relationsRepository;
+    private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
     public SearchCitationsRelationsService(ImporterPreferences importerPreferences) {
         this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);
-        this.relationsRepository = BibEntryRelationsRepositoryChain.of(
+        this.relationsRepository = SimpleBibEntryCitationsAndReferencesRepository.of(
             Directories.getCitationsRelationsDirectory(),
             importerPreferences.getCitationsRelationsStoreTTL()
         );
@@ -36,7 +36,7 @@ public class SearchCitationsRelationsService {
      */
     @VisibleForTesting
     public SearchCitationsRelationsService(
-            CitationFetcher citationFetcher, BibEntryRelationsRepository repository
+            CitationFetcher citationFetcher, BibEntryCitationsAndReferencesRepository repository
     ) {
         this.citationFetcher = citationFetcher;
         this.relationsRepository = repository;

@@ -8,18 +8,18 @@ import java.util.function.Function;
 import org.jabref.model.entry.BibEntry;
 
 /**
- * Provide helpers methods and classes for tests to manage {@link BibEntryRelationsRepository} mocks.
+ * Provide helpers methods and classes for tests to manage {@link BibEntryCitationsAndReferencesRepository} mocks.
  */
 public class BibEntryRelationsRepositoryHelpersForTest {
 
     /**
-     * Provide mocks factories for {@link BibEntryRelationsRepository} mocks.
+     * Provide mocks factories for {@link BibEntryCitationsAndReferencesRepository} mocks.
      * <br>
      * Those implementations should help to test the values passed to an injected repository instance
      * when it is called from {@link org.jabref.logic.citation.SearchCitationsRelationsService}.
      */
     public static class Mocks {
-        public static BibEntryRelationsRepository from(
+        public static BibEntryCitationsAndReferencesRepository from(
             Function<BibEntry, List<BibEntry>> retrieveCitations,
             BiConsumer<BibEntry, List<BibEntry>> insertCitations,
             Function<BibEntry, List<BibEntry>> retrieveReferences,
@@ -27,7 +27,7 @@ public class BibEntryRelationsRepositoryHelpersForTest {
             Function<BibEntry, Boolean> isCitationsUpdatable,
             Function<BibEntry, Boolean> isReferencesUpdatable
         ) {
-            return new BibEntryRelationsRepository() {
+            return new BibEntryCitationsAndReferencesRepository() {
                 @Override
                 public void insertCitations(BibEntry entry, List<BibEntry> citations) {
                     insertCitations.accept(entry, citations);
@@ -70,10 +70,10 @@ public class BibEntryRelationsRepositoryHelpersForTest {
             };
         }
 
-        public static BibEntryRelationsRepository from(
+        public static BibEntryCitationsAndReferencesRepository from(
             Map<BibEntry, List<BibEntry>> citationsDB, Map<BibEntry, List<BibEntry>> referencesDB
         ) {
-            return new BibEntryRelationsRepository() {
+            return new BibEntryCitationsAndReferencesRepository() {
                 @Override
                 public void insertCitations(BibEntry entry, List<BibEntry> citations) {
                     citationsDB.put(entry, citations);
