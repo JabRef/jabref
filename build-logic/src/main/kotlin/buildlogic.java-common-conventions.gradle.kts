@@ -3,8 +3,6 @@ plugins {
 
     id("idea")
 
-    // id("checkstyle")
-
     // id("jacoco")
 
     id("project-report")
