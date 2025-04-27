@@ -35,7 +35,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE }}
 
           # A numeric ID, found at https://crowdin.com/project/<projectName>/tools/api
-          CROWDIN_PROJECT_ID: 294858b
+          CROWDIN_PROJECT_ID: 294858
 
           # Visit https://crowdin.com/settings#api-key to create this token
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
