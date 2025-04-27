@@ -424,7 +424,7 @@ tasks.javadoc {
 
 tasks.test {
     useJUnitPlatform {
-        excludeTags("DatabaseTest", "FetcherTest", "GUITest")
+        excludeTags("DatabaseTest", "FetcherTest")
     }
 
     extensions.configure<org.javamodularity.moduleplugin.extensions.TestModuleOptions>("moduleOptions") {
