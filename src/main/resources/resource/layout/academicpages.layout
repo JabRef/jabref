@@ -1,0 +1,11 @@
+---
+\begin{title}title: \title \end{title}
+collection: publications
+\begin{entrytype}category: \entrytype \end{entrytype}
+\begin{citationkey}permalink: \citationkey \end{citationkey}
+\begin{note}excerpt: \note \end{note}
+\begin{year}date: \year-01-\day \end{year}
+---
+
+
+\begin{abstract}\abstract \end{abstract}
