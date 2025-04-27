@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.strings.StringUtil;
 
 import kong.unirest.core.json.JSONObject;

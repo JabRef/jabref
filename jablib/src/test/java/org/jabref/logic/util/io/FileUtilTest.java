@@ -435,7 +435,7 @@ class FileUtilTest {
     }
 
     @Test
-    public void testCTemp() {
+    public void cTemp() {
         String fileName = "c:\\temp.pdf";
         if (OS.WINDOWS) {
             assertFalse(FileUtil.detectBadFileName(fileName));

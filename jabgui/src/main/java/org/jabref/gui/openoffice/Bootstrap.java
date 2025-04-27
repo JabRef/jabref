@@ -326,8 +326,6 @@ public class Bootstrap {
                     Thread.sleep(500);
                 }
             }
-        } catch (BootstrapException | RuntimeException | InterruptedException | IOException e) {
-            throw e;
         } catch (Exception e) {
             throw new BootstrapException(e);
         }
