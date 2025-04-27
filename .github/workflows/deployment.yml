@@ -48,6 +48,7 @@ jobs:
             archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
           - os: macos-13  # intel image
             displayName: macOS
+            suffix: ''
           - os: macos-14
             displayName: macOS (ARM64)
             suffix: '_arm64'
@@ -171,8 +172,8 @@ jobs:
             --options runtime --timestamp build/distribution/JabRef.app
 
           # pack dmg and pkg
-          hdiutil create -volname "JabRef" -srcfolder build/distribution/JabRef.app -ov -format UDZO build/distribution/JabRef.dmg
-          productbuild --component build/distribution/JabRef.app /Applications --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" build/distribution/JabRef.pkg
+          hdiutil create -volname "JabRef" -srcfolder build/distribution/JabRef.app -ov -format UDZO build/distribution/JabRef${{ matrix.suffix }}.dmg
+          productbuild --component build/distribution/JabRef.app /Applications --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" build/distribution/JabRef${{ matrix.suffix }}.pkg
 
           # Cleanup unpacked file
           rm -rf build/distribution/JabRef.app
