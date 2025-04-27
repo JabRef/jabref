@@ -180,7 +180,7 @@ jobs:
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage :jabgui:jlinkZip
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
       - name: Package application image (linux, Windows)
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
