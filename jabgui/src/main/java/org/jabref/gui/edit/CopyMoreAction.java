@@ -1,7 +1,7 @@
 package org.jabref.gui.edit;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -182,7 +182,7 @@ public class CopyMoreAction extends SimpleCommand {
         List<BibEntry> entries = stateManager.getSelectedEntries();
 
         // ToDo: this string should be configurable to allow arbitrary exports
-        StringReader layoutString = new StringReader("\\citationkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
+        Reader layoutString = Reader.of("\\citationkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
         Layout layout;
         try {
             layout = new LayoutHelper(layoutString, preferences.getLayoutFormatterPreferences(), abbreviationRepository).getLayoutFromText();

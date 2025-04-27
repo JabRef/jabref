@@ -1,7 +1,7 @@
 package org.jabref.gui.entryeditor;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
@@ -289,7 +289,7 @@ public class SourceTab extends EntryEditorTab {
 
         BibtexParser bibtexParser = new BibtexParser(importFormatPreferences, fileMonitor);
         try {
-            ParserResult parserResult = bibtexParser.parse(new StringReader(text));
+            ParserResult parserResult = bibtexParser.parse(Reader.of(text));
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
