@@ -71,8 +71,29 @@ class ACMPortalFetcherTest {
     }
 
     @Test
+    void performSearchPagedReturnsResults() throws FetcherException {
+    List<BibEntry> results = fetcher.performSearchPaged(new JabRefSearchTerm("machine learning"), 0);
+
+    assertNotNull(results);
+    assertFalse(results.isEmpty());
+}
+    @Test
     void getParser() {
         ACMPortalParser expected = new ACMPortalParser();
         assertEquals(expected.getClass(), fetcher.getParser().getClass());
+        
     }
+    @Test
+    void performSearchPagedReturnsExpectedResults() throws FetcherException {
+        ACMPortalFetcher fetcherSpy = spy(new ACMPortalFetcher());
+
+        BibEntry expectedEntry = new BibEntry();
+        expectedEntry.setField("title", "Machine Learning: A Probabilistic Perspective");
+        List<BibEntry> expectedResults = List.of(expectedEntry);
+
+        doReturn(expectedResults).when(fetcherSpy).performSearchPaged(new JabRefSearchTerm("machine learning"), 0);
+
+        List<BibEntry> results = fetcherSpy.performSearchPaged(new JabRefSearchTerm("machine learning"), 0);
+
+        assertEquals(expectedResults, results);
 }
