@@ -7,6 +7,8 @@ on:
     paths:
       - 'src/main/java/org/jabref/logic/importer/fetcher/**'
       - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/main/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporter.java'
+      - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
       - 'src/main/java/org/jabref/logic/crawler/**'
       - 'src/test/java/org/jabref/logic/crawler/**'
       - '.github/workflows/tests-fetchers.yml'
@@ -15,6 +17,10 @@ on:
     paths:
       - 'src/main/java/org/jabref/logic/importer/fetcher/**'
       - 'src/test/java/org/jabref/logic/importer/fetcher/**'
+      - 'src/main/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporter.java'
+      - 'src/test/java/org/jabref/logic/importer/fileformat/PdfMergeMetadataImporterTest.java'
+      - 'src/main/java/org/jabref/logic/crawler/**'
+      - 'src/test/java/org/jabref/logic/crawler/**'
       - '.github/workflows/tests-fetchers.yml'
       - 'build.gradle'
   schedule:
@@ -37,6 +43,7 @@ permissions:
 
 jobs:
   fetchertests:
+    if: github.repository == 'JabRef/jabref' || github.event_name != 'schedule'
     name: Fetcher tests
     runs-on: ubuntu-latest
     steps:
@@ -48,12 +55,10 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 23.0.1
-          distribution: 'temurin'
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-home-cache-cleanup: true
       - name: Run fetcher tests
         run: ./gradlew fetcherTest
         env:

@@ -5,6 +5,11 @@ parent: Code Howtos
 
 Following is a list of common errors encountered by developers which lead to failing tests, with their common solutions:
 
+## git hints
+
+* Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
+* Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
+
 ## Failing tests
 
 ### Failing <b>Checkstyle</b> tests
@@ -32,16 +37,16 @@ You can always click on the details of the failing test to pinpoint which keys a
 Background: There are localization keys in the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties) that are not used in the code, probably due to the removal of existing code.
 Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
 
-### `org.jabref.logic.citationstyle.CitationStyle discoverCitationStyles` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
+### `org.jabref.logic.citationstyle.CitationStyleCatalogGenerator generateCitationStyleCatalog` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
 
-Check the directory `src/main/resources/csl-styles`.
+Check the directory `jablib/src/main/resources/csl-styles`.
 If it is missing or empty, run `git submodule update`.
 Now, check inside if `ieee.csl` exists.
 If it does not, run `git reset --hard` **inside that directory**.
 
 ### `java.lang.IllegalArgumentException`: Unable to load locale en-US <span style="color:red">ERROR: Could not generate BibEntry citation. The CSL engine could not create a preview for your item.</span>
 
-Check the directory `src/main/resources/csl-locales`.
+Check the directory `jablib/src/main/resources/csl-locales`.
 If it is missing or empty, run `git submodule update`.
 If still not fixed, run `git reset --hard` **inside that directory**.
 
@@ -61,7 +66,7 @@ The import statement for all the classes using this class will be automatically 
 
 More information on the architecture can be found at [../getting-into-the-code/high-level-documentation.md](High-level documentation).
 
-### `Check external href links in the documentation / lychee (push)` <span style="color:red">FAILED</span>
+### `Check external href links in the documentation / check-links (push)` <span style="color:red">FAILED</span>
 
 This test is triggered when any kind of documentation is touched (be it the JabRef docs, or JavaDoc in code). If you changed something in the documentation, and particularly added/changed any links (to external files or websites), check if the links are correct and working. If you didn't change/add any link, or added correct links, the test is most probably failing due to any of the existing links being broken, and thus can be ignored (in the context of your contribution).
 
@@ -106,7 +111,7 @@ For `csl-styles`:
 
 ```bash
 git merge origin/main
-git checkout main -- src/main/resources/csl-styles
+git checkout main -- jablib/src/main/resources/csl-styles
 ... git commit ... 
 git push
 ```
@@ -124,7 +129,7 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 2. `cd` into the changed submodules directory (lets say `csl-styles` was changed):
 
     ```bash
-    cd src/main/resources/csl-styles
+    cd jablib/src/main/resources/csl-styles
     ```
 
 3. Find the latest submodule commit id from remote (github):
@@ -148,5 +153,11 @@ And similarly for `csl-locales` or `abbrv.jabref.org`.
 ### Prevention
 
 To avoid this, avoid staging using `git add .` from CLI. Preferably use a GUI-based git manager, such as the one built in IntelliJ or open git gui from the command line. Even if you accidentally stage them, don't commit all files, selectively commit the files you touched using the GUI based tool, and push.
+
+## Q: I get `java: package org.jabref.logic.journals does not exist`
+
+A: You have to ignore `buildSrc/src/main` as source directory in IntelliJ as indicated in our [setup guide](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace).
+
+Also filed as IntelliJ issue [IDEA-240250](https://youtrack.jetbrains.com/issue/IDEA-240250).
 
 <!-- markdownlint-disable-file MD033 -->

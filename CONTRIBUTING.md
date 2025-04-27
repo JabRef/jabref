@@ -1,12 +1,21 @@
 # Contributing
 
-General overview about contributing for non-programmers is available at <https://docs.jabref.org/contributing>.
+<!-- markdownlint-disable-next-line MD001 -->
+### For programmers
 
-We welcome contributions to JabRef and encourage you to follow the GitHub workflow specified below.
-If you are not familiar with this type of workflow, take a look at GitHub's excellent overview on the [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow) and the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+A detailed guide on contributing for programmers is available at <https://devdocs.jabref.org>.
 
-Before you start, get the JabRef code on your local machine.
-Detailed instructions about this step can be found in our [guidelines for setting up a local workspace](getting-into-the-code/guidelines-for-setting-up-a-local-workspace/).
+If you are a newcomer, the two most helpful sections to navigate through are the [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) (to get JabRef's source code into your local machine and get the development version running), and [frequently asked questions](https://devdocs.jabref.org/code-howtos/faq) - where you will find solutions to issues that are most commonly faced by new contributors.
+
+We welcome contributions to JabRef and encourage you to follow the [GitHub workflow](https://docs.github.com/en/get-started/using-github/github-flow).
+You can also check out the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
+
+JabRef regards its contributors as **[software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
+As one consequence, for non-basic issues, you will have to work on the requirements side, too.
+
+### For non-programmers
+
+For non-programmers, a general overview on contributing is available at <https://docs.jabref.org/contributing>.
 
 ## Table of Contents
 
@@ -25,13 +34,32 @@ These tasks provide an opportunity to learn how to set up your local workspace, 
 It is essential to note that JabRef's issues vary in difficulty.
 Some are simpler, while others are more complex. Our primary aim is to guide you through the code, ensuring that the understanding scope remains manageable. Sometimes, grasping the code might demand more effort than actually writing lines of code.
 
-### I am a student and I want to start with something easy
+### I am a student (or a beginner to Open Source)
 
-We collect good issues to start with at our [list of good first issues](https://github.com/orgs/JabRef/projects/5/views/1).
+* Select an issue to work on from the [Issues Page](https://github.com/JabRef/jabref/issues). If you are a newcomer, we have a few issues labeled as <https://github.com/JabRef/jabref/labels/good%20first%20issue> to help you get started. You can start with any of the [unassigned good first issues](https://github.com/JabRef/jabref/issues?q=sort%3Aupdated-desc%20is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22%20no%3Aassignee).
+* Once you get your first PR merged, you can move on to <https://github.com/JabRef/jabref/labels/good%20second%20issue>, <https://github.com/JabRef/jabref/labels/good%20third%20issue>, and finally <https://github.com/JabRef/jabref/labels/good%20fourth%20issue> before taking up some more major bug fixes or features. Note that not all beginner friendly issues are labeled, so you may find suitable untagged issues to solve as well.
+  
+Always make sure that the issue you select is not presently assigned to anyone.
 
 ### I am a student and I want to choose from a curated list of university projects
 
-Take a look at [JabRef's candidates for university projects](https://github.com/orgs/JabRef/projects/3). There, a list of possible projects to work on during a teaching period is offered.
+Apart from "good first issues", we also offer collections of curated issues to work on.
+We categorize them into "small", "medium", and "large".
+All of them are intended to
+a) bring you closer to a larger code base with a dedicated issue and
+b) be clear in their description of work.
+Sometimes, you may need to refine the requirements:
+We see contributors as software engineers and [not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html).
+Thus, requirement engineering inherently comes up as a part of the process.
+
+Take a look at [JabRef's candidates for university projects](https://github.com/orgs/JabRef/projects/3).
+Here, you will get a table of curated issues.
+The table offers filtering for small, medium, and large projects.
+You can check the main focus (UI, logic, or both), the issue understanding effort, the implementation effort, and testing effort.
+The "issue understanding effort" is an indication of how much time you will need to understand the issue before you can do any coding. It may depend on how easy it is to reproduce the issue, how much background knowledge is needed, etc.
+The "implementation effort" is based on our experience of JabRef development.
+Note that there may be issues with a high effort in understanding, but low implementation effort.
+The challenge of these issues is to understand **where** in the code base something needs to be modified.
 
 ### I am a lecturer
 
@@ -61,20 +89,39 @@ One can also add [callouts](https://just-the-docs.github.io/just-the-docs-tests/
 Comment on the issue you want to work at with `/assign-me`.
 GitHub will then automatically assign you.
 
+<!-- markdownlint-disable-next-line MD026 -->
+## Give JabRef a Star!
+
+JabRef is completely free and used by students and researchers all over the world.
+It is actively developed and maintained primarily by volunteers in their free time.
+Keep them motivated by giving the project a GitHub star:
+Simply navigate to <https://github.com/jabref/jabref/> and click on the Star button!
+
 ## Pull Request Process
 
 1. Follow the steps at [Pre Condition 3: Code on the local machine](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code.html) to a) create a fork and b) have the fork checked out on your local machine
 2. Ensure that you followed the [steps to set up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) to have the code running properly in IntelliJ.
 3. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
-4. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
-5. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
+4. Read our [high-level documentation](https://devdocs.jabref.org/getting-into-the-code/high-level-documentation).
+5. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
+6. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
    For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
    1. Ensure that you followed the requirements listed below. They are not too hard, they merely support the maintainers to focus on supportive feedback than just stating the obvious.
    2. For text inspirations, consider [How to write the perfect pull request](https://github.com/blog/1943-how-to-write-the-perfect-pull-request).
    3. In case your pull request is not yet complete or not yet ready for review, create a [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/) instead.
-6. Wait for feedback of the developers
-7. Address the feedback of the developers
-8. After two developers gave their green flag, the pull request will be merged.
+7. Wait for automatic checks to run and bots commenting.
+8. Address the feedback of the automated checks. To find solutions to the most common errors that lead to such failures, check our [FAQ page](https://devdocs.jabref.org/code-howtos/faq).
+9. Wait for feedback of one of the developers.
+10. Address the feedback of the developer.
+11. Wait for feedback of a second developer.
+12. Address the feedback of the second developer.
+13. After two developers gave their green flag, the pull request will be merged.
+
+We view pull requests as a collaborative process.
+Submit a pull request early to enable feedback from the team while you continue working.
+Please also remember to discuss bigger changes early with the core developers to ensure properly spend time and work.
+Some fundamental design decisions can be found within our list of [Architectural Decision Records](https://devdocs.jabref.org/decisions/).
+After a pull request is ready for review, we will discuss improvements with you and agree to merge them once the [developers](https://github.com/JabRef/jabref/blob/main/MAINTAINERS) approve.
 
 In case you have any questions, please
 
@@ -129,23 +176,30 @@ We reserve the right to reject pull requests that contain little or no genuine a
 
 ### After submission of a pull request
 
-After you submitted a pull request, automated checks will run.
-You may see "Some checks were not successful".
-You can click on failing checks to see more information about why they failed.
-Then, please look into them and handle accordingly.
+Once you submit a pull request, automated checks will run and bots will perform a preliminary review on your code.
+You will get automated comments on your pull request within about 5 minutes.
+Acting on them in a timely manner is expected.
 
-Afterwards, you will receive comments on your pull request.
-The pull request may be approved immediatly, or a reviewer may request changes.
-In that case, please implement the requested changes.
+You may also see "Some checks were not successful".
+You can click on failing checks to see more information about why they failed.
+Please look into them and handle accordingly.
 
 After implementing changes, commit to the branch your pull request is *from* and push.
 The pull request will automatically be updated with your changes.
-Your commits will also be automatically squashed upon the pull request being accepted.
+To maintain a clean git history, your commits will also be automatically squashed upon acceptance of the pull request, during merging.
+Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules), and force-pushing should be **avoided**.
 
-Please – **Never ever close a pull request and open a new one** -
-This causes unessesary work on our side, and is not in the the style of the GitHub open source community.
+After all the basic checks are green, maintainers will look at your pull request.
+Since JabRef is driven by volunteers in their spare time, reviews may take more time than a project with full time developers.
+The pull request may be approved immediatly, or a reviewer may request changes and/or have discussions regarding your approach.
+In that case, you are expected to answer any questions and implement the requested changes.
+
+Please – **never ever close a pull request and open a new one** -
+This causes unnecessary work on our side, and is not in the style of the GitHub Open Source community.
 You can push any changes you need to make to the branch your pull request is *from*.
-These changes will be automatically added to your pull request.
+These changes will be automatically reflected in your pull request.
+
+> **If you close your pull request, you will be unassigned from the issue automatically.**
 
 ### Development hints
 

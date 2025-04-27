@@ -1,0 +1,26 @@
+name: On PR labeled
+
+on:
+  pull_request:
+     types:
+       - labeled
+
+jobs:
+  automerge:
+    name: Auto Merge
+    if: >
+      github.event.label.name == 'automerge' &&
+      github.repository == 'JabRef/jabref' &&
+      github.event.pull_request.head.repo.full_name == 'JabRef/jabref'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve PR
+        run: gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
+      - name: Merge PR
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN_UPDATE_GRADLE_WRAPPER}}
