@@ -1,9 +1,9 @@
 package org.jabref.logic.layout;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -150,7 +150,7 @@ class LayoutTest {
                 entry);
 
         assertEquals(
-                "1. Test file (" + new File("src/test/resources/pdfs/encrypted.pdf").getCanonicalPath() + ")",
+                "1. Test file (" + Paths.get("src/test/resources/pdfs/encrypted.pdf").toRealPath() + ")",
                 layoutText);
     }
 

@@ -1,9 +1,9 @@
 package org.jabref.logic.exporter;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -44,8 +44,8 @@ class AtomicFileOutputStreamTest {
 
         Path pathToTmpFile = tempDir.resolve("error-during-save.txt.tmp");
 
-        try (FileOutputStream outputStream = new FileOutputStream(pathToTmpFile.toFile())) {
-            FileOutputStream spiedOutputStream = spy(outputStream);
+        try (OutputStream outputStream = Files.newOutputStream(pathToTmpFile)) {
+            OutputStream spiedOutputStream = spy(outputStream);
             doAnswer(invocation -> {
                 // by writing one byte, we ensure that the `.tmp` file is created
                 outputStream.write(((byte[]) invocation.getRawArguments()[0])[0]);

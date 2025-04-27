@@ -3,7 +3,7 @@ package org.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
@@ -45,7 +45,7 @@ class MedlinePlainImporterTest {
     }
 
     private BufferedReader readerForString(String string) {
-        return new BufferedReader(new StringReader(string));
+        return new BufferedReader(Reader.of(string));
     }
 
     @BeforeEach

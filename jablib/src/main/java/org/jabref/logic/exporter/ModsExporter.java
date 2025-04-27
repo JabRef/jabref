@@ -2,7 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringReader;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -162,7 +162,7 @@ class ModsExporter extends Exporter {
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
         try (OutputStream outputStream = Files.newOutputStream(file)) {
-            transformer.transform(new StreamSource(new StringReader(sw.toString())), new StreamResult(outputStream));
+            transformer.transform(new StreamSource(Reader.of(sw.toString())), new StreamResult(outputStream));
         }
     }
 

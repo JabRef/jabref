@@ -1,7 +1,7 @@
 package org.jabref.logic.layout;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -37,9 +37,9 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
 
     public void setText(String text) {
         this.text = text;
-        StringReader sr = new StringReader(text.replace("__NEWLINE__", "\n"));
+        Reader reader = Reader.of(text.replace("__NEWLINE__", "\n"));
         try {
-            layout = new LayoutHelper(sr, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
+            layout = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.error("Could not generate layout", e);
         }

@@ -1,6 +1,5 @@
 package org.jabref.logic.exporter;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -85,7 +84,7 @@ public class OpenOfficeDocumentCreatorTest {
     }
 
     private static void unzipContentXml(Path zipFile, Path unzipFolder) throws IOException {
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile.toFile()))) {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile))) {
             ZipEntry zipEntry = zis.getNextEntry();
 
             while (zipEntry != null) {

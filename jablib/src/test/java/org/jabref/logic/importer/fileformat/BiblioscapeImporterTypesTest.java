@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -39,7 +39,7 @@ class BiblioscapeImporterTypesTest {
         String bsInput = "--AU-- Baklouti, F.\n" + "--YP-- 1999\n" + "--KW-- Cells; Rna; Isoforms\n" + "--TI-- Blood\n"
                 + "--RT-- " + biblioscapeType + "\n" + "------";
 
-        List<BibEntry> bibEntries = new BiblioscapeImporter().importDatabase(new BufferedReader(new StringReader(bsInput)))
+        List<BibEntry> bibEntries = new BiblioscapeImporter().importDatabase(new BufferedReader(Reader.of(bsInput)))
                                                              .getDatabase().getEntries();
 
         BibEntry entry = new BibEntry();

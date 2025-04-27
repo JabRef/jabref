@@ -1,8 +1,9 @@
 package org.jabref.logic.exporter;
 
-import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,7 +160,7 @@ public class CffExporter extends Exporter {
             cffData.put("references", related);
         }
 
-        try (FileWriter writer = new FileWriter(file.toFile(), StandardCharsets.UTF_8)) {
+        try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
             yaml.dump(cffData, writer);
         } catch (IOException ex) {
             throw new SaveException(ex);

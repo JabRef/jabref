@@ -5,7 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -62,8 +62,8 @@ public abstract class Importer implements Comparable<Importer> {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public boolean isRecognizedFormat(String data) throws IOException {
-        try (StringReader stringReader = new StringReader(data);
-             BufferedReader bufferedReader = new BufferedReader(stringReader)) {
+        try (Reader reader = Reader.of(data);
+             BufferedReader bufferedReader = new BufferedReader(reader)) {
             return isRecognizedFormat(bufferedReader);
         }
     }
@@ -152,8 +152,8 @@ public abstract class Importer implements Comparable<Importer> {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public ParserResult importDatabase(String data) throws IOException {
-        try (StringReader stringReader = new StringReader(data);
-             BufferedReader bufferedReader = new BufferedReader(stringReader)) {
+        try (Reader reader = Reader.of(data);
+             BufferedReader bufferedReader = new BufferedReader(reader)) {
             return importDatabase(bufferedReader);
         }
     }
