@@ -275,6 +275,8 @@ jobs:
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
     strategy:
+      # Ensure that calls to Apple are sequentially made
+      max-parallel: 1
       matrix:
         include:
           - os: macos-13  # intel image
