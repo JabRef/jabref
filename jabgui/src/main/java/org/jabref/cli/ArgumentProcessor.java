@@ -23,6 +23,7 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class ArgumentProcessor {
                              Mode startupMode,
                              GuiPreferences preferences,
                              FileUpdateMonitor fileUpdateMonitor)
-            throws org.apache.commons.cli.ParseException {
+            throws ParseException {
         this.cli = new CliOptions(args);
         this.startupMode = startupMode;
         this.preferences = preferences;
