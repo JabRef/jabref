@@ -115,6 +115,8 @@ dependencies {
         exclude(group = "org.antlr")
     }
 
+    testImplementation(project(":test-support"))
+
     testImplementation("io.github.classgraph:classgraph:4.8.179")
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
