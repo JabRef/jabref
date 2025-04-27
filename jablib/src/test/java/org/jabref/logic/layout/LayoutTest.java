@@ -2,7 +2,7 @@ package org.jabref.logic.layout;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -35,9 +35,9 @@ class LayoutTest {
     }
 
     private String layout(String layout, List<Path> fileDirForDatabase, BibEntry entry) throws IOException {
-        StringReader layoutStringReader = new StringReader(layout.replace("__NEWLINE__", "\n"));
+        Reader layoutReader = Reader.of(layout.replace("__NEWLINE__", "\n"));
 
-        return new LayoutHelper(layoutStringReader, fileDirForDatabase, layoutFormatterPreferences, abbreviationRepository)
+        return new LayoutHelper(layoutReader, fileDirForDatabase, layoutFormatterPreferences, abbreviationRepository)
                 .getLayoutFromText()
                 .doLayout(entry, null);
     }
