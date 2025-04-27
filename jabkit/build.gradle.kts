@@ -66,4 +66,8 @@ javafx {
 application {
     mainClass.set("org.jabref.cli.JabKit")
     mainModule.set("org.jabref.jabkit")
+
+    applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=com.sun.jna"
+    )
 }
