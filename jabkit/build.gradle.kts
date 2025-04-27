@@ -292,16 +292,14 @@ jlink {
                     "--win-console"
                 )
             )
-
            skipInstaller = true
         } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
             imageOptions.addAll(
                 listOf(
-                    "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
+                    "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
                     "--app-version", "$version"
                 )
             )
-
             skipInstaller = true
         } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
             skipInstaller = true
