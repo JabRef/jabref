@@ -8,7 +8,6 @@ import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.remote.server.RemoteMessageHandler;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import org.apache.commons.cli.ParseException;
@@ -20,17 +19,14 @@ public class CLIMessageHandler implements RemoteMessageHandler {
 
     private final GuiPreferences preferences;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final BibEntryTypesManager entryTypesManager;
     private final UiMessageHandler uiMessageHandler;
 
     public CLIMessageHandler(UiMessageHandler uiMessageHandler,
                              GuiPreferences preferences,
-                             FileUpdateMonitor fileUpdateMonitor,
-                             BibEntryTypesManager entryTypesManager) {
+                             FileUpdateMonitor fileUpdateMonitor) {
         this.uiMessageHandler = uiMessageHandler;
         this.preferences = preferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.entryTypesManager = entryTypesManager;
     }
 
     @Override
@@ -41,8 +37,7 @@ public class CLIMessageHandler implements RemoteMessageHandler {
                     message,
                     ArgumentProcessor.Mode.REMOTE_START,
                     preferences,
-                    fileUpdateMonitor,
-                    entryTypesManager);
+                    fileUpdateMonitor);
             argumentProcessor.processArguments();
             Platform.runLater(() -> uiMessageHandler.handleUiCommands(argumentProcessor.getUiCommands()));
         } catch (ParseException e) {
