@@ -1,7 +1,7 @@
 package org.jabref.logic.layout;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
@@ -18,23 +18,23 @@ class LayoutHelperTest {
 
     @Test
     void backslashDoesNotTriggerException() {
-        StringReader stringReader = new StringReader("\\");
-        LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
+        Reader reader = Reader.of("\\");
+        LayoutHelper layoutHelper = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository);
         assertThrows(IOException.class, layoutHelper::getLayoutFromText);
     }
 
     @Test
     void unbalancedBeginEndIsParsed() throws IOException {
-        StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi");
-        LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
+        Reader reader = Reader.of("\\begin{doi}, DOI: \\doi");
+        LayoutHelper layoutHelper = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
         assertNotNull(layout);
     }
 
     @Test
     void minimalExampleWithDoiGetsParsed() throws IOException {
-        StringReader stringReader = new StringReader("\\begin{doi}, DOI: \\doi\\end{doi}");
-        LayoutHelper layoutHelper = new LayoutHelper(stringReader, layoutFormatterPreferences, abbreviationRepository);
+        Reader reader = Reader.of("\\begin{doi}, DOI: \\doi\\end{doi}");
+        LayoutHelper layoutHelper = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
         assertNotNull(layout);
     }

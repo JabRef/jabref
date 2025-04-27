@@ -1,6 +1,5 @@
 package org.jabref.logic.preferences;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -434,7 +433,7 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     protected JabRefCliPreferences() {
         try {
-            if (new File("jabref.xml").exists()) {
+            if (Files.exists(Path.of("jabref.xml"))) {
                 importPreferences(Path.of("jabref.xml"));
             }
         } catch (JabRefException e) {

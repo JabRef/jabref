@@ -80,7 +80,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
      */
     public AtomicFileOutputStream(Path path, boolean keepBackup) throws IOException {
         // Files.newOutputStream(getPathOfTemporaryFile(path)) leads to a "sun.nio.ch.ChannelOutputStream", which does not offer "lock"
-        this(path, getPathOfTemporaryFile(path), new FileOutputStream(getPathOfTemporaryFile(path).toFile()), keepBackup);
+        this(path, getPathOfTemporaryFile(path), Files.newOutputStream(getPathOfTemporaryFile(path)), keepBackup);
     }
 
     /**

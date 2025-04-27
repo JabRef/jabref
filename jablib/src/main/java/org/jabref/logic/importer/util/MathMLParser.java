@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.util;
 
 import java.io.InputStream;
-import java.io.StringReader;
+import java.io.Reader;
 import java.io.StringWriter;
 
 import javax.xml.stream.XMLStreamReader;
@@ -38,7 +38,7 @@ public class MathMLParser {
             xmlContent = StaxParser.getXMLContent(reader);
 
             // convert to LaTeX using XSLT file
-            Source xmlSource = new StreamSource(new StringReader(xmlContent));
+            Source xmlSource = new StreamSource(Reader.of(xmlContent));
 
             // No SystemId required, because no relative URLs need to be resolved
             Source xsltSource = new StreamSource(xsltResource, MathMLParser.class.getResource(XSLT_FILE_PATH).toExternalForm());

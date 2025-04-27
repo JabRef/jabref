@@ -3,8 +3,6 @@ package org.jabref.logic.exporter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -68,7 +66,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
         OpenOfficeDocumentCreator.exportOpenOfficeCalcXML(tmpFile, database, entries);
 
         // Then add the content to the zip file:
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+        try (BufferedInputStream in = new BufferedInputStream(Files.newInputStream(tmpFile.toPath()))) {
             OpenOfficeDocumentCreator.storeOpenOfficeFile(file, in);
         }
 
@@ -91,7 +89,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
     private static void exportOpenOfficeCalcXML(File tmpFile, BibDatabase database, List<BibEntry> entries) {
         OOCalcDatabase od = new OOCalcDatabase(database, entries);
 
-        try (Writer ps = new OutputStreamWriter(new FileOutputStream(tmpFile), StandardCharsets.UTF_8)) {
+        try (Writer ps = new OutputStreamWriter(Files.newOutputStream(tmpFile.toPath()), StandardCharsets.UTF_8)) {
             DOMSource source = new DOMSource(od.getDOMrepresentation());
             StreamResult result = new StreamResult(ps);
             Transformer trans = TransformerFactory.newInstance().newTransformer();

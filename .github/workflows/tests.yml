@@ -171,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        module: [jablib, jabkit, jabsrv]
+        module: [jablib, jabkit, jabsrv, jabgui]
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -233,27 +233,6 @@ jobs:
         env:
           CI: "true"
           DBMS: "postgresql"
-
-  guitests:
-    name: GUI tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: 24.0.1
-          distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-      - name: Run GUI tests
-        run: xvfb-run --auto-servernum ./gradlew :jabgui:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
-        env:
-          CI: "true"
 
   codecoverage:
     if: false

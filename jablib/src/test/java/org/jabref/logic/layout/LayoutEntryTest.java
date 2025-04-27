@@ -1,7 +1,7 @@
 package org.jabref.logic.layout;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -67,8 +67,8 @@ class LayoutEntryTest {
     }
 
     public String layout(String layoutFile, BibEntry entry) throws IOException {
-        StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr, mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)).getLayoutFromText();
+        Reader reader = Reader.of(layoutFile.replace("__NEWLINE__", "\n"));
+        Layout layout = new LayoutHelper(reader, mock(LayoutFormatterPreferences.class), mock(JournalAbbreviationRepository.class)).getLayoutFromText();
 
         return layout.doLayout(entry, null);
     }
