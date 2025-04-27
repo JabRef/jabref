@@ -373,8 +373,7 @@ public class JabRefGUI extends Application {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
-                            preferences,
-                            fileUpdateMonitor),
+                            preferences),
                     remotePreferences.getPort());
         }
     }

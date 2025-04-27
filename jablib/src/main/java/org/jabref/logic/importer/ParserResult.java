@@ -23,7 +23,6 @@ public class ParserResult {
     private MetaData metaData;
     private Path file;
     private boolean invalid;
-    private boolean toOpenTab;
     private boolean changedOnMigration = false;
 
     public ParserResult() {
@@ -61,17 +60,6 @@ public class ParserResult {
 
     public static ParserResult fromError(Exception exception) {
         return fromErrorMessage(getErrorMessage(exception));
-    }
-
-    /**
-     * Check if this database is marked to be added to the currently open tab. Default is false.
-     */
-    public boolean toOpenTab() {
-        return toOpenTab;
-    }
-
-    public void setToOpenTab() {
-        this.toOpenTab = true;
     }
 
     public BibDatabase getDatabase() {
