@@ -40,7 +40,6 @@ import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -103,10 +102,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final Validator remotePortValidator;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final BibEntryTypesManager entryTypesManager;
     private final TrustStoreManager trustStoreManager;
 
-    public GeneralTabViewModel(DialogService dialogService, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor, BibEntryTypesManager entryTypesManager) {
+    public GeneralTabViewModel(DialogService dialogService, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.workspacePreferences = preferences.getWorkspacePreferences();
@@ -114,7 +112,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.entryTypesManager = entryTypesManager;
 
         fontSizeValidator = new FunctionBasedValidator<>(
                 fontSizeProperty,
@@ -259,7 +256,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor, entryTypesManager),
+                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor),
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
@@ -269,7 +266,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor, entryTypesManager),
+                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor),
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);

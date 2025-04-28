@@ -377,14 +377,12 @@ public class JabRefGUI extends Application {
     // Background tasks
     public void startBackgroundTasks() {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
-        BibEntryTypesManager bibEntryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         if (remotePreferences.useRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
                             preferences,
-                            fileUpdateMonitor,
-                            bibEntryTypesManager),
+                            fileUpdateMonitor),
                     remotePreferences.getPort());
         }
     }

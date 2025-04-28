@@ -85,7 +85,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferences, fileUpdateMonitor, entryTypesManager);
+        this.viewModel = new GeneralTabViewModel(dialogService, preferences, fileUpdateMonitor);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)

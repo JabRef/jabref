@@ -9,7 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.TreeItem;
 
 import org.jabref.model.TreeNode;
-import org.jabref.model.TreeNodeTestData;
+import org.jabref.support.TreeNodeTestData;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

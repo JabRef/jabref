@@ -25,5 +25,10 @@
 --add-reads
     org.mockito=java.prefs
 
+--add-modules
+  org.jabref.testsupport
+--add-reads
+  org.jabref=org.jabref.testsupport
+
 --add-exports
     javafx.controls/com.sun.javafx.scene.control=org.jabref

@@ -1,4 +1,6 @@
-package org.jabref.model;
+package org.jabref.support;
+
+import org.jabref.model.TreeNode;
 
 public class TreeNodeTestData {
     /**
