@@ -41,7 +41,7 @@ dependencies {
     implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
 
-    implementation("com.konghq:unirest-modules-gson:4.4.5")
+    implementation("com.konghq:unirest-modules-gson:4.4.6")
 
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     implementation("org.glassfish.hk2:hk2-api:3.1.1")
