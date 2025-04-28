@@ -327,6 +327,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
     // Journal
     private static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
+    private static final String ENABLED_EXTERNAL_JOURNAL_LISTS = "enabledExternalJournalLists";
     private static final String USE_AMS_FJOURNAL = "useAMSFJournal";
 
     // Protected terms
@@ -685,6 +686,9 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
 
         // endregion
+
+        // region:Journal abbreviations
+        defaults.put(JournalAbbreviationPreferences.ENABLED_EXTERNAL_JOURNAL_LISTS, Boolean.FALSE);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -1022,14 +1026,41 @@ public class JabRefCliPreferences implements CliPreferences {
             return journalAbbreviationPreferences;
         }
 
+        Map<String, Boolean> enabledExternalLists = new HashMap<>();
+        
+        enabledExternalLists.put(JournalAbbreviationRepository.BUILTIN_LIST_ID, 
+                getBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + JournalAbbreviationRepository.BUILTIN_LIST_ID, true));
+        
+        for (String path : getStringList(EXTERNAL_JOURNAL_LISTS)) {
+            try {
+                String absolutePath = Path.of(path).toAbsolutePath().toString();
+                enabledExternalLists.put(absolutePath, getBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + absolutePath, true));
+            } catch (Exception e) {
+                enabledExternalLists.put(path, getBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + path, true));
+                LOGGER.warn("Could not resolve absolute path for {}", path, e);
+            }
+        }
+
         journalAbbreviationPreferences = new JournalAbbreviationPreferences(
                 getStringList(EXTERNAL_JOURNAL_LISTS),
-                getBoolean(USE_AMS_FJOURNAL));
+                getBoolean(USE_AMS_FJOURNAL),
+                enabledExternalLists);
 
         journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
         EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
                 (obs, oldValue, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+                
+        journalAbbreviationPreferences.getEnabledExternalLists().forEach((path, enabled) -> {
+            LOGGER.debug("Setting preference value for journal list: {} = {}", path, enabled);
+            putBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + path, enabled);
+        });
+        
+        journalAbbreviationPreferences.enabledListsChangedProperty().addListener(observable -> {
+            journalAbbreviationPreferences.getEnabledExternalLists().forEach((path, enabled) -> {
+                putBoolean(ENABLED_EXTERNAL_JOURNAL_LISTS + ":" + path, enabled);
+            });
+        });
 
         return journalAbbreviationPreferences;
     }
@@ -1477,10 +1508,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 !getBoolean(DO_NOT_RESOLVE_STRINGS), // mind the !
                 getStringList(RESOLVE_STRINGS_FOR_FIELDS).stream()
                                                          .map(FieldFactory::parseField)
-                                                         .collect(Collectors.toList()),
+                                                         .toList(),
                 getStringList(NON_WRAPPABLE_FIELDS).stream()
                                                    .map(FieldFactory::parseField)
-                                                   .collect(Collectors.toList()));
+                                                   .toList());
 
         EasyBind.listen(fieldPreferences.resolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
         fieldPreferences.getResolvableFields().addListener((InvalidationListener) change ->
@@ -1722,7 +1753,7 @@ public class JabRefCliPreferences implements CliPreferences {
                         FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) c ->
-                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
+                putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).toList()));
 
         EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (fieldFormatters, oldValue, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
@@ -1929,7 +1960,7 @@ public class JabRefCliPreferences implements CliPreferences {
         xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) c ->
                 putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
                                                                  .map(Field::getName)
-                                                                 .collect(Collectors.toList())));
+                                                                 .toList()));
 
         return xmpPreferences;
     }

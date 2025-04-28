@@ -27,6 +27,8 @@ public class UndoableAbbreviator {
 
     /**
      * Abbreviate the journal name of the given entry.
+     * This method respects the enabled/disabled state of journal abbreviation sources.
+     * If a journal name comes from a disabled source, it will not be abbreviated.
      *
      * @param database  The database the entry belongs to, or null if no database.
      * @param entry     The entry to be treated.
@@ -42,7 +44,7 @@ public class UndoableAbbreviator {
         String origText = entry.getField(fieldName).get();
         String text = database != null ? database.resolveForStrings(origText) : origText;
 
-        Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.get(text);
+        Optional<Abbreviation> foundAbbreviation = journalAbbreviationRepository.getForAbbreviation(text);
 
         if (foundAbbreviation.isEmpty() && abbreviationType != AbbreviationType.LTWA) {
             return false; // Unknown, cannot abbreviate anything.

@@ -21,6 +21,8 @@ public class UndoableUnabbreviator {
 
     /**
      * Unabbreviate the journal name of the given entry.
+     * This method respects the enabled/disabled state of journal abbreviation sources.
+     * If an abbreviation comes from a disabled source, it will not be unabbreviated.
      *
      * @param entry The entry to be treated.
      * @param field The field
@@ -41,16 +43,17 @@ public class UndoableUnabbreviator {
         if (database != null) {
             text = database.resolveForStrings(text);
         }
-
-        if (!journalAbbreviationRepository.isKnownName(text)) {
-            return false; // Cannot do anything if it is not known.
-        }
-
+        
         if (!journalAbbreviationRepository.isAbbreviatedName(text)) {
             return false; // Cannot unabbreviate unabbreviated name.
         }
+        
+        var abbreviationOpt = journalAbbreviationRepository.getForUnabbreviation(text);
+        if (abbreviationOpt.isEmpty()) {
+            return false;
+        }
 
-        Abbreviation abbreviation = journalAbbreviationRepository.get(text).get();
+        Abbreviation abbreviation = abbreviationOpt.get();
         String newText = abbreviation.getName();
         entry.setField(field, newText);
         ce.addEdit(new UndoableFieldChange(entry, field, origText, newText));
