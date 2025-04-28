@@ -30,7 +30,6 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -89,24 +88,18 @@ public class JabKit {
 
             IndexManager.clearOldSearchIndices();
 
-            try {
-                Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
+            Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
 
-                // Process arguments
-                ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                        args,
-                        ArgumentProcessor.Mode.INITIAL_START,
-                        preferences,
-                        fileUpdateMonitor,
-                        entryTypesManager);
-                argumentProcessor.processArguments();
+            // Process arguments
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(
+                    args,
+                    ArgumentProcessor.Mode.INITIAL_START,
+                    preferences,
+                    fileUpdateMonitor,
+                    entryTypesManager);
+            argumentProcessor.processArguments();
 
                 systemExit();
-            } catch (ParseException e) {
-                LOGGER.error("Problem parsing arguments", e);
-                JabKitCliOptions.printUsage(preferences);
-                systemExit();
-            }
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
             systemExit();

@@ -1,0 +1,27 @@
+package org.jabref.cli;
+
+import java.io.File;
+import java.util.concurrent.Callable;
+
+import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Option;
+import static picocli.CommandLine.Parameters;
+
+@Command(name = "check-integrity", description = "Check integrity of the database.")
+class CheckIntegrity implements Callable<Integer> {
+
+    @Parameters(index = "0", description = "BibTeX file to check", arity = "0..1")
+    private File inputFile;
+
+    @Option(names = {"--input"}, description = "Input BibTeX file")
+    private File inputOption;
+
+    @Option(names = {"--output-format"}, description = "Output format: txt or csv")
+    private String outputFormat = "txt"; // FixMe: Default value?
+
+    @Override
+    public Integer call() throws Exception {
+        // TODO: Implement consistency checking
+        return 0;
+    }
+}

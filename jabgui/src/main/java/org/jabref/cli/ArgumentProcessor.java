@@ -2,21 +2,14 @@ package org.jabref.cli;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.prefs.BackingStoreException;
-
-import javafx.util.Pair;
 
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.UiCommand;
-import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +29,6 @@ public class ArgumentProcessor {
     Staying on top of your literature since 2003 - https://www.jabref.org/
     Please report issues at https://github.com/JabRef/jabref/issues
     """;
-
-    private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
-    private static final String STRING_TABLE_DELIMITER = " : ";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
@@ -122,40 +112,5 @@ public class ArgumentProcessor {
 
     public boolean shouldShutDown() {
         return !guiNeeded;
-    }
-
-    public static List<Pair<String, String>> getAvailableImportFormats(CliPreferences preferences) {
-        ImportFormatReader importFormatReader = new ImportFormatReader(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                new DummyFileUpdateMonitor()
-        );
-        return importFormatReader
-                .getImportFormats().stream()
-                .map(format -> new Pair<>(format.getName(), format.getId()))
-                .toList();
-    }
-
-    protected static String alignStringTable(List<Pair<String, String>> table) {
-        StringBuilder sb = new StringBuilder();
-
-        int maxLength = table.stream()
-                             .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
-                             .max().orElse(0);
-
-        for (Pair<String, String> pair : table) {
-            int padding = Math.max(0, maxLength - pair.getKey().length());
-            sb.append(WRAPPED_LINE_PREFIX);
-            sb.append(pair.getKey());
-
-            sb.append(StringUtil.repeatSpaces(padding));
-
-            sb.append(STRING_TABLE_DELIMITER);
-            sb.append(pair.getValue());
-            sb.append(OS.NEWLINE);
-        }
-
-        return sb.toString();
     }
 }

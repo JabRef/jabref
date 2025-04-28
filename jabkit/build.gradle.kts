@@ -22,7 +22,8 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
-    implementation("commons-cli:commons-cli:1.9.0")
+    implementation("info.picocli:picocli:4.7.7")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")

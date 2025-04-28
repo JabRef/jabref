@@ -1,8 +1,6 @@
 package org.jabref.cli;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -10,9 +8,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
+
+import javafx.util.Pair;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.JabRefException;
@@ -29,27 +30,21 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
-import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.OpenDatabase;
-import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
-import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.logic.search.DatabaseSearcher;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpPreferences;
@@ -67,14 +62,101 @@ import com.airhacks.afterburner.injection.Injector;
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
-///  TODO: This is a clone of {@link org.jabref.cli.ArgumentProcessor} in jabgui - should be unified
+/**
+ jabkit generate-citation-keys Chocolate.bib
+ jabkit --help
+ jabkit --version
+ jabkit --debug
+
+ jabkit check-consistency Chocolate.bib
+ jabkit check-consistency --input Chocolate.bib --output-format csv
+ jabkit check-consistency --input Chocolate.bib --output-format txt
+
+ jabkit check-integrity Chocolate.bib
+
+ # Overwrite
+ jabkit fetch --provider Medline/PubMed --query cancer --output Chocolate.bib
+ # Append - similar to "--import to upen"
+ jabkit fetch --provider Medline/PubMed --query cancer --output Chocolate.bib --append
+ # query is read from stdin if not provided
+
+ // Search within the library
+ // OLD: jabkit export-matches --from db.bib -m author=Newton,search.htm,html
+ // Place target at the end
+ // search.g4 / https://docs.jabref.org/finding-sorting-and-cleaning-entries/search
+ jabkit search <searchstring> Chocolate.bib
+ jabkit search --query <searchstring> --input Chocolate.bib --output newfile.bib
+ // no --input: stdin
+ // no --output: stdout
+ // --output-format medline # otherwise: auto detected
+ // --input-format ris      # otherwise: auto detected
+
+ // standard format: Output matched citation keys a list
+ // sno
+ jabkit search --query <searchstring> --input Chocolate.bib
+ jabkit search <searchstring> Chocolate.bib --output-format <format>
+ jabkit search --query <searchstring> --input Chocolate.bib --output-format <format> --output newfile.txt
+
+ // similarily: convert
+ jabkit convert a.ris b.bib
+ jabkit convert --input a.ris --output b.bib
+
+ // Localization.lang("Sublibrary from AUX to BibTeX")
+ jabkit generate-bib-from-aux --aux thesis.aux --input thesis.bib --output small.bib
+
+ # Reset preferences
+ jabkit preferences reset
+ # Import preferences from a file
+ jabkit preferences import <filename>
+ # Export preferences to a file
+ jabkit preferences export <filename>
+
+
+ # Write BibTeX data into PDF file
+ jabkit pdf write-xmp --citation-key key1 --citation-key key2 --input Chocolate.bib --output paper.pdf
+ also: jabkit pdf write-xmp -k key1 -k key2
+
+ # takes Chocolate.bib, searches the citatoin-keys, looks up linked files and writes xmp
+ # Description?
+ jabkit pdf update --format=xmp --citation-key key1 --citation-key key2 --update-linked-files --input Chocolate.bib
+ jabkit pdf update --format=xmp --format=bibtex-attachment --citation-key key1 --citation-key key2 --update-linked-files --input Chocolate.bib
+ # default: all formats: xmp and bibtex-attachment
+ # implementation: open Chocolate.bib, search for key1 and key2 (List<BibEntry>), search for linked files - map linked files to BibEntry, for each map entry: execute update action (xmp and/or embed-bibtex)
+
+ # NOT jabkit pdf update-embedded-bibtex (reminder: as above)
+
+ # jabkit pdf embed-metadata
+ # NOT CHOSEN:jabkit pdf embed --format=xmp --format=bibtex --citation-key key1 --citation-key key2 --update-linked-files --input Chocolate.bib
+
+ # updates all linked files (only ommitting -k leads to error)
+ # NOT jabkit pdf write-xmp --all --update-linked-files --input Chocolate.bib
+
+ // .desc(Localization.lang("Script-friendly output"))
+ jabkit <whateveraction> --porcelain
+ */
 public class ArgumentProcessor {
+    private static final String JABREF_BANNER = """
+
+       &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
+       &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
+       &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
+       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&& %s
+       &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
+       &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
+    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
+
+    Staying on top of your literature since 2003 - https://www.jabref.org/
+    Please report issues at https://github.com/JabRef/jabref/issues
+    """;
+
+    private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
+    private static final String STRING_TABLE_DELIMITER = " : ";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
     public enum Mode { INITIAL_START, REMOTE_START }
-
-    private final JabKitCliOptions cli;
 
     private final Mode startupMode;
 
@@ -82,44 +164,23 @@ public class ArgumentProcessor {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final BibEntryTypesManager entryTypesManager;
 
+    private final KitCommandLine kitCli;
+    private final CommandLine cli;
+
     /**
      * First call the constructor, then call {@link #processArguments()}.
      */
-    public ArgumentProcessor(String[] args,
-                             Mode startupMode,
+    public ArgumentProcessor(Mode startupMode,
                              CliPreferences cliPreferences,
                              FileUpdateMonitor fileUpdateMonitor,
-                             BibEntryTypesManager entryTypesManager)
-            throws org.apache.commons.cli.ParseException {
-        this.cli = new JabKitCliOptions(args);
+                             BibEntryTypesManager entryTypesManager) {
         this.startupMode = startupMode;
         this.cliPreferences = cliPreferences;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
-    }
+        this.kitCli = new KitCommandLine(cliPreferences, fileUpdateMonitor, entryTypesManager);
 
-    /**
-     * Will open a file (like {@link #importFile(String)}, but will also request JabRef to focus on this library.
-     *
-     * @return ParserResult with setToOpenTab(true)
-     */
-    private Optional<ParserResult> importToOpenBase(String importArguments) {
-        Optional<ParserResult> result = importFile(importArguments);
-        result.ifPresent(ParserResult::setToOpenTab);
-        return result;
-    }
-
-    private Optional<ParserResult> importBibtexToOpenBase(String argument, ImportFormatPreferences importFormatPreferences) {
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
-        try {
-            List<BibEntry> entries = parser.parseEntries(argument);
-            ParserResult result = new ParserResult(entries);
-            result.setToOpenTab();
-            return Optional.of(result);
-        } catch (ParseException e) {
-            System.err.println(Localization.lang("Error occurred when parsing entry") + ": " + e.getLocalizedMessage());
-            return Optional.empty();
-        }
+        cli = new CommandLine(this.kitCli);
     }
 
     /**
@@ -193,7 +254,25 @@ public class ArgumentProcessor {
         }
     }
 
-    public void processArguments() {
+    public void processArguments(String[] args) {
+        cli.execute(args);
+
+        if (cli.isVersionHelpRequested()) {
+            System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
+            return;
+        }
+
+        if (cli.isUsageHelpRequested()) {
+            System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
+            System.out.println(cli.getUsageMessage());
+
+            System.out.println(Localization.lang("Available import formats"));
+            System.out.println(alignStringTable(getAvailableImportFormats(cliPreferences)));
+
+            return;
+        }
+
+        /*
         if ((startupMode == Mode.INITIAL_START) && cli.isShowVersion()) {
             cli.displayVersion();
         }
@@ -276,61 +355,8 @@ public class ArgumentProcessor {
         if (cli.isCheckConsistency()) {
             checkConsistency(cliPreferences, entryTypesManager);
         }
-    }
 
-    private void checkConsistency(CliPreferences cliPreferences,
-                                  BibEntryTypesManager entryTypesManager) {
-        Optional<String> fileName = Optional.ofNullable(cli.getCheckConsistency());
-
-        if (fileName.isEmpty()) {
-            System.out.println(Localization.lang("No file specified for consistency check."));
-            return;
-        }
-
-        Optional<String> outputFormat = Optional.ofNullable(cli.getCheckConsistencyOutputFormat());
-
-        Path filePath = Path.of(fileName.get());
-        ParserResult pr;
-        try {
-            pr = OpenDatabase.loadDatabase(filePath, cliPreferences.getImportFormatPreferences(), fileUpdateMonitor);
-        } catch (IOException ex) {
-            LOGGER.error("Error reading '{}'.", filePath, ex);
-            return;
-        }
-        BibDatabaseContext databaseContext = pr.getDatabaseContext();
-        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
-
-        BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
-
-        Writer writer = new OutputStreamWriter(System.out);
-        BibliographyConsistencyCheckResultWriter checkResultWriter;
-        if (outputFormat.isEmpty() || "txt".equalsIgnoreCase(outputFormat.get())) {
-            checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
-                    result,
-                    writer,
-                    cli.isPorcelainOutputMode(),
-                    entryTypesManager,
-                    databaseContext.getMode());
-        } else {
-            checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
-                    result,
-                    writer,
-                    cli.isPorcelainOutputMode(),
-                    entryTypesManager,
-                    databaseContext.getMode());
-        }
-
-        // System.out should not be closed, therefore no try-with-resources
-        try {
-            checkResultWriter.writeFindings();
-            writer.flush();
-        } catch (IOException e) {
-            LOGGER.error("Error writing results", e);
-        }
-        if (!cli.isPorcelainOutputMode()) {
-            System.out.println(Localization.lang("Consistency check completed"));
-        }
+         */
     }
 
     private static void writeMetadataToPdf(List<ParserResult> loaded,
@@ -825,5 +851,40 @@ public class ArgumentProcessor {
                 return Optional.empty();
             }
         }
+    }
+
+    public static List<Pair<String, String>> getAvailableImportFormats(CliPreferences preferences) {
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                new DummyFileUpdateMonitor()
+        );
+        return importFormatReader
+                .getImportFormats().stream()
+                .map(format -> new Pair<>(format.getName(), format.getId()))
+                .toList();
+    }
+
+    protected static String alignStringTable(List<Pair<String, String>> table) {
+        StringBuilder sb = new StringBuilder();
+
+        int maxLength = table.stream()
+                             .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
+                             .max().orElse(0);
+
+        for (Pair<String, String> pair : table) {
+            int padding = Math.max(0, maxLength - pair.getKey().length());
+            sb.append(WRAPPED_LINE_PREFIX);
+            sb.append(pair.getKey());
+
+            sb.append(StringUtil.repeatSpaces(padding));
+
+            sb.append(STRING_TABLE_DELIMITER);
+            sb.append(pair.getValue());
+            sb.append(OS.NEWLINE);
+        }
+
+        return sb.toString();
     }
 }
