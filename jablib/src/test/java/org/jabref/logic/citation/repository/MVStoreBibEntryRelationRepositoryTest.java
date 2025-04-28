@@ -39,7 +39,6 @@ class MVStoreBibEntryRelationRepositoryTest {
     @TempDir Path temporaryFolder;
     private MVStoreBibEntryRelationRepository dao;
 
-
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
             .range(0, 150)

@@ -69,7 +69,9 @@ public class BibEntryRelationsRepositoryTestHelpers {
                 }
 
                 @Override
-                public void close() {}
+                public void close() {
+                    // Nothing to do
+                }
             };
         }
 
@@ -118,7 +120,9 @@ public class BibEntryRelationsRepositoryTestHelpers {
                 }
 
                 @Override
-                public void close() {}
+                public void close() {
+                    // Nothing to do
+                }
             };
         }
     }
