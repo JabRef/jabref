@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -121,7 +121,7 @@ class EndnoteImporterTest {
     @Test
     void importEntries1() throws IOException {
         String medlineString = "%O Artn\\\\s testO\n%A testA,\n%E testE0, testE1";
-        List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(Reader.of(medlineString))).getDatabase()
+        List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(medlineString))).getDatabase()
                                             .getEntries();
 
         BibEntry entry = bibEntries.getFirst();

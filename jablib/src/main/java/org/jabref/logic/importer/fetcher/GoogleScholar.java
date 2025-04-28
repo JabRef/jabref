@@ -1,7 +1,7 @@
 package org.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.io.Reader;
+import java.io.StringReader;
 import java.net.HttpCookie;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -150,7 +150,7 @@ public class GoogleScholar implements FulltextFetcher, PagedSearchBasedFetcher {
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
         String downloadedContent = new URLDownload(link).asString();
         BibtexParser parser = new BibtexParser(importFormatPreferences);
-        ParserResult result = parser.parse(Reader.of(downloadedContent));
+        ParserResult result = parser.parse(new StringReader(downloadedContent));
         if ((result == null) || (result.getDatabase() == null)) {
             throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
         } else {

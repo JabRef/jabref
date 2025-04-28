@@ -1,6 +1,6 @@
 package org.jabref.logic.importer.util;
 
-import java.io.Reader;
+import java.io.StringReader;
 import java.util.stream.Stream;
 
 import javax.xml.stream.XMLInputFactory;
@@ -26,7 +26,7 @@ class MathMLParserTest {
     @ParameterizedTest
     @MethodSource("tests")
     void parserConvertsMathMLIntoLatex(String expected, String input) throws XMLStreamException {
-        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(Reader.of(input));
+        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(new StringReader(input));
         assertEquals(expected, MathMLParser.parse(reader));
     }
 

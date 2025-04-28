@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -409,7 +410,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
             try {
                 final String typeName = line.substring(0, index);
                 final String formatString = line.substring(index + 1);
-                Layout layout = new LayoutHelper(Reader.of(formatString), layoutPreferences, abbreviationRepository).getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString), layoutPreferences, abbreviationRepository).getLayoutFromText();
                 EntryType type = EntryTypeFactory.parse(typeName);
 
                 if (!isDefaultLayoutPresent && JStyle.DEFAULT_MARK.equals(typeName)) {

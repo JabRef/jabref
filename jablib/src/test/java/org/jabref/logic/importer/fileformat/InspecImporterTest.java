@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.function.Predicate;
@@ -80,7 +80,7 @@ class InspecImporterTest {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.InProceedings);
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
 
-        try (BufferedReader reader = new BufferedReader(Reader.of(testInput))) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
             List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(List.of(expectedEntry), entries);
         }
@@ -95,7 +95,7 @@ class InspecImporterTest {
         BibEntry expectedEntry = new BibEntry(StandardEntryType.Misc);
         expectedEntry.setField(StandardField.AUTHOR, "Prechelt, Lutz");
 
-        try (BufferedReader reader = new BufferedReader(Reader.of(testInput))) {
+        try (BufferedReader reader = new BufferedReader(new StringReader(testInput))) {
             List<BibEntry> entries = importer.importDatabase(reader).getDatabase().getEntries();
             assertEquals(1, entries.size());
             BibEntry entry = entries.getFirst();
