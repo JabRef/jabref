@@ -52,7 +52,7 @@ Currently, it looks as follows:
 ![Directory Mappings including sub modules](intellij-directory-mappings-unmodified.png)
 {% endfigure %}
 
-You need to tell IntelliJ to ignore the submodules `buildres\abbrv.jabref.org`, `src\main\resources\csl-locales`, and `src\main\resources\csl-styles`.
+You need to tell IntelliJ to ignore the submodules `buildres\abbrv.jabref.org`, `jablib\src\main\resources\csl-locales`, and `jablib\src\main\resources\csl-styles`.
 Select all three (holding the <kbd>Ctrl</kbd> key).
 Then press the red minus button on top.
 
@@ -71,7 +71,7 @@ Open the context menu of the file explorer (using the right mouse button), choos
 Execute following command:
 
 ```shell
-git update-index --assume-unchanged buildres/abbrv.jabref.org src/main/resources/csl-styles src/main/resources/csl-locales
+git update-index --assume-unchanged buildres/abbrv.jabref.org jablib/src/main/resources/csl-styles jablib/src/main/resources/csl-locales
 ```
 
 {: .tip }
