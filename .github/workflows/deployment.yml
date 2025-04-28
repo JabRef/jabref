@@ -119,17 +119,13 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Build dmg and pkg (macOS)
+      - name: Build dmg (macOS)
         if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           set -e
           cd jabgui
 
-      - name: Build dmg (macOS)
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        shell: bash
-        run: |
           jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
@@ -168,7 +164,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           jpackage \
