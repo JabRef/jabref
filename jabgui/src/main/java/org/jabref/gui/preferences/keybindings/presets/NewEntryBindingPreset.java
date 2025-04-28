@@ -25,7 +25,7 @@ public class NewEntryBindingPreset implements KeyBindingPreset {
         keyBindings.put(KeyBinding.NEW_ARTICLE, "ctrl+shift+A");
         keyBindings.put(KeyBinding.NEW_BOOK, "ctrl+shift+B");
         keyBindings.put(KeyBinding.NEW_ENTRY, "ctrl+N");
-        keyBindings.put(KeyBinding.NEW_ENTRY_FROM_PLAIN_TEXT_ONLINE, "ctrl+shift+N");
+        keyBindings.put(KeyBinding.NEW_ENTRY_PLAINTEXT, "ctrl+shift+N");
         keyBindings.put(KeyBinding.NEW_INBOOK, "ctrl+shift+I");
         keyBindings.put(KeyBinding.NEW_INPROCEEDINGS, "ctrl+shift+C");
         keyBindings.put(KeyBinding.NEW_MASTERSTHESIS, "ctrl+shift+M");

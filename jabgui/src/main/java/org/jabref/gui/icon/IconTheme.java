@@ -347,7 +347,7 @@ public class IconTheme {
         REMOVE_ABBREVIATION_LIST(MaterialDesignM.MINUS),
         ADD_ABBREVIATION(MaterialDesignP.PLAYLIST_PLUS),
         REMOVE_ABBREVIATION(MaterialDesignP.PLAYLIST_MINUS),
-        NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignP.PLUS_BOX),
+        NEW_ENTRY_PLAINTEXT(MaterialDesignP.PLUS_BOX),
         REMOTE_DATABASE(MaterialDesignD.DATABASE),
         HOME(MaterialDesignH.HOME),
         LINK(MaterialDesignL.LINK),
