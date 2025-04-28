@@ -2,10 +2,10 @@ package org.jabref.logic.layout;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
-import java.io.StringReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
