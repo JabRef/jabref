@@ -2,6 +2,7 @@ package org.jabref.logic.citation;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jabref.logic.citation.repository.BibEntryRelationsRepositoryTestHelpers;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherHelpersForTest;
@@ -40,7 +41,7 @@ class SearchCitationsRelationsServiceTest {
             var cited = new BibEntry();
             var newCitations = new BibEntry();
             var citationsToReturn = List.of(newCitations);
-            var citationsDatabase = new HashMap<BibEntry, List<BibEntry>>();
+            Map<BibEntry, List<BibEntry>> citationsDatabase = HashMap.newHashMap(300);
             var fetcher = CitationFetcherHelpersForTest.Mocks.from(
                 entry -> {
                     if (entry == cited) {
@@ -74,7 +75,7 @@ class SearchCitationsRelationsServiceTest {
             var cited = new BibEntry();
             var newCitations = new BibEntry();
             var citationsToReturn = List.of(newCitations);
-            var citationsDatabase = new HashMap<BibEntry, List<BibEntry>>();
+            Map<BibEntry, List<BibEntry>> citationsDatabase = HashMap.newHashMap(300);
             var fetcher = CitationFetcherHelpersForTest.Mocks.from(
                 entry -> {
                     if (entry == cited) {

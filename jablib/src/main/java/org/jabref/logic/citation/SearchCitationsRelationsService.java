@@ -74,4 +74,8 @@ public class SearchCitationsRelationsService {
         }
         return this.relationsRepository.readCitations(cited);
     }
+
+    public void close() {
+        this.relationsRepository.close();
+    }
 }

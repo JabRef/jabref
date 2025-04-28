@@ -67,6 +67,9 @@ public class BibEntryRelationsRepositoryTestHelpers {
                 public boolean isReferencesUpdatable(BibEntry entry) {
                     return isReferencesUpdatable.apply(entry);
                 }
+
+                @Override
+                public void close() {}
             };
         }
 
@@ -113,6 +116,9 @@ public class BibEntryRelationsRepositoryTestHelpers {
                 public boolean isReferencesUpdatable(BibEntry entry) {
                     return true;
                 }
+
+                @Override
+                public void close() {}
             };
         }
     }

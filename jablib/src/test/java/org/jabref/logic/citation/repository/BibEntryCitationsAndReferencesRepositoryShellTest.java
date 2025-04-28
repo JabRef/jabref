@@ -52,6 +52,11 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
         public boolean containsKey(BibEntry entry) {
             return this.relations.containsKey(entry);
         }
+
+        @Override
+        public void close() {
+            // do nothing
+        }
     }
 
     @Test

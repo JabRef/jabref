@@ -47,6 +47,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     private final MVStore.Builder storeConfiguration;
     private final int storeTTLInDays;
     private final MVMap.Builder<String, LinkedHashSet<BibEntry>> mapConfiguration;
+    private final MVStore store;
 
     MVStoreBibEntryRelationRepository(Path path, String mapName, int storeTTLInDays) {
         this(
@@ -76,6 +77,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
                 .fileName(path.toAbsolutePath().toString());
         this.storeTTLInDays = storeTTLInDays;
         this.mapConfiguration = new MVMap.Builder<String, LinkedHashSet<BibEntry>>().valueType(serializer);
+        this.store = this.storeConfiguration.open();
     }
 
     @Override
@@ -83,10 +85,8 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
         return entry
             .getDOI()
             .map(doi -> {
-                try (var store = this.storeConfiguration.open()) {
-                    MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
-                    return relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>()).stream().toList();
-                }
+                MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
+                return relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>()).stream().toList();
             })
             .orElse(List.of());
     }
@@ -97,22 +97,19 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     @Override
     synchronized public void addRelations(@NonNull BibEntry entry, @NonNull List<BibEntry> relations) {
         entry.getDOI().ifPresent(doi -> {
-            try (var store = this.storeConfiguration.open()) {
-                // Save the relations
-                // FIXME: This is costing much performance - store should be stared only once
-                MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
-                var relationsAlreadyStored = relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>());
-                relationsAlreadyStored.addAll(relations);
-                relationsMap.put(doi.asString(), relationsAlreadyStored);
+            // Save the relations
+            MVMap<String, LinkedHashSet<BibEntry>> relationsMap = this.store.openMap(mapName, mapConfiguration);
+            var relationsAlreadyStored = relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>());
+            relationsAlreadyStored.addAll(relations);
+            relationsMap.put(doi.asString(), relationsAlreadyStored);
 
-                // Save insertion timestamp
-                var insertionTime = LocalDateTime.now(TIME_STAMP_ZONE_ID);
-                MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
-                insertionTimeStampMap.put(doi.asString(), insertionTime);
+            // Save insertion timestamp
+            var insertionTime = LocalDateTime.now(TIME_STAMP_ZONE_ID);
+            MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
+            insertionTimeStampMap.put(doi.asString(), insertionTime);
 
-                // Commit
-                store.commit();
-            }
+            // Commit
+            store.commit();
         });
     }
 
@@ -121,10 +118,8 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
         return entry
             .getDOI()
             .map(doi -> {
-                try (var store = this.storeConfiguration.open()) {
-                    MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
-                    return relationsMap.containsKey(doi.asString());
-                }
+                MVMap<String, LinkedHashSet<BibEntry>> relationsMap = store.openMap(mapName, mapConfiguration);
+                return relationsMap.containsKey(doi.asString());
             })
             .orElse(false);
     }
@@ -141,15 +136,18 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
         return entry
             .getDOI()
             .map(doi -> {
-                try (var store = this.storeConfiguration.open()) {
-                    MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
-                    return insertionTimeStampMap.getOrDefault(doi.asString(), executionTime);
-                }
+                MVMap<String, LocalDateTime> insertionTimeStampMap = store.openMap(insertionTimeStampMapName);
+                return insertionTimeStampMap.getOrDefault(doi.asString(), executionTime);
             })
             .map(lastExecutionTime -> lastExecutionTime.equals(executionTime)
                 || lastExecutionTime.isBefore(executionTime.minusDays(this.storeTTLInDays))
             )
             .orElse(true);
+    }
+
+    @Override
+    public void close() {
+        this.store.close();
     }
 
     static class BibEntrySerializer extends BasicDataType<BibEntry> {

@@ -21,4 +21,6 @@ public interface BibEntryRelationRepository {
     default boolean isUpdatable(BibEntry entry) {
         return true;
     }
+
+    void close();
 }

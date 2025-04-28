@@ -72,6 +72,12 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
         return referencesDao.isUpdatable(entry);
     }
 
+    @Override
+    public void close() {
+        this.citationsDao.close();
+        this.referencesDao.close();
+    }
+
     public static BibEntryCitationsAndReferencesRepositoryShell of(Path citationsRelationsDirectory, int storeTTL) {
         var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
         var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));

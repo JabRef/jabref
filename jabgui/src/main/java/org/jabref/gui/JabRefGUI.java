@@ -63,6 +63,8 @@ public class JabRefGUI extends Application {
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
+    // CitationsAndRelationsSearchService is here configured for a local machine and so to the GUI.
+    private static SearchCitationsRelationsService citationsAndRelationsSearchService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -174,8 +176,10 @@ public class JabRefGUI extends Application {
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
 
-        var searchCitationsRelationsService = new SearchCitationsRelationsService(preferences.getImporterPreferences());
-        Injector.setModelOrService(SearchCitationsRelationsService.class, searchCitationsRelationsService);
+        JabRefGUI.citationsAndRelationsSearchService = new SearchCitationsRelationsService(
+                preferences.getImporterPreferences()
+        );
+        Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
     }
 
     private void setupProxy() {
@@ -399,6 +403,8 @@ public class JabRefGUI extends Application {
         stopBackgroundTasks();
         LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
+        LOGGER.trace("Closing citations and relations search service");
+        citationsAndRelationsSearchService.close();
         LOGGER.trace("Finished stop");
     }
 
