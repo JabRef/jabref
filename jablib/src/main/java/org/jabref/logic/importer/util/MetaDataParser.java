@@ -2,6 +2,7 @@ package org.jabref.logic.importer.util;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -208,7 +209,7 @@ public class MetaDataParser {
     }
 
     private static List<String> getAsList(String value) throws ParseException {
-        Reader valueReader = Reader.of(value);
+        Reader valueReader = new StringReader(value);
         List<String> orderedValue = new ArrayList<>();
 
         // We must allow for ; and \ in escape sequences.

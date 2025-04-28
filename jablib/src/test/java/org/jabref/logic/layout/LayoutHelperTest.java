@@ -5,6 +5,7 @@ import java.io.Reader;
 
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 
+import java.io.StringReader;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -18,14 +19,14 @@ class LayoutHelperTest {
 
     @Test
     void backslashDoesNotTriggerException() {
-        Reader reader = Reader.of("\\");
+        Reader reader = new StringReader("\\");
         LayoutHelper layoutHelper = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository);
         assertThrows(IOException.class, layoutHelper::getLayoutFromText);
     }
 
     @Test
     void unbalancedBeginEndIsParsed() throws IOException {
-        Reader reader = Reader.of("\\begin{doi}, DOI: \\doi");
+        Reader reader = new StringReader("\\begin{doi}, DOI: \\doi");
         LayoutHelper layoutHelper = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
         assertNotNull(layout);
@@ -33,7 +34,7 @@ class LayoutHelperTest {
 
     @Test
     void minimalExampleWithDoiGetsParsed() throws IOException {
-        Reader reader = Reader.of("\\begin{doi}, DOI: \\doi\\end{doi}");
+        Reader reader = new StringReader("\\begin{doi}, DOI: \\doi\\end{doi}");
         LayoutHelper layoutHelper = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository);
         Layout layout = layoutHelper.getLayoutFromText();
         assertNotNull(layout);

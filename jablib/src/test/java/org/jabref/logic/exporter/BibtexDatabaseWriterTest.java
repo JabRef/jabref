@@ -2,7 +2,7 @@ package org.jabref.logic.exporter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -445,7 +445,7 @@ class BibtexDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
         databaseWriter.saveDatabase(context);
         // @formatter:off
@@ -578,7 +578,7 @@ class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibEntry));
 
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
@@ -611,7 +611,7 @@ class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibEntry));
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibEntry));
 
         BibEntry entry = result.getDatabase().getEntryByCitationKey("1137631").get();
         entry.setField(StandardField.AUTHOR, "Mr. Author");
@@ -961,7 +961,7 @@ class BibtexDatabaseWriterTest {
         String fileContent = encodingHeader + commentEntry;
         Charset encoding = StandardCharsets.UTF_8;
 
-        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(Reader.of(fileContent));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(fileContent));
 
         BibDatabaseContext context = new BibDatabaseContext(firstParse.getDatabase(), firstParse.getMetaData());
 
@@ -983,7 +983,7 @@ class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -1031,7 +1031,7 @@ class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Reader.of(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -1061,7 +1061,7 @@ class BibtexDatabaseWriterTest {
 
         // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Reader.of(bibtexEntry));
+        ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 

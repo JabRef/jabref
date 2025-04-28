@@ -2,7 +2,7 @@ package org.jabref.logic.citationstyle;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -111,7 +111,7 @@ public final class CSLStyleUtils {
      */
     public static Optional<StyleInfo> parseStyleInfo(String filename, String content) {
         try {
-            XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(Reader.of(content));
+            XMLStreamReader reader = XML_INPUT_FACTORY.createXMLStreamReader(new StringReader(content));
 
             boolean inInfo = false;
             boolean hasBibliography = false;

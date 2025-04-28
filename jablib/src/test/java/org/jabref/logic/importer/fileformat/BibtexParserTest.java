@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -231,7 +232,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesEntryWithVeryLongType() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@thisIsALongStringToTestMaybeItIsToLongWhoKnowsNOTme{test,author={Ed von Test}}"));
+               new StringReader("@thisIsALongStringToTestMaybeItIsToLongWhoKnowsNOTme{test,author={Ed von Test}}"));
         BibEntry expected = new BibEntry(new UnknownEntryType("thisisalongstringtotestmaybeitistolongwhoknowsnotme"))
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Ed von Test");
@@ -313,7 +314,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesMultipleEntries() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("""
+               new StringReader("""
                         @article{canh05,  author = {Crowston, K. and Annabi, H.},
                           title = {Title A}}
                         @inProceedings{foo,  author={Norton Bar}}"""));
@@ -354,7 +355,7 @@ class BibtexParserTest {
     @Test
     void parseCombinesMultipleAuthorFields() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@article{test,author={Ed von Test},author={Second Author},author={Third Author}}"));
+               new StringReader("@article{test,author={Ed von Test},author={Second Author},author={Third Author}}"));
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.AUTHOR, "Ed von Test and Second Author and Third Author");
@@ -364,7 +365,7 @@ class BibtexParserTest {
     @Test
     void parseCombinesMultipleEditorFields() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@article{test,editor={Ed von Test},editor={Second Author},editor={Third Author}}"));
+               new StringReader("@article{test,editor={Ed von Test},editor={Second Author},editor={Third Author}}"));
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.EDITOR, "Ed von Test and Second Author and Third Author");
@@ -374,7 +375,7 @@ class BibtexParserTest {
     @Test
     void parseCombinesMultipleKeywordsFields() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@article{test,Keywords={Test},Keywords={Second Keyword},Keywords={Third Keyword}}"));
+               new StringReader("@article{test,Keywords={Test},Keywords={Second Keyword},Keywords={Third Keyword}}"));
         BibEntry expected = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test")
                 .withField(StandardField.KEYWORDS, "Test, Second Keyword, Third Keyword");
@@ -419,7 +420,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesFormatedEntry() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("""
+               new StringReader("""
                         @INPROCEEDINGS{CroAnnHow05,
                           author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
                           title = {Effective work practices for floss development: A model and propositions},
@@ -511,7 +512,7 @@ class BibtexParserTest {
     @Test
     void parseReturnsEmptyListIfNoEntryRecognized() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("""
+               new StringReader("""
                           author = {Crowston, K. and Annabi, H. and Howison, J. and Masango, C.},
                           title = {Effective work practices for floss development: A model and propositions},
                           booktitle = {Hawaii International Conference On System Sciences (HICSS)},
@@ -689,7 +690,7 @@ class BibtexParserTest {
     @Test
     void parseIgnoresAndWarnsAboutCorruptedEntryButRecognizeOthers() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of(
+               new StringReader(
                         "@article{test,author={author missing bracket}" + "@article{test,author={Ed von Test}}"));
 
         Collection<BibEntry> parsed = result.getDatabase().getEntries();
@@ -844,7 +845,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesStringAndEntry() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@string{bourdieu = {Bourdieu, Pierre}}"
+               new StringReader("@string{bourdieu = {Bourdieu, Pierre}}"
                         + "@book{bourdieu-2002-questions-sociologie, " + "    Address = {Paris}," + "    Author = bourdieu,"
                         + "    Isbn = 2707318256," + "    Publisher = {Minuit}," + "    Title = {Questions de sociologie},"
                         + "    Year = 2002" + "}"));
@@ -1130,7 +1131,7 @@ class BibtexParserTest {
     void parseRemovesEncodingLineAndSeparatorInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = parser.parse(
-                Reader.of(SaveConfiguration.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
+               new StringReader(SaveConfiguration.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
 
         Collection<BibEntry> parsedEntries = result.getDatabase().getEntries();
         BibEntry parsedEntry = parsedEntries.iterator().next();
@@ -1203,7 +1204,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesSaveActionsAfterEntry() throws IOException {
         ParserResult parserResult = parser.parse(
-                Reader.of("""
+               new StringReader("""
                         @InProceedings{6055279,
                           Title                    = {Educational session 1},
                           Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
@@ -1227,7 +1228,7 @@ class BibtexParserTest {
     @Test
     void parserKeepsSaveActions() throws IOException {
         ParserResult parserResult = parser.parse(
-                Reader.of("""
+               new StringReader("""
                         @InProceedings{6055279,
                           Title                    = {Educational session 1},
                           Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
@@ -1269,7 +1270,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesCRLFLineBreak() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("""
+               new StringReader("""
                         @InProceedings{6055279,\r
                           Title                    = {Educational session 1},\r
                           Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\r
@@ -1287,7 +1288,7 @@ class BibtexParserTest {
     @Test
     void parseRecognizesLFLineBreak() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("""
+               new StringReader("""
                         @InProceedings{6055279,
                           Title                    = {Educational session 1},
                           Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},
@@ -1317,7 +1318,7 @@ class BibtexParserTest {
     @Test
     void integrationTestBibEntryType() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));
+               new StringReader("@comment{jabref-entrytype: Lecturenotes: req[author;title] opt[language;url]}"));
 
         BibEntryType expectedEntryType = new BibEntryType(
                 new UnknownEntryType("lecturenotes"),
@@ -1337,7 +1338,7 @@ class BibtexParserTest {
     @Test
     void integrationTestSaveOrderConfig() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of(
+               new StringReader(
                         "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"));
 
         Optional<SaveOrder> saveOrderConfig = result.getMetaData().getSaveOrder();
@@ -1742,7 +1743,7 @@ class BibtexParserTest {
     @Test
     void integrationTestContentSelectors() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@Comment{jabref-meta: selector_pubstate:approved;captured;received;status;}"));
+               new StringReader("@Comment{jabref-meta: selector_pubstate:approved;captured;received;status;}"));
 
         List<String> values = new ArrayList<>(4);
         values.add("approved");
@@ -1814,7 +1815,7 @@ class BibtexParserTest {
     @Test
     void integrationTestFileDirectories() throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}"
+               new StringReader("@comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}"
                         + "@comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
                         + "@comment{jabref-meta: fileDirectoryLatex-defaultOwner-user:D:\\\\Latex;}"));
 
@@ -1832,7 +1833,7 @@ class BibtexParserTest {
             "."})
     void fileDirectoriesUnmodified(String directory) throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@comment{jabref-meta: fileDirectory:" + directory + "}"));
+               new StringReader("@comment{jabref-meta: fileDirectory:" + directory + "}"));
         assertEquals(directory, result.getMetaData().getLibrarySpecificFileDirectory().get());
     }
 
@@ -1842,7 +1843,7 @@ class BibtexParserTest {
             "\\\\servername\\path\\to\\file, \\\\\\\\servername\\\\path\\\\to\\\\file"})
     void fileDirectoryWithDoubleEscapeIsRead(String expected, String provided) throws IOException {
         ParserResult result = parser.parse(
-                Reader.of("@comment{jabref-meta: fileDirectory: " + provided + "}"));
+               new StringReader("@comment{jabref-meta: fileDirectory: " + provided + "}"));
         assertEquals(expected, result.getMetaData().getLibrarySpecificFileDirectory().get());
     }
 

@@ -2,6 +2,7 @@ package org.jabref.gui.preview;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,7 +126,7 @@ public class ClipboardContentGenerator {
 
     private List<String> generateTextBasedPreviewLayoutCitations(List<BibEntry> selectedEntries, BibDatabaseContext bibDatabaseContext) throws IOException {
         TextBasedPreviewLayout customPreviewLayout = previewPreferences.getCustomPreviewLayout();
-        Reader customLayoutReader = Reader.of(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
+        Reader customLayoutReader = new StringReader(customPreviewLayout.getText().replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(customLayoutReader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
         List<String> citations = new ArrayList<>(selectedEntries.size());
         for (BibEntry entry : selectedEntries) {

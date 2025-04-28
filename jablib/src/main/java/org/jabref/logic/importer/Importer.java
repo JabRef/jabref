@@ -153,7 +153,7 @@ public abstract class Importer implements Comparable<Importer> {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public ParserResult importDatabase(String data) throws IOException {
-        try (Reader reader = Reader.of(data);
+        try (Reader reader = new StringReader(data);
              BufferedReader bufferedReader = new BufferedReader(reader)) {
             return importDatabase(bufferedReader);
         }

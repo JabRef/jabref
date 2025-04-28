@@ -9,6 +9,7 @@ import org.jabref.logic.preview.PreviewLayout;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import java.io.StringReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ public final class TextBasedPreviewLayout implements PreviewLayout {
 
     public void setText(String text) {
         this.text = text;
-        Reader reader = Reader.of(text.replace("__NEWLINE__", "\n"));
+        Reader reader = new StringReader(text.replace("__NEWLINE__", "\n"));
         try {
             layout = new LayoutHelper(reader, layoutFormatterPreferences, abbreviationRepository).getLayoutFromText();
         } catch (IOException e) {
