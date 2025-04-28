@@ -1,11 +1,5 @@
 package org.jabref.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,9 +38,9 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
-import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.FallbackExceptionHandler;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
@@ -155,7 +149,7 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
         Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
-        clearOldSearchIndices();
+        IndexManager.clearOldSearchIndices();
 
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
         Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
@@ -435,32 +429,5 @@ public class JabRefGUI extends Application {
         LOGGER.trace("Shutting down HeadlessExecutorService");
         HeadlessExecutorService.INSTANCE.shutdownEverything();
         LOGGER.trace("Finished shutdownThreadPools");
-    }
-
-    private static void clearOldSearchIndices() {
-        Path currentIndexPath = Directories.getFulltextIndexBaseDirectory();
-        Path appData = currentIndexPath.getParent();
-
-        try {
-            Files.createDirectories(currentIndexPath);
-        } catch (
-                IOException e) {
-            LOGGER.error("Could not create index directory {}", appData, e);
-        }
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
-            for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene")
-                        && !path.equals(currentIndexPath)) {
-                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
-                    Files.walk(path)
-                         .sorted(Comparator.reverseOrder())
-                         .map(Path::toFile)
-                         .forEach(File::delete);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("Could not access app-directory at {}", appData, e);
-        }
     }
 }

@@ -3,10 +3,8 @@ package org.jabref.cli;
 import java.io.File;
 import java.io.IOException;
 import java.net.Authenticator;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Map;
 
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -21,6 +19,7 @@ import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
@@ -86,7 +85,7 @@ public class JabKit {
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
 
-            clearOldSearchIndices();
+            IndexManager.clearOldSearchIndices();
 
             try {
                 Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
@@ -200,31 +199,5 @@ public class JabKit {
 
     private static void configureSSL(SSLPreferences sslPreferences) {
         TrustStoreManager.createTruststoreFileIfNotExist(Path.of(sslPreferences.getTruststorePath()));
-    }
-
-    private static void clearOldSearchIndices() {
-        Path currentIndexPath = Directories.getFulltextIndexBaseDirectory();
-        Path appData = currentIndexPath.getParent();
-
-        try {
-            Files.createDirectories(currentIndexPath);
-        } catch (IOException e) {
-            LOGGER.error("Could not create index directory {}", appData, e);
-        }
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
-            for (Path path : stream) {
-                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene")
-                        && !path.equals(currentIndexPath)) {
-                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
-                    Files.walk(path)
-                         .sorted(Comparator.reverseOrder())
-                         .map(Path::toFile)
-                         .forEach(File::delete);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.error("Could not access app-directory at {}", appData, e);
-        }
     }
 }
