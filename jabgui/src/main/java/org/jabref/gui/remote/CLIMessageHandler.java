@@ -5,7 +5,7 @@ import java.util.List;
 
 import javafx.application.Platform;
 
-import org.jabref.ArgumentProcessor;
+import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.frame.UiMessageHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.UiCommand;

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.cli.ArgumentProcessor;
 import org.jabref.gui.JabRefGUI;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.JabRefGuiPreferences;

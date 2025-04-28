@@ -1,4 +1,4 @@
-package org.jabref.cli;
+package org.jabref;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.jabref.cli.ArgumentProcessor;
+import org.jabref.cli.JabKitCliOptions;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.net.ProxyAuthenticator;

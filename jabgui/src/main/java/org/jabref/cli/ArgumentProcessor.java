@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.cli;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.jabref;
+package org.jabref.cli;
 
 import java.nio.file.Path;
 import java.util.List;
