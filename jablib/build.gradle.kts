@@ -114,7 +114,7 @@ dependencies {
     implementation("org.tinylog:tinylog-api:2.7.0")
     implementation("org.tinylog:tinylog-impl:2.7.0")
 
-    implementation("de.undercouch:citeproc-java:3.2.0") {
+    implementation("de.undercouch:citeproc-java:3.3.0") {
         exclude(group = "org.antlr")
     }
 
