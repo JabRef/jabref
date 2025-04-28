@@ -17,9 +17,9 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.logic.journals.Abbreviation;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
-import org.jabref.logic.journals.JournalAbbreviationRepositoryManager;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -46,6 +46,9 @@ public class AbbreviateAction extends SimpleCommand {
     private JournalAbbreviationRepository abbreviationRepository;
     private final TaskExecutor taskExecutor;
     private final UndoManager undoManager;
+    
+    private JournalAbbreviationPreferences lastUsedPreferences;
+    private JournalAbbreviationRepository cachedRepository;
 
     private AbbreviationType abbreviationType;
 
@@ -108,9 +111,7 @@ public class AbbreviateAction extends SimpleCommand {
     }
 
     private String abbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
-        // Use the repository manager to get a cached repository or build a new one if needed
-        abbreviationRepository = JournalAbbreviationRepositoryManager.getInstance()
-                                .getRepository(journalAbbreviationPreferences);
+        abbreviationRepository = getRepository();
                                 
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
                 abbreviationRepository,
@@ -140,8 +141,7 @@ public class AbbreviateAction extends SimpleCommand {
     private String unabbreviate(BibDatabaseContext databaseContext, List<BibEntry> entries) {
         List<BibEntry> filteredEntries = new ArrayList<>();
         
-        JournalAbbreviationRepository freshRepository = JournalAbbreviationRepositoryManager.getInstance()
-                                                      .getRepository(journalAbbreviationPreferences);
+        JournalAbbreviationRepository freshRepository = getRepository();
         
         Map<String, Boolean> sourceEnabledStates = new HashMap<>();
         String builtInId = JournalAbbreviationRepository.BUILTIN_LIST_ID;
@@ -232,6 +232,82 @@ public class AbbreviateAction extends SimpleCommand {
         map.computeIfAbsent(text, k -> new ArrayList<>()).add(abbrWithSource);
     }
 
+    /**
+     * Gets a repository instance, using cached version if preferences haven't changed.
+     * This provides efficient repository creation without using static/singleton patterns.
+     * 
+     *
+     * @return A repository configured with current preferences
+     */
+    private JournalAbbreviationRepository getRepository() {
+        if (cachedRepository != null && !preferencesChanged()) {
+            return cachedRepository;
+        }
+        
+        cachedRepository = JournalAbbreviationLoader.loadRepository(journalAbbreviationPreferences);
+        lastUsedPreferences = clonePreferences();
+        return cachedRepository;
+    }
+    
+    /**
+     * Checks if preferences have changed since last repository creation
+     * 
+     *
+     * @return true if preferences have changed, false otherwise
+     */
+    private boolean preferencesChanged() {
+        if (lastUsedPreferences == null) {
+            return true;
+        }
+        
+        if (lastUsedPreferences.shouldUseFJournalField() != journalAbbreviationPreferences.shouldUseFJournalField()) {
+            return true;
+        }
+        
+        List<String> oldLists = lastUsedPreferences.getExternalJournalLists();
+        List<String> newLists = journalAbbreviationPreferences.getExternalJournalLists();
+        
+        if (oldLists.size() != newLists.size()) {
+            return true;
+        }
+        
+        for (int i = 0; i < oldLists.size(); i++) {
+            if (!oldLists.get(i).equals(newLists.get(i))) {
+                return true;
+            }
+        }
+        
+        Map<String, Boolean> oldEnabled = lastUsedPreferences.getEnabledExternalLists();
+        Map<String, Boolean> newEnabled = journalAbbreviationPreferences.getEnabledExternalLists();
+        
+        if (oldEnabled.size() != newEnabled.size()) {
+            return true;
+        }
+        
+        for (Map.Entry<String, Boolean> entry : newEnabled.entrySet()) {
+            Boolean oldValue = oldEnabled.get(entry.getKey());
+            if (!java.util.Objects.equals(oldValue, entry.getValue())) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Creates a clone of the current preferences for comparison
+     * 
+     *
+     * @return A new preferences instance with the same settings
+     */
+    private JournalAbbreviationPreferences clonePreferences() {
+        return new JournalAbbreviationPreferences(
+                journalAbbreviationPreferences.getExternalJournalLists(),
+                journalAbbreviationPreferences.shouldUseFJournalField(),
+                journalAbbreviationPreferences.getEnabledExternalLists()
+        );
+    }
+    
     /**
      * Checks if any journal abbreviation source is enabled in the preferences.
      * This includes both the built-in list and any external journal lists.
