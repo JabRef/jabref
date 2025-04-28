@@ -11,9 +11,15 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
+
 ### Changed
 
+- We merged the 'New Entry', 'Import by ID', and 'New Entry from Plain Text' tools into a single 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
+
 ### Fixed
+
+- We fixed an issue where the option for which method to use when parsing plaintext citations was unavailable in the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 
 ### Removed
 
@@ -50,7 +56,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 - We now support usage of custom CSL styles in the Open/LibreOffice integration. [#12337](https://github.com/JabRef/jabref/issues/12337)
 - We added support for citation-only CSL styles which don't specify bibliography formatting. [#12996](https://github.com/JabRef/jabref/pull/12996)
-- We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 
 ### Changed
 
@@ -88,7 +93,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - 'Affected fields' and 'Do not wrap when saving' are now displayed as tags. [#12550](https://github.com/JabRef/jabref/issues/12550)
 - We revamped the UI of the Select Style dialog (in the LibreOffice panel) for CSL styles. [#12951](https://github.com/JabRef/jabref/pull/12951)
 - We reduced the delay in populating the list of CSL styles in the Select Style dialog of the LibreOffice panel. [#12951](https://github.com/JabRef/jabref/pull/12951)
-- We merged the 'New Entry', 'Import by ID', and 'New Entry from Plain Text' toolbar actions into a single 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 
 ### Fixed
 
@@ -137,7 +141,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
 - We fixed an issue with deleting entries in large libraries that caused it to take a long time. [#8976](https://github.com/JabRef/jabref/issues/8976)
 - We fixed an issue where "Reveal in file explorer" option was disabled for newly saved libraries until reopening the file. [#12722](https://github.com/JabRef/jabref/issues/12722)
-- We fixed an issue where the option for what method to use when parsing plaintext citations was unavailable in the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 
 ### Removed
 
