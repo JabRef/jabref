@@ -126,9 +126,9 @@ jobs:
           set -e
           cd jabgui
 
-          /usr/bin/codesign -s Developer ID Application: JabRef e.V. (6792V39SK3) -vvvv buildres/mac/jabrefHost.py
-          /usr/bin/codesign -s Developer ID Application: JabRef e.V. (6792V39SK3) -vvvv buildres/mac/native-messaging-host/firefox/org.jabref.jabref.json
-          /usr/bin/codesign -s Developer ID Application: JabRef e.V. (6792V39SK3) -vvvv buildres/mac/native-messaging-host/chromium/org.jabref.jabref.json
+          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/jabrefHost.py
+          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/firefox/org.jabref.jabref.json
+          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/chromium/org.jabref.jabref.json
 
           jpackage \
           --module org.jabref/org.jabref.Launcher \
@@ -172,9 +172,9 @@ jobs:
         shell: bash
         run: |
 
-          /usr/bin/codesign -s Developer ID Application: JabRef e.V. (6792V39SK3) -vvvv buildres/mac/jabrefHost.py
-          /usr/bin/codesign -s Developer ID Application: JabRef e.V. (6792V39SK3) -vvvv buildres/mac/native-messaging-host/firefox/org.jabref.jabref.json
-          /usr/bin/codesign -s Developer ID Application: JabRef e.V. (6792V39SK3) -vvvv buildres/mac/native-messaging-host/chromium/org.jabref.jabref.json
+          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/jabrefHost.py
+          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/firefox/org.jabref.jabref.json
+          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/chromium/org.jabref.jabref.json
 
           jpackage \
           --module org.jabref/org.jabref.Launcher \
@@ -214,8 +214,8 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
 
-      - name: Rename files with arm64 suffix as well
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+      - name: Rename files for mac
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-${{matrix.suffix}}.dmg
