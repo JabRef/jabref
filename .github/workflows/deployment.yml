@@ -126,10 +126,6 @@ jobs:
           set -e
           cd jabgui
 
-          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/jabrefHost.py
-          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/firefox/org.jabref.jabref.json
-          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/chromium/org.jabref.jabref.json
-
           jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
@@ -171,11 +167,6 @@ jobs:
         if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
-
-          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/jabrefHost.py
-          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/firefox/org.jabref.jabref.json
-          /usr/bin/codesign -s "Developer ID Application: JabRef e.V. (6792V39SK3)" -vvvv buildres/mac/native-messaging-host/chromium/org.jabref.jabref.json
-
           jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
