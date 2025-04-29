@@ -136,13 +136,10 @@ jobs:
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
-          --mac-sign \
           --vendor "JabRef e.V." \
           --mac-package-identifier JabRef \
           --mac-package-name JabRef \
           --type app-image \
-          --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
-          --mac-package-signing-prefix org.jabref \
           --mac-entitlements buildres/mac/jabref.entitlements \
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
@@ -165,17 +162,34 @@ jobs:
           --java-options --add-modules=jdk.incubator.vector
 
           # Add additional files / directories
-          cp buildres/mac/jabrefHost.py build/distribution/JabRef.app/Contents/
-          cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/
+          cp buildres/mac/script/jabrefHost.py build/distribution/JabRef.app/Contents/Resources
+          cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/Resources
 
-          # Sign the final artifact
-          codesign --force --deep --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" \
-            --entitlements buildres/mac/jabref.entitlements \
-            --options runtime --timestamp build/distribution/JabRef.app
+          jpackage \
+          --verbose \
+          --type dmg \
+          --mac-sign \
+          --vendor "JabRef e.V." \
+          --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --mac-package-signing-prefix org.jabref \
+          --mac-entitlements buildres/mac/jabref.entitlements \
+          --icon src/main/resources/icons/jabref.icns \
+          --resource-dir buildres/mac \
+          --file-associations buildres/mac/bibtexAssociations.properties \
+          --app-image build/distribution/JabRef.app
 
-          # pack dmg and pkg
-          hdiutil create -volname "JabRef" -srcfolder build/distribution/JabRef.app -ov -format UDZO build/distribution/JabRef${{ matrix.suffix }}.dmg
-          productbuild --component build/distribution/JabRef.app /Applications --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" build/distribution/JabRef${{ matrix.suffix }}.pkg
+          jpackage \
+          --verbose \
+          --type pkg \
+          --mac-sign \
+          --vendor "JabRef e.V." \
+          --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --mac-package-signing-prefix org.jabref \
+          --mac-entitlements buildres/mac/jabref.entitlements \
+          --icon src/main/resources/icons/jabref.icns \
+          --resource-dir buildres/mac \
+          --file-associations buildres/mac/bibtexAssociations.properties \
+          --app-image build/distribution/JabRef.app
 
           # Cleanup unpacked file
           rm -rf build/distribution/JabRef.app
