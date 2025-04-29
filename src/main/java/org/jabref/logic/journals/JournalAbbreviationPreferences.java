@@ -139,4 +139,29 @@ public class JournalAbbreviationPreferences {
     public boolean hasExplicitEnabledSetting(String sourcePath) {
         return enabledExternalLists.containsKey(sourcePath);
     }
+    
+    /**
+     * Checks if any journal abbreviation source is enabled in the preferences.
+     * This includes both the built-in list and any external journal lists.
+     *
+     * @return true if at least one source is enabled, false if all sources are disabled
+     */
+    public boolean areAnyJournalSourcesEnabled() {
+        boolean anySourceEnabled = isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID);
+        
+        if (!anySourceEnabled) {
+            for (String listPath : getExternalJournalLists()) {
+                if (listPath != null && !listPath.isBlank()) {
+                    // Just check the filename since that's what's used as the source key
+                    String fileName = java.nio.file.Path.of(listPath).getFileName().toString();
+                    if (isSourceEnabled(fileName)) {
+                        anySourceEnabled = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return anySourceEnabled;
+    }
 }

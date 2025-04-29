@@ -85,7 +85,7 @@ public class AbbreviateAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (action == StandardActions.UNABBREVIATE && !areAnyJournalSourcesEnabled()) {
+        if (action == StandardActions.UNABBREVIATE && !journalAbbreviationPreferences.areAnyJournalSourcesEnabled()) {
             dialogService.notify(Localization.lang("Cannot unabbreviate: all journal lists are disabled."));
             return;
         }
@@ -306,30 +306,5 @@ public class AbbreviateAction extends SimpleCommand {
                 journalAbbreviationPreferences.shouldUseFJournalField(),
                 journalAbbreviationPreferences.getEnabledExternalLists()
         );
-    }
-    
-    /**
-     * Checks if any journal abbreviation source is enabled in the preferences.
-     * This includes both the built-in list and any external journal lists.
-     *
-     * @return true if at least one source is enabled, false if all sources are disabled
-     */
-    private boolean areAnyJournalSourcesEnabled() {
-        boolean anySourceEnabled = journalAbbreviationPreferences.isSourceEnabled(JournalAbbreviationRepository.BUILTIN_LIST_ID);
-        
-        if (!anySourceEnabled) {
-            for (String listPath : journalAbbreviationPreferences.getExternalJournalLists()) {
-                if (listPath != null && !listPath.isBlank()) {
-                    // Just check the filename since that's what's used as the source key
-                    String fileName = Path.of(listPath).getFileName().toString();
-                    if (journalAbbreviationPreferences.isSourceEnabled(fileName)) {
-                        anySourceEnabled = true;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        return anySourceEnabled;
     }
 }
