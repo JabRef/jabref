@@ -3,7 +3,6 @@ package org.jabref.gui.preferences;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -420,7 +419,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
 
         // region NewEntryUnifierPreferences
-        defaults.put(NEW_ENTRY_APPROACH, Arrays.asList(NewEntryApproach.values()).indexOf(NewEntryApproach.CREATE_ENTRY));
+        defaults.put(NEW_ENTRY_APPROACH, List.of(NewEntryApproach.values()).indexOf(NewEntryApproach.CREATE_ENTRY));
         defaults.put(NEW_ENTRY_INSTANT_TYPE, StandardEntryType.Article.getDisplayName());
         defaults.put(NEW_ENTRY_ID_LOOKUP_GUESSING, true);
         defaults.put(NEW_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
@@ -1278,7 +1277,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             get(NEW_ENTRY_ID_FETCHER_NAME),
             get(NEW_ENTRY_INTERPRET_PARSER_NAME));
 
-        EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_APPROACH, Arrays.asList(NewEntryApproach.values()).indexOf(newValue)));
+        EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_APPROACH, List.of(NewEntryApproach.values()).indexOf(newValue)));
         EasyBind.listen(newEntryPreferences.latestInstantTypeProperty(), (_, _, newValue) -> put(NEW_ENTRY_INSTANT_TYPE, newValue.getDisplayName()));
         EasyBind.listen(newEntryPreferences.idLookupGuessingProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_ID_LOOKUP_GUESSING, newValue));
         EasyBind.listen(newEntryPreferences.latestIdFetcherProperty(), (_, _, newValue) -> put(NEW_ENTRY_ID_FETCHER_NAME, newValue));
