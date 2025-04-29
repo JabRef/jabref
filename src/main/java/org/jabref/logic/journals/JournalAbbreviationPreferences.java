@@ -78,9 +78,6 @@ public class JournalAbbreviationPreferences {
      * @return true if the source is enabled or has no explicit state (default is enabled)
      */
     public boolean isSourceEnabled(String sourcePath) {
-        if (sourcePath == null) {
-            return true;
-        }
         return enabledExternalLists.getOrDefault(sourcePath, true);
     }
     
@@ -91,9 +88,6 @@ public class JournalAbbreviationPreferences {
      * @param enabled Whether the source should be enabled
      */
     public void setSourceEnabled(String sourcePath, boolean enabled) {
-        if (sourcePath == null) {
-            return;
-        }
         enabledExternalLists.put(sourcePath, enabled);
         enabledListsChanged.set(!enabledListsChanged.get());
     }
