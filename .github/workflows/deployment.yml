@@ -277,7 +277,7 @@ jobs:
         with:
           # tbn = to-be-notarized
           name: JabRef-macOS-tbn-${{ matrix.os }}
-          path: build/distribution
+          path: jabgui/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES')
