@@ -8,6 +8,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 
 /**
  * Class for storing and managing journal abbreviation preferences
@@ -18,7 +19,11 @@ public class JournalAbbreviationPreferences {
 
     private final ObservableList<String> externalJournalLists;
     private final BooleanProperty useFJournalField;
-    private final Map<String, Boolean> enabledExternalLists = new HashMap<>();
+    private final ObservableMap<String, Boolean> enabledExternalLists = FXCollections.observableHashMap();
+    
+    // We use a separate property for change tracking because ObservableMap listeners
+    // do not always fire correctly when used for UI bindings, especially when
+    // clearing and re-adding multiple entries at once
     private final BooleanProperty enabledListsChanged = new SimpleBooleanProperty();
     
     /**
