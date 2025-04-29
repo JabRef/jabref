@@ -1278,11 +1278,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             get(NEW_ENTRY_UNIFIED_ID_FETCHER_NAME),
             get(NEW_ENTRY_UNIFIED_INTERPRET_PARSER_NAME));
 
-        EasyBind.listen(newEntryUnifiedPreferences.latestApproachProperty(), (obs, oldValue, newValue) -> putInt(NEW_ENTRY_UNIFIED_APPROACH, Arrays.asList(NewEntryUnifiedApproach.values()).indexOf(newValue)));
-        EasyBind.listen(newEntryUnifiedPreferences.latestInstantTypeProperty(), (obs, oldValue, newValue) -> put(NEW_ENTRY_UNIFIED_INSTANT_TYPE, newValue.getDisplayName()));
-        EasyBind.listen(newEntryUnifiedPreferences.idLookupGuessingProperty(), (obs, oldValue, newValue) -> putBoolean(NEW_ENTRY_UNIFIED_ID_LOOKUP_GUESSING, newValue));
-        EasyBind.listen(newEntryUnifiedPreferences.latestIdFetcherProperty(), (obs, oldValue, newValue) -> put(NEW_ENTRY_UNIFIED_ID_FETCHER_NAME, newValue));
-        EasyBind.listen(newEntryUnifiedPreferences.latestInterpretParserProperty(), (obs, oldValue, newValue) -> put(NEW_ENTRY_UNIFIED_INTERPRET_PARSER_NAME, newValue));
+        EasyBind.listen(newEntryUnifiedPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_UNIFIED_APPROACH, Arrays.asList(NewEntryUnifiedApproach.values()).indexOf(newValue)));
+        EasyBind.listen(newEntryUnifiedPreferences.latestInstantTypeProperty(), (_, _, newValue) -> put(NEW_ENTRY_UNIFIED_INSTANT_TYPE, newValue.getDisplayName()));
+        EasyBind.listen(newEntryUnifiedPreferences.idLookupGuessingProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_UNIFIED_ID_LOOKUP_GUESSING, newValue));
+        EasyBind.listen(newEntryUnifiedPreferences.latestIdFetcherProperty(), (_, _, newValue) -> put(NEW_ENTRY_UNIFIED_ID_FETCHER_NAME, newValue));
+        EasyBind.listen(newEntryUnifiedPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(NEW_ENTRY_UNIFIED_INTERPRET_PARSER_NAME, newValue));
 
         return newEntryUnifiedPreferences;
     }
