@@ -8,8 +8,8 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.newentryunified.NewEntryUnifiedApproach;
-import org.jabref.gui.newentryunified.NewEntryUnifiedView;
+import org.jabref.gui.newentry.NewEntryApproach;
+import org.jabref.gui.newentry.NewEntryView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.EntryType;
@@ -17,9 +17,9 @@ import org.jabref.model.entry.types.EntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NewEntryUnifiedAction extends SimpleCommand {
+public class NewEntryAction extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryUnifiedAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryAction.class);
 
     private final Supplier<LibraryTab> tabSupplier;
 
@@ -27,13 +27,13 @@ public class NewEntryUnifiedAction extends SimpleCommand {
 
     private final GuiPreferences preferences;
 
-    private NewEntryUnifiedApproach initialApproach;
+    private NewEntryApproach initialApproach;
     private boolean isInstant;
     private Optional<EntryType> instantType;
 
     // Launches a dialog asking the user for inputs for the new entry to create.
     // This dialog initially opens to the last-used tab (from previous use of the tool).
-    public NewEntryUnifiedAction(Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+    public NewEntryAction(Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -48,7 +48,7 @@ public class NewEntryUnifiedAction extends SimpleCommand {
     // Launches a dialog asking the user for inputs for the new entry to create.
     // This dialog initially opens to the tab specified by `approach`. If `approach` is `null`, then the last-used tab
     // from previous use of the tool is restored.
-    public NewEntryUnifiedAction(NewEntryUnifiedApproach approach, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+    public NewEntryAction(NewEntryApproach approach, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this(tabSupplier, dialogService, preferences, stateManager);
 
         this.initialApproach = approach;
@@ -58,7 +58,7 @@ public class NewEntryUnifiedAction extends SimpleCommand {
     // inputs.
     // If `instantType` is `null`, the last-selected instant type from the previous use of the tool to create an empty
     // instance of a particular type is used (the `Article` standard entry type by default).
-    public NewEntryUnifiedAction(EntryType instantType, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+    public NewEntryAction(EntryType instantType, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this(tabSupplier, dialogService, preferences, stateManager);
 
         this.isInstant = true;
@@ -85,14 +85,14 @@ public class NewEntryUnifiedAction extends SimpleCommand {
                 // And we were created with an instant type, then we use that type.
                 type = instantType.get();
             } else {
-                // Otherwise, we query the last-selected entry type from the NewEntryUnified dialogue.
-                type = preferences.getNewEntryUnifiedPreferences().getLatestInstantType();
+                // Otherwise, we query the last-selected entry type from the NewEntry dialogue.
+                type = preferences.getNewEntryPreferences().getLatestInstantType();
             }
             // ...and create a new entry using this type.
             newEntry = new BibEntry(type);
         } else {
             // Otherwise, we launch a panel asking the user to specify details of the new entry.
-            NewEntryUnifiedView newEntryDialog = new NewEntryUnifiedView(initialApproach, preferences, tabSupplier.get(), dialogService);
+            NewEntryView newEntryDialog = new NewEntryView(initialApproach, preferences, tabSupplier.get(), dialogService);
             newEntry = dialogService.showCustomDialogAndWait(newEntryDialog).orElse(null);
         }
 

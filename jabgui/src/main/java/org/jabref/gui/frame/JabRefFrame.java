@@ -40,7 +40,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.entryeditor.EntryEditor;
-import org.jabref.gui.importer.NewEntryUnifiedAction;
+import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
@@ -339,31 +339,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         globalSearchBar.openGlobalSearchDialog();
                         break;
                     case NEW_ARTICLE:
-                        new NewEntryUnifiedAction(StandardEntryType.Article, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Article, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_BOOK:
-                        new NewEntryUnifiedAction(StandardEntryType.Book, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Book, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INBOOK:
-                        new NewEntryUnifiedAction(StandardEntryType.InBook, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.InBook, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_MASTERSTHESIS:
-                        new NewEntryUnifiedAction(StandardEntryType.MastersThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.MastersThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PHDTHESIS:
-                        new NewEntryUnifiedAction(StandardEntryType.PhdThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.PhdThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PROCEEDINGS:
-                        new NewEntryUnifiedAction(StandardEntryType.Proceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Proceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_TECHREPORT:
-                        new NewEntryUnifiedAction(StandardEntryType.TechReport, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.TechReport, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_UNPUBLISHED:
-                        new NewEntryUnifiedAction(StandardEntryType.Unpublished, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Unpublished, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INPROCEEDINGS:
-                        new NewEntryUnifiedAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     default:
                 }

@@ -14,7 +14,7 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
-import org.jabref.gui.newentryunified.NewEntryUnifiedPreferences;
+import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
@@ -57,5 +57,5 @@ public interface GuiPreferences extends CliPreferences {
 
     KeyBindingRepository getKeyBindingRepository();
 
-    NewEntryUnifiedPreferences getNewEntryUnifiedPreferences();
+    NewEntryPreferences getNewEntryPreferences();
 }

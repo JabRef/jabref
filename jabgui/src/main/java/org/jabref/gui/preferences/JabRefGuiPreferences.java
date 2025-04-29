@@ -41,8 +41,8 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
-import org.jabref.gui.newentryunified.NewEntryUnifiedApproach;
-import org.jabref.gui.newentryunified.NewEntryUnifiedPreferences;
+import org.jabref.gui.newentry.NewEntryApproach;
+import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.push.PushToApplications;
@@ -224,12 +224,12 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String INCLUDE_CROSS_REFERENCES = "includeCrossReferences";
     private static final String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
 
-    // region NewEntryUnifiedPreferences
-    private static final String NEW_ENTRY_UNIFIED_APPROACH = "latestApproach";
-    private static final String NEW_ENTRY_UNIFIED_INSTANT_TYPE = "latestInstantType";
-    private static final String NEW_ENTRY_UNIFIED_ID_LOOKUP_GUESSING = "idLookupGuessing";
-    private static final String NEW_ENTRY_UNIFIED_ID_FETCHER_NAME = "latestIdFetcherName";
-    private static final String NEW_ENTRY_UNIFIED_INTERPRET_PARSER_NAME = "latestInterpretParserName";
+    // region NewEntryPreferences
+    private static final String NEW_ENTRY_APPROACH = "latestApproach";
+    private static final String NEW_ENTRY_INSTANT_TYPE = "latestInstantType";
+    private static final String NEW_ENTRY_ID_LOOKUP_GUESSING = "idLookupGuessing";
+    private static final String NEW_ENTRY_ID_FETCHER_NAME = "latestIdFetcherName";
+    private static final String NEW_ENTRY_INTERPRET_PARSER_NAME = "latestInterpretParserName";
     // endregion
 
     private static JabRefGuiPreferences singleton;
@@ -252,7 +252,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private ColumnPreferences searchDialogColumnPreferences;
     private KeyBindingRepository keyBindingRepository;
     private CopyToPreferences copyToPreferences;
-    private NewEntryUnifiedPreferences newEntryUnifiedPreferences;
+    private NewEntryPreferences newEntryPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -420,11 +420,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
 
         // region NewEntryUnifierPreferences
-        defaults.put(NEW_ENTRY_UNIFIED_APPROACH, Arrays.asList(NewEntryUnifiedApproach.values()).indexOf(NewEntryUnifiedApproach.CREATE_ENTRY));
-        defaults.put(NEW_ENTRY_UNIFIED_INSTANT_TYPE, StandardEntryType.Article.getDisplayName());
-        defaults.put(NEW_ENTRY_UNIFIED_ID_LOOKUP_GUESSING, true);
-        defaults.put(NEW_ENTRY_UNIFIED_ID_FETCHER_NAME, DoiFetcher.NAME);
-        defaults.put(NEW_ENTRY_UNIFIED_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED.getLocalizedName());
+        defaults.put(NEW_ENTRY_APPROACH, Arrays.asList(NewEntryApproach.values()).indexOf(NewEntryApproach.CREATE_ENTRY));
+        defaults.put(NEW_ENTRY_INSTANT_TYPE, StandardEntryType.Article.getDisplayName());
+        defaults.put(NEW_ENTRY_ID_LOOKUP_GUESSING, true);
+        defaults.put(NEW_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
+        defaults.put(NEW_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED.getLocalizedName());
         // endregion
     }
 
@@ -1252,17 +1252,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     }
 
     @Override
-    public NewEntryUnifiedPreferences getNewEntryUnifiedPreferences() {
-        if (newEntryUnifiedPreferences != null) {
-            return newEntryUnifiedPreferences;
+    public NewEntryPreferences getNewEntryPreferences() {
+        if (newEntryPreferences != null) {
+            return newEntryPreferences;
         }
 
-        final int approachIndex = getInt(NEW_ENTRY_UNIFIED_APPROACH);
-        NewEntryUnifiedApproach approach = NewEntryUnifiedApproach.values().length > approachIndex
-            ? NewEntryUnifiedApproach.values()[approachIndex]
-            : NewEntryUnifiedApproach.values()[0];
+        final int approachIndex = getInt(NEW_ENTRY_APPROACH);
+        NewEntryApproach approach = NewEntryApproach.values().length > approachIndex
+            ? NewEntryApproach.values()[approachIndex]
+            : NewEntryApproach.values()[0];
 
-        final String instantTypeName = get(NEW_ENTRY_UNIFIED_INSTANT_TYPE);
+        final String instantTypeName = get(NEW_ENTRY_INSTANT_TYPE);
         EntryType instantType = StandardEntryType.Article;
         for (StandardEntryType type : StandardEntryType.values()) {
             if (type.getDisplayName().equals(instantTypeName)) {
@@ -1271,20 +1271,20 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             }
         }
 
-        newEntryUnifiedPreferences = new NewEntryUnifiedPreferences(
+        newEntryPreferences = new NewEntryPreferences(
             approach,
             instantType,
-            getBoolean(NEW_ENTRY_UNIFIED_ID_LOOKUP_GUESSING),
-            get(NEW_ENTRY_UNIFIED_ID_FETCHER_NAME),
-            get(NEW_ENTRY_UNIFIED_INTERPRET_PARSER_NAME));
+            getBoolean(NEW_ENTRY_ID_LOOKUP_GUESSING),
+            get(NEW_ENTRY_ID_FETCHER_NAME),
+            get(NEW_ENTRY_INTERPRET_PARSER_NAME));
 
-        EasyBind.listen(newEntryUnifiedPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_UNIFIED_APPROACH, Arrays.asList(NewEntryUnifiedApproach.values()).indexOf(newValue)));
-        EasyBind.listen(newEntryUnifiedPreferences.latestInstantTypeProperty(), (_, _, newValue) -> put(NEW_ENTRY_UNIFIED_INSTANT_TYPE, newValue.getDisplayName()));
-        EasyBind.listen(newEntryUnifiedPreferences.idLookupGuessingProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_UNIFIED_ID_LOOKUP_GUESSING, newValue));
-        EasyBind.listen(newEntryUnifiedPreferences.latestIdFetcherProperty(), (_, _, newValue) -> put(NEW_ENTRY_UNIFIED_ID_FETCHER_NAME, newValue));
-        EasyBind.listen(newEntryUnifiedPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(NEW_ENTRY_UNIFIED_INTERPRET_PARSER_NAME, newValue));
+        EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_APPROACH, Arrays.asList(NewEntryApproach.values()).indexOf(newValue)));
+        EasyBind.listen(newEntryPreferences.latestInstantTypeProperty(), (_, _, newValue) -> put(NEW_ENTRY_INSTANT_TYPE, newValue.getDisplayName()));
+        EasyBind.listen(newEntryPreferences.idLookupGuessingProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_ID_LOOKUP_GUESSING, newValue));
+        EasyBind.listen(newEntryPreferences.latestIdFetcherProperty(), (_, _, newValue) -> put(NEW_ENTRY_ID_FETCHER_NAME, newValue));
+        EasyBind.listen(newEntryPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(NEW_ENTRY_INTERPRET_PARSER_NAME, newValue));
 
-        return newEntryUnifiedPreferences;
+        return newEntryPreferences;
     }
 
     /**

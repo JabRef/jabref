@@ -20,8 +20,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class NewEntryUnifiedActionTest {
-    private NewEntryUnifiedAction newEntryAction;
+class NewEntryActionTest {
+    private NewEntryAction newEntryAction;
 
     private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final LibraryTab libraryTab = mock(LibraryTab.class);
@@ -32,13 +32,13 @@ class NewEntryUnifiedActionTest {
     @BeforeEach
     void setUp() {
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
-        newEntryAction = new NewEntryUnifiedAction(() -> libraryTab, dialogService, preferences, stateManager);
+        newEntryAction = new NewEntryAction(() -> libraryTab, dialogService, preferences, stateManager);
     }
 
     @Test
     void executeOnSuccessWithFixedType() {
         EntryType type = StandardEntryType.Article;
-        newEntryAction = new NewEntryUnifiedAction(type, () -> libraryTab, dialogService, preferences, stateManager);
+        newEntryAction = new NewEntryAction(type, () -> libraryTab, dialogService, preferences, stateManager);
         when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(libraryTab));
 
         newEntryAction.execute();

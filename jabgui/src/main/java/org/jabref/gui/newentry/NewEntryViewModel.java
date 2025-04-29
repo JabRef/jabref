@@ -1,4 +1,4 @@
-package org.jabref.gui.newentryunified;
+package org.jabref.gui.newentry;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,9 +48,9 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NewEntryUnifiedViewModel {
+public class NewEntryViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryUnifiedViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NewEntryViewModel.class);
 
     private final GuiPreferences preferences;
     private final LibraryTab libraryTab;
@@ -80,7 +80,7 @@ public class NewEntryUnifiedViewModel {
     private final Validator bibtexTextValidator;
     private Task<Optional<List<BibEntry>>> bibtexWorker;
 
-    public NewEntryUnifiedViewModel(GuiPreferences preferences,
+    public NewEntryViewModel(GuiPreferences preferences,
                                     LibraryTab libraryTab,
                                     DialogService dialogService,
                                     StateManager stateManager,

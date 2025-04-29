@@ -1,4 +1,4 @@
-package org.jabref.gui.newentryunified;
+package org.jabref.gui.newentry;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,14 +61,14 @@ import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
 
-public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
-    private NewEntryUnifiedViewModel viewModel;
+public class NewEntryView extends BaseDialog<BibEntry> {
+    private NewEntryViewModel viewModel;
 
-    private final NewEntryUnifiedApproach initialApproach;
-    private NewEntryUnifiedApproach currentApproach;
+    private final NewEntryApproach initialApproach;
+    private NewEntryApproach currentApproach;
 
     private final GuiPreferences guiPreferences;
-    private final NewEntryUnifiedPreferences preferences;
+    private final NewEntryPreferences preferences;
     private final LibraryTab libraryTab;
     private final DialogService dialogService;
     @Inject private StateManager stateManager;
@@ -108,12 +108,12 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
 
     private BibEntry result;
 
-    public NewEntryUnifiedView(NewEntryUnifiedApproach initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {
+    public NewEntryView(NewEntryApproach initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {
         this.initialApproach = initialApproach;
         this.currentApproach = initialApproach;
 
         this.guiPreferences = preferences;
-        this.preferences = preferences.getNewEntryUnifiedPreferences();
+        this.preferences = preferences.getNewEntryPreferences();
         this.libraryTab = libraryTab;
         this.dialogService = dialogService;
 
@@ -140,25 +140,25 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
     }
 
     private void finalizeTabs() {
-        NewEntryUnifiedApproach approach = initialApproach;
+        NewEntryApproach approach = initialApproach;
         if (approach == null) {
             approach = preferences.getLatestApproach();
         }
 
         switch (approach) {
-            case NewEntryUnifiedApproach.CREATE_ENTRY:
+            case NewEntryApproach.CREATE_ENTRY:
                 tabs.getSelectionModel().select(tabCreateEntry);
                 switchCreateEntry();
                 break;
-            case NewEntryUnifiedApproach.LOOKUP_IDENTIFIER:
+            case NewEntryApproach.LOOKUP_IDENTIFIER:
                 tabs.getSelectionModel().select(tabLookupIdentifier);
                 switchLookupIdentifier();
                 break;
-            case NewEntryUnifiedApproach.INTERPRET_CITATIONS:
+            case NewEntryApproach.INTERPRET_CITATIONS:
                 tabs.getSelectionModel().select(tabInterpretCitations);
                 switchInterpretCitations();
                 break;
-            case NewEntryUnifiedApproach.SPECIFY_BIBTEX:
+            case NewEntryApproach.SPECIFY_BIBTEX:
                 tabs.getSelectionModel().select(tabSpecifyBibtex);
                 switchSpecifyBibtex();
                 break;
@@ -172,7 +172,7 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
 
     @FXML
     public void initialize() {
-        viewModel = new NewEntryUnifiedViewModel(guiPreferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
+        viewModel = new NewEntryViewModel(guiPreferences, libraryTab, dialogService, stateManager, (UiTaskExecutor) taskExecutor, aiService, fileUpdateMonitor);
 
         visualizer.setDecoration(new IconValidationDecorator());
 
@@ -312,8 +312,8 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryUnifiedApproach.CREATE_ENTRY;
-        preferences.setLatestApproach(NewEntryUnifiedApproach.CREATE_ENTRY);
+        currentApproach = NewEntryApproach.CREATE_ENTRY;
+        preferences.setLatestApproach(NewEntryApproach.CREATE_ENTRY);
 
         if (generateButton != null) {
             generateButton.disableProperty().unbind();
@@ -328,8 +328,8 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryUnifiedApproach.LOOKUP_IDENTIFIER;
-        preferences.setLatestApproach(NewEntryUnifiedApproach.LOOKUP_IDENTIFIER);
+        currentApproach = NewEntryApproach.LOOKUP_IDENTIFIER;
+        preferences.setLatestApproach(NewEntryApproach.LOOKUP_IDENTIFIER);
 
         if (idText != null) {
             Platform.runLater(() -> idText.requestFocus());
@@ -347,8 +347,8 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryUnifiedApproach.INTERPRET_CITATIONS;
-        preferences.setLatestApproach(NewEntryUnifiedApproach.INTERPRET_CITATIONS);
+        currentApproach = NewEntryApproach.INTERPRET_CITATIONS;
+        preferences.setLatestApproach(NewEntryApproach.INTERPRET_CITATIONS);
 
         if (interpretText != null) {
             Platform.runLater(() -> interpretText.requestFocus());
@@ -366,8 +366,8 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryUnifiedApproach.SPECIFY_BIBTEX;
-        preferences.setLatestApproach(NewEntryUnifiedApproach.SPECIFY_BIBTEX);
+        currentApproach = NewEntryApproach.SPECIFY_BIBTEX;
+        preferences.setLatestApproach(NewEntryApproach.SPECIFY_BIBTEX);
 
         if (bibtexText != null) {
             Platform.runLater(() -> bibtexText.requestFocus());
@@ -396,20 +396,20 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
         // update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
         // a `Platform.runLater(...)` which would probably fix this.
         switch (currentApproach) {
-            case NewEntryUnifiedApproach.CREATE_ENTRY:
+            case NewEntryApproach.CREATE_ENTRY:
                 // We do nothing here.
                 break;
-            case NewEntryUnifiedApproach.LOOKUP_IDENTIFIER:
+            case NewEntryApproach.LOOKUP_IDENTIFIER:
                 generateButton.setText("Searching...");
                 viewModel.executeLookupIdentifier(idLookupGuess.isSelected());
                 switchLookupIdentifier();
                 break;
-            case NewEntryUnifiedApproach.INTERPRET_CITATIONS:
+            case NewEntryApproach.INTERPRET_CITATIONS:
                 generateButton.setText("Parsing...");
                 viewModel.executeInterpretCitations();
                 switchInterpretCitations();
                 break;
-            case NewEntryUnifiedApproach.SPECIFY_BIBTEX:
+            case NewEntryApproach.SPECIFY_BIBTEX:
                 generateButton.setText("Parsing...");
                 viewModel.executeSpecifyBibtex();
                 switchSpecifyBibtex();

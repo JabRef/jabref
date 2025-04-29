@@ -1,6 +1,6 @@
-package org.jabref.gui.newentryunified;
+package org.jabref.gui.newentry;
 
-public enum NewEntryUnifiedApproach {
+public enum NewEntryApproach {
     CREATE_ENTRY,
     LOOKUP_IDENTIFIER,
     INTERPRET_CITATIONS,

@@ -1,4 +1,4 @@
-package org.jabref.gui.newentryunified;
+package org.jabref.gui.newentry;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -9,14 +9,14 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.model.entry.types.EntryType;
 
-public class NewEntryUnifiedPreferences {
-    private final ObjectProperty<NewEntryUnifiedApproach> latestApproach;
+public class NewEntryPreferences {
+    private final ObjectProperty<NewEntryApproach> latestApproach;
     private final ObjectProperty<EntryType> latestInstantType;
     private final BooleanProperty idLookupGuessing;
     private final StringProperty latestIdFetcherName;
     private final StringProperty latestInterpretParserName;
 
-    public NewEntryUnifiedPreferences(NewEntryUnifiedApproach approach,
+    public NewEntryPreferences(NewEntryApproach approach,
                                       EntryType instantType,
                                       boolean idLookupGuessing,
                                       String idFetcherName,
@@ -28,15 +28,15 @@ public class NewEntryUnifiedPreferences {
         this.latestInterpretParserName = new SimpleStringProperty(interpretParserName);
     }
 
-    public NewEntryUnifiedApproach getLatestApproach() {
+    public NewEntryApproach getLatestApproach() {
         return latestApproach.get();
     }
 
-    public void setLatestApproach(NewEntryUnifiedApproach approach) {
+    public void setLatestApproach(NewEntryApproach approach) {
         latestApproach.set(approach);
     }
 
-    public ObjectProperty<NewEntryUnifiedApproach> latestApproachProperty() {
+    public ObjectProperty<NewEntryApproach> latestApproachProperty() {
         return latestApproach;
     }
 

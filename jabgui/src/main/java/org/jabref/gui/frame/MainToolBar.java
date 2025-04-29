@@ -25,7 +25,7 @@ import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.exporter.SaveAction;
 import org.jabref.gui.importer.NewDatabaseAction;
-import org.jabref.gui.importer.NewEntryUnifiedAction;
+import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplicationCommand;
@@ -116,8 +116,8 @@ public class MainToolBar extends ToolBar {
                 rightSpacer,
 
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_INSTANT_ENTRY, new NewEntryUnifiedAction((EntryType) null, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY_UNIFIED, new NewEntryUnifiedAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_INSTANT_ENTRY, new NewEntryAction((EntryType) null, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),

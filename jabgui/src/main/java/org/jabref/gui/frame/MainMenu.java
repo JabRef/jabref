@@ -44,7 +44,7 @@ import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.help.SearchForUpdateAction;
 import org.jabref.gui.importer.ImportCommand;
 import org.jabref.gui.importer.NewDatabaseAction;
-import org.jabref.gui.importer.NewEntryUnifiedAction;
+import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.importer.fetcher.LookupIdentifierAction;
 import org.jabref.gui.integrity.IntegrityCheckAction;
@@ -54,7 +54,7 @@ import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
-import org.jabref.gui.newentryunified.NewEntryUnifiedApproach;
+import org.jabref.gui.newentry.NewEntryApproach;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
@@ -240,9 +240,9 @@ public class MainMenu extends MenuBar {
         });
 
         library.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_INSTANT_ENTRY, new NewEntryUnifiedAction((EntryType) null, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_UNIFIED, new NewEntryUnifiedAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_PLAINTEXT, new NewEntryUnifiedAction(NewEntryUnifiedApproach.INTERPRET_CITATIONS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_INSTANT_ENTRY, new NewEntryAction((EntryType) null, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.NEW_ENTRY_PLAINTEXT, new NewEntryAction(NewEntryApproach.INTERPRET_CITATIONS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
