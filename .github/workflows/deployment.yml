@@ -183,7 +183,7 @@ jobs:
           --verbose \
           --type pkg \
           --mac-sign \
-          --vendor "JabRef e.V."
+          --vendor "JabRef e.V." \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
