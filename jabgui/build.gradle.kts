@@ -259,18 +259,18 @@ tasks.named("jlinkZip") {
 }
 
 tasks.register<Delete>("deleteInstallerTemp") {
-    delete(file("$buildDir/installer"))
+    delete(layout.buildDirectory.dir("installer"))
 }
 
-var jpackageResourceDir: String = ""
+var jpackageResourceDir: String  = ""
 
 if (OperatingSystem.current().isWindows) {
-    jpackageResourceDir = "${buildDir}/jpackage-resource-dir"
+    jpackageResourceDir = "${layout.buildDirectory.get().asFile}/jpackage-resource-dir"
 
     tasks.register<Copy>("copyJPackageResourceDir") {
         from("${projectDir}/buildres/windows") {
             include("JabRef-post-image.wsf")
-            filter<ReplaceTokens>(mapOf("jabRefRoot" to "${projectDir}".replace('\\', '/')))
+            filter<ReplaceTokens>(mapOf("jabRefRoot" to "$projectDir".replace('\\', '/')))
         }
         from("${projectDir}/buildres/windows") {
             exclude("JabRef-post-image.wsf")
@@ -286,7 +286,6 @@ if (OperatingSystem.current().isWindows) {
 } else if (OperatingSystem.current().isMacOsX) {
     jpackageResourceDir = "${projectDir}/buildres/mac"
 }
-
 
 jlink {
     // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
@@ -440,7 +439,7 @@ jlink {
         )
         requires(
             "org.tukaani.xz"
-        );
+        )
         uses(
             "ai.djl.engine.EngineProvider"
         )
@@ -523,7 +522,7 @@ jlink {
                     "--win-shortcut",
                     "--win-menu",
                     "--win-menu-group", "JabRef",
-                    "--temp", "$buildDir/installer",
+                    "--temp", "${layout.buildDirectory.get()}/installer",
                     "--resource-dir", jpackageResourceDir,
                     "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
                     "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
@@ -543,7 +542,7 @@ jlink {
                     "--vendor",  "JabRef",
                     "--app-version", "$version",
                     // "--temp", "$buildDir/installer",
-                    "--resource-dir", jpackageResourceDir
+                    "--resource-dir", jpackageResourceDir,
                     "--linux-menu-group", "Office;",
                     "--linux-rpm-license-type", "MIT",
                     // "--license-file", "$projectDir/LICENSE.md",
