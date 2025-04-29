@@ -23,7 +23,9 @@ public class JournalAbbreviationPreferences {
     
     // We use a separate property for change tracking because ObservableMap listeners
     // do not always fire correctly when used for UI bindings, especially when
-    // clearing and re-adding multiple entries at once
+    // clearing and re-adding multiple entries at once.
+    // The actual boolean value does not matter because we toggle it (true → false or false → true)
+    // to signal to listeners that a change occurred. This technique is a "dirty flag".
     private final BooleanProperty enabledListsChanged = new SimpleBooleanProperty();
     
     /**
@@ -94,6 +96,14 @@ public class JournalAbbreviationPreferences {
      */
     public void setSourceEnabled(String sourcePath, boolean enabled) {
         enabledExternalLists.put(sourcePath, enabled);
+        notifyChange();
+    }
+    
+    /**
+     * Notifies listeners that the enabled states have changed.
+     * This simply toggles the boolean value to trigger listeners.
+     */
+    private void notifyChange() {
         enabledListsChanged.set(!enabledListsChanged.get());
     }
     
@@ -116,7 +126,7 @@ public class JournalAbbreviationPreferences {
         if (enabledLists != null) {
             this.enabledExternalLists.putAll(enabledLists);
         }
-        enabledListsChanged.set(!enabledListsChanged.get());
+        notifyChange();
     }
     
     /**
