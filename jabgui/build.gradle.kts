@@ -92,7 +92,7 @@ dependencies {
     }
 
     // implementation("net.java.dev.jna:jna:5.16.0")
-    implementation("net.java.dev.jna:jna-platform:5.16.0")
+    implementation("net.java.dev.jna:jna-platform:5.17.0")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
 
@@ -111,9 +111,11 @@ dependencies {
 
     implementation("commons-cli:commons-cli:1.9.0")
 
-    implementation("de.undercouch:citeproc-java:3.2.0") {
+    implementation("de.undercouch:citeproc-java:3.3.0") {
         exclude(group = "org.antlr")
     }
+
+    testImplementation(project(":test-support"))
 
     testImplementation("io.github.classgraph:classgraph:4.8.179")
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
@@ -167,7 +169,7 @@ application {
         "--add-opens=javafx.base/javafx.collections=org.jabref",
         "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
 
-        "--enable-native-access=com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+        "--enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
     )
 }
 
@@ -185,7 +187,7 @@ tasks.named<JavaExec>("run") {
     doFirst {
         // Clear the default JVM arguments to avoid warnings
         // application.applicationDefaultJvmArgs = emptyList()
-        application.applicationDefaultJvmArgs = listOf("--enable-native-access=com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core")
+        application.applicationDefaultJvmArgs = listOf("--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core")
     }
 
     extensions.configure<RunModuleOptions>("moduleOptions") {
@@ -270,9 +272,7 @@ jlink {
         "--compress",
         "zip-6",
         "--no-header-files",
-        "--no-man-pages"
-    )
-    addOptions(
+        "--no-man-pages",
         "--bind-services"
     )
 
@@ -371,9 +371,6 @@ jlink {
         )
         requires(
             "javafx.swing"
-        )
-        requires(
-            "jdk.jsobject"
         )
         requires(
             "jdk.security.jgss"
@@ -481,100 +478,72 @@ jlink {
 
         if (OperatingSystem.current().isWindows) {
             // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
-            installerType =
-                "msi"
+            installerType =  "msi"
 
             imageOptions.addAll(
                 listOf(
-                    "--icon",
-                    "${projectDir}/src/main/resources/icons/jabref.ico"
+                    "--icon", "${projectDir}/src/main/resources/icons/jabref.ico"
                 )
             )
 
             installerOptions.addAll(
                 listOf(
-                    "--vendor",
-                    "JabRef",
-                    "--app-version",
-                    "$version",
+                    "--vendor", "JabRef",
+                    "--app-version", "$version",
                     "--verbose",
-                    "--win-upgrade-uuid",
-                    "d636b4ee-6f10-451e-bf57-c89656780e36",
+                    "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
                     "--win-dir-chooser",
                     "--win-shortcut",
                     "--win-menu",
-                    "--win-menu-group",
-                    "JabRef",
-                    "--temp",
-                    "$buildDir/installer",
-                    "--resource-dir",
-                    "$projectDir/buildres/windows",
-                    "--license-file",
-                    "$projectDir/buildres/LICENSE_with_Privacy.md",
-                    "--file-associations",
-                    "$projectDir/buildres/windows/bibtexAssociations.properties"
+                    "--win-menu-group", "JabRef",
+                    "--temp", "$buildDir/installer",
+                    "--resource-dir", "$projectDir/buildres/windows",
+                    "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+                    "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
                 )
             )
         } else if (OperatingSystem.current().isLinux) {
             imageOptions.addAll(
                 listOf(
-                    "--icon",
-                    "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
-                    "--app-version",
-                    "$version"
+                    "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
+                    "--app-version", "$version"
                 )
             )
 
             installerOptions.addAll(
                 listOf(
                     "--verbose",
-                    "--vendor",
-                    "JabRef",
-                    "--app-version",
-                    "$version",
+                    "--vendor",  "JabRef",
+                    "--app-version", "$version",
                     // "--temp", "$buildDir/installer",
-                    "--resource-dir",
-                    "$projectDir/buildres/linux",
-                    "--linux-menu-group",
-                    "Office;",
-                    "--linux-rpm-license-type",
-                    "MIT",
+                    "--resource-dir", "$projectDir/buildres/linux",
+                    "--linux-menu-group", "Office;",
+                    "--linux-rpm-license-type", "MIT",
                     // "--license-file", "$projectDir/LICENSE.md",
-                    "--description",
-                    "JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.",
+                    "--description", "JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.",
                     "--linux-shortcut",
-                    "--file-associations",
-                    "$projectDir/buildres/linux/bibtexAssociations.properties"
+                    "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
                 )
             )
         } else if (OperatingSystem.current().isMacOsX) {
             imageOptions.addAll(
                 listOf(
-                    "--icon",
-                    "$projectDir/src/main/resources/icons/jabref.icns",
-                    "--resource-dir",
-                    "$projectDir/buildres/mac"
+                    "--icon",  "$projectDir/src/main/resources/icons/jabref.icns",
+                    "--resource-dir", "$projectDir/buildres/mac"
                 )
             )
 
-            skipInstaller =
-                true
+            skipInstaller = true
 
             installerOptions.addAll(
                 listOf(
                     "--verbose",
-                    "--vendor",
-                    "JabRef",
-                    "--mac-package-identifier",
-                    "JabRef",
-                    "--mac-package-name",
-                    "JabRef",
-                    "--app-version",
-                    "$version",
-                    "--file-associations",
-                    "$projectDir/buildres/mac/bibtexAssociations.properties",
-                    "--resource-dir",
-                    "$projectDir/buildres/mac"
+                    "--vendor", "JabRef",
+                    "--mac-package-identifier", "JabRef",
+                    "--mac-package-name", "JabRef",
+                    "--app-version", "$version",
+                    "--file-associations", "$projectDir/buildres/mac/bibtexAssociations.properties",
+                    "--resource-dir", "$projectDir/buildres/mac"
                 )
             )
         }
