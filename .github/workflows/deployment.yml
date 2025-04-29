@@ -177,6 +177,7 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
+          --dest build/distribution \
           --app-image build/distribution/JabRef.app
 
           jpackage \
