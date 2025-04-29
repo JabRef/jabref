@@ -191,6 +191,7 @@ jobs:
           --icon src/main/resources/icons/jabref.icns \
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
+          --dest build/distribution \
           --app-image build/distribution/JabRef.app
 
           # Cleanup unpacked file
@@ -200,8 +201,9 @@ jobs:
         if: (steps.checksecrets.outputs.secretspresent == 'YES') && (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
         shell: bash
         run: |
-          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-${{ matrix.suffix }}.dmg
-          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-${{ matrix.suffix }}.pkg
+          cd jabgui
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.dmg
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.pkg
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
