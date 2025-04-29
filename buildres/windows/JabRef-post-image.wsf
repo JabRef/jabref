@@ -9,13 +9,17 @@
         // DEBUG Output
         // var shell = new ActiveXObject("WScript.Shell");
         // shell.Popup(fileSystem.GetFolder("."));
-        var jabRefRoot = fileSystem.GetFolder(".").ParentFolder.ParentFolder.ParentFolder.ParentFolder.Path;
-        var installerConfig = jabRefRoot + "/build/installer/config/";
+        var jabRefRoot = fileSystem.GetFolder('@jabRefRoot@');
+        // jpackage will run a copy of the script from the "config" directory.
+        var installerConfig = fileSystem.GetFile(WScript.ScriptFullName).ParentFolder;
+
+        WScript.Echo("jabRefRoot: " + jabRefRoot)
+        WScript.Echo("installerConfig: " + installerConfig)
 
         // Copy additional installer resources
-        fileSystem.CopyFile(jabRefRoot + "/buildres/windows/JabRefTopBanner.bmp", installerConfig);
+        fileSystem.CopyFile(jabRefRoot + "/buildres/windows/JabRefTopBanner.bmp", installerConfig + "/JabRefTopBanner.bmp");
 
-        var wxsFilePath = installerConfig + "main.wxs";
+        var wxsFilePath = installerConfig + "/main.wxs";
         wxsFile = fileSystem.OpenTextFile(wxsFilePath, 1);
         var contents = wxsFile.ReadAll();
         wxsFile.Close();

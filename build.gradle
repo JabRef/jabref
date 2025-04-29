@@ -2,6 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jabref.build.xjc.XjcPlugin
 import org.jabref.build.xjc.XjcTask
+import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'application'
@@ -811,6 +812,30 @@ tasks.register('deleteInstallerTemp', Delete) {
     delete "$buildDir/installer"
 }
 
+def jpackageResourceDir;
+if (OperatingSystem.current().isWindows()) {
+    jpackageResourceDir = "${buildDir}/jpackage-resource-dir"
+    tasks.register('copyJPackageResourceDir', Copy) {
+        from("${projectDir}/buildres/windows") {
+            include 'JabRef-post-image.wsf'
+            filter(ReplaceTokens, tokens: [jabRefRoot: "${projectDir}".replace('\\', '/')])
+        }
+        from("${projectDir}/buildres/windows") {
+            exclude 'JabRef-post-image.wsf'
+        }
+        into jpackageResourceDir
+    }
+    jpackage.dependsOn copyJPackageResourceDir
+}
+
+if (OperatingSystem.current().isLinux()) {
+    jpackageResourceDir = "${projectDir}/buildres/linux"
+}
+
+if (OperatingSystem.current().isMacOsX()) {
+    jpackageResourceDir = "${projectDir}/buildres/mac"
+}
+
 jpackage.dependsOn deleteInstallerTemp
 jlinkZip.dependsOn jpackage
 jlink {
@@ -933,8 +958,7 @@ jlink {
                     '--win-shortcut',
                     '--win-menu',
                     '--win-menu-group', "JabRef",
-                    '--temp', "$buildDir/installer",
-                    '--resource-dir', "${projectDir}/buildres/windows",
+                    '--resource-dir', jpackageResourceDir,
                     '--license-file', "${projectDir}/buildres/LICENSE_with_Privacy.md",
                     '--file-associations', "${projectDir}/buildres/windows/bibtexAssociations.properties"
             ]
@@ -950,7 +974,7 @@ jlink {
                     '--vendor', 'JabRef',
                     '--app-version', "${project.version}",
                     // '--temp', "$buildDir/installer",
-                    '--resource-dir', "${projectDir}/buildres/linux",
+                    '--resource-dir', jpackageResourceDir,
                     '--linux-menu-group', 'Office;',
                     '--linux-rpm-license-type', 'MIT',
                     // '--license-file', "${projectDir}/LICENSE.md",
@@ -963,7 +987,7 @@ jlink {
         if (OperatingSystem.current().isMacOsX()) {
             imageOptions = [
                     '--icon', "${projectDir}/src/main/resources/icons/jabref.icns",
-                    '--resource-dir', "${projectDir}/buildres/mac"
+                    '--resource-dir', jpackageResourceDir
             ]
             // Notarized mac images and packages are built on the pipeline only
             skipInstaller = true
@@ -974,7 +998,7 @@ jlink {
                     '--mac-package-name', "JabRef",
                     '--app-version', "${project.version}",
                     '--file-associations', "${projectDir}/buildres/mac/bibtexAssociations.properties",
-                    '--resource-dir', "${projectDir}/buildres/mac"
+                    '--resource-dir', jpackageResourceDir
             ]
         }
     }
