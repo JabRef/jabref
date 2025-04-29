@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where directory check for relative path was not handled properly under library properties. [#13017](https://github.com/JabRef/jabref/issues/13017) 
+
 ### Removed
 
 - We removed support for MySQL/MariaDB and Oracle. [#12990](https://github.com/JabRef/jabref/pull/12990)

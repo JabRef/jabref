@@ -196,23 +196,24 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     private Path getBrowseDirectory(String configuredDir) {
+        Path libPath = preferences.getFilePreferences().getWorkingDirectory();
         if (configuredDir.isEmpty()) {
-            return preferences.getFilePreferences().getWorkingDirectory();
+            return libPath;
         }
-        Optional<Path> foundPath = this.databaseContext.getFileDirectories(preferences.getFilePreferences()).stream()
-                                                       .filter(path -> path.toString().endsWith(configuredDir))
-                                                       .filter(Files::exists).findFirst();
+        Path path = libPath.resolve(configuredDir).normalize();
 
-        if (foundPath.isEmpty()) {
+        if (!Files.isDirectory(path)) {
             dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working dir.", configuredDir));
             return preferences.getFilePreferences().getWorkingDirectory();
         }
-        return foundPath.get();
+        return path;
     }
 
     private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
         try {
-            Path path = Path.of(directoryPath);
+            Path libPath = preferences.getFilePreferences().getWorkingDirectory();
+            Path path = libPath.resolve(directoryPath).normalize();
+
             if (!Files.isDirectory(path)) {
                 return ValidationMessage.error(
                         Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
