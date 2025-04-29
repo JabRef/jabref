@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -230,20 +228,20 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
     }
 
     private void initializeLookupIdentifier() {
+        // :TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
+        // model would then iterate through all non-blank lines, passing each of them through the specified lookup
+        // method (each automatically independently, or all through the same fetcher).
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
+            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+            // supported identifier format.
             idText.setText(clipboardText);
             idText.selectAll();
         }
 
-        idLookupGuess.selectedProperty().addListener(
-            new ChangeListener<Boolean>() {
-                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-                    preferences.setIdLookupGuessing(newValue);
-                }
-            });
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
 
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
@@ -301,6 +299,8 @@ public class NewEntryUnifiedView extends BaseDialog<BibEntry> {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
+            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+            // supported Bib(La)Tex source format.
             bibtexText.setText(clipboardText);
             bibtexText.selectAll();
         }

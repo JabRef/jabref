@@ -265,7 +265,7 @@ public class NewEntryUnifiedViewModel {
         idLookupWorker.setOnSucceeded(event -> {
             final Optional<BibEntry> result = idLookupWorker.getValue();
 
-            if (!result.isPresent()) {
+            if (result.isEmpty()) {
                 dialogService.showWarningDialogAndWait(
                     Localization.lang("Invalid result returned"),
                     Localization.lang(
@@ -355,7 +355,7 @@ public class NewEntryUnifiedViewModel {
         interpretWorker.setOnSucceeded(event -> {
             final Optional<List<BibEntry>> result = interpretWorker.getValue();
 
-            if (!result.isPresent()) {
+            if (result.isEmpty()) {
                 dialogService.showWarningDialogAndWait(
                     Localization.lang("Invalid result"),
                     Localization.lang(
@@ -438,7 +438,7 @@ public class NewEntryUnifiedViewModel {
         bibtexWorker.setOnSucceeded(event -> {
             final Optional<List<BibEntry>> result = bibtexWorker.getValue();
 
-            if (!result.isPresent()) {
+            if (result.isEmpty()) {
                 dialogService.showWarningDialogAndWait(
                     Localization.lang("Invalid result"),
                     Localization.lang(
