@@ -82,6 +82,11 @@ public class AbbreviateAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsEntriesSelected(stateManager));
     }
 
+    /**
+     * Executes the abbreviation or unabbreviation action on selected entries.
+     * For unabbreviation, checks if any journal source is enabled first.
+     * For abbreviation, handles different abbreviation types (default, dotless, shortest unique, LTWA).
+     */
     @Override
     public void execute() {
         if (action == StandardActions.UNABBREVIATE && !journalAbbreviationPreferences.areAnyJournalSourcesEnabled()) {
