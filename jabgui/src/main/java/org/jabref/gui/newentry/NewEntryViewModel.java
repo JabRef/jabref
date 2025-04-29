@@ -221,7 +221,7 @@ public class NewEntryViewModel {
             idLookupWorker = new WorkerLookupTypedId();
         }
 
-        idLookupWorker.setOnFailed(event -> {
+        idLookupWorker.setOnFailed(_ -> {
             final Throwable exception = idLookupWorker.getException();
             final String exceptionMessage = exception.getMessage();
             final String textString = idText.getValue();
@@ -352,7 +352,7 @@ public class NewEntryViewModel {
             executing.set(false);
         });
 
-        interpretWorker.setOnSucceeded(event -> {
+        interpretWorker.setOnSucceeded(_ -> {
             final Optional<List<BibEntry>> result = interpretWorker.getValue();
 
             if (result.isEmpty()) {
@@ -407,7 +407,7 @@ public class NewEntryViewModel {
         cancel();
         bibtexWorker = new WorkerSpecifyBibtex();
 
-        bibtexWorker.setOnFailed(event -> {
+        bibtexWorker.setOnFailed(_ -> {
             final Throwable exception = interpretWorker.getException();
             final String exceptionMessage = exception.getMessage();
 
@@ -435,7 +435,7 @@ public class NewEntryViewModel {
             executing.set(false);
         });
 
-        bibtexWorker.setOnSucceeded(event -> {
+        bibtexWorker.setOnSucceeded(_ -> {
             final Optional<List<BibEntry>> result = bibtexWorker.getValue();
 
             if (result.isEmpty()) {

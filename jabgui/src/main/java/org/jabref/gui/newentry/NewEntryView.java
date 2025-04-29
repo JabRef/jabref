@@ -127,11 +127,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         ((Stage) getDialogPane().getScene().getWindow()).setMinWidth(400);
         ((Stage) getDialogPane().getScene().getWindow()).setMinHeight(300);
 
-        ControlHelper.setAction(generateButtonType, getDialogPane(), event -> execute());
-        setOnCloseRequest(e -> cancel());
-        setResultConverter(button -> {
-            return result;
-        });
+        ControlHelper.setAction(generateButtonType, getDialogPane(), _ -> execute());
+        setOnCloseRequest(_ -> cancel());
+        setResultConverter(_ -> result);
 
         getDialogPane().disableProperty().bind(viewModel.executingProperty());
 
@@ -164,10 +162,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 break;
         }
 
-        tabCreateEntry.setOnSelectionChanged(event -> switchCreateEntry());
-        tabLookupIdentifier.setOnSelectionChanged(event -> switchLookupIdentifier());
-        tabInterpretCitations.setOnSelectionChanged(event -> switchInterpretCitations());
-        tabSpecifyBibtex.setOnSelectionChanged(event -> switchSpecifyBibtex());
+        tabCreateEntry.setOnSelectionChanged(_ -> switchCreateEntry());
+        tabLookupIdentifier.setOnSelectionChanged(_ -> switchLookupIdentifier());
+        tabInterpretCitations.setOnSelectionChanged(_ -> switchInterpretCitations());
+        tabSpecifyBibtex.setOnSelectionChanged(_ -> switchSpecifyBibtex());
     }
 
     @FXML
@@ -263,9 +261,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             initialFetcher = fetcherFromName(defaultFetcher.getName(), idFetcher.getItems());
         }
         idFetcher.setValue(initialFetcher);
-        idFetcher.setOnAction(event -> {
-            preferences.setLatestIdFetcher(idFetcher.getValue().getName());
-        });
+        idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
@@ -289,9 +285,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             initialParser = parserFromName(defaultParser.getLocalizedName(), interpretParser.getItems());
         }
         interpretParser.setValue(initialParser);
-        interpretParser.setOnAction(event -> {
-            preferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName());
-        });
+        interpretParser.setOnAction(_ -> preferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName()));
     }
 
     private void initializeSpecifyBibTex() {
@@ -428,7 +422,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
             final Button button = new Button(type.getDisplayName());
             button.setUserData(entry);
-            button.setOnAction(event -> onEntryTypeSelected(type));
+            button.setOnAction(_ -> onEntryTypeSelected(type));
             pane.getChildren().add(button);
 
             final String description = descriptionOfEntryType(type);
