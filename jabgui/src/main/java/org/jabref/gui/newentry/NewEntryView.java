@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -424,6 +425,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             button.setUserData(entry);
             button.setOnAction(_ -> onEntryTypeSelected(type));
             pane.getChildren().add(button);
+            pane.setMargin(button, new Insets(1.0));
 
             final String description = descriptionOfEntryType(type);
             if (description != null) {
