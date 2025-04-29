@@ -1,6 +1,5 @@
 package org.jabref.gui.journals;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,17 +142,6 @@ public class AbbreviateAction extends SimpleCommand {
         
         JournalAbbreviationRepository freshRepository = getRepository();
         
-        Map<String, Boolean> sourceEnabledStates = new HashMap<>();
-        String builtInId = JournalAbbreviationRepository.BUILTIN_LIST_ID;
-        sourceEnabledStates.put(builtInId, journalAbbreviationPreferences.isSourceEnabled(builtInId));
-        
-        for (String listPath : journalAbbreviationPreferences.getExternalJournalLists()) {
-            if (listPath != null && !listPath.isBlank()) {
-                String fileName = Path.of(listPath).getFileName().toString();
-                sourceEnabledStates.put(fileName, journalAbbreviationPreferences.isSourceEnabled(fileName));
-            }
-        }
-        
         var allAbbreviationsWithSources = freshRepository.getAllAbbreviationsWithSources();
         Map<String, List<JournalAbbreviationRepository.AbbreviationWithSource>> textToSourceMap = new HashMap<>();
         
@@ -181,7 +169,7 @@ public class AbbreviateAction extends SimpleCommand {
                     boolean allSourcesDisabled = true;
                     for (var abbrWithSource : possibleSources) {
                         String source = abbrWithSource.getSource();
-                        if (sourceEnabledStates.getOrDefault(source, true)) {
+                        if (freshRepository.isSourceEnabled(source)) {
                             allSourcesDisabled = false;
                             break;
                         }
