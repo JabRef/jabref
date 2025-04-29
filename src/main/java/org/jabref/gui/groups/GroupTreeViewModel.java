@@ -238,7 +238,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
             selectedGroups.setAll(newSuggestedSubgroups
                     .stream()
                     .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
-                    .collect(Collectors.toList()));
+                    .toList());
 
             writeGroupChangesToMetaData();
 
