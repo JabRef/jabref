@@ -1,9 +1,9 @@
 package org.jabref.gui.journals;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javax.swing.undo.UndoManager;
@@ -142,17 +142,6 @@ public class AbbreviateAction extends SimpleCommand {
         
         JournalAbbreviationRepository freshRepository = getRepository();
         
-        var allAbbreviationsWithSources = freshRepository.getAllAbbreviationsWithSources();
-        Map<String, List<JournalAbbreviationRepository.AbbreviationWithSource>> textToSourceMap = new HashMap<>();
-        
-        for (var abbrWithSource : allAbbreviationsWithSources) {
-            Abbreviation abbr = abbrWithSource.getAbbreviation();
-            addToMap(textToSourceMap, abbr.getName(), abbrWithSource);
-            addToMap(textToSourceMap, abbr.getAbbreviation(), abbrWithSource);
-            addToMap(textToSourceMap, abbr.getDotlessAbbreviation(), abbrWithSource);
-            addToMap(textToSourceMap, abbr.getShortestUniqueAbbreviation(), abbrWithSource);
-        }
-        
         for (BibEntry entry : entries) {
             boolean includeEntry = true;
             
@@ -162,20 +151,11 @@ public class AbbreviateAction extends SimpleCommand {
                 }
                 
                 String text = entry.getFieldLatexFree(journalField).orElse("");
-                List<JournalAbbreviationRepository.AbbreviationWithSource> possibleSources = 
-                    textToSourceMap.getOrDefault(text, List.of());
                 
-                if (!possibleSources.isEmpty()) {
-                    boolean allSourcesDisabled = true;
-                    for (var abbrWithSource : possibleSources) {
-                        String source = abbrWithSource.getSource();
-                        if (freshRepository.isSourceEnabled(source)) {
-                            allSourcesDisabled = false;
-                            break;
-                        }
-                    }
+                if (freshRepository.isAbbreviatedName(text)) {
+                    Optional<Abbreviation> abbreviation = freshRepository.getForUnabbreviation(text);
                     
-                    if (allSourcesDisabled) {
+                    if (abbreviation.isEmpty()) {
                         includeEntry = false;
                         break;
                     }
@@ -201,23 +181,6 @@ public class AbbreviateAction extends SimpleCommand {
         undoManager.addEdit(ce);
         tabSupplier.get().markBaseChanged();
         return Localization.lang("Unabbreviated %0 journal names.", String.valueOf(count));
-    }
-
-    /**
-     * Helper method to add an abbreviation to the text-to-source map
-     *
-     * @param map The map to add to
-     * @param text The text to use as key
-     * @param abbrWithSource The abbreviation with source to add
-     */
-    private void addToMap(Map<String, List<JournalAbbreviationRepository.AbbreviationWithSource>> map, 
-                          String text, 
-                          JournalAbbreviationRepository.AbbreviationWithSource abbrWithSource) {
-        if (text == null || text.isBlank()) {
-            return;
-        }
-        
-        map.computeIfAbsent(text, k -> new ArrayList<>()).add(abbrWithSource);
     }
 
     /**
