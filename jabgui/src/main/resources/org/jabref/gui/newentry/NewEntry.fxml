@@ -27,6 +27,10 @@
             <Tab fx:id="tabCreateEntry" text="%Create Entry" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
+                    <Label text="%The 'add empty entry' tool uses the last-selected entry type from this menu.">
+                        <font><Font name="System Italic" size="13.0"/></font>
+                        <padding><Insets bottom="5.0"/></padding>
+                    </Label>
                     <TitledPane fx:id="entryRecommendedTitle" text="%Recommended types" animated="false" collapsible="false">
                         <content>
                             <FlowPane fx:id="entryRecommended"/>
@@ -42,15 +46,16 @@
                             <FlowPane fx:id="entryCustom"/>
                         </content>
                     </TitledPane>
-                    <Label text="%The 'add empty entry' toolbar quick-action uses the last-selected entry type from this menu.">
-                        <font><Font name="System Italic" size="13.0"/></font>
-                    </Label>
                 </VBox>
             </Tab>
 
             <Tab fx:id="tabLookupIdentifier" text="%Lookup Identifier" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
+                    <Label text="%You can also paste identifiers (using 'Ctrl + V') into the entry table to create them directly.">
+                        <font><Font name="System Italic" size="13.0"/></font>
+                        <padding><Insets bottom="5.0"/></padding>
+                    </Label>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <Label text="%Identifier:"/>
                         <TextField fx:id="idText" prefHeight="30.0" HBox.hgrow="ALWAYS">
@@ -94,6 +99,10 @@
             <Tab fx:id="tabInterpretCitations" text="%Interpret Citations" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
+                    <Label text="%Enter plain citations to parse, separated by blank lines.">
+                        <font><Font name="System Italic" size="13.0"/></font>
+                        <padding><Insets bottom="5.0"/></padding>
+                    </Label>
                     <TextArea fx:id="interpretText" VBox.vgrow="always" wrapText="true"/>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <Label text="%Parser:"/>
@@ -117,6 +126,10 @@
             <Tab fx:id="tabSpecifyBibtex" text="%Enter BibTeX" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
+                    <Label text="%Enter Bib(La)TeX sources to generate entries from.">
+                        <font><Font name="System Italic" size="13.0"/></font>
+                        <padding><Insets bottom="5.0"/></padding>
+                    </Label>
                     <TextArea fx:id="bibtexText" VBox.vgrow="always" wrapText="true"/>
                 </VBox>
             </Tab>

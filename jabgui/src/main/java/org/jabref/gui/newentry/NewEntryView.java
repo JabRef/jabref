@@ -269,7 +269,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeInterpretCitations() {
-        interpretText.setPromptText(Localization.lang("Enter the plain citations to parse, separated by blank lines."));
         interpretText.textProperty().bindBidirectional(viewModel.interpretTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
@@ -290,7 +289,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeSpecifyBibTex() {
-        bibtexText.setPromptText(Localization.lang("Enter the Bib(La)TeX sources to generate entries from."));
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
