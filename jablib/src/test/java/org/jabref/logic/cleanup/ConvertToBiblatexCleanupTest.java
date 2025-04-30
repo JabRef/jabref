@@ -110,8 +110,7 @@ class ConvertToBiblatexCleanupTest {
             "2004-22"
     })
     void fallbackDateParsing_shouldAcceptTypicalBibLatexValues(String fakeYear) {
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.YEAR, fakeYear);
+        BibEntry entry = new BibEntry().withField(StandardField.YEAR, fakeYear);
 
         worker.cleanup(entry);
 
