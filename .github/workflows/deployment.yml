@@ -104,6 +104,8 @@ jobs:
         if: (matrix.os == 'windows-latest')
         shell: bash
         run: mv ~/.local/share/mise ~/.asdf
+      - run: java --version
+      - run: echo $JAVA_HOME
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir (macOS)
