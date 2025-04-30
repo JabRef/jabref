@@ -141,7 +141,9 @@ jobs:
           set -e
           cd jabgui
 
-          eval "$(mise hook-env)"
+          # see https://github.com/jdx/mise/discussions/4973
+          eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          eval $(mise hook-env -f | grep 'export PATH')
 
           # Use Java's packaging tool to create "JabRef.app"
           jpackage \
