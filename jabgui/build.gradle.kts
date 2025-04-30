@@ -273,7 +273,9 @@ if (OperatingSystem.current().isWindows) {
     tasks.register<Copy>("copyJPackageResourceDir") {
         from("${projectDir}/buildres/windows") {
             include("JabRef-post-image.wsf")
-            filter<ReplaceTokens>(mapOf("jabRefRoot" to "$projectDir".replace('\\', '/')))
+            filter(ReplaceTokens::class, mapOf("tokens" to mapOf(
+                "jabRefRoot" to project.projectDir.toString().replace('\\', '/')
+            )))
         }
         from("${projectDir}/buildres/windows") {
             exclude("JabRef-post-image.wsf")
