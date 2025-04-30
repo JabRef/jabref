@@ -111,6 +111,15 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Debug
+        run: |
+          echo $JAVA_HOME
+          mise hook-env -f
+          mise hook-env -f | grep 'export JAVA_HOME'
+          eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          echo $JAVA_HOME
+          eval $(mise hook-env -f | grep 'export PATH')
+          echo $JAVA_HOME
       # endregion
 
       - name: Setup Gradle
