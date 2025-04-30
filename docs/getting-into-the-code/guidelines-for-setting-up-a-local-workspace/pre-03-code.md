@@ -32,7 +32,6 @@ cd JabRef
 git remote rename origin upstream
 git remote add origin https://github.com/YOUR_USERNAME/jabref.git
 git fetch --all
-git branch --set-upstream-to=origin/main main
 ```
 
 {: .important }
