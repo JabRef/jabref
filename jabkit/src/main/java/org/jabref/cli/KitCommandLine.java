@@ -245,7 +245,7 @@ public class KitCommandLine implements Callable<Integer> {
         }
     }
 
-    public static List<Pair<String, String>> getAvailableImportFormats(CliPreferences preferences) {
+    protected static List<Pair<String, String>> getAvailableImportFormats(CliPreferences preferences) {
         ImportFormatReader importFormatReader = new ImportFormatReader(
                 preferences.getImporterPreferences(),
                 preferences.getImportFormatPreferences(),
