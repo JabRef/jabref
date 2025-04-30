@@ -52,7 +52,7 @@ Currently, it looks as follows:
 ![Directory Mappings including sub modules](intellij-directory-mappings-unmodified.png)
 {% endfigure %}
 
-You need to tell IntelliJ to ignore the submodules `buildres\abbrv.jabref.org`, `jablib\src\main\resources\csl-locales`, and `jablib\src\main\resources\csl-styles`.
+You need to tell IntelliJ to ignore the submodules `jablib\src\main\abbrv.jabref.org`, `jablib\src\main\resources\csl-locales`, and `jablib\src\main\resources\csl-styles`.
 Select all three (holding the <kbd>Ctrl</kbd> key).
 Then press the red minus button on top.
 
