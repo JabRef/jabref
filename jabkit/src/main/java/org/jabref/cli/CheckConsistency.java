@@ -16,6 +16,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTx
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ class CheckConsistency implements Callable<Integer> {
     private String outputFormat;
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         if (inputFile == null) {
             System.out.println(Localization.lang("No file specified for consistency check."));
             return 0;
@@ -48,7 +49,11 @@ class CheckConsistency implements Callable<Integer> {
 
         ParserResult pr;
         try {
-            pr = OpenDatabase.loadDatabase(inputFile, kitCommandLine.cliPreferences.getImportFormatPreferences(), kitCommandLine.fileUpdateMonitor);
+            pr = OpenDatabase.loadDatabase(
+                    inputFile,
+                    kitCommandLine.cliPreferences.getImportFormatPreferences(),
+                    new DummyFileUpdateMonitor()
+            );
         } catch (IOException ex) {
             LOGGER.error("Error reading '{}'.", inputFile, ex);
             return 0;

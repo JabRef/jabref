@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.net.Authenticator;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.jabref.cli.ArgumentProcessor;
-import org.jabref.cli.JabKitCliOptions;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.net.ProxyAuthenticator;
@@ -92,12 +92,9 @@ public class JabKit {
 
             // Process arguments
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                    args,
-                    ArgumentProcessor.Mode.INITIAL_START,
                     preferences,
-                    fileUpdateMonitor,
                     entryTypesManager);
-            argumentProcessor.processArguments();
+            argumentProcessor.processArguments(args);
 
                 systemExit();
         } catch (Exception ex) {
@@ -116,14 +113,8 @@ public class JabKit {
         SLF4JBridgeHandler.install();
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
-        // argument parsing workflow to parse logging options .e.g. --debug
-        boolean isDebugEnabled;
-        try {
-            JabKitCliOptions jabKitCliOptions = new JabKitCliOptions(args);
-            isDebugEnabled = jabKitCliOptions.isDebugLogging();
-        } catch (ParseException e) {
-            isDebugEnabled = false;
-        }
+        // argument parsing workflow to parse logging options e.g. --debug
+        boolean isDebugEnabled = Arrays.stream(args).anyMatch(arg -> arg.equalsIgnoreCase("--debug"));
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging

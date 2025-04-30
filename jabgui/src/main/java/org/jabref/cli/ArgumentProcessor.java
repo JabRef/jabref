@@ -67,9 +67,6 @@ public class ArgumentProcessor {
             System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
             System.out.println(cli.getUsageMessage());
 
-            System.out.println(Localization.lang("Available import formats"));
-            System.out.println(alignStringTable(getAvailableImportFormats(preferences)));
-
             guiNeeded = false;
             return List.of();
         }

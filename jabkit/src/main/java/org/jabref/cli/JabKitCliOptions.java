@@ -161,15 +161,13 @@ public class JabKitCliOptions {
     }
 
     public String getWriteMetadataToPdf() {
-        return commandLine.hasOption("writeMetadatatoPdf") ? commandLine.getOptionValue("writeMetadataToPdf") :
-                commandLine.hasOption("writeXMPtoPdf") ? commandLine.getOptionValue("writeXmpToPdf") :
-                        commandLine.hasOption("embeddBibfileInPdf") ? commandLine.getOptionValue("embeddBibfileInPdf") : null;
+        return commandLine.hasOption("writeMetadatatoPdf") ? commandLine.getOptionValue("writeMetadataToPdf")
+                : commandLine.hasOption("writeXMPtoPdf") ? commandLine.getOptionValue("writeXmpToPdf")
+                : commandLine.hasOption("embeddBibfileInPdf") ? commandLine.getOptionValue("embeddBibfileInPdf")
+                : null;
     }
 
     private static Options getOptions() {
-
-
-
         return options;
     }
 

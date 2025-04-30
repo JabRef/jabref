@@ -12,7 +12,6 @@ import java.util.Objects;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.cli.ArgumentProcessor.Mode;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -28,7 +27,6 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
 import org.apache.commons.cli.ParseException;
@@ -75,12 +73,9 @@ class ArgumentProcessorTest {
         List<String> args = List.of("--aux", auxFile + "," + outputBib, fullBib);
 
         ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
                 preferences,
-                mock(FileUpdateMonitor.class),
                 entryTypesManager);
-        processor.processArguments();
+        processor.processArguments(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputBib));
     }
@@ -104,12 +99,9 @@ class ArgumentProcessorTest {
         List<String> args = List.of("-n", "--debug", "--exportMatches", "author=Einstein," + outputBibFile, originBibFile);
 
         ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
                 preferences,
-                mock(FileUpdateMonitor.class),
                 entryTypesManager);
-        processor.processArguments();
+        processor.processArguments(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
@@ -136,12 +128,9 @@ class ArgumentProcessorTest {
         List<String> args = List.of("-n", "-i", originBibFile + ",bibtex", "-o", outputHtmlFile + ",tablerefsabsbib");
 
         ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
                 preferences,
-                mock(FileUpdateMonitor.class),
                 entryTypesManager);
-        processor.processArguments();
+        processor.processArguments(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputHtml));
     }
@@ -154,16 +143,13 @@ class ArgumentProcessorTest {
         List<String> args = List.of("--check-consistency", testBibFile, "--output-format", "txt");
 
         ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
                 preferences,
-                mock(FileUpdateMonitor.class),
                 entryTypesManager);
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent, true));
 
-        processor.processArguments();
+        processor.processArguments(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertTrue(output.contains("Consistency check completed"));
@@ -180,16 +166,13 @@ class ArgumentProcessorTest {
         List<String> args = List.of("--check-consistency", testBibFile, "--porcelain");
 
         ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
                 preferences,
-                mock(FileUpdateMonitor.class),
                 entryTypesManager);
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 
-        processor.processArguments();
+        processor.processArguments(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertEquals("", output);
