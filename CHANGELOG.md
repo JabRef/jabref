@@ -90,7 +90,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where the "Convert to biblatex" cleanup failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). A fallback was added to correctly interpret such values. [#11868](https://github.com/JabRef/jabref/issues/11868)
 - We fixed an issue where pasted entries would sometimes end up in the search bar instead of the main table [#12910](https://github.com/JabRef/jabref/issues/12910)
 - We fixed an issue where warning signs were improperly positioned next to text fields containing capital letters. [#12884](https://github.com/JabRef/jabref/issues/12884)
 - We fixed an issue where the drag'n'drop functionality in entryeditor did not work [#12561](https://github.com/JabRef/jabref/issues/12561)
@@ -136,6 +135,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
 - We fixed an issue with deleting entries in large libraries that caused it to take a long time. [#8976](https://github.com/JabRef/jabref/issues/8976)
 - We fixed an issue where "Reveal in file explorer" option was disabled for newly saved libraries until reopening the file. [#12722](https://github.com/JabRef/jabref/issues/12722)
+- We fixed an issue where the "Convert to biblatex" cleanup failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). A fallback was added to correctly interpret such values. [#11868](https://github.com/JabRef/jabref/issues/11868)
 
 ### Removed
 
