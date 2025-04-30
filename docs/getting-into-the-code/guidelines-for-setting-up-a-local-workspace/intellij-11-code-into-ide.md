@@ -52,14 +52,14 @@ Currently, it looks as follows:
 ![Directory Mappings including sub modules](intellij-directory-mappings-unmodified.png)
 {% endfigure %}
 
-You need to tell IntelliJ to ignore the submodules `buildres\abbrv.jabref.org`, `jablib\src\main\resources\csl-locales`, and `jablib\src\main\resources\csl-styles`.
+You need to tell IntelliJ to ignore the submodules `jablib\src\main\abbrv.jabref.org`, `jablib\src\main\resources\csl-locales`, and `jablib\src\main\resources\csl-styles`.
 Select all three (holding the <kbd>Ctrl</kbd> key).
 Then press the red minus button on top.
 
 This will make these directories "Unregistered roots:", which is fine.
 
 {% figure caption:"Directory Mappings having three unregistered roots" %}
-![Directory Mappings having three repositories unregsitered](intellij-directory-mappings-unregistered-roots.png)
+![Directory Mappings having three repositories unregistered](intellij-directory-mappings-unregistered-roots.png)
 {% endfigure %}
 
 ## Ensure that committing with other tools work

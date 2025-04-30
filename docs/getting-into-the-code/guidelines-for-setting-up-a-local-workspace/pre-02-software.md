@@ -16,7 +16,7 @@ It is strongly recommended that you have git installed.
 
 ### macOS
 
-* Use [homebrew](https://brew.sh/))
+* Use [homebrew](https://brew.sh/)
 * `brew install git git-gui`
 
 ### Windows
