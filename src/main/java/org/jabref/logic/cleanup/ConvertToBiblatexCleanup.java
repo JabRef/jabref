@@ -1,6 +1,7 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,6 +53,27 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
                     entry.clearField(StandardField.MONTH).ifPresent(changes::add);
                 }
             });
+        }
+        // If still no 'date' field, try fallback logic
+        if (entry.getField(StandardField.DATE).isEmpty()) {
+            changes.addAll(applyDateFallback(entry));
+        }
+
+        return changes;
+    }
+
+    private Collection<? extends FieldChange> applyDateFallback(BibEntry entry) {
+        List<FieldChange> changes = new ArrayList<>();
+        Optional<String> yearValue = entry.getFieldOrAlias(StandardField.YEAR).map(String::trim);
+        Optional<String> monthValue = entry.getFieldOrAlias(StandardField.MONTH).map(String::trim);
+
+        if (yearValue.isPresent() && monthValue.isEmpty()) {
+            String yearText = yearValue.get().trim();
+            Optional<Date> fallbackDate = Date.parse(yearText);
+            if (fallbackDate.isPresent()) {
+                entry.setField(StandardField.DATE, yearText).ifPresent(changes::add);
+                entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+            }
         }
         return changes;
     }
