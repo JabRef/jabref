@@ -93,11 +93,26 @@ jobs:
       - name: Run GitVersion
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
-      - name: Setup JDK
+
+      # region setup-JDK
+      - name: Setup JDK (to use in Gradle's Java toolchain)
+        uses: jdx/mise-action@v2
+      - name: Make JDK known to gradle (Linux, macOS)
+        if: (matrix.os != 'windows-latest')
+        shell: bash
+        # Hint by https://github.com/gradle/gradle/issues/29355#issuecomment-2598556970
+        run: ln -s ~/.local/share/mise ~/.asdf
+      - name: Make JDK known to gradle (Windows)
+        if: (matrix.os == 'windows-latest')
+        shell: bash
+        run: mv ~/AppData/Local/mise ~/.asdf
+      - name: Setup JDK for gradle itself
         uses: actions/setup-java@v4
         with:
-          java-version: '24'
-          distribution: 'liberica'
+          java-version: '21'
+          distribution: 'temurin'
+      # endregion
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir (macOS)
@@ -126,10 +141,15 @@ jobs:
           set -e
           cd jabgui
 
+          # see https://github.com/jdx/mise/discussions/4973
+          eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          eval $(mise hook-env -f | grep 'export PATH')
+          echo $JAVA_HOME
+
           # Use Java's packaging tool to create "JabRef.app"
           jpackage \
           --module org.jabref/org.jabref.Launcher \
-          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
+          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --add-modules jdk.incubator.vector \
           --dest build/distribution \
