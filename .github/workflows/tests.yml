@@ -87,6 +87,8 @@ jobs:
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
+      - run: cat build/reports/rewrite/rewrite.patch
+        if: failure()
 
   modernizer:
     name: Modernizer
