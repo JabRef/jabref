@@ -103,7 +103,7 @@ jobs:
       - name: Make JDK known to gradle (Window)
         if: (matrix.os == 'windows-latest')
         shell: bash
-        run: mv ~/.asdf ~/.local/share/mise
+        run: mv ~/.local/share/mise ~/.asdf
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir (macOS)
