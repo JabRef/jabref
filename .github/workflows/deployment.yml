@@ -143,6 +143,15 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
+      - name: Debug
+        run: |
+          echo $JAVA_HOME
+          mise hook-env -f
+          mise hook-env -f | grep 'export JAVA_HOME'
+          eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          echo $JAVA_HOME
+          eval $(mise hook-env -f | grep 'export PATH')
+          echo $JAVA_HOME
       - name: Build dmg and pkg (macOS)
         if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -153,11 +162,12 @@ jobs:
           # see https://github.com/jdx/mise/discussions/4973
           eval $(mise hook-env -f | grep 'export JAVA_HOME')
           eval $(mise hook-env -f | grep 'export PATH')
+          echo $JAVA_HOME
 
           # Use Java's packaging tool to create "JabRef.app"
           jpackage \
           --module org.jabref/org.jabref.Launcher \
-          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
+          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --add-modules jdk.incubator.vector \
           --dest build/distribution \
