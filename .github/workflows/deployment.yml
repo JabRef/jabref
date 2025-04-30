@@ -141,8 +141,10 @@ jobs:
           set -e
           cd jabgui
 
+          eval "$(mise hook-env)"
+
           # Use Java's packaging tool to create "JabRef.app"
-          mise exec -- jpackage \
+          jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
