@@ -225,6 +225,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     // region NewEntryPreferences
     private static final String NEW_ENTRY_APPROACH = "latestApproach";
+    private static final String NEW_ENTRY_EXPAND_RECOMMENDED = "typesRecommendedExpanded";
+    private static final String NEW_ENTRY_EXPAND_OTHER = "typesOtherExpanded";
+    private static final String NEW_ENTRY_EXPAND_CUSTOM = "typesCustomExpanded";
     private static final String NEW_ENTRY_INSTANT_TYPE = "latestInstantType";
     private static final String NEW_ENTRY_ID_LOOKUP_GUESSING = "idLookupGuessing";
     private static final String NEW_ENTRY_ID_FETCHER_NAME = "latestIdFetcherName";
@@ -420,6 +423,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region NewEntryUnifierPreferences
         defaults.put(NEW_ENTRY_APPROACH, List.of(NewEntryApproach.values()).indexOf(NewEntryApproach.CREATE_ENTRY));
+        defaults.put(NEW_ENTRY_EXPAND_RECOMMENDED, true);
+        defaults.put(NEW_ENTRY_EXPAND_OTHER, false);
+        defaults.put(NEW_ENTRY_EXPAND_CUSTOM, true);
         defaults.put(NEW_ENTRY_INSTANT_TYPE, StandardEntryType.Article.getDisplayName());
         defaults.put(NEW_ENTRY_ID_LOOKUP_GUESSING, true);
         defaults.put(NEW_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
@@ -1272,12 +1278,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         newEntryPreferences = new NewEntryPreferences(
             approach,
+            getBoolean(NEW_ENTRY_EXPAND_RECOMMENDED),
+            getBoolean(NEW_ENTRY_EXPAND_OTHER),
+            getBoolean(NEW_ENTRY_EXPAND_CUSTOM),
             instantType,
             getBoolean(NEW_ENTRY_ID_LOOKUP_GUESSING),
             get(NEW_ENTRY_ID_FETCHER_NAME),
             get(NEW_ENTRY_INTERPRET_PARSER_NAME));
 
         EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_APPROACH, List.of(NewEntryApproach.values()).indexOf(newValue)));
+        EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_EXPAND_RECOMMENDED, newValue));
+        EasyBind.listen(newEntryPreferences.typesOtherExpandedProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_EXPAND_OTHER, newValue));
+        EasyBind.listen(newEntryPreferences.typesCustomExpandedProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_EXPAND_CUSTOM, newValue));
         EasyBind.listen(newEntryPreferences.latestInstantTypeProperty(), (_, _, newValue) -> put(NEW_ENTRY_INSTANT_TYPE, newValue.getDisplayName()));
         EasyBind.listen(newEntryPreferences.idLookupGuessingProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_ID_LOOKUP_GUESSING, newValue));
         EasyBind.listen(newEntryPreferences.latestIdFetcherProperty(), (_, _, newValue) -> put(NEW_ENTRY_ID_FETCHER_NAME, newValue));

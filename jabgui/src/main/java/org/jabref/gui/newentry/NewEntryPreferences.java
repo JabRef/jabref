@@ -11,17 +11,26 @@ import org.jabref.model.entry.types.EntryType;
 
 public class NewEntryPreferences {
     private final ObjectProperty<NewEntryApproach> latestApproach;
+    private final BooleanProperty typesRecommendedExpanded;
+    private final BooleanProperty typesOtherExpanded;
+    private final BooleanProperty typesCustomExpanded;
     private final ObjectProperty<EntryType> latestInstantType;
     private final BooleanProperty idLookupGuessing;
     private final StringProperty latestIdFetcherName;
     private final StringProperty latestInterpretParserName;
 
     public NewEntryPreferences(NewEntryApproach approach,
-                                      EntryType instantType,
-                                      boolean idLookupGuessing,
-                                      String idFetcherName,
-                                      String interpretParserName) {
+                               boolean expandRecommended,
+                               boolean expandOther,
+                               boolean expandCustom,
+                               EntryType instantType,
+                               boolean idLookupGuessing,
+                               String idFetcherName,
+                               String interpretParserName) {
         this.latestApproach = new SimpleObjectProperty<>(approach);
+        this.typesRecommendedExpanded = new SimpleBooleanProperty(expandRecommended);
+        this.typesOtherExpanded = new SimpleBooleanProperty(expandOther);
+        this.typesCustomExpanded = new SimpleBooleanProperty(expandCustom);
         this.latestInstantType = new SimpleObjectProperty<>(instantType);
         this.idLookupGuessing = new SimpleBooleanProperty(idLookupGuessing);
         this.latestIdFetcherName = new SimpleStringProperty(idFetcherName);
@@ -38,6 +47,42 @@ public class NewEntryPreferences {
 
     public ObjectProperty<NewEntryApproach> latestApproachProperty() {
         return latestApproach;
+    }
+
+    public boolean getTypesRecommendedExpanded() {
+        return typesRecommendedExpanded.get();
+    }
+
+    public void getTypesRecommendedExpanded(boolean expanded) {
+        typesRecommendedExpanded.set(expanded);
+    }
+
+    public BooleanProperty typesRecommendedExpandedProperty() {
+        return typesRecommendedExpanded;
+    }
+
+    public boolean getTypesOtherExpanded() {
+        return typesOtherExpanded.get();
+    }
+
+    public void getTypesOtherExpanded(boolean expanded) {
+        typesOtherExpanded.set(expanded);
+    }
+
+    public BooleanProperty typesOtherExpandedProperty() {
+        return typesOtherExpanded;
+    }
+
+    public boolean getTypesCustomExpanded() {
+        return typesCustomExpanded.get();
+    }
+
+    public void getTypesCustomExpanded(boolean expanded) {
+        typesCustomExpanded.set(expanded);
+    }
+
+    public BooleanProperty typesCustomExpandedProperty() {
+        return typesCustomExpanded;
     }
 
     public EntryType getLatestInstantType() {

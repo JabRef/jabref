@@ -31,17 +31,17 @@
                         <font><Font name="System Italic" size="13.0"/></font>
                         <padding><Insets bottom="5.0"/></padding>
                     </Label>
-                    <TitledPane fx:id="entryRecommendedTitle" text="%Recommended types" animated="false" collapsible="false">
+                    <TitledPane fx:id="entryRecommendedTitle" text="% Recommended types" animated="false">
                         <content>
                             <FlowPane fx:id="entryRecommended"/>
                         </content>
                     </TitledPane>
-                    <TitledPane fx:id="entryOtherTitle" text="%Other types" animated="false" collapsible="false">
+                    <TitledPane fx:id="entryOtherTitle" text="% Other types" animated="false">
                         <content>
                             <FlowPane fx:id="entryOther"/>
                         </content>
                     </TitledPane>
-                    <TitledPane fx:id="entryCustomTitle" text="%Custom types" animated="false" collapsible="false">
+                    <TitledPane fx:id="entryCustomTitle" text="% Custom types" animated="false">
                         <content>
                             <FlowPane fx:id="entryCustom"/>
                         </content>

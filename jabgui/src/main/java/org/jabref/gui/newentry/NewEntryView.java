@@ -191,10 +191,15 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     private void initializeCreateEntry() {
         entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
+        entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
         entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());
+
         entryOtherTitle.managedProperty().bind(entryOtherTitle.visibleProperty());
+        entryOtherTitle.expandedProperty().bindBidirectional(preferences.typesOtherExpandedProperty());
         entryOther.managedProperty().bind(entryOther.visibleProperty());
+
         entryCustomTitle.managedProperty().bind(entryCustomTitle.visibleProperty());
+        entryCustomTitle.expandedProperty().bindBidirectional(preferences.typesCustomExpandedProperty());
         entryCustom.managedProperty().bind(entryCustom.visibleProperty());
 
         final boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
