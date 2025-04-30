@@ -59,7 +59,7 @@ Then press the red minus button on top.
 This will make these directories "Unregistered roots:", which is fine.
 
 {% figure caption:"Directory Mappings having three unregistered roots" %}
-![Directory Mappings having three repositories unregsitered](intellij-directory-mappings-unregistered-roots.png)
+![Directory Mappings having three repositories unregistered](intellij-directory-mappings-unregistered-roots.png)
 {% endfigure %}
 
 ## Ensure that committing with other tools work
