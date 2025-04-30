@@ -138,7 +138,7 @@ jobs:
           cd jabgui
 
           # Use Java's packaging tool to create "JabRef.app"
-          jpackage \
+          mise exec -- jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
