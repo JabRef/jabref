@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 import java.util.prefs.BackingStoreException;
@@ -8,9 +7,7 @@ import java.util.prefs.BackingStoreException;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
-import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,14 +37,14 @@ class Preferences implements Runnable {
     class PreferencesReset implements Callable<Integer> {
         @Override
         public Integer call() {
-                try {
-                    System.out.println(Localization.lang("Setting all preferences to default values."));
-                    kitCommandLine.cliPreferences.clear();
-                    new SharedDatabasePreferences().clear();
-                } catch (BackingStoreException e) {
-                    System.err.println(Localization.lang("Unable to clear preferences."));
-                    LOGGER.error("Unable to clear preferences", e);
-                }
+            try {
+                System.out.println(Localization.lang("Setting all preferences to default values."));
+                kitCommandLine.cliPreferences.clear();
+                new SharedDatabasePreferences().clear();
+            } catch (BackingStoreException e) {
+                System.err.println(Localization.lang("Unable to clear preferences."));
+                LOGGER.error("Unable to clear preferences", e);
+            }
             return 0;
         }
     }
@@ -55,14 +52,14 @@ class Preferences implements Runnable {
     @Command(name = "import", description = "Import preferences from a file.")
     class PreferencesImport implements Callable<Integer> {
 
-        @Parameters(index = "0", description = "The file to import preferences from.")
-        File file;
+        @Parameters(index = "0", arity = "1", description = "The file to import preferences from.")
+        Path inputFile;
 
         @Override
         public Integer call() {
             try {
-                kitCommandLine.cliPreferences.importPreferences(Path.of(kitCommandLine.cliPreferences.getPreferencesImport()));
-                Injector.setModelOrService(BibEntryTypesManager.class, kitCommandLine.cliPreferences.getCustomEntryTypesRepository()); // ToDo
+                kitCommandLine.cliPreferences.importPreferences(inputFile);
+                kitCommandLine.cliPreferences.flush();
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot import preferences", ex);
             }
@@ -73,12 +70,16 @@ class Preferences implements Runnable {
     @Command(name = "export", description = "Export preferences to a file.")
     class PreferencesExport implements Callable<Integer> {
 
-        @Parameters(index = "0", description = "The file to export preferences to.")
-        File file;
+        @Parameters(index = "0", arity = "1", description = "The file to export preferences to.")
+        Path outputFile;
 
         @Override
         public Integer call() {
-            // Logic // TODO
+            try {
+                kitCommandLine.cliPreferences.exportPreferences(outputFile);
+            } catch (JabRefException ex) {
+                LOGGER.error("Cannot export preferences", ex);
+            }
             return 0;
         }
     }
