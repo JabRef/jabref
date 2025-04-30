@@ -91,23 +91,6 @@ import picocli.CommandLine;
  jabkit <whateveraction> --porcelain
  */
 public class ArgumentProcessor {
-    private static final String JABREF_BANNER = """
-
-       &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
-       &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&& %s
-       &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
-       &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
-    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
-
-    Staying on top of your literature since 2003 - https://www.jabref.org/
-    Please report issues at https://github.com/JabRef/jabref/issues
-    """;
-
-    private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
-    private static final String STRING_TABLE_DELIMITER = " : ";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
     private final CliPreferences cliPreferences;
@@ -127,20 +110,7 @@ public class ArgumentProcessor {
     public void processArguments(String[] args) {
         cli.execute(args);
 
-        if (cli.isVersionHelpRequested()) {
-            System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
-            return;
-        }
 
-        if (cli.isUsageHelpRequested()) {
-            System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
-            System.out.println(cli.getUsageMessage());
-
-            System.out.println(Localization.lang("Available import formats"));
-            System.out.println(alignStringTable(getAvailableImportFormats(cliPreferences)));
-
-            return;
-        }
     }
         /*
         // Check if we should reset all preferences to default values:
@@ -241,40 +211,4 @@ public class ArgumentProcessor {
         return loaded;
     }
 */
-
-
-    public static List<Pair<String, String>> getAvailableImportFormats(CliPreferences preferences) {
-        ImportFormatReader importFormatReader = new ImportFormatReader(
-                preferences.getImporterPreferences(),
-                preferences.getImportFormatPreferences(),
-                preferences.getCitationKeyPatternPreferences(),
-                new DummyFileUpdateMonitor()
-        );
-        return importFormatReader
-                .getImportFormats().stream()
-                .map(format -> new Pair<>(format.getName(), format.getId()))
-                .toList();
-    }
-
-    protected static String alignStringTable(List<Pair<String, String>> table) {
-        StringBuilder sb = new StringBuilder();
-
-        int maxLength = table.stream()
-                             .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
-                             .max().orElse(0);
-
-        for (Pair<String, String> pair : table) {
-            int padding = Math.max(0, maxLength - pair.getKey().length());
-            sb.append(WRAPPED_LINE_PREFIX);
-            sb.append(pair.getKey());
-
-            sb.append(StringUtil.repeatSpaces(padding));
-
-            sb.append(STRING_TABLE_DELIMITER);
-            sb.append(pair.getValue());
-            sb.append(OS.NEWLINE);
-        }
-
-        return sb.toString();
-    }
 }

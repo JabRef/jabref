@@ -5,8 +5,11 @@ import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Callable;
+
+import javafx.util.Pair;
 
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
@@ -24,15 +27,18 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Option;
@@ -51,6 +57,23 @@ import static picocli.CommandLine.Option;
                 Pdf.class
         })
 public class KitCommandLine implements Callable<Integer> {
+    public static final String JABREF_BANNER = """
+
+       &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
+       &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
+       &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
+       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&& %s
+       &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
+       &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
+    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
+
+    Staying on top of your literature since 2003 - https://www.jabref.org/
+    Please report issues at https://github.com/JabRef/jabref/issues
+    """;
+
+    private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
+    private static final String STRING_TABLE_DELIMITER = " : ";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(KitCommandLine.class);
 
     protected final CliPreferences cliPreferences;
@@ -75,7 +98,18 @@ public class KitCommandLine implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        // Todo: Implement
+        if (versionInfoRequested) {
+            System.out.printf(KitCommandLine.JABREF_BANNER + "%n", new BuildInfo().version);
+        }
+
+        if (usageHelpRequested) {
+            System.out.printf(KitCommandLine.JABREF_BANNER + "%n", new BuildInfo().version);
+            CommandLine cli = new CommandLine(this); // ToDo: Is there a better option?
+            System.out.println(cli.getUsageMessage());
+
+            System.out.println(Localization.lang("Available import formats"));
+            System.out.println(alignStringTable(getAvailableImportFormats(cliPreferences)));
+        }
         return 0;
     }
 
@@ -209,5 +243,40 @@ public class KitCommandLine implements Callable<Integer> {
                 System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", outputFile, Throwables.getStackTraceAsString(ex)));
             }
         }
+    }
+
+    public static List<Pair<String, String>> getAvailableImportFormats(CliPreferences preferences) {
+        ImportFormatReader importFormatReader = new ImportFormatReader(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                new DummyFileUpdateMonitor()
+        );
+        return importFormatReader
+                .getImportFormats().stream()
+                .map(format -> new Pair<>(format.getName(), format.getId()))
+                .toList();
+    }
+
+    protected static String alignStringTable(List<Pair<String, String>> table) {
+        StringBuilder sb = new StringBuilder();
+
+        int maxLength = table.stream()
+                             .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
+                             .max().orElse(0);
+
+        for (Pair<String, String> pair : table) {
+            int padding = Math.max(0, maxLength - pair.getKey().length());
+            sb.append(WRAPPED_LINE_PREFIX);
+            sb.append(pair.getKey());
+
+            sb.append(StringUtil.repeatSpaces(padding));
+
+            sb.append(STRING_TABLE_DELIMITER);
+            sb.append(pair.getValue());
+            sb.append(OS.NEWLINE);
+        }
+
+        return sb.toString();
     }
 }
