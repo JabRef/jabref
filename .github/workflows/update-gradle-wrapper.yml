@@ -12,12 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: 24.0.1
-          distribution: 'zulu'
-
       - name: Update Gradle Wrapper
         uses: gradle-update/update-gradle-wrapper-action@v2
         with:
