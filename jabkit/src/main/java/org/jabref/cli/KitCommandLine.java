@@ -1,10 +1,17 @@
 package org.jabref.cli;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
+import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
+import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -13,6 +20,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -125,6 +134,33 @@ public class KitCommandLine implements Callable<Integer> {
         } catch (ImportException ex) {
             System.err.println(Localization.lang("Error opening file '%0'", file) + "\n" + ex.getLocalizedMessage());
             return Optional.empty();
+        }
+    }
+
+    protected void saveDatabase(BibDatabase newBase, Path outputFile) {
+        try {
+            System.out.println(Localization.lang("Saving") + ": " + outputFile);
+            try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
+                BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
+                SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
+                        .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
+                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                        bibWriter,
+                        saveConfiguration,
+                        cliPreferences.getFieldPreferences(),
+                        cliPreferences.getCitationKeyPatternPreferences(),
+                        entryTypesManager);
+                databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
+
+                // Show just a warning message if encoding did not work for all characters:
+                if (fileWriter.hasEncodingProblems()) {
+                    System.err.println(Localization.lang("Warning") + ": "
+                            + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
+                }
+            }
+        } catch (
+                IOException ex) {
+            System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
         }
     }
 }

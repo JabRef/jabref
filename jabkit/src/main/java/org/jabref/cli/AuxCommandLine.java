@@ -19,15 +19,6 @@ public class AuxCommandLine {
     }
 
     public BibDatabase perform() {
-        BibDatabase subDatabase = null;
 
-        if (!auxFile.isEmpty() && (database != null)) {
-            AuxParser auxParser = new DefaultAuxParser(database);
-            AuxParserResult result = auxParser.parse(Path.of(auxFile));
-            subDatabase = result.getGeneratedBibDatabase();
-            // print statistics
-            System.out.println(new AuxParserStatisticsProvider(result).getInformation(true));
-        }
-        return subDatabase;
     }
 }

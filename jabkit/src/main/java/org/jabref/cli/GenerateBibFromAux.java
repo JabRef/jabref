@@ -1,21 +1,63 @@
 package org.jabref.cli;
 
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+
+import org.jabref.logic.auxparser.AuxParser;
+import org.jabref.logic.auxparser.AuxParserResult;
+import org.jabref.logic.auxparser.AuxParserStatisticsProvider;
+import org.jabref.logic.auxparser.DefaultAuxParser;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.model.database.BibDatabase;
+
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Option;
+import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate-bib-from-aux", description = "Generate small bib from aux file.")
-class GenerateBibFromAux implements Runnable {
+class GenerateBibFromAux implements Callable<Integer> {
+    @ParentCommand
+    private KitCommandLine kitCommandLine;
+
     @Option(names = "--aux", required = true)
-    String aux;
+    private Path auxFile;
 
     @Option(names = "--input", required = true)
-    String input;
+    private Path inputFile;
 
-    @Option(names = "--output", required = true)
-    String output;
+    @Option(names = "--output")
+    private Path outputFile;
 
     @Override
-    public void run() {
-        // TODO: implement
+    public Integer call() {
+        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, "bib");
+
+        if (pr.isEmpty() || auxFile == null) {
+            return 1;
+        }
+
+        BibDatabase subDatabase = null;
+        BibDatabase sourceDatabase = pr.get().getDatabase();
+        if (auxFile != null && (sourceDatabase != null)) {
+            AuxParser auxParser = new DefaultAuxParser(sourceDatabase);
+            AuxParserResult result = auxParser.parse(auxFile);
+            subDatabase = result.getGeneratedBibDatabase();
+
+            System.out.println(new AuxParserStatisticsProvider(result).getInformation(true));
+        }
+
+        if (subDatabase == null || !subDatabase.hasEntries()) {
+            System.out.println(Localization.lang("no library generated"));
+            return 1;
+        }
+
+        if (outputFile == null) {
+            System.out.println(subDatabase.getEntries().stream()); // ToDo: Make nice
+        } else {
+            kitCommandLine.saveDatabase(subDatabase, outputFile);
+        }
+        return 0;
     }
 }

@@ -308,19 +308,7 @@ public class ArgumentProcessor {
     }
 
     private void doAuxImport(List<ParserResult> loaded) {
-        boolean usageMsg;
 
-        if (!loaded.isEmpty()) {
-            usageMsg = generateAux(loaded, cli.getAuxImport().split(","));
-        } else {
-            usageMsg = true;
-        }
-
-        if (usageMsg) {
-            System.out.println(Localization.lang("no base-BibTeX-file specified!"));
-            System.out.println(Localization.lang("usage") + " :");
-            System.out.println("jabref --aux infile[.aux],outfile[.bib] base-BibTeX-file");
-        }
     }
 
     /**
@@ -390,54 +378,10 @@ public class ArgumentProcessor {
      * @param data [0]: the .aux file; [1]: the target .bib file
      */
     private boolean generateAux(List<ParserResult> loaded, String[] data) {
-        if (data.length == 2) {
-            ParserResult pr = loaded.getFirst();
-            AuxCommandLine acl = new AuxCommandLine(data[0], pr.getDatabase());
-            BibDatabase newBase = acl.perform();
 
-            boolean notSavedMsg = false;
-
-            // write an output, if something could be resolved
-            if ((newBase != null) && newBase.hasEntries()) {
-                String subName = StringUtil.getCorrectFileName(data[1], "bib");
-                saveDatabase(newBase, subName);
-                notSavedMsg = true;
-            }
-
-            if (!notSavedMsg) {
-                System.out.println(Localization.lang("no library generated"));
-            }
-            return false;
-        } else {
-            return true;
-        }
     }
 
-    private void saveDatabase(BibDatabase newBase, String subName) {
-        try {
-            System.out.println(Localization.lang("Saving") + ": " + subName);
-            try (AtomicFileWriter fileWriter = new AtomicFileWriter(Path.of(subName), StandardCharsets.UTF_8)) {
-                BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-                SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
-                        .withReformatOnSave(cliPreferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
-                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
-                        bibWriter,
-                        saveConfiguration,
-                        cliPreferences.getFieldPreferences(),
-                        cliPreferences.getCitationKeyPatternPreferences(),
-                        entryTypesManager);
-                databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
 
-                // Show just a warning message if encoding did not work for all characters:
-                if (fileWriter.hasEncodingProblems()) {
-                    System.err.println(Localization.lang("Warning") + ": "
-                                       + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
-                }
-            }
-        } catch (IOException ex) {
-            System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-        }
-    }
 
     private void exportFile(List<ParserResult> loaded, String[] data) {
         if (data.length == 1) {
