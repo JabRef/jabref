@@ -125,8 +125,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         generateButton = (Button) this.getDialogPane().lookupButton(generateButtonType);
         generateButton.getStyleClass().add("customGenerateButton");
 
-        ((Stage) getDialogPane().getScene().getWindow()).setMinWidth(400);
-        ((Stage) getDialogPane().getScene().getWindow()).setMinHeight(300);
+        final Stage stage = (Stage) getDialogPane().getScene().getWindow();
+        stage.setHeight(650);
+        stage.setWidth(1010);
+        stage.setMinHeight(300);
+        stage.setMinWidth(400);
 
         ControlHelper.setAction(generateButtonType, getDialogPane(), _ -> execute());
         setOnCloseRequest(_ -> cancel());
