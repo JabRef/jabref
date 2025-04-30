@@ -77,6 +77,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the "Convert to biblatex" cleanup failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). A fallback was added to correctly interpret such values. [#11868](https://github.com/JabRef/jabref/issues/11868)
 - We fixed an issue where pasted entries would sometimes end up in the search bar instead of the main table [#12910](https://github.com/JabRef/jabref/issues/12910)
 - We fixed an issue where warning signs were improperly positioned next to text fields containing capital letters. [#12884](https://github.com/JabRef/jabref/issues/12884)
 - We fixed an issue where the drag'n'drop functionality in entryeditor did not work [#12561](https://github.com/JabRef/jabref/issues/12561)
