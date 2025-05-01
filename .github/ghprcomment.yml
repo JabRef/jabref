@@ -8,9 +8,27 @@
 
     To verify compilation locally, run `./gradlew build` or try running JabRef.
 
-- jobName: 'Unit tests'
+- jobName: 'Unit tests - jablib'
   message: >
-    JUnit tests are failing.
+    JUnit tests of `jablib` are failing.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+
+
+    You can then run these tests in IntelliJ to reproduce the failing tests locally.
+    We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
+- jobName: 'Unit tests - jabkit'
+  message: >
+    JUnit tests of `jabkit` are failing.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+
+
+    You can then run these tests in IntelliJ to reproduce the failing tests locally.
+    We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
+- jobName: 'Unit tests - jabsrv'
+  message: >
+    JUnit tests of `jabsrv` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
     To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
 
@@ -38,7 +56,7 @@
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
     To see the test output, locate "Tests / OpenRewrite (pull_request)" and click on it.
 
-    
+
     The issues found can be **automatically fixed**.
     Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
 - jobName: Modernizer
@@ -88,10 +106,13 @@
 - jobName: no-force-push
   always: true
   message: >
-    Do not force-push!
-    Force pushing is a very bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
+    Hey, we noticed that you **force-pushed** your changes.
+    Force pushing is a bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
     Commits are lost and comments on commits lose their context, thus making it harder to review changes.
     At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
+
+
+    In future, **please avoid that**. For now, you can continue working.
 - jobName: 'Conflicts with target branch'
   message: >
     Your pull request conflicts with the target branch.
@@ -119,7 +140,7 @@
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
-- jobName: 'Determine issue number'
+- jobName: 'Issue number present'
   always: true
   message: |
     Your pull request needs to link an issue.

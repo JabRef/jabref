@@ -5,6 +5,14 @@ parent: Code Howtos
 
 This page lists some software we consider useful.
 
+## Run `gradle` from command line
+
+1. [Install mise](https://mise.jdx.dev/installing-mise.html). `mise` is an SDK manager for all popular operating systems.
+2. Run `gradle`:
+
+   * Linux/macOS: `mise exec java@21 -- ./gradlew run`
+   * Windows: `mise exec java@21 -- gradlew run`
+
 ## Browser plugins
 
 * [Refined GitHub](https://github.com/sindresorhus/refined-github) - GitHub on steroids
@@ -30,43 +38,19 @@ Here, we collect some helpful git hints
 * Review the changes and create a new commit using git gui: `git gui`
 * Do a force push: `git push -f origin`
 
-See also: [https://help.github.com/articles/syncing-a-fork/](https://help.github.com/articles/syncing-a-fork/)
+See also: <https://help.github.com/articles/syncing-a-fork/>
 
 ## Tooling for Windows
 
-(As Administrator - one time)
+### Better console applications: Windows Terminal plus clink
 
-1. Install [chocolatey](https://chocolatey.org)
-2. `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal"`
-3. `choco install notepadplusplus`
-4. If you want to have your JDK also managed via chocolatey: `choco install temurin`
+* Install [Windows Terminal](https://aka.ms/terminal)
+* Install [clink](http://mridgers.github.io/clink/), to enable `mise` support and to have Unix keys (<kbd>Alt</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>S</kbd>, etc.) also available at the prompt of `cmd.exe`
+* Install `mise` support for `cmd.exe`
+  * Pre-condition: Install [mise](https://mise.jdx.dev/)
+  * Find out script directory: `clink info | findstr scripts`
+  * Place the `clink_mise.lua` script from [mise forum](https://github.com/jdx/mise/discussions/4679#discussioncomment-12841639) into that directory.
 
-Then, each weak do `choco upgrade all` to ensure all tooling is kept updated.
-
-### General git tooling on Windows
-
-* Use [git for windows](https://git-for-windows.github.io), no additional git tooling required
-  * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation. Aim: Store password for GitHub permanently for `https` repository locations
-* [Use notepad++ as editor](http://stackoverflow.com/a/2486342/873282) for `git rebase -i`
-
-### Better console applications
-
-#### ConEmu plus clink
-
-* `choco install conemu clink`
-* [ConEmu](http://conemu.github.io) -> Preview Version - Aim: Colorful console with tabs
-  * At first start:
-    * "Choose your startup task ...": \`{Bash::Git bash\}}
-    * `OK`
-    * Upper right corner: "Settings..." (third entrry Eintrag)
-    * Startup/Tasks: Choose task no. 7 ("Bash::Git bash"). At "Task parameters" `/dir C:\git-repositories\jabref\jabref`
-    * `Save Settings`
-* [clink](http://mridgers.github.io/clink/) - Aim: Unix keys (<kbd>Alt</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>S</kbd>, etc.) also available at the prompt of `cmd.exe`
-
-#### Other bundles
-
-* [Cmder](https://cmder.app/) - bundles ConEmu plus clink
-
-### Tools for working with XMP
+## Tools for working with XMP
 
 * Validate XMP: <https://www.pdflib.com/pdf-knowledge-base/xmp/free-xmp-validator>

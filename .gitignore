@@ -3,7 +3,16 @@ src/main/gen/
 src/main/generated/
 src-gen/
 
+src/main/resources/csl-styles
+src/main/resources/csl-locales
+buildres/abbrv.jabref.org
+
+jablib/src/main/resources/csl-styles
+jablib/src/main/resources/csl-locales
+
 .lycheecache
+
+.kotlin
 
 javafx/javafx-sdk-*
 javafx/javafx-jmods-*
@@ -567,3 +576,6 @@ lib/ojdbc.jar
 
 # generated during release process
 CHANGELOG.html
+
+# some strange gradle/IntelliJ extension
+extension 'reporting' property 'baseDirectory'
