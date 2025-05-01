@@ -1,18 +1,7 @@
 package org.jabref.cli;
 
-import java.util.List;
-import java.util.Objects;
-
-import javafx.util.Pair;
-
-import org.jabref.logic.importer.ImportFormatReader;
-import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.strings.StringUtil;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,15 +82,10 @@ import picocli.CommandLine;
 public class ArgumentProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
-    private final CliPreferences cliPreferences;
-    private final BibEntryTypesManager entryTypesManager;
-
     private final CommandLine cli;
 
     public ArgumentProcessor(CliPreferences cliPreferences,
                              BibEntryTypesManager entryTypesManager) {
-        this.cliPreferences = cliPreferences;
-        this.entryTypesManager = entryTypesManager;
 
         KitCommandLine kitCli = new KitCommandLine(cliPreferences, entryTypesManager);
         cli = new CommandLine(kitCli);
@@ -109,106 +93,5 @@ public class ArgumentProcessor {
 
     public void processArguments(String[] args) {
         cli.execute(args);
-
-
     }
-        /*
-        // Check if we should reset all preferences to default values:
-        if (cli.isPreferencesReset()) {
-            resetPreferences(cli.getPreferencesReset());
-        }
-
-        // Check if we should import preferences from a file:
-        if (cli.isPreferencesImport()) {
-            importPreferences();
-        }
-
-        List<ParserResult> loaded = importAndOpenFiles();
-
-        if (cli.isFetcherEngine()) {
-            fetch(cli.getFetcherEngine()).ifPresent(loaded::add);
-        }
-
-        if (cli.isGenerateCitationKeys()) {
-            regenerateCitationKeys(loaded);
-        }
-
-        if ((cli.isWriteXmpToPdf() && cli.isEmbedBibFileInPdf()) || (cli.isWriteMetadataToPdf() && (cli.isWriteXmpToPdf() || cli.isEmbedBibFileInPdf()))) {
-            System.err.println("Give only one of [writeXmpToPdf, embedBibFileInPdf, writeMetadataToPdf]");
-        }
-
-        if (cli.isWriteMetadataToPdf() || cli.isWriteXmpToPdf() || cli.isEmbedBibFileInPdf()) {
-            if (!loaded.isEmpty()) {
-                writeMetadataToPdf(loaded,
-                        cli.getWriteMetadataToPdf(),
-                        cliPreferences.getXmpPreferences(),
-                        cliPreferences.getFilePreferences(),
-                        cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                        cliPreferences.getCustomEntryTypesRepository(),
-                        cliPreferences.getFieldPreferences(),
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
-                        cli.isWriteXmpToPdf() || cli.isWriteMetadataToPdf(),
-                        cli.isEmbedBibFileInPdf() || cli.isWriteMetadataToPdf());
-            }
-        }
-
-        if (cli.isFileExport()) {
-            if (!loaded.isEmpty()) {
-                exportFile(loaded, cli.getFileExport().split(","));
-                LOGGER.debug("Finished export");
-            } else {
-                System.err.println(Localization.lang("The output option depends on a valid import option."));
-            }
-        }
-    }
-*/
-
-    /**
-     * @return List of opened files (could be .bib, but also other formats). May also contain error results.
-     */
-/*    private List<ParserResult> importAndOpenFiles() {
-        List<ParserResult> loaded = new ArrayList<>();
-        List<String> toImport = new ArrayList<>();
-        if (!cli.getLeftOver().isEmpty()) {
-            for (String aLeftOver : cli.getLeftOver()) {
-                // Leftover arguments that have a "bib" extension are interpreted as
-                // BIB files to open. Other files, and files that could not be opened
-                // as bib, we try to import instead.
-                boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
-
-                ParserResult pr = new ParserResult();
-                if (bibExtension) {
-                    try {
-                        pr = OpenDatabase.loadDatabase(
-                                Path.of(aLeftOver),
-                                cliPreferences.getImportFormatPreferences(),
-                                fileUpdateMonitor);
-                        // In contrast to org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed, we do not execute OpenDatabaseAction.performPostOpenActions(result, dialogService);
-                    } catch (IOException ex) {
-                        pr = ParserResult.fromError(ex);
-                        LOGGER.error("Error opening file '{}'", aLeftOver, ex);
-                    }
-                }
-
-                if (!bibExtension || (pr.isEmpty())) {
-                    // We will try to import this file. Normally we
-                    // will import it into a new tab, but if this import has
-                    // been initiated by another instance through the remote
-                    // listener, we will instead import it into the current library.
-                    // This will enable easy integration with web browsers that can
-                    // open a reference file in JabRef.
-                    if (startupMode == Mode.INITIAL_START) {
-                        toImport.add(aLeftOver);
-                    } else {
-                        loaded.add(importToOpenBase(aLeftOver).orElse(new ParserResult()));
-                    }
-                } else {
-                    loaded.add(pr);
-                }
-            }
-        }
-
-        return loaded;
-    }
-*/
 }

@@ -1,7 +1,6 @@
 package org.jabref.cli;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
@@ -18,13 +17,11 @@ import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
@@ -48,7 +45,7 @@ import static picocli.CommandLine.Option;
         subcommands = {
                 GenerateCitationKeys.class,
                 CheckConsistency.class,
-                CheckIntegrity.class,
+//                CheckIntegrity.class,
                 Fetch.class,
                 Search.class,
                 Convert.class,
@@ -107,17 +104,20 @@ public class KitCommandLine implements Callable<Integer> {
             CommandLine cli = new CommandLine(this); // ToDo: Is there a better option?
             System.out.println(cli.getUsageMessage());
 
-            System.out.println(Localization.lang("Available import formats"));
+            System.out.println(Localization.lang("Available import formats:"));
             System.out.println(alignStringTable(getAvailableImportFormats(cliPreferences)));
+
+            System.out.println(Localization.lang("Available export formats:"));
+            System.out.println(alignStringTable(getAvailableExportFormats(cliPreferences)));
         }
         return 0;
     }
 
     /**
-     *
-     * @param importArguments Format: <code>fileName[,format]</code>
+     * Reads URIs as input // ToDo: Bring back
+     * importArguments Format: <code>fileName[,format]</code>
      */
-    protected Optional<ParserResult> importFile(String importArguments, String importFormat) {
+    /* protected Optional<ParserResult> importFile(String importArguments, String importFormat) {
         LOGGER.debug("Importing file {}", importArguments);
         String[] data = importArguments.split(",");
 
@@ -146,7 +146,7 @@ public class KitCommandLine implements Callable<Integer> {
             }
         });
         return importResult;
-    }
+    } */
 
     protected Optional<ParserResult> importFile(Path file, String importFormat) {
         try {
@@ -256,6 +256,13 @@ public class KitCommandLine implements Callable<Integer> {
                 .getImportFormats().stream()
                 .map(format -> new Pair<>(format.getName(), format.getId()))
                 .toList();
+    }
+
+    protected static List<Pair<String, String>> getAvailableExportFormats(CliPreferences preferences) {
+        ExporterFactory exporterFactory = ExporterFactory.create(preferences);
+        return exporterFactory.getExporters().stream()
+                              .map(format -> new Pair<>(format.getName(), format.getId()))
+                              .toList();
     }
 
     protected static String alignStringTable(List<Pair<String, String>> table) {

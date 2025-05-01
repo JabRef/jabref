@@ -1,12 +1,9 @@
 package org.jabref.cli;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import org.jabref.logic.FilePreferences;
@@ -41,21 +38,20 @@ class Pdf implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Pdf.class);
 
     @ParentCommand
-    private KitCommandLine kitCommandLine;
+    protected KitCommandLine kitCommandLine;
 
-        @Override
-        public void run() {
-            System.out.println("Specify a subcommand (write-xmp, update).");
-        }
+    @Override
+    public void run() {
+        System.out.println("Specify a subcommand (write-xmp, update).");
+    }
 
     @Command(name = "update", description = "Update linked PDFs with XMP and/or embedded BibTeX.")
     class PdfUpdate implements Callable<Integer> {
-
         @Option(names = "--format", description = "Format to update (xmp, bibtex-attachment)", split = ",")
         List<String> formats = List.of("xmp", "bibtex-attachment"); // ToDO: default value?
 
         @Option(names = {"-k", "--citation-key"}, description = "Citation keys", required = true)
-        List<String> citationKeys;
+        List<String> citationKeys = List.of(); // ToDo: check dedault value
 
         @Option(names = "--input", description = "Input file", required = true)
         Path inputFile;
@@ -70,13 +66,14 @@ class Pdf implements Runnable {
         public Integer call() {
             if (formats.contains("xmp") || formats.contains("bibtex-attachment")) {
                 if (inputFile != null) {
-                    writeMetadataToPdf(kitCommandLine.importFile(inputFile, inputFormat),
-                            cli.getWriteMetadataToPdf(),
-                            cliPreferences.getXmpPreferences(),
-                            cliPreferences.getFilePreferences(),
-                            cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                            cliPreferences.getCustomEntryTypesRepository(),
-                            cliPreferences.getFieldPreferences(),
+                    writeMetadataToPdf(List.of(kitCommandLine.importFile(inputFile, inputFormat).get()),
+                            List.of(inputFile),
+                            citationKeys,
+                            kitCommandLine.cliPreferences.getXmpPreferences(),
+                            kitCommandLine.cliPreferences.getFilePreferences(),
+                            kitCommandLine.cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
+                            kitCommandLine.cliPreferences.getCustomEntryTypesRepository(),
+                            kitCommandLine.cliPreferences.getFieldPreferences(),
                             Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                             formats.contains("xmp"),
                             formats.contains("bibtex-attachment"));
@@ -88,7 +85,8 @@ class Pdf implements Runnable {
         }
 
         private static void writeMetadataToPdf(List<ParserResult> loaded,
-                                               String filesAndCiteKeys,
+                                               List<Path> files,
+                                               List<String> citationKeys,
                                                XmpPreferences xmpPreferences,
                                                FilePreferences filePreferences,
                                                BibDatabaseMode databaseMode,
@@ -107,7 +105,7 @@ class Pdf implements Runnable {
             XmpPdfExporter xmpPdfExporter = new XmpPdfExporter(xmpPreferences);
             EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter = new EmbeddedBibFilePdfExporter(databaseMode, entryTypesManager, fieldPreferences);
 
-            if ("all".equals(filesAndCiteKeys)) {
+            if (citationKeys.contains("all")) {
                 for (BibEntry entry : databaseContext.getEntries()) {
                     writeMetadataToPDFsOfEntry(
                             databaseContext,
@@ -123,19 +121,9 @@ class Pdf implements Runnable {
                 return;
             }
 
-            List<String> citeKeys = new ArrayList<>();
-            List<String> pdfs = new ArrayList<>();
-            for (String fileOrCiteKey : filesAndCiteKeys.split(",")) {
-                if (fileOrCiteKey.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
-                    pdfs.add(fileOrCiteKey);
-                } else {
-                    citeKeys.add(fileOrCiteKey);
-                }
-            }
-
             writeMetadataToPdfByCitekey(
                     databaseContext,
-                    citeKeys,
+                    citationKeys,
                     filePreferences,
                     xmpPdfExporter,
                     embeddedBibFilePdfExporter,
@@ -144,7 +132,7 @@ class Pdf implements Runnable {
                     embeddBibfile);
             writeMetadataToPdfByFileNames(
                     databaseContext,
-                    pdfs,
+                    files,
                     filePreferences,
                     xmpPdfExporter,
                     embeddedBibFilePdfExporter,
@@ -182,7 +170,6 @@ class Pdf implements Runnable {
             }
         }
 
-        ///
         private static void writeMetadataToPdfByCitekey(BibDatabaseContext databaseContext,
                                                         List<String> citeKeys,
                                                         FilePreferences filePreferences,
@@ -204,41 +191,41 @@ class Pdf implements Runnable {
         }
 
         private static void writeMetadataToPdfByFileNames(BibDatabaseContext databaseContext,
-                                                          List<String> pdfs,
+                                                          List<Path> pdfs,
                                                           FilePreferences filePreferences,
                                                           XmpPdfExporter xmpPdfExporter,
                                                           EmbeddedBibFilePdfExporter embeddedBibFilePdfExporter,
                                                           JournalAbbreviationRepository abbreviationRepository,
                                                           boolean writeXMP,
                                                           boolean embeddBibfile) {
-            for (String fileName : pdfs) {
-                Path filePath = Path.of(fileName);
-                if (!filePath.isAbsolute()) {
-                    filePath = FileUtil.find(fileName, databaseContext.getFileDirectories(filePreferences)).orElse(FileUtil.find(fileName, List.of(Path.of("").toAbsolutePath())).orElse(filePath));
+            for (Path filePath : pdfs) {
+                if (!filePath.isAbsolute()) { // ToDo: Fix toString
+                    filePath = FileUtil.find(filePath.toString(), databaseContext.getFileDirectories(filePreferences)).orElse(
+                            FileUtil.find(filePath.toString(), List.of(Path.of("").toAbsolutePath())).orElse(filePath));
                 }
                 if (Files.exists(filePath)) {
                     try {
                         if (writeXMP) {
                             if (xmpPdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
-                                System.out.printf("Successfully written XMP metadata of at least one entry to %s%n", fileName);
+                                System.out.printf("Successfully written XMP metadata of at least one entry to %s%n", filePath);
                             } else {
-                                System.out.printf("File %s is not linked to any entry in database.%n", fileName);
+                                System.out.printf("File %s is not linked to any entry in database.%n", filePath);
                             }
                         }
                         if (embeddBibfile) {
                             if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
-                                System.out.printf("Successfully embedded XMP metadata of at least one entry to %s%n", fileName);
+                                System.out.printf("Successfully embedded XMP metadata of at least one entry to %s%n", filePath);
                             } else {
-                                System.out.printf("File %s is not linked to any entry in database.%n", fileName);
+                                System.out.printf("File %s is not linked to any entry in database.%n", filePath);
                             }
                         }
                     } catch (IOException e) {
-                        LOGGER.error("Error accessing file '{}'.", fileName);
+                        LOGGER.error("Error accessing file '{}'.", filePath);
                     } catch (Exception e) {
-                        LOGGER.error("Error writing entry to {}.", fileName);
+                        LOGGER.error("Error writing entry to {}.", filePath);
                     }
                 } else {
-                    LOGGER.error("Skipped - PDF {} does not exist", fileName);
+                    LOGGER.error("Skipped - PDF {} does not exist", filePath);
                 }
             }
         }
