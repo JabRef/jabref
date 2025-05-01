@@ -57,7 +57,7 @@
                         <padding><Insets bottom="5.0"/></padding>
                     </Label>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
-                        <Label text="%Identifier:"/>
+                        <Label text="%Identifier"/>
                         <TextField fx:id="idText" prefHeight="30.0" HBox.hgrow="ALWAYS">
                             <tooltip>
                                 <Tooltip text="%Specify the source identifier to look up."/>
@@ -70,13 +70,12 @@
                                 <Tooltip text="%If selected, the provided identifier will automatically parsed and searched for.\nThis process may not always return correct results."/>
                             </tooltip>
                         </RadioButton>
-                        <RadioButton fx:id="idLookupSpecify" text="%Specify entry type:">
-                            <tooltip>
-                                <Tooltip text="%If selected, the specified type will be used far parsing and searching the provided identifier."/>
-                            </tooltip>
-                        </RadioButton>
                         <HBox>
-                            <padding><Insets left="25.0"/></padding>
+                            <RadioButton fx:id="idLookupSpecify" text="%Identifier type">
+                                <tooltip>
+                                    <Tooltip text="%If selected, the specified type will be used for parsing and searching the provided identifier."/>
+                                </tooltip>
+                            </RadioButton>
                             <ComboBox fx:id="idFetcher" prefHeight="30.0" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
                                 <tooltip>
                                     <Tooltip text="%Specify the type of the provided identifier."/>
@@ -86,10 +85,10 @@
                     </VBox>
                     <VBox spacing="5.0">
                         <padding><Insets top="5.0"/></padding>
-                        <Label fx:id="idErrorInvalidText" text="%You must provide an identifier!">
+                        <Label fx:id="idErrorInvalidText" text="%You must provide an identifier.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>
-                        <Label fx:id="idErrorInvalidFetcher" text="%You must select an identifier type!">
+                        <Label fx:id="idErrorInvalidFetcher" text="%You must select an identifier type.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>
                     </VBox>
@@ -105,7 +104,7 @@
                     </Label>
                     <TextArea fx:id="interpretText" VBox.vgrow="always" wrapText="true"/>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
-                        <Label text="%Parser:"/>
+                        <Label text="%Parser"/>
                         <ComboBox fx:id="interpretParser" prefHeight="30.0" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308">
                             <tooltip>
                                 <Tooltip text="%Specify the parser to use for interpreting the provided citations."/>
