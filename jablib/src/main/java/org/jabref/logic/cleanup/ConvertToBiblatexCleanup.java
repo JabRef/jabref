@@ -1,7 +1,6 @@
 package org.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,7 +61,7 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         return changes;
     }
 
-    private Collection<? extends FieldChange> applyDateFallback(BibEntry entry) {
+    private List<FieldChange> applyDateFallback(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
         Optional<String> yearValue = entry.getFieldOrAlias(StandardField.YEAR).map(String::trim);
         Optional<String> monthValue = entry.getFieldOrAlias(StandardField.MONTH).map(String::trim);
