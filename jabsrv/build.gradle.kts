@@ -9,6 +9,10 @@ plugins {
 application{
     mainClass.set("org.jabref.http.server.Server")
     mainModule.set("org.jabref.jabsrv")
+
+    applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=org.jabref.jabserv.merged.module,com.sun.jna"
+    )
 }
 
 dependencies {
@@ -73,4 +77,13 @@ javafx {
 
 tasks.test {
     maxParallelForks = 1
+}
+
+tasks.named<JavaExec>("run") {
+    doFirst {
+        application.applicationDefaultJvmArgs =
+            listOf(
+                "--enable-native-access=com.sun.jna"
+            )
+    }
 }
