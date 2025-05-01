@@ -46,10 +46,15 @@
             </tooltip>
         </Button>
 
+        <fx:define>
+            <Tooltip fx:id="userSpecificFileDirectoryTooltip"/>
+        </fx:define>
         <Label text="%User-specific file directory"
-               GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+               GridPane.columnIndex="0" GridPane.rowIndex="2"
+               tooltip="$userSpecificFileDirectoryTooltip"/>
         <TextField fx:id="userSpecificFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="2"
+                   tooltip="$userSpecificFileDirectoryTooltip"/>
         <Button onAction="#browseUserSpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="2">
@@ -61,10 +66,15 @@
             </tooltip>
         </Button>
 
+        <fx:define>
+            <Tooltip fx:id="laTexFileDirectoryTooltip"/>
+        </fx:define>
         <Label text="%LaTeX file directory"
-               GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+               GridPane.columnIndex="0" GridPane.rowIndex="3"
+               tooltip="$laTexFileDirectoryTooltip"/>
         <TextField fx:id="laTexFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="3"
+                   tooltip="$laTexFileDirectoryTooltip"/>
         <Button onAction="#browseLatexFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="3">
