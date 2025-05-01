@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-class AuxCommandLineTest {
+class GenerateBibFromAuxTest {
 
     private ImportFormatPreferences importFormatPreferences;
 
@@ -32,14 +31,13 @@ class AuxCommandLineTest {
 
     @Test
     void test() throws URISyntaxException, IOException {
-        InputStream originalStream = AuxCommandLineTest.class.getResourceAsStream("origin.bib");
+        InputStream originalStream = GenerateBibFromAuxTest.class.getResourceAsStream("origin.bib");
 
-        File auxFile = Path.of(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
+        Path auxFile = Path.of(GenerateBibFromAuxTest.class.getResource("paper.aux").toURI());
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
             ParserResult result = new BibtexParser(importFormatPreferences).parse(originalReader);
 
-            AuxCommandLine auxCommandLine = new AuxCommandLine(auxFile.getAbsolutePath(), result.getDatabase());
-            BibDatabase newDB = auxCommandLine.perform();
+            BibDatabase newDB = GenerateBibFromAux.createFromAux(result, auxFile);
             assertNotNull(newDB);
             assertEquals(2, newDB.getEntries().size());
         }
