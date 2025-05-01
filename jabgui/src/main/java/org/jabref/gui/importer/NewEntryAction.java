@@ -31,8 +31,10 @@ public class NewEntryAction extends SimpleCommand {
     private boolean isInstant;
     private Optional<EntryType> instantType;
 
-    // Launches a dialog asking the user for inputs for the new entry to create.
-    // This dialog initially opens to the last-used tab (from previous use of the tool).
+    /**
+     * Launches a dialog asking the user for inputs for the new entry to create.
+     * This dialog initially opens to the last-used tab (from previous use of the tool).
+     */
     public NewEntryAction(Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
@@ -45,19 +47,23 @@ public class NewEntryAction extends SimpleCommand {
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
     }
 
-    // Launches a dialog asking the user for inputs for the new entry to create.
-    // This dialog initially opens to the tab specified by `approach`. If `approach` is `null`, then the last-used tab
-    // from previous use of the tool is restored.
+    /**
+     * Launches a dialog asking the user for inputs for the new entry to create.
+     * This dialog initially opens to the tab specified by `approach`. If `approach` is `null`, then the last-used tab
+     * from previous use of the tool is restored.
+     */
     public NewEntryAction(NewEntryApproach approach, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this(tabSupplier, dialogService, preferences, stateManager);
 
         this.initialApproach = approach;
     }
 
-    // Directly creates a new empty entry of the type `instantType`, without opening a dialog for the user to provide
-    // inputs.
-    // If `instantType` is `null`, the last-selected instant type from the previous use of the tool to create an empty
-    // instance of a particular type is used (the `Article` standard entry type by default).
+    /**
+     * Directly creates a new empty entry of the type `instantType`, without opening a dialog for the user to provide
+     * inputs.
+     * If `instantType` is `null`, the last-selected instant type from the previous use of the tool to create an empty
+     * instance of a particular type is used (the `Article` standard entry type by default).
+     */
     public NewEntryAction(EntryType instantType, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this(tabSupplier, dialogService, preferences, stateManager);
 
