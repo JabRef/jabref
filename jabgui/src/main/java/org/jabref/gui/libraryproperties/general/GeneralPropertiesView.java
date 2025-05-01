@@ -15,9 +15,11 @@ import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
+import org.jabref.model.metadata.MetaData;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
@@ -41,6 +43,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private Tooltip libSpecificFileDirSwitchTooltip;
     @FXML private Tooltip userSpecificFileDirSwitchTooltip;
     @FXML private Tooltip laTexSpecificFileDirSwitchTooltip;
+    @FXML private Tooltip userSpecificFileDirectoryTooltip;
+    @FXML private Tooltip laTexFileDirectoryTooltip;
 
     private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
@@ -49,6 +53,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     private final String switchToAbsoluteText = Localization.lang("Switch to absolute path: converts the path to an absolute path.");
 
     @Inject private CliPreferences preferences;
+    @Inject private MetaData metadata;
 
     public GeneralPropertiesView(BibDatabaseContext databaseContext) {
         this.databaseContext = databaseContext;
@@ -107,6 +112,15 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
+
+        String userString = preferences.getFilePreferences().getUserAndHost().replace("-" + OS.getHostName(), "");
+        userSpecificFileDirectoryTooltip.setText("User: " + userString + ", Host: " + OS.getHostName());
+
+        laTexFileDirectoryTooltip.textProperty().bind(
+                viewModel.laTexFileDirectoryProperty().map(path ->
+                        "Directory for LaTeX files: " + (path.isEmpty() ? "(not set)" : path)
+                )
+        );
 
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
