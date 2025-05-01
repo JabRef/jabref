@@ -65,7 +65,7 @@
                         </TextField>
                     </HBox>
                     <VBox spacing="5.0">
-                        <RadioButton fx:id="idLookupGuess" text="%Automatically determine entry type">
+                        <RadioButton fx:id="idLookupGuess" text="%Automatically determine identifier type">
                             <tooltip>
                                 <Tooltip text="%If selected, the provided identifier will automatically parsed and searched for.\nThis process may not always return correct results."/>
                             </tooltip>
