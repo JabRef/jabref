@@ -69,3 +69,7 @@ javafx {
     // because of afterburner.fx
     modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
 }
+
+tasks.test {
+    maxParallelForks = 1
+}
