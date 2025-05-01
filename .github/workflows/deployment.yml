@@ -97,6 +97,7 @@ jobs:
       # region setup-JDK
       - name: Setup JDK (to use in Gradle's Java toolchain)
         uses: jdx/mise-action@v2
+      - run: mise dr
       - name: Make JDK known to gradle (Linux, macOS)
         if: (matrix.os != 'windows-latest')
         shell: bash
@@ -111,6 +112,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      - run: mise dr
       # endregion
 
       - name: Setup Gradle
@@ -139,12 +141,21 @@ jobs:
         shell: bash
         run: |
           set -e
+          set -x
           cd jabgui
+
+          mise dr
+
+          mise hook-env
+
+          mise dr
 
           # see https://github.com/jdx/mise/discussions/4973
           eval $(mise hook-env -f | grep 'export JAVA_HOME')
           eval $(mise hook-env -f | grep 'export PATH')
           echo $JAVA_HOME
+
+          mise dr
 
           # Use Java's packaging tool to create "JabRef.app"
           jpackage \
