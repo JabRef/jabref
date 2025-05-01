@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Option;
-import static picocli.CommandLine.Parameters;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "search", description = "Search in a library.")
@@ -36,12 +35,10 @@ class Search implements Callable<Integer> {
     @ParentCommand
     private KitCommandLine kitCommandLine;
 
-    @Parameters(index = "0", description = "Search query", arity = "0..1")
-    @Option(names = {"--query"}, description = "Search query")
+    @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
 
-    @Parameters(index = "1", description = "Input BibTeX file", arity = "0..1")
-    @Option(names = {"--input"}, description = "Input BibTeX file")
+    @Option(names = {"--input"}, description = "Input BibTeX file", required = true)
     private Path inputFile;
 
     @Option(names = {"--output"}, description = "Output file")

@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Option;
-import static picocli.CommandLine.Parameters;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "check-consistency", description = "Check consistency of the database.")
@@ -33,8 +32,7 @@ class CheckConsistency implements Callable<Integer> {
     @ParentCommand
     private KitCommandLine kitCommandLine;
 
-    @Parameters(index = "0", description = "Input BibTeX file", arity = "0..1")
-    @Option(names = {"--input"}, description = "Input BibTeX file")
+    @Option(names = {"--input"}, description = "Input BibTeX file", required = true)
     private Path inputFile;
 
     @Option(names = {"--output-format"}, description = "Output format: txt or csv", defaultValue = "txt")

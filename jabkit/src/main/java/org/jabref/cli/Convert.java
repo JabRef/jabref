@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Option;
-import static picocli.CommandLine.Parameters;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "convert", description = "Convert between bibliography formats.")
@@ -22,14 +21,12 @@ public class Convert implements Callable<Integer> {
     @ParentCommand
     private KitCommandLine kitCommandLine;
 
-    @Parameters(index = "0", description = "Input file", arity = "0..1")
-    @Option(names = {"--input"}, description = "Input file")
+    @Option(names = {"--input"}, description = "Input file", required = true)
     private Path inputFile;
 
     @Option(names = {"--input-format"}, description = "Input format")
     private String inputFormat;
 
-    @Parameters(index = "1", description = "Output file")
     @Option(names = {"--output"}, description = "Output file")
     private Path outputFile;
 
