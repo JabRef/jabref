@@ -115,4 +115,4 @@ class URLUtilTest {
         URL actualUrl = URLUtil.create(inputUrl);
         assertEquals(expectedUrl, actualUrl.toString());
     }
-} 
+}
