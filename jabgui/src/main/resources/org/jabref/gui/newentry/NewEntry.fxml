@@ -12,8 +12,8 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <DialogPane xmlns:fx="http://javafx.com/fxml/1" prefWidth="600" xmlns="http://javafx.com/javafx/8.0.171"
@@ -33,17 +33,17 @@
                     </Label>
                     <TitledPane fx:id="entryRecommendedTitle" text="%Recommended types" animated="false">
                         <content>
-                            <FlowPane fx:id="entryRecommended"/>
+                            <TilePane fx:id="entryRecommended" hgap="2.0" vgap="2.0"/>
                         </content>
                     </TitledPane>
                     <TitledPane fx:id="entryOtherTitle" text="%Other types" animated="false">
                         <content>
-                            <FlowPane fx:id="entryOther"/>
+                            <TilePane fx:id="entryOther" hgap="2.0" vgap="2.0"/>
                         </content>
                     </TitledPane>
                     <TitledPane fx:id="entryCustomTitle" text="%Custom types" animated="false">
                         <content>
-                            <FlowPane fx:id="entryCustom"/>
+                            <TilePane fx:id="entryCustom" hgap="2.0" vgap="2.0"/>
                         </content>
                     </TitledPane>
                 </VBox>

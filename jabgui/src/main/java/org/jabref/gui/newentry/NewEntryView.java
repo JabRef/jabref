@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -20,7 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -89,11 +88,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private Tab tabSpecifyBibtex;
 
     @FXML private TitledPane entryRecommendedTitle;
-    @FXML private FlowPane entryRecommended;
+    @FXML private TilePane entryRecommended;
     @FXML private TitledPane entryOtherTitle;
-    @FXML private FlowPane entryOther;
+    @FXML private TilePane entryOther;
     @FXML private TitledPane entryCustomTitle;
-    @FXML private FlowPane entryCustom;
+    @FXML private TilePane entryCustom;
 
     @FXML private TextField idText;
     @FXML private RadioButton idLookupGuess;
@@ -127,7 +126,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         final Stage stage = (Stage) getDialogPane().getScene().getWindow();
         stage.setHeight(650);
-        stage.setWidth(1010);
+        stage.setWidth(931);
         stage.setMinHeight(300);
         stage.setMinWidth(400);
 
@@ -422,16 +421,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         viewModel.cancel();
     }
 
-    private void addEntriesToPane(FlowPane pane, Collection<? extends BibEntryType> entries) {
+    private void addEntriesToPane(TilePane pane, Collection<? extends BibEntryType> entries) {
         final double maxTooltipWidth = (2.0 / 3.0) * Screen.getPrimary().getBounds().getWidth();
+
         for (BibEntryType entry : entries) {
             final EntryType type = entry.getType();
 
             final Button button = new Button(type.getDisplayName());
+            button.setMinWidth(Button.USE_PREF_SIZE);
+            button.setMaxWidth(Double.MAX_VALUE);
             button.setUserData(entry);
             button.setOnAction(_ -> onEntryTypeSelected(type));
-            pane.getChildren().add(button);
-            pane.setMargin(button, new Insets(1.0));
 
             final String description = descriptionOfEntryType(type);
             if (description != null) {
@@ -440,6 +440,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 tooltip.setWrapText(true);
                 button.setTooltip(tooltip);
             }
+
+            pane.getChildren().add(button);
         }
     }
 
