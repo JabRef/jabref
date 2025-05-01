@@ -90,17 +90,23 @@ public class Server {
                                                      .build();
         }
         LOGGER.debug("Starting server...");
-        SeBootstrap.start(Application.class, configuration).thenAccept(instance -> {
-            LOGGER.debug("Server started.");
-            instance.stopOnShutdown(stopResult ->
-                    LOGGER.debug("Stop result: {} [Native stop result: {}].", stopResult,
-                            stopResult.unwrap(Object.class)));
-            final URI uri = instance.configuration().baseUri();
-            LOGGER.debug("Instance {} running at {} [Native handle: {}].%n", instance, uri,
-                    instance.unwrap(Object.class));
-            LOGGER.debug("Send SIGKILL to shutdown.");
-            serverInstance = instance;
-        });
+        Application application = new Application(filesToServe);
+        SeBootstrap.start(application, configuration)
+                   .thenAccept(instance -> {
+                       LOGGER.debug("Server started.");
+                       instance.stopOnShutdown(stopResult ->
+                               LOGGER.debug("Stop result: {} [Native stop result: {}].", stopResult,
+                                       stopResult.unwrap(Object.class)));
+                       final URI uri = instance.configuration().baseUri();
+                       LOGGER.debug("Instance {} running at {} [Native handle: {}].%n", instance, uri,
+                               instance.unwrap(Object.class));
+                       LOGGER.debug("Send SIGKILL to shutdown.");
+                       serverInstance = instance;
+                   })
+                   .exceptionally(ex -> {
+                       LOGGER.error("Server startup failed", ex);
+                       return null;
+                   });;
     }
 
     private static boolean sslCertExists() {
