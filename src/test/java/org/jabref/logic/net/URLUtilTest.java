@@ -101,9 +101,9 @@ class URLUtilTest {
     "http://www.example.com, http://www.example.com",
     "https://www.example.com, https://www.example.com"
     })
-    void createShouldHandleURLs(String input, String expected) throws Exception {
-    URL url = URLUtil.create(input);
-    assertEquals(expected, url.toString());
+    void createShouldHandleURLs(String expected, String input) throws Exception {
+        URL url = URLUtil.create(input);
+        assertEquals(expected, url.toString());
     }
 
     @ParameterizedTest
@@ -111,7 +111,7 @@ class URLUtilTest {
         "ftp://example.com, ftp://example.com",
         "file:///path/to/file, file:/path/to/file"
     })
-    void createShouldHandleOtherProtocols(String inputUrl, String expectedUrl) throws Exception {
+    void createShouldHandleOtherProtocols(String expectedUrl, String inputUrl) throws Exception {
         URL actualUrl = URLUtil.create(inputUrl);
         assertEquals(expectedUrl, actualUrl.toString());
     }
