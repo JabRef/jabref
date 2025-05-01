@@ -15,7 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where the "Convert to biblatex" cleanup failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). A fallback was added to correctly interpret such values. [#11868](https://github.com/JabRef/jabref/issues/11868)
+- We added a fallback for the "Convert to biblatex" cleanup when it failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). [#11868](https://github.com/JabRef/jabref/issues/11868)
 
 ### Removed
 

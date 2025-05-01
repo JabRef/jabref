@@ -68,7 +68,7 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
         Optional<String> monthValue = entry.getFieldOrAlias(StandardField.MONTH).map(String::trim);
 
         if (yearValue.isPresent() && monthValue.isEmpty()) {
-            String yearText = yearValue.get().trim();
+            String yearText = yearValue.get();
             Optional<Date> fallbackDate = Date.parse(yearText);
             if (fallbackDate.isPresent()) {
                 entry.setField(StandardField.DATE, yearText).ifPresent(changes::add);
