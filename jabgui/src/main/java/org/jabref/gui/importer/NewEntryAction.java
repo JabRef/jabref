@@ -8,7 +8,7 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.newentry.NewEntryApproach;
+import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.newentry.NewEntryView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.model.entry.BibEntry;
@@ -27,7 +27,7 @@ public class NewEntryAction extends SimpleCommand {
 
     private final GuiPreferences preferences;
 
-    private NewEntryApproach initialApproach;
+    private NewEntryDialogTab initialApproach;
     private boolean isInstant;
     private Optional<EntryType> instantType;
 
@@ -52,7 +52,7 @@ public class NewEntryAction extends SimpleCommand {
      * This dialog initially opens to the tab specified by `approach`. If `approach` is `null`, then the last-used tab
      * from previous use of the tool is restored.
      */
-    public NewEntryAction(NewEntryApproach approach, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+    public NewEntryAction(NewEntryDialogTab approach, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this(tabSupplier, dialogService, preferences, stateManager);
 
         this.initialApproach = approach;

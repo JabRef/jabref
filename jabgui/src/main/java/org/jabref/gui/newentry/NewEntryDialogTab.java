@@ -1,6 +1,6 @@
 package org.jabref.gui.newentry;
 
-public enum NewEntryApproach {
+public enum NewEntryDialogTab {
     CREATE_ENTRY,
     LOOKUP_IDENTIFIER,
     INTERPRET_CITATIONS,

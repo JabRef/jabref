@@ -10,7 +10,7 @@ import javafx.beans.property.StringProperty;
 import org.jabref.model.entry.types.EntryType;
 
 public class NewEntryPreferences {
-    private final ObjectProperty<NewEntryApproach> latestApproach;
+    private final ObjectProperty<NewEntryDialogTab> latestApproach;
     private final BooleanProperty typesRecommendedExpanded;
     private final BooleanProperty typesOtherExpanded;
     private final BooleanProperty typesCustomExpanded;
@@ -19,7 +19,7 @@ public class NewEntryPreferences {
     private final StringProperty latestIdFetcherName;
     private final StringProperty latestInterpretParserName;
 
-    public NewEntryPreferences(NewEntryApproach approach,
+    public NewEntryPreferences(NewEntryDialogTab approach,
                                boolean expandRecommended,
                                boolean expandOther,
                                boolean expandCustom,
@@ -37,15 +37,15 @@ public class NewEntryPreferences {
         this.latestInterpretParserName = new SimpleStringProperty(interpretParserName);
     }
 
-    public NewEntryApproach getLatestApproach() {
+    public NewEntryDialogTab getLatestApproach() {
         return latestApproach.get();
     }
 
-    public void setLatestApproach(NewEntryApproach approach) {
+    public void setLatestApproach(NewEntryDialogTab approach) {
         latestApproach.set(approach);
     }
 
-    public ObjectProperty<NewEntryApproach> latestApproachProperty() {
+    public ObjectProperty<NewEntryDialogTab> latestApproachProperty() {
         return latestApproach;
     }
 

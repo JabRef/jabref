@@ -64,8 +64,8 @@ import jakarta.inject.Inject;
 public class NewEntryView extends BaseDialog<BibEntry> {
     private NewEntryViewModel viewModel;
 
-    private final NewEntryApproach initialApproach;
-    private NewEntryApproach currentApproach;
+    private final NewEntryDialogTab initialApproach;
+    private NewEntryDialogTab currentApproach;
 
     private final GuiPreferences guiPreferences;
     private final NewEntryPreferences preferences;
@@ -108,7 +108,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     private BibEntry result;
 
-    public NewEntryView(NewEntryApproach initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {
+    public NewEntryView(NewEntryDialogTab initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {
         this.initialApproach = initialApproach;
         this.currentApproach = initialApproach;
 
@@ -141,25 +141,25 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void finalizeTabs() {
-        NewEntryApproach approach = initialApproach;
+        NewEntryDialogTab approach = initialApproach;
         if (approach == null) {
             approach = preferences.getLatestApproach();
         }
 
         switch (approach) {
-            case NewEntryApproach.CREATE_ENTRY:
+            case NewEntryDialogTab.CREATE_ENTRY:
                 tabs.getSelectionModel().select(tabCreateEntry);
                 switchCreateEntry();
                 break;
-            case NewEntryApproach.LOOKUP_IDENTIFIER:
+            case NewEntryDialogTab.LOOKUP_IDENTIFIER:
                 tabs.getSelectionModel().select(tabLookupIdentifier);
                 switchLookupIdentifier();
                 break;
-            case NewEntryApproach.INTERPRET_CITATIONS:
+            case NewEntryDialogTab.INTERPRET_CITATIONS:
                 tabs.getSelectionModel().select(tabInterpretCitations);
                 switchInterpretCitations();
                 break;
-            case NewEntryApproach.SPECIFY_BIBTEX:
+            case NewEntryDialogTab.SPECIFY_BIBTEX:
                 tabs.getSelectionModel().select(tabSpecifyBibtex);
                 switchSpecifyBibtex();
                 break;
@@ -312,8 +312,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryApproach.CREATE_ENTRY;
-        preferences.setLatestApproach(NewEntryApproach.CREATE_ENTRY);
+        currentApproach = NewEntryDialogTab.CREATE_ENTRY;
+        preferences.setLatestApproach(NewEntryDialogTab.CREATE_ENTRY);
 
         if (generateButton != null) {
             generateButton.disableProperty().unbind();
@@ -328,8 +328,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryApproach.LOOKUP_IDENTIFIER;
-        preferences.setLatestApproach(NewEntryApproach.LOOKUP_IDENTIFIER);
+        currentApproach = NewEntryDialogTab.LOOKUP_IDENTIFIER;
+        preferences.setLatestApproach(NewEntryDialogTab.LOOKUP_IDENTIFIER);
 
         if (idText != null) {
             Platform.runLater(() -> idText.requestFocus());
@@ -347,8 +347,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryApproach.INTERPRET_CITATIONS;
-        preferences.setLatestApproach(NewEntryApproach.INTERPRET_CITATIONS);
+        currentApproach = NewEntryDialogTab.INTERPRET_CITATIONS;
+        preferences.setLatestApproach(NewEntryDialogTab.INTERPRET_CITATIONS);
 
         if (interpretText != null) {
             Platform.runLater(() -> interpretText.requestFocus());
@@ -366,8 +366,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryApproach.SPECIFY_BIBTEX;
-        preferences.setLatestApproach(NewEntryApproach.SPECIFY_BIBTEX);
+        currentApproach = NewEntryDialogTab.SPECIFY_BIBTEX;
+        preferences.setLatestApproach(NewEntryDialogTab.SPECIFY_BIBTEX);
 
         if (bibtexText != null) {
             Platform.runLater(() -> bibtexText.requestFocus());
@@ -396,20 +396,20 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
         // a `Platform.runLater(...)` which would probably fix this.
         switch (currentApproach) {
-            case NewEntryApproach.CREATE_ENTRY:
+            case NewEntryDialogTab.CREATE_ENTRY:
                 // We do nothing here.
                 break;
-            case NewEntryApproach.LOOKUP_IDENTIFIER:
+            case NewEntryDialogTab.LOOKUP_IDENTIFIER:
                 generateButton.setText("Searching...");
                 viewModel.executeLookupIdentifier(idLookupGuess.isSelected());
                 switchLookupIdentifier();
                 break;
-            case NewEntryApproach.INTERPRET_CITATIONS:
+            case NewEntryDialogTab.INTERPRET_CITATIONS:
                 generateButton.setText("Parsing...");
                 viewModel.executeInterpretCitations();
                 switchInterpretCitations();
                 break;
-            case NewEntryApproach.SPECIFY_BIBTEX:
+            case NewEntryDialogTab.SPECIFY_BIBTEX:
                 generateButton.setText("Parsing...");
                 viewModel.executeSpecifyBibtex();
                 switchSpecifyBibtex();

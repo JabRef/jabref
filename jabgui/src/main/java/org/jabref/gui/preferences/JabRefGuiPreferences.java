@@ -40,7 +40,7 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
-import org.jabref.gui.newentry.NewEntryApproach;
+import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
@@ -422,7 +422,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
 
         // region NewEntryUnifierPreferences
-        defaults.put(NEW_ENTRY_APPROACH, List.of(NewEntryApproach.values()).indexOf(NewEntryApproach.CREATE_ENTRY));
+        defaults.put(NEW_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CREATE_ENTRY));
         defaults.put(NEW_ENTRY_EXPAND_RECOMMENDED, true);
         defaults.put(NEW_ENTRY_EXPAND_OTHER, false);
         defaults.put(NEW_ENTRY_EXPAND_CUSTOM, true);
@@ -1263,9 +1263,9 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         }
 
         final int approachIndex = getInt(NEW_ENTRY_APPROACH);
-        NewEntryApproach approach = NewEntryApproach.values().length > approachIndex
-            ? NewEntryApproach.values()[approachIndex]
-            : NewEntryApproach.values()[0];
+        NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
+            ? NewEntryDialogTab.values()[approachIndex]
+            : NewEntryDialogTab.values()[0];
 
         final String instantTypeName = get(NEW_ENTRY_INSTANT_TYPE);
         EntryType instantType = StandardEntryType.Article;
@@ -1286,7 +1286,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             get(NEW_ENTRY_ID_FETCHER_NAME),
             get(NEW_ENTRY_INTERPRET_PARSER_NAME));
 
-        EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_APPROACH, List.of(NewEntryApproach.values()).indexOf(newValue)));
+        EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(NEW_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
         EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_EXPAND_RECOMMENDED, newValue));
         EasyBind.listen(newEntryPreferences.typesOtherExpandedProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_EXPAND_OTHER, newValue));
         EasyBind.listen(newEntryPreferences.typesCustomExpandedProperty(), (_, _, newValue) -> putBoolean(NEW_ENTRY_EXPAND_CUSTOM, newValue));
