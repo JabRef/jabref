@@ -207,7 +207,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         // As the user types, the configureDir may become invalid.
         if (!Files.isDirectory(configuredPath)) {
-            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working directory.", configuredDir));
+            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working directory", configuredDir));
             return workingDir;
         }
 
