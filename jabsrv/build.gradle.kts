@@ -8,6 +8,7 @@ plugins {
 
 application{
     mainClass.set("org.jabref.http.server.Server")
+    mainModule.set("org.jabref.jabsrv")
 }
 
 dependencies {
