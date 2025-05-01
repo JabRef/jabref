@@ -27,7 +27,7 @@
             <Tab fx:id="tabCreateEntry" text="%Choose Entry Type" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
-                    <Label text="%The 'add empty entry' tool uses the last-selected entry type from this menu.">
+                    <Label text="%The 'add entry' tool uses the last-selected entry type from this menu.">
                         <font><Font name="System Italic" size="13.0"/></font>
                         <padding><Insets bottom="5.0"/></padding>
                     </Label>

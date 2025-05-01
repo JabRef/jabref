@@ -135,10 +135,10 @@ public enum StandardActions implements Action {
     EXPAND_ALL(Localization.lang("Expand all")),
     COLLAPSE_ALL(Localization.lang("Collapse all")),
 
-    NEW_INSTANT_ENTRY(Localization.lang("Add empty entry"), IconTheme.JabRefIcons.ADD_ARTICLE),
-    NEW_ENTRY(Localization.lang("Create new entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
-    NEW_ENTRY_IDENTIFIER(Localization.lang("Lookup identifier"), IconTheme.JabRefIcons.NEW_ENTRY_IDENTIFIER, KeyBinding.NEW_ENTRY_IDENTIFIER),
-    NEW_ENTRY_PLAINTEXT(Localization.lang("Interpret citations"), IconTheme.JabRefIcons.NEW_ENTRY_PLAINTEXT, KeyBinding.NEW_ENTRY_PLAINTEXT),
+    NEW_INSTANT_ENTRY(Localization.lang("Add entry"), IconTheme.JabRefIcons.ADD_ARTICLE),
+    NEW_ENTRY(Localization.lang("Create new entry..."), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
+    NEW_ENTRY_IDENTIFIER(Localization.lang("Lookup identifier..."), IconTheme.JabRefIcons.NEW_ENTRY_IDENTIFIER, KeyBinding.NEW_ENTRY_IDENTIFIER),
+    NEW_ENTRY_PLAINTEXT(Localization.lang("Interpret citations..."), IconTheme.JabRefIcons.NEW_ENTRY_PLAINTEXT, KeyBinding.NEW_ENTRY_PLAINTEXT),
 
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
     FIND_DUPLICATES(Localization.lang("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES),

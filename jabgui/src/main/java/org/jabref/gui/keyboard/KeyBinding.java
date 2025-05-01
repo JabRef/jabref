@@ -71,7 +71,7 @@ public enum KeyBinding {
 
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl+shift+A", KeyBindingCategory.BIBTEX),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl+shift+B", KeyBindingCategory.BIBTEX),
-    NEW_ENTRY("New entry", Localization.lang("New entry"), "ctrl+N", KeyBindingCategory.BIBTEX),
+    NEW_ENTRY("Create new entry", Localization.lang("Create new entry"), "ctrl+N", KeyBindingCategory.BIBTEX),
     NEW_ENTRY_IDENTIFIER("Lookup identifier", Localization.lang("Lookup identifier"), "ctrl+alt+shift+N", KeyBindingCategory.BIBTEX),
     NEW_ENTRY_PLAINTEXT("Interpret citations", Localization.lang("Interpret citations"), "ctrl+shift+N", KeyBindingCategory.BIBTEX),
     NEW_INBOOK("New inbook", Localization.lang("New inbook"), "ctrl+shift+I", KeyBindingCategory.BIBTEX),
