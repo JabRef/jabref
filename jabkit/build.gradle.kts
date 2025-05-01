@@ -70,12 +70,12 @@ javafx {
 }
 
 application {
-    mainClass.set("org.jabref.cli.JabKit")
+    mainClass.set("org.jabref.JabKit")
     mainModule.set("org.jabref.jabkit")
 
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=org.jabref.jabkit.merged.module,com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }
 

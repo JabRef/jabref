@@ -2,6 +2,7 @@ module org.jabref.jabkit {
     requires org.jabref.jablib;
 
     requires info.picocli;
+    opens org.jabref.cli;
 
     requires transitive org.jspecify;
     requires java.prefs;

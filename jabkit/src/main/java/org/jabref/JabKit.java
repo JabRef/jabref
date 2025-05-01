@@ -96,7 +96,7 @@ public class JabKit {
                     entryTypesManager);
             argumentProcessor.processArguments(args);
 
-                systemExit();
+            systemExit();
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
             systemExit();

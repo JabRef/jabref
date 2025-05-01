@@ -28,7 +28,7 @@ import static picocli.CommandLine.Option;
  */
 @Command(name = "fetch", description = "Fetch entries from a provider.")
 class Fetch implements Callable<Integer> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Fetch.class);
 
     @CommandLine.ParentCommand
     private KitCommandLine kitCommandLine;
