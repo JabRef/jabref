@@ -112,8 +112,8 @@ import static picocli.CommandLine.Option;
  # NOT jabkit pdf write-xmp --all --update-linked-files --input Chocolate.bib
 
  // .desc(Localization.lang("Script-friendly output"))
- jabkit <whateveraction> --porcelain
- */
+ jabkit whateveraction --porcelain
+  */
 @Command(name = "jabkit",
         mixinStandardHelpOptions = true,
         subcommands = {
