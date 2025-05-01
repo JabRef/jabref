@@ -36,6 +36,7 @@ dependencies {
     // Injection framework
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     implementation("org.glassfish.hk2:hk2-api:3.1.1")
+    implementation("org.glassfish.hk2:hk2-utils:3.1.1")
 
     // testImplementation("org.glassfish.hk2:hk2-testing:3.0.4")
     // implementation("org.glassfish.hk2:hk2-testing-jersey:3.0.4")
@@ -47,6 +48,8 @@ dependencies {
     implementation("org.glassfish.grizzly:grizzly-http-server:4.0.2")
     implementation("org.glassfish.grizzly:grizzly-framework:4.0.2")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
+    implementation("jakarta.validation:jakarta.validation-api:3.1.1")
+    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
 
     implementation("com.konghq:unirest-modules-gson:4.4.6")
 

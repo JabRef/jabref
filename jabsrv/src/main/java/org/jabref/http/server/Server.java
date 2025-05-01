@@ -3,18 +3,26 @@ package org.jabref.http.server;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
+import org.jabref.http.dto.GsonFactory;
+import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 
 import jakarta.ws.rs.SeBootstrap;
 import net.harawata.appdirs.AppDirsFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.internal.inject.AbstractBinder;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +42,7 @@ public class Server {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        final List<Path> lastFilesOpened = new ArrayList<>(); // JabRefCliPreferences.getInstance().getGuiPreferences().getLastFilesOpened();
+        final List<Path> filesToServe = JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened().stream().toList();
 
         // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
         // In a testing environment, this might be difficult to handle
@@ -44,69 +52,83 @@ public class Server {
             List<Path> filesToAdd = Arrays.stream(args)
                                           .map(Path::of)
                                           .filter(Files::exists)
-                                          .filter(path -> !lastFilesOpened.contains(path))
+                                          .filter(path -> !filesToServe.contains(path))
                                           .toList();
 
             LOGGER.debug("Adding following files to the list of opened libraries: {}", filesToAdd);
 
             // add the files in the front of the last opened libraries
             for (Path path : filesToAdd.reversed()) {
-                lastFilesOpened.addFirst(path);
+                filesToServe.addFirst(path);
             }
         }
 
-        if (lastFilesOpened.isEmpty()) {
-            LOGGER.debug("still no library available to serve, serve the demo library");
+        if (filesToServe.isEmpty()) {
+            LOGGER.debug("Still no library available to serve, serving the demo library...");
             // Server.class.getResource("...") is always null here, thus trying relative path
             // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
             Path bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
             LOGGER.debug("Location of demo library: {}", bibPath);
-            lastFilesOpened.add(bibPath);
+            filesToServe.add(bibPath);
         }
 
-        LOGGER.debug("Libraries served: {}", lastFilesOpened);
+        LOGGER.debug("Libraries to serve: {}", filesToServe);
 
-        Server.startServer();
+        FilesToServe filesToServeService = new FilesToServe();
+        filesToServeService.setFilesToServe(filesToServe);
+
+        Server.startServer(filesToServeService);
 
         // Keep the http server running until user kills the process (e.g., presses Ctrl+C)
         Thread.currentThread().join();
     }
 
-    private static void startServer() {
-        SeBootstrap.Configuration configuration;
-        if (!sslCertExists()) {
-            LOGGER.info("SSL certificate not found. Server starts in non-SSL mode.");
-            configuration = SeBootstrap.Configuration.builder()
-                                                     .protocol("HTTP")
-                                                     .port(6050)
-                                                     .build();
-        } else {
-            LOGGER.info("SSL certificate found. Server starts in SSL mode.");
-            SSLContext sslContext = getSslContext();
-            configuration = SeBootstrap.Configuration.builder()
-                                                     .sslContext(sslContext)
-                                                     .protocol("HTTPS")
-                                                     .port(6051)
-                                                     .build();
-        }
+    public static final String BASE_URI = "http://localhost:6050/";
+
+    public static HttpServer startServer(ServiceLocator serviceLocator) {
+        // see https://stackoverflow.com/a/33794265/873282
+        final ResourceConfig resourceConfig = new ResourceConfig();
+        // TODO: Add SSL
+        resourceConfig.register(LibrariesResource.class);
+        resourceConfig.register(LibraryResource.class);
+        resourceConfig.register(CORSFilter.class);
+
         LOGGER.debug("Starting server...");
-        Application application = new Application(filesToServe);
-        SeBootstrap.start(application, configuration)
-                   .thenAccept(instance -> {
-                       LOGGER.debug("Server started.");
-                       instance.stopOnShutdown(stopResult ->
-                               LOGGER.debug("Stop result: {} [Native stop result: {}].", stopResult,
-                                       stopResult.unwrap(Object.class)));
-                       final URI uri = instance.configuration().baseUri();
-                       LOGGER.debug("Instance {} running at {} [Native handle: {}].%n", instance, uri,
-                               instance.unwrap(Object.class));
-                       LOGGER.debug("Send SIGKILL to shutdown.");
-                       serverInstance = instance;
-                   })
-                   .exceptionally(ex -> {
-                       LOGGER.error("Server startup failed", ex);
-                       return null;
-                   });;
+        final HttpServer httpServer =
+                GrizzlyHttpServerFactory
+                        .createHttpServer(URI.create(BASE_URI), resourceConfig, serviceLocator);
+        return httpServer;
+
+    }
+
+    private static void startServer(FilesToServe filesToServe) {
+        ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
+
+        try {
+            final HttpServer httpServer = startServer(serviceLocator);
+
+            // add jvm shutdown hook
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    System.out.println("Shutting down jabsrv...");
+                    httpServer.shutdownNow();
+                    System.out.println("Done, exit.");
+                } catch (Exception e) {
+                    LOGGER.error("Could not shut down server", e);
+                }
+            }));
+
+            System.out.println(String.format("Application started.%nStop the application using CTRL+C"));
+
+            // block and wait shut down signal, like CTRL+C
+            Thread.currentThread().join();
+
+        } catch (InterruptedException ex) {
+            LOGGER.error("Could not start down server", ex);
+        }
     }
 
     private static boolean sslCertExists() {

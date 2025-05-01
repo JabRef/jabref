@@ -1,8 +1,9 @@
 module org.jabref.jabsrv {
     exports org.jabref.http.server;
-    opens org.jabref.http.server
-            to org.glassfish.hk2.utilities,
-            org.glassfish.hk2.locator;
+
+    exports org.jabref.http.dto to org.glassfish.hk2.locator;
+
+    opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
 
     requires org.jabref.jablib;
 
@@ -31,9 +32,11 @@ module org.jabref.jabsrv {
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;
     requires org.glassfish.grizzly.http.server;
-
-
+    requires jakarta.validation;
     requires jakarta.ws.rs;
+
+    requires jersey.common;
+
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
@@ -43,4 +46,7 @@ module org.jabref.jabsrv {
     requires citeproc.java;
 
     requires transitive org.jspecify;
+    requires java.logging;
+    requires jersey.container.grizzly2.http;
+    requires jersey.server;
 }
