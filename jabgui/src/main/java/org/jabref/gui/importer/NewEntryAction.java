@@ -32,16 +32,18 @@ public class NewEntryAction extends SimpleCommand {
     private Optional<EntryType> instantType;
 
     /**
-     * Launches a dialog asking the user for inputs for the new entry to create.
-     * This dialog initially opens to the last-used tab (from previous use of the tool).
+     * Launches a tool for creating new entries.
+     * If `createInstantEntry` is `true`, a new entry will be immediately be created (using the last-selected entry
+     * type from the tool dialog was last run with).
+     * If `createInstantEntry` is `false`, a dialog will appear asking the user to specify inputs for the new entry.
      */
-    public NewEntryAction(Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
+    public NewEntryAction(boolean createInstantEntry, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
         this.tabSupplier = tabSupplier;
         this.dialogService = dialogService;
         this.preferences = preferences;
 
         this.initialApproach = null;
-        this.isInstant = false;
+        this.isInstant = createInstantEntry;
         this.instantType = Optional.empty();
 
         this.executable.bind(ActionHelper.needsDatabase(stateManager));
@@ -53,7 +55,7 @@ public class NewEntryAction extends SimpleCommand {
      * from previous use of the tool is restored.
      */
     public NewEntryAction(NewEntryDialogTab approach, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
-        this(tabSupplier, dialogService, preferences, stateManager);
+        this(false, tabSupplier, dialogService, preferences, stateManager);
 
         this.initialApproach = approach;
     }
@@ -65,9 +67,8 @@ public class NewEntryAction extends SimpleCommand {
      * instance of a particular type is used (the `Article` standard entry type by default).
      */
     public NewEntryAction(EntryType instantType, Supplier<LibraryTab> tabSupplier, DialogService dialogService, GuiPreferences preferences, StateManager stateManager) {
-        this(tabSupplier, dialogService, preferences, stateManager);
+        this(true, tabSupplier, dialogService, preferences, stateManager);
 
-        this.isInstant = true;
         this.instantType = Optional.ofNullable(instantType);
     }
 

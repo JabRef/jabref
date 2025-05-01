@@ -32,7 +32,7 @@ class NewEntryActionTest {
     @BeforeEach
     void setUp() {
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
-        newEntryAction = new NewEntryAction(() -> libraryTab, dialogService, preferences, stateManager);
+        newEntryAction = new NewEntryAction(false, () -> libraryTab, dialogService, preferences, stateManager);
     }
 
     @Test
