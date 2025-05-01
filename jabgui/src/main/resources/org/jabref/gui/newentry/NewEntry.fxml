@@ -70,7 +70,7 @@
                                 <Tooltip text="%If selected, the provided identifier will automatically parsed and searched for.\nThis process may not always return correct results."/>
                             </tooltip>
                         </RadioButton>
-                        <HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
                             <RadioButton fx:id="idLookupSpecify" text="%Identifier type">
                                 <tooltip>
                                     <Tooltip text="%If selected, the specified type will be used for parsing and searching the provided identifier."/>
