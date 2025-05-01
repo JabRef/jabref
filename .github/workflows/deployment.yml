@@ -148,6 +148,12 @@ jobs:
 
           mise hook-env
 
+          echo $JAVA_HOME
+
+          eval "$(mise hook-env)"
+
+          echo $JAVA_HOME
+
           mise dr
 
           # see https://github.com/jdx/mise/discussions/4973
