@@ -29,6 +29,10 @@ module org.jabref.jabsrv {
     // requires org.glassfish.jaxb.runtime;
 
     requires org.glassfish.grizzly;
+    requires org.glassfish.grizzly.http;
+    requires org.glassfish.grizzly.http.server;
+
+
     requires jakarta.ws.rs;
 
     requires net.harawata.appdirs;
