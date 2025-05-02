@@ -320,12 +320,12 @@ jobs:
       max-parallel: 1
       matrix:
         include:
-          - os: macos-13  # intel image
-            displayName: macOS
-            suffix: ''
           - os: macos-14
             displayName: macOS (ARM64)
             suffix: '-arm64'
+          - os: macos-13  # intel image
+            displayName: macOS
+            suffix: ''
     runs-on: ${{ matrix.os }}
     needs: [build]
     if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
