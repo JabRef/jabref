@@ -339,31 +339,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         globalSearchBar.openGlobalSearchDialog();
                         break;
                     case NEW_ARTICLE:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Article, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_BOOK:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Book, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Book, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INBOOK:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InBook, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.InBook, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_MASTERSTHESIS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.MastersThesis, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.MastersThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PHDTHESIS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.PhdThesis, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.PhdThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PROCEEDINGS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Proceedings, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Proceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_TECHREPORT:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.TechReport, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.TechReport, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_UNPUBLISHED:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Unpublished, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Unpublished, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INPROCEEDINGS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     default:
                 }
