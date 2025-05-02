@@ -49,7 +49,8 @@ abstract class ServerTest extends JerseyTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
+        super.setUp();
         filesToServe.setFilesToServe(List.of(TestBibFile.GENERAL_SERVER_TEST.path));
     }
 
