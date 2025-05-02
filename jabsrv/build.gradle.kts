@@ -21,7 +21,6 @@ dependencies {
     implementation(project(":jablib"))
 
     implementation("org.slf4j:slf4j-api:2.0.17")
-    implementation("org.tinylog:tinylog-api:2.7.0")
     implementation("org.tinylog:slf4j-tinylog:2.7.0")
     implementation("org.tinylog:tinylog-impl:2.7.0")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
