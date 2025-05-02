@@ -1,7 +1,7 @@
 module org.jabref.jabsrv {
     exports org.jabref.http.server;
 
-    exports org.jabref.http.dto to org.glassfish.hk2.locator;
+    exports org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator;
 
     opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
 

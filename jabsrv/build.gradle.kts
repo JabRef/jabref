@@ -11,7 +11,7 @@ application{
     mainModule.set("org.jabref.jabsrv")
 
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=org.jabref.jabserv.merged.module,com.sun.jna"
+        "--enable-native-access=com.sun.jna"
     )
 }
 
