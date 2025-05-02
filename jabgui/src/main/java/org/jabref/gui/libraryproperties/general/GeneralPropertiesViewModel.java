@@ -211,7 +211,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         // configuredDir can be input manually, which may lead it to being invalid
         if (!Files.isDirectory(configuredPath)) {
-            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working directory", configuredDir));
+            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working directory.", configuredDir));
             return workingDir;
         }
 
