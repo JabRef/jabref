@@ -196,24 +196,40 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     private Path getBrowseDirectory(String configuredDir) {
-        if (configuredDir.isEmpty()) {
-            return preferences.getFilePreferences().getWorkingDirectory();
-        }
-        Optional<Path> foundPath = this.databaseContext.getFileDirectories(preferences.getFilePreferences()).stream()
-                                                       .filter(path -> path.toString().endsWith(configuredDir))
-                                                       .filter(Files::exists).findFirst();
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+        Path workingDir = preferences.getFilePreferences().getWorkingDirectory();
 
-        if (foundPath.isEmpty()) {
-            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working dir.", configuredDir));
-            return preferences.getFilePreferences().getWorkingDirectory();
+        if (libPath.isEmpty()) {
+            Path potentialAbsolutePath = Path.of(configuredDir);
+            return Files.isDirectory(potentialAbsolutePath) ? potentialAbsolutePath : workingDir;
         }
-        return foundPath.get();
+        if (configuredDir.isEmpty()) {
+            return workingDir;
+        }
+
+        Path configuredPath = libPath.get().getParent().resolve(configuredDir).normalize();
+
+        // configuredDir can be input manually, which may lead it to being invalid
+        if (!Files.isDirectory(configuredPath)) {
+            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working directory.", configuredDir));
+            return workingDir;
+        }
+
+        return configuredPath;
     }
 
     private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+        Path potentialAbsolutePath = Path.of(directoryPath);
+
+        // check absolute path separately in case of unsaved libraries
+        if (libPath.isEmpty() && Files.isDirectory(potentialAbsolutePath)) {
+            return null;
+        }
         try {
-            Path path = Path.of(directoryPath);
-            if (!Files.isDirectory(path)) {
+            if (!libPath.map(p -> p.getParent().resolve(directoryPath).normalize())
+                        .map(Files::isDirectory)
+                        .orElse(false)) {
                 return ValidationMessage.error(
                         Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
                 );
