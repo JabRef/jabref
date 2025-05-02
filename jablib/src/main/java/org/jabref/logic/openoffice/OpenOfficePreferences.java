@@ -11,6 +11,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 import org.jabref.logic.openoffice.style.OOStyle;
 
 public class OpenOfficePreferences {
@@ -57,7 +58,9 @@ public class OpenOfficePreferences {
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
-        this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
+        this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat != null ? 
+                                                               cslBibliographyBodyFormat : 
+                                                               CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
     }
 
@@ -186,7 +189,8 @@ public class OpenOfficePreferences {
     }
 
     public String getCslBibliographyBodyFormat() {
-        return cslBibliographyBodyFormat.get();
+        String format = cslBibliographyBodyFormat.get();
+        return format != null ? format : CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT;
     }
 
     public void setCslBibliographyBodyFormat(String format) {
