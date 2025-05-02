@@ -18,7 +18,7 @@ on:
       notarization:
         type: boolean
         required: false
-        default: false
+        default: false  # TODO: set to false again
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -322,7 +322,7 @@ jobs:
         include:
           - os: macos-14
             displayName: macOS (ARM64)
-            suffix: '-arm64'
+            suffix: '_arm64'
           - os: macos-13  # intel image
             displayName: macOS
             suffix: ''
@@ -354,6 +354,7 @@ jobs:
         shell: bash
         run: |
           cd jabgui
+          ls
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
