@@ -199,7 +199,11 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
         Path workingDir = preferences.getFilePreferences().getWorkingDirectory();
 
-        if (libPath.isEmpty() || configuredDir.isEmpty()) {
+        if (libPath.isEmpty()) {
+            Path potetialAbsolutePath = Path.of(configuredDir);
+            return Files.isDirectory(potetialAbsolutePath) ? potetialAbsolutePath : workingDir;
+        }
+        if (configuredDir.isEmpty()) {
             return workingDir;
         }
 
@@ -216,6 +220,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
+        Path potetialAbsolutePath = Path.of(directoryPath);
+
+        // check absolute path separately in case of unsaved libraries
+        if (libPath.isEmpty() && Files.isDirectory(potetialAbsolutePath)) {
+            return null;
+        }
         try {
             if (!libPath.map(p -> p.getParent().resolve(directoryPath).normalize())
                         .map(Files::isDirectory)
