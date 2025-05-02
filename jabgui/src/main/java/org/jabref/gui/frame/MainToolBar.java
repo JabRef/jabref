@@ -18,19 +18,15 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
-import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.citationkeypattern.GenerateCitationKeyAction;
 import org.jabref.gui.cleanup.CleanupAction;
 import org.jabref.gui.edit.EditAction;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.exporter.SaveAction;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.importer.GenerateEntryFromIdDialog;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
-import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
@@ -42,7 +38,6 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -120,10 +115,8 @@ public class MainToolBar extends ToolBar {
                 rightSpacer,
 
                 new HBox(
-                        factory.createIconButton(StandardActions.NEW_ARTICLE, new NewEntryAction(frame::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager)),
-                        factory.createIconButton(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                        createNewEntryFromIdButton(),
-                        factory.createIconButton(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
+                        factory.createIconButton(StandardActions.CREATE_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                        factory.createIconButton(StandardActions.CREATE_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                         factory.createIconButton(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager))),
 
                 new Separator(Orientation.VERTICAL),
@@ -159,36 +152,6 @@ public class MainToolBar extends ToolBar {
         HBox.setHgrow(rightSpacer, Priority.SOMETIMES);
 
         getStyleClass().add("mainToolbar");
-    }
-
-    Button createNewEntryFromIdButton() {
-        Button newEntryFromIdButton = new Button();
-
-        newEntryFromIdButton.setGraphic(IconTheme.JabRefIcons.IMPORT.getGraphicNode());
-        newEntryFromIdButton.getStyleClass().setAll("icon-button");
-        newEntryFromIdButton.setFocusTraversable(false);
-        newEntryFromIdButton.disableProperty().bind(ActionHelper.needsDatabase(stateManager).not());
-        newEntryFromIdButton.setOnMouseClicked(event -> {
-            GenerateEntryFromIdDialog entryFromId = new GenerateEntryFromIdDialog(frame.getCurrentLibraryTab(), dialogService, preferences, taskExecutor, stateManager);
-
-            if (entryFromIdPopOver == null) {
-                entryFromIdPopOver = new PopOver(entryFromId.getDialogPane());
-                entryFromIdPopOver.setTitle(Localization.lang("Import by ID"));
-                entryFromIdPopOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
-            } else if (entryFromIdPopOver.isShowing()) {
-                entryFromIdPopOver.hide();
-            } else {
-                entryFromIdPopOver.setContentNode(entryFromId.getDialogPane());
-                entryFromIdPopOver.show(newEntryFromIdButton);
-                entryFromId.setEntryFromIdPopOver(entryFromIdPopOver);
-            }
-        });
-        newEntryFromIdButton.setTooltip(new Tooltip(Localization.lang("Import by ID")));
-
-        return newEntryFromIdButton;
     }
 
     Group createTaskIndicator() {

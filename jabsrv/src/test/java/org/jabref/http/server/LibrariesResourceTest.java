@@ -1,7 +1,6 @@
 package org.jabref.http.server;
 
 import java.util.EnumSet;
-import java.util.stream.Collectors;
 
 import jakarta.ws.rs.core.Application;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -14,21 +13,31 @@ class LibrariesResourceTest extends ServerTest {
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
-        addPreferencesToResourceConfig(resourceConfig);
+        addFilesToServeToResourceConfig(resourceConfig);
+        addGsonToResourceConfig(resourceConfig);
+        addGlobalExceptionMapperToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
     }
 
     @Test
     void defaultOneTestLibrary() {
-        assertEquals("[\"" + TestBibFile.GENERAL_SERVER_TEST.id + "\"]", target("/libraries").request().get(String.class));
+        String expected = """
+                [
+                  "%s"
+                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id);
+        assertEquals(expected, target("/libraries").request().get(String.class));
     }
 
     @Test
     void twoTestLibraries() {
-        EnumSet<TestBibFile> availableLibraries = EnumSet.of(TestBibFile.GENERAL_SERVER_TEST, TestBibFile.JABREF_AUTHORS);
+        EnumSet<TestBibFile> availableLibraries = EnumSet.of(TestBibFile.GENERAL_SERVER_TEST, TestBibFile.CHOCOLATE_BIB);
         setAvailableLibraries(availableLibraries);
-        // We cannot use a string constant as the path changes from OS to OS. Therefore, we need to dynamically create the expected result.
-        String expected = availableLibraries.stream().map(file -> file.id).collect(Collectors.joining("\",\"", "[\"", "\"]"));
+
+        String expected = """
+                [
+                  "%s",
+                  "%s"
+                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id, TestBibFile.CHOCOLATE_BIB.id);
         assertEquals(expected, target("/libraries").request().get(String.class));
     }
 }
