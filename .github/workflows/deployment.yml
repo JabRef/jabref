@@ -137,8 +137,11 @@ jobs:
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
           --vendor "JabRef e.V." \
+          --mac-sign \
           --mac-package-identifier JabRef \
           --mac-package-name JabRef \
+          --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --mac-package-signing-prefix org.jabref \
           --type app-image \
           --mac-entitlements buildres/mac/jabref.entitlements \
           --icon src/main/resources/icons/jabref.icns \
