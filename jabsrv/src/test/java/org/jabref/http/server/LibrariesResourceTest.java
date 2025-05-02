@@ -14,6 +14,7 @@ class LibrariesResourceTest extends ServerTest {
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
+        addFilesToServeToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
     }

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javafx.collections.FXCollections;
 
 import org.jabref.http.dto.GsonFactory;
+import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -18,6 +19,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import static org.mockito.Mockito.mock;
@@ -34,7 +36,8 @@ import static org.mockito.Mockito.when;
 abstract class ServerTest extends JerseyTest {
 
     private static CliPreferences preferences;
-    private static LastFilesOpenedPreferences lastFilesOpenedPreferences;
+
+    private static final FilesToServe filesToServe = new FilesToServe();
 
     @BeforeAll
     static void installLoggingBridge() {
@@ -43,6 +46,15 @@ abstract class ServerTest extends JerseyTest {
         SLF4JBridgeHandler.install();
 
         initializePreferencesService();
+    }
+
+    @BeforeEach
+    public void setUp() {
+        filesToServe.setFilesToServe(List.of(TestBibFile.GENERAL_SERVER_TEST.path));
+    }
+
+    protected void addFilesToServeToResourceConfig(ResourceConfig resourceConfig) {
+        resourceConfig.register(filesToServe);
     }
 
     protected void addGsonToResourceConfig(ResourceConfig resourceConfig) {
@@ -64,11 +76,7 @@ abstract class ServerTest extends JerseyTest {
     }
 
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
-        when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(
-                FXCollections.observableArrayList(
-                        files.stream()
-                             .map(file -> file.path)
-                             .collect(Collectors.toList())));
+        filesToServe.setFilesToServe(files.stream().map(file -> file.path).toList());
     }
 
     private static void initializePreferencesService() {
@@ -89,10 +97,5 @@ abstract class ServerTest extends JerseyTest {
         FieldPreferences fieldContentFormatterPreferences = new FieldPreferences(false, List.of(), List.of());
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
-
-        lastFilesOpenedPreferences = mock(LastFilesOpenedPreferences.class);
-        when(preferences.getLastFilesOpenedPreferences()).thenReturn(lastFilesOpenedPreferences);
-
-        when(lastFilesOpenedPreferences.getLastFilesOpened()).thenReturn(FXCollections.observableArrayList(TestBibFile.GENERAL_SERVER_TEST.path));
     }
 }
