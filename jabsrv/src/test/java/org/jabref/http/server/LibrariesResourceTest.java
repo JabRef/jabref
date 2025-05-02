@@ -21,10 +21,10 @@ class LibrariesResourceTest extends ServerTest {
 
     @Test
     void defaultOneTestLibrary() {
-        String expected = String.format("""
+        String expected = """
                 [
                   "%s"
-                ]""", TestBibFile.GENERAL_SERVER_TEST.id);
+                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id);
         assertEquals(expected, target("/libraries").request().get(String.class));
     }
 
@@ -33,11 +33,11 @@ class LibrariesResourceTest extends ServerTest {
         EnumSet<TestBibFile> availableLibraries = EnumSet.of(TestBibFile.GENERAL_SERVER_TEST, TestBibFile.CHOCOLATE_BIB);
         setAvailableLibraries(availableLibraries);
 
-        String expected = String.format("""
+        String expected = """
                 [
                   "%s",
                   "%s"
-                ]""", TestBibFile.GENERAL_SERVER_TEST.id, TestBibFile.CHOCOLATE_BIB.id);
+                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id, TestBibFile.CHOCOLATE_BIB.id);
         assertEquals(expected, target("/libraries").request().get(String.class));
     }
 }
