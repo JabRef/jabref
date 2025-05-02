@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     id("buildlogic.java-common-conventions")
 
@@ -81,6 +83,11 @@ javafx {
 }
 
 tasks.test {
+    testLogging {
+        // set options for log level LIFECYCLE
+        events("FAILED")
+        exceptionFormat = TestExceptionFormat.FULL
+    }
     maxParallelForks = 1
 }
 
