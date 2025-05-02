@@ -38,7 +38,7 @@ public class LibraryResource {
     CliPreferences preferences;
 
     @Inject
-    private FilesToServe filesToServe;
+    FilesToServe filesToServe;
 
     @Inject
     Gson gson;

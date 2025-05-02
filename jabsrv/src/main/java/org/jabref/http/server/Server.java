@@ -21,7 +21,6 @@ import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -98,7 +97,6 @@ public class Server {
                 GrizzlyHttpServerFactory
                         .createHttpServer(URI.create(BASE_URI), resourceConfig, serviceLocator);
         return httpServer;
-
     }
 
     private static void startServer(FilesToServe filesToServe) {
@@ -125,7 +123,6 @@ public class Server {
 
             // block and wait shut down signal, like CTRL+C
             Thread.currentThread().join();
-
         } catch (InterruptedException ex) {
             LOGGER.error("Could not start down server", ex);
         }
