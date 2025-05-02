@@ -17,12 +17,15 @@ public class LibrariesResource {
     @Inject
     private FilesToServe filesToServe;
 
+    @Inject
+    private Gson gson;
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String get() {
         List<String> fileNamesWithUniqueSuffix = filesToServe.getFilesToServe().stream()
                                                             .map(p -> p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p))
                                                             .toList();
-        return new Gson().toJson(fileNamesWithUniqueSuffix);
+        return gson.toJson(fileNamesWithUniqueSuffix);
     }
 }
