@@ -2,16 +2,12 @@ package org.jabref.http.server;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import javafx.collections.FXCollections;
 
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.preferences.LastFilesOpenedPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 
 import com.google.gson.Gson;
@@ -37,7 +33,7 @@ abstract class ServerTest extends JerseyTest {
 
     private static CliPreferences preferences;
 
-    private static final FilesToServe filesToServe = new FilesToServe();
+    private static final FilesToServe FILES_TO_SERVE = new FilesToServe();
 
     @BeforeAll
     static void installLoggingBridge() {
@@ -51,11 +47,11 @@ abstract class ServerTest extends JerseyTest {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        filesToServe.setFilesToServe(List.of(TestBibFile.GENERAL_SERVER_TEST.path));
+        FILES_TO_SERVE.setFilesToServe(List.of(TestBibFile.GENERAL_SERVER_TEST.path));
     }
 
     protected void addFilesToServeToResourceConfig(ResourceConfig resourceConfig) {
-        resourceConfig.register(filesToServe);
+        resourceConfig.register(FILES_TO_SERVE);
     }
 
     protected void addGsonToResourceConfig(ResourceConfig resourceConfig) {
@@ -77,7 +73,7 @@ abstract class ServerTest extends JerseyTest {
     }
 
     protected void setAvailableLibraries(EnumSet<TestBibFile> files) {
-        filesToServe.setFilesToServe(files.stream().map(file -> file.path).toList());
+        FILES_TO_SERVE.setFilesToServe(files.stream().map(file -> file.path).toList());
     }
 
     private static void initializePreferencesService() {
