@@ -52,7 +52,12 @@ abstract class ServerTest extends JerseyTest {
     }
 
     protected void addFilesToServeToResourceConfig(ResourceConfig resourceConfig) {
-        resourceConfig.register(FILES_TO_SERVE);
+        resourceConfig.register(new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(FILES_TO_SERVE).to(FilesToServe.class);
+            }
+        });
     }
 
     protected void addGsonToResourceConfig(ResourceConfig resourceConfig) {
