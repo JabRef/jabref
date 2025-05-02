@@ -120,9 +120,9 @@ public class Server {
                 }
             }));
 
-            System.out.println("Application started.%nStop the application using CTRL+C".formatted());
+            System.out.println("JabSrv started.");
+            System.out.println("Stop JabSrv using Ctrl+C");
 
-            // block and wait shut down signal, like CTRL+C
             Thread.currentThread().join();
         } catch (InterruptedException ex) {
             LOGGER.error("Could not start down server", ex);
