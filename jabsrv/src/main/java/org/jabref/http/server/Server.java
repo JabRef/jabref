@@ -41,7 +41,7 @@ public class Server {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        final List<Path> filesToServe = JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened().stream().toList();
+        final List<Path> filesToServe = JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened().stream().collect(Collectors.toCollection(ArrayList::new));
 
         // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
         // In a testing environment, this might be difficult to handle
