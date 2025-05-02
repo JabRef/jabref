@@ -9,12 +9,12 @@ import java.util.List;
 import javax.net.ssl.SSLContext;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
+import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 
-import jakarta.ws.rs.SeBootstrap;
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
@@ -31,7 +31,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    private static SeBootstrap.Instance serverInstance;
+    private static final String BASE_URI = "http://localhost:6050/";
 
     /**
      * Starts an http server serving the last files opened in JabRef<br>
@@ -82,8 +82,6 @@ public class Server {
         Thread.currentThread().join();
     }
 
-    public static final String BASE_URI = "http://localhost:6050/";
-
     public static HttpServer startServer(ServiceLocator serviceLocator) {
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
@@ -91,6 +89,7 @@ public class Server {
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
         resourceConfig.register(CORSFilter.class);
+        resourceConfig.register(GlobalExceptionMapper.class);
 
         LOGGER.debug("Starting server...");
         final HttpServer httpServer =
@@ -157,6 +156,6 @@ public class Server {
     }
 
     static void stopServer() {
-        serverInstance.stop();
+        // serverInstance.stop();
     }
 }

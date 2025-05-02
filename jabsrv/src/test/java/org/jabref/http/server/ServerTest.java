@@ -3,6 +3,7 @@ package org.jabref.http.server;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -94,5 +95,9 @@ abstract class ServerTest extends JerseyTest {
         FieldPreferences fieldContentFormatterPreferences = new FieldPreferences(false, List.of(), List.of());
         // used twice, once for reading and once for writing
         when(importFormatPreferences.fieldPreferences()).thenReturn(fieldContentFormatterPreferences);
+    }
+
+    protected void addGlobalExceptionMapperToResourceConfig(ResourceConfig resourceConfig) {
+        resourceConfig.register(GlobalExceptionMapper.class);
     }
 }
