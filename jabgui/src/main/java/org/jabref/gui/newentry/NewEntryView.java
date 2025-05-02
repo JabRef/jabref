@@ -147,11 +147,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
 
         switch (approach) {
-            case NewEntryDialogTab.CREATE_ENTRY:
+            case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
                 tabs.getSelectionModel().select(tabCreateEntry);
                 switchCreateEntry();
                 break;
-            case NewEntryDialogTab.LOOKUP_IDENTIFIER:
+            case NewEntryDialogTab.ENTER_IDENTIFIER:
                 tabs.getSelectionModel().select(tabLookupIdentifier);
                 switchLookupIdentifier();
                 break;
@@ -312,8 +312,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryDialogTab.CREATE_ENTRY;
-        preferences.setLatestApproach(NewEntryDialogTab.CREATE_ENTRY);
+        currentApproach = NewEntryDialogTab.CHOOSE_ENTRY_TYPE;
+        preferences.setLatestApproach(NewEntryDialogTab.CHOOSE_ENTRY_TYPE);
 
         if (generateButton != null) {
             generateButton.disableProperty().unbind();
@@ -328,8 +328,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             return;
         }
 
-        currentApproach = NewEntryDialogTab.LOOKUP_IDENTIFIER;
-        preferences.setLatestApproach(NewEntryDialogTab.LOOKUP_IDENTIFIER);
+        currentApproach = NewEntryDialogTab.ENTER_IDENTIFIER;
+        preferences.setLatestApproach(NewEntryDialogTab.ENTER_IDENTIFIER);
 
         if (idText != null) {
             Platform.runLater(() -> idText.requestFocus());
@@ -337,7 +337,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(idErrorInvalidText.visibleProperty().or(idErrorInvalidFetcher.visibleProperty()));
-            generateButton.setText("Lookup");
+            generateButton.setText("Search");
         }
     }
 
@@ -356,7 +356,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         if (generateButton != null) {
             generateButton.disableProperty().bind(viewModel.interpretTextValidatorProperty().not());
-            generateButton.setText("Interpret");
+            generateButton.setText("Parse");
         }
     }
 
@@ -380,7 +380,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void onEntryTypeSelected(EntryType type) {
-        preferences.setLatestInstantType(type);
+        preferences.setLatestImmediateType(type);
         result = new BibEntry(type);
         this.close();
     }
@@ -396,10 +396,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // update before the button text is reset. The `viewModel.execute*()` and `switch*()` calls could be wrapped in
         // a `Platform.runLater(...)` which would probably fix this.
         switch (currentApproach) {
-            case NewEntryDialogTab.CREATE_ENTRY:
+            case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
                 // We do nothing here.
                 break;
-            case NewEntryDialogTab.LOOKUP_IDENTIFIER:
+            case NewEntryDialogTab.ENTER_IDENTIFIER:
                 generateButton.setText("Searching...");
                 viewModel.executeLookupIdentifier(idLookupGuess.isSelected());
                 switchLookupIdentifier();

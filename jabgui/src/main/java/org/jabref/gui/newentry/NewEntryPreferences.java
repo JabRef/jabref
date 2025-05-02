@@ -14,7 +14,7 @@ public class NewEntryPreferences {
     private final BooleanProperty typesRecommendedExpanded;
     private final BooleanProperty typesOtherExpanded;
     private final BooleanProperty typesCustomExpanded;
-    private final ObjectProperty<EntryType> latestInstantType;
+    private final ObjectProperty<EntryType> latestImmediateType;
     private final BooleanProperty idLookupGuessing;
     private final StringProperty latestIdFetcherName;
     private final StringProperty latestInterpretParserName;
@@ -23,7 +23,7 @@ public class NewEntryPreferences {
                                boolean expandRecommended,
                                boolean expandOther,
                                boolean expandCustom,
-                               EntryType instantType,
+                               EntryType immediateType,
                                boolean idLookupGuessing,
                                String idFetcherName,
                                String interpretParserName) {
@@ -31,7 +31,7 @@ public class NewEntryPreferences {
         this.typesRecommendedExpanded = new SimpleBooleanProperty(expandRecommended);
         this.typesOtherExpanded = new SimpleBooleanProperty(expandOther);
         this.typesCustomExpanded = new SimpleBooleanProperty(expandCustom);
-        this.latestInstantType = new SimpleObjectProperty<>(instantType);
+        this.latestImmediateType = new SimpleObjectProperty<>(immediateType);
         this.idLookupGuessing = new SimpleBooleanProperty(idLookupGuessing);
         this.latestIdFetcherName = new SimpleStringProperty(idFetcherName);
         this.latestInterpretParserName = new SimpleStringProperty(interpretParserName);
@@ -85,16 +85,16 @@ public class NewEntryPreferences {
         return typesCustomExpanded;
     }
 
-    public EntryType getLatestInstantType() {
-        return latestInstantType.get();
+    public EntryType getLatestImmediateType() {
+        return latestImmediateType.get();
     }
 
-    public void setLatestInstantType(EntryType type) {
-        latestInstantType.set(type);
+    public void setLatestImmediateType(EntryType type) {
+        latestImmediateType.set(type);
     }
 
-    public ObjectProperty<EntryType> latestInstantTypeProperty() {
-        return latestInstantType;
+    public ObjectProperty<EntryType> latestImmediateTypeProperty() {
+        return latestImmediateType;
     }
 
     public boolean getIdLookupGuessing() {

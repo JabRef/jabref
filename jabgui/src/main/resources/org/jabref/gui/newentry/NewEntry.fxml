@@ -52,7 +52,7 @@
             <Tab fx:id="tabLookupIdentifier" text="%Enter Identifier" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
-                    <Label text="%You can also paste identifiers (using 'Ctrl + V') into the JabRef entry table to create them directly.">
+                    <Label text="%You can also paste identifiers (using 'Ctrl + V') into the JabRef table to create entries directly.">
                         <font><Font name="System Italic" size="13.0"/></font>
                         <padding><Insets bottom="5.0"/></padding>
                     </Label>
