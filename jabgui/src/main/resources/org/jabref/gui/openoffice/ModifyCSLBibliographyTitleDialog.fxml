@@ -12,7 +12,9 @@
             <Label text="%Bibliography title" GridPane.rowIndex="0" GridPane.columnIndex="0" />
             <TextField fx:id="titleField" prefWidth="300.0" GridPane.rowIndex="0" GridPane.columnIndex="1" />
             <Label text="%Header format" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <ComboBox fx:id="formats" prefWidth="300.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <ComboBox fx:id="headerFormats" prefWidth="300.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="%Body format" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <ComboBox fx:id="bodyFormats" prefWidth="300.0" GridPane.rowIndex="2" GridPane.columnIndex="1" />
         </GridPane>
     </content>
     <ButtonType fx:constant="OK"/>

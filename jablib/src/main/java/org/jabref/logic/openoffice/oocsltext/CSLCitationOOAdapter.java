@@ -191,7 +191,7 @@ public class CSLCitationOOAdapter {
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
-        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
+        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, ooBreak);
 
         String style = selectedStyle.getSource();

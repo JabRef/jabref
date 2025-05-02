@@ -32,7 +32,10 @@ public final class CSLFormatUtils {
         HEADING_1("Heading 1"),
         HEADING_2("Heading 2"),
         HEADING_3("Heading 3"),
-        HEADING_4("Heading 4");
+        HEADING_4("Heading 4"),
+        BIBLIOGRAPHY_HEADING("Bibliography Heading"),
+        BIBLIOGRAPHY_1("Bibliography 1"),
+        TEXT_BODY("Text body");
 
         private final String format;
 
@@ -45,7 +48,7 @@ public final class CSLFormatUtils {
         }
     }
 
-    public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
+    public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Bibliography 1";
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 

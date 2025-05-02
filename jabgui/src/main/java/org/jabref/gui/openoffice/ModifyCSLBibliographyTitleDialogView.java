@@ -17,14 +17,15 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class ModifyCSLBibliographyTitleDialogView extends BaseDialog<Void> {
 
     @FXML private TextField titleField;
-    @FXML private ComboBox<String> formats;
+    @FXML private ComboBox<String> headerFormats;
+    @FXML private ComboBox<String> bodyFormats;
 
     private final ModifyCSLBibliographyTitleDialogViewModel viewModel;
 
     public ModifyCSLBibliographyTitleDialogView(OpenOfficePreferences openOfficePreferences) {
         this.viewModel = new ModifyCSLBibliographyTitleDialogViewModel(openOfficePreferences);
 
-        this.setTitle(Localization.lang("Modify bibliography title"));
+        this.setTitle(Localization.lang("Modify bibliography properties"));
         this.initModality(Modality.NONE);
         this.setResizable(false);
 
@@ -44,8 +45,14 @@ public class ModifyCSLBibliographyTitleDialogView extends BaseDialog<Void> {
 
         new ViewModelListCellFactory<String>()
                 .withText(format -> format)
-                .install(formats);
-        formats.itemsProperty().bind(viewModel.formatListProperty());
-        formats.valueProperty().bindBidirectional(viewModel.cslBibliographySelectedHeaderFormatProperty());
+                .install(headerFormats);
+        headerFormats.itemsProperty().bind(viewModel.formatListProperty());
+        headerFormats.valueProperty().bindBidirectional(viewModel.cslBibliographySelectedHeaderFormatProperty());
+
+        new ViewModelListCellFactory<String>()
+                .withText(format -> format)
+                .install(bodyFormats);
+        bodyFormats.itemsProperty().bind(viewModel.formatListProperty());
+        bodyFormats.valueProperty().bindBidirectional(viewModel.cslBibliographySelectedBodyFormatProperty());
     }
 }
