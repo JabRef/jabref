@@ -54,7 +54,7 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
             });
         }
         // If still no 'date' field, try fallback logic
-        if (entry.getField(StandardField.DATE).isEmpty()) {
+        if (!entry.hasField(StandardField.DATE)) {
             changes.addAll(applyDateFallback(entry));
         }
 
@@ -63,17 +63,21 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
 
     private List<FieldChange> applyDateFallback(BibEntry entry) {
         List<FieldChange> changes = new ArrayList<>();
-        Optional<String> yearValue = entry.getFieldOrAlias(StandardField.YEAR).map(String::trim);
-        Optional<String> monthValue = entry.getFieldOrAlias(StandardField.MONTH).map(String::trim);
 
-        if (yearValue.isPresent() && monthValue.isEmpty()) {
-            String yearText = yearValue.get();
-            Optional<Date> fallbackDate = Date.parse(yearText);
-            if (fallbackDate.isPresent()) {
-                entry.setField(StandardField.DATE, yearText).ifPresent(changes::add);
-                entry.clearField(StandardField.YEAR).ifPresent(changes::add);
-            }
+        Optional<String> yearValue = entry.getFieldOrAlias(StandardField.YEAR).map(String::trim);
+        if (yearValue.isEmpty()) {
+            return changes;
         }
+
+        String yearText = yearValue.get();
+        Optional<Date> fallbackDate = Date.parse(yearText);
+        if (fallbackDate.isEmpty()) {
+            return changes;
+        }
+
+        entry.setField(StandardField.DATE, yearText).ifPresent(changes::add);
+        entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+
         return changes;
     }
 }
