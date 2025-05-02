@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
+import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -35,6 +36,9 @@ public class LibraryResource {
 
     @Inject
     CliPreferences preferences;
+
+    @Inject
+    FilesToServe filesToServe;
 
     @Inject
     Gson gson;
@@ -89,7 +93,7 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getLibraryPath(String id) {
-        return preferences.getLastFilesOpenedPreferences().getLastFilesOpened()
+        return filesToServe.getFilesToServe()
                           .stream()
                           .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
                           .findAny()
