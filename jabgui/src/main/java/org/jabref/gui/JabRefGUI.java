@@ -29,6 +29,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
@@ -62,6 +63,8 @@ public class JabRefGUI extends Application {
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
+    // CitationsAndRelationsSearchService is here configured for a local machine and so to the GUI.
+    private static SearchCitationsRelationsService citationsAndRelationsSearchService;
 
     private static StateManager stateManager;
     private static ThemeManager themeManager;
@@ -172,6 +175,11 @@ public class JabRefGUI extends Application {
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
+
+        JabRefGUI.citationsAndRelationsSearchService = new SearchCitationsRelationsService(
+                preferences.getImporterPreferences()
+        );
+        Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
     }
 
     private void setupProxy() {
@@ -393,6 +401,8 @@ public class JabRefGUI extends Application {
         stopBackgroundTasks();
         LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
+        LOGGER.trace("Closing citations and relations search service");
+        citationsAndRelationsSearchService.close();
         LOGGER.trace("Finished stop");
     }
 

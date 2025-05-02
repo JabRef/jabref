@@ -14,14 +14,14 @@ import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
 
-public class SemanticScholarFetcher implements CitationFetcher, CustomizableKeyFetcher {
+public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
 
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
 
     private final ImporterPreferences importerPreferences;
 
-    public SemanticScholarFetcher(ImporterPreferences importerPreferences) {
+    public SemanticScholarCitationFetcher(ImporterPreferences importerPreferences) {
         this.importerPreferences = importerPreferences;
     }
 
