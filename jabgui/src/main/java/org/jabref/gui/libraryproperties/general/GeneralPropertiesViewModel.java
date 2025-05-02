@@ -200,8 +200,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         Path workingDir = preferences.getFilePreferences().getWorkingDirectory();
 
         if (libPath.isEmpty()) {
-            Path potetialAbsolutePath = Path.of(configuredDir);
-            return Files.isDirectory(potetialAbsolutePath) ? potetialAbsolutePath : workingDir;
+            Path potentialAbsolutePath = Path.of(configuredDir);
+            return Files.isDirectory(potentialAbsolutePath) ? potentialAbsolutePath : workingDir;
         }
         if (configuredDir.isEmpty()) {
             return workingDir;
@@ -209,7 +209,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
         Path configuredPath = libPath.get().getParent().resolve(configuredDir).normalize();
 
-        // As the user types, the configureDir may become invalid.
+        // configuredDir can be input manually, which may lead it to being invalid
         if (!Files.isDirectory(configuredPath)) {
             dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working directory", configuredDir));
             return workingDir;
@@ -220,10 +220,10 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
-        Path potetialAbsolutePath = Path.of(directoryPath);
+        Path potentialAbsolutePath = Path.of(directoryPath);
 
         // check absolute path separately in case of unsaved libraries
-        if (libPath.isEmpty() && Files.isDirectory(potetialAbsolutePath)) {
+        if (libPath.isEmpty() && Files.isDirectory(potentialAbsolutePath)) {
             return null;
         }
         try {
