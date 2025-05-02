@@ -23,7 +23,7 @@ class LibrariesResourceTest extends ServerTest {
     void defaultOneTestLibrary() {
         String expected = String.format("""
                 [
-                    "%s"
+                      "%s"
                 ]""", TestBibFile.GENERAL_SERVER_TEST.id);
         assertEquals(expected, target("/libraries").request().get(String.class));
     }
@@ -35,8 +35,8 @@ class LibrariesResourceTest extends ServerTest {
 
         String expected = String.format("""
                 [
-                    "%s",
-                    "%s
+                      "%s",
+                      "%s
                 ]""", TestBibFile.GENERAL_SERVER_TEST.id, TestBibFile.CHOCOLATE_BIB.id);
         assertEquals(expected, target("/libraries").request().get(String.class));
     }
