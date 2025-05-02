@@ -25,7 +25,7 @@ class LibrariesResourceTest extends ServerTest {
 
     @Test
     void twoTestLibraries() {
-        EnumSet<TestBibFile> availableLibraries = EnumSet.of(TestBibFile.GENERAL_SERVER_TEST, TestBibFile.JABREF_AUTHORS);
+        EnumSet<TestBibFile> availableLibraries = EnumSet.of(TestBibFile.GENERAL_SERVER_TEST, TestBibFile.CHOCOLATE_BIB);
         setAvailableLibraries(availableLibraries);
         // We cannot use a string constant as the path changes from OS to OS. Therefore, we need to dynamically create the expected result.
         String expected = availableLibraries.stream().map(file -> file.id).collect(Collectors.joining("\",\"", "[\"", "\"]"));

@@ -6,7 +6,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 
 public enum TestBibFile {
     GENERAL_SERVER_TEST("src/test/resources/org/jabref/http/server/general-server-test.bib"),
-    JABREF_AUTHORS("src/test/resources/testbib/jabref-authors.bib");
+    CHOCOLATE_BIB("src/main/resources/chocolate.bib");
 
     public final Path path;
     public final String id;
