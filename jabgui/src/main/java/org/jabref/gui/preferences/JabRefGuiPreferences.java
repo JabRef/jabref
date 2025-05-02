@@ -40,6 +40,8 @@ import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
+import org.jabref.gui.newentry.NewEntryDialogTab;
+import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.push.PushToApplications;
@@ -55,6 +57,7 @@ import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.TextBasedPreviewLayout;
@@ -67,6 +70,8 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
+import org.jabref.model.entry.types.EntryType;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
@@ -210,7 +215,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
     // endregion
 
-    private static final String ID_ENTRY_GENERATOR = "idEntryGenerator";
     private static final String SELECTED_SLR_CATALOGS = "selectedSlrCatalogs";
     private static final String UNLINKED_FILES_SELECTED_EXTENSION = "unlinkedFilesSelectedExtension";
     private static final String UNLINKED_FILES_SELECTED_DATE_RANGE = "unlinkedFilesSelectedDateRange";
@@ -218,6 +222,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
     private static final String INCLUDE_CROSS_REFERENCES = "includeCrossReferences";
     private static final String ASK_FOR_INCLUDING_CROSS_REFERENCES = "askForIncludingCrossReferences";
+
+    // region NewEntryPreferences
+    private static final String CREATE_ENTRY_APPROACH = "latestApproach";
+    private static final String CREATE_ENTRY_EXPAND_RECOMMENDED = "typesRecommendedExpanded";
+    private static final String CREATE_ENTRY_EXPAND_OTHER = "typesOtherExpanded";
+    private static final String CREATE_ENTRY_EXPAND_CUSTOM = "typesCustomExpanded";
+    private static final String CREATE_ENTRY_IMMEDIATE_TYPE = "latestImmediateType";
+    private static final String CREATE_ENTRY_ID_LOOKUP_GUESSING = "idLookupGuessing";
+    private static final String CREATE_ENTRY_ID_FETCHER_NAME = "latestIdFetcherName";
+    private static final String CREATE_ENTRY_INTERPRET_PARSER_NAME = "latestInterpretParserName";
+    // endregion
 
     private static JabRefGuiPreferences singleton;
 
@@ -239,6 +254,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private ColumnPreferences searchDialogColumnPreferences;
     private KeyBindingRepository keyBindingRepository;
     private CopyToPreferences copyToPreferences;
+    private NewEntryPreferences newEntryPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -393,7 +409,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region core GUI preferences
         // Set DOI to be the default ID entry generator
-        defaults.put(ID_ENTRY_GENERATOR, DoiFetcher.NAME);
         defaults.put(MAIN_WINDOW_POS_X, 0);
         defaults.put(MAIN_WINDOW_POS_Y, 0);
         defaults.put(MAIN_WINDOW_WIDTH, 1024);
@@ -405,6 +420,17 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         defaults.put(ASK_FOR_INCLUDING_CROSS_REFERENCES, Boolean.TRUE);
         defaults.put(INCLUDE_CROSS_REFERENCES, Boolean.FALSE);
+
+        // region NewEntryUnifierPreferences
+        defaults.put(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(NewEntryDialogTab.CHOOSE_ENTRY_TYPE));
+        defaults.put(CREATE_ENTRY_EXPAND_RECOMMENDED, true);
+        defaults.put(CREATE_ENTRY_EXPAND_OTHER, false);
+        defaults.put(CREATE_ENTRY_EXPAND_CUSTOM, true);
+        defaults.put(CREATE_ENTRY_IMMEDIATE_TYPE, StandardEntryType.Article.getDisplayName());
+        defaults.put(CREATE_ENTRY_ID_LOOKUP_GUESSING, true);
+        defaults.put(CREATE_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
+        defaults.put(CREATE_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED.getLocalizedName());
+        // endregion
     }
 
     /**
@@ -623,7 +649,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getDouble(MAIN_WINDOW_WIDTH),
                 getDouble(MAIN_WINDOW_HEIGHT),
                 getBoolean(WINDOW_MAXIMISED),
-                get(ID_ENTRY_GENERATOR),
                 getDouble(SIDE_PANE_WIDTH),
                 getDouble(ENTRY_EDITOR_HEIGHT));
 
@@ -632,7 +657,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         EasyBind.listen(coreGuiPreferences.sizeXProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_WIDTH, newValue.doubleValue()));
         EasyBind.listen(coreGuiPreferences.sizeYProperty(), (_, _, newValue) -> putDouble(MAIN_WINDOW_HEIGHT, newValue.doubleValue()));
         EasyBind.listen(coreGuiPreferences.windowMaximisedProperty(), (_, _, newValue) -> putBoolean(WINDOW_MAXIMISED, newValue));
-        EasyBind.listen(coreGuiPreferences.lastSelectedIdBasedFetcherProperty(), (_, _, newValue) -> put(ID_ENTRY_GENERATOR, newValue));
         EasyBind.listen(coreGuiPreferences.horizontalDividerPositionProperty(), (_, _, newValue) -> putDouble(SIDE_PANE_WIDTH, newValue.doubleValue()));
         EasyBind.listen(coreGuiPreferences.getVerticalDividerPositionProperty(), (_, _, newValue) -> putDouble(ENTRY_EDITOR_HEIGHT, newValue.doubleValue()));
 
@@ -1230,6 +1254,48 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         });
 
         return keyBindingRepository;
+    }
+
+    @Override
+    public NewEntryPreferences getNewEntryPreferences() {
+        if (newEntryPreferences != null) {
+            return newEntryPreferences;
+        }
+
+        final int approachIndex = getInt(CREATE_ENTRY_APPROACH);
+        NewEntryDialogTab approach = NewEntryDialogTab.values().length > approachIndex
+            ? NewEntryDialogTab.values()[approachIndex]
+            : NewEntryDialogTab.values()[0];
+
+        final String immediateTypeName = get(CREATE_ENTRY_IMMEDIATE_TYPE);
+        EntryType immediateType = StandardEntryType.Article;
+        for (StandardEntryType type : StandardEntryType.values()) {
+            if (type.getDisplayName().equals(immediateTypeName)) {
+                immediateType = type;
+                break;
+            }
+        }
+
+        newEntryPreferences = new NewEntryPreferences(
+            approach,
+            getBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED),
+            getBoolean(CREATE_ENTRY_EXPAND_OTHER),
+            getBoolean(CREATE_ENTRY_EXPAND_CUSTOM),
+            immediateType,
+            getBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING),
+            get(CREATE_ENTRY_ID_FETCHER_NAME),
+            get(CREATE_ENTRY_INTERPRET_PARSER_NAME));
+
+        EasyBind.listen(newEntryPreferences.latestApproachProperty(), (_, _, newValue) -> putInt(CREATE_ENTRY_APPROACH, List.of(NewEntryDialogTab.values()).indexOf(newValue)));
+        EasyBind.listen(newEntryPreferences.typesRecommendedExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_RECOMMENDED, newValue));
+        EasyBind.listen(newEntryPreferences.typesOtherExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_OTHER, newValue));
+        EasyBind.listen(newEntryPreferences.typesCustomExpandedProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_EXPAND_CUSTOM, newValue));
+        EasyBind.listen(newEntryPreferences.latestImmediateTypeProperty(), (_, _, newValue) -> put(CREATE_ENTRY_IMMEDIATE_TYPE, newValue.getDisplayName()));
+        EasyBind.listen(newEntryPreferences.idLookupGuessingProperty(), (_, _, newValue) -> putBoolean(CREATE_ENTRY_ID_LOOKUP_GUESSING, newValue));
+        EasyBind.listen(newEntryPreferences.latestIdFetcherProperty(), (_, _, newValue) -> put(CREATE_ENTRY_ID_FETCHER_NAME, newValue));
+        EasyBind.listen(newEntryPreferences.latestInterpretParserProperty(), (_, _, newValue) -> put(CREATE_ENTRY_INTERPRET_PARSER_NAME, newValue));
+
+        return newEntryPreferences;
     }
 
     /**
