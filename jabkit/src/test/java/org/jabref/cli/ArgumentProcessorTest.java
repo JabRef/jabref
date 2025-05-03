@@ -124,7 +124,7 @@ class ArgumentProcessorTest {
         SelfContainedSaveConfiguration selfContainedSaveConfiguration = new SelfContainedSaveConfiguration(selfContainedSaveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         when(preferences.getSelfContainedExportConfiguration()).thenReturn(selfContainedSaveConfiguration);
 
-        List<String> args = List.of("-n", "-i", originBibFile + ",bibtex", "-o", outputHtmlFile + ",tablerefsabsbib");
+        List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 preferences,
@@ -139,7 +139,7 @@ class ArgumentProcessorTest {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("--check-consistency", testBibFile, "--output-format", "txt");
+        List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 preferences,

@@ -14,13 +14,11 @@ import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
-import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
@@ -31,8 +29,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.airhacks.afterburner.injection.Injector;
-import com.google.common.base.Throwables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -272,48 +268,6 @@ public class KitCommandLine implements Callable<Integer> {
             }
         } catch (IOException ex) {
             System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
-        }
-    }
-
-    protected void exportFile(ParserResult pr, Path outputFile, String format) {
-        if (pr == null || outputFile == null) {
-            return;
-        }
-
-        if (!pr.isInvalid()) {
-            System.err.println(Localization.lang("The output option depends on a valid import option."));
-            return;
-        }
-
-        if ("bib".equalsIgnoreCase(format)) {
-            saveDatabase(pr.getDatabase(), outputFile);
-            return;
-        }
-
-        // This signals that the latest import should be stored in the given
-        // format to the given file.
-        Path path = pr.getPath().get().toAbsolutePath();
-        BibDatabaseContext databaseContext = pr.getDatabaseContext();
-        databaseContext.setDatabasePath(path);
-        List<Path> fileDirForDatabase = databaseContext
-                .getFileDirectories(cliPreferences.getFilePreferences());
-        System.out.println(Localization.lang("Exporting %0", outputFile));
-        ExporterFactory exporterFactory = ExporterFactory.create(cliPreferences);
-        Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
-        if (exporter.isEmpty()) {
-            System.err.println(Localization.lang("Unknown export format %0", format));
-        } else {
-            // We have an exporter:
-            try {
-                exporter.get().export(
-                        pr.getDatabaseContext(),
-                        outputFile,
-                        pr.getDatabaseContext().getDatabase().getEntries(),
-                        fileDirForDatabase,
-                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-            } catch (Exception ex) {
-                System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", outputFile, Throwables.getStackTraceAsString(ex)));
-            }
         }
     }
 
