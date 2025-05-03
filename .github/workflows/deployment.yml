@@ -165,8 +165,13 @@ jobs:
           --java-options --add-modules=jdk.incubator.vector
 
           # Add additional files / directories
-         # cp buildres/mac/script/jabrefHost.py build/distribution/JabRef.app/Contents/Resources
-         # cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/Resources
+          cp buildres/mac/script/jabrefHost.py build/distribution/JabRef.app/Contents/Resources
+          cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/Resources
+
+          # Sign the final artifact
+          codesign --force --deep --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" \
+            --entitlements buildres/mac/jabref.entitlements \
+            --options runtime --timestamp build/distribution/JabRef.app
 
           jpackage \
           --verbose \
