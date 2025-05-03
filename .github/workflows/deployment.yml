@@ -165,8 +165,8 @@ jobs:
           --java-options --add-modules=jdk.incubator.vector
 
           # Add additional files / directories
-          cp buildres/mac/script/jabrefHost.py build/distribution/JabRef.app/Contents/Resources
-          cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/Resources
+         # cp buildres/mac/script/jabrefHost.py build/distribution/JabRef.app/Contents/Resources
+         # cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/Resources
 
           jpackage \
           --verbose \
