@@ -38,7 +38,7 @@ class GenerateBibFromAux implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, "bib");
+        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, "bibtex");
 
         if (pr.isEmpty() || auxFile == null) {
             return 1;

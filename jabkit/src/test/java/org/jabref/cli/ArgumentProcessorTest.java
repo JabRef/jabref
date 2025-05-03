@@ -69,7 +69,7 @@ class ArgumentProcessorTest {
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
-        List<String> args = List.of("--aux", auxFile + "," + outputBib, fullBib);
+        List<String> args = List.of("generate-bib-from-aux", "--aux", auxFile, "--input", fullBib, "--output", outputBib.toString());
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 preferences,
