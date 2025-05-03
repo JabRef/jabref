@@ -169,7 +169,7 @@ jobs:
           cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/Resources
 
           # Sign the final artifact
-          codesign --force --deep --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" \
+          codesign --force --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" \
             --entitlements buildres/mac/jabref.entitlements \
             --options runtime --timestamp build/distribution/JabRef.app
 
