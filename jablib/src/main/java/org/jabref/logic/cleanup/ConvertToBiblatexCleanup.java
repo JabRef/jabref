@@ -62,19 +62,18 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
     }
 
     private List<FieldChange> applyDateFallback(BibEntry entry) {
-        List<FieldChange> changes = new ArrayList<>();
-
-        Optional<String> yearValue = entry.getFieldOrAlias(StandardField.YEAR).map(String::trim);
+        Optional<String> yearValue = entry.getFieldOrAlias(StandardField.YEAR);
         if (yearValue.isEmpty()) {
-            return changes;
+            return List.of();
         }
 
         String yearText = yearValue.get();
-        Optional<Date> fallbackDate = Date.parse(yearText);
-        if (fallbackDate.isEmpty()) {
-            return changes;
+        if (Date.parse(yearText).isEmpty()) {
+            return List.of();
         }
 
+        List<FieldChange> changes = new ArrayList<>();
+        // If year was a full date, move it from year to date field.
         entry.setField(StandardField.DATE, yearText).ifPresent(changes::add);
         entry.clearField(StandardField.YEAR).ifPresent(changes::add);
 

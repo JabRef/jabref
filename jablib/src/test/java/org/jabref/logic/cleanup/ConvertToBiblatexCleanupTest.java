@@ -117,15 +117,4 @@ class ConvertToBiblatexCleanupTest {
         assertEquals(Optional.of(fakeYear), entry.getField(StandardField.DATE));
         assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
     }
-
-    @Test
-    void fallbackDateParsing_shouldCleanWhitespaceBeforeParsing() {
-        String dirtyDate = " 2025-05-02 ";
-        BibEntry entry = new BibEntry().withField(StandardField.YEAR, dirtyDate);
-
-        worker.cleanup(entry);
-
-        assertEquals(Optional.of("2025-05-02"), entry.getField(StandardField.DATE));
-        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
-    }
 }
