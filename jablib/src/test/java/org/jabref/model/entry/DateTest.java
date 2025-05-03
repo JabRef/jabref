@@ -128,7 +128,7 @@ class DateTest {
     @Test
     void parseShouldTrimValidDate() {
         assertEquals(
-                Optional.of(Date.parse("2025-05-02").get()),
+                Date.parse("2025-05-02"),
                 Date.parse(" 2025-05-02 ")
         );
     }
