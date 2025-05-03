@@ -674,7 +674,7 @@ class CitationStyleGeneratorTest {
                         CitationStyleOutputFormat.TEXT
                 ),
 
-                // Test 2: DOI with https://doi.org/ prefix
+                // Test 2: DOI with https://doi.org/ prefix (behavior: another https://doi.org/ prefix is added from APA style regardless)
                 Arguments.of(
                         "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/https://doi.org/10.1161/circulationaha.108.827022\n",
                         BibDatabaseMode.BIBLATEX,
