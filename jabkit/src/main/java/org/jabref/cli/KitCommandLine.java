@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 
 /**
@@ -150,17 +151,14 @@ public class KitCommandLine implements Callable<Integer> {
     protected final CliPreferences cliPreferences;
     protected final BibEntryTypesManager entryTypesManager;
 
-    @Option(names = "--debug", description = "Enable debug output")
-    boolean debug;
-
-    @Option(names = "--porcelain", description = "Enable script-friendly output")
-    boolean porcelain;
+    @Mixin
+    private SharedOptions sharedOptions = new SharedOptions();
 
     @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
-    boolean versionInfoRequested;
+    private boolean versionInfoRequested;
 
     @Option(names = {"?", "-h", "--help"}, usageHelp = true, description = "display this help message")
-    boolean usageHelpRequested;
+    private boolean usageHelpRequested;
 
     public KitCommandLine(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
         this.cliPreferences = cliPreferences;
@@ -359,5 +357,13 @@ public class KitCommandLine implements Callable<Integer> {
         }
 
         return sb.toString();
+    }
+
+    public static class SharedOptions {
+        @Option(names = {"-d", "--debug"}, description = "Enable debug output")
+        boolean debug;
+
+        @Option(names = {"-p", "--porcelain"}, description = "Enable script-friendly output")
+        boolean porcelain;
     }
 }

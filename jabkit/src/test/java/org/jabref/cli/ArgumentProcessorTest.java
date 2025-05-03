@@ -162,7 +162,7 @@ class ArgumentProcessorTest {
         String testBibFile = testBib.toAbsolutePath().toString();
 
         // "txt" is the default output format; thus not provided here
-        List<String> args = List.of("--check-consistency", testBibFile, "--porcelain");
+        List<String> args = List.of("check-consistency", "--input", testBibFile, "--porcelain");
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 preferences,

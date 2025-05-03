@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
@@ -31,6 +32,9 @@ class CheckConsistency implements Callable<Integer> {
 
     @ParentCommand
     private KitCommandLine kitCommandLine;
+
+    @Mixin
+    private KitCommandLine.SharedOptions sharedOptions = new KitCommandLine.SharedOptions();
 
     @Option(names = {"--input"}, description = "Input BibTeX file", required = true)
     private Path inputFile;
@@ -68,14 +72,14 @@ class CheckConsistency implements Callable<Integer> {
             checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
                     result,
                     writer,
-                    kitCommandLine.porcelain,
+                    sharedOptions.porcelain,
                     kitCommandLine.entryTypesManager,
                     databaseContext.getMode());
         } else {
             checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
                     result,
                     writer,
-                    kitCommandLine.porcelain,
+                    sharedOptions.porcelain,
                     kitCommandLine.entryTypesManager,
                     databaseContext.getMode());
         }
@@ -87,7 +91,7 @@ class CheckConsistency implements Callable<Integer> {
         } catch (IOException e) {
             LOGGER.error("Error writing results", e);
         }
-        if (!kitCommandLine.porcelain) {
+        if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Consistency check completed"));
         }
 
