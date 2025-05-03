@@ -13,6 +13,7 @@ class LibraryResourceTest extends ServerTest {
     @Override
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibraryResource.class, LibrariesResource.class);
+        addFilesToServeToResourceConfig(resourceConfig);
         addPreferencesToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
