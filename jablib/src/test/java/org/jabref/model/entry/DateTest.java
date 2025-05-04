@@ -123,4 +123,13 @@ class DateTest {
     void parseDateNull() {
         assertThrows(NullPointerException.class, () -> Date.parse(null));
     }
+
+    // Date.parse() has been updated to defensively strip surrounding whitespace from input strings.
+    @Test
+    void parseShouldTrimValidDate() {
+        assertEquals(
+                Date.parse("2025-05-02"),
+                Date.parse(" 2025-05-02 ")
+        );
+    }
 }

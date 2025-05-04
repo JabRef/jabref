@@ -130,6 +130,8 @@ public class Date {
     public static Optional<Date> parse(String dateString) {
         Objects.requireNonNull(dateString);
 
+        dateString = dateString.strip();
+
         if (dateString.isEmpty()) {
             return Optional.empty();
         }

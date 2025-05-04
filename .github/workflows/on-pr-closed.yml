@@ -126,8 +126,6 @@ jobs:
         with:
           pr-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           message: |
-            Closed by ${{ github.event.pull_request.html_url }}
-
-            Please head to <https://builds.jabref.org/main> to try it out.
+            We think that this issue was fixed. Please head to <https://builds.jabref.org/main> to download a development build and try it out.
 
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.
