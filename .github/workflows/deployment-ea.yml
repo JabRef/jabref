@@ -1,18 +1,15 @@
-name: Deployment
+# This workflow is a clone of "deployment.yml"
+# The difference is that this workflow uses JDK early access builds (jdk-ea) to check the build of JabRef
+# We separated this from the main workflow as we do not want to check on each PR if the JDK build, but only on main
+name: Deployment (JDK and JavaFX early access builds)
 
 on:
-  push:
-    branches:
-      - main
-      - main-release
-    paths-ignore:
-      - 'docs/**'
-      - 'src/test/**'
-      - 'README.md'
-    tags:
-       - '*'
+  schedule:
+    - cron: "0 18 * * *"
   pull_request:
-  merge_group:
+    paths:
+      - .github/workflows/deployment-jdk-ea.yml
+      - '**/build.gradle.kts'
   workflow_dispatch:
     inputs:
       notarization:
@@ -35,9 +32,13 @@ concurrency:
 
 jobs:
   build:
+    if: github.repository_owner == 'JabRef'
     strategy:
       fail-fast: false
       matrix:
+        javafx: [25]
+        jdk_version: [25]
+        jdk: ["openjdk-25.0.0-ea+21"]
         include:
           # if you change the os version rename all other occurrences
           - os: ubuntu-22.04
@@ -58,7 +59,7 @@ jobs:
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
-      branchname: ${{ steps.gitversion.outputs.branchName }}
+      branchname: jdk-ea
     name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Check secrets presence
@@ -94,16 +95,16 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
 
-      - name: Tell gradle to use JDK25
-        run: sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(24)/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+      - name: Tell gradle to use JDK ${{ matrix.jdk_version }}
+        run: sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ matrix.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
 
       # region setup-JDK
-      - name: Setup JDK 25 for "java toolchain" of Gradle
+      - name: Setup JDK ${{ matrix.jdk_version }} (${{ matrix.jdk }}) for "java toolchain" of Gradle
         uses: jdx/mise-action@v2
         with:
           mise_toml: |
             [tools]
-            java = { version = "openjdk-25.0.0-ea+21", release_type = "ea" }
+            java = { version = "${{ matrix.jdk }}", release_type = "ea" }
       - name: Debug
         run: |
           set -x
@@ -124,6 +125,85 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+      # endregion
+
+      # region JavaFX
+      - name: Download and extract JavaFX ${{ matrix.javafx }}
+        if: (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
+        shell: bash
+        run: |
+          set -e
+          cd javafx
+          curl --no-progress-meter https://jdk.java.net/javafx${{ matrix.javafx }}/ > javafx.html
+
+          case "${{ matrix.os }}" in
+            "ubuntu-latest")
+              OS="linux"
+              EXTRACT="tar xzf *.tar.gz"
+              EXT="tar.gz"
+              ;;
+            "windows-latest")
+              OS="windows"
+              EXTRACT="unzip -qq *.zip"
+              EXT="zip"
+              ;;
+            "macos-latest")
+              OS="macos"
+              EXTRACT="tar xzf *.tar.gz"
+              EXT="tar.gz"
+              ;;
+            *)
+              echo "Unsupported OS"
+              exit 1
+              ;;
+          esac
+          echo "OS set to $OS"
+
+          URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
+          echo "Downloading $URL_SDK..."
+          curl -OJ --no-progress-meter $URL_SDK
+          $EXTRACT
+          rm *.$EXT
+
+          URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-jmods.${EXT}" javafx.html | head -n 1)
+          echo "Downloading $URL_JMODS..."
+          curl -OJ --no-progress-meter $URL_JMODS
+          $EXTRACT
+          rm *.$EXT
+      - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
+        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
+        run: |
+          set -e
+          shopt -s globstar
+          for buildgradle in **/build.gradle.kts; do
+            sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' $buildgradle
+            sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" $buildgradle
+            cat $buildgradle
+          done
+      - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
+        if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
+        run: |
+          set -e
+          shopt -s globstar
+          for buildgradle in **/build.gradle.kts; do
+            sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' $buildgradle
+            sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" $buildgradle
+            cat $buildgradle
+          done
+      - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
+        if: (matrix.os == 'buildjet-8vcpu-ubuntu-2204-arm')
+        # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
+        run: |
+          set -e
+          curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=10&core=gav" > /tmp/versions.json
+          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17|^18|^19|^20|^21|^22") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
+          JAVAFX=$(jq -r '.[-1].version' /tmp/versions-latest.json)
+          echo "Using JavaFX ${JAVAFX}"
+          shopt -s globstar
+          for buildgradle in **/build.gradle.kts; do
+            sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" $buildgradle
+            cat $buildgradle
+          done
       # endregion
 
       - name: Setup Gradle
@@ -257,37 +337,45 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+      - name: Rename files with JDK version
+        shell: bash
+        run: |
+          for file in build/distribution/*.*; do
+            base=${file%.*}
+            ext=${file##*.}
+            mv "$file" "${base}-jdk${{ matrix.jdk_version }}-javafx${{ matrix.javafx }}.${ext}"
+          done
       - name: Setup rsync (macOS)
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && (((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         run: choco install --no-progress rsync
       - name: Setup SSH key
-        if: ${{ (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (!((startsWith(github.ref, 'refs/tags/') || (inputs.notarization == true)))) }}
+        if: ${{ (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main') && (!((startsWith(github.ref, 'refs/tags/') || (inputs.notarization == true)))) }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Upload to builds.jabref.org (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/ || true
       - name: Upload to builds.jabref.org (linux, macOS)
         # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
         #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
         # needs to be on one line; multi line does not work
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || (matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
+        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || (matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: ((matrix.os == 'macos-13')  || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         uses: actions/upload-artifact@v4
@@ -297,39 +385,12 @@ jobs:
           path: build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
-        if: (steps.checksecrets.outputs.secretspresent != 'YES')
+        if: (steps.checksecrets.outputs.secretspresent != 'YES') || (github.ref != 'refs/heads/main')
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
           path: build/distribution
           compression-level: 0 # no compression
-  announce:
-    name: Comment on pull request
-    runs-on: ubuntu-22.04
-    needs: [build]
-    if: ${{ github.event_name == 'pull_request' }}
-    steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Comment PR
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
-        uses: thollander/actions-comment-pull-request@v3
-        with:
-          message: |
-            The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
-          comment-tag: download-link
-          mode: recreate
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
     strategy:
