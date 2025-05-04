@@ -98,10 +98,16 @@ jobs:
 
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
-        run: sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+        run: |
+          sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (macOS)
         if: ${{ startsWith(matrix.os, 'macos') }}
-        run: sed -i '' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+        run: |
+          sed -i '.bak' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i '.bak' "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
 
       # region setup-JDK
       - name: Setup JDK ${{ env.jdk_version }} (${{ env.jdk }}) for "java toolchain" of Gradle
@@ -190,7 +196,6 @@ jobs:
           for buildgradle in **/build.gradle.kts; do
             sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ env.javafx }}"#}' $buildgradle
             sed -i "s#jlink {#jlink { addExtraModulePath(\"javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
-            sed -i "s#vendor = JvmVendorSpec.AZUL##" $buildgradle
             cat $buildgradle
           done
       - name: 'Set JavaFX ${{ env.javafx }} (macOS)'
@@ -200,7 +205,6 @@ jobs:
           find . -name 'build.gradle.kts' | while read -r buildgradle; do
             sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ env.javafx }}"#;}' $buildgradle
             sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath(\"javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
-            sed -i '.bak' "s#vendor = JvmVendorSpec.AZUL##" $buildgradle
             cat $buildgradle
           done
       - name: 'Set JavaFX ${{ env.javafx }} (linux-arm)'
