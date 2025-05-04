@@ -146,21 +146,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(getBrowseDirectory(librarySpecificDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> librarySpecificDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> setDirectory(librarySpecificDirectoryProperty, dir));
     }
 
     public void browseUserDir() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(getBrowseDirectory(userSpecificFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> setDirectory(userSpecificFileDirectoryProperty, dir));
     }
 
     public void browseLatexDir() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(getBrowseDirectory(laTexFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> laTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> setDirectory(laTexFileDirectoryProperty, dir));
     }
 
     public BooleanProperty encodingDisableProperty() {
@@ -250,5 +250,45 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             return false;
         }
         return true;
+    }
+
+    /**
+     * While 'Make absolute' button is pressed it will generate an 'absolute path'.
+     *
+     * @param specificFileDirectory (library/user/laTex) directory to be converted to an absolute path
+     */
+    public void generateAbsolutePath(StringProperty specificFileDirectory) {
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+
+        if (libPath.isEmpty() || specificFileDirectory.get().isEmpty()) {
+            return;
+        }
+
+        specificFileDirectory.setValue(libPath
+                .get().getParent()
+                .resolve(specificFileDirectory.get())
+                .normalize().toAbsolutePath().toString()
+        );
+    }
+
+    /**
+     * For a saved library, any directory relative to the library path will be set as relative; otherwise, it will be set as absolute.
+     *
+     * @param fileDirectory file directory to be updated (lib/user/laTex)
+     * @param selectedDirPath path of directory (selected by user)
+     */
+    private void setDirectory(StringProperty fileDirectory, Path selectedDirPath) {
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+
+        if (libPath.isEmpty() || !selectedDirPath.startsWith(libPath.get().getParent())) {
+            // set absolute path
+            fileDirectory.setValue(selectedDirPath.toAbsolutePath().toString());
+            return;
+        }
+
+        // set relative path
+        fileDirectory.setValue(libPath.get()
+                .getParent()
+                .relativize(selectedDirPath).toString());
     }
 }

@@ -1,9 +1,11 @@
 package org.jabref.gui.libraryproperties.general;
 
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
@@ -25,6 +27,9 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField laTexFileDirectory;
+    @FXML private Button librarySpecificFileAbsolutePathBtnId;
+    @FXML private Button userSpecificFileAbsolutePathBtnId;
+    @FXML private Button laTexSpecificFileAbsolutePathBtnId;
 
     private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
@@ -62,8 +67,17 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
 
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryPropertyProperty());
+        librarySpecificFileDirectory.textProperty().addListener((_, _, _) -> {
+            librarySpecificFileAbsolutePathBtnId.setDisable(Path.of(viewModel.librarySpecificDirectoryPropertyProperty().get()).isAbsolute());
+        });
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
+        userSpecificFileDirectory.textProperty().addListener((_, _, _) -> {
+            userSpecificFileAbsolutePathBtnId.setDisable(Path.of(viewModel.userSpecificFileDirectoryProperty().get()).isAbsolute());
+        });
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        laTexFileDirectory.textProperty().addListener((_, _, _) -> {
+            laTexSpecificFileAbsolutePathBtnId.setDisable(Path.of(viewModel.laTexFileDirectoryProperty().get()).isAbsolute());
+        });
 
         librarySpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
@@ -91,5 +105,20 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML
     void browseLatexFileDirectory() {
         viewModel.browseLatexDir();
+    }
+
+    @FXML
+    void libSpecificFileAbsolutePathBtn() {
+        viewModel.generateAbsolutePath(viewModel.librarySpecificDirectoryPropertyProperty());
+    }
+
+    @FXML
+    void userSpecificFileAbsolutePathBtn() {
+        viewModel.generateAbsolutePath(viewModel.userSpecificFileDirectoryProperty());
+    }
+
+    @FXML
+    void laTexSpecificFileAbsolutePathBtn() {
+        viewModel.generateAbsolutePath(viewModel.laTexFileDirectoryProperty());
     }
 }

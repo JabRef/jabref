@@ -35,9 +35,11 @@
                GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <TextField fx:id="librarySpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Button fx:id="librarySpecificFileAbsolutePathBtnId" text="%Make absolute"
+                GridPane.columnIndex="2" GridPane.rowIndex="1" onAction="#libSpecificFileAbsolutePathBtn"/>
         <Button onAction="#browseLibrarySpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
-                GridPane.columnIndex="2" GridPane.rowIndex="1">
+                GridPane.columnIndex="3" GridPane.rowIndex="1">
             <graphic>
                 <JabRefIconView glyph="OPEN"/>
             </graphic>
@@ -50,9 +52,11 @@
                GridPane.columnIndex="0" GridPane.rowIndex="2"/>
         <TextField fx:id="userSpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <Button fx:id="userSpecificFileAbsolutePathBtnId" text="%Make absolute"
+                GridPane.columnIndex="2" GridPane.rowIndex="2" onAction="#userSpecificFileAbsolutePathBtn"/>
         <Button onAction="#browseUserSpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
-                GridPane.columnIndex="2" GridPane.rowIndex="2">
+                GridPane.columnIndex="3" GridPane.rowIndex="2">
             <graphic>
                 <JabRefIconView glyph="OPEN"/>
             </graphic>
@@ -65,9 +69,11 @@
                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
         <TextField fx:id="laTexFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <Button fx:id="laTexSpecificFileAbsolutePathBtnId" text="%Make absolute"
+                GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#laTexSpecificFileAbsolutePathBtn"/>
         <Button onAction="#browseLatexFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
-                GridPane.columnIndex="2" GridPane.rowIndex="3">
+                GridPane.columnIndex="3" GridPane.rowIndex="3">
             <graphic>
                 <JabRefIconView glyph="OPEN"/>
             </graphic>
