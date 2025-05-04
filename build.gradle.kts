@@ -56,8 +56,12 @@ requirementTracing {
 
 subprojects {
     plugins.apply("checkstyle")
+
     plugins.apply("com.github.andygoossens.modernizer")
+
+    // Hint from https://stackoverflow.com/a/46533151/873282
     plugins.apply("com.adarshr.test-logger")
+
     plugins.apply("com.github.koppor.gradle-modules-plugin")
 
     checkstyle {
