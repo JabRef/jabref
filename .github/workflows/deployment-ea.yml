@@ -33,12 +33,13 @@ concurrency:
 jobs:
   build:
     if: github.repository_owner == 'JabRef'
+    env:
+      javafx: '25'
+      jdk_version: '25'
+      jdk: 'openjdk-25.0.0-ea+21'
     strategy:
       fail-fast: false
       matrix:
-        javafx: [25]
-        jdk_version: [25]
-        jdk: ["openjdk-25.0.0-ea+21"]
         include:
           # if you change the os version rename all other occurrences
           - os: ubuntu-22.04
@@ -95,20 +96,20 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
 
-      - name: Tell gradle to use JDK ${{ matrix.jdk_version }} (linux, Windows)
+      - name: Tell gradle to use JDK ${{ env.jdk_version }} (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
-        run: sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ matrix.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-      - name: Tell gradle to use JDK ${{ matrix.jdk_version }} (macOS)
+        run: sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+      - name: Tell gradle to use JDK ${{ env.jdk_version }} (macOS)
         if: ${{ startsWith(matrix.os, 'macos') }}
-        run: sed -i '' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ matrix.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+        run: sed -i '' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
 
       # region setup-JDK
-      - name: Setup JDK ${{ matrix.jdk_version }} (${{ matrix.jdk }}) for "java toolchain" of Gradle
+      - name: Setup JDK ${{ env.jdk_version }} (${{ env.jdk }}) for "java toolchain" of Gradle
         uses: jdx/mise-action@v2
         with:
           mise_toml: |
             [tools]
-            java = { version = "${{ matrix.jdk }}", release_type = "ea" }
+            java = { version = "${{ env.jdk }}", release_type = "ea" }
       - name: Debug
         shell: bash
         run: |
@@ -133,13 +134,13 @@ jobs:
       # endregion
 
       # region JavaFX
-      - name: Download and extract JavaFX ${{ matrix.javafx }}
+      - name: Download and extract JavaFX ${{ env.javafx }}
         if: (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
         shell: bash
         run: |
           set -e
           cd javafx
-          curl --no-progress-meter https://jdk.java.net/javafx${{ matrix.javafx }}/ > javafx.html
+          curl --no-progress-meter https://jdk.java.net/javafx${{ env.javafx }}/ > javafx.html
 
           case "${{ matrix.os }}" in
             "ubuntu-latest")
@@ -175,27 +176,27 @@ jobs:
           curl -OJ --no-progress-meter $URL_JMODS
           $EXTRACT
           rm *.$EXT
-      - name: 'Set JavaFX ${{ matrix.javafx }} (linux, Windows)'
+      - name: 'Set JavaFX ${{ env.javafx }} (linux, Windows)'
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
         run: |
           set -e
           shopt -s globstar
           for buildgradle in **/build.gradle.kts; do
-            sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#}' $buildgradle
-            sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" $buildgradle
+            sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ env.javafx }}"#}' $buildgradle
+            sed -i "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ env.javafx }}'#" $buildgradle
             cat $buildgradle
           done
-      - name: 'Set JavaFX ${{ matrix.javafx }} (macOS)'
+      - name: 'Set JavaFX ${{ env.javafx }} (macOS)'
         if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
         run: |
           set -e
           shopt -s globstar
           for buildgradle in **/build.gradle.kts; do
-            sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ matrix.javafx }}"#;}' $buildgradle
-            sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ matrix.javafx }}'#" $buildgradle
+            sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ env.javafx }}"#;}' $buildgradle
+            sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath 'javafx/javafx-jmods-${{ env.javafx }}'#" $buildgradle
             cat $buildgradle
           done
-      - name: 'Set JavaFX ${{ matrix.javafx }} (linux-arm)'
+      - name: 'Set JavaFX ${{ env.javafx }} (linux-arm)'
         if: (matrix.os == 'buildjet-8vcpu-ubuntu-2204-arm')
         # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
         run: |
@@ -348,7 +349,7 @@ jobs:
           for file in build/distribution/*.*; do
             base=${file%.*}
             ext=${file##*.}
-            mv "$file" "${base}-jdk${{ matrix.jdk_version }}-javafx${{ matrix.javafx }}.${ext}"
+            mv "$file" "${base}-jdk${{ env.jdk_version }}-javafx${{ env.javafx }}.${ext}"
           done
       - name: Setup rsync (macOS)
         if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && (((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
