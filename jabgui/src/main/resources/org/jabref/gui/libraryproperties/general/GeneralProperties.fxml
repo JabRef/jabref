@@ -36,7 +36,7 @@
         <TextField fx:id="librarySpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
         <Button fx:id="librarySpecificFileAbsolutePathBtnId" text="%Make absolute"
-                GridPane.columnIndex="2" GridPane.rowIndex="1" onAction="#libSpecificFileAbsolutePathBtn"/>
+                GridPane.columnIndex="2" GridPane.rowIndex="1" onAction="#convertLibSpecificPathToAbsolute"/>
         <Button onAction="#browseLibrarySpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="1">
@@ -53,7 +53,7 @@
         <TextField fx:id="userSpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="2"/>
         <Button fx:id="userSpecificFileAbsolutePathBtnId" text="%Make absolute"
-                GridPane.columnIndex="2" GridPane.rowIndex="2" onAction="#userSpecificFileAbsolutePathBtn"/>
+                GridPane.columnIndex="2" GridPane.rowIndex="2" onAction="#convertUserSpecificPathToAbsolute"/>
         <Button onAction="#browseUserSpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="2">
@@ -70,7 +70,7 @@
         <TextField fx:id="laTexFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="3"/>
         <Button fx:id="laTexSpecificFileAbsolutePathBtnId" text="%Make absolute"
-                GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#laTexSpecificFileAbsolutePathBtn"/>
+                GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#convertLaTexSpecificPathToAbsolute"/>
         <Button onAction="#browseLatexFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="3">

@@ -108,17 +108,17 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     }
 
     @FXML
-    void libSpecificFileAbsolutePathBtn() {
+    void convertLibSpecificPathToAbsolute() {
         viewModel.generateAbsolutePath(viewModel.librarySpecificDirectoryPropertyProperty());
     }
 
     @FXML
-    void userSpecificFileAbsolutePathBtn() {
+    void convertUserSpecificPathToAbsolute() {
         viewModel.generateAbsolutePath(viewModel.userSpecificFileDirectoryProperty());
     }
 
     @FXML
-    void laTexSpecificFileAbsolutePathBtn() {
+    void convertLaTexSpecificPathToAbsolute() {
         viewModel.generateAbsolutePath(viewModel.laTexFileDirectoryProperty());
     }
 }
