@@ -209,8 +209,8 @@ jobs:
         run: |
           set -e
           find . -name 'build.gradle.kts' | while read -r buildgradle; do
-            sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "javafx/javafx-sdk-${{ env.javafx }}"#;}' $buildgradle
-            sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath(\"javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
+            sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "../javafx/javafx-sdk-${{ env.javafx }}"#;}' $buildgradle
+            sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath(\"../javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
             cat $buildgradle
           done
       - name: 'Set JavaFX ${{ env.javafx }} (linux-arm)'
