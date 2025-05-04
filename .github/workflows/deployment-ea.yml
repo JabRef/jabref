@@ -145,6 +145,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          set -x
           cd javafx
           curl --no-progress-meter https://jdk.java.net/javafx${{ env.javafx }}/ > javafx.html
 
@@ -187,6 +188,8 @@ jobs:
           curl -OJ --no-progress-meter $URL_JMODS
           $EXTRACT
           rm *.$EXT
+
+          ls -la
       - name: 'Set JavaFX ${{ env.javafx }} (linux, Windows)'
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
         shell: bash
@@ -194,8 +197,11 @@ jobs:
           set -e
           shopt -s globstar
           for buildgradle in **/build.gradle.kts; do
-            sed -i '/javafx {/{n;s#version = ".*"#sdk = "javafx/javafx-sdk-${{ env.javafx }}"#}' $buildgradle
-            sed -i "s#jlink {#jlink { addExtraModulePath(\"javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
+            sed -i '/javafx {/{n;s#version = ".*"#sdk = "../javafx/javafx-sdk-${{ env.javafx }}"#}' $buildgradle
+            sed -i "s#jlink {#jlink { addExtraModulePath(\"../javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
+            echo "=========="
+            echo $buidgradle
+            echo "=========="
             cat $buildgradle
           done
       - name: 'Set JavaFX ${{ env.javafx }} (macOS)'
