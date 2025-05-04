@@ -56,7 +56,7 @@ public class FileFieldParser {
             return files;
         }
 
-        if (URLUtil.isURL(value.trim())) {
+        if (LinkedFile.isOnlineLink(value.trim())) {
             // needs to be modifiable
             try {
                 return List.of(new LinkedFile(URLUtil.create(value), ""));
