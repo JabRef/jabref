@@ -94,9 +94,22 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
 
+      - name: Tell gradle to use JDK25
+        run: sed -i "s/JavaLanguageVersion.of(25)/JavaLanguageVersion.of(24)/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+
       # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
+      - name: Setup JDK 25 for "java toolchain" of Gradle
         uses: jdx/mise-action@v2
+        with:
+          mise_toml: |
+            [tools]
+            java = { version = "openjdk-25.0.0-ea+21", release_type = "ea" }
+      - name: Debug
+        run: |
+          set -x
+          set -e
+          echo $JAVA_HOME
+          java --version
       - name: Make JDK known to gradle (Linux, macOS)
         if: (matrix.os != 'windows-latest')
         shell: bash
@@ -111,15 +124,6 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-      - name: Debug
-        run: |
-          echo $JAVA_HOME
-          mise hook-env -f
-          mise hook-env -f | grep 'export JAVA_HOME'
-          eval $(mise hook-env -f | grep 'export JAVA_HOME')
-          echo $JAVA_HOME
-          eval $(mise hook-env -f | grep 'export PATH')
-          echo $JAVA_HOME
       # endregion
 
       - name: Setup Gradle
@@ -146,6 +150,7 @@ jobs:
       - name: Debug
         run: |
           echo $JAVA_HOME
+          cat mise.toml
           mise hook-env -f
           mise hook-env -f | grep 'export JAVA_HOME'
           eval $(mise hook-env -f | grep 'export JAVA_HOME')
