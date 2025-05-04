@@ -395,14 +395,16 @@ jobs:
         with:
           # tbn = to-be-notarized
           name: JabRef-macOS-tbn-${{ matrix.os }}
-          path: build/distribution
+          path: jabgui/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES') || (github.ref != 'refs/heads/main')
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
-          path: build/distribution
+          path: |
+            jabgui/build/distribution
+            jabkit/build/distribution
           compression-level: 0 # no compression
   notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
