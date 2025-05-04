@@ -353,7 +353,7 @@ jobs:
       - name: Rename files with JDK version
         shell: bash
         run: |
-          for file in build/distribution/*.*; do
+          for file in jabgui/build/distribution/*.*; do
             base=${file%.*}
             ext=${file##*.}
             mv "$file" "${base}-jdk${{ env.jdk_version }}-javafx${{ env.javafx }}.${ext}"
