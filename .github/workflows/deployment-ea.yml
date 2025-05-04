@@ -240,17 +240,6 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Debug
-        shell: bash
-        run: |
-          echo $JAVA_HOME
-          cat mise.toml
-          mise hook-env -f
-          mise hook-env -f | grep 'export JAVA_HOME'
-          eval $(mise hook-env -f | grep 'export JAVA_HOME')
-          echo $JAVA_HOME
-          eval $(mise hook-env -f | grep 'export PATH')
-          echo $JAVA_HOME
       - name: Build dmg and pkg (macOS)
         if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
