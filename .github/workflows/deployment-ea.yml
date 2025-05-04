@@ -8,7 +8,7 @@ on:
     - cron: "0 18 * * *"
   pull_request:
     paths:
-      - .github/workflows/deployment-jdk-ea.yml
+      - .github/workflows/deployment-ea.yml
       - '**/build.gradle.kts'
   workflow_dispatch:
     inputs:
