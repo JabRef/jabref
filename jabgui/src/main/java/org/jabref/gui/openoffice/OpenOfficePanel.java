@@ -417,7 +417,7 @@ public class OpenOfficePanel {
         boolean canCite = isConnectedToDocument && hasStyle && hasDatabase;
         boolean canRefreshDocument = isConnectedToDocument && hasStyle;
         boolean cslStyleSelected = currentStyle instanceof CitationStyle;
-        boolean canGenerateBibliography = currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography();
+        boolean canGenerateBibliography = (currentStyle instanceof JStyle) || (currentStyle instanceof CitationStyle citationStyle && citationStyle.hasBibliography());
 
         selectDocument.setDisable(!isConnectedToDocument);
 
