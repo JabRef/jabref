@@ -44,12 +44,15 @@ class ArgumentProcessorTest {
     private final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private final ExportPreferences exportPreferences = mock(ExportPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
 
     @BeforeEach()
     void setup() {
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        when(exportPreferences.getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
 
+        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
@@ -93,9 +96,8 @@ class ArgumentProcessorTest {
         List<BibEntry> expectedEntries = bibtexImporter.importDatabase(expectedBib).getDatabase().getEntries();
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
-        String outputBibFile = outputBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("-n", "--debug", "--exportMatches", "author=Einstein," + outputBibFile, originBibFile);
+        List<String> args = List.of("search", "--debug", "--query", "author=Einstein", "--input", originBibFile, "--output", outputBib.toString());
 
         ArgumentProcessor processor = new ArgumentProcessor(
                 preferences,

@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
@@ -34,6 +35,9 @@ class Search implements Callable<Integer> {
 
     @ParentCommand
     private KitCommandLine kitCommandLine;
+
+    @Mixin
+    private KitCommandLine.SharedOptions sharedOptions = new KitCommandLine.SharedOptions();
 
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
@@ -45,12 +49,12 @@ class Search implements Callable<Integer> {
     private Path outputFile;
 
     @Option(names = {"--output-format"}, description = "Output format: bib, txt, etc.")
-    private String outputFormat = "bib"; // FixMe: defaultValue ?
+    private String outputFormat = "bibtex";
 
     @Override
     public Integer call() throws Exception {
         String searchTerm = query;
-        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, "bib");
+        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, "bibtex");
         if (pr.isEmpty()) {
             return 1;
         }
@@ -75,14 +79,12 @@ class Search implements Callable<Integer> {
         }
 
         // export matches
-        if (!matches.isEmpty()) {
+        if (matches.isEmpty()) {
             System.out.println(Localization.lang("No search matches."));
             return 0;
         }
 
-        String formatName = outputFormat;
-
-        if ("bib".equals(formatName)) {
+        if ("bibtex".equals(outputFormat)) {
             // output a bib file as default or if
             // provided exportFormat is "bib"
             kitCommandLine.saveDatabase(new BibDatabase(matches), outputFile);
@@ -90,9 +92,9 @@ class Search implements Callable<Integer> {
         } else {
             // export new database
             ExporterFactory exporterFactory = ExporterFactory.create(kitCommandLine.cliPreferences);
-            Optional<Exporter> exporter = exporterFactory.getExporterByName(formatName);
+            Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat);
             if (exporter.isEmpty()) {
-                System.err.println(Localization.lang("Unknown export format %0", formatName));
+                System.err.println(Localization.lang("Unknown export format %0", outputFormat));
             } else {
                 // We have an TemplateExporter instance:
                 try {
