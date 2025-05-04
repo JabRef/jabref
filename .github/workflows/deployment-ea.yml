@@ -143,18 +143,23 @@ jobs:
           curl --no-progress-meter https://jdk.java.net/javafx${{ env.javafx }}/ > javafx.html
 
           case "${{ matrix.os }}" in
-            "ubuntu-latest")
-              OS="linux"
+            "ubuntu-22.04")
+              OS="linux-x64"
               EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
               ;;
             "windows-latest")
-              OS="windows"
+              OS="windows-x64"
               EXTRACT="unzip -qq *.zip"
               EXT="zip"
               ;;
-            "macos-latest")
-              OS="macos"
+            "macos-13")
+              OS="macos-x64"
+              EXTRACT="tar xzf *.tar.gz"
+              EXT="tar.gz"
+              ;;
+            "macos-14")
+              OS="macos-aarch64"
               EXTRACT="tar xzf *.tar.gz"
               EXT="tar.gz"
               ;;
@@ -165,19 +170,20 @@ jobs:
           esac
           echo "OS set to $OS"
 
-          URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-sdk.${EXT}" javafx.html | head -n 1)
+          URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}_bin-sdk.${EXT}" javafx.html | head -n 1)
           echo "Downloading $URL_SDK..."
           curl -OJ --no-progress-meter $URL_SDK
           $EXTRACT
           rm *.$EXT
 
-          URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}-x64_bin-jmods.${EXT}" javafx.html | head -n 1)
+          URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}_bin-jmods.${EXT}" javafx.html | head -n 1)
           echo "Downloading $URL_JMODS..."
           curl -OJ --no-progress-meter $URL_JMODS
           $EXTRACT
           rm *.$EXT
       - name: 'Set JavaFX ${{ env.javafx }} (linux, Windows)'
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
+        shell: bash
         run: |
           set -e
           shopt -s globstar
