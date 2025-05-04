@@ -110,6 +110,7 @@ jobs:
             [tools]
             java = { version = "${{ matrix.jdk }}", release_type = "ea" }
       - name: Debug
+        shell: bash
         run: |
           set -x
           set -e
