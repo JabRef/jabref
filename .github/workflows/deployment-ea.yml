@@ -95,8 +95,12 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v3.2.1
 
-      - name: Tell gradle to use JDK ${{ matrix.jdk_version }}
+      - name: Tell gradle to use JDK ${{ matrix.jdk_version }} (linux, Windows)
+        if: ${{ !startsWith(matrix.os, 'macos') }}
         run: sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ matrix.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+      - name: Tell gradle to use JDK ${{ matrix.jdk_version }} (macOS)
+        if: ${{ startsWith(matrix.os, 'macos') }}
+        run: sed -i '' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ matrix.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
 
       # region setup-JDK
       - name: Setup JDK ${{ matrix.jdk_version }} (${{ matrix.jdk }}) for "java toolchain" of Gradle
