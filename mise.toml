@@ -1,2 +1,2 @@
 [tools]
-"java" = { version = "openjdk-25.0.0-ea+20", release_type = "ea" }
+java = 'temurin-24'

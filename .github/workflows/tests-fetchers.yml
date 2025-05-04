@@ -52,20 +52,11 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-
-      # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
-        uses: jdx/mise-action@v2
-      - name: Make JDK known to gradle (Linux, macOS)
-        shell: bash
-        run: ln -s ~/.local/share/mise ~/.asdf
-      - name: Setup JDK for gradle itself
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      # endregion
-
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run fetcher tests
