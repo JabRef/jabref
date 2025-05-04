@@ -19,7 +19,9 @@ public class LibraryPreferences {
 
     public LibraryPreferences(BibDatabaseMode defaultBibDatabaseMode,
                               boolean alwaysReformatOnSave,
-                              boolean autoSave, boolean addImportedEntries, String addImportedEntriesGroupName) {
+                              boolean autoSave,
+                              boolean addImportedEntries,
+                              String addImportedEntriesGroupName) {
         this.defaultBibDatabaseMode = new SimpleObjectProperty<>(defaultBibDatabaseMode);
         this.alwaysReformatOnSave = new SimpleBooleanProperty(alwaysReformatOnSave);
         this.autoSave = new SimpleBooleanProperty(autoSave);

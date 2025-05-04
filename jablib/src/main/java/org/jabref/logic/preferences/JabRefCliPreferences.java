@@ -1131,7 +1131,6 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));
         EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
         EasyBind.listen(libraryPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
-
         EasyBind.listen(libraryPreferences.addImportedEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_IMPORTED_ENTRIES, newValue));
         EasyBind.listen(libraryPreferences.addImportedEntriesGroupNameProperty(), (obs, oldValue, newValue) -> put(ADD_IMPORTED_ENTRIES_GROUP_NAME, newValue));
 

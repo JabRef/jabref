@@ -7,6 +7,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
@@ -47,6 +48,13 @@ class GroupTreeViewModelTest {
         preferences = mock(GuiPreferences.class);
         dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
 
+        when(preferences.getLibraryPreferences()).thenReturn(new LibraryPreferences(
+                databaseContext.getMode(),
+                false,
+                false,
+                false,
+                "Imported entries"
+        ));
         when(preferences.getGroupsPreferences()).thenReturn(new GroupsPreferences(
                 EnumSet.noneOf(GroupViewMode.class),
                 true,
