@@ -536,7 +536,7 @@ jlink {
                 )
             )
 
-            skipInstaller = false
+            skipInstaller = true
 
             installerOptions.addAll(
                 listOf(
