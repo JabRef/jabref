@@ -13,10 +13,13 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Changed
 
+- We introduced a new command line application called `jabkit` and moved some functionality from the graphical application `jabref` with their new command verbs `generate-citation-keys`, `check-consistency`, `fetch`, `search`, `convert`, `generate-bib-from-aux`, `preferences` and `pdf` to the new toolkit. [#13012](https://github.com/JabRef/jabref/pull/13012) 
+
 ### Fixed
 
 ### Removed
 
+- We removed the ability to change internal preference values. [#13012](https://github.com/JabRef/jabref/pull/13012)
 - We removed support for MySQL/MariaDB and Oracle. [#12990](https://github.com/JabRef/jabref/pull/12990)
 - We removed library migrations (users need to use JabRef 6.0-alpha.1 to perform migrations) [#12990](https://github.com/JabRef/jabref/pull/12990)
 
