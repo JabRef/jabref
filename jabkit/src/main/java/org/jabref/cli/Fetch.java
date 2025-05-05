@@ -15,10 +15,11 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
+import static picocli.CommandLine.ParentCommand;
 
 /**
  * Run an entry fetcher from the command line.
@@ -30,8 +31,11 @@ import static picocli.CommandLine.Option;
 class Fetch implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Fetch.class);
 
-    @CommandLine.ParentCommand
+    @ParentCommand
     private ArgumentProcessor argumentProcessor;
+
+    @Mixin
+    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = "--provider", required = true)
     private String provider;

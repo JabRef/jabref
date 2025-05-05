@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
@@ -27,6 +28,9 @@ public class Convert implements Runnable {
 
     @ParentCommand
     private ArgumentProcessor argumentProcessor;
+
+    @Mixin
+    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = {"--input"}, description = "Input file", required = true)
     private Path inputFile;

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
+import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Parameters;
 import static picocli.CommandLine.ParentCommand;
 
@@ -27,6 +28,9 @@ class Preferences implements Runnable {
 
     @ParentCommand
     protected ArgumentProcessor argumentProcessor;
+
+    @Mixin
+    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Override
     public void run() {

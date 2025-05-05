@@ -6,7 +6,10 @@ import java.net.Authenticator;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+
+import javafx.util.Pair;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -70,16 +73,34 @@ public class JabKit {
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
             commandLine.getCommandSpec().usageMessage().header(String.format(ArgumentProcessor.JABREF_BANNER, new BuildInfo().version));
-            commandLine.getCommandSpec().usageMessage().footer("\n" +
-                    Localization.lang("Available import formats:\n") + // ToDo: Move to where input is
-                    StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(preferences)) + "\n" +
-                    Localization.lang("Available export formats:") + "\n" + // ToDo: Move to where output is
-                    StringUtil.alignStringTable(ArgumentProcessor.getAvailableExportFormats(preferences)));
+            applyFooterFormats(commandLine,
+                    ArgumentProcessor.getAvailableImportFormats(preferences),
+                    ArgumentProcessor.getAvailableExportFormats(preferences));
             commandLine.execute(args);
-            // FixMe: Help message on subcommands
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
         }
+    }
+
+    private static void applyFooterFormats(CommandLine commandLineRoot, List<Pair<String, String>> inputFormats, List<Pair<String, String>> outputFormats) {
+        String inputFooter = "\n"
+                + Localization.lang("Available import formats:") + "\n"
+                + StringUtil.alignStringTable(inputFormats);
+        String outputFooter = "\n"
+                + Localization.lang("Available export formats:") + "\n"
+                + StringUtil.alignStringTable(outputFormats);
+
+        commandLineRoot.getSubcommands().values().forEach(subCommand -> {
+            boolean hasInputOption = subCommand.getCommandSpec().options().stream()
+                                               .anyMatch(opt -> Arrays.asList(opt.names()).contains("--input-format"));
+            boolean hasOutputOption = subCommand.getCommandSpec().options().stream()
+                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output-format"));
+
+            String footerText = "";
+            footerText += hasInputOption ? inputFooter : "";
+            footerText += hasOutputOption ? outputFooter : "";
+            subCommand.getCommandSpec().usageMessage().footer(footerText);
+        });
     }
 
     /**
