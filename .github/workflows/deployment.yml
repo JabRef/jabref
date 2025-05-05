@@ -132,7 +132,7 @@ jobs:
           --add-modules org.jabref,org.jabref.merged.module  \
           --add-modules jdk.incubator.vector \
           --dest build/distribution \
-          --app-content buildres/mac/Resources\
+          --app-content buildres/mac/Resources \
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
