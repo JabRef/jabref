@@ -11,6 +11,7 @@ import java.util.Map;
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyAuthenticator;
 import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ProxyRegisterer;
@@ -19,13 +20,10 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
-import org.jabref.logic.remote.RemotePreferences;
-import org.jabref.logic.remote.client.RemoteClient;
-import org.jabref.logic.search.IndexManager;
-import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -34,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.tinylog.configuration.Configuration;
+import picocli.CommandLine;
 
 /// Entrypoint for a command-line only version of JabRef.
 /// It does not open any dialogs, just parses the command line arguments and outputs text and creates/modifies files.
@@ -50,29 +49,11 @@ public class JabKit {
     public static void main(String[] args) {
         initLogging(args);
 
-        final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
-        Injector.setModelOrService(CliPreferences.class, preferences);
-
-        FileUpdateMonitor fileUpdateMonitor = new DummyFileUpdateMonitor();
-
-        processArguments(args, preferences, fileUpdateMonitor);
-    }
-
-    private static void systemExit() {
-        LOGGER.debug("JabRef shut down after processing command line arguments");
-        // A clean shutdown takes 60s time
-        // We don't need the clean shutdown here
-        System.exit(0);
-    }
-
-    public static void processArguments(String[] args, JabRefCliPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
         try {
-            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
+            final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
+            Injector.setModelOrService(CliPreferences.class, preferences);
 
-            // Early exit in case another instance is already running
-            if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
-                systemExit();
-            }
+            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
             BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
@@ -80,26 +61,36 @@ public class JabKit {
             Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
-            PostgreServer postgreServer = new PostgreServer();
-            Injector.setModelOrService(PostgreServer.class, postgreServer);
-
             configureProxy(preferences.getProxyPreferences());
             configureSSL(preferences.getSSLPreferences());
 
-            IndexManager.clearOldSearchIndices();
-
-            Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
+            Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 
             // Process arguments
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(
-                    preferences,
-                    entryTypesManager);
-            argumentProcessor.processArguments(args);
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
+            CommandLine commandLine = new CommandLine(argumentProcessor);
+            commandLine.execute(args);
 
-            systemExit();
+            handleHelp(commandLine, preferences);
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
-            systemExit();
+        }
+    }
+
+    private static void handleHelp(CommandLine commandLine, CliPreferences cliPreferences) {
+        if (commandLine.isUsageHelpRequested()) {
+            System.out.printf(ArgumentProcessor.JABREF_BANNER + "%n", new BuildInfo().version);
+        }
+
+        if (commandLine.isVersionHelpRequested()) {
+            System.out.printf(ArgumentProcessor.JABREF_BANNER + "%n", new BuildInfo().version);
+            System.out.println(commandLine.getUsageMessage());
+
+            System.out.println(Localization.lang("Available import formats:"));
+            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(cliPreferences)));
+
+            System.out.println(Localization.lang("Available export formats:"));
+            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableExportFormats(cliPreferences)));
         }
     }
 
@@ -141,39 +132,6 @@ public class JabKit {
         configuration.forEach(Configuration::set);
 
         LOGGER = LoggerFactory.getLogger(JabKit.class);
-    }
-
-    /**
-     * @return true if JabRef should continue starting up, false if it should quit.
-     */
-    private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) throws InterruptedException {
-        LOGGER.trace("Checking for remote handling...");
-        if (remotePreferences.useRemoteServer()) {
-            // Try to contact already running JabRef
-            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
-            if (remoteClient.ping()) {
-                LOGGER.debug("Pinging other instance succeeded.");
-                if (args.length == 0) {
-                    // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
-                    LOGGER.warn("This JabRef instance is already running. Please switch to that instance.");
-                } else {
-                    // We are not alone, there is already a server out there, send command line arguments to other instance
-                    LOGGER.debug("Passing arguments passed on to running JabRef...");
-                    if (remoteClient.sendCommandLineArguments(args)) {
-                        // So we assume it's all taken care of, and quit.
-                        // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
-                        LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
-                    } else {
-                        LOGGER.warn("Could not communicate with other running JabRef instance.");
-                    }
-                }
-                // We do not launch a new instance in presence if there is another instance running
-                return false;
-            } else {
-                LOGGER.debug("Could not ping JabRef instance.");
-            }
-        }
-        return true;
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {

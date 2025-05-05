@@ -33,6 +33,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
+import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,6 +47,8 @@ class ArgumentProcessorTest {
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ExportPreferences exportPreferences = mock(ExportPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+
+    private CommandLine commandLine;
 
     @BeforeEach()
     void setup() {
@@ -63,6 +66,9 @@ class ArgumentProcessorTest {
                 0,
                 0,
                 0));
+
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
+        commandLine = new CommandLine(argumentProcessor);
     }
 
     @Test
@@ -74,10 +80,7 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("generate-bib-from-aux", "--aux", auxFile, "--input", fullBib, "--output", outputBib.toString());
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                preferences,
-                entryTypesManager);
-        processor.processArguments(args.toArray(String[]::new));
+        commandLine.execute(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputBib));
     }
@@ -99,10 +102,7 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("search", "--debug", "--query", "author=Einstein", "--input", originBibFile, "--output", outputBib.toString());
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                preferences,
-                entryTypesManager);
-        processor.processArguments(args.toArray(String[]::new));
+        commandLine.execute(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
@@ -128,10 +128,7 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                preferences,
-                entryTypesManager);
-        processor.processArguments(args.toArray(String[]::new));
+        commandLine.execute(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputHtml));
     }
@@ -143,14 +140,10 @@ class ArgumentProcessorTest {
 
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                preferences,
-                entryTypesManager);
-
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent, true));
 
-        processor.processArguments(args.toArray(String[]::new));
+        commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertTrue(output.contains("Consistency check completed"));
@@ -166,14 +159,10 @@ class ArgumentProcessorTest {
         // "txt" is the default output format; thus not provided here
         List<String> args = List.of("check-consistency", "--input", testBibFile, "--porcelain");
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                preferences,
-                entryTypesManager);
-
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 
-        processor.processArguments(args.toArray(String[]::new));
+        commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertEquals("", output);

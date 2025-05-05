@@ -5,7 +5,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
@@ -27,14 +26,14 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "check-consistency", description = "Check consistency of the database.")
-class CheckConsistency implements Callable<Integer> {
+class CheckConsistency implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConsistency.class);
 
     @ParentCommand
-    private KitCommandLine kitCommandLine;
+    private ArgumentProcessor argumentProcessor;
 
     @Mixin
-    private KitCommandLine.SharedOptions sharedOptions = new KitCommandLine.SharedOptions();
+    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = {"--input"}, description = "Input BibTeX file", required = true)
     private Path inputFile;
@@ -43,22 +42,22 @@ class CheckConsistency implements Callable<Integer> {
     private String outputFormat;
 
     @Override
-    public Integer call() {
+    public void run() {
         if (inputFile == null) {
             System.out.println(Localization.lang("No file specified for consistency check."));
-            return 0;
+            return;
         }
 
         ParserResult pr;
         try {
             pr = OpenDatabase.loadDatabase(
                     inputFile,
-                    kitCommandLine.cliPreferences.getImportFormatPreferences(),
+                    argumentProcessor.cliPreferences.getImportFormatPreferences(),
                     new DummyFileUpdateMonitor()
             );
         } catch (IOException ex) {
             LOGGER.error("Error reading '{}'.", inputFile, ex);
-            return 0;
+            return;
         }
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         List<BibEntry> entries = databaseContext.getDatabase().getEntries();
@@ -73,14 +72,14 @@ class CheckConsistency implements Callable<Integer> {
                     result,
                     writer,
                     sharedOptions.porcelain,
-                    kitCommandLine.entryTypesManager,
+                    argumentProcessor.entryTypesManager,
                     databaseContext.getMode());
         } else {
             checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
                     result,
                     writer,
                     sharedOptions.porcelain,
-                    kitCommandLine.entryTypesManager,
+                    argumentProcessor.entryTypesManager,
                     databaseContext.getMode());
         }
 
@@ -94,7 +93,5 @@ class CheckConsistency implements Callable<Integer> {
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Consistency check completed"));
         }
-
-        return 0;
     }
 }

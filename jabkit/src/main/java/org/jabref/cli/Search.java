@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -12,6 +11,7 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.search.DatabaseSearcher;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
@@ -30,14 +30,14 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "search", description = "Search in a library.")
-class Search implements Callable<Integer> {
+class Search implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Search.class);
 
     @ParentCommand
-    private KitCommandLine kitCommandLine;
+    private ArgumentProcessor argumentProcessor;
 
     @Mixin
-    private KitCommandLine.SharedOptions sharedOptions = new KitCommandLine.SharedOptions();
+    private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
@@ -52,16 +52,20 @@ class Search implements Callable<Integer> {
     private String outputFormat = "bibtex";
 
     @Override
-    public Integer call() throws Exception {
+    public void run() {
         String searchTerm = query;
-        Optional<ParserResult> pr = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, "bibtex");
+        Optional<ParserResult> pr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex");
         if (pr.isEmpty()) {
-            return 1;
+            return;
         }
 
         BibDatabaseContext databaseContext = pr.get().getDatabaseContext();
 
-        SearchPreferences searchPreferences = kitCommandLine.cliPreferences.getSearchPreferences();
+        PostgreServer postgreServer = new PostgreServer();
+        Injector.setModelOrService(PostgreServer.class, postgreServer);
+        IndexManager.clearOldSearchIndices();
+
+        SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
         SearchQuery query = new SearchQuery(searchTerm, searchPreferences.getSearchFlags());
 
         List<BibEntry> matches;
@@ -70,28 +74,28 @@ class Search implements Callable<Integer> {
             matches = new DatabaseSearcher(query,
                     databaseContext,
                     new CurrentThreadTaskExecutor(),
-                    kitCommandLine.cliPreferences,
+                    argumentProcessor.cliPreferences,
                     Injector.instantiateModelOrService(PostgreServer.class)
             ).getMatches();
         } catch (IOException ex) {
             LOGGER.error("Error occurred when searching", ex);
-            return 1;
+            return;
         }
 
         // export matches
         if (matches.isEmpty()) {
             System.out.println(Localization.lang("No search matches."));
-            return 0;
+            return;
         }
 
         if ("bibtex".equals(outputFormat)) {
             // output a bib file as default or if
             // provided exportFormat is "bib"
-            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, new BibDatabase(matches), outputFile);
+            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, new BibDatabase(matches), outputFile);
             LOGGER.debug("Finished export");
         } else {
             // export new database
-            ExporterFactory exporterFactory = ExporterFactory.create(kitCommandLine.cliPreferences);
+            ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
             Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat);
             if (exporter.isEmpty()) {
                 System.err.println(Localization.lang("Unknown export format %0", outputFormat));
@@ -110,7 +114,5 @@ class Search implements Callable<Integer> {
                 }
             }
         }
-
-        return 0;
     }
 }

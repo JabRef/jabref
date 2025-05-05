@@ -4,7 +4,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -12,6 +11,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +27,11 @@ import static picocli.CommandLine.Option;
  * Outputs a TODO: @return A parser result containing the entries fetched or null if an error occurred.
  */
 @Command(name = "fetch", description = "Fetch entries from a provider.")
-class Fetch implements Callable<Integer> {
+class Fetch implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Fetch.class);
 
     @CommandLine.ParentCommand
-    private KitCommandLine kitCommandLine;
+    private ArgumentProcessor argumentProcessor;
 
     @Option(names = "--provider", required = true)
     private String provider;
@@ -42,21 +42,18 @@ class Fetch implements Callable<Integer> {
     @Option(names = "--output")
     private Path outputFile;
 
-//    @Option(names = "--append", description = "Append to existing file") // ToDO: implement
-//    private boolean append;
-
     @Override
-    public Integer call() {
+    public void run() {
         if ((provider == null) || !provider.contains(":")) {
             System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
             System.out.println(Localization.lang("The following fetchers are available:"));
-            System.out.println(KitCommandLine.alignStringTable(KitCommandLine.getAvailableImportFormats(kitCommandLine.cliPreferences)));
-            return 1;
+            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(argumentProcessor.cliPreferences)));
+            return;
         }
 
         Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
-                kitCommandLine.cliPreferences.getImportFormatPreferences(),
-                kitCommandLine.cliPreferences.getImporterPreferences());
+                argumentProcessor.cliPreferences.getImportFormatPreferences(),
+                argumentProcessor.cliPreferences.getImporterPreferences());
         Optional<SearchBasedFetcher> selectedFetcher = fetchers.stream()
                                                                .filter(fetcher -> fetcher.getName().equalsIgnoreCase(provider))
                                                                .findFirst();
@@ -64,9 +61,9 @@ class Fetch implements Callable<Integer> {
             System.out.println(Localization.lang("Could not find fetcher '%0'", provider));
 
             System.out.println(Localization.lang("The following fetchers are available:"));
-            System.out.println(KitCommandLine.alignStringTable(KitCommandLine.getAvailableImportFormats(kitCommandLine.cliPreferences)));
+            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(argumentProcessor.cliPreferences)));
 
-            return 1;
+            return;
         }
 
         System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, provider));
@@ -75,22 +72,19 @@ class Fetch implements Callable<Integer> {
             List<BibEntry> matches = selectedFetcher.get().performSearch(query);
             if (matches.isEmpty()) {
                 System.out.println("\r" + Localization.lang("No results found."));
-                return 1;
+                return;
             }
 
             System.out.println("\r" + Localization.lang("Found %0 results.", String.valueOf(matches.size())));
 
             if (outputFile != null) {
-                KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, new BibDatabase(matches), outputFile);
+                ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, new BibDatabase(matches), outputFile);
                 // ToDo: implement append
             } else {
                 System.out.println(matches.stream());
             }
         } catch (FetcherException e) {
             LOGGER.error("Error while fetching", e);
-            return 1;
         }
-
-        return 0;
     }
 }

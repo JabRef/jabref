@@ -1,14 +1,13 @@
 package org.jabref.cli;
 
 import java.io.File;
-import java.util.concurrent.Callable;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.Parameters;
 
 @Command(name = "check-integrity", description = "Check integrity of the database.")
-class CheckIntegrity implements Callable<Integer> {
+class CheckIntegrity implements Runnable {
 
     @Parameters(index = "0", description = "BibTeX file to check", arity = "0..1")
     private File inputFile;
@@ -20,8 +19,7 @@ class CheckIntegrity implements Callable<Integer> {
     private String outputFormat = "txt"; // FixMe: Default value?
 
     @Override
-    public Integer call() throws Exception {
+    public void run() {
         // TODO: Implement consistency checking
-        return 0;
     }
 }

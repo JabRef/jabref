@@ -2,7 +2,6 @@ package org.jabref.cli;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
@@ -20,11 +19,11 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate-bib-from-aux", description = "Generate small bib from aux file.")
-class GenerateBibFromAux implements Callable<Integer> {
+class GenerateBibFromAux implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateBibFromAux.class);
 
     @ParentCommand
-    private KitCommandLine kitCommandLine;
+    private ArgumentProcessor argumentProcessor;
 
     @Option(names = "--aux", required = true)
     private Path auxFile;
@@ -36,11 +35,11 @@ class GenerateBibFromAux implements Callable<Integer> {
     private Path outputFile;
 
     @Override
-    public Integer call() {
-        Optional<ParserResult> pr = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, "bibtex");
+    public void run() {
+        Optional<ParserResult> pr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex");
 
         if (pr.isEmpty() || auxFile == null) {
-            return 1;
+            return;
         }
 
         BibDatabase subDatabase = null;
@@ -55,14 +54,13 @@ class GenerateBibFromAux implements Callable<Integer> {
 
         if (subDatabase == null || !subDatabase.hasEntries()) {
             System.out.println(Localization.lang("no library generated"));
-            return 1;
+            return;
         }
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()); // ToDo: Make nice
         } else {
-            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, subDatabase, outputFile);
+            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, subDatabase, outputFile);
         }
-        return 0;
     }
 }

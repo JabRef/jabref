@@ -2,7 +2,6 @@ package org.jabref.cli;
 
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
@@ -18,10 +17,11 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate-citation-keys", description = "Generate citation keys for entries in a .bib file.")
-public class GenerateCitationKeys implements Callable<Integer> {
+public class GenerateCitationKeys implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateCitationKeys.class);
+
     @ParentCommand
-    private KitCommandLine kitCommandLine;
+    private ArgumentProcessor argumentProcessor;
 
     @Option(names = "--input", description = "The input .bib file.", required = true)
     private Path inputFile;
@@ -30,8 +30,8 @@ public class GenerateCitationKeys implements Callable<Integer> {
     private Path outputFile;
 
     @Override
-    public Integer call() {
-        Optional<ParserResult> parserResult = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, "bibtex");
+    public void run() {
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex");
         if (parserResult.isPresent()) {
             BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
 
@@ -39,18 +39,16 @@ public class GenerateCitationKeys implements Callable<Integer> {
 
             CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
                     databaseContext,
-                    kitCommandLine.cliPreferences.getCitationKeyPatternPreferences());
+                    argumentProcessor.cliPreferences.getCitationKeyPatternPreferences());
             for (BibEntry entry : databaseContext.getEntries()) {
                 keyGenerator.generateAndSetKey(entry);
             }
         }
 
         if (outputFile != null) {
-            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, parserResult.get().getDatabase(), outputFile);
+            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, parserResult.get().getDatabase(), outputFile);
         } else {
             System.out.println(parserResult.get().getDatabase());
         }
-
-        return 0;
     }
 }

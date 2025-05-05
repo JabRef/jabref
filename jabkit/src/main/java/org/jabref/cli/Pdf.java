@@ -38,7 +38,7 @@ class Pdf implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Pdf.class);
 
     @ParentCommand
-    protected KitCommandLine kitCommandLine;
+    protected ArgumentProcessor argumentProcessor;
 
     @Override
     public void run() {
@@ -66,14 +66,14 @@ class Pdf implements Runnable {
         public Integer call() {
             if (formats.contains("xmp") || formats.contains("bibtex-attachment")) {
                 if (inputFile != null) {
-                    writeMetadataToPdf(List.of(KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, inputFormat).get()),
+                    writeMetadataToPdf(List.of(ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, inputFormat).get()),
                             List.of(inputFile),
                             citationKeys,
-                            kitCommandLine.cliPreferences.getXmpPreferences(),
-                            kitCommandLine.cliPreferences.getFilePreferences(),
-                            kitCommandLine.cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
-                            kitCommandLine.cliPreferences.getCustomEntryTypesRepository(),
-                            kitCommandLine.cliPreferences.getFieldPreferences(),
+                            argumentProcessor.cliPreferences.getXmpPreferences(),
+                            argumentProcessor.cliPreferences.getFilePreferences(),
+                            argumentProcessor.cliPreferences.getLibraryPreferences().getDefaultBibDatabaseMode(),
+                            argumentProcessor.cliPreferences.getCustomEntryTypesRepository(),
+                            argumentProcessor.cliPreferences.getFieldPreferences(),
                             Injector.instantiateModelOrService(JournalAbbreviationRepository.class),
                             formats.contains("xmp"),
                             formats.contains("bibtex-attachment"));

@@ -26,7 +26,7 @@ class Preferences implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Preferences.class);
 
     @ParentCommand
-    protected KitCommandLine kitCommandLine;
+    protected ArgumentProcessor argumentProcessor;
 
     @Override
     public void run() {
@@ -39,7 +39,7 @@ class Preferences implements Runnable {
         public Integer call() {
             try {
                 System.out.println(Localization.lang("Setting all preferences to default values."));
-                kitCommandLine.cliPreferences.clear();
+                argumentProcessor.cliPreferences.clear();
                 new SharedDatabasePreferences().clear();
             } catch (BackingStoreException e) {
                 System.err.println(Localization.lang("Unable to clear preferences."));
@@ -58,8 +58,8 @@ class Preferences implements Runnable {
         @Override
         public Integer call() {
             try {
-                kitCommandLine.cliPreferences.importPreferences(inputFile);
-                kitCommandLine.cliPreferences.flush();
+                argumentProcessor.cliPreferences.importPreferences(inputFile);
+                argumentProcessor.cliPreferences.flush();
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot import preferences", ex);
             }
@@ -76,7 +76,7 @@ class Preferences implements Runnable {
         @Override
         public Integer call() {
             try {
-                kitCommandLine.cliPreferences.exportPreferences(outputFile);
+                argumentProcessor.cliPreferences.exportPreferences(outputFile);
             } catch (JabRefException ex) {
                 LOGGER.error("Cannot export preferences", ex);
             }

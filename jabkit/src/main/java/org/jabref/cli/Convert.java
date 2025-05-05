@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
@@ -23,11 +22,11 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "convert", description = "Convert between bibliography formats.")
-public class Convert implements Callable<Integer> {
+public class Convert implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Convert.class);
 
     @ParentCommand
-    private KitCommandLine kitCommandLine;
+    private ArgumentProcessor argumentProcessor;
 
     @Option(names = {"--input"}, description = "Input file", required = true)
     private Path inputFile;
@@ -42,20 +41,19 @@ public class Convert implements Callable<Integer> {
     private String outputFormat;
 
     @Override
-    public Integer call() throws Exception {
+    public void run() {
         if (inputFile == null
                 || !Files.exists(inputFile)
                 || outputFile == null) {
-            return 1;
+            return;
         }
 
-        Optional<ParserResult> pr = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, inputFormat);
+        Optional<ParserResult> pr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, inputFormat);
         if (pr.isPresent()) {
             exportFile(pr.get(), outputFile, outputFormat);
         } else {
             LOGGER.error("Unable to export input file {}", inputFile);
         }
-        return 0;
     }
 
     protected void exportFile(ParserResult pr, Path outputFile, String format) {
@@ -69,7 +67,7 @@ public class Convert implements Callable<Integer> {
         }
 
         if ("bibtex".equalsIgnoreCase(format)) {
-            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, pr.getDatabase(), outputFile);
+            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, pr.getDatabase(), outputFile);
             return;
         }
 
@@ -79,9 +77,9 @@ public class Convert implements Callable<Integer> {
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         databaseContext.setDatabasePath(path);
         List<Path> fileDirForDatabase = databaseContext
-                .getFileDirectories(kitCommandLine.cliPreferences.getFilePreferences());
+                .getFileDirectories(argumentProcessor.cliPreferences.getFilePreferences());
         System.out.println(Localization.lang("Exporting %0", outputFile));
-        ExporterFactory exporterFactory = ExporterFactory.create(kitCommandLine.cliPreferences);
+        ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
         Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
         if (exporter.isEmpty()) {
             System.err.println(Localization.lang("Unknown export format %0", format));
