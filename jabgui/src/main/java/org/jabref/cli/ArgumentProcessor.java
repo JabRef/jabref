@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 public class ArgumentProcessor {
-    private static final String JABREF_BANNER = """
-
+    public static final String JABREF_BANNER = """
+    \u001B[35m
        &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
        &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
        &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
@@ -25,7 +25,7 @@ public class ArgumentProcessor {
        &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
        &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
     &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
-
+    \u001B[0m
     Staying on top of your literature since 2003 - https://www.jabref.org/
     Please report issues at https://github.com/JabRef/jabref/issues
     """;
