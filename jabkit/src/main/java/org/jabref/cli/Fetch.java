@@ -81,7 +81,7 @@ class Fetch implements Callable<Integer> {
             System.out.println("\r" + Localization.lang("Found %0 results.", String.valueOf(matches.size())));
 
             if (outputFile != null) {
-                kitCommandLine.saveDatabase(new BibDatabase(matches), outputFile);
+                KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, new BibDatabase(matches), outputFile);
                 // ToDo: implement append
             } else {
                 System.out.println(matches.stream());

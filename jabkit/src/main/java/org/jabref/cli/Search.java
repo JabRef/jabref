@@ -54,7 +54,7 @@ class Search implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         String searchTerm = query;
-        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, "bibtex");
+        Optional<ParserResult> pr = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, "bibtex");
         if (pr.isEmpty()) {
             return 1;
         }
@@ -87,7 +87,7 @@ class Search implements Callable<Integer> {
         if ("bibtex".equals(outputFormat)) {
             // output a bib file as default or if
             // provided exportFormat is "bib"
-            kitCommandLine.saveDatabase(new BibDatabase(matches), outputFile);
+            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, new BibDatabase(matches), outputFile);
             LOGGER.debug("Finished export");
         } else {
             // export new database

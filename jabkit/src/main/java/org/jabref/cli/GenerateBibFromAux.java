@@ -12,7 +12,6 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +37,21 @@ class GenerateBibFromAux implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, "bibtex");
+        Optional<ParserResult> pr = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, "bibtex");
 
         if (pr.isEmpty() || auxFile == null) {
             return 1;
         }
 
-        BibDatabase subDatabase = createFromAux(pr.get(), auxFile);
+        BibDatabase subDatabase = null;
+        BibDatabase sourceDatabase = pr.get().getDatabase();
+
+        if (auxFile != null && (sourceDatabase != null)) {
+            AuxParser auxParser = new DefaultAuxParser(sourceDatabase);
+            AuxParserResult result = auxParser.parse(auxFile);
+            LOGGER.info(new AuxParserStatisticsProvider(result).getInformation(true));
+            subDatabase = result.getGeneratedBibDatabase();
+        }
 
         if (subDatabase == null || !subDatabase.hasEntries()) {
             System.out.println(Localization.lang("no library generated"));
@@ -54,21 +61,8 @@ class GenerateBibFromAux implements Callable<Integer> {
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream()); // ToDo: Make nice
         } else {
-            kitCommandLine.saveDatabase(subDatabase, outputFile);
+            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, subDatabase, outputFile);
         }
         return 0;
-    }
-
-    @VisibleForTesting
-    static BibDatabase createFromAux(ParserResult pr, Path auxFile) {
-        BibDatabase subDatabase = null;
-        BibDatabase sourceDatabase = pr.getDatabase();
-        if (auxFile != null && (sourceDatabase != null)) {
-            AuxParser auxParser = new DefaultAuxParser(sourceDatabase);
-            AuxParserResult result = auxParser.parse(auxFile);
-            LOGGER.info(new AuxParserStatisticsProvider(result).getInformation(true));
-            subDatabase = result.getGeneratedBibDatabase();
-        }
-        return subDatabase;
     }
 }

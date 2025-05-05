@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static picocli.CommandLine.Command;
-import static picocli.CommandLine.Parameters;
+import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "generate-citation-keys", description = "Generate citation keys for entries in a .bib file.")
@@ -23,12 +23,15 @@ public class GenerateCitationKeys implements Callable<Integer> {
     @ParentCommand
     private KitCommandLine kitCommandLine;
 
-    @Parameters(index = "0", description = "The input .bib file.")
-    private Path inputFile; // ToDo: Make list
+    @Option(names = "--input", description = "The input .bib file.", required = true)
+    private Path inputFile;
+
+    @Option(names = "--output", description = "The output .bib file.")
+    private Path outputFile;
 
     @Override
     public Integer call() {
-        Optional<ParserResult> parserResult = kitCommandLine.importFile(inputFile, "bib");
+        Optional<ParserResult> parserResult = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, "bibtex");
         if (parserResult.isPresent()) {
             BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
 
@@ -40,6 +43,12 @@ public class GenerateCitationKeys implements Callable<Integer> {
             for (BibEntry entry : databaseContext.getEntries()) {
                 keyGenerator.generateAndSetKey(entry);
             }
+        }
+
+        if (outputFile != null) {
+            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, parserResult.get().getDatabase(), outputFile);
+        } else {
+            System.out.println(parserResult.get().getDatabase());
         }
 
         return 0;

@@ -216,7 +216,7 @@ public class KitCommandLine implements Callable<Integer> {
         return importResult;
     } */
 
-    protected Optional<ParserResult> importFile(Path file, String importFormat) {
+    protected static Optional<ParserResult> importFile(CliPreferences cliPreferences, Path file, String importFormat) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     cliPreferences.getImporterPreferences(),
@@ -245,7 +245,7 @@ public class KitCommandLine implements Callable<Integer> {
         }
     }
 
-    protected void saveDatabase(BibDatabase newBase, Path outputFile) {
+    protected static void saveDatabase(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager, BibDatabase newBase, Path outputFile) {
         try {
             System.out.println(Localization.lang("Saving") + ": " + outputFile);
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {

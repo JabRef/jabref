@@ -83,7 +83,7 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void exportMatches(@TempDir Path tempDir) throws URISyntaxException, IOException {
+    void search(@TempDir Path tempDir) throws URISyntaxException, IOException {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 

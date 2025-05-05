@@ -66,7 +66,7 @@ class Pdf implements Runnable {
         public Integer call() {
             if (formats.contains("xmp") || formats.contains("bibtex-attachment")) {
                 if (inputFile != null) {
-                    writeMetadataToPdf(List.of(kitCommandLine.importFile(inputFile, inputFormat).get()),
+                    writeMetadataToPdf(List.of(KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, inputFormat).get()),
                             List.of(inputFile),
                             citationKeys,
                             kitCommandLine.cliPreferences.getXmpPreferences(),

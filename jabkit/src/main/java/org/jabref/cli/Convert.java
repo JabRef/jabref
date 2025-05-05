@@ -49,7 +49,7 @@ public class Convert implements Callable<Integer> {
             return 1;
         }
 
-        Optional<ParserResult> pr = kitCommandLine.importFile(inputFile, inputFormat);
+        Optional<ParserResult> pr = KitCommandLine.importFile(kitCommandLine.cliPreferences, inputFile, inputFormat);
         if (pr.isPresent()) {
             exportFile(pr.get(), outputFile, outputFormat);
         } else {
@@ -69,7 +69,7 @@ public class Convert implements Callable<Integer> {
         }
 
         if ("bibtex".equalsIgnoreCase(format)) {
-            kitCommandLine.saveDatabase(pr.getDatabase(), outputFile);
+            KitCommandLine.saveDatabase(kitCommandLine.cliPreferences, kitCommandLine.entryTypesManager, pr.getDatabase(), outputFile);
             return;
         }
 
