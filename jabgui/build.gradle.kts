@@ -72,7 +72,7 @@ dependencies {
     implementation("org.apache.lucene:lucene-analysis-common:${luceneVersion}")
     implementation("org.apache.lucene:lucene-highlighter:${luceneVersion}")
 
-    implementation("org.jsoup:jsoup:1.19.1")
+    implementation("org.jsoup:jsoup:1.20.1")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
