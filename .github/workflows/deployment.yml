@@ -100,7 +100,7 @@ jobs:
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Prepare merged jars and modules dir (macOS)
+      - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14') || (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
