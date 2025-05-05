@@ -251,6 +251,7 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
+
       - name: Build dmg and pkg (macOS)
         if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
@@ -263,13 +264,13 @@ jobs:
           eval $(mise hook-env -f | grep 'export PATH')
           echo $JAVA_HOME
 
-          # Use Java's packaging tool to create "JabRef.app"
           jpackage \
           --module org.jabref/org.jabref.Launcher \
           --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --add-modules jdk.incubator.vector \
           --dest build/distribution \
+          --app-content buildres/mac/Resources \
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
@@ -277,8 +278,7 @@ jobs:
           --vendor "JabRef e.V." \
           --mac-package-identifier JabRef \
           --mac-package-name JabRef \
-          --type app-image \
-          --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
           --mac-entitlements buildres/mac/jabref.entitlements \
           --icon src/main/resources/icons/jabref.icns \
@@ -300,22 +300,60 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
+      - name: Build pkg (macOS)
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          set -e
+          cd jabgui
 
-          # Add additional files / directories
-          cp buildres/mac/jabrefHost.py build/distribution/JabRef.app/Contents/
-          cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/
+          # see https://github.com/jdx/mise/discussions/4973
+          eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          eval $(mise hook-env -f | grep 'export PATH')
+          echo $JAVA_HOME
 
-          # Sign the final artifact
-          codesign --force --deep --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" \
-            --entitlements buildres/mac/jabref.entitlements \
-            --options runtime --timestamp build/distribution/JabRef.app
-
-          # pack dmg and pkg
-          hdiutil create -volname "JabRef" -srcfolder build/distribution/JabRef.app -ov -format UDZO build/distribution/JabRef${{ matrix.suffix }}.dmg
-          productbuild --component build/distribution/JabRef.app /Applications --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" build/distribution/JabRef${{ matrix.suffix }}.pkg
-
-          # Cleanup unpacked file
-          rm -rf build/distribution/JabRef.app
+          jpackage \
+          --module org.jabref/org.jabref.Launcher \
+          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
+          --add-modules org.jabref,org.jabref.merged.module  \
+          --add-modules jdk.incubator.vector \
+          --dest build/distribution \
+          --app-content buildres/mac/Resources \
+          --name JabRef \
+          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
+          --verbose \
+          --mac-sign \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
+          --mac-package-name JabRef \
+          --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --mac-package-signing-prefix org.jabref \
+          --mac-entitlements buildres/mac/jabref.entitlements \
+          --icon src/main/resources/icons/jabref.icns \
+          --resource-dir buildres/mac \
+          --file-associations buildres/mac/bibtexAssociations.properties \
+          --jlink-options --bind-services \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
+          --java-options --add-modules=jdk.incubator.vector
+      - name: Rename files for mac
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          cd jabgui
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.dmg
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.pkg
       - name: Build runtime image and installer (linux, Windows)
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14')
         shell: bash
@@ -323,8 +361,8 @@ jobs:
       - name: Build JabKit
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Remove JabKit build for macOS
-        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14') ) && (steps.checksecrets.outputs.secretspresent == 'YES')
+      - name: Remove JabKit app build (macOS)
+        if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package application image (linux, Windows)
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
