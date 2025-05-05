@@ -19,7 +19,7 @@ group = "org.jabref"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
 val luceneVersion = "10.2.0"
-val pdfbox = "3.0.4"
+val pdfbox = "3.0.5"
 
 dependencies {
     implementation(project(":jablib"))

@@ -16,7 +16,7 @@ plugins {
     id("me.champeau.jmh") version "0.7.3"
 }
 
-val pdfbox = "3.0.4"
+val pdfbox = "3.0.5"
 val luceneVersion = "10.2.0"
 val jaxbVersion by extra { "4.0.5" }
 
