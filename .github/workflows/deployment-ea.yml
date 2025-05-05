@@ -9,6 +9,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/deployment-ea.yml
+      - build-logic/src/**
       - '**/build.gradle.kts'
   workflow_dispatch:
     inputs:
