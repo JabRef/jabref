@@ -207,7 +207,7 @@ jobs:
           --java-options --add-modules=jdk.incubator.vector
 
       - name: Rename files for mac
-        if: (steps.checksecrets.outputs.secretspresent == 'YES') && (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui
