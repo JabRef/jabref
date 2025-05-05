@@ -17,7 +17,7 @@ plugins {
 }
 
 val pdfbox = "3.0.5"
-val luceneVersion = "10.2.0"
+val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
 
 dependencies {
@@ -97,7 +97,7 @@ dependencies {
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
 
     // region HTTP clients
-    implementation("org.jsoup:jsoup:1.19.1")
+    implementation("org.jsoup:jsoup:1.20.1")
     implementation("com.konghq:unirest-java-core:4.4.6")
     implementation("com.konghq:unirest-modules-gson:4.4.6")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
