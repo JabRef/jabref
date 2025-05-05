@@ -17,7 +17,7 @@ plugins {
 }
 
 val pdfbox = "3.0.4"
-val luceneVersion = "10.2.0"
+val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
 
 dependencies {
