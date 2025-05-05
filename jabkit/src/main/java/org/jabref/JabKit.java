@@ -69,28 +69,16 @@ public class JabKit {
             // Process arguments
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
+            commandLine.getCommandSpec().usageMessage().header(String.format(ArgumentProcessor.JABREF_BANNER, new BuildInfo().version));
+            commandLine.getCommandSpec().usageMessage().footer("\n" +
+                    Localization.lang("Available import formats:\n") + // ToDo: Move to where input is
+                    StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(preferences)) + "\n" +
+                    Localization.lang("Available export formats:") + "\n" + // ToDo: Move to where output is
+                    StringUtil.alignStringTable(ArgumentProcessor.getAvailableExportFormats(preferences)));
             commandLine.execute(args);
-
-            handleHelp(commandLine, preferences);
+            // FixMe: Help message on subcommands
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
-        }
-    }
-
-    private static void handleHelp(CommandLine commandLine, CliPreferences cliPreferences) {
-        if (commandLine.isUsageHelpRequested()) {
-            System.out.printf(ArgumentProcessor.JABREF_BANNER + "%n", new BuildInfo().version);
-        }
-
-        if (commandLine.isVersionHelpRequested()) {
-            System.out.printf(ArgumentProcessor.JABREF_BANNER + "%n", new BuildInfo().version);
-            System.out.println(commandLine.getUsageMessage());
-
-            System.out.println(Localization.lang("Available import formats:"));
-            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(cliPreferences)));
-
-            System.out.println(Localization.lang("Available export formats:"));
-            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableExportFormats(cliPreferences)));
         }
     }
 

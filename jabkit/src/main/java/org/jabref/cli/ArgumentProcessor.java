@@ -122,7 +122,7 @@ import static picocli.CommandLine.Option;
         })
 public class ArgumentProcessor implements Runnable {
     public static final String JABREF_BANNER = """
-
+    \u001B[35m
        &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
        &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
        &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
@@ -130,7 +130,7 @@ public class ArgumentProcessor implements Runnable {
        &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
        &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
     &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
-
+    \u001B[0m
     Staying on top of your literature since 2003 - https://www.jabref.org/
     Please report issues at https://github.com/JabRef/jabref/issues
     """;
