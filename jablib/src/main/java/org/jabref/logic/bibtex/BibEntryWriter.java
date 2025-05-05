@@ -66,7 +66,7 @@ public class BibEntryWriter {
      * @param bibDatabaseMode The database mode (bibtex or biblatex)
      * @param reformat        Should the entry be in any case, even if no change occurred?
      */
-    public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode, Boolean reformat) throws IOException {
+    public void write(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode, boolean reformat) throws IOException {
         // if the entry has not been modified, write it as it was
         if (!reformat && !entry.hasChanged()) {
             out.write(entry.getParsedSerialization());

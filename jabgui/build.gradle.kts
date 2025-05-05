@@ -93,7 +93,7 @@ dependencies {
     }
 
     // implementation("net.java.dev.jna:jna:5.16.0")
-    implementation("net.java.dev.jna:jna-platform:5.16.0")
+    implementation("net.java.dev.jna:jna-platform:5.17.0")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
 
@@ -113,7 +113,7 @@ dependencies {
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
-    implementation("de.undercouch:citeproc-java:3.2.0") {
+    implementation("de.undercouch:citeproc-java:3.3.0") {
         exclude(group = "org.antlr")
     }
 
@@ -123,7 +123,10 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
-    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito:mockito-core:5.17.0") {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
     testImplementation("org.wiremock:wiremock-standalone:3.12.1")

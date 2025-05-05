@@ -78,7 +78,7 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
 
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.3")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
 
     // required by XJC
@@ -99,7 +99,7 @@ dependencies {
     // region HTTP clients
     implementation("org.jsoup:jsoup:1.19.1")
     implementation("com.konghq:unirest-java-core:4.4.6")
-    implementation("com.konghq:unirest-modules-gson:4.4.5")
+    implementation("com.konghq:unirest-modules-gson:4.4.6")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
     // endregion
 
@@ -114,7 +114,7 @@ dependencies {
     implementation("org.tinylog:tinylog-api:2.7.0")
     implementation("org.tinylog:tinylog-impl:2.7.0")
 
-    implementation("de.undercouch:citeproc-java:3.2.0") {
+    implementation("de.undercouch:citeproc-java:3.3.0") {
         exclude(group = "org.antlr")
     }
 
@@ -205,9 +205,12 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
-    testImplementation("org.junit.platform:junit-platform-launcher:1.12.1")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2")
 
-    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito:mockito-core:5.17.0") {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.0")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")

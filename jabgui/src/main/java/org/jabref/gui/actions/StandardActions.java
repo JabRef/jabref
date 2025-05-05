@@ -135,9 +135,11 @@ public enum StandardActions implements Action {
     EXPAND_ALL(Localization.lang("Expand all")),
     COLLAPSE_ALL(Localization.lang("Collapse all")),
 
-    NEW_ENTRY(Localization.lang("New entry"), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.NEW_ENTRY),
-    NEW_ARTICLE(Localization.lang("New article"), IconTheme.JabRefIcons.ADD_ARTICLE),
-    NEW_ENTRY_FROM_PLAIN_TEXT(Localization.lang("New entry from plain text"), IconTheme.JabRefIcons.NEW_ENTRY_FROM_PLAIN_TEXT),
+    CREATE_ENTRY_IMMEDIATE(Localization.lang("Add entry"), IconTheme.JabRefIcons.CREATE_ENTRY_IMMEDIATE),
+    CREATE_ENTRY(Localization.lang("Create new entry..."), IconTheme.JabRefIcons.CREATE_ENTRY, KeyBinding.CREATE_ENTRY),
+    CREATE_ENTRY_IDENTIFIER(Localization.lang("Enter identifier..."), IconTheme.JabRefIcons.CREATE_ENTRY_IDENTIFIER, KeyBinding.CREATE_ENTRY_IDENTIFIER),
+    CREATE_ENTRY_PLAINTEXT(Localization.lang("Interpret citations..."), IconTheme.JabRefIcons.CREATE_ENTRY_PLAINTEXT, KeyBinding.CREATE_ENTRY_PLAINTEXT),
+
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
     FIND_DUPLICATES(Localization.lang("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES),
     MERGE_ENTRIES(Localization.lang("Merge entries"), IconTheme.JabRefIcons.MERGE_ENTRIES, KeyBinding.MERGE_ENTRIES),
@@ -201,6 +203,7 @@ public enum StandardActions implements Action {
     GROUP_EDIT(Localization.lang("Edit group")),
     GROUP_GENERATE_SUMMARIES(Localization.lang("Generate summaries for entries in the group")),
     GROUP_GENERATE_EMBEDDINGS(Localization.lang("Generate embeddings for linked files in the group")),
+    GROUP_SUGGESTED_GROUPS_ADD(Localization.lang("Add JabRef suggested groups")),
     GROUP_SUBGROUP_ADD(Localization.lang("Add subgroup")),
     GROUP_SUBGROUP_REMOVE(Localization.lang("Remove subgroups")),
     GROUP_SUBGROUP_SORT(Localization.lang("Sort subgroups A-Z")),
