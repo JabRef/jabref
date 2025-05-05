@@ -232,7 +232,7 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Prepare merged jars and modules dir (macOS)
+      - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14') || (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
@@ -317,15 +317,14 @@ jobs:
           # Cleanup unpacked file
           rm -rf build/distribution/JabRef.app
       - name: Build runtime image and installer (linux, Windows)
-        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
       - name: Build JabKit
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
       - name: Remove JabKit build for macOS
-        if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14') ) && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package application image (linux, Windows)
         if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
@@ -352,6 +351,7 @@ jobs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
       - name: Rename files with JDK version
+        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           for file in jabgui/build/distribution/*.*; do
