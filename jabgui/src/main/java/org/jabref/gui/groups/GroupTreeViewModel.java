@@ -210,6 +210,42 @@ public class GroupTreeViewModel extends AbstractViewModel {
     }
 
     /**
+     * Adds JabRef suggested groups under the "All Entries" parent node.
+     * Assumes the parent is already validated as "All Entries" by the caller.
+     *
+     * @param parent The "All Entries" parent node.
+     */
+    public void addSuggestedGroups(GroupNodeViewModel parent) {
+        currentDatabase.ifPresent(database -> {
+            GroupTreeNode rootNode = parent.getGroupNode();
+            List<GroupTreeNode> newSuggestedSubgroups = new ArrayList<>();
+
+            // 1. Create "Entries without linked files" group if it doesn't exist
+            SearchGroup withoutFilesGroup = JabRefSuggestedGroups.createWithoutFilesGroup();
+            if (!parent.hasSimilarSearchGroup(withoutFilesGroup)) {
+                GroupTreeNode subGroup = rootNode.addSubgroup(withoutFilesGroup);
+                newSuggestedSubgroups.add(subGroup);
+            }
+
+            // 2. Create "Entries without groups" group if it doesn't exist
+            SearchGroup withoutGroupsGroup = JabRefSuggestedGroups.createWithoutGroupsGroup();
+            if (!parent.hasSimilarSearchGroup(withoutGroupsGroup)) {
+                GroupTreeNode subGroup = rootNode.addSubgroup(withoutGroupsGroup);
+                newSuggestedSubgroups.add(subGroup);
+            }
+
+            selectedGroups.setAll(newSuggestedSubgroups
+                    .stream()
+                    .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                    .toList());
+
+            writeGroupChangesToMetaData();
+
+            dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
+        });
+    }
+
+    /**
      * Check if it is necessary to show a group modified, reassign entry dialog <br>
      * Group name change is handled separately
      *
