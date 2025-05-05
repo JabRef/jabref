@@ -62,7 +62,7 @@ jobs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
       branchname: jdk-ea
-    name: ${{ matrix.displayName }} installer and portable version
+    name: (ea) ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Check secrets presence
         id: checksecrets
