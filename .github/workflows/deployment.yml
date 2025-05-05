@@ -18,7 +18,7 @@ on:
       notarization:
         type: boolean
         required: false
-        default: false  # TODO: set to false again
+        default: false
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
@@ -132,8 +132,7 @@ jobs:
           --add-modules org.jabref,org.jabref.merged.module  \
           --add-modules jdk.incubator.vector \
           --dest build/distribution \
-          --app-content buildres/mac/Resources/jabrefHost.py \
-          --app-content buildres/mac/Resources/native-messaging-host \
+          --app-content buildres/mac/Resources\
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
@@ -177,8 +176,7 @@ jobs:
           --add-modules org.jabref,org.jabref.merged.module  \
           --add-modules jdk.incubator.vector \
           --dest build/distribution \
-          --app-content buildres/mac/Resources/jabrefHost.py \
-          --app-content buildres/mac/Resources/native-messaging-host \
+          --app-content buildres/mac/Resources \
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
