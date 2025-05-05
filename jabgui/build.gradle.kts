@@ -42,7 +42,7 @@ dependencies {
     implementation("de.saxsys:mvvmfx:1.8.0")
     implementation("org.fxmisc.flowless:flowless:0.7.4")
     implementation("org.fxmisc.richtext:richtextfx:0.11.5")
-    implementation("com.dlsc.gemsfx:gemsfx:2.96.0") {
+    implementation("com.dlsc.gemsfx:gemsfx:2.104.0") {
         exclude(module = "javax.inject") // Split package, use only jakarta.inject
         exclude(module = "commons-lang3")
         exclude(group = "org.apache.commons.validator")
