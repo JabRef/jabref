@@ -26,7 +26,7 @@ tell application "Finder"
     set appFilePath to POSIX path of "/DEPLOY_TARGET"
     if theFilePath ends with "DEPLOY_INSTALL_LOCATION_DISPLAY_NAME" then
       -- Position install location application
-      set position of item theFile of theWindow to {430, 170}
+      set position of item theFile of theWindow to {440, 170}
     else if theFilePath ends with appFilePath then
       -- Position application or runtime
       set position of item theFile of theWindow to {140, 170}
