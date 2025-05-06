@@ -25,8 +25,10 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public final class CSLFormatUtils {
 
-    public enum Format {
+    public enum BibliographyTitleFormat {
+        BIBLIOGRAPHY_HEADING("Bibliography Heading"),
         TITLE("Title"),
+        TEXT_BODY("Text body"),
         BODY_TEXT("Body Text"),
         SUBTITLE("Subtitle"),
         HEADING_1("Heading 1"),
@@ -36,7 +38,7 @@ public final class CSLFormatUtils {
 
         private final String format;
 
-        Format(String format) {
+        BibliographyTitleFormat(String format) {
             this.format = format;
         }
 
@@ -45,7 +47,22 @@ public final class CSLFormatUtils {
         }
     }
 
-    public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
+    public enum BibliographyBodyFormat {
+        BIBLIOGRAPHY_1("Bibliography 1"),
+        TEXT_BODY("Text body"),
+        BODY_TEXT("Body Text"),
+        HANGING_INDENT("Hanging indent");
+
+        private final String format;
+
+        BibliographyBodyFormat(String format) {
+            this.format = format;
+        }
+
+        public String getFormat() {
+            return format;
+        }
+    }
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 

@@ -34,6 +34,7 @@ public class OpenOfficePreferences {
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty cslBibliographyTitle;
     private final StringProperty cslBibliographyHeaderFormat;
+    private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
 
     public OpenOfficePreferences(String executablePath,
@@ -45,6 +46,7 @@ public class OpenOfficePreferences {
                                  boolean alwaysAddCitedOnPages,
                                  String cslBibliographyTitle,
                                  String cslBibliographyHeaderFormat,
+                                 String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
@@ -55,6 +57,7 @@ public class OpenOfficePreferences {
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
+        this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
     }
 
@@ -176,6 +179,18 @@ public class OpenOfficePreferences {
 
     public String getCslBibliographyHeaderFormat() {
         return cslBibliographyHeaderFormat.get();
+    }
+
+    public StringProperty cslBibliographyBodyFormatProperty() {
+        return cslBibliographyBodyFormat;
+    }
+
+    public String getCslBibliographyBodyFormat() {
+        return cslBibliographyBodyFormat.get();
+    }
+
+    public void setCslBibliographyBodyFormat(String format) {
+        this.cslBibliographyBodyFormat.set(format);
     }
 
     public ObservableList<String> getExternalCslStyles() {

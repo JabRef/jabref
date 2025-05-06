@@ -45,7 +45,7 @@
                             <Label text="%Preview" styleClass="sectionHeader"/>
                             <VBox fx:id="cslPreviewBox" prefHeight="200.0" spacing="4.0"/>
                         </VBox>
-                        <Button text="%Modify bibliography title" alignment="CENTER_RIGHT" onAction="#modifyBibliographyTitle" />
+                        <Button text="%Modify bibliography properties" alignment="CENTER_RIGHT" onAction="#modifyBibliographyProperties" />
                     </VBox>
                 </Tab>
                 <Tab fx:id="jStyleTab" text="JStyles">
