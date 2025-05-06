@@ -11,6 +11,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 import org.jabref.logic.openoffice.style.OOStyle;
 
 public class OpenOfficePreferences {
@@ -151,6 +153,9 @@ public class OpenOfficePreferences {
 
     public void setCurrentStyle(OOStyle style) {
         this.currentStyle.set(style);
+        if (style instanceof CitationStyle citationStyle && citationStyle.usesHangingIndent()) {
+            this.cslBibliographyBodyFormat.set(CSLFormatUtils.BibliographyBodyFormat.HANGING_INDENT.getFormat());
+        }
     }
 
     public boolean getAlwaysAddCitedOnPages() {

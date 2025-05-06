@@ -188,6 +188,7 @@ public class CSLCitationOOAdapter {
         }
 
         boolean isNumericStyle = selectedStyle.isNumericStyle();
+        boolean usesHangingIndent = selectedStyle.usesHangingIndent();
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
@@ -204,10 +205,13 @@ public class CSLCitationOOAdapter {
                 String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
+                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+                if (usesHangingIndent) {
+                    formattedBibliographyEntry = formattedBibliographyEntry.trim();
+                }
+                formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
 
-                String formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHTML(bibliographyEntry), currentNumber);
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-
                 OOTextIntoOO.write(document, cursor, ooText);
             }
         } else {
@@ -216,6 +220,10 @@ public class CSLCitationOOAdapter {
 
             for (String bibliographyEntry : bibliographyEntries) {
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+
+                if (usesHangingIndent) {
+                    formattedBibliographyEntry = formattedBibliographyEntry.trim();
+                }
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
                 OOTextIntoOO.write(document, cursor, ooText);
             }
