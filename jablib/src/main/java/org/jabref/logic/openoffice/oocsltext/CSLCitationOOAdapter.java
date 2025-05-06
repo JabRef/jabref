@@ -43,7 +43,6 @@ import com.sun.star.uno.Exception;
 public class CSLCitationOOAdapter {
 
     private static final CitationStyleOutputFormat HTML_OUTPUT_FORMAT = CitationStyleOutputFormat.HTML;
-    private static final double MM_PER_100_TWIP = 25.4 / 1440 * 100; // taken from
 
     private final XTextDocument document;
     private final CSLReferenceMarkManager markManager;
