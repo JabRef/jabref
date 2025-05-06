@@ -52,7 +52,7 @@ public class CSLStyleLoader {
                               .filter(style -> DEFAULT_STYLE.equals(style.getFilePath()))
                               .findFirst()
                               .orElseGet(() -> CSLStyleUtils.createCitationStyleFromFile(DEFAULT_STYLE)
-                                                            .orElse(new CitationStyle("", "Empty", false, false, false, "", true)));
+                                                            .orElse(new CitationStyle("", "Empty", false, false, false, false, -1, "", true)));
     }
 
     /**
@@ -80,12 +80,16 @@ public class CSLStyleLoader {
                     boolean isNumeric = (boolean) info.get("isNumeric");
                     boolean hasBibliography = (boolean) info.get("hasBibliography");
                     boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
+                    boolean hasLineSpacing = (boolean) info.get("hasLineSpacing");
+                    int lineSpacing = (int) info.get("lineSpacing");
 
                     // We use these metadata and just load the content instead of re-parsing for them
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
-                            CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography, usesHangingIndent, source, true);
+                            CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography,
+                                    usesHangingIndent, hasLineSpacing, lineSpacing,
+                                    source, true);
                             INTERNAL_STYLES.add(style);
                         }
                     } catch (IOException e) {
