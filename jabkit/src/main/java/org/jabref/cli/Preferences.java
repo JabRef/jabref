@@ -17,7 +17,7 @@ import static picocli.CommandLine.Parameters;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "preferences",
-        description = "Manage Jabkit preferences.",
+        description = "Manage JabKit preferences.",
         subcommands = {
                 Preferences.PreferencesReset.class,
                 Preferences.PreferencesImport.class,
