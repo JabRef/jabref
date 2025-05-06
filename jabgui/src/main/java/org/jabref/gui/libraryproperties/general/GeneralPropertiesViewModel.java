@@ -252,23 +252,31 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return true;
     }
 
-    /**
-     * While 'Make absolute' button is pressed it will generate an 'absolute path'.
-     *
-     * @param specificFileDirectory (library/user/laTex) directory to be converted to an absolute path
-     */
-    public void generateAbsolutePath(StringProperty specificFileDirectory) {
+    public void changePathRepresentation(StringProperty fileDirectory, boolean toAbsolute) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
 
-        if (libPath.isEmpty() || specificFileDirectory.get().isEmpty()) {
+        if (libPath.isEmpty() || fileDirectory.get().isEmpty()) {
             return;
         }
 
-        specificFileDirectory.setValue(libPath
-                .get().getParent()
-                .resolve(specificFileDirectory.get())
-                .normalize().toAbsolutePath().toString()
-        );
+        try {
+            Path parentPath = libPath.get().getParent();
+            Path currPath = Path.of(fileDirectory.get());
+            String newPath;
+
+            if (toAbsolute) {
+                newPath = parentPath.resolve(fileDirectory.get()).toAbsolutePath().toString();
+            } else if (currPath.isAbsolute()) {
+                newPath = parentPath.relativize(currPath).toString();
+            } else {
+                // case: convert to relative path and currPath is relative
+                return;
+            }
+
+            fileDirectory.setValue(newPath);
+        } catch (Exception ex) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Error Occurred"));
+        }
     }
 
     /**

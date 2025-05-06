@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import org.jabref.gui.icon.JabRefIconView?>
+<?import org.controlsfx.control.ToggleSwitch?>
 <fx:root spacing="10.0" type="VBox"
          xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.libraryproperties.general.GeneralPropertiesView">
@@ -35,8 +36,12 @@
                GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <TextField fx:id="librarySpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <Button fx:id="librarySpecificFileAbsolutePathBtnId" text="%Make absolute"
-                GridPane.columnIndex="2" GridPane.rowIndex="1" onAction="#convertLibSpecificPathToAbsolute"/>
+        <ToggleSwitch fx:id="librarySpecificFileAbsolutePathSwitch"
+                      GridPane.columnIndex="2" GridPane.rowIndex="1">
+            <tooltip>
+                <Tooltip fx:id ="librarySpecificFileAbsolutePathTooltip" text="%Make absolute"/>
+            </tooltip>
+        </ToggleSwitch>
         <Button onAction="#browseLibrarySpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="1">
@@ -52,8 +57,12 @@
                GridPane.columnIndex="0" GridPane.rowIndex="2"/>
         <TextField fx:id="userSpecificFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        <Button fx:id="userSpecificFileAbsolutePathBtnId" text="%Make absolute"
-                GridPane.columnIndex="2" GridPane.rowIndex="2" onAction="#convertUserSpecificPathToAbsolute"/>
+        <ToggleSwitch fx:id="userSpecificFileAbsolutePathSwitch"
+                      GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip fx:id ="userSpecificFileAbsolutePathTooltip" text="%Make absolute"/>
+            </tooltip>
+        </ToggleSwitch>
         <Button onAction="#browseUserSpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="2">
@@ -69,8 +78,12 @@
                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
         <TextField fx:id="laTexFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-        <Button fx:id="laTexSpecificFileAbsolutePathBtnId" text="%Make absolute"
-                GridPane.columnIndex="2" GridPane.rowIndex="3" onAction="#convertLaTexSpecificPathToAbsolute"/>
+        <ToggleSwitch fx:id="laTexSpecificFileAbsolutePathSwitch"
+                      GridPane.columnIndex="2" GridPane.rowIndex="3">
+            <tooltip>
+                <Tooltip fx:id ="laTexSpecificFileAbsolutePathTooltip" text="%Make absolute"/>
+            </tooltip>
+        </ToggleSwitch>
         <Button onAction="#browseLatexFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="3" GridPane.rowIndex="3">

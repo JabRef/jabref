@@ -5,9 +5,9 @@ import java.nio.file.Path;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import com.airhacks.afterburner.views.ViewLoader;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 import jakarta.inject.Inject;
+import org.controlsfx.control.ToggleSwitch;
 
 public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralPropertiesViewModel> {
     @FXML private ComboBox<Charset> encoding;
@@ -27,9 +28,12 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
     @FXML private TextField laTexFileDirectory;
-    @FXML private Button librarySpecificFileAbsolutePathBtnId;
-    @FXML private Button userSpecificFileAbsolutePathBtnId;
-    @FXML private Button laTexSpecificFileAbsolutePathBtnId;
+    @FXML private ToggleSwitch librarySpecificFileAbsolutePathSwitch;
+    @FXML private ToggleSwitch userSpecificFileAbsolutePathSwitch;
+    @FXML private ToggleSwitch laTexSpecificFileAbsolutePathSwitch;
+    @FXML private Tooltip librarySpecificFileAbsolutePathTooltip;
+    @FXML private Tooltip userSpecificFileAbsolutePathTooltip;
+    @FXML private Tooltip laTexSpecificFileAbsolutePathTooltip;
 
     private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
@@ -67,21 +71,43 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
 
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryPropertyProperty());
-        librarySpecificFileDirectory.textProperty().addListener((_, _, _) -> {
-            librarySpecificFileAbsolutePathBtnId.setDisable(Path.of(viewModel.librarySpecificDirectoryPropertyProperty().get()).isAbsolute());
-        });
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
-        userSpecificFileDirectory.textProperty().addListener((_, _, _) -> {
-            userSpecificFileAbsolutePathBtnId.setDisable(Path.of(viewModel.userSpecificFileDirectoryProperty().get()).isAbsolute());
-        });
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
-        laTexFileDirectory.textProperty().addListener((_, _, _) -> {
-            laTexSpecificFileAbsolutePathBtnId.setDisable(Path.of(viewModel.laTexFileDirectoryProperty().get()).isAbsolute());
-        });
 
         librarySpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         laTexFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
+
+        /* toggle-switch working mechanism region */
+        librarySpecificFileAbsolutePathSwitch.setDisable(this.databaseContext.getDatabasePath().isEmpty());
+        userSpecificFileAbsolutePathSwitch.setDisable(this.databaseContext.getDatabasePath().isEmpty());
+        laTexSpecificFileAbsolutePathSwitch.setDisable(this.databaseContext.getDatabasePath().isEmpty());
+
+        // 'text field' listeners
+        librarySpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
+            librarySpecificFileAbsolutePathSwitch.setSelected(Path.of(newValue).isAbsolute());
+        });
+        userSpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
+            userSpecificFileAbsolutePathSwitch.setSelected(Path.of(newValue).isAbsolute());
+        });
+        laTexFileDirectory.textProperty().addListener((_, _, newValue) -> {
+            laTexSpecificFileAbsolutePathSwitch.setSelected(Path.of(newValue).isAbsolute());
+        });
+
+        // 'switch' listeners
+        librarySpecificFileAbsolutePathSwitch.selectedProperty().addListener((_, _, toAbsolute) -> {
+            viewModel.changePathRepresentation(viewModel.librarySpecificDirectoryPropertyProperty(), toAbsolute);
+            librarySpecificFileAbsolutePathTooltip.setText(toAbsolute ? "Make relative" : "Make absolute");
+        });
+        userSpecificFileAbsolutePathSwitch.selectedProperty().addListener((_, _, toAbsolute) -> {
+            viewModel.changePathRepresentation(viewModel.userSpecificFileDirectoryProperty(), toAbsolute);
+            userSpecificFileAbsolutePathTooltip.setText(toAbsolute ? "Make relative" : "Make absolute");
+        });
+        laTexSpecificFileAbsolutePathSwitch.selectedProperty().addListener((_, _, toAbsolute) -> {
+            viewModel.changePathRepresentation(viewModel.laTexFileDirectoryProperty(), toAbsolute);
+            laTexSpecificFileAbsolutePathTooltip.setText(toAbsolute ? "Make relative" : "Make absolute");
+        });
+        /* region end */
 
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
@@ -105,20 +131,5 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML
     void browseLatexFileDirectory() {
         viewModel.browseLatexDir();
-    }
-
-    @FXML
-    void convertLibSpecificPathToAbsolute() {
-        viewModel.generateAbsolutePath(viewModel.librarySpecificDirectoryPropertyProperty());
-    }
-
-    @FXML
-    void convertUserSpecificPathToAbsolute() {
-        viewModel.generateAbsolutePath(viewModel.userSpecificFileDirectoryProperty());
-    }
-
-    @FXML
-    void convertLaTexSpecificPathToAbsolute() {
-        viewModel.generateAbsolutePath(viewModel.laTexFileDirectoryProperty());
     }
 }
