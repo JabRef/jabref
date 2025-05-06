@@ -27,7 +27,7 @@ public class CitationStyle implements OOStyle {
         this.title = Objects.requireNonNull(title);
         this.isNumericStyle = isNumericStyle;
         this.hasBibliography = hasBibliography;
-        this.usesHangingIndent = usesHangingIndent && hasBibliography;
+        this.usesHangingIndent = hasBibliography && usesHangingIndent;
         this.source = Objects.requireNonNull(source);
         this.isInternalStyle = isInternalStyle;
     }
