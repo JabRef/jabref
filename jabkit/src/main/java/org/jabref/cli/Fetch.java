@@ -38,7 +38,7 @@ class Fetch implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = "--provider", required = true)
-    private String provider;
+    private String provider; // ToDo: Custom type converter?
 
     @Option(names = "--query")
     private String query;
