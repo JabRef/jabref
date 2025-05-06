@@ -274,8 +274,8 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             }
 
             fileDirectory.setValue(newPath);
-        } catch (Exception ex) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Error Occurred"));
+        } catch (InvalidPathException ex) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Error occurred %0", ex.getMessage()));
         }
     }
 
