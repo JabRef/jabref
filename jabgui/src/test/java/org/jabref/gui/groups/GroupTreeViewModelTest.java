@@ -147,4 +147,49 @@ class GroupTreeViewModelTest {
         GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
         assertFalse(model.onlyMinorChanges(oldGroup, newGroup));
     }
+
+    @Test
+    void rootNodeShouldNotHaveSuggestedGroupsByDefault() {
+        GroupNodeViewModel rootGroup = groupTree.rootGroupProperty().getValue();
+        assertFalse(rootGroup.hasAllSuggestedGroups());
+    }
+
+    @Test
+    void shouldAddsAllSuggestedGroupsWhenNoneExist() {
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
+        assertFalse(rootGroup.hasAllSuggestedGroups());
+
+        model.addSuggestedGroups(rootGroup);
+
+        assertEquals(2, rootGroup.getChildren().size());
+        assertTrue(rootGroup.hasAllSuggestedGroups());
+    }
+
+    @Test
+    void shouldAddOnlyMissingGroup() {
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
+        rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
+        assertEquals(1, rootGroup.getChildren().size());
+
+        model.addSuggestedGroups(rootGroup);
+
+        assertEquals(2, rootGroup.getChildren().size());
+        assertTrue(rootGroup.hasAllSuggestedGroups());
+    }
+
+    @Test
+    void shouldNotAddSuggestedGroupsWhenAllExist() {
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
+        rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
+        rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutGroupsGroup());
+        assertEquals(2, rootGroup.getChildren().size());
+
+        model.addSuggestedGroups(rootGroup);
+
+        assertEquals(2, rootGroup.getChildren().size());
+        assertTrue(rootGroup.hasAllSuggestedGroups());
+    }
 }

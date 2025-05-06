@@ -413,6 +413,22 @@ public class GroupNodeViewModel {
         return !getChildren().isEmpty();
     }
 
+    public boolean isAllEntriesGroup() {
+        return groupNode.getGroup() instanceof AllEntriesGroup;
+    }
+
+    public boolean hasSimilarSearchGroup(SearchGroup searchGroup) {
+        return getChildren().stream()
+                            .filter(child -> child.getGroupNode().getGroup() instanceof SearchGroup)
+                            .map(child -> (SearchGroup) child.getGroupNode().getGroup())
+                            .anyMatch(group -> group.equals(searchGroup));
+    }
+
+    public boolean hasAllSuggestedGroups() {
+        return hasSimilarSearchGroup(JabRefSuggestedGroups.createWithoutFilesGroup())
+                && hasSimilarSearchGroup(JabRefSuggestedGroups.createWithoutGroupsGroup());
+    }
+
     public boolean canAddEntriesIn() {
         AbstractGroup group = groupNode.getGroup();
         if (group instanceof AllEntriesGroup) {

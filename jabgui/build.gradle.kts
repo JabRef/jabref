@@ -18,8 +18,8 @@ plugins {
 group = "org.jabref"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
-val luceneVersion = "10.2.0"
-val pdfbox = "3.0.4"
+val luceneVersion = "10.2.1"
+val pdfbox = "3.0.5"
 
 dependencies {
     implementation(project(":jablib"))
@@ -42,7 +42,7 @@ dependencies {
     implementation("de.saxsys:mvvmfx:1.8.0")
     implementation("org.fxmisc.flowless:flowless:0.7.4")
     implementation("org.fxmisc.richtext:richtextfx:0.11.5")
-    implementation("com.dlsc.gemsfx:gemsfx:2.96.0") {
+    implementation("com.dlsc.gemsfx:gemsfx:2.104.0") {
         exclude(module = "javax.inject") // Split package, use only jakarta.inject
         exclude(module = "commons-lang3")
         exclude(group = "org.apache.commons.validator")
@@ -72,7 +72,7 @@ dependencies {
     implementation("org.apache.lucene:lucene-analysis-common:${luceneVersion}")
     implementation("org.apache.lucene:lucene-highlighter:${luceneVersion}")
 
-    implementation("org.jsoup:jsoup:1.19.1")
+    implementation("org.jsoup:jsoup:1.20.1")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
@@ -121,7 +121,10 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
-    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito:mockito-core:5.17.0") {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
     testImplementation("org.wiremock:wiremock-standalone:3.12.1")

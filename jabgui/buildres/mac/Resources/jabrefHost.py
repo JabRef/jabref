@@ -15,9 +15,9 @@ from pathlib import Path
 script_dir = Path(__file__).resolve().parent.parent
 JABREF_PATH = script_dir / "bin/JabRef"
 
-# on mac we must only go one folder upwards
+# on mac we must only two  folder upwards
 if sys.platform.startswith('darwin'):
-    script_dir = Path(__file__).resolve().parent
+    script_dir = Path(__file__).resolve().parent.parent
 if not JABREF_PATH.exists():
     JABREF_PATH = script_dir / "MacOS/JabRef"
 
