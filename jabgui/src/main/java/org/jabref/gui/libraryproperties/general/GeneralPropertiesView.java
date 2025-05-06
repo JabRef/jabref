@@ -38,6 +38,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer laTexFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
+    private final String makeRelativeText = Localization.lang("Switch to relative path: converts the path to a relative path.");
+    private final String makeAbsoluteText = Localization.lang("Switch to absolute path: converts the path to an absolute path.");
 
     @Inject private CliPreferences preferences;
 
@@ -97,15 +99,15 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         // 'switch' listeners
         librarySpecificFileAbsolutePathSwitch.selectedProperty().addListener((_, _, toAbsolute) -> {
             viewModel.changePathRepresentation(viewModel.librarySpecificDirectoryPropertyProperty(), toAbsolute);
-            librarySpecificFileAbsolutePathTooltip.setText(toAbsolute ? "Make relative" : "Make absolute");
+            librarySpecificFileAbsolutePathTooltip.setText(toAbsolute ? makeRelativeText : makeAbsoluteText);
         });
         userSpecificFileAbsolutePathSwitch.selectedProperty().addListener((_, _, toAbsolute) -> {
             viewModel.changePathRepresentation(viewModel.userSpecificFileDirectoryProperty(), toAbsolute);
-            userSpecificFileAbsolutePathTooltip.setText(toAbsolute ? "Make relative" : "Make absolute");
+            userSpecificFileAbsolutePathTooltip.setText(toAbsolute ? makeRelativeText : makeAbsoluteText);
         });
         laTexSpecificFileAbsolutePathSwitch.selectedProperty().addListener((_, _, toAbsolute) -> {
             viewModel.changePathRepresentation(viewModel.laTexFileDirectoryProperty(), toAbsolute);
-            laTexSpecificFileAbsolutePathTooltip.setText(toAbsolute ? "Make relative" : "Make absolute");
+            laTexSpecificFileAbsolutePathTooltip.setText(toAbsolute ? makeRelativeText : makeAbsoluteText);
         });
         /* region end */
 

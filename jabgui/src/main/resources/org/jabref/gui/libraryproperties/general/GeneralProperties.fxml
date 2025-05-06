@@ -39,7 +39,7 @@
         <ToggleSwitch fx:id="librarySpecificFileAbsolutePathSwitch"
                       GridPane.columnIndex="2" GridPane.rowIndex="1">
             <tooltip>
-                <Tooltip fx:id ="librarySpecificFileAbsolutePathTooltip" text="%Make absolute"/>
+                <Tooltip fx:id ="librarySpecificFileAbsolutePathTooltip" text="%Switch to absolute path: converts the path to an absolute path."/>
             </tooltip>
         </ToggleSwitch>
         <Button onAction="#browseLibrarySpecificFileDirectory"
@@ -60,7 +60,7 @@
         <ToggleSwitch fx:id="userSpecificFileAbsolutePathSwitch"
                       GridPane.columnIndex="2" GridPane.rowIndex="2">
             <tooltip>
-                <Tooltip fx:id ="userSpecificFileAbsolutePathTooltip" text="%Make absolute"/>
+                <Tooltip fx:id ="userSpecificFileAbsolutePathTooltip" text="%Switch to absolute path: converts the path to an absolute path."/>
             </tooltip>
         </ToggleSwitch>
         <Button onAction="#browseUserSpecificFileDirectory"
@@ -81,7 +81,7 @@
         <ToggleSwitch fx:id="laTexSpecificFileAbsolutePathSwitch"
                       GridPane.columnIndex="2" GridPane.rowIndex="3">
             <tooltip>
-                <Tooltip fx:id ="laTexSpecificFileAbsolutePathTooltip" text="%Make absolute"/>
+                <Tooltip fx:id ="laTexSpecificFileAbsolutePathTooltip" text="%Switch to absolute path: converts the path to an absolute path."/>
             </tooltip>
         </ToggleSwitch>
         <Button onAction="#browseLatexFileDirectory"
