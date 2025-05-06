@@ -152,7 +152,10 @@ public class OpenOfficePreferences {
     }
 
     public void setCurrentStyle(OOStyle style) {
-        // System.out.println(style.getPath().equals(currentStyle.get().getPath()));
+        if (style.getPath().equals(currentStyle.get().getPath())) {
+            return;
+        }
+
         this.currentStyle.set(style);
         if (style instanceof CitationStyle citationStyle && citationStyle.usesHangingIndent()) {
             this.cslBibliographyBodyFormat.set(CSLFormatUtils.BibliographyBodyFormat.HANGING_INDENT.getFormat());
