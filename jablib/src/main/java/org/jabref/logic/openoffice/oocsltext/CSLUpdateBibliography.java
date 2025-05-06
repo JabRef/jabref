@@ -90,7 +90,7 @@ public class CSLUpdateBibliography {
                                            CitationStyle citationStyle,
                                            BibDatabaseContext bibDatabaseContext,
                                            BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, NoDocumentException, CreationException, PropertyVetoException, UnknownPropertyException {
+            throws WrappedTargetException, NoDocumentException, CreationException {
         LOGGER.debug("Populating CSL bibliography section");
 
         Optional<XTextRange> sectionRange = getBibliographyRange(doc);

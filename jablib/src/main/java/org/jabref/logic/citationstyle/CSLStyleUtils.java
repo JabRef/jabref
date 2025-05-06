@@ -28,9 +28,9 @@ public final class CSLStyleUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(CSLStyleUtils.class);
 
     /**
-     * Style information record (title, numeric nature, has bibliography specification, bibliography uses hanging indent, has line spacing specification, line spacing value) for a citation style.
+     * Style information record (title, numeric nature, has bibliography specification, bibliography uses hanging indent) for a citation style.
      */
-    public record StyleInfo(String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, boolean hasLineSpacing, int lineSpacing) {
+    public record StyleInfo(String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent) {
     }
 
     static {
@@ -101,8 +101,6 @@ public final class CSLStyleUtils {
                     info.isNumericStyle(),
                     info.hasBibliography(),
                     info.usesHangingIndent(),
-                    info.hasLineSpacing(),
-                    info.lineSpacing(),
                     content,
                     isInternal));
         } catch (IOException e) {
@@ -126,8 +124,6 @@ public final class CSLStyleUtils {
             boolean hasBibliography = false;
             boolean hasCitation = false;
             boolean usesHangingIndent = false;
-            boolean hasLineSpacing = false;
-            int lineSpacing = -1;
             String title = "";
             boolean isNumericStyle = false;
 
@@ -142,17 +138,6 @@ public final class CSLStyleUtils {
                             hasBibliography = true;
                             String hangingIndent = reader.getAttributeValue(null, "hanging-indent");
                             usesHangingIndent = "true".equals(hangingIndent);
-
-                            String lineSpacingAttr = reader.getAttributeValue(null, "line-spacing");
-                            if (lineSpacingAttr != null) {
-                                hasLineSpacing = true;
-                                try {
-                                    lineSpacing = Integer.parseInt(lineSpacingAttr);
-                                } catch (NumberFormatException e) {
-                                    lineSpacing = -1;
-                                    LOGGER.warn("Could not parse line-spacing value '{}' for file {}", lineSpacingAttr, filename);
-                                }
-                            }
                         }
                         case "citation" -> hasCitation = true;
                         case "info" -> inInfo = true;
@@ -176,7 +161,7 @@ public final class CSLStyleUtils {
             }
 
             if (hasCitation && title != null) {
-                return Optional.of(new StyleInfo(title, isNumericStyle, hasBibliography, usesHangingIndent, hasLineSpacing, lineSpacing));
+                return Optional.of(new StyleInfo(title, isNumericStyle, hasBibliography, usesHangingIndent));
             } else {
                 LOGGER.debug("No valid title or citation found for file {}", filename);
                 return Optional.empty();

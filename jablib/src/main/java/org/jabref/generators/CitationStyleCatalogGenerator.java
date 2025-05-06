@@ -77,8 +77,6 @@ public class CitationStyleCatalogGenerator {
                                                             info.put("isNumeric", style.isNumericStyle());
                                                             info.put("hasBibliography", style.hasBibliography());
                                                             info.put("usesHangingIndent", style.usesHangingIndent());
-                                                            info.put("hasLineSpacing", style.hasLineSpacing());
-                                                            info.put("lineSpacing", style.getLineSpacing());
                                                             return info;
                                                         })
                                                         .toList();

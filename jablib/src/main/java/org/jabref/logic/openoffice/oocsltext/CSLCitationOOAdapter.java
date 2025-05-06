@@ -22,15 +22,9 @@ import org.jabref.model.openoffice.ootext.OOFormat;
 import org.jabref.model.openoffice.ootext.OOText;
 import org.jabref.model.openoffice.ootext.OOTextIntoOO;
 import org.jabref.model.openoffice.uno.CreationException;
-import org.jabref.model.openoffice.uno.UnoCast;
 
-import com.sun.star.beans.PropertyVetoException;
-import com.sun.star.beans.UnknownPropertyException;
-import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
-import com.sun.star.style.LineSpacing;
-import com.sun.star.style.LineSpacingMode;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
 import com.sun.star.uno.Exception;
@@ -189,7 +183,7 @@ public class CSLCitationOOAdapter {
      * The list is generated based on the existing citations, in-text citations and empty citations in the document.
      */
     public void insertBibliography(XTextCursor cursor, CitationStyle selectedStyle, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager bibEntryTypesManager)
-            throws WrappedTargetException, CreationException, PropertyVetoException, UnknownPropertyException {
+            throws WrappedTargetException, CreationException {
         if (!selectedStyle.hasBibliography()) {
             return;
         }
@@ -216,20 +210,18 @@ public class CSLCitationOOAdapter {
                 if (usesHangingIndent) {
                     formattedBibliographyEntry = formattedBibliographyEntry.trim();
 
-                    // Get the property set using your UnoCast utility
-                    XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
-
-                    // Set hanging indent of 1.27cm (0.5in)
-                    propertySet.setPropertyValue("ParaLeftMargin", 1270);
-                    propertySet.setPropertyValue("ParaFirstLineIndent", -1270);
-
-                    if (selectedStyle.hasLineSpacing()) {
-                        // Set line spacing
-                        LineSpacing lineSpacingStruct = new LineSpacing();
-                        lineSpacingStruct.Mode = LineSpacingMode.MINIMUM;
-                        lineSpacingStruct.Height = (short) (selectedStyle.getLineSpacing() * 100);
-                        propertySet.setPropertyValue("ParaLineSpacing", lineSpacingStruct);
-                    }
+//                    // Get the property set using your UnoCast utility
+//                    XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
+//
+//                    // Set hanging indent of 1.27cm (0.5in)
+//                    propertySet.setPropertyValue("ParaLeftMargin", 1270);
+//                    propertySet.setPropertyValue("ParaFirstLineIndent", -1270);
+//
+//                    // Set line spacing
+//                    LineSpacing lineSpacingStruct = new LineSpacing();
+//                    lineSpacingStruct.Mode = LineSpacingMode.MINIMUM;
+//                    lineSpacingStruct.Height = (short) (lineSpacing * MM_PER_100_TWIP);
+//                    propertySet.setPropertyValue("ParaLineSpacing", lineSpacingStruct);
                 }
                 formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
 
@@ -246,20 +238,18 @@ public class CSLCitationOOAdapter {
                 if (usesHangingIndent) {
                     formattedBibliographyEntry = formattedBibliographyEntry.trim();
 
-                    // Get the property set using your UnoCast utility
-                    XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
-
-                    // Set hanging indent of 1.27cm (0.5in)
-                    propertySet.setPropertyValue("ParaLeftMargin", 1270);
-                    propertySet.setPropertyValue("ParaFirstLineIndent", -1270);
-
-                    if (selectedStyle.hasLineSpacing()) {
-                        // Set line spacing
-                        LineSpacing lineSpacingStruct = new LineSpacing();
-                        lineSpacingStruct.Mode = LineSpacingMode.MINIMUM;
-                        lineSpacingStruct.Height = (short) (selectedStyle.getLineSpacing() * 100);
-                        propertySet.setPropertyValue("ParaLineSpacing", lineSpacingStruct);
-                    }
+//                    // Get the property set using your UnoCast utility
+//                    XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
+//
+//                    // Set hanging indent of 1.27cm (0.5in)
+//                    propertySet.setPropertyValue("ParaLeftMargin", 1270);
+//                    propertySet.setPropertyValue("ParaFirstLineIndent", -1270);
+//
+//                    // Set line spacing
+//                    LineSpacing lineSpacingStruct = new LineSpacing();
+//                    lineSpacingStruct.Mode = LineSpacingMode.MINIMUM;
+//                    lineSpacingStruct.Height = (short) (lineSpacing * MM_PER_100_TWIP);
+//                    propertySet.setPropertyValue("ParaLineSpacing", lineSpacingStruct);
                 }
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
                 OOTextIntoOO.write(document, cursor, ooText);
