@@ -136,7 +136,6 @@ public final class CSLStyleUtils {
                     switch (elementName) {
                         case "bibliography" -> {
                             hasBibliography = true;
-                            // Check for hanging-indent attribute
                             String hangingIndent = reader.getAttributeValue(null, "hanging-indent");
                             usesHangingIndent = "true".equals(hangingIndent);
                         }
