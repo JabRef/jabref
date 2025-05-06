@@ -15,6 +15,7 @@ import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -31,14 +32,16 @@ import static picocli.CommandLine.ParentCommand;
 class Fetch implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Fetch.class);
 
+    record Provider(String name, String query) { }
+
     @ParentCommand
     private ArgumentProcessor argumentProcessor;
 
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Option(names = "--provider", required = true)
-    private String provider; // ToDo: Custom type converter?
+    @Option(names = "--provider", required = true, converter = ProviderConverter.class)
+    private Provider provider;
 
     @Option(names = "--query")
     private String query;
@@ -48,13 +51,6 @@ class Fetch implements Runnable {
 
     @Override
     public void run() {
-        if ((provider == null) || !provider.contains(":")) {
-            System.out.println(Localization.lang("Expected syntax for --fetch='<name of fetcher>:<query>'"));
-            System.out.println(Localization.lang("The following fetchers are available:"));
-            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(argumentProcessor.cliPreferences)));
-            return;
-        }
-
         Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
                 argumentProcessor.cliPreferences.getImportFormatPreferences(),
                 argumentProcessor.cliPreferences.getImporterPreferences());
@@ -89,6 +85,17 @@ class Fetch implements Runnable {
             }
         } catch (FetcherException e) {
             LOGGER.error("Error while fetching", e);
+        }
+    }
+
+    private static class ProviderConverter implements CommandLine.ITypeConverter<Provider> {
+        @Override
+        public Provider convert(String value) throws Exception {
+            String[] parts = value.split(":");
+            if (parts.length != 2) {
+                throw new Exception("Expected syntax for --fetch='<name of fetcher>:<query>'");
+            }
+            return new Provider(parts[0], parts[1]);
         }
     }
 }
