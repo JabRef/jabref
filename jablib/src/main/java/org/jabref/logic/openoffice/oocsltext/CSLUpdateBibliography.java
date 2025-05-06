@@ -39,7 +39,7 @@ public class CSLUpdateBibliography {
      * Rebuilds the bibliography using CSL.
      */
     public void rebuildCSLBibliography(XTextDocument doc,
-                                       CSLCitationOOAdapter cslAdapter,
+                                       CSLCitationOOAdapter cslCitationOOAdapter,
                                        List<BibEntry> entries,
                                        CitationStyle citationStyle,
                                        BibDatabaseContext bibDatabaseContext,
@@ -57,7 +57,7 @@ public class CSLUpdateBibliography {
             clearCSLBibTextSectionContent(doc);
         }
 
-        populateCSLBibTextSection(doc, cslAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
+        populateCSLBibTextSection(doc, cslCitationOOAdapter, entries, citationStyle, bibDatabaseContext, bibEntryTypesManager);
         LOGGER.debug("Finished rebuilding CSL bibliography");
     }
 
@@ -85,7 +85,7 @@ public class CSLUpdateBibliography {
     }
 
     private void populateCSLBibTextSection(XTextDocument doc,
-                                           CSLCitationOOAdapter cslAdapter,
+                                           CSLCitationOOAdapter cslCitationOOAdapter,
                                            List<BibEntry> entries,
                                            CitationStyle citationStyle,
                                            BibDatabaseContext bibDatabaseContext,
@@ -101,8 +101,7 @@ public class CSLUpdateBibliography {
 
         XTextCursor cursor = doc.getText().createTextCursorByRange(sectionRange.get());
 
-        // Use CSLCitationOOAdapter to insert the bibliography
-        cslAdapter.insertBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
+        cslCitationOOAdapter.insertBibliography(cursor, citationStyle, entries, bibDatabaseContext, bibEntryTypesManager);
 
         LOGGER.debug("CSL bibliography section population completed");
     }
