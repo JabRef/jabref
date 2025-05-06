@@ -13,6 +13,7 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.DummyFileUpdateMonitor;
@@ -45,6 +46,11 @@ class CheckConsistency implements Runnable {
     public void run() {
         if (inputFile == null) {
             System.out.println(Localization.lang("No file specified for consistency check."));
+            return;
+        }
+
+        if (!FileUtil.isBibFile(inputFile)) {
+            System.out.println(Localization.lang("Only bib files for consistency check."));
             return;
         }
 
