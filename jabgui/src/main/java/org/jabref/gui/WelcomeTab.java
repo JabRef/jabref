@@ -1,5 +1,12 @@
 package org.jabref.gui;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
+
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -124,7 +131,28 @@ public class WelcomeTab extends Tab {
                 stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                 taskExecutor).execute());
 
-        return createVBoxContainer(startLabel, newLibraryLink, openLibraryLink);
+        Hyperlink openExampleLibraryLink = new Hyperlink(Localization.lang("Open example library"));
+        openExampleLibraryLink.getStyleClass().add("welcome-hyperlink");
+        openExampleLibraryLink.setOnAction(e -> {
+            try (InputStream in = getClass().getResourceAsStream("/Chocolate.bib")) {
+                if (in != null) {
+                    Path tmpFile = Files.createTempFile("example-library", ".bib");
+                    try {
+                        Files.copy(in, tmpFile, StandardCopyOption.REPLACE_EXISTING);
+                        new OpenDatabaseAction(tabContainer, preferences, aiService, dialogService,
+                                stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
+                                taskExecutor).openFiles(List.of(tmpFile));
+                        tmpFile.toFile().deleteOnExit();
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        return createVBoxContainer(startLabel, newLibraryLink, openLibraryLink, openExampleLibraryLink);
     }
 
     private VBox createWelcomeRecentBox() {
