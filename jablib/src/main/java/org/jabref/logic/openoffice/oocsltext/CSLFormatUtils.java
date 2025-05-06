@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
@@ -25,49 +26,36 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public final class CSLFormatUtils {
 
-    public enum BibliographyTitleFormat {
-        BIBLIOGRAPHY_HEADING("Bibliography Heading"),
-        TITLE("Title"),
-        TEXT_BODY("Text body"),
-        BODY_TEXT("Body Text"),
-        SUBTITLE("Subtitle"),
-        HEADING_1("Heading 1"),
-        HEADING_2("Heading 2"),
-        HEADING_3("Heading 3"),
-        HEADING_4("Heading 4");
+    public static final List<String> BIBLIOGRAPHY_TITLE_FORMATS = List.of(
+            "Bibliography Heading",
+            "Title",
+            "Text body",
+            "Body Text",
+            "Subtitle",
+            "Heading 1",
+            "Heading 2",
+            "Heading 3",
+            "Heading 4"
+    );
 
-        private final String format;
-
-        BibliographyTitleFormat(String format) {
-            this.format = format;
-        }
-
-        public String getFormat() {
-            return format;
-        }
-    }
-
-    public enum BibliographyBodyFormat {
-        BIBLIOGRAPHY_1("Bibliography 1"),
-        TEXT_BODY("Text body"),
-        BODY_TEXT("Body Text"),
-        HANGING_INDENT("Hanging indent");
-
-        private final String format;
-
-        BibliographyBodyFormat(String format) {
-            this.format = format;
-        }
-
-        public String getFormat() {
-            return format;
-        }
-    }
+    public static final List<String> BIBLIOGRAPHY_BODY_FORMATS = List.of(
+            "Bibliography 1",
+            "Text body",
+            "Body Text",
+            "Hanging indent"
+    );
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     private CSLFormatUtils() {
         // prevent instantiation
+    }
+
+    public static String getDefaultBodyFormatForStyle(CitationStyle style) {
+        if (style.usesHangingIndent()) {
+            return "Hanging indent";
+        }
+        return "Bibliography 1";
     }
 
     /**

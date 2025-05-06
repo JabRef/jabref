@@ -157,8 +157,8 @@ public class OpenOfficePreferences {
         }
 
         this.currentStyle.set(style);
-        if (style instanceof CitationStyle citationStyle && citationStyle.usesHangingIndent()) {
-            this.cslBibliographyBodyFormat.set(CSLFormatUtils.BibliographyBodyFormat.HANGING_INDENT.getFormat());
+        if (style instanceof CitationStyle citationStyle) {
+            this.cslBibliographyBodyFormat.set(CSLFormatUtils.getDefaultBodyFormatForStyle(citationStyle));
         }
     }
 

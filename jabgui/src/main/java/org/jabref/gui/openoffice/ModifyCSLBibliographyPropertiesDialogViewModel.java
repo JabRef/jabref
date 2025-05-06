@@ -1,7 +1,5 @@
 package org.jabref.gui.openoffice;
 
-import java.util.Arrays;
-
 import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.ReadOnlyListWrapper;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,13 +15,9 @@ public class ModifyCSLBibliographyPropertiesDialogViewModel {
     private final StringProperty cslBibliographySelectedHeaderFormat = new SimpleStringProperty();
     private final StringProperty cslBibliographySelectedBodyFormat = new SimpleStringProperty();
     private final ReadOnlyListProperty<String> headerFormatListProperty =
-             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(
-                    Arrays.stream(CSLFormatUtils.BibliographyTitleFormat.values()).map(CSLFormatUtils.BibliographyTitleFormat::getFormat).toList()
-            ));
+             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_TITLE_FORMATS));
     private final ReadOnlyListProperty<String> bodyFormatListProperty =
-            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(
-                    Arrays.stream(CSLFormatUtils.BibliographyBodyFormat.values()).map(CSLFormatUtils.BibliographyBodyFormat::getFormat).toList()
-            ));
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_BODY_FORMATS));
 
     public ModifyCSLBibliographyPropertiesDialogViewModel(OpenOfficePreferences openOfficePreferences) {
         this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());
