@@ -208,19 +208,6 @@ public class CSLCitationOOAdapter {
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
                 if (usesHangingIndent) {
                     formattedBibliographyEntry = formattedBibliographyEntry.trim();
-
-//                    // Get the property set using your UnoCast utility
-//                    XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
-//
-//                    // Set hanging indent of 1.27cm (0.5in)
-//                    propertySet.setPropertyValue("ParaLeftMargin", 1270);
-//                    propertySet.setPropertyValue("ParaFirstLineIndent", -1270);
-//
-//                    // Set line spacing
-//                    LineSpacing lineSpacingStruct = new LineSpacing();
-//                    lineSpacingStruct.Mode = LineSpacingMode.MINIMUM;
-//                    lineSpacingStruct.Height = (short) (lineSpacing * MM_PER_100_TWIP);
-//                    propertySet.setPropertyValue("ParaLineSpacing", lineSpacingStruct);
                 }
                 formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
 
@@ -236,19 +223,6 @@ public class CSLCitationOOAdapter {
 
                 if (usesHangingIndent) {
                     formattedBibliographyEntry = formattedBibliographyEntry.trim();
-
-//                    // Get the property set using your UnoCast utility
-//                    XPropertySet propertySet = UnoCast.cast(XPropertySet.class, cursor).get();
-//
-//                    // Set hanging indent of 1.27cm (0.5in)
-//                    propertySet.setPropertyValue("ParaLeftMargin", 1270);
-//                    propertySet.setPropertyValue("ParaFirstLineIndent", -1270);
-//
-//                    // Set line spacing
-//                    LineSpacing lineSpacingStruct = new LineSpacing();
-//                    lineSpacingStruct.Mode = LineSpacingMode.MINIMUM;
-//                    lineSpacingStruct.Height = (short) (lineSpacing * MM_PER_100_TWIP);
-//                    propertySet.setPropertyValue("ParaLineSpacing", lineSpacingStruct);
                 }
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
                 OOTextIntoOO.write(document, cursor, ooText);
