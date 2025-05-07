@@ -15,18 +15,24 @@ public class ModifyCSLBibliographyPropertiesDialogViewModel {
     private final StringProperty cslBibliographySelectedHeaderFormat = new SimpleStringProperty();
     private final StringProperty cslBibliographySelectedBodyFormat = new SimpleStringProperty();
     private final ReadOnlyListProperty<String> headerFormatListProperty =
-             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_TITLE_FORMATS));
+            new ReadOnlyListWrapper<>(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_TITLE_FORMATS));
     private final ReadOnlyListProperty<String> bodyFormatListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(CSLFormatUtils.BIBLIOGRAPHY_BODY_FORMATS));
 
+    private final OpenOfficePreferences openOfficePreferences;
+
     public ModifyCSLBibliographyPropertiesDialogViewModel(OpenOfficePreferences openOfficePreferences) {
+        this.openOfficePreferences = openOfficePreferences;
+
         this.cslBibliographyTitle.set(openOfficePreferences.getCslBibliographyTitle());
         this.cslBibliographySelectedHeaderFormat.set(openOfficePreferences.getCslBibliographyHeaderFormat());
         this.cslBibliographySelectedBodyFormat.set(openOfficePreferences.getCslBibliographyBodyFormat());
+    }
 
-        cslBibliographyTitle.bindBidirectional(openOfficePreferences.cslBibliographyTitleProperty());
-        cslBibliographySelectedHeaderFormat.bindBidirectional(openOfficePreferences.cslBibliographyHeaderFormatProperty());
-        cslBibliographySelectedBodyFormat.bindBidirectional(openOfficePreferences.cslBibliographyBodyFormatProperty());
+    public void savePreferences() {
+        openOfficePreferences.setCslBibliographyTitle(cslBibliographyTitle.get());
+        openOfficePreferences.setCslBibliographyHeaderFormat(cslBibliographySelectedHeaderFormat.get());
+        openOfficePreferences.setCslBibliographyBodyFormat(cslBibliographySelectedBodyFormat.get());
     }
 
     public StringProperty cslBibliographyTitleProperty() {

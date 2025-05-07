@@ -34,7 +34,16 @@ public class ModifyCSLBibliographyPropertiesDialogView extends BaseDialog<Void> 
                   .setAsDialogPane(this);
 
         Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
-        okButton.setOnAction(_ -> this.close());
+
+        okButton.setOnAction(_ -> {
+            viewModel.savePreferences();
+            this.close();
+        });
+
+        Button cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
+        if (cancelButton != null) {
+            cancelButton.setOnAction(_ -> this.close());
+        }
     }
 
     @FXML
