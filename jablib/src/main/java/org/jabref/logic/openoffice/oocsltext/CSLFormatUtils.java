@@ -116,6 +116,7 @@ public final class CSLFormatUtils {
         // Remove extra trailing paragraph tags when there are multiple (keeping one)
         html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
 
+        // In bibliography entries, citeproc-java adds 4 heading spaces for numeric styles, and 2 for non-numeric
         html = html.trim();
 
         return html;
