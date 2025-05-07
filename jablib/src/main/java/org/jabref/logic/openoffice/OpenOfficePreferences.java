@@ -11,6 +11,8 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import org.jabref.logic.citationstyle.CitationStyle;
+import org.jabref.logic.openoffice.oocsltext.CSLFormatUtils;
 import org.jabref.logic.openoffice.style.OOStyle;
 
 public class OpenOfficePreferences {
@@ -28,33 +30,36 @@ public class OpenOfficePreferences {
     private final StringProperty executablePath;
     private final BooleanProperty useAllDatabases;
     private final BooleanProperty syncWhenCiting;
-    private final ObservableList<String> externalStyles;
+    private final ObservableList<String> externalJStyles;
     private final StringProperty currentJStyle;
     private final ObjectProperty<OOStyle> currentStyle;
     private final BooleanProperty alwaysAddCitedOnPages;
     private final StringProperty cslBibliographyTitle;
     private final StringProperty cslBibliographyHeaderFormat;
+    private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
                                  boolean syncWhenCiting,
-                                 List<String> externalStyles,
+                                 List<String> externalJStyles,
                                  String currentJStyle,
                                  OOStyle currentStyle,
                                  boolean alwaysAddCitedOnPages,
                                  String cslBibliographyTitle,
                                  String cslBibliographyHeaderFormat,
+                                 String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
-        this.externalStyles = FXCollections.observableArrayList(externalStyles);
+        this.externalJStyles = FXCollections.observableArrayList(externalJStyles);
         this.currentJStyle = new SimpleStringProperty(currentJStyle);
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
         this.cslBibliographyTitle = new SimpleStringProperty(cslBibliographyTitle);
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
+        this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
     }
 
@@ -114,13 +119,13 @@ public class OpenOfficePreferences {
     /**
      * list with paths to external style files
      */
-    public ObservableList<String> getExternalStyles() {
-        return externalStyles;
+    public ObservableList<String> getExternalJStyles() {
+        return externalJStyles;
     }
 
-    public void setExternalStyles(List<String> list) {
-        externalStyles.clear();
-        externalStyles.addAll(list);
+    public void setExternalJStyles(List<String> list) {
+        externalJStyles.clear();
+        externalJStyles.addAll(list);
     }
 
     /**
@@ -148,6 +153,9 @@ public class OpenOfficePreferences {
 
     public void setCurrentStyle(OOStyle style) {
         this.currentStyle.set(style);
+        if (style instanceof CitationStyle citationStyle) {
+            this.cslBibliographyBodyFormat.set(CSLFormatUtils.getDefaultBodyFormatForStyle(citationStyle));
+        }
     }
 
     public boolean getAlwaysAddCitedOnPages() {
@@ -170,12 +178,32 @@ public class OpenOfficePreferences {
         return cslBibliographyTitle.get();
     }
 
+    public void setCslBibliographyTitle(String title) {
+        this.cslBibliographyTitle.set(title);
+    }
+
     public StringProperty cslBibliographyHeaderFormatProperty() {
         return cslBibliographyHeaderFormat;
     }
 
     public String getCslBibliographyHeaderFormat() {
         return cslBibliographyHeaderFormat.get();
+    }
+
+    public void setCslBibliographyHeaderFormat(String headerFormat) {
+        this.cslBibliographyHeaderFormat.set(headerFormat);
+    }
+
+    public StringProperty cslBibliographyBodyFormatProperty() {
+        return cslBibliographyBodyFormat;
+    }
+
+    public String getCslBibliographyBodyFormat() {
+        return cslBibliographyBodyFormat.get();
+    }
+
+    public void setCslBibliographyBodyFormat(String format) {
+        this.cslBibliographyBodyFormat.set(format);
     }
 
     public ObservableList<String> getExternalCslStyles() {

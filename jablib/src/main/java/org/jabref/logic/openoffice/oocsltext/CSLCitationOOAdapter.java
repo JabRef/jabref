@@ -191,7 +191,7 @@ public class CSLCitationOOAdapter {
 
         OOText title = OOFormat.paragraph(OOText.fromString(openOfficePreferences.getCslBibliographyTitle()), openOfficePreferences.getCslBibliographyHeaderFormat());
         OOTextIntoOO.write(document, cursor, OOText.fromString(title.toString()));
-        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), CSLFormatUtils.DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT);
+        OOText ooBreak = OOFormat.paragraph(OOText.fromString(""), openOfficePreferences.getCslBibliographyBodyFormat());
         OOTextIntoOO.write(document, cursor, ooBreak);
 
         String style = selectedStyle.getSource();
@@ -204,10 +204,10 @@ public class CSLCitationOOAdapter {
                 String bibliographyEntry = CitationStyleGenerator.generateBibliography(List.of(entry), style, HTML_OUTPUT_FORMAT, bibDatabaseContext, bibEntryTypesManager).getFirst();
                 String citationKey = entry.getCitationKey().orElse("");
                 int currentNumber = markManager.getCitationNumber(citationKey);
+                String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+                formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(formattedBibliographyEntry, currentNumber);
 
-                String formattedBibliographyEntry = CSLFormatUtils.updateSingleBibliographyNumber(CSLFormatUtils.transformHTML(bibliographyEntry), currentNumber);
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
-
                 OOTextIntoOO.write(document, cursor, ooText);
             }
         } else {
@@ -216,6 +216,7 @@ public class CSLCitationOOAdapter {
 
             for (String bibliographyEntry : bibliographyEntries) {
                 String formattedBibliographyEntry = CSLFormatUtils.transformHTML(bibliographyEntry);
+
                 OOText ooText = OOFormat.setLocaleNone(OOText.fromString(formattedBibliographyEntry));
                 OOTextIntoOO.write(document, cursor, ooText);
             }

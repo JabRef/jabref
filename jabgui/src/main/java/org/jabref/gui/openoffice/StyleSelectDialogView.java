@@ -288,12 +288,6 @@ public class StyleSelectDialogView extends BaseDialog<OOStyle> {
         viewModel.addJStyleFile();
     }
 
-    @FXML
-    private void modifyBibliographyTitle() {
-        ModifyCSLBibliographyTitleDialogView modifyBibliographyTitleDialogView = new ModifyCSLBibliographyTitleDialogView(preferences.getOpenOfficePreferences(Injector.instantiateModelOrService(JournalAbbreviationRepository.class)));
-        dialogService.showCustomDialog(modifyBibliographyTitleDialogView);
-    }
-
     /**
      * When Select Style dialog is first opened, there is a slight delay in population of CSL styles table.
      * This function scrolls to the last selected style, while taking care of the delay.
