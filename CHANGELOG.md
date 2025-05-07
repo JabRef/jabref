@@ -12,7 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
-- We added 'Make absolute' button which will convert the selected path to an absolute path in context of library properties. [#13031](https://github.com/JabRef/jabref/issues/13031)
+- We added a new button to toggle the file path between an absolute and relative formats in context of library properties. [#13031](https://github.com/JabRef/jabref/issues/13031)
 
 ### Changed
 

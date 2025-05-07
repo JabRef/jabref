@@ -183,7 +183,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return selectedDatabaseModeProperty;
     }
 
-    public StringProperty librarySpecificDirectoryPropertyProperty() {
+    public StringProperty librarySpecificDirectoryProperty() {
         return this.librarySpecificDirectoryProperty;
     }
 
@@ -252,7 +252,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return true;
     }
 
-    public void changePathRepresentation(StringProperty fileDirectory, boolean toAbsolute) {
+    public void togglePath(StringProperty fileDirectory) {
         Optional<Path> libPath = this.databaseContext.getDatabasePath();
 
         if (libPath.isEmpty() || fileDirectory.get().isEmpty()) {
@@ -264,7 +264,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             Path currPath = Path.of(fileDirectory.get());
             String newPath;
 
-            if (toAbsolute) {
+            if (!currPath.isAbsolute()) {
                 newPath = parentPath.resolve(fileDirectory.get()).toAbsolutePath().toString();
             } else if (currPath.isAbsolute()) {
                 newPath = parentPath.relativize(currPath).toString();
