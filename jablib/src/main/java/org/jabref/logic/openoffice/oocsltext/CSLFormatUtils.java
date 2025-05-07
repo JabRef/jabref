@@ -26,6 +26,11 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public final class CSLFormatUtils {
 
+    /**
+     * The formatting names specified to and understood by LibreOffice via code are often different from their displayed names in the LibreOffice GUI application.
+     * For example, "Hanging Indent" as visible in LO styles list should be specified as "Hanging indent" (note casing). Similarly, "Body Text, Indented" is specified as "Text body indent".
+     * The following two lists here are taken from https://github.com/LibreOffice/core/blob/0891df6b21fd95ec7c9614509d92829c0f17c353/sw/qa/python/check_styles.py#L132
+     */
     public static final List<String> BIBLIOGRAPHY_TITLE_FORMATS = List.of(
             "Bibliography Heading",
             "Title",
@@ -42,7 +47,12 @@ public final class CSLFormatUtils {
             "Bibliography 1",
             "Text body",
             "Body Text",
-            "Hanging indent"
+            "Text body indent",
+            "First line indent",
+            "Hanging indent",
+            "List",
+            "List Indent",
+            "Marginalia"
     );
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
