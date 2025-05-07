@@ -92,20 +92,20 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         laTexSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());
 
         librarySpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
-            Boolean state = Path.of(newValue).isAbsolute();
-            libSpecificFileDirSwitchIcon.setGlyph(state ? RELATIVE_PATH : ABSOLUTE_PATH);
-            libSpecificFileDirSwitchTooltip.setText(state ? switchToRelativeText : switchToAbsoluteText);
+            boolean isAbsolute = Path.of(newValue).isAbsolute();
+            libSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
+            libSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
         userSpecificFileDirectory.textProperty().addListener((_, _, newValue) -> {
-            Boolean state = Path.of(newValue).isAbsolute();
-            userSpecificFileDirSwitchIcon.setGlyph(state ? RELATIVE_PATH : ABSOLUTE_PATH);
-            userSpecificFileDirSwitchTooltip.setText(state ? switchToRelativeText : switchToAbsoluteText);
+            boolean isAbsolute = Path.of(newValue).isAbsolute();
+            userSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
+            userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
 
         laTexFileDirectory.textProperty().addListener((_, _, newValue) -> {
-            Boolean state = Path.of(newValue).isAbsolute();
-            laTexSpecificFileDirSwitchIcon.setGlyph(state ? RELATIVE_PATH : ABSOLUTE_PATH);
-            laTexSpecificFileDirSwitchTooltip.setText(state ? switchToRelativeText : switchToAbsoluteText);
+            boolean isAbsolute = Path.of(newValue).isAbsolute();
+            laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
+            laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
 
         Platform.runLater(() -> {
