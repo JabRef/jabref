@@ -30,7 +30,7 @@ public class OpenOfficePreferences {
     private final StringProperty executablePath;
     private final BooleanProperty useAllDatabases;
     private final BooleanProperty syncWhenCiting;
-    private final ObservableList<String> externalStyles;
+    private final ObservableList<String> externalJStyles;
     private final StringProperty currentJStyle;
     private final ObjectProperty<OOStyle> currentStyle;
     private final BooleanProperty alwaysAddCitedOnPages;
@@ -42,7 +42,7 @@ public class OpenOfficePreferences {
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
                                  boolean syncWhenCiting,
-                                 List<String> externalStyles,
+                                 List<String> externalJStyles,
                                  String currentJStyle,
                                  OOStyle currentStyle,
                                  boolean alwaysAddCitedOnPages,
@@ -53,7 +53,7 @@ public class OpenOfficePreferences {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
-        this.externalStyles = FXCollections.observableArrayList(externalStyles);
+        this.externalJStyles = FXCollections.observableArrayList(externalJStyles);
         this.currentJStyle = new SimpleStringProperty(currentJStyle);
         this.currentStyle = new SimpleObjectProperty<>(currentStyle);
         this.alwaysAddCitedOnPages = new SimpleBooleanProperty(alwaysAddCitedOnPages);
@@ -119,13 +119,13 @@ public class OpenOfficePreferences {
     /**
      * list with paths to external style files
      */
-    public ObservableList<String> getExternalStyles() {
-        return externalStyles;
+    public ObservableList<String> getExternalJStyles() {
+        return externalJStyles;
     }
 
-    public void setExternalStyles(List<String> list) {
-        externalStyles.clear();
-        externalStyles.addAll(list);
+    public void setExternalJStyles(List<String> list) {
+        externalJStyles.clear();
+        externalJStyles.addAll(list);
     }
 
     /**
