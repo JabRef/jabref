@@ -69,6 +69,10 @@ An explanation of donation possibilities and usage of donations is available at 
 Want to be part of a free and open-source project that tens of thousands of researchers use every day?
 Please take a look at our [guidelines for contributing](CONTRIBUTING.md).
 
+## Building from Source
+
+Please see [here](https://docs.jabref.org/installation#building-from-source) for instructions on how to build JabRef from sources.
+
 ## Research and Education
 
 JabRef welcomes research applied to it.
