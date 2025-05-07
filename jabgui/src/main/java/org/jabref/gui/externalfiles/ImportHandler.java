@@ -505,7 +505,7 @@ public class ImportHandler {
         }
     }
 
-    private void addToImportEntriesGroup(List<BibEntry> entryToInsert) {
+    private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
         if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
             // Only one SmartGroup
             this.bibDatabaseContext.getMetaData()
@@ -514,7 +514,7 @@ public class ImportHandler {
                                                       .stream()
                                                       .filter(node -> node.getGroup() instanceof SmartGroup)
                                                       .findFirst())
-                                   .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entryToInsert));
+                                   .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entriesToInsert));
         }
     }
 }

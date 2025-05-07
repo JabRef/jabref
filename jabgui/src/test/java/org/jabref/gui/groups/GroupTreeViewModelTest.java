@@ -1,6 +1,7 @@
 package org.jabref.gui.groups;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
@@ -191,5 +192,28 @@ class GroupTreeViewModelTest {
 
         assertEquals(2, rootGroup.getChildren().size());
         assertTrue(rootGroup.hasAllSuggestedGroups());
+    }
+
+    @Test
+    void shouldCreateImportedEntriesGroupWhenEnabled() {
+        preferences.getLibraryPreferences().setAddImportedEntries(true);
+
+        List<GroupNodeViewModel> prevModel = groupTree.rootGroupProperty().getValue().getChildren();
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
+
+        assertTrue(prevModel.isEmpty());
+        assertEquals("Imported entries", actualGrpName);
+    }
+
+    @Test
+    void shouldReflectUpdatedNameForImportedEntriesGroup() {
+        preferences.getLibraryPreferences().setAddImportedEntries(true);
+        preferences.getLibraryPreferences().setAddImportedEntriesGroupName("Review list");
+
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
+
+        assertEquals("Review list", actualGrpName);
     }
 }
