@@ -75,13 +75,15 @@ public class CopyTo extends SimpleCommand {
                                                             .flatMap(entry -> getCrossRefEntry(entry, sourceDatabaseContext).stream()).toList();
         entriesToAdd.addAll(entriesWithCrossRef);
 
-        copyEntriesWithFeedback(entriesToAdd, targetDatabaseContext, "Copied %0 entry(s) to %1, including cross-references",
-                "Copied %0 entry(s) to %1. %2 were skipped including cross-references");
+        copyEntriesWithFeedback(entriesToAdd, targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"));
     }
 
     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
-        copyEntriesWithFeedback(selectedEntries, targetDatabaseContext, "Copied %0 entry(s) to %1 without cross-references",
-                "Copied %0 entry(s) to %1. %2 were skipped without cross-references");
+        copyEntriesWithFeedback(selectedEntries, targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1 without cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"));
     }
 
     private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext targetDatabaseContext, String successMessage, String partialMessage) {
@@ -99,8 +101,7 @@ public class CopyTo extends SimpleCommand {
             } else if (importedCount == 0) {
                 dialogService.notify(Localization.lang("No entry was copied to %0", targetName));
             } else {
-                dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount),
-                        targetName, String.valueOf(skippedCount)));
+                dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
             }
         });
 
