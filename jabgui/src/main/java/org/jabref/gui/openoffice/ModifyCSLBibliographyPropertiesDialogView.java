@@ -1,7 +1,6 @@
 package org.jabref.gui.openoffice;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -33,17 +32,12 @@ public class ModifyCSLBibliographyPropertiesDialogView extends BaseDialog<Void> 
                   .load()
                   .setAsDialogPane(this);
 
-        Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
-
-        okButton.setOnAction(_ -> {
-            viewModel.savePreferences();
-            this.close();
+        setResultConverter(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                viewModel.savePreferences();
+            }
+            return null;
         });
-
-        Button cancelButton = (Button) getDialogPane().lookupButton(ButtonType.CANCEL);
-        if (cancelButton != null) {
-            cancelButton.setOnAction(_ -> this.close());
-        }
     }
 
     @FXML
