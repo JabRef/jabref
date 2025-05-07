@@ -182,12 +182,20 @@ public class OpenOfficePreferences {
         return cslBibliographyTitle.get();
     }
 
+    public void setCslBibliographyTitle(String title) {
+        this.cslBibliographyTitle.set(title);
+    }
+
     public StringProperty cslBibliographyHeaderFormatProperty() {
         return cslBibliographyHeaderFormat;
     }
 
     public String getCslBibliographyHeaderFormat() {
         return cslBibliographyHeaderFormat.get();
+    }
+
+    public void setCslBibliographyHeaderFormat(String headerFormat) {
+        this.cslBibliographyHeaderFormat.set(headerFormat);
     }
 
     public StringProperty cslBibliographyBodyFormatProperty() {
