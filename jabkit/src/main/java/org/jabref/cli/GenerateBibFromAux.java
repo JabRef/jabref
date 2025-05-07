@@ -2,6 +2,7 @@ package org.jabref.cli;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.auxparser.AuxParser;
 import org.jabref.logic.auxparser.AuxParserResult;
@@ -10,6 +11,7 @@ import org.jabref.logic.auxparser.DefaultAuxParser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +59,12 @@ class GenerateBibFromAux implements Runnable {
         }
 
         if (subDatabase == null || !subDatabase.hasEntries()) {
-            System.out.println(Localization.lang("no library generated"));
+            System.out.println(Localization.lang("No library generated."));
             return;
         }
 
         if (outputFile == null) {
-            System.out.println(subDatabase.getEntries().stream()); // ToDo: Make nice
+            System.out.println(subDatabase.getEntries().stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
         } else {
             ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, subDatabase, outputFile);
         }

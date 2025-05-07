@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -60,8 +61,11 @@ class Fetch implements Runnable {
             return;
         }
 
-        System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, provider));
-        System.out.print(Localization.lang("Please wait..."));
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, provider));
+            System.out.print(Localization.lang("Please wait..."));
+        }
+
         try {
             List<BibEntry> matches = selectedFetcher.get().performSearch(query);
             if (matches.isEmpty()) {
@@ -69,13 +73,14 @@ class Fetch implements Runnable {
                 return;
             }
 
-            System.out.println("\r" + Localization.lang("Found %0 results.", String.valueOf(matches.size())));
+            if (!sharedOptions.porcelain) {
+                System.out.println("\r" + Localization.lang("Found %0 results.", String.valueOf(matches.size())));
+            }
 
             if (outputFile != null) {
                 ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, new BibDatabase(matches), outputFile);
-                // ToDo: implement append
             } else {
-                System.out.println(matches.stream());
+                System.out.println(matches.stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
             }
         } catch (FetcherException e) {
             LOGGER.error("Error while fetching", e);
