@@ -220,11 +220,11 @@ public class OpenOfficePanel {
     }
 
     private void initPanel() {
-        connect.setOnAction(e -> connectAutomatically());
-        manualConnect.setOnAction(e -> connectManually());
+        connect.setOnAction(_ -> connectAutomatically());
+        manualConnect.setOnAction(_ -> connectManually());
 
         selectDocument.setTooltip(new Tooltip(Localization.lang("Select which open Writer document to work on")));
-        selectDocument.setOnAction(e -> {
+        selectDocument.setOnAction(_ -> {
             try {
                 ooBase.guiActionSelectDocument(false);
             } catch (WrappedTargetException
@@ -234,7 +234,7 @@ public class OpenOfficePanel {
         });
 
         setStyleFile.setMaxWidth(Double.MAX_VALUE);
-        setStyleFile.setOnAction(event -> {
+        setStyleFile.setOnAction(_ -> {
             StyleSelectDialogView styleDialog = new StyleSelectDialogView(cslStyleLoader, jStyleLoader);
             dialogService.showCustomDialogAndWait(styleDialog)
                          .ifPresent(selectedStyle -> {
@@ -256,21 +256,21 @@ public class OpenOfficePanel {
         });
 
         pushEntries.setTooltip(new Tooltip(Localization.lang("Cite selected entries between parenthesis")));
-        pushEntries.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_PAR, false));
+        pushEntries.setOnAction(_ -> pushEntries(CitationType.AUTHORYEAR_PAR, false));
         pushEntries.setMaxWidth(Double.MAX_VALUE);
         pushEntriesInt.setTooltip(new Tooltip(Localization.lang("Cite selected entries with in-text citation")));
-        pushEntriesInt.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, false));
+        pushEntriesInt.setOnAction(_ -> pushEntries(CitationType.AUTHORYEAR_INTEXT, false));
         pushEntriesInt.setMaxWidth(Double.MAX_VALUE);
         pushEntriesEmpty.setTooltip(new Tooltip(Localization.lang("Insert a citation without text (the entry will appear in the reference list)")));
-        pushEntriesEmpty.setOnAction(e -> pushEntries(CitationType.INVISIBLE_CIT, false));
+        pushEntriesEmpty.setOnAction(_ -> pushEntries(CitationType.INVISIBLE_CIT, false));
         pushEntriesEmpty.setMaxWidth(Double.MAX_VALUE);
         pushEntriesAdvanced.setTooltip(new Tooltip(Localization.lang("Cite selected entries with extra information")));
-        pushEntriesAdvanced.setOnAction(e -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
+        pushEntriesAdvanced.setOnAction(_ -> pushEntries(CitationType.AUTHORYEAR_INTEXT, true));
         pushEntriesAdvanced.setMaxWidth(Double.MAX_VALUE);
 
         update.setTooltip(new Tooltip(Localization.lang("Make/Sync bibliography")));
 
-        update.setOnAction(event -> {
+        update.setOnAction(_ -> {
             String title = Localization.lang("Could not update bibliography");
             if (getOrUpdateTheStyle(title)) {
                 return;
@@ -281,18 +281,18 @@ public class OpenOfficePanel {
 
         merge.setMaxWidth(Double.MAX_VALUE);
         merge.setTooltip(new Tooltip(Localization.lang("Combine pairs of citations that are separated by spaces only")));
-        merge.setOnAction(e -> ooBase.guiActionMergeCitationGroups(getBaseList(), currentStyle));
+        merge.setOnAction(_ -> ooBase.guiActionMergeCitationGroups(getBaseList(), currentStyle));
 
         unmerge.setMaxWidth(Double.MAX_VALUE);
         unmerge.setTooltip(new Tooltip(Localization.lang("Separate merged citations")));
-        unmerge.setOnAction(e -> ooBase.guiActionSeparateCitations(getBaseList(), currentStyle));
+        unmerge.setOnAction(_ -> ooBase.guiActionSeparateCitations(getBaseList(), currentStyle));
 
         ContextMenu settingsMenu = createSettingsPopup();
         settingsB.setMaxWidth(Double.MAX_VALUE);
         settingsB.setContextMenu(settingsMenu);
-        settingsB.setOnAction(e -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
+        settingsB.setOnAction(_ -> settingsMenu.show(settingsB, Side.BOTTOM, 0, 0));
         manageCitations.setMaxWidth(Double.MAX_VALUE);
-        manageCitations.setOnAction(e -> {
+        manageCitations.setOnAction(_ -> {
             ManageCitationsDialogView dialog = new ManageCitationsDialogView(ooBase);
             if (dialog.isOkToShowThisDialog()) {
                 dialogService.showCustomDialogAndWait(dialog);
@@ -300,10 +300,10 @@ public class OpenOfficePanel {
         });
 
         modifyBibliographyProperties.setMaxWidth(Double.MAX_VALUE);
-        modifyBibliographyProperties.setOnAction(event -> modifyBibliographyProperties());
+        modifyBibliographyProperties.setOnAction(_ -> modifyBibliographyProperties());
 
         exportCitations.setMaxWidth(Double.MAX_VALUE);
-        exportCitations.setOnAction(event -> exportEntries());
+        exportCitations.setOnAction(_ -> exportEntries());
 
         updateButtonAvailability();
 
@@ -390,7 +390,7 @@ public class OpenOfficePanel {
                 }
             });
 
-            taskConnectIfInstalled.setOnFailed(value -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), taskConnectIfInstalled.getException()));
+            taskConnectIfInstalled.setOnFailed(_ -> dialogService.showErrorDialogAndWait(Localization.lang("Autodetection failed"), Localization.lang("Autodetection failed"), taskConnectIfInstalled.getException()));
 
             dialogService.showProgressDialog(Localization.lang("Autodetecting paths..."), Localization.lang("Autodetecting paths..."), taskConnectIfInstalled);
             taskExecutor.execute(taskConnectIfInstalled);
@@ -453,7 +453,7 @@ public class OpenOfficePanel {
             }
         };
 
-        connectTask.setOnSucceeded(value -> {
+        connectTask.setOnSucceeded(_ -> {
             ooBase = connectTask.getValue();
 
             try {
@@ -467,7 +467,7 @@ public class OpenOfficePanel {
             updateButtonAvailability();
         });
 
-        connectTask.setOnFailed(value -> {
+        connectTask.setOnFailed(_ -> {
             Throwable ex = connectTask.getException();
             LOGGER.error("autodetect failed", ex);
             switch (ex) {
@@ -646,16 +646,16 @@ public class OpenOfficePanel {
 
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
-        alwaysAddCitedOnPagesText.setOnAction(e -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
+        alwaysAddCitedOnPagesText.setOnAction(_ -> openOfficePreferences.setAlwaysAddCitedOnPages(alwaysAddCitedOnPagesText.isSelected()));
 
-        EasyBind.listen(currentStyleProperty, (obs, oldValue, newValue) -> {
+        EasyBind.listen(currentStyleProperty, (_, _, newValue) -> {
             switch (newValue) {
-                case JStyle ignored -> {
+                case JStyle _ -> {
                     if (!contextMenu.getItems().contains(alwaysAddCitedOnPagesText)) {
                         contextMenu.getItems().add(1, alwaysAddCitedOnPagesText);
                     }
                 }
-                case CitationStyle ignored ->
+                case CitationStyle _ ->
                         contextMenu.getItems().remove(alwaysAddCitedOnPagesText);
                 default -> { }
             }
@@ -675,10 +675,10 @@ public class OpenOfficePanel {
             useActiveBase.setSelected(true);
         }
 
-        autoSync.setOnAction(e -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
-        useAllBases.setOnAction(e -> openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));
-        useActiveBase.setOnAction(e -> openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));
-        clearConnectionSettings.setOnAction(e -> {
+        autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
+        useAllBases.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));
+        useActiveBase.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));
+        clearConnectionSettings.setOnAction(_ -> {
             openOfficePreferences.clearConnectionSettings();
             dialogService.notify(Localization.lang("Cleared connection settings"));
         });
