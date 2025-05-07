@@ -143,6 +143,9 @@ public class ArgumentProcessor implements Runnable {
     @Mixin
     private SharedOptions sharedOptions = new SharedOptions();
 
+    @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
+    private boolean versionInfoRequested;
+
     public ArgumentProcessor(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager) {
         this.cliPreferences = cliPreferences;
         this.entryTypesManager = entryTypesManager;
@@ -269,9 +272,6 @@ public class ArgumentProcessor implements Runnable {
 
         @Option(names = {"-p", "--porcelain"}, description = "Enable script-friendly output")
         boolean porcelain;
-
-        @Option(names = {"-v", "--version"}, versionHelp = true, description = "display version info")
-        private boolean versionInfoRequested;
 
         @Option(names = {"-h", "--help"}, usageHelp = true, description = "display this help message")
         private boolean usageHelpRequested = true;

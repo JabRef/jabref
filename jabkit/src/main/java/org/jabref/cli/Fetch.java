@@ -11,11 +11,9 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import picocli.CommandLine;
 
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
@@ -40,8 +38,8 @@ class Fetch implements Runnable {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Option(names = "--provider", required = true, converter = ProviderConverter.class)
-    private Provider provider;
+    @Option(names = "--provider", required = true)
+    private String provider;
 
     @Option(names = "--query")
     private String query;
@@ -59,10 +57,6 @@ class Fetch implements Runnable {
                                                                .findFirst();
         if (selectedFetcher.isEmpty()) {
             System.out.println(Localization.lang("Could not find fetcher '%0'", provider));
-
-            System.out.println(Localization.lang("The following fetchers are available:"));
-            System.out.println(StringUtil.alignStringTable(ArgumentProcessor.getAvailableImportFormats(argumentProcessor.cliPreferences)));
-
             return;
         }
 
@@ -85,17 +79,6 @@ class Fetch implements Runnable {
             }
         } catch (FetcherException e) {
             LOGGER.error("Error while fetching", e);
-        }
-    }
-
-    private static class ProviderConverter implements CommandLine.ITypeConverter<Provider> {
-        @Override
-        public Provider convert(String value) throws Exception {
-            String[] parts = value.split(":");
-            if (parts.length != 2) {
-                throw new Exception("Expected syntax for --fetch='<name of fetcher>:<query>'");
-            }
-            return new Provider(parts[0], parts[1]);
         }
     }
 }

@@ -8,10 +8,15 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.util.Pair;
 
 import org.jabref.cli.ArgumentProcessor;
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.WebFetcher;
+import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -72,17 +77,23 @@ public class JabKit {
             // Process arguments
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
-            commandLine.getCommandSpec().usageMessage().header(String.format(ArgumentProcessor.JABREF_BANNER, new BuildInfo().version));
-            applyFooterFormats(commandLine,
+            String usageHeader = String.format(ArgumentProcessor.JABREF_BANNER, new BuildInfo().version);
+            commandLine.getCommandSpec().usageMessage().header(usageHeader);
+            commandLine.getSubcommands().values().forEach(subCommand -> subCommand.getCommandSpec().usageMessage().header(usageHeader));
+            applyUsageFooters(commandLine,
                     ArgumentProcessor.getAvailableImportFormats(preferences),
-                    ArgumentProcessor.getAvailableExportFormats(preferences));
+                    ArgumentProcessor.getAvailableExportFormats(preferences),
+                    WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
             commandLine.execute(args);
         } catch (Exception ex) {
             LOGGER.error("Unexpected exception", ex);
         }
     }
 
-    private static void applyFooterFormats(CommandLine commandLineRoot, List<Pair<String, String>> inputFormats, List<Pair<String, String>> outputFormats) {
+    private static void applyUsageFooters(CommandLine commandLine,
+                                          List<Pair<String, String>> inputFormats,
+                                          List<Pair<String, String>> outputFormats,
+                                          Set<SearchBasedFetcher> fetchers) {
         String inputFooter = "\n"
                 + Localization.lang("Available import formats:") + "\n"
                 + StringUtil.alignStringTable(inputFormats);
@@ -90,7 +101,7 @@ public class JabKit {
                 + Localization.lang("Available export formats:") + "\n"
                 + StringUtil.alignStringTable(outputFormats);
 
-        commandLineRoot.getSubcommands().values().forEach(subCommand -> {
+        commandLine.getSubcommands().values().forEach(subCommand -> {
             boolean hasInputOption = subCommand.getCommandSpec().options().stream()
                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--input-format"));
             boolean hasOutputOption = subCommand.getCommandSpec().options().stream()
@@ -101,6 +112,13 @@ public class JabKit {
             footerText += hasOutputOption ? outputFooter : "";
             subCommand.getCommandSpec().usageMessage().footer(footerText);
         });
+
+        commandLine.getSubcommands().get("fetch")
+                   .getCommandSpec().usageMessage().footer(Localization.lang("The following providers are available:") + "\n"
+                           + fetchers.stream()
+                                     .map(WebFetcher::getName)
+                                     .filter(name -> !name.equals("Search pre-configured"))
+                                     .collect(Collectors.joining(", ")));
     }
 
     /**
