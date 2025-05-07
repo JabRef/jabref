@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -277,19 +276,19 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
      */
     private void reload() throws IOException {
         if (styleFile != null) {
-            Path resourcePath = styleFile;
             if (fromResource) {
-                try {
-                    URL resUrl = JStyle.class.getResource(path);
-                    if (resUrl != null) {
-                        resourcePath = Path.of(resUrl.toURI());
+                URL resUrl = JStyle.class.getResource(path);
+                if (resUrl != null) {
+                    try (InputStream stream = resUrl.openStream()) {
+                        initialize(stream);
+                        this.styleFileModificationTime = System.currentTimeMillis();
+                        return;
                     }
-                } catch (URISyntaxException ex) {
-                    LOGGER.error("Couldn't resolve resource path for style  {}", path, ex);
                 }
             }
-            this.styleFileModificationTime = Files.getLastModifiedTime(resourcePath).toMillis();
-            try (InputStream stream = Files.newInputStream(resourcePath)) {
+
+            this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();
+            try (InputStream stream = Files.newInputStream(styleFile)) {
                 initialize(stream);
             }
         }
