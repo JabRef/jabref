@@ -152,10 +152,6 @@ public class OpenOfficePreferences {
     }
 
     public void setCurrentStyle(OOStyle style) {
-        if (style.getPath().equals(currentStyle.get().getPath())) {
-            return;
-        }
-
         this.currentStyle.set(style);
         if (style instanceof CitationStyle citationStyle) {
             this.cslBibliographyBodyFormat.set(CSLFormatUtils.getDefaultBodyFormatForStyle(citationStyle));

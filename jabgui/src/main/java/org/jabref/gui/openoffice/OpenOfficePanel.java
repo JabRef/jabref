@@ -94,6 +94,7 @@ public class OpenOfficePanel {
     private final Button unmerge = new Button(Localization.lang("Separate citations"));
     private final Button manageCitations = new Button(Localization.lang("Manage citations"));
     private final Button exportCitations = new Button(Localization.lang("Export cited"));
+    private final Button modifyBibliographyProperties = new Button(Localization.lang("Bibliography properties"));
     private final Button settingsB = new Button(Localization.lang("Settings"));
     private final Button help;
     private final VBox vbox = new VBox();
@@ -298,6 +299,9 @@ public class OpenOfficePanel {
             }
         });
 
+        modifyBibliographyProperties.setMaxWidth(Double.MAX_VALUE);
+        modifyBibliographyProperties.setOnAction(event -> modifyBibliographyProperties());
+
         exportCitations.setMaxWidth(Double.MAX_VALUE);
         exportCitations.setOnAction(event -> exportEntries());
 
@@ -314,10 +318,15 @@ public class OpenOfficePanel {
         flow.setPrefWrapLength(200);
         flow.getChildren().addAll(setStyleFile, pushEntries, pushEntriesInt);
         flow.getChildren().addAll(pushEntriesAdvanced, pushEntriesEmpty, merge, unmerge);
-        flow.getChildren().addAll(manageCitations, exportCitations, settingsB);
+        flow.getChildren().addAll(manageCitations, exportCitations, modifyBibliographyProperties, settingsB);
 
         vbox.setFillWidth(true);
         vbox.getChildren().addAll(hbox, flow);
+    }
+
+    private void modifyBibliographyProperties() {
+        ModifyCSLBibliographyPropertiesDialogView modifyBibliographyPropertiesDialogView = new ModifyCSLBibliographyPropertiesDialogView(openOfficePreferences);
+        dialogService.showCustomDialog(modifyBibliographyPropertiesDialogView);
     }
 
     private void exportEntries() {
