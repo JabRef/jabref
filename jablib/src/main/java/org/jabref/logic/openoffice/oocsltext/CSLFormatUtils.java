@@ -26,9 +26,6 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public final class CSLFormatUtils {
 
-    private static final String DEFAULT_BIBLIOGRAPHY_BODY_FORMAT = "Text body";
-    private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
-
     /**
      * The formatting names specified to and understood by LibreOffice via code are often different from their displayed names in the LibreOffice GUI application.
      * For example, "Hanging Indent" as visible in LO styles list should be specified as "Hanging indent" (note casing). Similarly, "Body Text, Indented" is specified as "Text body indent".
@@ -55,6 +52,9 @@ public final class CSLFormatUtils {
             "List Indent",
             "Marginalia"
     );
+
+    private static final String DEFAULT_BIBLIOGRAPHY_BODY_FORMAT = "Text body";
+    private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
@@ -115,6 +115,8 @@ public final class CSLFormatUtils {
 
         // Remove extra trailing paragraph tags when there are multiple (keeping one)
         html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
+
+        html = html.trim();
 
         return html;
     }
