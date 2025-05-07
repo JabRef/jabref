@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -35,24 +36,39 @@ public class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex");
-        if (parserResult.isPresent()) {
-            BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+        if (!FileUtil.isBibFile(inputFile)) {
+            System.out.println(Localization.lang("Citation keys can only be generated for BibTeX files."));
+            return;
+        }
 
-            LOGGER.info(Localization.lang("Regenerating citation keys according to metadata"));
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex", sharedOptions.porcelain);
+        if (parserResult.isEmpty()) {
+            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            return;
+        }
 
-            CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
-                    databaseContext,
-                    argumentProcessor.cliPreferences.getCitationKeyPatternPreferences());
-            for (BibEntry entry : databaseContext.getEntries()) {
-                keyGenerator.generateAndSetKey(entry);
-            }
+        if (parserResult.get().isInvalid()) {
+            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return;
+        }
+
+        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
+
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Regenerating citation keys according to metadata."));
+        }
+
+        CitationKeyGenerator keyGenerator = new CitationKeyGenerator(
+                databaseContext,
+                argumentProcessor.cliPreferences.getCitationKeyPatternPreferences());
+        for (BibEntry entry : databaseContext.getEntries()) {
+            keyGenerator.generateAndSetKey(entry);
         }
 
         if (outputFile != null) {
             ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, parserResult.get().getDatabase(), outputFile);
         } else {
-            System.out.println(parserResult.get().getDatabase());
+            System.out.println(databaseContext.getEntries().stream().map(BibEntry::toString).collect(java.util.stream.Collectors.joining("\n\n")));
         }
     }
 }

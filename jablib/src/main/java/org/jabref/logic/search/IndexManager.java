@@ -52,7 +52,10 @@ public class IndexManager {
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
 
-    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, CliPreferences preferences, PostgreServer postgreServer) {
+    public IndexManager(BibDatabaseContext databaseContext,
+                        TaskExecutor executor,
+                        CliPreferences preferences,
+                        PostgreServer postgreServer) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();

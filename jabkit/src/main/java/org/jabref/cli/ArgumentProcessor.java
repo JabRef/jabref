@@ -191,7 +191,7 @@ public class ArgumentProcessor implements Runnable {
         return importResult;
     } */
 
-    protected static Optional<ParserResult> importFile(CliPreferences cliPreferences, Path file, String importFormat) {
+    protected static Optional<ParserResult> importFile(CliPreferences cliPreferences, Path file, String importFormat, boolean porcelain) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     cliPreferences.getImporterPreferences(),
@@ -201,21 +201,27 @@ public class ArgumentProcessor implements Runnable {
             );
 
             if (!"*".equals(importFormat)) {
-                System.out.println(Localization.lang("Importing %0", file));
+                if (!porcelain) {
+                    System.out.println(Localization.lang("Importing %0", file));
+                }
                 ParserResult result = importFormatReader.importFromFile(importFormat, file);
                 return Optional.of(result);
             } else {
                 // * means "guess the format":
-                System.out.println(Localization.lang("Importing file %0 as unknown format", file));
+                if (!porcelain) {
+                    System.out.println(Localization.lang("Importing file %0 as unknown format", file));
+                }
 
                 ImportFormatReader.UnknownFormatImport importResult =
                         importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
 
-                System.out.println(Localization.lang("Format used: %0", importResult.format()));
+                if (!porcelain) {
+                    System.out.println(Localization.lang("Format used: %0", importResult.format()));
+                }
                 return Optional.of(importResult.parserResult());
             }
         } catch (ImportException ex) {
-            System.err.println(Localization.lang("Error opening file '%0'", file) + "\n" + ex.getLocalizedMessage());
+            LOGGER.error("Error opening file '{}'", file, ex);
             return Optional.empty();
         }
     }

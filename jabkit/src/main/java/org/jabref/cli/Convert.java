@@ -1,6 +1,5 @@
 package org.jabref.cli;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -47,39 +46,32 @@ public class Convert implements Runnable {
 
     @Override
     public void run() {
-        if (inputFile == null
-                || !Files.exists(inputFile)
-                || outputFile == null) {
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, inputFormat, sharedOptions.porcelain);
+        if (parserResult.isEmpty()) {
+            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
         }
 
-        Optional<ParserResult> optionalPr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, inputFormat);
-        if (optionalPr.isPresent()) {
-            ParserResult pr = optionalPr.get();
-
-            if (pr.isInvalid()) {
-                System.out.println(Localization.lang("The output option depends on a valid import option."));
-                return;
-            }
-
-            if (sharedOptions.porcelain) {
-                System.out.println(Localization.lang("Converting to {}", outputFormat));
-            }
-
-            if (outputFile == null) {
-                System.out.println(pr.getDatabase());
-                return;
-            }
-
-            exportFile(pr, outputFile, outputFormat);
-        } else {
-            LOGGER.error("Unable to export input file {}", inputFile);
+        if (parserResult.get().isInvalid()) {
+            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return;
         }
+
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Converting '%0' to '%1'", inputFile, outputFormat));
+        }
+
+        if (outputFile == null) {
+            System.out.println(parserResult.get().getDatabase());
+            return;
+        }
+
+        exportFile(parserResult.get(), outputFile, outputFormat);
     }
 
     protected void exportFile(@NonNull ParserResult pr, @NonNull Path outputFile, String format) {
         if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Exporting %0", outputFile));
+            System.out.println(Localization.lang("Exporting '%0'", outputFile));
         }
 
         if ("bibtex".equalsIgnoreCase(format)) {
@@ -96,7 +88,7 @@ public class Convert implements Runnable {
         ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
         Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
         if (exporter.isEmpty()) {
-            System.err.println(Localization.lang("Unknown export format %0", format));
+            LOGGER.error(Localization.lang("Unknown export format '%0'", format));
             return;
         }
 

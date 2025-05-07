@@ -5,8 +5,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
-import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
@@ -16,7 +16,6 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWr
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,28 +43,28 @@ class CheckConsistency implements Runnable {
 
     @Override
     public void run() {
-        if (inputFile == null) {
-            System.out.println(Localization.lang("No file specified for consistency check."));
-            return;
-        }
-
         if (!FileUtil.isBibFile(inputFile)) {
             System.out.println(Localization.lang("Only bib files for consistency check."));
             return;
         }
 
-        ParserResult pr;
-        try {
-            pr = OpenDatabase.loadDatabase(
-                    inputFile,
-                    argumentProcessor.cliPreferences.getImportFormatPreferences(),
-                    new DummyFileUpdateMonitor()
-            );
-        } catch (IOException ex) {
-            LOGGER.error("Error reading '{}'.", inputFile, ex);
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex", sharedOptions.porcelain);
+        if (parserResult.isEmpty()) {
+            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
         }
-        BibDatabaseContext databaseContext = pr.getDatabaseContext();
+
+        if (parserResult.get().isInvalid()) {
+            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return;
+        }
+
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Checking consistency of '%0'.", inputFile));
+            System.out.flush();
+        }
+
+        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
         List<BibEntry> entries = databaseContext.getDatabase().getEntries();
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
@@ -95,7 +94,9 @@ class CheckConsistency implements Runnable {
             writer.flush();
         } catch (IOException e) {
             LOGGER.error("Error writing results", e);
+            return;
         }
+
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Consistency check completed"));
         }

@@ -53,29 +53,33 @@ class Search implements Runnable {
 
     @Override
     public void run() {
-        String searchTerm = query;
-        Optional<ParserResult> pr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex");
-        if (pr.isEmpty()) {
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex", sharedOptions.porcelain);
+        if (parserResult.isEmpty()) {
+            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
         }
 
-        BibDatabaseContext databaseContext = pr.get().getDatabaseContext();
+        if (parserResult.get().isInvalid()) {
+            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            return;
+        }
 
         PostgreServer postgreServer = new PostgreServer();
-        Injector.setModelOrService(PostgreServer.class, postgreServer);
+        // Injector.setModelOrService(PostgreServer.class, postgreServer);
         IndexManager.clearOldSearchIndices();
 
         SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
-        SearchQuery query = new SearchQuery(searchTerm, searchPreferences.getSearchFlags());
+        SearchQuery searchQuery = new SearchQuery(query, searchPreferences.getSearchFlags());
 
+        BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
         List<BibEntry> matches;
         try {
             // extract current thread task executor from indexManager
-            matches = new DatabaseSearcher(query,
+            matches = new DatabaseSearcher(searchQuery,
                     databaseContext,
                     new CurrentThreadTaskExecutor(),
                     argumentProcessor.cliPreferences,
-                    Injector.instantiateModelOrService(PostgreServer.class)
+                    postgreServer
             ).getMatches();
         } catch (IOException ex) {
             LOGGER.error("Error occurred when searching", ex);
@@ -97,21 +101,23 @@ class Search implements Runnable {
             // export new database
             ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
             Optional<Exporter> exporter = exporterFactory.getExporterByName(outputFormat);
+
             if (exporter.isEmpty()) {
-                System.err.println(Localization.lang("Unknown export format %0", outputFormat));
-            } else {
-                // We have an TemplateExporter instance:
-                try {
-                    System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
-                    exporter.get().export(
-                            databaseContext,
-                            outputFile,
-                            matches,
-                            List.of(),
-                            Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-                } catch (Exception ex) {
-                    LOGGER.error("Could not export file '{}}'", outputFile.toAbsolutePath(), ex);
-                }
+                System.out.println(Localization.lang("Unknown export format %0", outputFormat));
+                return;
+            }
+
+            // We have an TemplateExporter instance:
+            try {
+                System.out.println(Localization.lang("Exporting %0", outputFile.toAbsolutePath().toString()));
+                exporter.get().export(
+                        databaseContext,
+                        outputFile,
+                        matches,
+                        List.of(),
+                        Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+            } catch (Exception ex) {
+                LOGGER.error("Could not export file '{}}'", outputFile.toAbsolutePath(), ex);
             }
         }
     }

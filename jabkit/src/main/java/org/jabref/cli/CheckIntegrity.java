@@ -2,6 +2,8 @@ package org.jabref.cli;
 
 import java.io.File;
 
+import org.jabref.logic.l10n.Localization;
+
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
@@ -24,6 +26,11 @@ class CheckIntegrity implements Runnable {
 
     @Override
     public void run() {
-        // TODO: Implement consistency checking
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Checking integrity of '%0'.", inputFile));
+            System.out.flush();
+        }
+
+        // TODO: Implement integrity checking
     }
 }

@@ -1,5 +1,6 @@
 package org.jabref.cli;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,22 +43,29 @@ class GenerateBibFromAux implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> pr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex");
-
-        if (pr.isEmpty() || auxFile == null) {
+        Optional<ParserResult> pr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex", sharedOptions.porcelain);
+        if (pr.isEmpty()) {
+            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
         }
 
-        BibDatabase subDatabase = null;
-        BibDatabase sourceDatabase = pr.get().getDatabase();
-
-        if (auxFile != null && (sourceDatabase != null)) {
-            AuxParser auxParser = new DefaultAuxParser(sourceDatabase);
-            AuxParserResult result = auxParser.parse(auxFile);
-            LOGGER.info(new AuxParserStatisticsProvider(result).getInformation(true));
-            subDatabase = result.getGeneratedBibDatabase();
+        if (!Files.exists(auxFile)) {
+            System.out.println(Localization.lang("Unable to open file '%0'.", auxFile));
+            return;
         }
 
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Creating excerpt of from '%0' with '%1'", inputFile, auxFile.toAbsolutePath()));
+        }
+
+        AuxParser auxParser = new DefaultAuxParser(pr.get().getDatabase());
+        AuxParserResult result = auxParser.parse(auxFile);
+
+        if (!sharedOptions.porcelain) {
+            System.out.println(new AuxParserStatisticsProvider(result).getInformation(true));
+        }
+
+        BibDatabase subDatabase = result.getGeneratedBibDatabase();
         if (subDatabase == null || !subDatabase.hasEntries()) {
             System.out.println(Localization.lang("No library generated."));
             return;
@@ -65,8 +73,13 @@ class GenerateBibFromAux implements Runnable {
 
         if (outputFile == null) {
             System.out.println(subDatabase.getEntries().stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
+            return;
         } else {
             ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, subDatabase, outputFile);
+        }
+
+        if (!sharedOptions.porcelain) {
+            System.out.println(Localization.lang("Created library with '%0' entries.", subDatabase.getEntryCount()));
         }
     }
 }
