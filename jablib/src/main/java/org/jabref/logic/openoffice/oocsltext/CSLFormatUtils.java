@@ -26,6 +26,9 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public final class CSLFormatUtils {
 
+    private static final String DEFAULT_BIBLIOGRAPHY_BODY_FORMAT = "Text body";
+    private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
+
     /**
      * The formatting names specified to and understood by LibreOffice via code are often different from their displayed names in the LibreOffice GUI application.
      * For example, "Hanging Indent" as visible in LO styles list should be specified as "Hanging indent" (note casing). Similarly, "Body Text, Indented" is specified as "Text body indent".
@@ -35,7 +38,6 @@ public final class CSLFormatUtils {
             "Bibliography Heading",
             "Title",
             "Text body",
-            "Body Text",
             "Subtitle",
             "Heading 1",
             "Heading 2",
@@ -46,7 +48,6 @@ public final class CSLFormatUtils {
     public static final List<String> BIBLIOGRAPHY_BODY_FORMATS = List.of(
             "Bibliography 1",
             "Text body",
-            "Body Text",
             "Text body indent",
             "First line indent",
             "Hanging indent",
@@ -63,9 +64,9 @@ public final class CSLFormatUtils {
 
     public static String getDefaultBodyFormatForStyle(CitationStyle style) {
         if (style.usesHangingIndent()) {
-            return "Hanging indent";
+            return DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT;
         }
-        return "Bibliography 1";
+        return DEFAULT_BIBLIOGRAPHY_BODY_FORMAT;
     }
 
     /**
