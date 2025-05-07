@@ -15,6 +15,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 - We added the provision to choose different CSL bibliography body formats (e.g. First Line Indent, Hanging Indent, Bibliography 1, etc.) in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
+- We added a success dialog when using the "Copy to" option, indicating whether the entry was successfully copied and specifying if a cross-reference entry was included. [#12486](https://github.com/JabRef/jabref/issues/12486)
 
 ### Changed
 
