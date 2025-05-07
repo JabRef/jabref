@@ -34,9 +34,7 @@ public class ModifyCSLBibliographyPropertiesDialogView extends BaseDialog<Void> 
                   .setAsDialogPane(this);
 
         Button okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
-        okButton.setOnAction(_ -> {
-            this.close();
-        });
+        okButton.setOnAction(_ -> this.close());
     }
 
     @FXML
