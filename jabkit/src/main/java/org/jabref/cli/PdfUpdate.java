@@ -165,7 +165,7 @@ class PdfUpdate implements Runnable {
                         abbreviationRepository)) {
                     System.out.println(Localization.lang("Successfully written XMP metadata on at least one linked file of %0.", citeKey));
                 } else {
-                    System.out.println(Localization.lang("Cannot write XMP metadata on any linked files of %0. Make sure there is at least one linked file and the path is correct.%n", citeKey));
+                    System.out.println(Localization.lang("Cannot write XMP metadata on any linked files of %0. Make sure there is at least one linked file and the path is correct.", citeKey));
                 }
             }
             if (embedBibfile) {
@@ -177,7 +177,7 @@ class PdfUpdate implements Runnable {
                         abbreviationRepository)) {
                     System.out.println(Localization.lang("Successfully embedded metadata on at least one linked file of %0.", citeKey));
                 } else {
-                    System.out.println(Localization.lang("Cannot embed metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey));
+                    System.out.println(Localization.lang("Cannot embed metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
                 }
             }
         } catch (Exception e) {
