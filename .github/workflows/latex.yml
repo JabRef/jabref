@@ -31,7 +31,7 @@ jobs:
         uses: zauguin/install-texlive@v4
         with:
            package_file: jablib/src/test/latex/Texlivefile
-  build:
+  check-latex:
     needs: [cache]
     runs-on: ubuntu-latest
     strategy:
@@ -84,7 +84,7 @@ jobs:
       - name: Install TeX Live
         uses: zauguin/install-texlive@v4
         with:
-           package_file: Texlivefile
+          package_file: jablib/src/test/latex/Texlivefile
 
       - run: ${{ matrix.engine }} ${{ matrix.tex }}
         working-directory: ${{ matrix.directory }}
