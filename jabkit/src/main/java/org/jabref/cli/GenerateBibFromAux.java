@@ -43,7 +43,11 @@ class GenerateBibFromAux implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> pr = ArgumentProcessor.importFile(inputFile, "bibtex", argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> pr = ArgumentProcessor.importFile(
+                inputFile,
+                "bibtex",
+                argumentProcessor.cliPreferences,
+                sharedOptions.porcelain);
         if (pr.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -72,10 +76,16 @@ class GenerateBibFromAux implements Runnable {
         }
 
         if (outputFile == null) {
-            System.out.println(subDatabase.getEntries().stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
+            System.out.println(subDatabase.getEntries().stream()
+                                          .map(BibEntry::toString)
+                                          .collect(Collectors.joining("\n\n")));
             return;
         } else {
-            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, subDatabase, outputFile);
+            ArgumentProcessor.saveDatabase(
+                    argumentProcessor.cliPreferences,
+                    argumentProcessor.entryTypesManager,
+                    subDatabase,
+                    outputFile);
         }
 
         if (!sharedOptions.porcelain) {

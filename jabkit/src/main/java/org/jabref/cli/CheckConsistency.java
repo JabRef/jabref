@@ -41,7 +41,11 @@ class CheckConsistency implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, "bibtex", argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+                inputFile,
+                "bibtex",
+                argumentProcessor.cliPreferences,
+                sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;

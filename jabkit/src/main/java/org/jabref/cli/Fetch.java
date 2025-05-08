@@ -72,7 +72,11 @@ class Fetch implements Runnable {
             }
 
             if (outputFile != null) {
-                ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, new BibDatabase(matches), outputFile);
+                ArgumentProcessor.saveDatabase(
+                        argumentProcessor.cliPreferences,
+                        argumentProcessor.entryTypesManager,
+                        new BibDatabase(matches),
+                        outputFile);
             } else {
                 System.out.println(matches.stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
             }

@@ -36,7 +36,11 @@ public class GenerateCitationKeys implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, "bibtex", argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+                inputFile,
+                "bibtex",
+                argumentProcessor.cliPreferences,
+                sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -61,9 +65,15 @@ public class GenerateCitationKeys implements Runnable {
         }
 
         if (outputFile != null) {
-            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, parserResult.get().getDatabase(), outputFile);
+            ArgumentProcessor.saveDatabase(
+                    argumentProcessor.cliPreferences,
+                    argumentProcessor.entryTypesManager,
+                    parserResult.get().getDatabase(),
+                    outputFile);
         } else {
-            System.out.println(databaseContext.getEntries().stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
+            System.out.println(databaseContext.getEntries().stream()
+                                              .map(BibEntry::toString)
+                                              .collect(Collectors.joining("\n\n")));
         }
     }
 }

@@ -60,7 +60,11 @@ class PdfUpdate implements Runnable {
             return;
         }
 
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, inputFormat, pdf.argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+                inputFile,
+                inputFormat,
+                pdf.argumentProcessor.cliPreferences,
+                sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -153,14 +157,24 @@ class PdfUpdate implements Runnable {
                                                    boolean embedBibfile) {
         try {
             if (writeXMP) {
-                if (xmpPdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry), abbreviationRepository)) {
+                if (xmpPdfExporter.exportToAllFilesOfEntry(
+                        databaseContext,
+                        filePreferences,
+                        entry,
+                        List.of(entry),
+                        abbreviationRepository)) {
                     System.out.println(Localization.lang("Successfully written XMP metadata on at least one linked file of %0.", citeKey));
                 } else {
                     System.out.println(Localization.lang("Cannot write XMP metadata on any linked files of %0. Make sure there is at least one linked file and the path is correct.%n", citeKey));
                 }
             }
             if (embedBibfile) {
-                if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(databaseContext, filePreferences, entry, List.of(entry), abbreviationRepository)) {
+                if (embeddedBibFilePdfExporter.exportToAllFilesOfEntry(
+                        databaseContext,
+                        filePreferences,
+                        entry,
+                        List.of(entry),
+                        abbreviationRepository)) {
                     System.out.println(Localization.lang("Successfully embedded metadata on at least one linked file of %0.", citeKey));
                 } else {
                     System.out.println(Localization.lang("Cannot embed metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.%n", citeKey));
@@ -186,7 +200,16 @@ class PdfUpdate implements Runnable {
                 continue;
             }
             for (BibEntry entry : bibEntryList) {
-                writeMetadataToPDFsOfEntry(databaseContext, citeKey, entry, filePreferences, xmpPdfExporter, embeddedBibFilePdfExporter, abbreviationRepository, writeXMP, embeddBibfile);
+                writeMetadataToPDFsOfEntry(
+                        databaseContext,
+                        citeKey,
+                        entry,
+                        filePreferences,
+                        xmpPdfExporter,
+                        embeddedBibFilePdfExporter,
+                        abbreviationRepository,
+                        writeXMP,
+                        embeddBibfile);
             }
         }
     }

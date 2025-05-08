@@ -53,7 +53,11 @@ class Search implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, "bibtex", argumentProcessor.cliPreferences, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
+                inputFile,
+                "bibtex",
+                argumentProcessor.cliPreferences,
+                sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
@@ -94,7 +98,11 @@ class Search implements Runnable {
         if ("bibtex".equals(outputFormat)) {
             // output a bib file as default or if
             // provided exportFormat is "bib"
-            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, new BibDatabase(matches), outputFile);
+            ArgumentProcessor.saveDatabase(
+                    argumentProcessor.cliPreferences,
+                    argumentProcessor.entryTypesManager,
+                    new BibDatabase(matches),
+                    outputFile);
             LOGGER.debug("Finished export");
         } else {
             // export new database

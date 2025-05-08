@@ -12,7 +12,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.google.common.base.Throwables;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,18 +68,22 @@ public class Convert implements Runnable {
         exportFile(parserResult.get(), outputFile, outputFormat);
     }
 
-    protected void exportFile(@NonNull ParserResult pr, @NonNull Path outputFile, String format) {
+    protected void exportFile(@NonNull ParserResult parserResult, @NonNull Path outputFile, String format) {
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Exporting '%0'", outputFile));
         }
 
         if ("bibtex".equalsIgnoreCase(format)) {
-            ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, pr.getDatabase(), outputFile);
+            ArgumentProcessor.saveDatabase(
+                    argumentProcessor.cliPreferences,
+                    argumentProcessor.entryTypesManager,
+                    parserResult.getDatabase(),
+                    outputFile);
             return;
         }
 
-        Path path = pr.getPath().get().toAbsolutePath();
-        BibDatabaseContext databaseContext = pr.getDatabaseContext();
+        Path path = parserResult.getPath().get().toAbsolutePath();
+        BibDatabaseContext databaseContext = parserResult.getDatabaseContext();
         databaseContext.setDatabasePath(path);
         List<Path> fileDirForDatabase = databaseContext
                 .getFileDirectories(argumentProcessor.cliPreferences.getFilePreferences());
@@ -88,19 +91,19 @@ public class Convert implements Runnable {
         ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
         Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
         if (exporter.isEmpty()) {
-            LOGGER.error(Localization.lang("Unknown export format '%0'", format));
+            System.out.println(Localization.lang("Unknown export format '%0'", format));
             return;
         }
 
         try {
             exporter.get().export(
-                    pr.getDatabaseContext(),
+                    parserResult.getDatabaseContext(),
                     outputFile,
-                    pr.getDatabaseContext().getDatabase().getEntries(),
+                    parserResult.getDatabaseContext().getDatabase().getEntries(),
                     fileDirForDatabase,
                     Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
         } catch (Exception ex) {
-            System.err.println(Localization.lang("Could not export file '%0' (reason: %1)", outputFile, Throwables.getStackTraceAsString(ex)));
+            LOGGER.error("Could not export file '{}'.", outputFile, ex);
         }
     }
 }

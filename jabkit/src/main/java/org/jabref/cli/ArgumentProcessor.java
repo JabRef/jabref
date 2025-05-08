@@ -74,7 +74,10 @@ public class ArgumentProcessor implements Runnable {
     /**
      * Reads URIs as input
      */
-    protected static Optional<ParserResult> importFile(String importArguments, String importFormat, CliPreferences cliPreferences, boolean porcelain) {
+    protected static Optional<ParserResult> importFile(String importArguments,
+                                                       String importFormat,
+                                                       CliPreferences cliPreferences,
+                                                       boolean porcelain) {
         LOGGER.debug("Importing file {}", importArguments);
         String[] data = importArguments.split(",");
 
@@ -105,7 +108,10 @@ public class ArgumentProcessor implements Runnable {
         return importResult;
     }
 
-    protected static Optional<ParserResult> importFile(Path file, String importFormat, CliPreferences cliPreferences, boolean porcelain) {
+    protected static Optional<ParserResult> importFile(Path file,
+                                                       String importFormat,
+                                                       CliPreferences cliPreferences,
+                                                       boolean porcelain) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     cliPreferences.getImporterPreferences(),
@@ -140,7 +146,10 @@ public class ArgumentProcessor implements Runnable {
         }
     }
 
-    protected static void saveDatabase(CliPreferences cliPreferences, BibEntryTypesManager entryTypesManager, BibDatabase newBase, Path outputFile) {
+    protected static void saveDatabase(CliPreferences cliPreferences,
+                                       BibEntryTypesManager entryTypesManager,
+                                       BibDatabase newBase,
+                                       Path outputFile) {
         try {
             System.out.println(Localization.lang("Saving") + ": " + outputFile);
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
