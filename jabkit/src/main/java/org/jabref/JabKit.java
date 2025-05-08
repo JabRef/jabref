@@ -77,7 +77,7 @@ public class JabKit {
             // Process arguments
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
-            String usageHeader = String.format(BuildInfo.JABREF_BANNER, new BuildInfo().version);
+            String usageHeader = BuildInfo.JABREF_BANNER.formatted(new BuildInfo().version);
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             commandLine.getSubcommands().values().forEach(subCommand -> subCommand.getCommandSpec().usageMessage().header(usageHeader));
             applyUsageFooters(commandLine,
@@ -117,7 +117,7 @@ public class JabKit {
                    .getCommandSpec().usageMessage().footer(Localization.lang("The following providers are available:") + "\n"
                            + fetchers.stream()
                                      .map(WebFetcher::getName)
-                                     .filter(name -> !name.equals("Search pre-configured"))
+                                     .filter(name -> !"Search pre-configured".equals(name))
                                      .collect(Collectors.joining(", ")));
     }
 
@@ -132,7 +132,7 @@ public class JabKit {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug
-        boolean isDebugEnabled = Arrays.stream(args).anyMatch(arg -> arg.equalsIgnoreCase("--debug"));
+        boolean isDebugEnabled = Arrays.stream(args).anyMatch(arg -> "--debug".equalsIgnoreCase(arg));
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging

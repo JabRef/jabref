@@ -2,6 +2,7 @@ package org.jabref.cli;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
@@ -62,7 +63,7 @@ public class GenerateCitationKeys implements Runnable {
         if (outputFile != null) {
             ArgumentProcessor.saveDatabase(argumentProcessor.cliPreferences, argumentProcessor.entryTypesManager, parserResult.get().getDatabase(), outputFile);
         } else {
-            System.out.println(databaseContext.getEntries().stream().map(BibEntry::toString).collect(java.util.stream.Collectors.joining("\n\n")));
+            System.out.println(databaseContext.getEntries().stream().map(BibEntry::toString).collect(Collectors.joining("\n\n")));
         }
     }
 }

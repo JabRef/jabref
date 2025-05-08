@@ -18,7 +18,7 @@ import picocli.CommandLine;
 public class ArgumentProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
-    public enum Mode { INITIAL_START, REMOTE_START; }
+    public enum Mode { INITIAL_START, REMOTE_START }
 
     private final Mode startupMode;
     private final GuiPreferences preferences;
