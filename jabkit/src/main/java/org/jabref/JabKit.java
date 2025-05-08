@@ -54,6 +54,8 @@ import picocli.CommandLine;
 public class JabKit {
     private static Logger LOGGER;
 
+    private static String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
+
     public static void main(String[] args) {
         initLogging(args);
 
@@ -77,9 +79,8 @@ public class JabKit {
             // Process arguments
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
-            String usageHeader = BuildInfo.JABREF_BANNER.formatted(new BuildInfo().version);
+            String usageHeader = BuildInfo.JABREF_BANNER.formatted(new BuildInfo().version) + "\n" + JABKIT_BRAND;
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
-            commandLine.getSubcommands().values().forEach(subCommand -> subCommand.getCommandSpec().usageMessage().header(usageHeader));
             applyUsageFooters(commandLine,
                     ArgumentProcessor.getAvailableImportFormats(preferences),
                     ArgumentProcessor.getAvailableExportFormats(preferences),
