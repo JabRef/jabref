@@ -16,20 +16,6 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 
 public class ArgumentProcessor {
-    public static final String JABREF_BANNER = """
-    \u001B[35m
-       &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
-       &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&& %s
-       &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
-       &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
-    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
-    \u001B[0m
-    Staying on top of your literature since 2003 - https://www.jabref.org/
-    Please report issues at https://github.com/JabRef/jabref/issues
-    """;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
     public enum Mode { INITIAL_START, REMOTE_START; }
@@ -58,13 +44,13 @@ public class ArgumentProcessor {
         guiNeeded = true;
 
         if ((startupMode == Mode.INITIAL_START) && cli.isVersionHelpRequested()) {
-            System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
+            System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
             guiNeeded = false;
             return List.of();
         }
 
         if ((startupMode == Mode.INITIAL_START) && cli.isUsageHelpRequested()) {
-            System.out.printf(JABREF_BANNER + "%n", new BuildInfo().version);
+            System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
             System.out.println(cli.getUsageMessage());
 
             guiNeeded = false;

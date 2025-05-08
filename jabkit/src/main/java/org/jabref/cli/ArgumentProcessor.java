@@ -47,20 +47,6 @@ import static picocli.CommandLine.Option;
                 Pdf.class
         })
 public class ArgumentProcessor implements Runnable {
-    public static final String JABREF_BANNER = """
-    \u001B[35m
-       &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
-       &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&& %s
-       &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
-       &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
-    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
-    \u001B[0m
-    Staying on top of your literature since 2003 - https://www.jabref.org/
-    Please report issues at https://github.com/JabRef/jabref/issues
-    """;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
 
     protected final CliPreferences cliPreferences;
@@ -79,7 +65,7 @@ public class ArgumentProcessor implements Runnable {
 
     @Override
     public void run() {
-        System.out.printf(ArgumentProcessor.JABREF_BANNER + "%n", new BuildInfo().version);
+        System.out.printf(BuildInfo.JABREF_BANNER + "%n", new BuildInfo().version);
     }
 
     /**

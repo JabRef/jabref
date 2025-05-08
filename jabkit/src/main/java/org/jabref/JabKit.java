@@ -77,7 +77,7 @@ public class JabKit {
             // Process arguments
             ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
             CommandLine commandLine = new CommandLine(argumentProcessor);
-            String usageHeader = String.format(ArgumentProcessor.JABREF_BANNER, new BuildInfo().version);
+            String usageHeader = String.format(BuildInfo.JABREF_BANNER, new BuildInfo().version);
             commandLine.getCommandSpec().usageMessage().header(usageHeader);
             commandLine.getSubcommands().values().forEach(subCommand -> subCommand.getCommandSpec().usageMessage().header(usageHeader));
             applyUsageFooters(commandLine,
