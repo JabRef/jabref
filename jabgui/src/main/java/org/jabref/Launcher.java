@@ -65,7 +65,6 @@ public class Launcher {
                 ArgumentProcessor.Mode.INITIAL_START,
                 preferences);
 
-        // The method `processArguments` quits the whole JVM if no GUI is needed.
         List<UiCommand> uiCommands = argumentProcessor.processArguments();
         if (argumentProcessor.shouldShutDown()) {
             systemExit();
