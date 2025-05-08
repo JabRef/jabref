@@ -1,6 +1,8 @@
+
 \documentclass{article}
-\bibliographystyle{plain}
+\usepackage[backend=biber, style=numeric]{biblatex}
+\addbibresource{json-metadata.bib}
 \begin{document}
 This is a citation~\cite{GustafssonJohansson2015}.
-\bibliography{json-metadata}
+\printbibliography
 \end{document}
