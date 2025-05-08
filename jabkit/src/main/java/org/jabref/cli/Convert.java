@@ -57,7 +57,7 @@ public class Convert implements Runnable {
         }
 
         if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Converting '%0' to '%1'", inputFile, outputFormat));
+            System.out.println(Localization.lang("Converting '%0' to '%1'.", inputFile, outputFormat));
         }
 
         if (outputFile == null) {
@@ -70,7 +70,7 @@ public class Convert implements Runnable {
 
     protected void exportFile(@NonNull ParserResult parserResult, @NonNull Path outputFile, String format) {
         if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Exporting '%0'", outputFile));
+            System.out.println(Localization.lang("Exporting '%0'.", outputFile));
         }
 
         if ("bibtex".equalsIgnoreCase(format)) {
@@ -91,7 +91,7 @@ public class Convert implements Runnable {
         ExporterFactory exporterFactory = ExporterFactory.create(argumentProcessor.cliPreferences);
         Optional<Exporter> exporter = exporterFactory.getExporterByName(format);
         if (exporter.isEmpty()) {
-            System.out.println(Localization.lang("Unknown export format '%0'", format));
+            System.out.println(Localization.lang("Unknown export format '%0'.", format));
             return;
         }
 

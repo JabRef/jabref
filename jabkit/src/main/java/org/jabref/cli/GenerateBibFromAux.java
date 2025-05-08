@@ -59,7 +59,7 @@ class GenerateBibFromAux implements Runnable {
         }
 
         if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Creating excerpt of from '%0' with '%1'", inputFile, auxFile.toAbsolutePath()));
+            System.out.println(Localization.lang("Creating excerpt of from '%0' with '%1'.", inputFile, auxFile.toAbsolutePath()));
         }
 
         AuxParser auxParser = new DefaultAuxParser(pr.get().getDatabase());

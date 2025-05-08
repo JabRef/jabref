@@ -238,14 +238,14 @@ class PdfUpdate implements Runnable {
                     if (xmpPdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
                         System.out.println(Localization.lang("Successfully written XMP metadata of at least one entry to %0.", filePath));
                     } else {
-                        System.out.println(Localization.lang("File %0 is not linked to any entry in database.", filePath));
+                        System.out.println(Localization.lang("File %0 is not linked to any entry in library.", filePath));
                     }
                 }
                 if (embeddBibfile) {
                     if (embeddedBibFilePdfExporter.exportToFileByPath(databaseContext, filePreferences, filePath, abbreviationRepository)) {
                         System.out.println(Localization.lang("Successfully embedded XMP metadata of at least one entry to %0.", filePath));
                     } else {
-                        System.out.println(Localization.lang("File %0 is not linked to any entry in database.", filePath));
+                        System.out.println(Localization.lang("File %0 is not linked to any entry in library.", filePath));
                     }
                 }
             } catch (Exception e) {
