@@ -60,7 +60,7 @@ class PdfUpdate implements Runnable {
             return;
         }
 
-        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(pdf.argumentProcessor.cliPreferences, inputFile, inputFormat, sharedOptions.porcelain);
+        Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, inputFormat, pdf.argumentProcessor.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;

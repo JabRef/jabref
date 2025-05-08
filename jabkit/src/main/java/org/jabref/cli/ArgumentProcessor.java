@@ -69,8 +69,7 @@ public class ArgumentProcessor implements Runnable {
     }
 
     /**
-     * Reads URIs as input // ToDo: Bring back
-     * importArguments Format: <code>fileName[,format]</code>
+     * Reads URIs as input
      */
     /* protected Optional<ParserResult> importFile(String importArguments, String importFormat) {
         LOGGER.debug("Importing file {}", importArguments);
@@ -103,7 +102,7 @@ public class ArgumentProcessor implements Runnable {
         return importResult;
     } */
 
-    protected static Optional<ParserResult> importFile(CliPreferences cliPreferences, Path file, String importFormat, boolean porcelain) {
+    protected static Optional<ParserResult> importFile(Path file, String importFormat, CliPreferences cliPreferences, boolean porcelain) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     cliPreferences.getImporterPreferences(),

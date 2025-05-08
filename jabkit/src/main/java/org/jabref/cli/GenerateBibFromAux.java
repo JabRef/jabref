@@ -43,7 +43,7 @@ class GenerateBibFromAux implements Runnable {
 
     @Override
     public void run() {
-        Optional<ParserResult> pr = ArgumentProcessor.importFile(argumentProcessor.cliPreferences, inputFile, "bibtex", sharedOptions.porcelain);
+        Optional<ParserResult> pr = ArgumentProcessor.importFile(inputFile, "bibtex", argumentProcessor.cliPreferences, sharedOptions.porcelain);
         if (pr.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
             return;
