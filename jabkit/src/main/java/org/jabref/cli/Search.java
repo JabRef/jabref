@@ -43,7 +43,7 @@ class Search implements Runnable {
     private String query;
 
     @Option(names = {"--input"}, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    private String inputFile;
 
     @Option(names = {"--output"}, description = "Output file")
     private Path outputFile;

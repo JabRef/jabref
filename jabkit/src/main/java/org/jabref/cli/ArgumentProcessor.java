@@ -1,6 +1,7 @@
 package org.jabref.cli;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
@@ -14,10 +15,12 @@ import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
@@ -71,7 +74,7 @@ public class ArgumentProcessor implements Runnable {
     /**
      * Reads URIs as input
      */
-    /* protected Optional<ParserResult> importFile(String importArguments, String importFormat) {
+    protected static Optional<ParserResult> importFile(String importArguments, String importFormat, CliPreferences cliPreferences, boolean porcelain) {
         LOGGER.debug("Importing file {}", importArguments);
         String[] data = importArguments.split(",");
 
@@ -93,14 +96,14 @@ public class ArgumentProcessor implements Runnable {
             }
         }
 
-        Optional<ParserResult> importResult = importFile(file, importFormat);
+        Optional<ParserResult> importResult = importFile(file, importFormat, cliPreferences, porcelain);
         importResult.ifPresent(result -> {
             if (result.hasWarnings()) {
                 System.out.println(result.getErrorMessage());
             }
         });
         return importResult;
-    } */
+    }
 
     protected static Optional<ParserResult> importFile(Path file, String importFormat, CliPreferences cliPreferences, boolean porcelain) {
         try {

@@ -3,7 +3,6 @@ package org.jabref.cli;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +12,6 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCsvWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -36,18 +34,13 @@ class CheckConsistency implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = {"--input"}, description = "Input BibTeX file", required = true)
-    private Path inputFile;
+    private String inputFile;
 
     @Option(names = {"--output-format"}, description = "Output format: txt or csv", defaultValue = "txt")
     private String outputFormat;
 
     @Override
     public void run() {
-        if (!FileUtil.isBibFile(inputFile)) {
-            System.out.println(Localization.lang("Only bib files for consistency check."));
-            return;
-        }
-
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, "bibtex", argumentProcessor.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));

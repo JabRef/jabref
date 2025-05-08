@@ -33,7 +33,7 @@ public class Convert implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = {"--input"}, description = "Input file", required = true)
-    private Path inputFile;
+    private String inputFile;
 
     @Option(names = {"--input-format"}, description = "Input format")
     private String inputFormat;

@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -29,18 +28,13 @@ public class GenerateCitationKeys implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @Option(names = "--input", description = "The input .bib file.", required = true)
-    private Path inputFile;
+    private String inputFile;
 
     @Option(names = "--output", description = "The output .bib file.")
     private Path outputFile;
 
     @Override
     public void run() {
-        if (!FileUtil.isBibFile(inputFile)) {
-            System.out.println(Localization.lang("Citation keys can only be generated for BibTeX files."));
-            return;
-        }
-
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(inputFile, "bibtex", argumentProcessor.cliPreferences, sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));

@@ -45,7 +45,7 @@ class PdfUpdate implements Runnable {
     private List<String> citationKeys = List.of(); // ToDo: check dedault value
 
     @Option(names = "--input", description = "Input file", required = true)
-    private Path inputFile;
+    private Path inputFile; // Local files only
 
     @Option(names = "--input-format", description = "Input format of the file", required = true)
     private String inputFormat = "*";

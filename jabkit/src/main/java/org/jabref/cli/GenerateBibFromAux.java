@@ -36,7 +36,7 @@ class GenerateBibFromAux implements Runnable {
     private Path auxFile;
 
     @Option(names = "--input", required = true)
-    private Path inputFile;
+    private String inputFile;
 
     @Option(names = "--output")
     private Path outputFile;
