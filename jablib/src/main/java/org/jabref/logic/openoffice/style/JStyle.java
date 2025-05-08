@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -277,9 +276,8 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     private void reload() throws IOException {
         if (styleFile != null) {
             if (fromResource) {
-                URL resUrl = JStyle.class.getResource(path);
-                if (resUrl != null) {
-                    try (InputStream stream = resUrl.openStream()) {
+                try (InputStream stream = JStyle.class.getResourceAsStream(path)) {
+                    if (stream != null) {
                         initialize(stream);
                         this.styleFileModificationTime = System.currentTimeMillis();
                         return;
