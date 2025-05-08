@@ -65,7 +65,6 @@ class Search implements Runnable {
         }
 
         PostgreServer postgreServer = new PostgreServer();
-        // Injector.setModelOrService(PostgreServer.class, postgreServer);
         IndexManager.clearOldSearchIndices();
 
         SearchPreferences searchPreferences = argumentProcessor.cliPreferences.getSearchPreferences();
