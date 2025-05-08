@@ -51,6 +51,7 @@ import com.airhacks.afterburner.injection.Injector;
 import com.sun.star.beans.IllegalTypeException;
 import com.sun.star.beans.NotRemoveableException;
 import com.sun.star.beans.PropertyVetoException;
+import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.DisposedException;
@@ -949,7 +950,9 @@ public class OOBibBase {
 
                     cslUpdateBibliography.rebuildCSLBibliography(doc, cslCitationOOAdapter, citedEntries, citationStyle, bibDatabaseContext, Injector.instantiateModelOrService(BibEntryTypesManager.class));
                 } catch (NoDocumentException
-                         | NoSuchElementException e) {
+                         | NoSuchElementException
+                         | PropertyVetoException
+                         | UnknownPropertyException e) {
                     throw new RuntimeException(e);
                 } finally {
                     doc.unlockControllers();

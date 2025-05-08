@@ -12,7 +12,7 @@ plugins {
 group = "org.jabref.jabkit"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
-val luceneVersion = "10.2.0"
+val luceneVersion = "10.2.1"
 
 dependencies {
     implementation(project(":jablib"))
