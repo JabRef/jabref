@@ -21,12 +21,6 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
-/**
- * Run an entry fetcher from the command line.
- *
- * Takes a string containing both the name of the fetcher to use and the search query, separated by a :
- * Outputs a TODO: @return A parser result containing the entries fetched or null if an error occurred.
- */
 @Command(name = "fetch", description = "Fetch entries from a provider.")
 class Fetch implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Fetch.class);
