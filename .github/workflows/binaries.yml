@@ -375,14 +375,22 @@ jobs:
             jabgui/build/distribution
             jabkit/build/distribution
           compression-level: 0 # no compression
+
+  comment-on-pr:
+    name: Comment on PR
+    # separate job, because it should wait until all binaries are available
+    needs: [should-upload, build]
+    if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'YES') }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Comment PR
-        if: ${{ needs.should-upload.outputs.secretspresent == 'NO' }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
           comment-tag: download-link
           mode: recreate
+
   notarize:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
