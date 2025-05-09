@@ -475,7 +475,6 @@ jobs:
         run: choco install --no-progress rsync
       - name: Setup SSH key
         if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
-        shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
