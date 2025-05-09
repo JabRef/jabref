@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/8.0.121" fx:controller="org.jabref.gui.openoffice.ModifyCSLBibliographyPropertiesDialogView">
+    <content>
+        <GridPane hgap="10.0" vgap="4.0">
+            <Label text="%Bibliography title" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+            <TextField fx:id="titleField" prefWidth="300.0" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+            <Label text="%Title format" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+            <ComboBox fx:id="headerFormats" prefWidth="300.0" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+            <Label text="%Body format" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+            <ComboBox fx:id="bodyFormats" prefWidth="300.0" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+        </GridPane>
+    </content>
+    <ButtonType fx:constant="OK"/>
+    <ButtonType fx:constant="CANCEL"/>
+</DialogPane>

@@ -8,11 +8,29 @@
 
     To verify compilation locally, run `./gradlew build` or try running JabRef.
 
-- jobName: 'Unit tests'
+- jobName: 'Unit tests - jablib'
   message: >
-    JUnit tests are failing.
-    In the area "Some checks were not successful", locate "Tests / Unit tests (pull_request)" and click on "Details".
-    This brings you to the test output.
+    JUnit tests of `jablib` are failing.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+
+
+    You can then run these tests in IntelliJ to reproduce the failing tests locally.
+    We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
+- jobName: 'Unit tests - jabkit'
+  message: >
+    JUnit tests of `jabkit` are failing.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
+
+
+    You can then run these tests in IntelliJ to reproduce the failing tests locally.
+    We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
+- jobName: 'Unit tests - jabsrv'
+  message: >
+    JUnit tests of `jabsrv` are failing.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Unit tests (pull_request)" and click on it.
 
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
@@ -21,30 +39,35 @@
   message: >
     Your code currently does not meet [JabRef's code guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
     We use [Checkstyle](https://checkstyle.sourceforge.io/) to identify issues.
-    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
-    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Checkstyle (pull_request)" and click on it.
 
 
     In case of issues with the import order, double check that you [activated Auto Import](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#enable-proper-import-cleanup).
     You can trigger fixing imports by pressing <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>O</kbd> to trigger [Optimize Imports](https://www.jetbrains.com/guide/tips/optimize-imports/).
+
+
+    Please carefully follow [the setup guide for the codestyle](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html).
+    Afterwards, please [run checkstyle locally](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-13-code-style.html#run-checkstyle) and fix the issues, commit, and push.
 - jobName: OpenRewrite
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [OpenRewrite](https://docs.openrewrite.org/) to ensure "modern" Java coding practices.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / OpenRewrite (pull_request)" and click on it.
+
+
     The issues found can be **automatically fixed**.
-    Please execute the gradle task *`rewriteRun`*, check the results, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "OpenRewrite".
+    Please execute the gradle task *`rewriteRun`* from the [`rewrite` group of the Gradle Tool window](https://devdocs.jabref.org/code-howtos/faq.html#failing-openrewrite-tests) in IntelliJ, then check the results, commit, and push.
 - jobName: Modernizer
   message: >
     Your code currently does not meet JabRef's code guidelines.
     We use [Gradle Modernizer Plugin](https://github.com/andygoossens/gradle-modernizer-plugin#gradle-modernizer-plugin) to ensure "modern" Java coding practices.
+    You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
+    To see the test output, locate "Tests / Modernizer (pull_request)" and click on it.
+
+
     Please fix the detected errors, commit, and push.
-
-
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Modernizer".
-
 
 # CHANGELOG.md and *.md
 
@@ -83,10 +106,13 @@
 - jobName: no-force-push
   always: true
   message: >
-    Do not force-push!
-    Force pushing is a very bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
+    Hey, we noticed that you **force-pushed** your changes.
+    Force pushing is a bad practice when working together on a project (mainly because it is [not supported well by GitHub itself](https://github.com/orgs/community/discussions/3478)).
     Commits are lost and comments on commits lose their context, thus making it harder to review changes.
     At the end, all commits will be [squashed](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/incorporating-changes-from-a-pull-request/about-pull-request-merges#squash-and-merge-your-commits) anyway before being merged into the `main` branch.
+
+
+    In future, **please avoid that**. For now, you can continue working.
 - jobName: 'Conflicts with target branch'
   message: >
     Your pull request conflicts with the target branch.
@@ -106,11 +132,15 @@
 
 # PR text
 
+- jobName: 'Mandatory Checks present'
+  always: true
+  message: >
+    You have removed the "Mandatory Checks" section from your pull request description. Please adhere to our [pull request template](https://github.com/JabRef/jabref/blob/main/.github/PULL_REQUEST_TEMPLATE.md?plain=1#L10).
 - jobName: 'PR checklist OK'
   always: true
   message: >
-    Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and mark them as one of `[x] done`, `[ ] not done (yet)`, `[/] not applicable`.
-- jobName: 'Determine issue number'
+    Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
+- jobName: 'Issue number present'
   always: true
   message: |
     Your pull request needs to link an issue.
