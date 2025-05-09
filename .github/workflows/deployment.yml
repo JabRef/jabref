@@ -50,10 +50,31 @@ jobs:
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             echo "secretspresent=NO" >> "$GITHUB_OUTPUT"
-            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
+            echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
             exit 0
           fi
           echo "secretspresent=YES" >> "$GITHUB_OUTPUT"
+
+          if [[ "$GITHUB_REF" == refs/heads/gh-readonly-queue* ]]; then
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫 merge queue – skipping upload"
+            exit 0
+          fi
+
+          # macOS: We either upload the non-notarized files - or notarize the files later (and upload these later)
+          #        The variable "upload-to-builds-jabref-org" covers the former case
+
+          if [[ "$OS" == macos* ]]; then
+            if [[ "$GITHUB_REF" != refs/tags/* && "$NOTARIZATION" != "true" ]]; then
+              echo "✅ macOS build without tag and without notarization"
+              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            else
+              echo "🚫 macOS build but for tag or notarization – skipping upload"
+              echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -69,7 +90,7 @@ jobs:
             echo "✅ Label 'dev: binary' found – will upload"
           else
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-            echo "❌ Label 'dev: binary' not found – skipping upload"
+            echo "🚫 Label 'dev: binary' not found – skipping upload"
           fi
 
   build:
@@ -128,7 +149,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
-        if: startsWith(matrix.os, 'macos') || (needs.should-upload.outputs.secretspresent == 'NO')
+        if: startsWith(matrix.os, 'macos') || (needs.should-upload.outputs.upload-to-builds-jabref-org == 'false')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
@@ -261,7 +282,7 @@ jobs:
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Repack deb file for Debian
-        if: (matrix.os == 'ubuntu-22.04') && (needs.should-upload.outputs.secretspresent == 'YES')
+        if: (matrix.os == 'ubuntu-22.04')
         shell: bash
         run: |
           cd jabgui/build/distribution
@@ -272,50 +293,45 @@ jobs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
       - name: Setup rsync (macOS)
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (needs.should-upload.outputs.secretspresent == 'YES') && ((startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+        if: ${{ startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: (matrix.os == 'windows-latest') && (needs.should-upload.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: ${{ (matrix.os == 'windows-latest') && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         run: choco install --no-progress rsync
       - name: Setup SSH key
-        if: ${{ (needs.should-upload.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (!((startsWith(github.ref, 'refs/tags/') || (inputs.notarization == true)))) }}
+        if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
+        shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Upload jabgui to builds.jabref.org (Windows)
-        if: (matrix.os == 'windows-latest') && (needs.should-upload.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: ${{ (matrix.os == 'windows-latest') && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkkit to builds.jabref.org (Windows)
-        if: (matrix.os == 'windows-latest') && (needs.should-upload.outputs.secretspresent == 'YES') && ((github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')))
+        if: ${{ (matrix.os == 'windows-latest') && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabgui to builds.jabref.org (linux, macOS)
-        # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
-        #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
-        # needs to be on one line; multi line does not work
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (needs.should-upload.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
+        if: ${{ (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkit to builds.jabref.org (linux, macOS)
-        # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
-        #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
-        # needs to be on one line; multi line does not work
-        if: ${{ (github.ref == 'refs/heads/main') && (needs.should-upload.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
+        if: ${{ (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
+        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES') && (!(needs.should-upload.outputs.upload-to-builds-jabref-org == 'true')) }}
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
@@ -325,7 +341,7 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
-        if: ${{ needs.should-upload.outputs.upload-to-builds-jabref-org != 'true' }}
+        if: ${{ needs.should-upload.outputs.secretspresent == 'NO' }}
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
@@ -334,7 +350,7 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Comment PR
-        if: ${{ needs.should-upload.outputs.upload-to-builds-jabref-org == 'true' }}
+        if: ${{ needs.should-upload.outputs.secretspresent == 'NO' }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
