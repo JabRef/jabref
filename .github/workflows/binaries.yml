@@ -376,7 +376,7 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
-        if: ${{ needs.should-upload.outputs.secretspresent == 'false' }}
+        if: ${{ needs.should-upload.outputs.upload-to-builds-jabref-org == 'false' }}
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
