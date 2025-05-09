@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.collections.FXCollections;
 
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -29,6 +30,8 @@ class SpringerLinkTest {
 
     @BeforeEach
     void setUp() {
+        Optional<String> apiKey = Optional.of(new BuildInfo().springerNatureAPIKey);
+        when(importerPreferences.getApiKey(SpringerLink.FETCHER_NAME)).thenReturn(apiKey);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         finder = new SpringerLink(importerPreferences);
         entry = new BibEntry();

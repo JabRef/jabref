@@ -44,7 +44,7 @@ public interface PreferencesTab {
      * This method should be called after storing the preferences, This
      * calls the appropriate method in the ViewModel.
      *
-     * @return The messages for the changed properties (e. g. "Changed language: English")
+     * @return The messages for the changed properties (e.g. "Changed language: English")
      */
     List<String> getRestartWarnings();
 }

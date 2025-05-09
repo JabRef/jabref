@@ -53,7 +53,7 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
     @Override
     public void setValues() {
         // ToDo: Include CustomizeGeneralFieldsDialog in PreferencesDialog
-        // therefore yet unused: entryEditorPreferences.getEntryEditorTabList();
+        //       Therefore yet unused: entryEditorPreferences.getEntryEditorTabList();
 
         openOnNewEntryProperty.setValue(entryEditorPreferences.shouldOpenOnNewEntry());
         defaultSourceProperty.setValue(entryEditorPreferences.showSourceTabByDefault());
