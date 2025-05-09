@@ -100,19 +100,6 @@ jobs:
       branchname: ${{ steps.gitversion.outputs.branchName }}
     name: ${{ matrix.displayName }} installer and portable version
     steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
@@ -141,17 +128,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
-        if: startsWith(matrix.os, 'macos') || (steps.checksecrets.outputs.secretspresent == 'NO')
+        if: startsWith(matrix.os, 'macos') || (needs.should-upload.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
       - name: Setup macOS key chain
-        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup macOS key chain for app id cert
-        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -159,7 +146,7 @@ jobs:
           create-keychain: false
           keychain-password: jabref
       - name: Build dmg and pkg (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           set -e
@@ -202,7 +189,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           set -e
@@ -244,7 +231,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Rename files for mac
-        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui
@@ -261,20 +248,20 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package application image (linux, Windows)
-        if: !startsWith(matrix.os, 'macos') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           set -e
           ${{ matrix.archivePortable }}
           ${{ matrix.archivePortableJabKit }}
       - name: Rename files
-        if: ${{ !startsWith(matrix.os, 'macos') && (steps.checksecrets.outputs.secretspresent == 'YES') }}
+        if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES') }}
         shell: pwsh
         run: |
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
       - name: Repack deb file for Debian
-        if: (matrix.os == 'ubuntu-22.04') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os == 'ubuntu-22.04') && (needs.should-upload.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui/build/distribution
@@ -285,28 +272,28 @@ jobs:
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
       - name: Setup rsync (macOS)
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (needs.should-upload.outputs.secretspresent == 'YES') && ((startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: (matrix.os == 'windows-latest') && (needs.should-upload.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         # We want to have rsync available at this place to avoid uploading and downloading from GitHub artifact store (taking > 5 minutes in total)
         # We cannot use "action-rsyncer", because that requires Docker which is unavailable on Windows
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         run: choco install --no-progress rsync
       - name: Setup SSH key
-        if: ${{ (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (!((startsWith(github.ref, 'refs/tags/') || (inputs.notarization == true)))) }}
+        if: ${{ (needs.should-upload.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (!((startsWith(github.ref, 'refs/tags/') || (inputs.notarization == true)))) }}
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
       - name: Upload jabgui to builds.jabref.org (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
+        if: (matrix.os == 'windows-latest') && (needs.should-upload.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkkit to builds.jabref.org (Windows)
-        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')))
+        if: (matrix.os == 'windows-latest') && (needs.should-upload.outputs.secretspresent == 'YES') && ((github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')))
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
@@ -315,7 +302,7 @@ jobs:
         # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
         #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
         # needs to be on one line; multi line does not work
-        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
+        if: ${{ (!startsWith(github.ref, 'refs/heads/gh-readonly-queue')) && (needs.should-upload.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
@@ -323,12 +310,12 @@ jobs:
         # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
         #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
         # needs to be on one line; multi line does not work
-        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
+        if: ${{ (github.ref == 'refs/heads/main') && (needs.should-upload.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
