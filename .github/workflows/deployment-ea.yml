@@ -445,7 +445,8 @@ jobs:
             jabgui/build/distribution
             jabkit/build/distribution
           compression-level: 0 # no compression
-  notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
+  notarize:
+    # outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
     strategy:
       # Ensure that calls to Apple are sequentially made
