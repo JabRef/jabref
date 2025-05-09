@@ -149,7 +149,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldAddsAllSuggestedGroupsWhenNoneExist() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         assertFalse(rootGroup.hasAllSuggestedGroups());
 
@@ -161,7 +161,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldAddOnlyMissingGroup() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
         assertEquals(1, rootGroup.getChildren().size());
@@ -174,7 +174,7 @@ class GroupTreeViewModelTest {
 
     @Test
     void shouldNotAddSuggestedGroupsWhenAllExist() {
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         GroupNodeViewModel rootGroup = model.rootGroupProperty().getValue();
         rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutFilesGroup());
         rootGroup.getGroupNode().addSubgroup(JabRefSuggestedGroups.createWithoutGroupsGroup());
