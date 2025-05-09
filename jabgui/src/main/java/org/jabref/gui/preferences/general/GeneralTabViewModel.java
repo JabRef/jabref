@@ -256,7 +256,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor),
+                    new CLIMessageHandler(uiMessageHandler, preferences),
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
@@ -266,7 +266,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor),
+                    new CLIMessageHandler(uiMessageHandler, preferences),
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);

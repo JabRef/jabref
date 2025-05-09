@@ -1,7 +1,12 @@
 package org.jabref.logic.search;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -17,6 +22,7 @@ import org.jabref.logic.search.indexing.ReadOnlyLinkedFilesIndexer;
 import org.jabref.logic.search.retrieval.BibFieldsSearcher;
 import org.jabref.logic.search.retrieval.LinkedFilesSearcher;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -46,7 +52,10 @@ public class IndexManager {
     private final BibFieldsSearcher bibFieldsSearcher;
     private final LinkedFilesSearcher linkedFilesSearcher;
 
-    public IndexManager(BibDatabaseContext databaseContext, TaskExecutor executor, CliPreferences preferences, PostgreServer postgreServer) {
+    public IndexManager(BibDatabaseContext databaseContext,
+                        TaskExecutor executor,
+                        CliPreferences preferences,
+                        PostgreServer postgreServer) {
         this.taskExecutor = executor;
         this.databaseContext = databaseContext;
         this.shouldIndexLinkedFiles = preferences.getFilePreferences().fulltextIndexLinkedFilesProperty();
@@ -221,5 +230,31 @@ public class IndexManager {
      */
     public boolean isEntryMatched(BibEntry entry, SearchQuery query) {
         return bibFieldsSearcher.isMatched(entry, query);
+    }
+
+    public static void clearOldSearchIndices() {
+        Path currentIndexPath = Directories.getFulltextIndexBaseDirectory();
+        Path appData = currentIndexPath.getParent();
+
+        try {
+            Files.createDirectories(currentIndexPath);
+        } catch (IOException e) {
+            LOGGER.error("Could not create index directory {}", appData, e);
+        }
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(appData)) {
+            for (Path path : stream) {
+                if (Files.isDirectory(path) && !path.toString().endsWith("ssl") && path.toString().contains("lucene")
+                        && !path.equals(currentIndexPath)) {
+                    LOGGER.info("Deleting out-of-date fulltext search index at {}.", path);
+                    Files.walk(path)
+                         .sorted(Comparator.reverseOrder())
+                         .map(Path::toFile)
+                         .forEach(File::delete);
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not access app-directory at {}", appData, e);
+        }
     }
 }

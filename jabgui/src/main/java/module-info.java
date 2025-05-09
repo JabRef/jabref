@@ -105,7 +105,7 @@ open module org.jabref {
     requires com.google.common;
     requires io.github.javadiffutils;
     // requires java.string.similarity;
-    requires org.apache.commons.cli;
+    requires info.picocli;
     // requires org.apache.commons.compress;
     // requires org.apache.commons.csv;
     requires org.apache.commons.io;
