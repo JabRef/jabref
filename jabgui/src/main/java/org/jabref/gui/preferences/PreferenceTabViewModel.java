@@ -15,13 +15,6 @@ public interface PreferenceTabViewModel {
     void setValues();
 
     /**
-     * This method is called when the user presses OK in the
-     * Preferences dialog. Implementing classes must make sure all
-     * settings presented get stored in PreferencesService.
-     */
-    void storeSettings();
-
-    /**
      * This method is called before the {@link #storeSettings()} method,
      * to check if there are illegal settings in the tab, or if is ready
      * to be closed.
@@ -31,6 +24,13 @@ public interface PreferenceTabViewModel {
     default boolean validateSettings() {
         return true;
     }
+
+    /**
+     * This method is called when the user presses OK in the
+     * Preferences dialog. Implementing classes must make sure all
+     * settings presented get stored in PreferencesService.
+     */
+    void storeSettings();
 
     /**
      * This method should be called after storing the preferences, to
