@@ -36,7 +36,7 @@ public interface PreferenceTabViewModel {
      * This method should be called after storing the preferences, to
      * collect the properties, which require a restart of JabRef to load
      *
-     * @return The messages for the changed properties (e. g. "Changed language: English")
+     * @return The messages for the changed properties (e.g. "Changed language: English")
      */
     default List<String> getRestartWarnings() {
         return List.of();
