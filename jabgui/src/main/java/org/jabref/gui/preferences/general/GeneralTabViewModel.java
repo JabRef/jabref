@@ -205,7 +205,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (newLanguage != workspacePreferences.getLanguage()) {
             workspacePreferences.setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
-            restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
+            restartWarning.add(Localization.lang("Changed language: %0", newLanguage.getDisplayName()));
         }
 
         workspacePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
