@@ -35,7 +35,7 @@ env:
   JAVA_OPTS: -Xmx4g
 
 concurrency:
-  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}-${{ github.event_name }}"
   cancel-in-progress: true
 
 jobs:
