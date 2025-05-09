@@ -192,7 +192,7 @@ jobs:
 
           ls -la
       - name: 'Set JavaFX ${{ env.javafx }} (linux, Windows)'
-        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
+        if: ${{ !startsWith(matrix.os, 'macos') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm') }}
         shell: bash
         run: |
           set -e
@@ -206,7 +206,7 @@ jobs:
             cat $buildgradle
           done
       - name: 'Set JavaFX ${{ env.javafx }} (macOS)'
-        if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
+        if: startsWith(matrix.os, 'macos')
         run: |
           set -e
           find . -name 'build.gradle.kts' | while read -r buildgradle; do
@@ -234,17 +234,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
-        if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14') || (steps.checksecrets.outputs.secretspresent == 'NO')
+        if: startsWith(matrix.os, 'macos') || (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
       - name: Setup macOS key chain
-        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup macOS key chain for app id cert
-        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -253,7 +253,7 @@ jobs:
           keychain-password: jabref
 
       - name: Build dmg and pkg (macOS)
-        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           set -e
@@ -301,7 +301,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
-        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           set -e
@@ -348,31 +348,31 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Rename files for mac
-        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui
           mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.dmg
           mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.pkg
       - name: Build runtime image and installer (linux, Windows)
-        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14')
+        if: !startsWith(matrix.os, 'macos')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
       - name: Build JabKit
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
       - name: Remove JabKit app build (macOS)
-        if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
+        if: startsWith(matrix.os, 'macos')
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package application image (linux, Windows)
-        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: !startsWith(matrix.os, 'macos') && (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           set -e
           ${{ matrix.archivePortable }}
           ${{ matrix.archivePortableJabKit }}
       - name: Rename files
-        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: ${{ !startsWith(matrix.os, 'macos') && (steps.checksecrets.outputs.secretspresent == 'YES') }}
         shell: pwsh
         run: |
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
@@ -398,7 +398,7 @@ jobs:
             mv "$file" "${base}-jdk${{ env.jdk_version }}-javafx${{ env.javafx }}.${ext}"
           done
       - name: Setup rsync (macOS)
-        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && (((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
+        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true))) }}
         run: brew install rsync
       - name: Setup rsync (Windows)
         if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (github.ref == 'refs/heads/main')
@@ -423,7 +423,7 @@ jobs:
         # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
         #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
         # needs to be on one line; multi line does not work
-        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || (matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
+        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || startsWith(matrix.os, 'macos')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/jdk-ea && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/jdk-ea/ || true
