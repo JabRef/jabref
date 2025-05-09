@@ -9,11 +9,10 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
-<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0"
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" minHeight="-Infinity" minWidth="-Infinity" prefHeight="680.0"
             prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171"
             fx:controller="org.jabref.gui.openoffice.StyleSelectDialogView"
             id="styleSelectDialog">
@@ -45,7 +44,6 @@
                             <Label text="%Preview" styleClass="sectionHeader"/>
                             <VBox fx:id="cslPreviewBox" prefHeight="200.0" spacing="4.0"/>
                         </VBox>
-                        <Button text="%Modify bibliography title" alignment="CENTER_RIGHT" onAction="#modifyBibliographyTitle" />
                     </VBox>
                 </Tab>
                 <Tab fx:id="jStyleTab" text="JStyles">
@@ -71,7 +69,7 @@
                         </TableView>
                         <VBox spacing="4.0">
                             <Label text="%Preview" styleClass="sectionHeader"/>
-                            <VBox fx:id="jStylePreviewBox" prefHeight="84.0" prefWidth="665.0"/>
+                            <VBox fx:id="jStylePreviewBox" prefHeight="200.0" prefWidth="665.0"/>
                         </VBox>
                     </VBox>
                 </Tab>

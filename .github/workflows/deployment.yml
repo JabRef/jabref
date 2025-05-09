@@ -100,7 +100,7 @@ jobs:
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Prepare merged jars and modules dir (macOS)
+      - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14') || (steps.checksecrets.outputs.secretspresent == 'NO')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
@@ -126,13 +126,13 @@ jobs:
           set -e
           cd jabgui
 
-          # Use Java's packaging tool to create "JabRef.app"
           jpackage \
           --module org.jabref/org.jabref.Launcher \
-          --module-path ${{env.JAVA_HOME}}/jmods/:build/jlinkbase/jlinkjars \
+          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
           --add-modules org.jabref,org.jabref.merged.module  \
           --add-modules jdk.incubator.vector \
           --dest build/distribution \
+          --app-content buildres/mac/Resources \
           --name JabRef \
           --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
           --verbose \
@@ -140,8 +140,7 @@ jobs:
           --vendor "JabRef e.V." \
           --mac-package-identifier JabRef \
           --mac-package-name JabRef \
-          --type app-image \
-          --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
           --mac-package-signing-prefix org.jabref \
           --mac-entitlements buildres/mac/jabref.entitlements \
           --icon src/main/resources/icons/jabref.icns \
@@ -163,31 +162,63 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
+      - name: Build pkg (macOS)
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          set -e
+          cd jabgui
 
-          # Add additional files / directories
-          cp buildres/mac/jabrefHost.py build/distribution/JabRef.app/Contents/
-          cp -R buildres/mac/native-messaging-host build/distribution/JabRef.app/Contents/
-
-          # Sign the final artifact
-          codesign --force --deep --sign "Developer ID Application: JabRef e.V. (6792V39SK3)" \
-            --entitlements buildres/mac/jabref.entitlements \
-            --options runtime --timestamp build/distribution/JabRef.app
-
-          # pack dmg and pkg
-          hdiutil create -volname "JabRef" -srcfolder build/distribution/JabRef.app -ov -format UDZO build/distribution/JabRef${{ matrix.suffix }}.dmg
-          productbuild --component build/distribution/JabRef.app /Applications --sign "Developer ID Installer: JabRef e.V. (6792V39SK3)" build/distribution/JabRef${{ matrix.suffix }}.pkg
-
-          # Cleanup unpacked file
-          rm -rf build/distribution/JabRef.app
+          jpackage \
+          --module org.jabref/org.jabref.Launcher \
+          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
+          --add-modules org.jabref,org.jabref.merged.module  \
+          --add-modules jdk.incubator.vector \
+          --dest build/distribution \
+          --app-content buildres/mac/Resources \
+          --name JabRef \
+          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
+          --verbose \
+          --mac-sign \
+          --vendor "JabRef e.V." \
+          --mac-package-identifier JabRef \
+          --mac-package-name JabRef \
+          --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
+          --mac-package-signing-prefix org.jabref \
+          --mac-entitlements buildres/mac/jabref.entitlements \
+          --icon src/main/resources/icons/jabref.icns \
+          --resource-dir buildres/mac \
+          --file-associations buildres/mac/bibtexAssociations.properties \
+          --jlink-options --bind-services \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
+          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
+          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
+          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
+          --java-options --add-modules=jdk.incubator.vector
+      - name: Rename files for mac
+        if: ((matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES')
+        shell: bash
+        run: |
+          cd jabgui
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.dmg
+          mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.pkg
       - name: Build runtime image and installer (linux, Windows)
-        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14') && (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: (matrix.os != 'macos-13') && (matrix.os != 'macos-14')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
       - name: Build JabKit
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Remove JabKit build for macOS
+      - name: Remove JabKit app build (macOS)
         if: (matrix.os == 'macos-13') || (matrix.os == 'macos-14')
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package application image (linux, Windows)
@@ -229,14 +260,19 @@ jobs:
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-      - name: Upload to builds.jabref.org (Windows)
+      - name: Upload jabgui to builds.jabref.org (Windows)
         if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && (!startsWith(github.ref, 'refs/heads/gh-readonly-queue'))
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+      - name: Upload jabkkit to builds.jabref.org (Windows)
+        if: (matrix.os == 'windows-latest') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/')))
+        shell: cmd
+        # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
+        run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
-      - name: Upload to builds.jabref.org (linux, macOS)
+      - name: Upload jabgui to builds.jabref.org (linux, macOS)
         # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
         #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
         # needs to be on one line; multi line does not work
@@ -244,6 +280,13 @@ jobs:
         shell: bash
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+      - name: Upload jabkit to builds.jabref.org (linux, macOS)
+        # macOS: Negated condition of "Upload to GitHub workflow artifacts store (macOS)"
+        #        Reason: We either upload the non-notarized files - or notarize the files later (and upload these later)
+        # needs to be on one line; multi line does not work
+        if: ${{ (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES') && ((matrix.os == 'ubuntu-22.04') || (matrix.os == 'macos-13') || (matrix.os == 'macos-14')) && !((startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)) }}
+        shell: bash
+        run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: ((matrix.os == 'macos-13')  || (matrix.os == 'macos-14')) && (steps.checksecrets.outputs.secretspresent == 'YES') && (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true)
@@ -251,14 +294,18 @@ jobs:
         with:
           # tbn = to-be-notarized
           name: JabRef-macOS-tbn-${{ matrix.os }}
-          path: build/distribution
+          path: |
+            jabgui/build/distribution
+            jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
         if: (steps.checksecrets.outputs.secretspresent != 'YES')
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
-          path: build/distribution
+          path: |
+            jabgui/build/distribution
+            jabkit/build/distribution
           compression-level: 0 # no compression
   announce:
     name: Comment on pull request
@@ -294,12 +341,12 @@ jobs:
       max-parallel: 1
       matrix:
         include:
+          - os: macos-14
+            displayName: macOS (ARM64)
+            suffix: '_arm64'
           - os: macos-13  # intel image
             displayName: macOS
             suffix: ''
-          - os: macos-14
-            displayName: macOS (ARM64)
-            suffix: '-arm64'
     runs-on: ${{ matrix.os }}
     needs: [build]
     if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
@@ -328,6 +375,7 @@ jobs:
         shell: bash
         run: |
           cd jabgui
+          ls
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg

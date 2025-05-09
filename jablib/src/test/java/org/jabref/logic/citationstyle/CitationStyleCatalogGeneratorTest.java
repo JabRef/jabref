@@ -46,5 +46,6 @@ class CitationStyleCatalogGeneratorTest {
         assertTrue(firstStyle.containsKey("title"), "Style entry should have a title");
         assertTrue(firstStyle.containsKey("isNumeric"), "Style entry should have isNumeric flag");
         assertTrue(firstStyle.containsKey("hasBibliography"), "Style entry should have hasBibliography flag");
+        assertTrue(firstStyle.containsKey("usesHangingIndent"), "Style entry should have usesHangingIndent flag");
     }
 }

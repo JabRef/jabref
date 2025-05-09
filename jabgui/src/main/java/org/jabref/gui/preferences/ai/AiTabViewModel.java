@@ -119,16 +119,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.aiPreferences = preferences.getAiPreferences();
 
-        this.enableAi.addListener((observable, oldValue, newValue) -> {
+        this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
             disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
         });
 
-        this.customizeExpertSettings.addListener((observableValue, oldValue, newValue) ->
+        this.customizeExpertSettings.addListener((_, _, newValue) ->
             disableExpertSettings.set(!newValue || !enableAi.get())
         );
 
-        this.selectedAiProvider.addListener((observable, oldValue, newValue) -> {
+        this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
             List<String> models = AiDefaultPreferences.getAvailableModels(newValue);
 
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
@@ -198,7 +198,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        this.currentChatModel.addListener((observable, oldValue, newValue) -> {
+        this.currentChatModel.addListener((_, _, newValue) -> {
             if (newValue == null) {
                 return;
             }
@@ -214,7 +214,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), newValue));
         });
 
-        this.currentApiKey.addListener((observable, oldValue, newValue) -> {
+        this.currentApiKey.addListener((_, _, newValue) -> {
             switch (selectedAiProvider.get()) {
                 case OPEN_AI -> openAiApiKey.set(newValue);
                 case MISTRAL_AI -> mistralAiApiKey.set(newValue);
@@ -224,7 +224,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        this.currentApiBaseUrl.addListener((observable, oldValue, newValue) -> {
+        this.currentApiBaseUrl.addListener((_, _, newValue) -> {
             switch (selectedAiProvider.get()) {
                 case OPEN_AI -> openAiApiBaseUrl.set(newValue);
                 case MISTRAL_AI -> mistralAiApiBaseUrl.set(newValue);

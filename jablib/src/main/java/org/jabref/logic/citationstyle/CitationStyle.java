@@ -18,14 +18,16 @@ public class CitationStyle implements OOStyle {
     private final String title;
     private final boolean isNumericStyle;
     private final boolean hasBibliography;
+    private final boolean usesHangingIndent;
     private final String source;
     private final boolean isInternalStyle;
 
-    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, String source, boolean isInternalStyle) {
+    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source, boolean isInternalStyle) {
         this.filePath = Path.of(Objects.requireNonNull(filePath)).toString(); // wrapping with Path.of takes care of extra slashes in path due to subsequent storage and retrieval (observed on Windows)
         this.title = Objects.requireNonNull(title);
         this.isNumericStyle = isNumericStyle;
         this.hasBibliography = hasBibliography;
+        this.usesHangingIndent = hasBibliography && usesHangingIndent;
         this.source = Objects.requireNonNull(source);
         this.isInternalStyle = isInternalStyle;
     }
@@ -33,8 +35,8 @@ public class CitationStyle implements OOStyle {
     /**
      * Creates a new citation style with an auto-determined internal/external state.
      */
-    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, String source) {
-        this(filePath, title, isNumericStyle, hasBibliography, source, !Path.of(filePath).isAbsolute());
+    public CitationStyle(String filePath, String title, boolean isNumericStyle, boolean hasBibliography, boolean usesHangingIndent, String source) {
+        this(filePath, title, isNumericStyle, hasBibliography, usesHangingIndent, source, !Path.of(filePath).isAbsolute());
     }
 
     public String getTitle() {
@@ -47,6 +49,10 @@ public class CitationStyle implements OOStyle {
 
     public boolean hasBibliography() {
         return hasBibliography;
+    }
+
+    public boolean usesHangingIndent() {
+        return usesHangingIndent;
     }
 
     /**

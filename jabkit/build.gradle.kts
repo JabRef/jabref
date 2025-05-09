@@ -12,7 +12,7 @@ plugins {
 group = "org.jabref.jabkit"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
-val luceneVersion = "10.2.0"
+val luceneVersion = "10.2.1"
 
 dependencies {
     implementation(project(":jablib"))
@@ -53,7 +53,10 @@ dependencies {
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
     testImplementation(project(":test-support"))
-    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito:mockito-core:5.17.0") {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 }
 
 /*
