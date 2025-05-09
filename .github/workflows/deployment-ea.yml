@@ -446,52 +446,37 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
   notarize:
-    # outsourced in a separate job to be able to rerun if this fails for timeouts
+    # Outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
+    needs: [should-upload, build]
+    if: ${{ (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true) && ((needs.should-upload.outputs.secretspresent == 'YES')) }}
     strategy:
       # Ensure that calls to Apple are sequentially made
       max-parallel: 1
       matrix:
         include:
+          - os: macos-14
+            displayName: macOS (ARM64)
+            suffix: '_arm64'
           - os: macos-13  # intel image
             displayName: macOS
             suffix: ''
-          - os: macos-14
-            displayName: macOS (ARM64)
-            suffix: '-arm64'
     runs-on: ${{ matrix.os }}
-    needs: [build]
-    if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
     steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Download from GitHub workflow artifacts store (macOS)
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/download-artifact@v4
         with:
           name: JabRef-macOS-tbn-${{ matrix.os }}
           path: jabgui/build/distribution/
       - name: Notarize dmg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui
+          ls
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
       - name: Notarize pkg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui
@@ -499,7 +484,6 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
       - name: Upload to builds.jabref.org
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey

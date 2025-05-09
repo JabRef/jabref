@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
+      secretspresent: ${{ steps.binary.outputs.secretspresent }}
     steps:
       - name: Check upload condition
         id: binary
@@ -48,9 +49,11 @@ jobs:
         run: |
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=NO" >> "$GITHUB_OUTPUT"
             echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
             exit 0
           fi
+          echo "secretspresent=YES" >> "$GITHUB_OUTPUT"
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
@@ -353,8 +356,9 @@ jobs:
           mode: recreate
   notarize:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
-    # Will upload to builds.jabref.org in all cases
     name: macOS notarization
+    needs: [should-upload, build]
+    if: ${{ (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true) && ((needs.should-upload.outputs.secretspresent == 'YES')) }}
     strategy:
       # Ensure that calls to Apple are sequentially made
       max-parallel: 1
@@ -367,30 +371,13 @@ jobs:
             displayName: macOS
             suffix: ''
     runs-on: ${{ matrix.os }}
-    needs: [build]
-    if: ${{ startsWith(github.ref, 'refs/tags/') || inputs.notarization == true }}
     steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Download from GitHub workflow artifacts store (macOS)
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         uses: actions/download-artifact@v4
         with:
           name: JabRef-macOS-tbn-${{ matrix.os }}
           path: jabgui/build/distribution/
       - name: Notarize dmg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui
@@ -399,7 +386,6 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
       - name: Notarize pkg
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           cd jabgui
@@ -407,7 +393,6 @@ jobs:
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
       - name: Upload to builds.jabref.org
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
         shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
