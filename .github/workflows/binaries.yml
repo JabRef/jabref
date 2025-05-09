@@ -123,10 +123,12 @@ jobs:
             displayName: linux
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distribution/jabkit
+            suffix: ''
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: 7z a -r jabkit/build/distribution/jabkit-portable_windows.zip ./jabkit/build/distribution/jabkit && rm -R jabkit/build/distribution/jabkit
+            suffix: ''
           - os: macos-13  # intel image
             displayName: macOS
             suffix: ''
@@ -291,19 +293,19 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: pwsh
         run: |
-          get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
-          get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}-portable"}
+          get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
+          get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
       - name: Repack deb file for Debian
         if: (matrix.os == 'ubuntu-22.04')
         shell: bash
         run: |
           cd jabgui/build/distribution
-          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
           zstd -d < control.tar.zst | xz > control.tar.xz
           zstd -d < data.tar.zst | xz > data.tar.xz
-          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
+          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
 
       - name: Build JabKit
         shell: bash
