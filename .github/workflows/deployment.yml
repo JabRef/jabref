@@ -278,21 +278,14 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
-      - name: Build JabKit
-        shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Remove JabKit app build (macOS)
+      - name: Package JabGui application image (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
-        run: rm -rf jabkit/build/distribution/jabkit.app
-      - name: Package application image (linux, Windows)
-        if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES') }}
         shell: bash
         run: |
           set -e
           ${{ matrix.archivePortable }}
-          ${{ matrix.archivePortableJabKit }}
       - name: Rename files
-        if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES') }}
+        if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: pwsh
         run: |
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}"}
@@ -308,6 +301,20 @@ jobs:
           ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}_amd64.deb
+
+      - name: Build JabKit
+        shell: bash
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
+      - name: Remove JabKit app build (macOS)
+        if: ${{ !startsWith(matrix.os, 'macos') }}
+        run: rm -rf jabkit/build/distribution/jabkit.app
+      - name: Package JabKit application image (linux, Windows)
+        if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES') }}
+        shell: bash
+        run: |
+          set -e
+          ${{ matrix.archivePortableJabKit }}
+
       - name: Setup rsync (macOS)
         if: ${{ startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
         run: brew install rsync
