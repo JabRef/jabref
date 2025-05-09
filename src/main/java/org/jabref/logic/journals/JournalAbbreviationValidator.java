@@ -1,5 +1,6 @@
 package org.jabref.logic.journals;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,7 +78,7 @@ public class JournalAbbreviationValidator {
 
     // Updated pattern to include more valid escape sequences
     private static final Pattern INVALID_ESCAPE_PATTERN = Pattern.compile("(?<!\\\\)\\\\(?![\\\\\"ntrbfu])|\\\\$");
-    
+
     private final List<ValidationResult> issues = new ArrayList<>();
     private final Map<String, List<String>> fullNameToAbbrev = new HashMap<>();
     private final Map<String, List<String>> abbrevToFullName = new HashMap<>();
@@ -115,5 +116,30 @@ public class JournalAbbreviationValidator {
         return escapeIssues.isEmpty() ?
             new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber) :
             escapeIssues.get(0);
+    }
+
+    /**
+     * Checks if the journal name or abbreviation contains non-UTF8 characters
+     */
+    public ValidationResult checkNonUtf8(String fullName, String abbreviation, int lineNumber) {
+        if (!isValidUtf8(fullName) || !isValidUtf8(abbreviation)) {
+            return new ValidationResult(false,
+                    "Journal name or abbreviation contains invalid UTF-8 sequences",
+                    ValidationType.ERROR,
+                    fullName,
+                    abbreviation,
+                    lineNumber,
+                    "Ensure all characters are valid UTF-8. Remove or replace any invalid characters.");
+        }
+        return new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber);
+    }
+
+    private boolean isValidUtf8(String str) {
+        try {
+            byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+            return new String(bytes, StandardCharsets.UTF_8).equals(str);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
