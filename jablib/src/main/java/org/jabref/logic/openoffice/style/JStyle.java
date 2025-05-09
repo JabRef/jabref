@@ -131,14 +131,33 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     private final Map<EntryType, Layout> bibLayout = new HashMap<>();
     private final Map<String, Object> properties = new HashMap<>();
     private final Map<String, Object> citProperties = new HashMap<>();
+
+    /**
+     * Flag indicating whether this style is loaded from internal resources (true)
+     * or from an external file (false).
+     */
     private boolean fromResource;
+
+    /**
+     * Path used to identify the style file.
+     * For internal resources: contains the resource path (e.g., "resource/openoffice/default_authoryear.jstyle")
+     * For external files: contains the absolute file path.
+     */
     private final String path;
+
     private final LayoutFormatterPreferences layoutPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
     private String name = "";
     private Layout defaultBibLayout;
     private boolean valid;
+
+    /**
+     * Reference to the style file on the filesystem.
+     * For internal resources: points to the path but cannot be directly accessed.
+     * For external files: points to the actual file that can be read directly.
+     */
     private final Path styleFile;
+
     private long styleFileModificationTime = Long.MIN_VALUE;
     private String localCopy;
     private boolean isDefaultLayoutPresent;
@@ -276,6 +295,8 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
     private void reload() throws IOException {
         if (styleFile != null) {
             if (fromResource) {
+                // implies internal styles, we need to use Class.getResourceAsStream with the path
+                // instead of accessing the styleFile directly, as resource paths work differently
                 try (InputStream stream = JStyle.class.getResourceAsStream(path)) {
                     if (stream != null) {
                         initialize(stream);
@@ -285,6 +306,7 @@ public class JStyle implements Comparable<JStyle>, OOStyle {
                 }
             }
 
+            // for external files, we can directly access the file on disk
             this.styleFileModificationTime = Files.getLastModifiedTime(styleFile).toMillis();
             try (InputStream stream = Files.newInputStream(styleFile)) {
                 initialize(stream);
