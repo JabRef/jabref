@@ -34,7 +34,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  should-upload:
+    runs-on: ubuntu-latest
+    outputs:
+      upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
+    steps:
+      - name: Check upload condition
+        id: binary
+        shell: bash
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
+            exit 0
+          fi
+
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Non-PR event – will upload"
+            exit 0
+          fi
+
+          echo "🔍 Checking labels on PR #${{ github.event.pull_request.number }}"
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
+
+          if echo "$LABELS" | grep -q "^dev: binary$"; then
+            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Label 'dev: binary' found – will upload"
+          else
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "❌ Label 'dev: binary' not found – skipping upload"
+          fi
+
   build:
+    needs: [should-upload]
     strategy:
       fail-fast: false
       matrix:
@@ -299,7 +335,7 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
-        if: (steps.checksecrets.outputs.secretspresent != 'YES')
+        if: ${{ needs.should-upload.outputs.upload-to-builds-jabref-org != 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
@@ -307,34 +343,17 @@ jobs:
             jabgui/build/distribution
             jabkit/build/distribution
           compression-level: 0 # no compression
-  announce:
-    name: Comment on pull request
-    runs-on: ubuntu-22.04
-    needs: [build]
-    if: ${{ github.event_name == 'pull_request' }}
-    steps:
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
-        run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
-          else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
-          fi
-        env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
       - name: Comment PR
-        if: (steps.checksecrets.outputs.secretspresent == 'YES')
+        if: ${{ needs.should-upload.outputs.upload-to-builds-jabref-org == 'true' }}
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
             The build of this PR is available at <https://builds.jabref.org/pull/${{ github.event.pull_request.number }}/merge>.
           comment-tag: download-link
           mode: recreate
-  notarize: # outsourced in a separate job to be able to rerun if this fails for timeouts
+  notarize:
+    # Outsourced in a separate job to be able to rerun if this fails for timeouts
+    # Will upload to builds.jabref.org in all cases
     name: macOS notarization
     strategy:
       # Ensure that calls to Apple are sequentially made
