@@ -22,7 +22,11 @@ public class DatabaseSearcher {
     private final IndexManager indexManager;
 
     // TODO: get rid of task executor here or add a constructor overload?
-    public DatabaseSearcher(SearchQuery query, BibDatabaseContext databaseContext, TaskExecutor taskExecutor, CliPreferences preferences, PostgreServer postgreServer) throws IOException {
+    public DatabaseSearcher(SearchQuery query,
+                            BibDatabaseContext databaseContext,
+                            TaskExecutor taskExecutor,
+                            CliPreferences preferences,
+                            PostgreServer postgreServer) throws IOException {
         this.databaseContext = databaseContext;
         this.query = Objects.requireNonNull(query);
         this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgreServer);

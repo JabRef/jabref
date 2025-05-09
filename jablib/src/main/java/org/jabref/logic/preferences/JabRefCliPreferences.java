@@ -114,7 +114,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
-import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +131,6 @@ import org.slf4j.LoggerFactory;
  * There are more default parameters in this map which belong to separate preference classes.
  */
 @Singleton
-@Service
 public class JabRefCliPreferences implements CliPreferences {
 
     public static final String LANGUAGE = "language";

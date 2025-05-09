@@ -4,8 +4,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import javafx.util.Pair;
+
+import org.jabref.logic.os.OS;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +31,7 @@ class StringUtilTest {
         Path path = Path.of("src", "main", "java", StringUtil.class.getName().replace('.', '/') + ".java");
         int lineCount = Files.readAllLines(path, StandardCharsets.UTF_8).size();
 
-        assertTrue(lineCount <= 774, "StringUtil increased in size to " + lineCount + ". "
+        assertTrue(lineCount <= 789, "StringUtil increased in size to " + lineCount + ". "
                 + "We try to keep this class as small as possible. "
                 + "Thus think twice if you add something to StringUtil.");
     }
@@ -409,5 +414,23 @@ class StringUtilTest {
     @MethodSource
     void containsWhitespace(Boolean expected, String input) {
         assertEquals(expected, StringUtil.containsWhitespace(input));
+    }
+
+    @Test
+    void alignStringTable() {
+        List<Pair<String, String>> given = List.of(
+                new Pair<>("Apple", "Slice"),
+                new Pair<>("Bread", "Loaf"),
+                new Pair<>("Paper", "Sheet"),
+                new Pair<>("Country", "County"));
+
+        String expected = """
+                Apple   : Slice
+                Bread   : Loaf
+                Paper   : Sheet
+                Country : County
+                """.replace("\n", OS.NEWLINE);
+
+        assertEquals(expected, StringUtil.alignStringTable(given));
     }
 }

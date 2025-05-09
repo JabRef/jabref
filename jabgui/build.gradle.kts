@@ -1,4 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.kotlin.dsl.annotationProcessor
 import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
 import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
@@ -109,7 +110,8 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
-    implementation("commons-cli:commons-cli:1.9.0")
+    implementation("info.picocli:picocli:4.7.7")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
     implementation("de.undercouch:citeproc-java:3.3.0") {
         exclude(group = "org.antlr")
