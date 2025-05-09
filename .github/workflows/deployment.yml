@@ -12,6 +12,11 @@ on:
     tags:
        - '*'
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
   merge_group:
   workflow_dispatch:
     inputs:
@@ -39,6 +44,8 @@ jobs:
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
+      # requried to avoid obsolete builds in case of labels != "dev: binary"
+      should-build: ${{ steps.binary.outputs.should-build }}
     steps:
       - name: Check upload condition
         id: binary
@@ -46,7 +53,15 @@ jobs:
         env:
           BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          LABEL_NAME: ${{ github.event.label.name }}
         run: |
+          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge" ]]; then
+            echo "should-build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should-build=false" >> "$GITHUB_OUTPUT"
+          fi
+
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             echo "secretspresent=NO" >> "$GITHUB_OUTPUT"
@@ -95,6 +110,7 @@ jobs:
 
   build:
     needs: [should-upload]
+    if: ${{ needs.should-upload.outputs.should-build == 'true' }}
     strategy:
       fail-fast: false
       matrix:
