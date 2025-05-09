@@ -306,7 +306,7 @@ jobs:
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
       - name: Remove JabKit app build (macOS)
-        if: ${{ !startsWith(matrix.os, 'macos') }}
+        if: ${{ startsWith(matrix.os, 'macos') }}
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package JabKit application image (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES') }}
