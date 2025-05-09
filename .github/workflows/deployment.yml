@@ -248,7 +248,7 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package application image (linux, Windows)
-        if: !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES')
+        if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES') }}
         shell: bash
         run: |
           set -e
