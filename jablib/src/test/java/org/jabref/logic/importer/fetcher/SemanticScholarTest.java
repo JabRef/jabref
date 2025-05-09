@@ -8,10 +8,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.entryeditor.citationrelationtab.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarFetcher;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
