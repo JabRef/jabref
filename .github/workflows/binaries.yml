@@ -55,7 +55,14 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           EVENT_NAME: ${{ github.event_name }}
           LABEL_NAME: ${{ github.event.label.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
         run: |
+          if [[ "$GITHUB_WORKFLOW" == *"early access"* && "$REPO_OWNER" != "JabRef" ]]; then
+            echo "🚫 Early access workflow for JabRef disabled for non-JabRef owner"
+            echo "should-build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge" ]]; then
             echo "✅ build enabled"
             echo "should-build=true" >> "$GITHUB_OUTPUT"

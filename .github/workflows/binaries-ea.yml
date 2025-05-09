@@ -32,7 +32,88 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  should-upload:
+    runs-on: ubuntu-latest
+    outputs:
+      upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
+      secretspresent: ${{ steps.binary.outputs.secretspresent }}
+      # requried to avoid obsolete builds in case of labels != "dev: binary"
+      should-build: ${{ steps.binary.outputs.should-build }}
+    steps:
+      - name: Check upload condition
+        id: binary
+        shell: bash
+        env:
+          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          LABEL_NAME: ${{ github.event.label.name }}
+          REPO_OWNER: ${{ github.repository_owner }}
+        run: |
+          if [[ "$GITHUB_WORKFLOW" == *"early access"* && "$REPO_OWNER" != "JabRef" ]]; then
+            echo "🚫 Early access workflow for JabRef disabled for non-JabRef owner"
+            echo "should-build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge" ]]; then
+            echo "✅ build enabled"
+            echo "should-build=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "🚫 build should be skipped"
+            echo "should-build=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=true" >> "$GITHUB_OUTPUT"
+            echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
+            exit 0
+          fi
+          echo "secretspresent=true" >> "$GITHUB_OUTPUT"
+
+          if [[ "$GITHUB_REF" == refs/heads/gh-readonly-queue* ]]; then
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫 merge queue – skipping upload"
+            exit 0
+          fi
+
+          # macOS: We either upload the non-notarized files - or notarize the files later (and upload these later)
+          #        The variable "upload-to-builds-jabref-org" covers the former case
+
+          if [[ "$OS" == macos* ]]; then
+            if [[ "$GITHUB_REF" != refs/tags/* && "$NOTARIZATION" != "true" ]]; then
+              echo "✅ macOS build without tag and without notarization"
+              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            else
+              echo "🚫 macOS build but for tag or notarization – skipping upload"
+              echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Non-PR event – will upload"
+            exit 0
+          fi
+
+          echo "🔍 Checking labels on PR #${{ github.event.pull_request.number }}"
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
+
+          if echo "$LABELS" | grep -q "^dev: binary$"; then
+            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+            echo "✅ Label 'dev: binary' found – will upload"
+          else
+            echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
+            echo "🚫 Label 'dev: binary' not found – skipping upload"
+          fi
+
   build:
+    needs: [should-upload]
+    if: ${{ needs.should-upload.outputs.should-build == 'true' }}
     if: github.repository_owner == 'JabRef'
     env:
       javafx: '25'
