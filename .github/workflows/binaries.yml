@@ -67,11 +67,11 @@ jobs:
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-            echo "secretspresent=NO" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=true" >> "$GITHUB_OUTPUT"
             echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
             exit 0
           fi
-          echo "secretspresent=YES" >> "$GITHUB_OUTPUT"
+          echo "secretspresent=true" >> "$GITHUB_OUTPUT"
 
           if [[ "$GITHUB_REF" == refs/heads/gh-readonly-queue* ]]; then
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
@@ -171,14 +171,14 @@ jobs:
         if: startsWith(matrix.os, 'macos') || (needs.should-upload.outputs.upload-to-builds-jabref-org == 'false')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
       - name: Setup macOS key chain
-        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup macOS key chain for app id cert
-        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
@@ -186,7 +186,7 @@ jobs:
           create-keychain: false
           keychain-password: jabref
       - name: Build dmg and pkg (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
         shell: bash
         run: |
           set -e
@@ -229,7 +229,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Build pkg (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
         shell: bash
         run: |
           set -e
@@ -271,7 +271,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector
       - name: Rename files for mac
-        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES')
+        if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
         shell: bash
         run: |
           cd jabgui
@@ -312,7 +312,7 @@ jobs:
         if: ${{ startsWith(matrix.os, 'macos') }}
         run: rm -rf jabkit/build/distribution/jabkit.app
       - name: Package JabKit application image (linux, Windows)
-        if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'YES') }}
+        if: ${{ !startsWith(matrix.os, 'macos') && (needs.should-upload.outputs.secretspresent == 'true') }}
         shell: bash
         run: |
           set -e
@@ -357,7 +357,7 @@ jobs:
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
-        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'YES') && (!(needs.should-upload.outputs.upload-to-builds-jabref-org == 'true')) }}
+        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true') && (!(needs.should-upload.outputs.upload-to-builds-jabref-org == 'true')) }}
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
@@ -367,7 +367,7 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
-        if: ${{ needs.should-upload.outputs.secretspresent == 'NO' }}
+        if: ${{ needs.should-upload.outputs.secretspresent == 'false' }}
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
@@ -380,7 +380,7 @@ jobs:
     name: Comment on PR
     # separate job, because it should wait until all binaries are available
     needs: [should-upload, build]
-    if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'YES') }}
+    if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - name: Comment PR
@@ -395,7 +395,7 @@ jobs:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
     needs: [should-upload, build]
-    if: ${{ (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true) && ((needs.should-upload.outputs.secretspresent == 'YES')) }}
+    if: ${{ (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true) && ((needs.should-upload.outputs.secretspresent == 'true')) }}
     strategy:
       # Ensure that calls to Apple are sequentially made
       max-parallel: 1
