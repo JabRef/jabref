@@ -238,7 +238,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector \
-          --java-options --enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core
+          --java-options --enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,jkeychain,org.apache.lucene.core
       - name: Build pkg (macOS)
         if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
         shell: bash
@@ -281,7 +281,7 @@ jobs:
           --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
           --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
           --java-options --add-modules=jdk.incubator.vector \
-          --java-options --enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core
+          --java-options --enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,jkeychain,org.apache.lucene.core
       - name: Rename files for mac
         if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
         shell: bash
