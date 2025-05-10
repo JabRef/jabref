@@ -200,10 +200,10 @@ class GroupTreeViewModelTest {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
 
         List<GroupNodeViewModel> prevModel = groupTree.rootGroupProperty().getValue().getChildren();
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
 
-        assertTrue(prevModel.isEmpty());
+        assertEquals(0, prevModel.size());
         assertEquals("Imported entries", actualGrpName);
     }
 
@@ -212,7 +212,7 @@ class GroupTreeViewModelTest {
         preferences.getLibraryPreferences().setAddImportedEntries(true);
         preferences.getLibraryPreferences().setAddImportedEntriesGroupName("Review list");
 
-        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, taskExecutor, new CustomLocalDragboard());
+        GroupTreeViewModel model = new GroupTreeViewModel(stateManager, dialogService, mock(AiService.class), preferences, mock(AdaptVisibleTabs.class), taskExecutor, new CustomLocalDragboard());
         String actualGrpName = model.rootGroupProperty().getValue().getChildren().getFirst().getDisplayName();
 
         assertEquals("Review list", actualGrpName);
