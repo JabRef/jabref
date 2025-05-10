@@ -38,7 +38,7 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
         defaultButton.setDefaultButton(true);
 
         Hyperlink lblMoreInformation = new Hyperlink(Localization.lang("See what's new"));
-        lblMoreInformation.setOnAction(event ->
+        lblMoreInformation.setOnAction(_ ->
                 NativeDesktop.openBrowserShowPopup(latestVersion.getChangelogUrl(), dialogService, externalApplicationsPreferences)
         );
 
