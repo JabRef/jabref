@@ -29,16 +29,6 @@ We needed to determine which framework would provide better maintainability, usa
 
 Chosen option: "Migrate to Picocli", because it offers a more modern, feature-rich, and developer-friendly approach to handling command-line interfaces with significantly less boilerplate code and better organization.
 
-### Consequences
-
-* Good, because command structure is more modular and organized
-* Good, because automatic argument parsing to types reduces boilerplate code
-* Good, because it's easier to understand with a cleaner, more declarative API
-* Good, because it provides better overview of available commands and options
-* Good, because it has built-in support for generating help documentation
-* Bad, because it requires learning a new API for developers familiar with Commons CLI
-* Bad, because we need to migrate existing code
-
 ## Pros and Cons of the Options
 
 ### Apache Commons CLI
