@@ -22,8 +22,9 @@ We needed to determine which framework would provide better maintainability, usa
 
 ## Considered Options
 
-1. Continue using Apache Commons CLI
+1. Apache Commons CLI
 2. Migrate to Picocli
+3. JCommand
 
 ## Decision Outcome
 
@@ -33,12 +34,12 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 
 ### Apache Commons CLI
 
-* Good, because it's a well-established library used in many Apache projects
+* Good, because it is a well-established library used in many Apache projects
 * Good, because it has been stable for many years (around since 2002)
 * Good, because it has minimal dependencies
 * Bad, because it requires more boilerplate code to define and parse options
 * Bad, because it lacks support for nested subcommands
-* Bad, because it doesn't automatically convert arguments to Java types
+* Bad, because it does not automatically convert arguments to Java types
 * Bad, because its API shows its age and is more procedural than declarative
 * Bad, because it appears to be near-dormant with few releases (6 releases in 16 years)
 
@@ -50,9 +51,21 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 * Good, because it has built-in support for nested commands and subcommands to any depth
 * Good, because it has an easier to understand and better overview
 * Good, because it generates more readable, colored help messages
-* Good, because it's actively maintained with regular updates
+* Good, because it is actively maintained with regular updates
 * Good, because it supports ANSI colors in help messages for better readability
 * Good, because it offers command completion for bash and zsh shells
 * Good, because it has built-in support for argument files (@-files) for very long command lines
-* Good, because it's well-documented with extensive user manual and detailed javadocs
+* Good, because it is well-documented with extensive user manual and detailed javadocs
 * Good, because it has built-in tracing facilities for troubleshooting
+* Good, because it is natively supported by GraalVM and Micronaut
+* Bad, because its feature set may introduce a steeper learning curve for new contributors
+* Bad, because the annotation-driven model can obscure logic flow
+
+### JCommander
+
+* Good, because it is lightweight and simple to use
+* Good, because it has minimal dependencies and a small footprint
+* Good, because it provides basic annotation-based configuration
+* Bad, because it does not support advanced CLI features (e.g., argument files, type conversion)
+* Bad, because there are fewer examples and tooling integrations
+* Bad, because it has limited documentation
