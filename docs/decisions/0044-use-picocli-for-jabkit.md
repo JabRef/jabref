@@ -46,7 +46,7 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 ### Picocli
 
 * Good, because it has a modern, annotation-based declarative API
-* Good, because it supports automatic type conversion for arguments
+* Good, because it supports automatic argument parsing to types
 * Good, because it has built-in support for nested commands and subcommands to any depth
 * Good, because it generates more readable, colored help messages
 * Good, because it greatly reduces boilerplate code through annotations
@@ -58,17 +58,3 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 * Good, because it has built-in tracing facilities for troubleshooting
 * Bad, because it's a newer library and might be less familiar to some developers
 * Bad, because it introduces an additional dependency to the project
-
-## More Information
-
-After investigating both options, we found that Picocli offers significant advantages over Apache Commons CLI, particularly in terms of code organization, type safety, and developer experience. The annotation-based approach of Picocli allows for a more declarative style that keeps all information about commands and options in one place, resulting in cleaner, more maintainable code.
-
-The main advantages of Picocli that influenced our decision were:
-
-1. **Commands and Subcommands**: Picocli's strong support for nested commands makes it easier to organize complex command-line applications with multiple features.
-
-2. **Modularization**: Better organization of code through a more modular structure, with each command potentially having its own class.
-
-3. **Better Overview**: The annotation-based approach provides a clearer view of all available options directly in the code.
-
-4. **Automatic Argument Parsing**: Automatic conversion of command-line arguments to Java types, which reduces boilerplate code and potential errors.
