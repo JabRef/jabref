@@ -35,18 +35,18 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
-import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -147,10 +147,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (approach == null) {
             final String clipboardText = ClipBoardManager.getContents().trim();
             if (!StringUtil.isBlank(clipboardText)) {
-                BibEntry tempEntry = new BibEntry().withField(StandardField.DOI, clipboardText);
-                IdentifierParser parser = new IdentifierParser(tempEntry);
-        
-                if (parser.parse(StandardField.DOI).isPresent()) {
+                Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
+                if (identifier.isPresent()) {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     interpretText.setText(clipboardText);
                     interpretText.selectAll();
