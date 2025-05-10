@@ -21,6 +21,10 @@
     <CheckBox fx:id="warnAboutDuplicatesOnImport" text="%Warn about duplicates on import"/>
     <CheckBox fx:id="downloadLinkedOnlineFiles" text="%Download referenced files (PDFs, ...)"/>
     <CheckBox fx:id="keepDownloadUrl" text="%Store url for downloaded file" />
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="addImportedEntries" text="%Add imported entries to group"/>
+        <TextField fx:id="addImportedEntriesGroupName" HBox.hgrow="ALWAYS"/>
+    </HBox>
     <HBox alignment="BASELINE_LEFT" spacing="10">
         <Label text="%Default plain citation parser"/>
         <ComboBox fx:id="defaultPlainCitationParser" HBox.hgrow="ALWAYS"/>
