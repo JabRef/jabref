@@ -69,7 +69,7 @@ class JStyleLoaderTest {
 
     @Test
     void getStylesWithEmptyExternal() {
-        preferences.setExternalStyles(List.of());
+        preferences.setExternalJStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
         assertEquals(2, loader.getStyles().size());
@@ -77,7 +77,7 @@ class JStyleLoaderTest {
 
     @Test
     void addStyleLeadsToOneMoreStyle() {
-        preferences.setExternalStyles(List.of());
+        preferences.setExternalJStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
 
         loader.addStyleIfValid(jStyleFile);
@@ -86,7 +86,7 @@ class JStyleLoaderTest {
 
     @Test
     void addInvalidStyleLeadsToNoMoreStyle() {
-        preferences.setExternalStyles(List.of());
+        preferences.setExternalJStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
         loader.addStyleIfValid(Path.of("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
@@ -95,14 +95,14 @@ class JStyleLoaderTest {
 
     @Test
     void initalizeWithOneExternalFile() {
-        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
+        when(preferences.getExternalJStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertEquals(NUMBER_OF_INTERNAL_STYLES + 1, loader.getStyles().size());
     }
 
     @Test
     void initalizeWithIncorrectExternalFile() {
-        preferences.setExternalStyles(List.of("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
+        preferences.setExternalJStyles(List.of("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         assertEquals(NUMBER_OF_INTERNAL_STYLES, loader.getStyles().size());
@@ -110,7 +110,7 @@ class JStyleLoaderTest {
 
     @Test
     void initalizeWithOneExternalFileRemoveStyle() {
-        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
+        when(preferences.getExternalJStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         List<JStyle> toremove = new ArrayList<>();
@@ -129,7 +129,7 @@ class JStyleLoaderTest {
 
     @Test
     void initalizeWithOneExternalFileRemoveStyleUpdatesPreferences() {
-        when(preferences.getExternalStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
+        when(preferences.getExternalJStyles()).thenReturn(FXCollections.singletonObservableList(jStyleFile.toString()));
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         List<JStyle> toremove = new ArrayList<>();
@@ -143,12 +143,12 @@ class JStyleLoaderTest {
             assertTrue(loader.removeStyle(style));
         }
         // As the prefs are mocked away, the getExternalStyles still returns the initial one
-        assertFalse(preferences.getExternalStyles().isEmpty());
+        assertFalse(preferences.getExternalJStyles().isEmpty());
     }
 
     @Test
     void addSameStyleTwiceLeadsToOneMoreStyle() {
-        preferences.setExternalStyles(List.of());
+        preferences.setExternalJStyles(List.of());
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         int beforeAdding = loader.getStyles().size();
         loader.addStyleIfValid(jStyleFile);
@@ -194,7 +194,7 @@ class JStyleLoaderTest {
 
     @Test
     void removeInternalStyleReturnsFalseAndDoNotRemove() {
-        preferences.setExternalStyles(List.of());
+        preferences.setExternalJStyles(List.of());
 
         loader = new JStyleLoader(preferences, layoutPreferences, abbreviationRepository);
         List<JStyle> toremove = new ArrayList<>();

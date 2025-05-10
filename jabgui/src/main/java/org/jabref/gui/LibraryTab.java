@@ -175,6 +175,7 @@ public class LibraryTab extends Tab {
         this.dialogService = dialogService;
         this.preferences = Objects.requireNonNull(preferences);
         this.stateManager = Objects.requireNonNull(stateManager);
+        assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.entryTypesManager = entryTypesManager;
         this.clipBoardManager = clipBoardManager;
@@ -751,6 +752,7 @@ public class LibraryTab extends Tab {
 
     public void resetChangeMonitor() {
         changeMonitor.ifPresent(DatabaseChangeMonitor::unregister);
+        assert bibDatabaseContext.getDatabasePath().isEmpty() || fileUpdateMonitor != null;
         changeMonitor = Optional.of(new DatabaseChangeMonitor(bibDatabaseContext,
                 fileUpdateMonitor,
                 taskExecutor,

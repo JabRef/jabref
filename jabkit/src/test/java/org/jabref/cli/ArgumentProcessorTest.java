@@ -12,7 +12,6 @@ import java.util.Objects;
 
 import javafx.collections.FXCollections;
 
-import org.jabref.cli.ArgumentProcessor.Mode;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
@@ -28,14 +27,13 @@ import org.jabref.model.metadata.SelfContainedSaveOrder;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.util.DummyFileUpdateMonitor;
-import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.support.BibEntryAssert;
 
-import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
+import picocli.CommandLine;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,12 +45,17 @@ class ArgumentProcessorTest {
     private final CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final BibEntryTypesManager entryTypesManager = mock(BibEntryTypesManager.class);
     private final ImporterPreferences importerPreferences = mock(ImporterPreferences.class, Answers.RETURNS_DEEP_STUBS);
+    private final ExportPreferences exportPreferences = mock(ExportPreferences.class, Answers.RETURNS_DEEP_STUBS);
     private final ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+
+    private CommandLine commandLine;
 
     @BeforeEach()
     void setup() {
         when(importerPreferences.getCustomImporters()).thenReturn(FXCollections.emptyObservableSet());
+        when(exportPreferences.getCustomExporters()).thenReturn(FXCollections.emptyObservableList());
 
+        when(preferences.getExportPreferences()).thenReturn(exportPreferences);
         when(preferences.getImporterPreferences()).thenReturn(importerPreferences);
         when(preferences.getImportFormatPreferences()).thenReturn(importFormatPreferences);
         when(preferences.getSearchPreferences()).thenReturn(new SearchPreferences(
@@ -63,30 +66,27 @@ class ArgumentProcessorTest {
                 0,
                 0,
                 0));
+
+        ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
+        commandLine = new CommandLine(argumentProcessor);
     }
 
     @Test
-    void auxImport(@TempDir Path tempDir) throws URISyntaxException, ParseException {
+    void auxImport(@TempDir Path tempDir) throws URISyntaxException {
         String fullBib = Path.of(ArgumentProcessorTest.class.getResource("origin.bib").toURI()).toAbsolutePath().toString();
         String auxFile = Path.of(ArgumentProcessorTest.class.getResource("paper.aux").toURI()).toAbsolutePath().toString();
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
 
-        List<String> args = List.of("--aux", auxFile + "," + outputBib, fullBib);
+        List<String> args = List.of("generate-bib-from-aux", "--aux", auxFile, "--input", fullBib, "--output", outputBib.toString());
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
-                preferences,
-                mock(FileUpdateMonitor.class),
-                entryTypesManager);
-        processor.processArguments();
+        commandLine.execute(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputBib));
     }
 
     @Test
-    void exportMatches(@TempDir Path tempDir) throws URISyntaxException, IOException, ParseException {
+    void search(@TempDir Path tempDir) throws URISyntaxException, IOException {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -99,24 +99,17 @@ class ArgumentProcessorTest {
         List<BibEntry> expectedEntries = bibtexImporter.importDatabase(expectedBib).getDatabase().getEntries();
 
         Path outputBib = tempDir.resolve("output.bib").toAbsolutePath();
-        String outputBibFile = outputBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("-n", "--debug", "--exportMatches", "author=Einstein," + outputBibFile, originBibFile);
+        List<String> args = List.of("search", "--debug", "--query", "author=Einstein", "--input", originBibFile, "--output", outputBib.toString());
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
-                preferences,
-                mock(FileUpdateMonitor.class),
-                entryTypesManager);
-        processor.processArguments();
+        commandLine.execute(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputBib));
         BibEntryAssert.assertEquals(expectedEntries, outputBib, bibtexImporter);
     }
 
     @Test
-    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException, ParseException {
+    void convertBibtexToTableRefsAsBib(@TempDir Path tempDir) throws URISyntaxException {
         Path originBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String originBibFile = originBib.toAbsolutePath().toString();
 
@@ -133,37 +126,24 @@ class ArgumentProcessorTest {
         SelfContainedSaveConfiguration selfContainedSaveConfiguration = new SelfContainedSaveConfiguration(selfContainedSaveOrder, false, BibDatabaseWriter.SaveType.WITH_JABREF_META_DATA, false);
         when(preferences.getSelfContainedExportConfiguration()).thenReturn(selfContainedSaveConfiguration);
 
-        List<String> args = List.of("-n", "-i", originBibFile + ",bibtex", "-o", outputHtmlFile + ",tablerefsabsbib");
+        List<String> args = List.of("convert", "--input", originBibFile, "--input-format", "bibtex", "--output", outputHtmlFile, "--output-format", "tablerefsabsbib");
 
-        ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
-                preferences,
-                mock(FileUpdateMonitor.class),
-                entryTypesManager);
-        processor.processArguments();
+        commandLine.execute(args.toArray(String[]::new));
 
         assertTrue(Files.exists(outputHtml));
     }
 
     @Test
-    void checkConsistency() throws URISyntaxException, ParseException {
+    void checkConsistency() throws URISyntaxException {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
-        List<String> args = List.of("--check-consistency", testBibFile, "--output-format", "txt");
-
-        ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
-                preferences,
-                mock(FileUpdateMonitor.class),
-                entryTypesManager);
+        List<String> args = List.of("check-consistency", "--input", testBibFile, "--output-format", "txt");
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent, true));
 
-        processor.processArguments();
+        commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertTrue(output.contains("Consistency check completed"));
@@ -172,24 +152,17 @@ class ArgumentProcessorTest {
     }
 
     @Test
-    void checkConsistencyPorcelain() throws URISyntaxException, ParseException {
+    void checkConsistencyPorcelain() throws URISyntaxException {
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
         // "txt" is the default output format; thus not provided here
-        List<String> args = List.of("--check-consistency", testBibFile, "--porcelain");
-
-        ArgumentProcessor processor = new ArgumentProcessor(
-                args.toArray(String[]::new),
-                Mode.INITIAL_START,
-                preferences,
-                mock(FileUpdateMonitor.class),
-                entryTypesManager);
+        List<String> args = List.of("check-consistency", "--input", testBibFile, "--porcelain");
 
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 
-        processor.processArguments();
+        commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertEquals("", output);

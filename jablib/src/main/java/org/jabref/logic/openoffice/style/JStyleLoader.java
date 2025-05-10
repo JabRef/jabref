@@ -80,7 +80,7 @@ public class JStyleLoader {
     private void loadExternalStyles() {
         externalStyles.clear();
         // Read external lists
-        List<String> lists = openOfficePreferences.getExternalStyles();
+        List<String> lists = openOfficePreferences.getExternalJStyles();
         for (String filename : lists) {
             try {
                 JStyle style = new JStyle(Path.of(filename), layoutFormatterPreferences, abbreviationRepository);
@@ -114,7 +114,7 @@ public class JStyleLoader {
         for (JStyle style : externalStyles) {
             filenames.add(style.getPath());
         }
-        openOfficePreferences.setExternalStyles(filenames);
+        openOfficePreferences.setExternalJStyles(filenames);
     }
 
     public boolean removeStyle(JStyle style) {

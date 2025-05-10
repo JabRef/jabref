@@ -114,7 +114,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Singleton;
-import org.jvnet.hk2.annotations.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,7 +131,6 @@ import org.slf4j.LoggerFactory;
  * There are more default parameters in this map which belong to separate preference classes.
  */
 @Singleton
-@Service
 public class JabRefCliPreferences implements CliPreferences {
 
     public static final String LANGUAGE = "language";
@@ -280,6 +278,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_ALWAYS_ADD_CITED_ON_PAGES = "ooAlwaysAddCitedOnPages";
     public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
+    public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
 
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
@@ -580,6 +579,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_CURRENT_STYLE, CSLStyleLoader.getDefaultStyle().getPath()); // Default CSL Style is IEEE
         defaults.put(OO_CSL_BIBLIOGRAPHY_TITLE, "References");
         defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
+        defaults.put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, "Text body");
         defaults.put(OO_EXTERNAL_CSL_STYLES, "");
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
@@ -2253,22 +2253,24 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES),
                 get(OO_CSL_BIBLIOGRAPHY_TITLE),
                 get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT),
+                get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT),
                 getStringList(OO_EXTERNAL_CSL_STYLES));
 
-        EasyBind.listen(openOfficePreferences.executablePathProperty(), (obs, oldValue, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
-        EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
-        EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (obs, oldValue, newValue) -> putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));
-        EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (obs, oldValue, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
+        EasyBind.listen(openOfficePreferences.executablePathProperty(), (_, _, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
+        EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (_, _, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
+        EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (_, _, newValue) -> putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));
+        EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (_, _, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
 
-        openOfficePreferences.getExternalStyles().addListener((InvalidationListener) change ->
-                putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalStyles()));
-        openOfficePreferences.getExternalCslStyles().addListener((InvalidationListener) change ->
+        openOfficePreferences.getExternalJStyles().addListener((InvalidationListener) _ ->
+                putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalJStyles()));
+        openOfficePreferences.getExternalCslStyles().addListener((InvalidationListener) _ ->
                 putStringList(OO_EXTERNAL_CSL_STYLES, openOfficePreferences.getExternalCslStyles()));
-        EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (obs, oldValue, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
-        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (obs, oldValue, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
+        EasyBind.listen(openOfficePreferences.currentJStyleProperty(), (_, _, newValue) -> put(OO_BIBLIOGRAPHY_STYLE_FILE, newValue));
+        EasyBind.listen(openOfficePreferences.currentStyleProperty(), (_, _, newValue) -> put(OO_CURRENT_STYLE, newValue.getPath()));
 
-        EasyBind.listen(openOfficePreferences.cslBibliographyTitleProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_TITLE, newValue));
-        EasyBind.listen(openOfficePreferences.cslBibliographyHeaderFormatProperty(), (obs, oldValue, newValue) -> put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, newValue));
+        EasyBind.listen(openOfficePreferences.cslBibliographyTitleProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_TITLE, newValue));
+        EasyBind.listen(openOfficePreferences.cslBibliographyHeaderFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, newValue));
+        EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
     }
