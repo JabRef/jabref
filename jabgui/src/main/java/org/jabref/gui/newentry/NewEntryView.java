@@ -45,6 +45,8 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.logic.importer.util.IdentifierParser;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -143,7 +145,22 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private void finalizeTabs() {
         NewEntryDialogTab approach = initialApproach;
         if (approach == null) {
-            approach = preferences.getLatestApproach();
+            final String clipboardText = ClipBoardManager.getContents().trim();
+            if (!StringUtil.isBlank(clipboardText)) {
+                BibEntry tempEntry = new BibEntry();
+                tempEntry.setField(StandardField.DOI, clipboardText);
+                IdentifierParser parser = new IdentifierParser(tempEntry);
+        
+                if (parser.parse(StandardField.DOI).isPresent()) {
+                    approach = NewEntryDialogTab.ENTER_IDENTIFIER;
+                    interpretText.setText(clipboardText);
+                    interpretText.selectAll();
+                } else {
+                    approach = preferences.getLatestApproach();
+                }
+            } else {
+                approach = preferences.getLatestApproach();
+            }
         }
 
         switch (approach) {
