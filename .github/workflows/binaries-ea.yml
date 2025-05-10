@@ -43,6 +43,7 @@ jobs:
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
       # requried to avoid obsolete builds in case of labels != "dev: binary"
       should-build: ${{ steps.binary.outputs.should-build }}
+      should-notarize: ${{ steps.binary.outputs.should-notarize }}
     steps:
       - name: Check upload condition
         id: binary
@@ -60,8 +61,8 @@ jobs:
             exit 0
           fi
 
-          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge" ]]; then
-            echo "✅ build enabled"
+          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binary" ]]; then
+            echo "📦 build enabled"
             echo "should-build=true" >> "$GITHUB_OUTPUT"
           else
             echo "🚫 build should be skipped"
@@ -83,33 +84,28 @@ jobs:
             exit 0
           fi
 
-          # macOS: We either upload the non-notarized files - or notarize the files later (and upload these later)
-          #        The variable "upload-to-builds-jabref-org" covers the former case
-
-          if [[ "$OS" == macos* ]]; then
-            if [[ "$GITHUB_REF" != refs/tags/* && "$NOTARIZATION" != "true" ]]; then
-              echo "✅ macOS build without tag and without notarization"
-              echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            else
-              echo "🚫 macOS build but for tag or notarization – skipping upload"
-              echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
+          if { [[ "$RUNNER_OS" == macOS ]] && ( [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]] ); }; then
+             echo "🧾 macOS notarization"
+             echo "should-notarize=true" >> "$GITHUB_OUTPUT"
+             echo "☁️ will upload"
+             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+             exit 0;
+          else
+            echo "🚫 no macOS notarization"
+            echo "should-notarize=false" >> "$GITHUB_OUTPUT"
           fi
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-            echo "✅ Non-PR event – will upload"
+            echo "☁️ Non-PR event – will upload"
             exit 0
           fi
 
-          echo "🔍 Checking labels on PR #${{ github.event.pull_request.number }}"
           LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
 
           if echo "$LABELS" | grep -q "^dev: binary$"; then
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-            echo "✅ Label 'dev: binary' found – will upload"
+            echo "☁️ Label 'dev: binary' found – will upload"
           else
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             echo "🚫 Label 'dev: binary' not found – skipping upload"
@@ -506,7 +502,7 @@ jobs:
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
-        if: ${{ (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true') && (!(needs.should-upload.outputs.upload-to-builds-jabref-org == 'true')) }}
+        if: ${{ (needs.should-upload.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
@@ -516,7 +512,7 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
-        if: ${{ needs.should-upload.outputs.upload-to-builds-jabref-org == 'false' }}
+        if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'false') && (needs.should-upload.outputs.should-notarize == 'false') }}
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
@@ -528,7 +524,7 @@ jobs:
     # Outsourced in a separate job to be able to rerun if this fails for timeouts
     name: macOS notarization
     needs: [should-upload, build]
-    if: ${{ (startsWith(github.ref, 'refs/tags/') || inputs.notarization == true) && ((needs.should-upload.outputs.secretspresent == 'true')) }}
+    if: ${{ needs.should-upload.outputs.should-notarize == 'true' }}
     strategy:
       # Ensure that calls to Apple are sequentially made
       max-parallel: 1
