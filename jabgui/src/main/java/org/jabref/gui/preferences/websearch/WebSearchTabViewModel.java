@@ -135,11 +135,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
         addImportedEntries.setValue(libraryPreferences.isAddImportedEntriesEnabled());
-        if (libraryPreferences.getAddImportedEntriesGroupName().isEmpty()) {
-            addImportedEntriesGroupName.setValue(Localization.lang("Imported entries"));
-        } else {
-            addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
-        }
+        addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
 
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
@@ -173,7 +169,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
         libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
         if (addImportedEntriesGroupName.getValue().isEmpty() || addImportedEntriesGroupName.getValue().startsWith(" ")) {
-            libraryPreferences.setAddImportedEntriesGroupName("");
+            libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
         } else {
             libraryPreferences.setAddImportedEntriesGroupName(addImportedEntriesGroupName.getValue());
         }
