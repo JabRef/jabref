@@ -272,9 +272,9 @@ class VersionTest {
     }
 
     @Test
-    void stableNewerThanBeta() {
-        Version older = Version.parse("2.8-alpha");
-        Version newer = Version.parse("2.8");
+    void alpha2NewerThanAlpha() {
+        Version older = Version.parse("6.0-alpha");
+        Version newer = Version.parse("6.0-alpha2");
         assertTrue(newer.isNewerThan(older));
     }
 
