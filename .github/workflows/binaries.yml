@@ -389,7 +389,7 @@ jobs:
     name: Comment on PR
     # separate job, because it should wait until all binaries are available
     needs: [should-upload, build]
-    if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
+    if: ${{ (github.event_name == 'pull_request') && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - name: Comment PR
