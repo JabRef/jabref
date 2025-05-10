@@ -92,12 +92,11 @@ jobs:
             exit 0
           fi
 
-          echo "$RUNNER_OS"
           echo "${GITHUB_REF}"
           echo "${{ inputs.notarization }}"
           echo [[ "${{ inputs.notarization }}" == "true" ]]
           
-          if { [[ "$RUNNER_OS" == macOS ]] && ( [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]] ); }; then
+          if { ( [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]] ); }; then
              echo "🧾 macOS notarization"
              echo "should-notarize=true" >> "$GITHUB_OUTPUT"
              echo "☁️ will upload"
