@@ -46,7 +46,7 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 ### Picocli
 
 * Good, because it has a modern, annotation-based declarative API which reduces boilerplate
-* Good, because it allows for more modularization
+* Good, because allows for more modularization
 * Good, because it supports automatic argument parsing to types
 * Good, because it has built-in support for nested commands and subcommands to any depth
 * Good, because it has an easier to understand and better overview
