@@ -36,7 +36,6 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 * Good, because it's a well-established library used in many Apache projects
 * Good, because it has been stable for many years (around since 2002)
 * Good, because it has minimal dependencies
-* Good, because team members might already be familiar with it
 * Bad, because it requires more boilerplate code to define and parse options
 * Bad, because it lacks support for nested subcommands
 * Bad, because it doesn't automatically convert arguments to Java types
@@ -56,5 +55,3 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 * Good, because it has built-in support for argument files (@-files) for very long command lines
 * Good, because it's well-documented with extensive user manual and detailed javadocs
 * Good, because it has built-in tracing facilities for troubleshooting
-* Bad, because it's a newer library and might be less familiar to some developers
-* Bad, because it introduces an additional dependency to the project
