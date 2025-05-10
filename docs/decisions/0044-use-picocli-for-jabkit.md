@@ -7,7 +7,7 @@ parent: Decision Records
 
 ## Context and Problem Statement
 
-As a part of refactoring and migrations to make JabRef a multi-project build, a decision on which CLI framework to use for JabRef's command-line toolkit (JabKit) was needed. The decision was between continuing to use the existing Apache Commons CLI or migrating to Picocli, a more modern CLI framework.
+As a part of refactoring and migrations to make JabRef a multi-project build, a decision on which CLI framework to use to handle command-line arguments and options for JabRef's command-line toolkit (JabKit) was needed. The decision was between continuing to use the existing Apache Commons CLI or migrating to Picocli, a more modern CLI framework.
 
 We needed to determine which framework would provide better maintainability, usability, and developer experience for the JabKit command-line interface.
 
