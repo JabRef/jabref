@@ -143,7 +143,7 @@ jobs:
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
-      branchname: jdk-ea
+      branchname: ${{ steps.gitversion.outputs.branchName }}
     name: (ea) ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Fetch all history for all tags and branches
