@@ -44,8 +44,8 @@ public class NewVersionDialog extends BaseDialog<Boolean> {
 
         VBox container = new VBox(
                 new Label(Localization.lang("A new version of JabRef is available!")),
-                new Label(Localization.lang("Latest version") + ": " + latestVersion.getFullVersion()),
-                new Label(Localization.lang("Installed version") + ": " + currentVersion.getFullVersion()),
+                new Label(Localization.lang("Latest version: %0", latestVersion.getFullVersion())),
+                new Label(Localization.lang("Installed version: %0", currentVersion.getFullVersion())),
                 lblMoreInformation
         );
         getDialogPane().setContent(container);
