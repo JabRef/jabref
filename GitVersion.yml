@@ -8,4 +8,5 @@ next-version: 6.0.1
 branches:
   main:
     regex: ^main
+    tag: 'alpha2'
     pre-release-weight: 16000 # 0 after stable release, 15000 before alpha release, 30000 before beta release, 50000 before stable release
