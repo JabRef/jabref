@@ -44,11 +44,10 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 
 ### Picocli
 
-* Good, because it has a modern, annotation-based declarative API
+* Good, because it has a modern, annotation-based declarative API which reduces boilerplate
 * Good, because it supports automatic argument parsing to types
 * Good, because it has built-in support for nested commands and subcommands to any depth
 * Good, because it generates more readable, colored help messages
-* Good, because it greatly reduces boilerplate code through annotations
 * Good, because it's actively maintained with regular updates
 * Good, because it supports ANSI colors in help messages for better readability
 * Good, because it offers command completion for bash and zsh shells
