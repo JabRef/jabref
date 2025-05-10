@@ -245,19 +245,23 @@ public class ImportHandler {
     }
 
     public void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry) {
-        importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK);
+        importEntryWithDuplicateCheck(bibDatabaseContext, entry, BREAK, new EntryImportHandlerTracker());
     }
 
-    private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision) {
+    private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
         BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
 
         BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
-                      .onFailure(e -> LOGGER.error("Error in duplicate search"))
+                      .onFailure(e -> {
+                          tracker.markSkipped();
+                          LOGGER.error("Error in duplicate search", e);
+                      })
                       .onSuccess(existingDuplicateInLibrary -> {
                           BibEntry finalEntry = entryToInsert;
                           if (existingDuplicateInLibrary.isPresent()) {
                               Optional<BibEntry> duplicateHandledEntry = handleDuplicates(bibDatabaseContext, entryToInsert, existingDuplicateInLibrary.get(), decision);
                               if (duplicateHandledEntry.isEmpty()) {
+                                    tracker.markSkipped();
                                   return;
                               }
                               finalEntry = duplicateHandledEntry.get();
@@ -266,6 +270,7 @@ public class ImportHandler {
                           downloadLinkedFiles(finalEntry);
                           BibEntry entryToFocus = finalEntry;
                           stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
+                          tracker.markImported();
                       }).executeWith(taskExecutor);
     }
 
@@ -443,21 +448,25 @@ public class ImportHandler {
     }
 
     public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd) {
+        importEntriesWithDuplicateCheck(database, entriesToAdd, new EntryImportHandlerTracker());
+    }
+
+    public void importEntriesWithDuplicateCheck(BibDatabaseContext database, List<BibEntry> entriesToAdd, EntryImportHandlerTracker tracker) {
         boolean firstEntry = true;
         for (BibEntry entry : entriesToAdd) {
             if (firstEntry) {
                 LOGGER.debug("First entry to import, we use BREAK (\"Ask every time\") as decision");
-                importEntryWithDuplicateCheck(database, entry, BREAK);
+                importEntryWithDuplicateCheck(database, entry, BREAK, tracker);
                 firstEntry = false;
                 continue;
             }
             if (preferences.getMergeDialogPreferences().shouldMergeApplyToAllEntries()) {
                 DuplicateResolverDialog.DuplicateResolverResult decision = preferences.getMergeDialogPreferences().getAllEntriesDuplicateResolverDecision();
                 LOGGER.debug("Not first entry, pref flag is true, we use {}", decision);
-                importEntryWithDuplicateCheck(database, entry, decision);
+                importEntryWithDuplicateCheck(database, entry, decision, tracker);
             } else {
                 LOGGER.debug("not first entry, not pref flag, break will  be used");
-                importEntryWithDuplicateCheck(database, entry);
+                importEntryWithDuplicateCheck(database, entry, BREAK, tracker);
             }
         }
     }
