@@ -24,6 +24,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
@@ -54,6 +55,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final AiService aiService;
     private final GuiPreferences preferences;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -80,6 +82,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               DialogService dialogService,
                               AiService aiService,
                               GuiPreferences preferences,
+                              AdaptVisibleTabs adaptVisibleTabs,
                               TaskExecutor taskExecutor,
                               CustomLocalDragboard localDragboard
     ) {
@@ -87,6 +90,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.aiService = Objects.requireNonNull(aiService);
         this.preferences = Objects.requireNonNull(preferences);
+        this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
 
@@ -452,6 +456,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     dialogService,
                     preferences.getAiPreferences(),
                     preferences.getExternalApplicationsPreferences(),
+                    adaptVisibleTabs,
                     taskExecutor
             );
 

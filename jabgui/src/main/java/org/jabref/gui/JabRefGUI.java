@@ -138,6 +138,7 @@ public class JabRefGUI extends Application {
         WebViewStore.init();
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
+        this.fileUpdateMonitor = fileUpdateMonitor;
         HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
         Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
 

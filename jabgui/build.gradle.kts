@@ -189,6 +189,9 @@ jacoco {
 */
 
 tasks.named<JavaExec>("run") {
+    // "assert" statements in the code should activated when running using gradle
+    enableAssertions = true
+
     doFirst {
         // Clear the default JVM arguments to avoid warnings
         // application.applicationDefaultJvmArgs = emptyList()
