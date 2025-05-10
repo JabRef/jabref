@@ -173,7 +173,7 @@ public class FileFieldParser {
                     // there is no Path.isValidPath(String) method
                     field = new LinkedFile(entry.getFirst(), Path.of(pathStr), entry.get(2));
                 } catch (InvalidPathException e) {
-                    // Ignored
+                    // Use string if path is invalid
                     LOGGER.debug("Invalid path object, continuing with string", e);
                     field = new LinkedFile(entry.getFirst(), pathStr, entry.get(2));
                 }

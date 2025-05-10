@@ -17,6 +17,8 @@ import org.jabref.logic.util.io.FileUtil;
  * For GUI-oriented URL utilities see {@link org.jabref.gui.fieldeditors.URLUtil}.
  */
 public class URLUtil {
+    private static final String PROTOCOL_SEPARATOR = "://";
+    private static final Pattern SCHEME_PREFIX = Pattern.compile("^[a-zA-Z]+://.*");
 
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
 
@@ -79,31 +81,46 @@ public class URLUtil {
     /**
      * Checks whether the given String is a URL.
      * <p>
-     * Currently only checks for a protocol String.
+     * A valid URL must have a scheme (e.g., "http", "https",
+     * "ftp") and an authority (e.g., "example.com").
+     * See <a href="https://en.wikipedia.org/wiki/URL#Syntax">
+     * URL Syntax</a> for details.
      *
      * @param url the String to check for a URL
      * @return true if <c>url</c> contains a valid URL
      */
     public static boolean isURL(String url) {
+        if (!SCHEME_PREFIX.matcher(url).matches()) {
+            return false;
+        }
         try {
-            create(url);
+            createUri(url);
             return true;
-        } catch (MalformedURLException | IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
 
     /**
      * Creates a {@link URL} object from the given string URL.
+     * <p>
+     * If the given URL string does not contain a protocol (e.g., "example.com"),
+     * "https://" is automatically added to ensure a valid URL format.
+     * This prevents errors when handling URLs without explicit protocols.
      *
      * @param url the URL string to be converted into a {@link URL}.
      * @return the {@link URL} object created from the string URL.
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        return createUri(url).toURL();
-    }
+        if (!url.contains(PROTOCOL_SEPARATOR)) {
+            url = "https://" + url;
+        }
 
+        URI uri = createUri(url);
+        return uri.toURL();
+    }
+    
     /**
      * Creates a {@link URI} object from the given string URL.
      * This method attempts to convert the given URL string into a {@link URI} object.

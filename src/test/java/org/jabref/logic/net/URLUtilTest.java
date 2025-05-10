@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class URLUtilTest {
 
     @Test
-    void cleanGoogleSearchURL() {
+    void cleanGoogleSearchURL() throws Exception {
         // empty text
         assertEquals("", URLUtil.cleanGoogleSearchURL(""));
         assertEquals(" ", URLUtil.cleanGoogleSearchURL(" "));
@@ -81,7 +81,8 @@ class URLUtilTest {
 
     @Test
     void isURLshouldRejectEmbeddedURL() {
-        assertFalse(URLUtil.isURL("dblp computer science bibliography, http://dblp.org"));
+        boolean result = URLUtil.isURL("dblp computer science bibliography, http://dblp.org");
+        assertEquals(false, result);
     }
 
     @Test
