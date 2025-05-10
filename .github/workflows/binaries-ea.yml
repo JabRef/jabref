@@ -7,6 +7,11 @@ on:
   schedule:
     - cron: "0 18 * * *"
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - labeled
     paths:
       - .github/workflows/binaries-ea.yml
       - build-logic/src/**
