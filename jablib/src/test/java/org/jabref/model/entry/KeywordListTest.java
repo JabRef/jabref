@@ -115,4 +115,41 @@ class KeywordListTest {
     void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
         assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
     }
+
+    @Test
+    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword() {
+        assertEquals(new KeywordList("keyword,one", "keywordTwo"),
+                KeywordList.parse("keyword\\,one, keywordTwo", ',', '>'));
+    }
+
+    @Test
+    void parseKeywordWithEscapedDelimiterAtEndPreservesDelimiter() {
+        assertEquals(new KeywordList("keywordOne,", "keywordTwo"),
+                KeywordList.parse("keywordOne\\,, keywordTwo", ',', '>'));
+    }
+
+    @Test
+    void parseKeywordWithEscapedBackslashTreatsItAsLiteral() {
+        assertEquals(new KeywordList("keyword\\", "keywordTwo"),
+                KeywordList.parse("keyword\\\\, keywordTwo", ',', '>'));
+    }
+
+    @Test
+    void parseKeywordWithEscapedDelimiterAndHierarchicalDelimiterCreatesHierarchy() {
+        Keyword expected = Keyword.of("keyword,one", "sub");
+        assertEquals(new KeywordList(expected),
+                KeywordList.parse("keyword\\,one > sub", ',', '>'));
+    }
+
+    @Test
+    void parseKeywordWithMultipleEscapedDelimitersTreatsThemAsLiteral() {
+        assertEquals(new KeywordList("one,two,three", "four"),
+                KeywordList.parse("one\\,two\\,three, four", ',', '>'));
+    }
+
+    @Test
+    void parseKeywordWithTrailingEscapeCharacterTreatsItAsLiteralBackslash() {
+        assertEquals(new KeywordList("keywordOne\\"),
+                KeywordList.parse("keywordOne\\\\", ',', '>'));
+    }
 }
