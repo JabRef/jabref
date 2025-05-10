@@ -26,8 +26,9 @@ on:
         default: false
 
 permissions:
-  contents: read
   actions: write
+  contents: read
+  pull-requests: write
 
 env:
   SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
