@@ -12,7 +12,6 @@ import org.jabref.gui.libraryproperties.AbstractPropertiesTabView;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -65,7 +64,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         databaseMode.itemsProperty().bind(viewModel.databaseModesProperty());
         databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
 
-        librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryPropertyProperty());
+        librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
 
@@ -73,12 +72,10 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         laTexFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
 
-        String userString = preferences.getFilePreferences().getUserAndHost().replace("-" + OS.getHostName(), "");
-        userSpecificFileDirectoryTooltip.setText("User: " + userString + ", Host: " + OS.getHostName());
-
+        userSpecificFileDirectoryTooltip.setText(Localization.lang(preferences.getFilePreferences().getUserAndHost()));
         laTexFileDirectoryTooltip.textProperty().bind(
                 viewModel.laTexFileDirectoryProperty().map(path ->
-                        "Directory for LaTeX files: " + (path.isEmpty() ? "(not set)" : path)
+                        Localization.lang(path.isEmpty() ? "Directory for LaTeX files: (not set)" : "Directory for LaTeX files: %0", path)
                 )
         );
 
