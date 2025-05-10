@@ -2,9 +2,6 @@ assembly-versioning-format: '{major}.{minor}.{WeightedPreReleaseNumber}'
 assembly-informational-format: '{major}.{minor}{PreReleaseTagWithDash}--{CommitDate}--{ShortSha}'
 mode: ContinuousDeployment
 
-# hint from https://gitversion.net/docs/reference/configuration -> "next-version"
-next-version: 6.0.1
-
 branches:
   main:
     regex: ^main
