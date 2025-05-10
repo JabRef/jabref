@@ -216,6 +216,7 @@ jobs:
         run: |
           set -e
           set -x
+          mkdir javafx
           cd javafx
           curl --no-progress-meter https://jdk.java.net/javafx${{ env.javafx }}/ > javafx.html
 

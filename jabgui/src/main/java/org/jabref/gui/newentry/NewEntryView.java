@@ -188,7 +188,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         initializeCreateEntry();
         initializeLookupIdentifier();
         initializeInterpretCitations();
-        initializeSpecifyBibTex();
+        initializeSpecifyBibTeX();
     }
 
     private void initializeCreateEntry() {
@@ -234,9 +234,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeLookupIdentifier() {
-        // :TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
-        // model would then iterate through all non-blank lines, passing each of them through the specified lookup
-        // method (each automatically independently, or all through the same fetcher).
+        // TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
+        //       model would then iterate through all non-blank lines, passing each of them through the specified lookup
+        //       method (each automatically independently, or all through the same fetcher).
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
@@ -295,7 +295,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         interpretParser.setOnAction(_ -> preferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName()));
     }
 
-    private void initializeSpecifyBibTex() {
+    private void initializeSpecifyBibTeX() {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {

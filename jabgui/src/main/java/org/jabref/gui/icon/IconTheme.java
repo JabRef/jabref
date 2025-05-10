@@ -369,7 +369,9 @@ public class IconTheme {
         CONSISTENCY_UNSET_FIELD(MaterialDesignM.MINUS),
         CONSISTENCY_REQUIRED_FIELD(MaterialDesignC.CLOSE),
         CONSISTENCY_OPTIONAL_FIELD(MaterialDesignC.CIRCLE_OUTLINE),
-        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP);
+        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP),
+        ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
+        RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE);
 
         private final JabRefIcon icon;
 

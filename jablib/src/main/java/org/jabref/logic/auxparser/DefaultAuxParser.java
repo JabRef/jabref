@@ -48,10 +48,6 @@ public class DefaultAuxParser implements AuxParser {
 
     @Override
     public AuxParserResult parse(Path auxFile) {
-        return parseAuxFile(auxFile);
-    }
-
-    private AuxParserResult parseAuxFile(Path auxFile) {
         AuxParserResult result = new AuxParserResult(masterDatabase);
 
         // nested AUX files

@@ -6,13 +6,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.util.Pair;
+
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
 import org.jabref.logic.bibtex.FieldWriter;
+import org.jabref.logic.os.OS;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +31,8 @@ public class StringUtil {
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
+    private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
+    private static final String STRING_TABLE_DELIMITER = " : ";
 
     public static String booleanToBinaryString(boolean expression) {
         return expression ? "1" : "0";
@@ -756,5 +762,27 @@ public class StringUtil {
     @AllowedToUseApacheCommonsLang3("No Guava equivalent existing")
     public static boolean endsWithIgnoreCase(String string, String suffix) {
         return StringUtils.endsWithIgnoreCase(string, suffix);
+    }
+
+    public static String alignStringTable(List<Pair<String, String>> table) {
+        StringBuilder sb = new StringBuilder();
+
+        int maxLength = table.stream()
+                             .mapToInt(pair -> Objects.requireNonNullElse(pair.getKey(), "").length())
+                             .max().orElse(0);
+
+        for (Pair<String, String> pair : table) {
+            int padding = Math.max(0, maxLength - pair.getKey().length());
+            sb.append(WRAPPED_LINE_PREFIX);
+            sb.append(pair.getKey());
+
+            sb.append(StringUtil.repeatSpaces(padding));
+
+            sb.append(STRING_TABLE_DELIMITER);
+            sb.append(pair.getValue());
+            sb.append(OS.NEWLINE);
+        }
+
+        return sb.toString();
     }
 }
