@@ -17,6 +17,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the provision to choose different CSL bibliography body formats (e.g. First Line Indent, Hanging Indent, Bibliography 1, etc.) in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added a new button to toggle the file path between an absolute and relative formats in context of library properties. [#13031](https://github.com/JabRef/jabref/issues/13031)
+- We introduced user-configurable group 'Imported entries' for automatic import of entries from web search, PDF import and web fetchers. [#12548](https://github.com/JabRef/jabref/issues/12548)
 
 ### Changed
 

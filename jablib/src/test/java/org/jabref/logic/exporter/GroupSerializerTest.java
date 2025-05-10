@@ -57,7 +57,7 @@ class GroupSerializerTest {
     void serializeSmartGroup() {
         SmartGroup group = new SmartGroup("mySmartGroup", GroupHierarchyType.INDEPENDENT, ',');
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
-        assertEquals(Collections.singletonList("0 SmartGroup:mySmartGroup;0;1;;;;"), serialization);
+        assertEquals(List.of("0 SmartGroup:mySmartGroup;0;1;;;;"), serialization);
     }
 
     @Test
