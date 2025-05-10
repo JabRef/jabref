@@ -23,7 +23,7 @@ We needed to determine which framework would provide better maintainability, usa
 ## Considered Options
 
 1. Apache Commons CLI
-2. Migrate to Picocli
+2. Picocli
 3. JCommander
 
 ## Decision Outcome
