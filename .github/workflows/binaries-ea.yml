@@ -89,7 +89,7 @@ jobs:
             exit 0
           fi
 
-          if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
+          if [[ "${{ inputs.notarization }}" == "true" ]]; then
             # This workflow runs on ubuntu-latest even for notarization for macOS; need to check later if really on macOS
              echo "🧾 macOS notarization"
              echo "should-notarize=true" >> "$GITHUB_OUTPUT"
