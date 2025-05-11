@@ -90,6 +90,7 @@ jobs:
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
+            # This workflow runs on ubuntu-latest even for notarization for macOS; need to check later if really on macOS
              echo "🧾 macOS notarization"
              echo "should-notarize=true" >> "$GITHUB_OUTPUT"
              echo "☁️ will upload"
@@ -309,7 +310,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
-        if: startsWith(matrix.os, 'macos') || (needs.should-upload.outputs.upload-to-builds-jabref-org == 'false')
+        if: (startsWith(matrix.os, 'macos')) || (needs.should-upload.outputs.upload-to-builds-jabref-org == 'false')
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.should-upload.outputs.secretspresent == 'true')
@@ -517,7 +518,7 @@ jobs:
             jabkit/build/distribution
           compression-level: 0 # no compression
       - name: Upload to GitHub workflow artifacts store
-        if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'false') && (needs.should-upload.outputs.should-notarize == 'false') }}
+        if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'false') }}
         uses: actions/upload-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}
