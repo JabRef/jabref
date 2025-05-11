@@ -478,6 +478,7 @@ jobs:
       - name: Check disk space on builds.jabref.org
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
         id: diskspace
+        shell: bash
         run: |
           USAGE=$(ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no jrrsync@build-upload.jabref.org \
             "df --output=pcent /var/www/builds.jabref.org | tail -n1 | tr -dc '0-9'")
