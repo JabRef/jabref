@@ -80,7 +80,7 @@ jobs:
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-            echo "secretspresent=true" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
             echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
             exit 0
           fi
@@ -92,7 +92,7 @@ jobs:
             exit 0
           fi
 
-          if { [[ "$RUNNER_OS" == macOS ]] && ( [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]] ); }; then
+          if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
              echo "🧾 macOS notarization"
              echo "should-notarize=true" >> "$GITHUB_OUTPUT"
              echo "☁️ will upload"
@@ -372,7 +372,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
-          name: JabRef-macOS-tbn-${{ matrix.os }}
+          name: JabRef-{{ matrix.os }}-tbn
           path: |
             jabgui/build/distribution
             jabkit/build/distribution
@@ -391,7 +391,7 @@ jobs:
     name: Comment on PR
     # separate job, because it should wait until all binaries are available
     needs: [should-upload, build]
-    if: ${{ (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
+    if: ${{ (github.event_name == 'pull_request') && (needs.should-upload.outputs.upload-to-builds-jabref-org == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - name: Comment PR
@@ -423,13 +423,13 @@ jobs:
       - name: Download from GitHub workflow artifacts store (macOS)
         uses: actions/download-artifact@v4
         with:
-          name: JabRef-macOS-tbn-${{ matrix.os }}
+          name: JabRef-{{ matrix.os }}-tbn
           path: jabgui/build/distribution/
       - name: Notarize dmg
         shell: bash
         run: |
           cd jabgui
-          ls
+          find . -type f
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
