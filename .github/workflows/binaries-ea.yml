@@ -90,16 +90,11 @@ jobs:
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
-            if [[ "$RUNNER_OS" == macOS ]]; then
-              echo "🧾 macOS notarization"
-              echo "should-notarize=true" >> "$GITHUB_OUTPUT"
-            else
-              echo "🚫 no macOS notarization"
-              echo "should-notarize=false" >> "$GITHUB_OUTPUT"
-            fi
-            echo "☁️ will upload"
-            echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-            exit 0;
+             echo "🧾 macOS notarization"
+             echo "should-notarize=true" >> "$GITHUB_OUTPUT"
+             echo "☁️ will upload"
+             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
+             exit 0;
           else
             echo "🚫 no macOS notarization"
             echo "should-notarize=false" >> "$GITHUB_OUTPUT"
@@ -512,7 +507,7 @@ jobs:
         run: |
           rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distribution/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
-        if: ${{ needs.should-upload.outputs.should-notarize == 'true' }}
+        if: ${{ (needs.should-upload.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
