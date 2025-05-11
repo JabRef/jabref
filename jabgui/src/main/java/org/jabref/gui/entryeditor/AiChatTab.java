@@ -37,6 +37,7 @@ public class AiChatTab extends EntryEditorTab {
     private final EntryEditorPreferences entryEditorPreferences;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
 
     private Optional<BibEntry> previousBibEntry = Optional.empty();
@@ -45,6 +46,7 @@ public class AiChatTab extends EntryEditorTab {
                      DialogService dialogService,
                      GuiPreferences preferences,
                      StateManager stateManager,
+                     AdaptVisibleTabs adaptVisibleTabs,
                      TaskExecutor taskExecutor) {
         this.aiService = aiService;
         this.dialogService = dialogService;
@@ -54,6 +56,7 @@ public class AiChatTab extends EntryEditorTab {
         this.entryEditorPreferences = preferences.getEntryEditorPreferences();
         this.citationKeyPatternPreferences = preferences.getCitationKeyPatternPreferences();
         this.stateManager = stateManager;
+        this.adaptVisibleTabs = adaptVisibleTabs;
 
         this.taskExecutor = taskExecutor;
 
@@ -89,7 +92,7 @@ public class AiChatTab extends EntryEditorTab {
     }
 
     private void showPrivacyNotice(BibEntry entry) {
-        setContent(new PrivacyNoticeComponent(aiPreferences, () -> bindToEntry(entry), externalApplicationsPreferences, dialogService));
+        setContent(new PrivacyNoticeComponent(aiPreferences, () -> bindToEntry(entry), externalApplicationsPreferences, dialogService, adaptVisibleTabs));
     }
 
     private void showErrorNotPdfs() {
@@ -139,6 +142,7 @@ public class AiChatTab extends EntryEditorTab {
                 dialogService,
                 aiPreferences,
                 externalApplicationsPreferences,
+                adaptVisibleTabs,
                 taskExecutor
         ));
     }

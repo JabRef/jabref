@@ -10,10 +10,10 @@ on:
   workflow_dispatch:
 
 env:
-  SpringerNatureAPIKey: ${{ secrets.SpringerNatureAPIKey }}
-  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey }}
-  IEEEAPIKey: ${{ secrets.IEEEAPIKey }}
-  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey}}
+  AstrophysicsDataSystemAPIKey: ${{ secrets.AstrophysicsDataSystemAPIKey_FOR_TESTS }}
+  BiodiversityHeritageApiKey: ${{ secrets.BiodiversityHeritageApiKey_FOR_TESTS}}
+  IEEEAPIKey: ${{ secrets.IEEEAPIKey_FOR_TESTS }}
+  SpringerNatureAPIKey: ${{ secrets.SPRINGERNATUREAPIKEY_FOR_TESTS }}
   GRADLE_OPTS: -Xmx4g
   JAVA_OPTS: -Xmx4g
 

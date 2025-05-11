@@ -19,7 +19,6 @@ public class OpenDatabase {
      */
     public static ParserResult loadDatabase(Path fileToOpen, ImportFormatPreferences importFormatPreferences, FileUpdateMonitor fileMonitor)
             throws IOException {
-        ParserResult result = new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen);
-        return result;
+        return new BibtexImporter(importFormatPreferences, fileMonitor).importDatabase(fileToOpen);
     }
 }

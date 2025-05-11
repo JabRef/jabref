@@ -157,7 +157,7 @@ public class DOI implements Identifier {
      * Creates an {@code Optional<DOI>} from various schemes including URL, URN, and plain DOIs.
      * <p>
      * Useful for suppressing the {@link java.lang.IllegalArgumentException IllegalArgumentException}
-     * of the Constructor and checking for {@link java.util.Optional.isPresent Optional.isPresent()} instead.
+     * of the constructor and checking for {@link java.util.Optional#isPresent} instead.
      *
      * @param doi the DOI/Short DOI string
      * @return an Optional containing the DOI or an empty Optional

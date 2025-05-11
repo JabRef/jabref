@@ -36,7 +36,7 @@
                             <JabRefIconView glyph="IMPORT"/>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="%Import preferences from file"/>
+                            <Tooltip text="%Import preferences from file."/>
                         </tooltip>
                     </Button>
                     <Button styleClass="icon-button,narrow" maxWidth="Infinity" onAction="#exportPreferences" HBox.hgrow="ALWAYS">
@@ -44,7 +44,7 @@
                             <JabRefIconView glyph="EXPORT"/>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="%Export preferences to file"/>
+                            <Tooltip text="%Export preferences to file."/>
                         </tooltip>
                     </Button>
                     <Button styleClass="icon-button,narrow" maxWidth="Infinity" onAction="#showAllPreferences" HBox.hgrow="ALWAYS">
