@@ -371,7 +371,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
-          name: JabRef-{{ matrix.os }}-tbn
+          name: JabRef-${{ matrix.os }}-tbn
           path: |
             jabgui/build/distribution
             jabkit/build/distribution
