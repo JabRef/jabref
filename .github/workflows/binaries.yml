@@ -80,7 +80,7 @@ jobs:
 
           if [ -z "$BUILDJABREFPRIVATEKEY" ]; then
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-            echo "secretspresent=true" >> "$GITHUB_OUTPUT"
+            echo "secretspresent=false" >> "$GITHUB_OUTPUT"
             echo "🚫 Secret BUILDJABREFPRIVATEKEY not present – skipping upload"
             exit 0
           fi
