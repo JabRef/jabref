@@ -470,6 +470,11 @@ jobs:
           set -e
           ${{ matrix.archivePortableJabKit }}
 
+      - name: Setup SSH key
+        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
+        run: |
+          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
+          chmod 600 sshkey
       - name: Check disk space on builds.jabref.org
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
         id: diskspace
@@ -482,8 +487,6 @@ jobs:
           else
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
-        env:
-          SSH_KEY: ${{ secrets.buildJabRefPrivateKey }}
 
       - name: Setup rsync (macOS)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
@@ -495,11 +498,6 @@ jobs:
         # We cannot use "setup-rsync", because that does not work on Windows
         # We do not use egor-tensin/setup-cygwin@v4, because it replaces the default shell
         run: choco install --no-progress rsync
-      - name: Setup SSH key
-        if: ${{ (steps.diskspace.outputs.available == 'true') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') }}
-        run: |
-          echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
-          chmod 600 sshkey
       - name: Upload jabgui to builds.jabref.org (Windows)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
