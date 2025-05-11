@@ -552,10 +552,10 @@ jobs:
         include:
           - os: macos-14
             displayName: macOS (ARM64)
-            suffix: '_arm64'
+            suffix: '-ea_arm64'
           - os: macos-13  # intel image
             displayName: macOS
-            suffix: ''
+            suffix: '-ea'
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
