@@ -438,7 +438,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: JabRef-${{ matrix.os }}-tbn
-          path: jabgui/build/distribution/
       - name: Notarize dmg
         shell: bash
         run: |
