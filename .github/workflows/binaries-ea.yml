@@ -547,7 +547,7 @@ jobs:
       - name: Download from GitHub workflow artifacts store (macOS)
         uses: actions/download-artifact@v4
         with:
-          name: JabRef-{{ matrix.os }}-tbn
+          name: JabRef-${{ matrix.os }}-tbn
           path: jabgui/build/distribution/
       - name: Notarize dmg
         shell: bash
