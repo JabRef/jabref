@@ -9,7 +9,7 @@ on:
 jobs:
   generate-map:
     runs-on: ubuntu-latest
-
+    if: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
