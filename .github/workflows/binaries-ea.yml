@@ -511,7 +511,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
-          name: JabRef-macOS-tbn-${{ matrix.os }}
+          name: JabRef-{{ matrix.os }}-tbn
           path: |
             jabgui/build/distribution
             jabkit/build/distribution
@@ -546,13 +546,13 @@ jobs:
       - name: Download from GitHub workflow artifacts store (macOS)
         uses: actions/download-artifact@v4
         with:
-          name: JabRef-macOS-tbn-${{ matrix.os }}
+          name: JabRef-{{ matrix.os }}-tbn
           path: jabgui/build/distribution/
       - name: Notarize dmg
         shell: bash
         run: |
           cd jabgui
-          ls
+          find . -type f
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
           xcrun notarytool submit build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
           xcrun stapler staple build/distribution/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
