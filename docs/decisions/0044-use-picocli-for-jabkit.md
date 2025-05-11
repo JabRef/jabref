@@ -25,6 +25,9 @@ We needed to determine which framework would provide better maintainability, usa
 1. Apache Commons CLI
 2. Picocli
 3. JCommander
+4. Airline 2
+5. ritopt
+6. crest
 
 ## Decision Outcome
 
@@ -69,3 +72,39 @@ Chosen option: "Migrate to Picocli", because it offers a more modern, feature-ri
 * Bad, because it does not support advanced CLI features (e.g., argument files, type conversion)
 * Bad, because there are fewer examples and tooling integrations
 * Bad, because it has limited documentation
+
+### Airline 2
+
+Available at <https://github.com/rvesse/airline>.
+
+* Bad, because unmaintained in 2025
+
+### ritopt
+
+Availale at <https://ritopt.sourceforge.net/index.shtml>.
+
+* Good, because simple interface
+* Good, because used in JabRef a long time ago (before 2.10)
+* Bad, because unmaintained in 2025
+
+### crest
+
+"Command-line API styled after JAX-RS"
+
+Available at <https://github.com/tomitribe/crest>
+
+Example:
+
+```java
+@Command
+public String hello(@Option("name") @Default("${user.name}") String user) throws Exception
+    return String.format("Hello, %s%n", user);
+}
+```
+
+* Good, because good alignment with JAX-RS
+* Bad, because not a large user base
+
+## More Information
+
+More CLI parsers are listed and discussed at <https://stackoverflow.com/a/7829772/873282>.
