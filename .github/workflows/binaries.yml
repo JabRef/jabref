@@ -196,7 +196,7 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Build dmg and pkg (macOS)
+      - name: Build dmg (macOS)
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         shell: bash
         run: |
@@ -373,7 +373,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           # tbn = to-be-notarized
-          name: JabRef-{{ matrix.os }}-tbn
+          name: JabRef-${{ matrix.os }}-tbn
           path: |
             jabgui/build/distribution
             jabkit/build/distribution
