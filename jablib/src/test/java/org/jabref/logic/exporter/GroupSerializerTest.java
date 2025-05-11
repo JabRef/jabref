@@ -22,6 +22,7 @@ import org.jabref.model.groups.GroupTreeNodeTest;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
@@ -49,6 +50,13 @@ class GroupSerializerTest {
         AllEntriesGroup group = new AllEntriesGroup("");
         List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
         assertEquals(List.of("0 AllEntriesGroup:"), serialization);
+    }
+
+    @Test
+    void serializeSmartGroup() {
+        SmartGroup group = new SmartGroup("mySmartGroup", GroupHierarchyType.INDEPENDENT, ',');
+        List<String> serialization = groupSerializer.serializeTree(GroupTreeNode.fromGroup(group));
+        assertEquals(List.of("0 SmartGroup:mySmartGroup;0;1;;;;"), serialization);
     }
 
     @Test
