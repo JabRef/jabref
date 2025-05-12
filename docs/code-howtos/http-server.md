@@ -4,7 +4,7 @@ parent: Code Howtos
 # HTTP Server
 
 JabRef has a built-in http server.
-For example, the resource for a library is implemented at [`org.jabref.http.server.LibraryResource`](https://github.com/JabRef/jabref/blob/main/src/main/java/org/jabref/http/server/LibraryResource.java).
+For example, the resource for a library is implemented at [`org.jabref.http.server.LibraryResource`](https://github.com/JabRef/jabref/blob/main/jabsrv/src/main/java/org/jabref/http/server/LibraryResource.java).
 
 ## Start http server
 
@@ -16,26 +16,24 @@ If that list is also empty, the file `src/main/resources/org/jabref/http/server/
 
 ### Starting with gradle
 
-Does not work.
-
-Current try:
-
 ```shell
-./gradlew run -Pcomment=httpserver
+./gradlew run :jabsrv:run
 ```
 
-However, there are with `ForkJoin` (discussion at <https://discuss.gradle.org/t/is-it-ok-to-use-collection-parallelstream-or-other-potentially-multi-threaded-code-within-gradle-plugin-code/28003>)
+The GUI is also started. Just close it.
 
 Gradle output:
 
 ```shell
-> Task :run
-2023-04-22 11:30:59 [main] org.jabref.http.server.Server.main()
-DEBUG: Libraries served: [C:\git-repositories\jabref-all\jabref\src\main\resources\org\jabref\http\server\http-server-demo.bib]
-2023-04-22 11:30:59 [main] org.jabref.http.server.Server.startServer()
-DEBUG: Starting server...
-<============-> 92% EXECUTING [2m 27s]
-> :run
+> Task :jabsrv:run
+2025-05-12 11:52:57 [main] org.glassfish.grizzly.http.server.NetworkListener.start()
+INFO: Started listener bound to [localhost:6050]
+2025-05-12 11:52:57 [main] org.glassfish.grizzly.http.server.HttpServer.start()
+INFO: [HttpServer] Started.
+JabSrv started.
+Stop JabSrv using Ctrl+C
+<============-> 96% EXECUTING [43s]
+> :jabsrv:run
 ```
 
 IntelliJ output, if `org.jabref.http.server.Server#main` is executed:
@@ -52,7 +50,7 @@ DEBUG: Server started.
 
 ## Developing with IntelliJ
 
-IntelliJ Ultimate offers a Markdown-based http-client. One has to open the file `src/test/java/org/jabref/testutils/interactive/http/rest-api.http`.
+IntelliJ Ultimate offers a Markdown-based http-client. One has to open the file `jabsrv/src/test/rest-api.http`.
 Then, there are play buttons appearing for interacting with the server.
 
 ## Get SSL Working

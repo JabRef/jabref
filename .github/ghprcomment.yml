@@ -8,7 +8,7 @@
 
     To verify compilation locally, run `./gradlew build` or try running JabRef.
 
-- jobName: 'Unit tests - jablib'
+- jobName: 'Unit tests – jablib'
   message: >
     JUnit tests of `jablib` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
@@ -17,7 +17,7 @@
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
-- jobName: 'Unit tests - jabkit'
+- jobName: 'Unit tests – jabkit'
   message: >
     JUnit tests of `jabkit` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
@@ -26,7 +26,7 @@
 
     You can then run these tests in IntelliJ to reproduce the failing tests locally.
     We offer a quick test running howto in the section [Final build system checks](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.html#final-build-system-checks) in our setup guide.
-- jobName: 'Unit tests - jabsrv'
+- jobName: 'Unit tests – jabsrv'
   message: >
     JUnit tests of `jabsrv` are failing.
     You can see which checks are failing by locating the box "Some checks were not successful" on the pull request page.
@@ -124,6 +124,7 @@
   message: >
     You committed your code on the `main` brach of your fork. This is a bad practice.
     The right way is to branch out from `main`, work on your patch/feature in that new branch, and then get that branch merged via the pull request (see [GitHub flow](https://docs.github.com/en/get-started/using-github/github-flow)).
+
 
     For this pull request, this is OK.
     For subsequent pull requests, please start with a different branch with a proper branch name.

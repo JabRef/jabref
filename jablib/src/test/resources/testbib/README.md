@@ -1,6 +1,5 @@
 # Test bib files
 
-- `Chocolate.bib`: Library demonstrating JabRef features
 - `entry-editor-tabs-biblatex.bib`: Minimal `.bib` file to demonstrate entry editor tab behavior
   - entry `a`: Tab "Optional fields" should be shown
   - entry `b`: Tabs "Optional fields" and "Other fields" should be shown

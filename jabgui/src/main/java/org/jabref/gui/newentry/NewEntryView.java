@@ -35,6 +35,7 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -45,6 +46,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -143,7 +145,19 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private void finalizeTabs() {
         NewEntryDialogTab approach = initialApproach;
         if (approach == null) {
-            approach = preferences.getLatestApproach();
+            final String clipboardText = ClipBoardManager.getContents().trim();
+            if (!StringUtil.isBlank(clipboardText)) {
+                Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
+                if (identifier.isPresent()) {
+                    approach = NewEntryDialogTab.ENTER_IDENTIFIER;
+                    interpretText.setText(clipboardText);
+                    interpretText.selectAll();
+                } else {
+                    approach = preferences.getLatestApproach();
+                }
+            } else {
+                approach = preferences.getLatestApproach();
+            }
         }
 
         switch (approach) {
@@ -188,7 +202,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         initializeCreateEntry();
         initializeLookupIdentifier();
         initializeInterpretCitations();
-        initializeSpecifyBibTex();
+        initializeSpecifyBibTeX();
     }
 
     private void initializeCreateEntry() {
@@ -234,9 +248,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeLookupIdentifier() {
-        // :TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
-        // model would then iterate through all non-blank lines, passing each of them through the specified lookup
-        // method (each automatically independently, or all through the same fetcher).
+        // TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
+        //       model would then iterate through all non-blank lines, passing each of them through the specified lookup
+        //       method (each automatically independently, or all through the same fetcher).
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
@@ -295,7 +309,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         interpretParser.setOnAction(_ -> preferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName()));
     }
 
-    private void initializeSpecifyBibTex() {
+    private void initializeSpecifyBibTeX() {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
