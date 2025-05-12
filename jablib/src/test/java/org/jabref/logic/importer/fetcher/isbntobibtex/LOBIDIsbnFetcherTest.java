@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 class LOBIDIsbnFetcherTest extends AbstractIsbnFetcherTest {
@@ -56,7 +56,7 @@ class LOBIDIsbnFetcherTest extends AbstractIsbnFetcherTest {
     @Test
     @Override
     public void authorsAreCorrectlyFormatted() throws FetcherException {
-        BibEntry thirdArticle = new BibEntry(StandardEntryType.Book)
+        BibEntry article = new BibEntry(StandardEntryType.Book)
                 .withField(StandardField.AUTHOR, "Nichols, Catherine and Blume, Eugen and Hamburger Bahnhof - Museum für Gegenwart - Berlin and Nationalgalerie (Berlin) and DruckVerlag Kettler GmbH")
                 .withField(StandardField.ABSTRACT, "Impresum: \"Diese Publikation erscheint anlässlich der Ausstellung Das Kapital. Schuld-Territorium-Utopie. Eine Ausstellung der Nationalgalerie im Hamburger Bahnhof - Museum für Gegenwart - Berlin, 2. Juli-6. November 2016\"")
                 .withField(StandardField.PUBLISHER, "Verlag Kettler")
@@ -73,7 +73,7 @@ class LOBIDIsbnFetcherTest extends AbstractIsbnFetcherTest {
                 .withField(StandardField.YEAR, "2016");
 
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("9783862065752");
-        assertEquals(Optional.of(thirdArticle), fetchedEntry);
+        assertEquals(Optional.of(article), fetchedEntry);
     }
 
     @Test

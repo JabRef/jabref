@@ -28,10 +28,8 @@ public class LOBIDIsbnFetcher extends AbstractIsbnFetcher {
         return lobidFetcher.getName();
     }
 
-
     @Override
     public Parser getParser() {
         return lobidFetcher.getParser();
     }
-
 }
