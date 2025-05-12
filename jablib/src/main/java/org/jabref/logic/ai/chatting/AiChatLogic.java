@@ -97,6 +97,15 @@ public class AiChatLogic {
     }
 
     private void rebuildChatMemory(List<ChatMessage> chatMessages) {
+        // Because we can't get a tokenizer for each model, {@link AiChatLogic} assumes that
+        // every text is tokenized like it's tokenized for OpenAI's GPT-4o-mini model.
+        // 
+        // Reasons why we can't get tokenizer for each model:
+        // - Some tokenizers might not be available in langchain4j.
+        // - User may use a custom model, but there is no way to supply a custom tokenizer.
+        // - OpenAI API (and compatible ones) doesn't have an endpoint for tokenizing text.
+        //
+        // This is another dark workaround of AI integration. But it works "good-enough" for now.
         this.chatMemory = TokenWindowChatMemory
                 .builder()
                 .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer(OpenAiChatModelName.GPT_4_O_MINI))
