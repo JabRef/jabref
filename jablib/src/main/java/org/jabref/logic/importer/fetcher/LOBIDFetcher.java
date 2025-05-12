@@ -64,7 +64,7 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParse
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         // We try to search by isbn field
-        uriBuilder.addParameter("q", "isbn:" + identifier );
+        uriBuilder.addParameter("q", "isbn:" + identifier);
         uriBuilder.addParameter("sort", "newest");
         uriBuilder.addParameter("format", "json");
         return uriBuilder.build().toURL();
