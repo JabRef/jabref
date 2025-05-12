@@ -52,7 +52,7 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api:3.1.1")
     implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
 
-    implementation("com.konghq:unirest-modules-gson:4.4.6")
+    implementation("com.konghq:unirest-modules-gson:4.4.7")
 
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     implementation("org.glassfish.hk2:hk2-api:3.1.1")
