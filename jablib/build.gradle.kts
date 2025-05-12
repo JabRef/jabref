@@ -164,7 +164,7 @@ dependencies {
     }
 
     implementation("org.apache.velocity:velocity-engine-core:2.4.1")
-    implementation(platform("ai.djl:bom:0.32.0"))
+    implementation(platform("ai.djl:bom:0.33.0"))
     implementation("ai.djl:api")
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
