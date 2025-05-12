@@ -18,6 +18,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added a success dialog when using the "Copy to" option, indicating whether the entry was successfully copied and specifying if a cross-reference entry was included. [#12486](https://github.com/JabRef/jabref/issues/12486)
 - We added a new button to toggle the file path between an absolute and relative formats in context of library properties. [#13031](https://github.com/JabRef/jabref/issues/13031)
+- We added an "Example open library" button to the Welcome tab. [#13014](https://github.com/JabRef/jabref/issues/13014)
 
 ### Changed
 
