@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
@@ -11,8 +12,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
+import org.jabref.model.strings.StringUtil;
 
 public class CompositeIdFetcher {
 
@@ -64,12 +67,25 @@ public class CompositeIdFetcher {
     }
 
     public static boolean containsValidId(String identifier) {
-        Optional<DOI> doi = DOI.findInText(identifier);
-        Optional<ArXivIdentifier> arXivIdentifier = ArXivIdentifier.parse(identifier);
-        Optional<ISBN> isbn = ISBN.parse(identifier);
-        Optional<SSRN> ssrn = SSRN.parse(identifier);
-        Optional<RFC> rfcId = RFC.parse(identifier);
+        return getIdentifier(identifier).isPresent();
+    }
 
-        return Stream.of(doi, arXivIdentifier, isbn, ssrn, rfcId).anyMatch(Optional::isPresent);
+    public static Optional<Identifier> getIdentifier(String identifier) {
+        if (StringUtil.isBlank(identifier)) {
+            return Optional.empty();
+        }
+
+        return Stream.<Supplier<Optional<? extends Identifier>>>of(
+                             () -> DOI.findInText(identifier),
+                             () -> ArXivIdentifier.parse(identifier),
+                             () -> ISBN.parse(identifier),
+                             () -> SSRN.parse(identifier),
+                             () -> RFC.parse(identifier)
+                     )
+                     .map(Supplier::get)
+                     .filter(Optional::isPresent)
+                     .map(Optional::get)
+                     .map(id -> (Identifier) id)
+                     .findFirst();
     }
 }
