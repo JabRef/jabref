@@ -214,7 +214,7 @@ dependencies {
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.0")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.0")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
