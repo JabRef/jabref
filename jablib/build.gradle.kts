@@ -98,7 +98,7 @@ dependencies {
 
     // region HTTP clients
     implementation("org.jsoup:jsoup:1.20.1")
-    implementation("com.konghq:unirest-java-core:4.4.6")
+    implementation("com.konghq:unirest-java-core:4.4.7")
     implementation("com.konghq:unirest-modules-gson:4.4.7")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
     // endregion
