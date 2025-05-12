@@ -56,7 +56,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_ISBN);
     }
-+
+
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<BibEntry> bibEntry = Optional.empty();
