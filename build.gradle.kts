@@ -4,7 +4,7 @@ plugins {
     id("checkstyle")
 
     id("com.github.andygoossens.modernizer") version "1.11.0"
-    id("org.openrewrite.rewrite") version "7.5.0"
+    id("org.openrewrite.rewrite") version "7.6.1"
 
     id("org.itsallcode.openfasttrace") version "3.0.1"
 
@@ -56,8 +56,12 @@ requirementTracing {
 
 subprojects {
     plugins.apply("checkstyle")
+
     plugins.apply("com.github.andygoossens.modernizer")
+
+    // Hint from https://stackoverflow.com/a/46533151/873282
     plugins.apply("com.adarshr.test-logger")
+
     plugins.apply("com.github.koppor.gradle-modules-plugin")
 
     checkstyle {

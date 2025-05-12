@@ -1,0 +1,36 @@
+// This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
+
+GET http://localhost:6050
+
+###
+
+GET http://localhost:6050/libraries
+Accept: application/json
+
+###
+
+GET http://localhost:6050/libraries/notfound
+
+###
+
+// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
+// will show the contents of your first opened library as BibTeX
+
+GET http://localhost:6050/libraries/Chocolate.bib-026bd7ec
+Accept: application/x-bibtex
+
+###
+
+// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
+// will show the contents of your first opened library using CSL JSON
+
+GET http://localhost:6050/libraries/Chocolate.bib-026bd7ec
+Accept: application/x-bibtex-library-csl+json
+
+###
+
+// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
+// will show the contents of your first opened library using json + embedded BibTeX
+
+GET http://localhost:6050/libraries/Chocolate.bib-026bd7ec
+Accept: application/json

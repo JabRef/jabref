@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
+import org.jabref.logic.citationstyle.CitationStyle;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.AuthorList;
@@ -25,32 +26,48 @@ import org.apache.commons.text.StringEscapeUtils;
  */
 public final class CSLFormatUtils {
 
-    public enum Format {
-        TITLE("Title"),
-        BODY_TEXT("Body Text"),
-        SUBTITLE("Subtitle"),
-        HEADING_1("Heading 1"),
-        HEADING_2("Heading 2"),
-        HEADING_3("Heading 3"),
-        HEADING_4("Heading 4");
+    /**
+     * The formatting names specified to and understood by LibreOffice internally via code are often different from their displayed names in the LibreOffice application.
+     * For example, "Hanging Indent" as visible in LO styles list should be specified as "Hanging indent" (note casing) internally. Similarly, "Body Text, Indented" is specified as "Text body indent".
+     * This is also why we don't let users manually input the name of any pre-set format.
+     * The following two lists below are taken from https://github.com/LibreOffice/core/blob/0891df6b21fd95ec7c9614509d92829c0f17c353/sw/qa/python/check_styles.py#L132
+     */
+    public static final List<String> BIBLIOGRAPHY_TITLE_FORMATS = List.of(
+            "Bibliography Heading",
+            "Title",
+            "Text body",
+            "Subtitle",
+            "Heading 1",
+            "Heading 2",
+            "Heading 3",
+            "Heading 4"
+    );
 
-        private final String format;
+    public static final List<String> BIBLIOGRAPHY_BODY_FORMATS = List.of(
+            "Bibliography 1",
+            "Text body",
+            "Text body indent",
+            "First line indent",
+            "Hanging indent",
+            "List",
+            "List Indent",
+            "Marginalia"
+    );
 
-        Format(String format) {
-            this.format = format;
-        }
-
-        public String getFormat() {
-            return format;
-        }
-    }
-
-    public static final String DEFAULT_BIBLIOGRAPHY_BODY_PARAGRAPH_FORMAT = "Body Text";
+    private static final String DEFAULT_BIBLIOGRAPHY_BODY_FORMAT = "Text body";
+    private static final String DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT = "Hanging indent";
 
     private static final Pattern YEAR_IN_CITATION_PATTERN = Pattern.compile("(.)(.*), (\\d{4}.*)");
 
     private CSLFormatUtils() {
         // prevent instantiation
+    }
+
+    public static String getDefaultBodyFormatForStyle(CitationStyle style) {
+        if (style.usesHangingIndent()) {
+            return DEFAULT_HANGING_INDENT_BIBLIOGRAPHY_BODY_FORMAT;
+        }
+        return DEFAULT_BIBLIOGRAPHY_BODY_FORMAT;
     }
 
     /**
@@ -99,6 +116,9 @@ public final class CSLFormatUtils {
 
         // Remove extra trailing paragraph tags when there are multiple (keeping one)
         html = html.replaceAll("(?:<p>\\s*</p>\\s*){2,}$", "<p></p>");
+
+        // In bibliography entries, citeproc-java adds 4 leading spaces for numeric styles, and 2 for non-numeric
+        html = html.trim();
 
         return html;
     }

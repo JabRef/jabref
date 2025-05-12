@@ -1,3 +1,5 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+
 plugins {
     id("buildlogic.java-common-conventions")
 
@@ -8,13 +10,17 @@ plugins {
 
 application{
     mainClass.set("org.jabref.http.server.Server")
+    mainModule.set("org.jabref.jabsrv")
+
+    applicationDefaultJvmArgs = listOf(
+        "--enable-native-access=com.sun.jna"
+    )
 }
 
 dependencies {
     implementation(project(":jablib"))
 
     implementation("org.slf4j:slf4j-api:2.0.17")
-    implementation("org.tinylog:tinylog-api:2.7.0")
     implementation("org.tinylog:slf4j-tinylog:2.7.0")
     implementation("org.tinylog:tinylog-impl:2.7.0")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
@@ -31,6 +37,7 @@ dependencies {
     // Injection framework
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     implementation("org.glassfish.hk2:hk2-api:3.1.1")
+    implementation("org.glassfish.hk2:hk2-utils:3.1.1")
 
     // testImplementation("org.glassfish.hk2:hk2-testing:3.0.4")
     // implementation("org.glassfish.hk2:hk2-testing-jersey:3.0.4")
@@ -39,9 +46,13 @@ dependencies {
     // HTTP server
     // implementation("org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1")
     implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
+    implementation("org.glassfish.grizzly:grizzly-http-server:4.0.2")
+    implementation("org.glassfish.grizzly:grizzly-framework:4.0.2")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
+    implementation("jakarta.validation:jakarta.validation-api:3.1.1")
+    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
 
-    implementation("com.konghq:unirest-modules-gson:4.4.6")
+    implementation("com.konghq:unirest-modules-gson:4.4.7")
 
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     implementation("org.glassfish.hk2:hk2-api:3.1.1")
@@ -61,11 +72,32 @@ dependencies {
         exclude(group = "org.antlr")
     }
 
-    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito:mockito-core:5.17.0") {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 }
 
 javafx {
     version = "24"
     // because of afterburner.fx
     modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
+}
+
+tasks.test {
+    testLogging {
+        // set options for log level LIFECYCLE
+        events("FAILED")
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+    maxParallelForks = 1
+}
+
+tasks.named<JavaExec>("run") {
+    doFirst {
+        application.applicationDefaultJvmArgs =
+            listOf(
+                "--enable-native-access=com.sun.jna"
+            )
+    }
 }

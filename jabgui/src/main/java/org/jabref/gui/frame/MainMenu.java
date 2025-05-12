@@ -54,7 +54,7 @@ import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
-import org.jabref.gui.plaincitationparser.PlainCitationParserAction;
+import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
@@ -239,8 +239,10 @@ public class MainMenu extends MenuBar {
         });
 
         library.getItems().addAll(
-                factory.createMenuItem(StandardActions.NEW_ENTRY, new NewEntryAction(frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.NEW_ENTRY_FROM_PLAIN_TEXT, new PlainCitationParserAction(dialogService, stateManager)),
+                factory.createMenuItem(StandardActions.CREATE_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.CREATE_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.CREATE_ENTRY_IDENTIFIER, new NewEntryAction(NewEntryDialogTab.ENTER_IDENTIFIER, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.CREATE_ENTRY_PLAINTEXT, new NewEntryAction(NewEntryDialogTab.INTERPRET_CITATIONS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),

@@ -12,7 +12,7 @@ plugins {
 group = "org.jabref.jabkit"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
-val luceneVersion = "10.2.0"
+val luceneVersion = "10.2.1"
 
 dependencies {
     implementation(project(":jablib"))
@@ -22,7 +22,8 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
-    implementation("commons-cli:commons-cli:1.9.0")
+    implementation("info.picocli:picocli:4.7.7")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
@@ -53,7 +54,10 @@ dependencies {
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
     testImplementation(project(":test-support"))
-    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito:mockito-core:5.17.0") {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 }
 
 /*
@@ -69,12 +73,12 @@ javafx {
 }
 
 application {
-    mainClass.set("org.jabref.cli.JabKit")
+    mainClass.set("org.jabref.JabKit")
     mainModule.set("org.jabref.jabkit")
 
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=org.jabref.jabkit.merged.module,com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }
 

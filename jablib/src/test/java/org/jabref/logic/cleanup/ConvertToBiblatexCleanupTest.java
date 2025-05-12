@@ -7,6 +7,8 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -96,5 +98,23 @@ class ConvertToBiblatexCleanupTest {
 
         assertEquals(Optional.empty(), entry.getField(StandardField.JOURNAL));
         assertEquals(Optional.of("Best of JabRef"), entry.getField(StandardField.JOURNALTITLE));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "2011-11",
+            "2011-11-11",
+            "2010/2011",
+            "0030 BC",
+            "-0876",
+            "2004-22"
+    })
+    void fallbackDateParsing_shouldAcceptTypicalBibLatexValues(String fakeYear) {
+        BibEntry entry = new BibEntry().withField(StandardField.YEAR, fakeYear);
+
+        worker.cleanup(entry);
+
+        assertEquals(Optional.of(fakeYear), entry.getField(StandardField.DATE));
+        assertEquals(Optional.empty(), entry.getField(StandardField.YEAR));
     }
 }

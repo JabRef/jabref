@@ -1,0 +1,107 @@
+name: Check LaTeX files
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+    paths:
+      - '**/*.bib'
+      - '**/*.tex'
+  pull_request:
+    paths:
+        - '**/*.bib'
+        - '**/*.tex'
+  schedule:
+    - cron: '1 2 5 * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Install TeX Live
+        uses: zauguin/install-texlive@v4
+        with:
+           package_file: jablib/src/test/latex/Texlivefile
+  check-latex:
+    needs: [cache]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          #  IEEE paper
+          - directory: jablib/src/test/latex/pdfs/IEEE
+            tex: ieee-paper
+            engine: pdflatex
+            bibengine: bibtex
+          # minimal search examples
+          - directory: jablib/src/test/latex/org/jabref/search
+            tex: minimal-all-upper-case
+            engine: pdflatex
+            bibengine: NONE
+          - directory: jablib/src/test/latex/org/jabref/search
+            tex: minimal-mixed-case
+            engine: pdflatex
+            bibengine: NONE
+          - directory: jablib/src/test/latex/org/jabref/search
+            tex: minimal-note-all-upper-case
+            engine: pdflatex
+            bibengine: NONE
+          - directory: jablib/src/test/latex/org/jabref/search
+            tex: minimal-note-mixed-case
+            engine: pdflatex
+            bibengine: NONE
+          - directory: jablib/src/test/latex/org/jabref/search
+            tex: minimal-note-sentence-case
+            engine: pdflatex
+            bibengine: NONE
+          - directory: jablib/src/test/latex/org/jabref/search
+            tex: minimal-sentence-case
+            engine: pdflatex
+            bibengine: NONE
+          # bibtex metadata-as-json checks
+          - directory: jablib/src/test/latex/bibtex
+            tex: json-metadata-bibtex
+            engine: pdflatex
+            bibengine: bibtex
+          - directory: jablib/src/test/latex/bibtex
+            tex: json-metadata-biblatex
+            engine: pdflatex
+            bibengine: biber
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Install TeX Live
+        uses: zauguin/install-texlive@v4
+        with:
+          package_file: jablib/src/test/latex/Texlivefile
+
+      - run: ${{ matrix.engine }} ${{ matrix.tex }}
+        working-directory: ${{ matrix.directory }}
+      - run: ${{ matrix.bibengine }} ${{ matrix.tex }}
+        if: ${{ matrix.bibengine != 'NONE' }}
+        working-directory: ${{ matrix.directory }}
+      - run: ${{ matrix.engine }} ${{ matrix.tex }}
+        if: ${{ matrix.bibengine != 'NONE' }}
+        working-directory: ${{ matrix.directory }}
+      - run: ${{ matrix.engine }} ${{ matrix.tex }}
+        working-directory: ${{ matrix.directory }}
+
+      - name: Upload build result
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF-${{ matrix.tex }}
+          path: |
+            ${{ matrix.directory }}/*.pdf
+            ${{ matrix.directory }}/*.log
+            ${{ matrix.directory }}/*.fls
