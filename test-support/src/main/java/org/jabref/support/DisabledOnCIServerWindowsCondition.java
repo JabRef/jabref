@@ -2,6 +2,7 @@ package org.jabref.support;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -25,7 +26,7 @@ public class DisabledOnCIServerWindowsCondition implements ExecutionCondition {
             return ENABLED;
         }
 
-        boolean isOnWindows = org.junit.jupiter.api.condition.OS.WINDOWS.isCurrentOs();
+        boolean isOnWindows = OS.WINDOWS.isCurrentOs();
         if (!isOnWindows) {
             return ENABLED;
         }
