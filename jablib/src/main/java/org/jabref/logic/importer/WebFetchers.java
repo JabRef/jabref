@@ -153,6 +153,7 @@ public class WebFetchers {
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new LibraryOfCongress(importFormatPreferences));
+        set.add(new LOBIDFetcher());
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());
