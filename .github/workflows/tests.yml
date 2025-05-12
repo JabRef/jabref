@@ -34,20 +34,11 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-
-      # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
-        uses: jdx/mise-action@v2
-      - name: Make JDK known to gradle (Linux, macOS)
-        shell: bash
-        run: ln -s ~/.local/share/mise ~/.asdf
-      - name: Setup JDK for gradle itself
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      # endregion
-
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Run checkstyle reporter
         uses: dbelyaev/action-checkstyle@master
         with:
@@ -68,27 +59,16 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-
-      # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
-        uses: jdx/mise-action@v2
-      - name: Make JDK known to gradle (Linux, macOS)
-        shell: bash
-        run: ln -s ~/.local/share/mise ~/.asdf
-      - name: Setup JDK for gradle itself
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      # endregion
-
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
-      - run: cat build/reports/rewrite/rewrite.patch
-        if: failure()
 
   modernizer:
     name: Modernizer
@@ -99,20 +79,11 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-
-      # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
-        uses: jdx/mise-action@v2
-      - name: Make JDK known to gradle (Linux, macOS)
-        shell: bash
-        run: ln -s ~/.local/share/mise ~/.asdf
-      - name: Setup JDK for gradle itself
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      # endregion
-
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run modernizer
@@ -207,20 +178,11 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-
-      # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
-        uses: jdx/mise-action@v2
-      - name: Make JDK known to gradle (Linux, macOS)
-        shell: bash
-        run: ln -s ~/.local/share/mise ~/.asdf
-      - name: Setup JDK for gradle itself
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      # endregion
-
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run ${{ matrix.module }} tests
@@ -259,20 +221,11 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-
-      # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
-        uses: jdx/mise-action@v2
-      - name: Make JDK known to gradle (Linux, macOS)
-        shell: bash
-        run: ln -s ~/.local/share/mise ~/.asdf
-      - name: Setup JDK for gradle itself
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      # endregion
-
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run tests on PostgreSQL
@@ -317,20 +270,12 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
-
-      # region setup-JDK
-      - name: Setup JDK (to use in Gradle's Java toolchain)
-        uses: jdx/mise-action@v2
-      - name: Make JDK known to gradle (Linux, macOS)
-        shell: bash
-        run: ln -s ~/.local/share/mise ~/.asdf
-      - name: Setup JDK for gradle itself
+      - name: Set up JDK
+        if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
-      # endregion
-
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Update test coverage metrics
@@ -357,7 +302,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
-
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements
