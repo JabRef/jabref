@@ -21,12 +21,11 @@ import static org.mockito.Mockito.mock;
 @FetcherTest
 class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
-    ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     LOBIDFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        fetcher = new LOBIDFetcher(importerPreferences);
+        fetcher = new LOBIDFetcher();
     }
 
     @Override

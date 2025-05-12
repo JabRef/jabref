@@ -129,7 +129,7 @@ public class WebFetchers {
         set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new BiodiversityLibrary(importerPreferences));
-        set.add(new LOBIDFetcher(importerPreferences));
+        set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
         return set;
     }

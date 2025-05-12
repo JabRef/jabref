@@ -14,6 +14,7 @@ import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
+import org.jabref.logic.importer.fetcher.LOBIDFetcher;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ISBN;
@@ -38,9 +39,11 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
+        LOBIDIsbnFetcher lobidIsbnFetcher = new LOBIDIsbnFetcher(importFormatPreferences);
         OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
         this.gvkIsbnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
+        this.addRetryFetcher(lobidIsbnFetcher);
         this.addRetryFetcher(openLibraryIsbnFetcher);
     }
 
@@ -53,7 +56,7 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
     public Optional<HelpFile> getHelpPage() {
         return Optional.of(HelpFile.FETCHER_ISBN);
     }
-
++
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         Optional<BibEntry> bibEntry = Optional.empty();
