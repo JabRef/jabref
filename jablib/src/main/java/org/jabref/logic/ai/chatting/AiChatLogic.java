@@ -27,6 +27,7 @@ import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
 import dev.langchain4j.model.openai.OpenAiTokenizer;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
@@ -98,7 +99,7 @@ public class AiChatLogic {
     private void rebuildChatMemory(List<ChatMessage> chatMessages) {
         this.chatMemory = TokenWindowChatMemory
                 .builder()
-                .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer())
+                .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer(OpenAiChatModelName.GPT_4_O_MINI))
                 .build();
 
         chatMessages.stream().filter(chatMessage -> !(chatMessage instanceof ErrorMessage)).forEach(chatMemory::add);
