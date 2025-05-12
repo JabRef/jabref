@@ -18,6 +18,7 @@ public class AiSummaryTab extends EntryEditorTab {
     private final AiService aiService;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final AiPreferences aiPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final CitationKeyPatternPreferences citationKeyPatternPreferences;
@@ -26,10 +27,12 @@ public class AiSummaryTab extends EntryEditorTab {
     public AiSummaryTab(AiService aiService,
                         DialogService dialogService,
                         StateManager stateManager,
+                        AdaptVisibleTabs adaptVisibleTabs,
                         GuiPreferences preferences) {
         this.aiService = aiService;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
+        this.adaptVisibleTabs = adaptVisibleTabs;
 
         this.aiPreferences = preferences.getAiPreferences();
         this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
@@ -58,7 +61,8 @@ public class AiSummaryTab extends EntryEditorTab {
                 aiPreferences,
                 externalApplicationsPreferences,
                 citationKeyPatternPreferences,
-                dialogService
+                dialogService,
+                adaptVisibleTabs
         ));
     }
 }

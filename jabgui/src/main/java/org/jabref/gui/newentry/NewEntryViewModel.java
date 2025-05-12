@@ -271,6 +271,7 @@ public class NewEntryViewModel {
                     Localization.lang(
                         "An unknown error has occurred.\n" +
                         "This entry may need to be added manually."));
+                executing.set(false);
                 return;
             }
 
@@ -285,6 +286,7 @@ public class NewEntryViewModel {
             handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
 
             executedSuccessfully.set(true);
+            executing.set(false);
         });
 
         taskExecutor.execute(idLookupWorker);
@@ -362,6 +364,7 @@ public class NewEntryViewModel {
                         "An unknown error has occurred.\n" +
                         "Entries may need to be added manually."));
                 LOGGER.error("An invalid result was returned when parsing citations.");
+                executing.set(false);
                 return;
             }
 
@@ -376,6 +379,7 @@ public class NewEntryViewModel {
             handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
 
             executedSuccessfully.set(true);
+            executing.set(false);
         });
 
         taskExecutor.execute(interpretWorker);
@@ -445,6 +449,7 @@ public class NewEntryViewModel {
                         "An unknown error has occurred.\n" +
                         "Entries may need to be added manually."));
                 LOGGER.error("An invalid result was returned when parsing Bib(La)Tex entries.");
+                executing.set(false);
                 return;
             }
 
@@ -459,6 +464,7 @@ public class NewEntryViewModel {
             handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
 
             executedSuccessfully.set(true);
+            executing.set(false);
         });
 
         taskExecutor.execute(bibtexWorker);

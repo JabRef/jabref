@@ -98,8 +98,8 @@ dependencies {
 
     // region HTTP clients
     implementation("org.jsoup:jsoup:1.20.1")
-    implementation("com.konghq:unirest-java-core:4.4.6")
-    implementation("com.konghq:unirest-modules-gson:4.4.6")
+    implementation("com.konghq:unirest-java-core:4.4.7")
+    implementation("com.konghq:unirest-modules-gson:4.4.7")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
     // endregion
 
@@ -164,7 +164,7 @@ dependencies {
     }
 
     implementation("org.apache.velocity:velocity-engine-core:2.4.1")
-    implementation(platform("ai.djl:bom:0.32.0"))
+    implementation(platform("ai.djl:bom:0.33.0"))
     implementation("ai.djl:api")
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
@@ -214,7 +214,7 @@ dependencies {
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.0")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.0")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")

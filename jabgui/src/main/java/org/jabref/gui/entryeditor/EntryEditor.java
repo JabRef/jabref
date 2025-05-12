@@ -86,7 +86,7 @@ import org.jspecify.annotations.NonNull;
  * <p>
  * The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
  */
-public class EntryEditor extends BorderPane implements PreviewControls {
+public class EntryEditor extends BorderPane implements PreviewControls, AdaptVisibleTabs {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
     private final PreviewPanel previewPanel;
@@ -337,8 +337,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
         tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor));
-        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, preferences));
-        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, taskExecutor));
+        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, this, preferences));
+        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, this, taskExecutor));
 
         return tabs;
     }
@@ -375,10 +375,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         return entryEditorTabList;
     }
 
-    /**
-     * Adapt the visible tabs to the current entry type.
-     */
-    private void adaptVisibleTabs() {
+    @Override
+    public void adaptVisibleTabs() {
         // We need to find out, which tabs will be shown (and which not anymore) and remove and re-add the appropriate tabs
         // to the editor. We cannot to simply remove all and re-add the complete list of visible tabs, because
         // the tabs give an ugly animation the looks like all tabs are shifting in from the right. In other words:
