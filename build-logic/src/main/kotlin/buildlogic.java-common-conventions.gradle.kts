@@ -74,6 +74,12 @@ extraJavaModuleInfo {
         patchRealModule()
         preserveExisting()
     }
+    module("org.controlsfx:controlsfx", "org.jabref") {
+        opens("impl.org.controlsfx.skin", "org.controlsfx.control.textfield")
+        exports("impl.org.controlsfx.skin")
+        patchRealModule()
+        preserveExisting()
+    }
 }
 
 testing {
