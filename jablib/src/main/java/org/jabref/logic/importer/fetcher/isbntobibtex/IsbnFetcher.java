@@ -38,9 +38,11 @@ public class IsbnFetcher implements EntryBasedFetcher, IdBasedFetcher {
 
     public IsbnFetcher(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = importFormatPreferences;
+        LOBIDIsbnFetcher lobidIsbnFetcher = new LOBIDIsbnFetcher(importFormatPreferences);
         OpenLibraryIsbnFetcher openLibraryIsbnFetcher = new OpenLibraryIsbnFetcher(importFormatPreferences);
         this.gvkIsbnFetcher = new GvkFetcher(importFormatPreferences);
         this.retryIsbnFetcher = new ArrayList<>();
+        this.addRetryFetcher(lobidIsbnFetcher);
         this.addRetryFetcher(openLibraryIsbnFetcher);
     }
 

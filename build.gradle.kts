@@ -4,7 +4,7 @@ plugins {
     id("checkstyle")
 
     id("com.github.andygoossens.modernizer") version "1.11.0"
-    id("org.openrewrite.rewrite") version "7.5.0"
+    id("org.openrewrite.rewrite") version "7.6.1"
 
     id("org.itsallcode.openfasttrace") version "3.0.1"
 

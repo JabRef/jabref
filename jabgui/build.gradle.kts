@@ -97,7 +97,7 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
 
-    implementation("com.konghq:unirest-java-core:4.4.6")
+    implementation("com.konghq:unirest-java-core:4.4.7")
 
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
 

@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.PagedSearchBasedParserFetcher;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.fetcher.transformers.LOBIDQueryTransformer;
@@ -35,19 +35,13 @@ import org.slf4j.LoggerFactory;
  *
  * @see <a href="https://lobid.org/resources/api">API documentation</a> for more details
  */
-public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
+public class LOBIDFetcher implements PagedSearchBasedParserFetcher, IdBasedParserFetcher {
 
     public static final String FETCHER_NAME = "LOBID";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LOBIDFetcher.class);
 
     private static final String API_URL = "https://lobid.org/resources/search";
-
-    private final ImporterPreferences importerPreferences;
-
-    public LOBIDFetcher(ImporterPreferences importerPreferences) {
-        this.importerPreferences = importerPreferences;
-    }
 
     /**
      * Gets the query URL
@@ -62,6 +56,16 @@ public class LOBIDFetcher implements PagedSearchBasedParserFetcher {
         uriBuilder.addParameter("q", new LOBIDQueryTransformer().transformLuceneQuery(luceneQuery).orElse("")); // search query
         uriBuilder.addParameter("from", String.valueOf(getPageSize() * pageNumber)); // from entry number, starts indexing at 0
         uriBuilder.addParameter("size", String.valueOf(getPageSize()));
+        uriBuilder.addParameter("format", "json");
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder(API_URL);
+        // We try to search by isbn field
+        uriBuilder.addParameter("q", "isbn:" + identifier);
+        uriBuilder.addParameter("sort", "newest");
         uriBuilder.addParameter("format", "json");
         return uriBuilder.build().toURL();
     }
