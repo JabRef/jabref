@@ -175,6 +175,29 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                           LOGGER.debug("Append to current library {} requested", toAppend);
                           waitForLoadingFinished(() -> appendToCurrentLibrary(toAppend));
                       });
+
+            uiCommands.stream().filter(UiCommand.ImportFileToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
+                    .findAny().ifPresent(importFile -> {
+                        LOGGER.debug("Import file {} requested", importFile);
+
+                        // bg task?
+                       Optional<ParserResult> parserResult =  ImportHelper.importFile(importFile.file(), "bibtex",  preferences, false);
+
+                      });
+
+            uiCommands.stream().filter(UiCommand.ImportBibTexToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
+                      .findAny().ifPresent(importFile -> {
+                          LOGGER.debug("Import file {} requested", importFile);
+
+
+                          Optional<ParserResult> parserResult =  ImportHelper.importFile(importFile.file(), "bibtex",  preferences, false);
+
+                      });
+
+
+
         }
 
         // Handle jumpToEntry

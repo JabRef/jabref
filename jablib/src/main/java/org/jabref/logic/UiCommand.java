@@ -11,4 +11,8 @@ public sealed interface UiCommand {
     record OpenLibraries(List<Path> toImport) implements UiCommand { }
 
     record AppendToCurrentLibrary(List<Path> toAppend) implements UiCommand { }
+
+    record ImportBibTexToCurrentLibrary(String bibtex) implements UiCommand { }
+
+    record ImportFileToCurrentLibrary(String file) implements UiCommand { }
 }
