@@ -39,21 +39,25 @@ extraJavaModuleInfo {
     module("org.openjfx:javafx-base", "org.jabref.merged.module") {
         exports("com.sun.javafx.event")
         patchRealModule()
+        preserveExisting()
     }
     module("org.openjfx:javafx-base", "org.jabref") {
         opens("javafx.collections", "javafx.collections.transformation")
         patchRealModule()
+        preserveExisting()
     }
     module("org.openjfx:javafx-controls", "org.jabref") {
         exports("com.sun.javafx.scene.control")
         opens("javafx.scene.control", "com.sun.javafx.scene.control", "javafx.scene.control.skin")
         patchRealModule()
+        preserveExisting()
     }
     module("org.openjfx:javafx-graphics", "org.controlsfx.controls") {
         exports("com.sun.javafx.scene")
         exports("com.sun.javafx.scene.traversal")
         exports("com.sun.javafx.css")
         patchRealModule()
+        preserveExisting()
     }
     module("org.openjfx:javafx-controls", "org.controlsfx.controls") {
         exports("com.sun.javafx.scene.control")
@@ -61,16 +65,14 @@ extraJavaModuleInfo {
         exports("com.sun.javafx.scene.control.inputmap")
         opens("javafx.scene")
         patchRealModule()
+        preserveExisting()
     }
     module("org.openjfx:javafx-base", "org.controlsfx.controls") {
         exports("com.sun.javafx.event")
         exports("com.sun.javafx.collections")
         exports("com.sun.javafx.runtime")
         patchRealModule()
-    }
-    module("org.controlsfx:controls", "org.jabref") {
-        opens("impl.org.controlsfx.skin", "org.controlsfx.control.textfield")
-        patchRealModule()
+        preserveExisting()
     }
 }
 
