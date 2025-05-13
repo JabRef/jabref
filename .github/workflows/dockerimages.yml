@@ -49,7 +49,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' || github.event.pull_request.number == 13114 }}
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
