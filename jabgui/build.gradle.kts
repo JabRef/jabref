@@ -1,7 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.annotationProcessor
-import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
-import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
 plugins {
     id("buildlogic.java-common-conventions")
@@ -178,10 +176,6 @@ application {
     )
 }
 
-// Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
-// See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
-modularity.disableEffectiveArgumentsAdjustment()
-
 /*
 jacoco {
     toolVersion = "0.8.13"
@@ -195,65 +189,10 @@ tasks.named<JavaExec>("run") {
     doFirst {
         // Clear the default JVM arguments to avoid warnings
         // application.applicationDefaultJvmArgs = emptyList()
-        application.applicationDefaultJvmArgs = listOf("--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core")
-    }
-
-    extensions.configure<RunModuleOptions>("moduleOptions") {
-        // On a change here, also adapt "application > applicationDefaultJvmArgs"
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal API
-                "javafx.base/com.sun.javafx.event" to "org.jabref.merged.module",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-
-                // ControlsFX compatibility
-                // We need to restate the ControlsFX exports, because we get following error otherwise:
-                //   java.lang.IllegalAccessError:
-                //     class org.controlsfx.control.textfield.AutoCompletionBinding (in module org.controlsfx.controls)
-                //     cannot access class com.sun.javafx.event.EventHandlerManager (in module javafx.base) because
-                //     module javafx.base does not export com.sun.javafx.event to module org.controlsfx.controls
-                // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
-                "javafx.graphics/com.sun.javafx.scene" to "org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.scene.traversal" to "org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.css" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control.behavior" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control.inputmap" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.event" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.collections" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.runtime" to "org.controlsfx.controls",
-                "javafx.web/com.sun.webkit" to "org.controlsfx.controls"
+        application.applicationDefaultJvmArgs =
+            listOf(
+                "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
             )
-        )
-
-        addOpens.putAll(
-            mapOf(
-                "javafx.controls/javafx.scene.control" to "org.jabref",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref",
-                "org.controlsfx.controls/org.controlsfx.control.textfield" to "org.jabref",
-                "javafx.controls/javafx.scene.control.skin" to "org.controlsfx.controls",
-                "javafx.graphics/javafx.scene" to "org.controlsfx.controls",
-                "javafx.base/javafx.collections" to "org.jabref",
-                "javafx.base/javafx.collections.transformation" to "org.jabref"
-            )
-        )
-
-        addModules.add("jdk.incubator.vector")
-
-        createCommandLineArgumentFile = true
-    }
-}
-
-tasks.compileJava {
-    extensions.configure<CompileModuleOptions> {
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal api
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
-            )
-        )
     }
 }
 
@@ -281,7 +220,8 @@ jlink {
         "zip-6",
         "--no-header-files",
         "--no-man-pages",
-        "--bind-services"
+        "--bind-services",
+        "--add-modules", "jdk.incubator.vector"
     )
 
     launcher {
@@ -596,4 +536,10 @@ if (OperatingSystem.current().isWindows) {
             }
         }
     }
+}
+
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.junit.jupiter.api")
+    // opensTo.add("org.junit.platform.commons") <-- opensTo 'org.junit.platform.commons' is done by default
+    // exportsTo.add("...")
 }

@@ -398,20 +398,6 @@ tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
 }
 
-/*
-tasks.named<JavaCompile>("compileJava") {
-    extensions.configure<org.javamodularity.moduleplugin.extensions.CompileModuleOptions>("moduleOptions") {
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal api
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
-            )
-        )
-    }
-}
-*/
-
 tasks.javadoc {
     (options as StandardJavadocDocletOptions).apply {
         encoding = "UTF-8"
@@ -428,11 +414,6 @@ tasks.javadoc {
 tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
-    }
-
-    extensions.configure<org.javamodularity.moduleplugin.extensions.TestModuleOptions>("moduleOptions") {
-        // TODO: Remove this as soon as ArchUnit is modularized
-        runOnClasspath = true
     }
 }
 

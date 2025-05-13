@@ -6,6 +6,9 @@ plugins {
     // id("jacoco")
 
     id("project-report")
+
+    id("org.gradlex.extra-java-module-info")
+    id("org.gradlex.java-module-testing")
 }
 
 repositories {
@@ -23,6 +26,49 @@ dependencies {
     constraints {
         // Define dependency versions as constraints
         // implementation("org.apache.commons:commons-text:1.12.0")
+    }
+}
+
+extraJavaModuleInfo {
+    failOnMissingModuleInfo = false
+    failOnAutomaticModules = false
+    // skipLocalJars = true
+    deriveAutomaticModuleNamesFromFileNames = true
+    module("org.openjfx:javafx-base", "org.jabref.merged.module") {
+        exports("com.sun.javafx.event")
+        patchRealModule()
+    }
+    module("org.openjfx:javafx-base", "org.jabref") {
+        opens("javafx.collections", "javafx.collections.transformation")
+        patchRealModule()
+    }
+    module("org.openjfx:javafx-controls", "org.jabref") {
+        exports("com.sun.javafx.scene.control")
+        opens("javafx.scene.control", "com.sun.javafx.scene.control", "javafx.scene.control.skin")
+        patchRealModule()
+    }
+    module("org.openjfx:javafx-graphics", "org.controlsfx.controls") {
+        exports("com.sun.javafx.scene")
+        exports("com.sun.javafx.scene.traversal")
+        exports("com.sun.javafx.css")
+        patchRealModule()
+    }
+    module("org.openjfx:javafx-controls", "org.controlsfx.controls") {
+        exports("com.sun.javafx.scene.control")
+        exports("com.sun.javafx.scene.control.behavior")
+        exports("com.sun.javafx.scene.control.inputmap")
+        opens("javafx.scene")
+        patchRealModule()
+    }
+    module("org.openjfx:javafx-base", "org.controlsfx.controls") {
+        exports("com.sun.javafx.event")
+        exports("com.sun.javafx.collections")
+        exports("com.sun.javafx.runtime")
+        patchRealModule()
+    }
+    module("org.controlsfx:controls", "org.jabref") {
+        opens("impl.org.controlsfx.skin", "org.controlsfx.control.textfield")
+        patchRealModule()
     }
 }
 
