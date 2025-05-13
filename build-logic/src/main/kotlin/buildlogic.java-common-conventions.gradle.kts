@@ -9,6 +9,8 @@ plugins {
 
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.java-module-testing")
+
+    id("org.openjfx.javafxplugin")
 }
 
 repositories {

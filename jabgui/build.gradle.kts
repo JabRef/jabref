@@ -6,8 +6,6 @@ plugins {
 
     application
 
-    id("org.openjfx.javafxplugin") version("0.1.0")
-
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
 

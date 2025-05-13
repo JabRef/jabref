@@ -11,8 +11,6 @@ plugins {
     id("antlr")
     id("com.github.edeandrea.xjc-generation") version "1.6"
 
-    id("org.openjfx.javafxplugin") version("0.1.0")
-
     id("me.champeau.jmh") version "0.7.3"
 }
 

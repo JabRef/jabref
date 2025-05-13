@@ -12,6 +12,7 @@ dependencies {
     implementation("org.gradlex:java-module-testing:1.7")
     implementation("org.gradlex:java-module-dependencies:1.9")
     implementation("org.gradlex:extra-java-module-info:1.12")
+    implementation("org.openjfx:javafx-plugin:0.1.0")
 
     configurations
         .matching { it.name.contains("downloadSources") }

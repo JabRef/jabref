@@ -4,8 +4,6 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     application
-
-    id("org.openjfx.javafxplugin") version("0.1.0")
 }
 
 application{
