@@ -5,6 +5,7 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     `java-library`
+    `jvm-test-suite`
 
     id("idea")
 
