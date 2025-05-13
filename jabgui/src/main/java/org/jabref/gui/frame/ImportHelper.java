@@ -36,8 +36,7 @@ public class ImportHelper {
             // Download web resource to temporary file
             try {
                 file = new URLDownload(address).toTemporaryFile();
-            } catch (
-                    FetcherException |
+            } catch (FetcherException |
                     MalformedURLException e) {
                 System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
                 return Optional.empty();

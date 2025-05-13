@@ -178,24 +178,21 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
             uiCommands.stream().filter(UiCommand.ImportFileToCurrentLibrary.class::isInstance)
                       .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
-                    .findAny().ifPresent(importFile -> {
-                        LOGGER.debug("Import file {} requested", importFile);
-
-                        // bg task?
-                       Optional<ParserResult> parserResult =  ImportHelper.importFile(importFile.file(), "bibtex",  preferences, false);
-                       parserResult.ifPresent(this::addParserResult);
-
+                      .findAny().ifPresent(importFile -> {
+                          LOGGER.debug("Import file {} requested", importFile);
+                          // bg task?
+                          Optional<ParserResult> parserResult = ImportHelper.importFile(importFile.file(), "bibtex", preferences, false);
+                          parserResult.ifPresent(this::addParserResult);
                       });
 
             uiCommands.stream().filter(UiCommand.ImportBibTexToCurrentLibrary.class::isInstance)
                       .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
                       .findAny().ifPresent(importFile -> {
-                          LOGGER.debug("Import file {} requested", importFile);
+                LOGGER.debug("Import file {} requested", importFile);
 
-                          Optional<ParserResult> parserResult =  ImportHelper.importFile(importFile.file(), "bibtex",  preferences, false);
-                          parserResult.ifPresent(this::addParserResult);
-
-                      });
+                Optional<ParserResult> parserResult = ImportHelper.importFile(importFile.file(), "bibtex", preferences, false);
+                parserResult.ifPresent(this::addParserResult);
+            });
         }
 
         // Handle jumpToEntry

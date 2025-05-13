@@ -16,11 +16,11 @@ public class GuiCommandLine {
     @Option(names = {"-a", "--add"}, description = "Add to currently opened library.")
     public boolean append;
 
-    @Option(names = {"importBibTex"}, description = "Import bibtex string")
+    @Option(names = {"--importBibTex"}, description = "Import bibtex string")
     public String importBibtex;
 
     @Deprecated
-    @Option(names= {"importToOpen"}, description = "Same as --import, but will be imported to the opened tab\"")
+    @Option(names = {"--importToOpen"}, description = "Same as --import, but will be imported to the opened tab")
     public String importToOpen;
 
     @Option(names = {"--reset"}, description = "Reset all preferences to default values.")
