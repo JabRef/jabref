@@ -36,6 +36,7 @@ jobs:
             type=schedule,pattern={{date 'YYYY-MM-DD'}}
             type=ref,event=tag
             type=edge,branch=main
+            type=edge,branch=ok-branch-4
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
         with:
