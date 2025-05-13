@@ -97,6 +97,7 @@ public class Server implements Callable<Void> {
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
         // TODO: Add SSL
+        resourceConfig.register(RootResource.class);
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
         resourceConfig.register(CORSFilter.class);
