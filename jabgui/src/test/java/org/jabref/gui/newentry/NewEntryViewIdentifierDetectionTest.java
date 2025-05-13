@@ -1,4 +1,5 @@
 package org.jabref.gui.newentry;
+
 import java.util.Optional;
 
 import org.jabref.logic.importer.CompositeIdFetcher;
@@ -10,44 +11,45 @@ import org.jabref.model.entry.identifier.RFC;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 public class NewEntryViewIdentifierDetectionTest {
 
     @Test
     void detectsValidDOI() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("10.1109/MCOM.2010.5673082");
-        assertTrue(result.isPresent());
-        assertTrue(result.get() instanceof DOI);
-        assertTrue(DOI.isValid(result.get().asString()));
+        assertEquals(true, result.isPresent());
+        assertInstanceOf(DOI.class, result.get());
+        assertEquals(true, DOI.isValid(result.get().asString()));
     }
 
     @Test
     void rejectsInvalidDOI() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("123456789");
-        assertTrue(result.isEmpty() || (result.get() instanceof DOI && !DOI.isValid(result.get().asString())));
+        boolean isInvalid = result.isEmpty() || (result.get() instanceof DOI && !DOI.isValid(result.get().asString()));
+        assertEquals(true, isInvalid);
     }
 
     @Test
     void detectsValidISBN() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("9780134685991");
-        assertTrue(result.isPresent());
-        assertTrue(result.get() instanceof ISBN);
-        assertTrue(((ISBN) result.get()).isValid());
+        assertEquals(true, result.isPresent());
+        assertInstanceOf(ISBN.class, result.get());
+        assertEquals(true, ((ISBN) result.get()).isValid());
     }
 
     @Test
     void detectsValidArXiv() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("arXiv:1706.03762");
-        assertTrue(result.isPresent());
-        assertTrue(result.get() instanceof ArXivIdentifier);
+        assertEquals(true, result.isPresent());
+        assertInstanceOf(ArXivIdentifier.class, result.get());
     }
 
     @Test
     void detectsValidRFC() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("rfc2616");
-        assertTrue(result.isPresent());
-        assertTrue(result.get() instanceof RFC);
+        assertEquals(true, result.isPresent());
+        assertInstanceOf(RFC.class, result.get());
     }
 }
-
