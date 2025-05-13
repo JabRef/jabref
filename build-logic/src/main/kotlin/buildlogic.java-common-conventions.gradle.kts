@@ -53,18 +53,18 @@ extraJavaModuleInfo {
         patchRealModule()
         preserveExisting()
     }
+    module("org.openjfx:javafx-controls", "org.controlsfx.controls") {
+        exports("com.sun.javafx.scene.control") // already done for org.jabref
+        exports("com.sun.javafx.scene.control.behavior")
+        exports("com.sun.javafx.scene.control.inputmap")
+        opens("javafx.scene")
+        patchRealModule()
+        preserveExisting()
+    }
     module("org.openjfx:javafx-graphics", "org.controlsfx.controls") {
         exports("com.sun.javafx.scene")
         exports("com.sun.javafx.scene.traversal")
         exports("com.sun.javafx.css")
-        patchRealModule()
-        preserveExisting()
-    }
-    module("org.openjfx:javafx-controls", "org.controlsfx.controls") {
-        exports("com.sun.javafx.scene.control")
-        exports("com.sun.javafx.scene.control.behavior")
-        exports("com.sun.javafx.scene.control.inputmap")
-        opens("javafx.scene")
         patchRealModule()
         preserveExisting()
     }
