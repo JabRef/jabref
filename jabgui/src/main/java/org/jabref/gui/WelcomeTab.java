@@ -2,9 +2,6 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 import javafx.collections.ListChangeListener;
@@ -171,7 +168,7 @@ public class WelcomeTab extends Tab {
         recentLibrariesBox.setAlignment(Pos.TOP_LEFT);
         updateWelcomeRecentLibraries();
 
-        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) _ -> updateWelcomeRecentLibraries());
+        fileHistoryMenu.getItems().addListener((ListChangeListener<MenuItem>) e -> updateWelcomeRecentLibraries());
 
         return createVBoxContainer(recentLabel, recentLibrariesBox);
     }
