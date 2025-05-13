@@ -23,10 +23,10 @@ public class ImportHelper {
     /**
      * Reads URIs as input
      */
-     static Optional<ParserResult> importFile(String importArguments,
-                                                       String importFormat,
-                                                       GuiPreferences cliPreferences,
-                                                       boolean porcelain) {
+    static Optional<ParserResult> importFile(String importArguments,
+                                             String importFormat,
+                                             GuiPreferences cliPreferences,
+                                             boolean porcelain) {
         LOGGER.debug("Importing file {}", importArguments);
         String[] data = importArguments.split(",");
 
@@ -59,10 +59,10 @@ public class ImportHelper {
         return importResult;
     }
 
-     static Optional<ParserResult> importFile(Path file,
-                                                       String importFormat,
-                                                       GuiPreferences cliPreferences,
-                                                       boolean porcelain) {
+    static Optional<ParserResult> importFile(Path file,
+                                             String importFormat,
+                                             GuiPreferences cliPreferences,
+                                             boolean porcelain) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
                     cliPreferences.getImporterPreferences(),
@@ -91,8 +91,7 @@ public class ImportHelper {
                 }
                 return Optional.of(importResult.parserResult());
             }
-        } catch (
-                ImportException ex) {
+        } catch (ImportException ex) {
             LOGGER.error("Error opening file '{}'", file, ex);
             return Optional.empty();
         }

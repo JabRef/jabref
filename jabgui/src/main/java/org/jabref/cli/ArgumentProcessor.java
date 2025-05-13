@@ -85,7 +85,6 @@ public class ArgumentProcessor {
         if (guiCli.importBibtex != null) {
             uiCommands.add(new UiCommand.ImportBibTexToCurrentLibrary(guiCli.importBibtex));
         }
-
         return uiCommands;
     }
 
@@ -103,5 +102,4 @@ public class ArgumentProcessor {
     public boolean shouldShutDown() {
         return !guiNeeded;
     }
-
 }

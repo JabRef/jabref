@@ -183,6 +183,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
                         // bg task?
                        Optional<ParserResult> parserResult =  ImportHelper.importFile(importFile.file(), "bibtex",  preferences, false);
+                       parserResult.ifPresent(this::addParserResult);
 
                       });
 
@@ -191,13 +192,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                       .findAny().ifPresent(importFile -> {
                           LOGGER.debug("Import file {} requested", importFile);
 
-
                           Optional<ParserResult> parserResult =  ImportHelper.importFile(importFile.file(), "bibtex",  preferences, false);
+                          parserResult.ifPresent(this::addParserResult);
 
                       });
-
-
-
         }
 
         // Handle jumpToEntry
