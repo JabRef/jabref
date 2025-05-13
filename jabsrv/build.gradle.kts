@@ -6,6 +6,8 @@ plugins {
     application
 
     id("org.openjfx.javafxplugin") version("0.1.0")
+
+    id("com.gradleup.shadow") version "9.0.0-beta13"
 }
 
 application{
@@ -72,6 +74,9 @@ dependencies {
         exclude(group = "org.antlr")
     }
 
+    implementation("info.picocli:picocli:4.7.7")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
+
     testImplementation("org.mockito:mockito-core:5.17.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
@@ -100,4 +105,8 @@ tasks.named<JavaExec>("run") {
                 "--enable-native-access=com.sun.jna"
             )
     }
+}
+
+tasks.shadowJar {
+    setProperty("zip64", true)
 }

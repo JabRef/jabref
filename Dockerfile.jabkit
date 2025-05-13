@@ -1,0 +1,20 @@
+FROM gradle:jdk24-noble AS build
+
+WORKDIR /app
+
+COPY . .
+
+RUN gradle --no-daemon :jabkit:shadowJar
+
+RUN mv jabkit/build/libs/jabkit*-all.jar jabkit.jar
+
+FROM eclipse-temurin:24-jre AS runtime
+
+WORKDIR /app
+
+COPY --from=build /app/jabkit.jar .
+
+EXPOSE 6050
+
+# Run server
+ENTRYPOINT ["java", "-jar", "jabkit.jar"]

@@ -4,8 +4,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLContext;
@@ -28,12 +28,21 @@ import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import picocli.CommandLine;
 
 @AllowedToUseStandardStreams("This is a CLI application. It resides in the package http.server to be close to the other http server related classes.")
-public class Server {
+@CommandLine.Command(name = "server", mixinStandardHelpOptions = true, description = "JabSrv - JabRef HTTP server")
+public class Server implements Callable<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    private static final String BASE_URI = "http://localhost:6050/";
+    @CommandLine.Parameters(arity = "0..*", paramLabel = "FILE")
+    List<Path> files;
+
+    @CommandLine.Option(names = {"-h", "--host"}, description = "the host name")
+    private String host = "localhost";
+
+    @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
+    private Integer port = 6050;
 
     /**
      * Starts an http server serving the last files opened in JabRef<br>
@@ -43,29 +52,27 @@ public class Server {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
+        new CommandLine(new Server()).execute(args);
+    }
+
+    @Override
+    public Void call() throws Exception { // your business logic goes here...
         final List<Path> filesToServe = JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened().stream().collect(Collectors.toCollection(ArrayList::new));
 
         // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
         // In a testing environment, this might be difficult to handle
         // This is a quick solution. The architectural fine solution would use some http context or other @Inject_ed variables in org.jabref.http.server.LibraryResource
-        if (args.length > 0) {
-            LOGGER.debug("Command line parameters passed");
-            List<Path> filesToAdd = Arrays.stream(args)
-                                          .map(Path::of)
+        if (files != null) {
+            List<Path> filesToAdd = files.stream()
                                           .filter(Files::exists)
                                           .filter(path -> !filesToServe.contains(path))
                                           .toList();
-
             LOGGER.debug("Adding following files to the list of opened libraries: {}", filesToAdd);
-
-            // add the files in the front of the last opened libraries
-            for (Path path : filesToAdd.reversed()) {
-                filesToServe.addFirst(path);
-            }
+            filesToServe.addAll(0, filesToAdd);
         }
 
         if (filesToServe.isEmpty()) {
-            LOGGER.debug("Still no library available to serve, serving the demo library...");
+            LOGGER.debug("No library available to serve, serving the demo library...");
             // Server.class.getResource("...") is always null here, thus trying relative path
             // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
             Path bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
@@ -78,13 +85,15 @@ public class Server {
         FilesToServe filesToServeService = new FilesToServe();
         filesToServeService.setFilesToServe(filesToServe);
 
-        Server.startServer(filesToServeService);
+        startServer(filesToServeService);
 
         // Keep the http server running until user kills the process (e.g., presses Ctrl+C)
         Thread.currentThread().join();
+
+        return null;
     }
 
-    public static HttpServer startServer(ServiceLocator serviceLocator) {
+    public HttpServer startServer(ServiceLocator serviceLocator) {
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
         // TODO: Add SSL
@@ -94,13 +103,14 @@ public class Server {
         resourceConfig.register(GlobalExceptionMapper.class);
 
         LOGGER.debug("Starting server...");
+        String url = "http://" + host + ":" + port + "/";
         final HttpServer httpServer =
                 GrizzlyHttpServerFactory
-                        .createHttpServer(URI.create(BASE_URI), resourceConfig, serviceLocator);
+                        .createHttpServer(URI.create(url), resourceConfig, serviceLocator);
         return httpServer;
     }
 
-    private static void startServer(FilesToServe filesToServe) {
+    private void startServer(FilesToServe filesToServe) {
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
@@ -129,12 +139,12 @@ public class Server {
         }
     }
 
-    private static boolean sslCertExists() {
+    private boolean sslCertExists() {
         Path serverKeyStore = getSslCert();
         return Files.exists(serverKeyStore);
     }
 
-    private static SSLContext getSslContext() {
+    private SSLContext getSslContext() {
         SSLContextConfigurator sslContextConfig = new SSLContextConfigurator();
         Path serverKeyStore = getSslCert();
         if (Files.exists(serverKeyStore)) {
@@ -148,7 +158,7 @@ public class Server {
     }
 
     @NonNull
-    private static Path getSslCert() {
+    private Path getSslCert() {
         return Path.of(AppDirsFactory.getInstance()
                                      .getUserDataDir(
                                              OS.APP_DIR_APP_NAME,

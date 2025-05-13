@@ -7,6 +7,7 @@ plugins {
     id("org.openjfx.javafxplugin") version("0.1.0")
 
     id("org.beryx.jlink") version "3.1.1"
+    id("com.gradleup.shadow") version "9.0.0-beta13"
 }
 
 group = "org.jabref.jabkit"
@@ -309,4 +310,8 @@ jlink {
             skipInstaller = true
         }
     }
+}
+
+tasks.shadowJar {
+    setProperty("zip64", true)
 }

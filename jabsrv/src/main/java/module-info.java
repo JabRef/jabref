@@ -36,6 +36,7 @@ module org.jabref.jabsrv {
 
     requires jersey.common;
 
+    requires info.picocli;
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
