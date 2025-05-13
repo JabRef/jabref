@@ -23,7 +23,7 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
-@Command(name = "check-consistency", description = "Check consistency of the database.")
+@Command(name = "check-consistency", description = "Check consistency of the library.")
 class CheckConsistency implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConsistency.class);
 
