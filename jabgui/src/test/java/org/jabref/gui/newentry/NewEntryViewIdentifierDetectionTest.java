@@ -11,45 +11,45 @@ import org.jabref.model.entry.identifier.RFC;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class NewEntryViewIdentifierDetectionTest {
 
     @Test
     void detectsValidDOI() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("10.1109/MCOM.2010.5673082");
-        assertEquals(true, result.isPresent());
+        assertTrue(result.isPresent());
         assertInstanceOf(DOI.class, result.get());
-        assertEquals(true, DOI.isValid(result.get().asString()));
+        assertTrue(DOI.isValid(result.get().asString()));
     }
 
     @Test
     void rejectsInvalidDOI() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("123456789");
         boolean isInvalid = result.isEmpty() || (result.get() instanceof DOI && !DOI.isValid(result.get().asString()));
-        assertEquals(true, isInvalid);
+        assertTrue(isInvalid);
     }
 
     @Test
     void detectsValidISBN() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("9780134685991");
-        assertEquals(true, result.isPresent());
+        assertTrue(result.isPresent());
         assertInstanceOf(ISBN.class, result.get());
-        assertEquals(true, ((ISBN) result.get()).isValid());
+        assertTrue(((ISBN) result.get()).isValid());
     }
 
     @Test
     void detectsValidArXiv() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("arXiv:1706.03762");
-        assertEquals(true, result.isPresent());
+        assertTrue(result.isPresent());
         assertInstanceOf(ArXivIdentifier.class, result.get());
     }
 
     @Test
     void detectsValidRFC() {
         Optional<Identifier> result = CompositeIdFetcher.getIdentifier("rfc2616");
-        assertEquals(true, result.isPresent());
+        assertTrue(result.isPresent());
         assertInstanceOf(RFC.class, result.get());
     }
 }
