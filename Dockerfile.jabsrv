@@ -1,14 +1,12 @@
-# FROM eclipse-temurin:24-jdk AS build
 FROM gradle:jdk24-noble AS build
 
 WORKDIR /app
 
 COPY . .
 
-# RUN ./gradlew :jabsrv:shadowJar
-RUN gradle --no-daemon :jabsrv:shadowJar
+RUN gradle --no-daemon :jabsrv-cli:shadowJar
 
-RUN mv jabsrv/build/libs/jabsrv*-all.jar jabsrv.jar
+RUN mv jabsrv-cli/build/libs/jabsrv*-all.jar jabsrv.jar
 
 FROM eclipse-temurin:24-jre AS runtime
 

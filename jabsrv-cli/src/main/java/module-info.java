@@ -1,13 +1,11 @@
-module org.jabref.jabsrv {
-    exports org.jabref.http.server;
+module org.jabref.jabsrv.cli {
+    opens org.jabref.http.server.cli to info.picocli;
 
-    exports org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator;
-
-    opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
-
-    requires org.jabref.jablib;
+    requires transitive org.jabref.jablib;
+    requires transitive org.jabref.jabsrv;
 
     requires org.slf4j;
+    requires jul.to.slf4j;
 
     requires com.google.common;
     requires com.google.gson;
@@ -18,8 +16,6 @@ module org.jabref.jabsrv {
     requires jakarta.inject;
 
     requires afterburner.fx;
-    provides com.airhacks.afterburner.views.ResourceLocator
-            with org.jabref.http.JabRefResourceLocator;
 
     // needs to be loaded here as it's otherwise not found at runtime; XJC related maybe
     // requires org.glassfish.jaxb.runtime;
@@ -31,6 +27,8 @@ module org.jabref.jabsrv {
     requires jakarta.ws.rs;
 
     requires jersey.common;
+
+    requires info.picocli;
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
