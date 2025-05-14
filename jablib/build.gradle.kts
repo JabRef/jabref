@@ -68,8 +68,8 @@ dependencies {
     // endregion
 
     // injection framework
-    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    implementation("org.glassfish.hk2:hk2-api:3.1.1")
+    // implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
+    // implementation("org.glassfish.hk2:hk2-api:3.1.1")
 
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
     implementation("info.debatty:java-string-similarity:2.0.0")
@@ -101,6 +101,7 @@ dependencies {
     implementation("com.konghq:unirest-java-core:4.4.7")
     implementation("com.konghq:unirest-modules-gson:4.4.7")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // endregion
 
     implementation("org.slf4j:slf4j-api:2.0.17")
