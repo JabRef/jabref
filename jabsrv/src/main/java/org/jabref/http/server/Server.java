@@ -56,7 +56,7 @@ public class Server implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception { // your business logic goes here...
+    public Void call() throws InterruptedException {
         final List<Path> filesToServe = JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened().stream().collect(Collectors.toCollection(ArrayList::new));
 
         // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
