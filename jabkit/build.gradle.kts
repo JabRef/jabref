@@ -89,6 +89,8 @@ jlink {
         "javafx"
     )
 
+    mergedModuleName = "jabkit.merged.module"
+
     // We keep debug statements - otherwise "--strip-debug" would be included
     addOptions(
         "--compress",
@@ -289,6 +291,9 @@ jlink {
     jpackage {
         outputDir = "distribution"
         skipInstaller = true
+
+        imageOptions.addAll(listOf(
+            "--java-options", "--enable-native-access=jabkit.merged.module"))
 
         // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
         if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
