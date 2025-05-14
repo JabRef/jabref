@@ -44,6 +44,9 @@ dependencies {
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
 
+    // Prevents errors at "createMergedModule"
+    // implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+
     // region copied from jabsrv
 
     // API
@@ -210,7 +213,9 @@ jlink {
         uses("ai.djl.engine.EngineProvider")
         uses("ai.djl.repository.RepositoryFactory")
         uses("ai.djl.repository.zoo.ZooProvider")
+        */
         uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
+        /*
         uses("kong.unirest.core.json.JsonEngine")
         uses("org.eclipse.jgit.lib.Signer")
         uses("org.eclipse.jgit.transport.SshSessionFactory")
@@ -234,6 +239,8 @@ jlink {
          */
 
         excludeRequires("org.glassfish.hk2.locator")
+        excludeRequires("org.apache.logging.log4j")
+        excludeRequires("kotlin.stdlib")
 
     }
     jpackage {
