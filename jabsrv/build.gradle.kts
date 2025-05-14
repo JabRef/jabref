@@ -23,6 +23,7 @@ dependencies {
     implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     implementation("org.glassfish.hk2:hk2-api:3.1.1")
     implementation("org.glassfish.hk2:hk2-utils:3.1.1")
+    implementation("org.glassfish.hk2:hk2-locator:3.1.1")
 
     // testImplementation("org.glassfish.hk2:hk2-testing:3.0.4")
     // implementation("org.glassfish.hk2:hk2-testing-jersey:3.0.4")
@@ -38,9 +39,6 @@ dependencies {
     implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
 
     implementation("com.konghq:unirest-modules-gson:4.4.7")
-
-    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    implementation("org.glassfish.hk2:hk2-api:3.1.1")
 
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation("org.glassfish.jersey.media:jersey-media-json-gson:3.1.1")

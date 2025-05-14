@@ -10,8 +10,7 @@ module org.jabref.jabsrv.cli {
     requires com.google.common;
     requires com.google.gson;
 
-    requires org.glassfish.hk2.api;
-    uses org.glassfish.hk2.extension.ServiceLocatorGenerator;
+    // requires org.glassfish.hk2.api;
 
     requires jakarta.annotation;
     requires jakarta.inject;

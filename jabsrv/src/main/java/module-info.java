@@ -5,6 +5,10 @@ module org.jabref.jabsrv {
 
     opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
 
+    // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
+    requires org.glassfish.hk2.locator;
+    uses org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl;
+
     requires org.jabref.jablib;
 
     requires org.slf4j;

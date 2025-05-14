@@ -8,6 +8,8 @@ plugins {
     id("org.openjfx.javafxplugin") version("0.1.0")
 
     id("org.beryx.jlink") version "3.1.1"
+
+    id("org.kordamp.gradle.jdeps") version "0.20.0"
 }
 
 application{
@@ -33,6 +35,15 @@ dependencies {
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
+    // required because of "service implementation must be defined in the same module as the provides directive"
+    implementation("org.postgresql:postgresql:42.7.5")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
+    implementation("com.konghq:unirest-modules-gson:4.4.7")
+    implementation(platform("ai.djl:bom:0.33.0"))
+    implementation("ai.djl:api")
+    implementation("ai.djl.huggingface:tokenizers")
+    implementation("ai.djl.pytorch:pytorch-model-zoo")
+
     // region copied from jabsrv
 
     // API
@@ -42,9 +53,11 @@ dependencies {
     implementation("org.glassfish.jersey.core:jersey-server:3.1.10")
 
     // Injection framework
-    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    implementation("org.glassfish.hk2:hk2-api:3.1.1")
-    implementation("org.glassfish.hk2:hk2-utils:3.1.1")
+    // implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
+    // implementation("org.glassfish.hk2:hk2-api:3.1.1")
+    // implementation("org.glassfish.hk2:hk2-utils:3.1.1")
+    // Just to avoid the compiler error " org.glassfish.hk2.extension.ServiceLocatorGenerator: module jabsrv.merged.module does not declare `uses`"
+    // implementation("org.glassfish.hk2:hk2-locator:3.1.1")
 
     // testImplementation("org.glassfish.hk2:hk2-testing:3.0.4")
     // implementation("org.glassfish.hk2:hk2-testing-jersey:3.0.4")
@@ -60,9 +73,6 @@ dependencies {
     implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
 
     implementation("com.konghq:unirest-modules-gson:4.4.7")
-
-    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    implementation("org.glassfish.hk2:hk2-api:3.1.1")
 
     // Allow objects "magically" to be mapped to JSON using GSON
     // implementation("org.glassfish.jersey.media:jersey-media-json-gson:3.1.1")
@@ -122,6 +132,8 @@ jlink {
         "javafx"
     )
 
+    mergedModuleName = "jabsrv.merged.module"
+
     // We keep debug statements - otherwise "--strip-debug" would be included
     addOptions(
         "--compress",
@@ -144,6 +156,7 @@ jlink {
     )
 
     mergedModule {
+        /*
         requires("com.google.gson")
         requires("com.fasterxml.jackson.annotation")
         requires("com.fasterxml.jackson.databind")
@@ -183,11 +196,17 @@ jlink {
         requires("org.jsoup")
         requires("org.slf4j")
         requires("org.tukaani.xz")
-        // requires("org.glassfish.hk2.api")
-        // requires("org.glassfish.hk2.utilities")
-        requires("jersey.hk2")
-        requires("jakarta.ws.rs")
+        */
+
+        // uses("org.glassfish.hk2.extension.ServiceLocatorGenerator")
+
+        // requires("org.glassfish.hk2.locator")
+        uses("org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl")
+
+        // requires("jakarta.inject")
+        // requires("jakarta.ws.rs")
         uses("org.glassfish.jersey.internal.inject.InjectionManager")
+        /*
         uses("ai.djl.engine.EngineProvider")
         uses("ai.djl.repository.RepositoryFactory")
         uses("ai.djl.repository.zoo.ZooProvider")
@@ -212,13 +231,17 @@ jlink {
             "ai.djl.engine.rust.RsEngineProvider",
             "ai.djl.pytorch.engine.PtEngineProvider")
 
+         */
+
+        excludeRequires("org.glassfish.hk2.locator")
+
     }
     jpackage {
         outputDir = "distribution"
 
         imageOptions.addAll(listOf(
-            "--java-options", "--add-reads JabRef.merged.module=jakarta.inject",
-            "--java-options", "--enable-native-access=org.jabref.merged.module"))
+            "--java-options", "--add-reads jabsrv.merged.module=jakarta.inject",
+            "--java-options", "--enable-native-access=jabsrv.merged.module"))
 
         // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
         if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
