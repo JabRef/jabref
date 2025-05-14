@@ -66,7 +66,6 @@ public class Server {
     }
 
     private HttpServer startServer(FilesToServe filesToServe, URI uri) {
-        var test = new org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl();
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
