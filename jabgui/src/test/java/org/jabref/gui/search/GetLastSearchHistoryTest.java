@@ -60,4 +60,25 @@ class GetLastSearchHistoryTest {
         expected = List.of();
         assertEquals(expected, lastSearchHistory);
     }
+
+    @Test
+    void getMoreThanAvailableHistory() {
+        StateManager stateManager = new StateManager();
+        stateManager.addSearchHistory("test1");
+        stateManager.addSearchHistory("test2");
+        List<String> lastSearchHistory = stateManager.getLastSearchHistory(5);
+        List<String> expected = List.of("test1", "test2");
+
+        assertEquals(expected, lastSearchHistory);
+    }
+
+    @Test
+    void getHistoryWhenEmpty() {
+        StateManager stateManager = new StateManager();
+        List<String> history = stateManager.getLastSearchHistory(3);
+        assertEquals(List.of(), history);
+
+        history = stateManager.getWholeSearchHistory();
+        assertEquals(List.of(), history);
+    }
 }
