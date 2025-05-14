@@ -21,7 +21,7 @@ import picocli.CommandLine;
 @AllowedToUseStandardStreams("This is a CLI application. It resides in the package http.server to be close to the other http server related classes.")
 @CommandLine.Command(name = "server", mixinStandardHelpOptions = true, description = "JabSrv - JabRef HTTP server")
 public class ServerCli implements Callable<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ServerCli.class);
 
     @CommandLine.Parameters(arity = "0..*", paramLabel = "FILE")
     List<Path> files;
