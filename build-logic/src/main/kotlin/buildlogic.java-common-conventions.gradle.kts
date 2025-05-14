@@ -1,6 +1,5 @@
 plugins {
     java
-    `jvm-test-suite`
 
     id("idea")
 
