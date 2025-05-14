@@ -7,7 +7,7 @@ plugins {
 
     id("org.openjfx.javafxplugin") version("0.1.0")
 
-    id("com.gradleup.shadow") version "9.0.0-beta13"
+    id("org.beryx.jlink") version "3.1.1"
 }
 
 application{
@@ -106,15 +106,243 @@ tasks.named<JavaExec>("run") {
     }
 }
 
-tasks.shadowJar {
-    setProperty("zip64", true)
-}
-
 tasks.named<JavaExec>("run") {
     doFirst {
         application.applicationDefaultJvmArgs =
             listOf(
                 "--enable-native-access=com.sun.jna"
             )
+    }
+}
+
+// This is more or less a clone of jabgui/build.gradle.kts -> jlink
+jlink {
+    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
+    addExtraDependencies(
+        "javafx"
+    )
+
+    // We keep debug statements - otherwise "--strip-debug" would be included
+    addOptions(
+        "--compress",
+        "zip-6",
+        "--no-header-files",
+        "--no-man-pages",
+        "--bind-services"
+    )
+
+    launcher {
+        name = "jabsrv"
+    }
+
+    // TODO: Remove as soon as dependencies are fixed (upstream)
+    forceMerge(
+        "bcprov",
+        "jaxb",
+        "istack",
+        "stax"
+    )
+
+    mergedModule {
+        requires(
+            "com.google.gson"
+        )
+        requires(
+            "com.fasterxml.jackson.annotation"
+        )
+        requires(
+            "com.fasterxml.jackson.databind"
+        )
+        requires(
+            "com.fasterxml.jackson.core"
+        )
+        requires(
+            "com.fasterxml.jackson.datatype.jdk8"
+        )
+        requires(
+            "jakarta.xml.bind"
+        )
+        requires(
+            "java.compiler"
+        )
+        requires(
+            "java.datatransfer"
+        )
+        requires(
+            "java.desktop"
+        )
+        requires(
+            "java.logging"
+        )
+        requires(
+            "java.management"
+        )
+        requires(
+            "java.naming"
+        )
+        requires(
+            "java.net.http"
+        )
+        requires(
+            "java.rmi"
+        )
+        requires(
+            "java.scripting"
+        )
+        requires(
+            "java.security.jgss"
+        )
+        requires(
+            "java.security.sasl"
+        )
+        requires(
+            "java.sql"
+        )
+        requires(
+            "java.sql.rowset"
+        )
+        requires(
+            "java.transaction.xa"
+        )
+        requires(
+            "java.xml"
+        )
+        requires(
+            "javafx.base"
+        )
+        requires(
+            "javafx.controls"
+        )
+        requires(
+            "javafx.fxml"
+        )
+        requires(
+            "javafx.graphics"
+        )
+        requires(
+            "jdk.security.jgss"
+        )
+        requires(
+            "jdk.unsupported"
+        )
+        requires(
+            "jdk.unsupported.desktop"
+        )
+        requires(
+            "jdk.xml.dom"
+        )
+        requires(
+            "org.apache.commons.lang3"
+        )
+        requires(
+            "org.apache.commons.logging"
+        )
+        requires(
+            "org.apache.commons.text"
+        )
+        requires(
+            "org.apache.commons.codec"
+        )
+        requires(
+            "org.apache.commons.io"
+        )
+        requires(
+            "org.apache.commons.compress"
+        )
+        requires(
+            "org.freedesktop.dbus"
+        )
+        requires(
+            "org.jsoup"
+        )
+        requires(
+            "org.slf4j"
+        )
+        requires(
+            "org.tukaani.xz"
+        );
+        uses(
+            "ai.djl.engine.EngineProvider"
+        )
+        uses(
+            "ai.djl.repository.RepositoryFactory"
+        )
+        uses(
+            "ai.djl.repository.zoo.ZooProvider"
+        )
+        uses(
+            "dev.langchain4j.spi.prompt.PromptTemplateFactory"
+        )
+        uses(
+            "kong.unirest.core.json.JsonEngine"
+        )
+        uses(
+            "org.eclipse.jgit.lib.Signer"
+        )
+        uses(
+            "org.eclipse.jgit.transport.SshSessionFactory"
+        )
+        uses(
+            "org.postgresql.shaded.com.ongres.stringprep.Profile"
+        )
+
+        provides(
+            "java.sql.Driver"
+        ).with(
+            "org.postgresql.Driver"
+        )
+        provides(
+            "java.security.Provider"
+        ).with(
+            "org.bouncycastle.jce.provider.BouncyCastleProvider",
+            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider"
+        )
+        provides(
+            "kong.unirest.core.json.JsonEngine"
+        ).with(
+            "kong.unirest.modules.gson.GsonEngine"
+        )
+        provides(
+            "ai.djl.repository.zoo.ZooProvider"
+        ).with(
+            "ai.djl.engine.rust.zoo.RsZooProvider",
+            "ai.djl.huggingface.zoo.HfZooProvider",
+            "ai.djl.pytorch.zoo.PtZooProvider",
+            "ai.djl.repository.zoo.DefaultZooProvider"
+        )
+        provides(
+            "ai.djl.engine.EngineProvider"
+        ).with(
+            "ai.djl.engine.rust.RsEngineProvider",
+            "ai.djl.pytorch.engine.PtEngineProvider"
+        )
+
+    }
+    jpackage {
+        outputDir = "distribution"
+
+        imageOptions.addAll(listOf(
+            "--java-options", "--add-reads JabRef.merged.module=jakarta.inject",
+            "--java-options", "--enable-native-access=org.jabref.merged.module"))
+
+        // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
+        if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
+            imageOptions.addAll(
+                listOf(
+                    "--win-console"
+                )
+            )
+            skipInstaller = true
+        } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
+            imageOptions.addAll(
+                listOf(
+                    "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
+                    "--app-version", "$version"
+                )
+            )
+            skipInstaller = true
+        } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
+            skipInstaller = true
+        }
     }
 }

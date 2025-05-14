@@ -4,17 +4,21 @@ WORKDIR /app
 
 COPY . .
 
-RUN gradle --no-daemon :jabkit:shadowJar
+RUN gradle --no-daemon :jabkit:jpackage
 
-RUN mv jabkit/build/libs/jabkit*-all.jar jabkit.jar
+RUN find jabkit/build/distribution
 
-FROM eclipse-temurin:24-jre AS runtime
+RUN mkdir /dist
 
-WORKDIR /app
+RUN mv jabkit/build/distribution/jabkit /dist
 
-COPY --from=build /app/jabkit.jar .
+# jpackage needs glibc; alpine does not work
+FROM debian:bookworm-slim AS runtime
+
+WORKDIR /work
+
+COPY --from=build /dist /jabref
 
 EXPOSE 6050
 
-# Run server
-ENTRYPOINT ["java", "-jar", "jabkit.jar"]
+ENTRYPOINT ["/jabref/jabkit/bin/jabkit"]

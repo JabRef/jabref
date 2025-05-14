@@ -4,17 +4,21 @@ WORKDIR /app
 
 COPY . .
 
-RUN gradle --no-daemon :jabsrv-cli:shadowJar
+RUN gradle --no-daemon :jabsrv-cli:jpackage
 
-RUN mv jabsrv-cli/build/libs/jabsrv*-all.jar jabsrv.jar
+RUN find jabsrv-cli/build/distribution
 
-FROM eclipse-temurin:24-jre AS runtime
+RUN mkdir /dist
 
-WORKDIR /app
+RUN mv jabsrv-cli/build/distribution/jabsrv /dist
 
-COPY --from=build /app/jabsrv.jar .
+# jpackage needs glibc; alpine does not work
+FROM debian:bookworm-slim AS runtime
+
+WORKDIR /work
+
+COPY --from=build /dist /jabref
 
 EXPOSE 6050
 
-# Run server
-ENTRYPOINT ["java", "-jar", "jabsrv.jar"]
+ENTRYPOINT ["/jabref/jabsrv/bin/jabsrv"]

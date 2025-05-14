@@ -7,7 +7,6 @@ plugins {
     id("org.openjfx.javafxplugin") version("0.1.0")
 
     id("org.beryx.jlink") version "3.1.1"
-    id("com.gradleup.shadow") version "9.0.0-beta13"
 }
 
 group = "org.jabref.jabkit"
@@ -289,6 +288,7 @@ jlink {
     }
     jpackage {
         outputDir = "distribution"
+        skipInstaller = true
 
         // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
         if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
@@ -297,7 +297,6 @@ jlink {
                     "--win-console"
                 )
             )
-           skipInstaller = true
         } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
             imageOptions.addAll(
                 listOf(
@@ -305,13 +304,6 @@ jlink {
                     "--app-version", "$version"
                 )
             )
-            skipInstaller = true
-        } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
-            skipInstaller = true
         }
     }
-}
-
-tasks.shadowJar {
-    setProperty("zip64", true)
 }
