@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -67,7 +66,7 @@ public class ServerCli implements Callable<Void> {
             URL resource = Server.class.getResource("http-server-demo.bib");
             if (resource != null) {
                 try {
-                    bibPath = Paths.get(resource.toURI());
+                    bibPath = Path.of(resource.toURI());
                 } catch (URISyntaxException e) {
                     LOGGER.error("Error while converting URL to URI", e);
                 }
