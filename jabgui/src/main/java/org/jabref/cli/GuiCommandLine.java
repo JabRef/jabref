@@ -16,6 +16,16 @@ public class GuiCommandLine {
     @Option(names = {"-a", "--add"}, description = "Add to currently opened library.")
     public boolean append;
 
+    /// @deprecated used by the browser extension
+    @Deprecated
+    @Option(names = {"--importBibTex"}, description = "Import bibtex string")
+    public String importBibtex;
+
+    /// @deprecated used by the browser extension
+    @Deprecated
+    @Option(names = {"--importToOpen"}, description = "Same as --import, but will be imported to the opened tab")
+    public String importToOpen;
+
     @Option(names = {"--reset"}, description = "Reset all preferences to default values.")
     public boolean resetPreferences;
 
