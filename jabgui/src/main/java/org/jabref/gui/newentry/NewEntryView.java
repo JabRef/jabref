@@ -46,7 +46,12 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.model.entry.identifier.RFC;
+import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -254,14 +259,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
-        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported identifier format.
-            idText.setText(clipboardText);
-            idText.selectAll();
-        }
-
-        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
 
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
@@ -272,6 +269,45 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         } else {
             idLookupSpecify.selectedProperty().set(true);
         }
+
+        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
+            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
+            // supported identifier format.
+            idText.setText(clipboardText);
+            idText.selectAll();
+
+            Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
+            if (identifier.isPresent()) {
+                Identifier id = identifier.get();
+                boolean isValid = switch (id) {
+                    case DOI doi -> DOI.isValid(doi.asString());
+                    case ISBN isbn -> isbn.isValid();
+                    default -> true;
+                };
+
+                if (isValid) {
+                    Platform.runLater(() -> {
+                        idLookupSpecify.setSelected(true);
+                        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
+                            if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
+                                    (id instanceof ISBN && fetcher.getName().toLowerCase().contains("isbn")) ||
+                                    (id instanceof ArXivIdentifier && fetcher.getName().toLowerCase().contains("arxiv")) ||
+                                    (id instanceof RFC && fetcher.getName().toLowerCase().contains("rfc")) ||
+                                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
+                                idFetcher.setValue(fetcher);
+                                break;
+                            }
+                        }
+                    });
+                } else {
+                    Platform.runLater(() -> idLookupGuess.setSelected(true));
+                }
+            } else {
+                Platform.runLater(() -> idLookupGuess.setSelected(true));
+            }
+        }
+
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
