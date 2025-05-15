@@ -19,6 +19,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.cli.CliImportHelper;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -32,6 +33,7 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -178,21 +180,11 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
             uiCommands.stream().filter(UiCommand.ImportFileToCurrentLibrary.class::isInstance)
                       .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
-                      .findAny().ifPresent(importFile -> {
-                          LOGGER.debug("Import file {} requested", importFile);
-                          // bg task?
-                          Optional<ParserResult> parserResult = ImportHelper.importFile(importFile.file(), "bibtex", preferences, false);
-                          parserResult.ifPresent(this::addParserResult);
-                      });
+                      .findAny().ifPresent(importFile -> importFromFileAndOpen(importFile.file()));
 
             uiCommands.stream().filter(UiCommand.ImportBibTexToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
-                      .findAny().ifPresent(importFile -> {
-                LOGGER.debug("Import file {} requested", importFile);
-
-                Optional<ParserResult> parserResult = ImportHelper.importFile(importFile.file(), "bibtex", preferences, false);
-                parserResult.ifPresent(this::addParserResult);
-            });
+                      .map(UiCommand.ImportBibTexToCurrentLibrary.class::cast)
+                      .findAny().ifPresent(importBibTex -> importBibtexStringAndOpen(importBibTex.bibtex()));
         }
 
         // Handle jumpToEntry
@@ -207,6 +199,25 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                       // tabs must be present and contents async loaded for an entry to be selected
                       waitForLoadingFinished(() -> jumpToEntry(entryKey));
                   });
+    }
+
+    private void importBibtexStringAndOpen(String importStr) {
+        LOGGER.debug("ImportBibtex {} requested", importStr);
+        BackgroundTask.wrap(() -> {
+                          BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
+                          List<BibEntry> entries = parser.parseEntries(importStr);
+                          return new ParserResult(entries);
+                      }).onSuccess(this::addParserResult)
+                      .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
+                      .executeWith(taskExecutor);
+    }
+
+    private void importFromFileAndOpen(String importFilePath) {
+        LOGGER.debug("Import file {} requested", importFilePath);
+        BackgroundTask.wrap(() -> CliImportHelper.importFile(importFilePath, "bibtex", preferences, false))
+                      .onSuccess(result -> result.ifPresent(this::addParserResult))
+                      .onFailure(t -> LOGGER.error("Unable to import file {} ", importFilePath, t))
+                      .executeWith(taskExecutor);
     }
 
     private void checkForBibInUpperDir() {

@@ -1,10 +1,9 @@
-package org.jabref.gui.frame;
+package org.jabref.cli;
 
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatReader;
@@ -12,20 +11,24 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ImportHelper {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportHelper.class);
+/**
+ *  CLI import helper that are needed for importing stuff from the browser extension
+ */
+public class CliImportHelper {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CliImportHelper.class);
 
     /**
      * Reads URIs as input
      */
-    static Optional<ParserResult> importFile(String importArguments,
+    public static Optional<ParserResult> importFile(String importArguments,
                                              String importFormat,
-                                             GuiPreferences cliPreferences,
+                                             CliPreferences cliPreferences,
                                              boolean porcelain) {
         LOGGER.debug("Importing file {}", importArguments);
         String[] data = importArguments.split(",");
@@ -58,9 +61,9 @@ public class ImportHelper {
         return importResult;
     }
 
-    static Optional<ParserResult> importFile(Path file,
+   public static Optional<ParserResult> importFile(Path file,
                                              String importFormat,
-                                             GuiPreferences cliPreferences,
+                                             CliPreferences cliPreferences,
                                              boolean porcelain) {
         try {
             ImportFormatReader importFormatReader = new ImportFormatReader(
@@ -92,7 +95,7 @@ public class ImportHelper {
             }
         } catch (ImportException ex) {
             LOGGER.error("Error opening file '{}'", file, ex);
-            return Optional.empty();
+            return java.util.Optional.empty();
         }
     }
 }
