@@ -1,8 +1,11 @@
 package org.jabref.http.server.cli;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -60,7 +63,15 @@ public class ServerCli implements Callable<Void> {
 
         if (filesToServe.isEmpty()) {
             LOGGER.info("No library available to serve, serving the demo library...");
-            Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
+            Path bibPath = null;
+            URL resource = Server.class.getResource("http-server-demo.bib");
+            if (resource != null) {
+                try {
+                    bibPath = Paths.get(resource.toURI());
+                } catch (URISyntaxException e) {
+                    LOGGER.error("Error while converting URL to URI", e);
+                }
+            }
             if (bibPath == null) {
                 // Server.class.getResource("...") is null when executing with IntelliJ
                 bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
