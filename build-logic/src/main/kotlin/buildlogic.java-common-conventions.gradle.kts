@@ -8,9 +8,9 @@ plugins {
     id("project-report")
 
     id("org.gradlex.extra-java-module-info")
+    id("org.gradlex.java-module-packaging")
     id("org.gradlex.java-module-testing")
-
-    id("org.openjfx.javafxplugin")
+    id("org.gradlex.jvm-dependency-conflict-detection")
 }
 
 repositories {
@@ -31,40 +31,100 @@ dependencies {
     }
 }
 
+javaModulePackaging {
+    target("ubuntu-22.04") {
+        operatingSystem = OperatingSystemFamily.LINUX
+        architecture = MachineArchitecture.X86_64
+        packageTypes = listOf("deb")
+    }
+    target("macos-13") {
+        operatingSystem = OperatingSystemFamily.MACOS
+        architecture = MachineArchitecture.X86_64
+        packageTypes = listOf("dmg")
+    }
+    target("macos-14") {
+        operatingSystem = OperatingSystemFamily.MACOS
+        architecture = MachineArchitecture.ARM64
+        packageTypes = listOf("dmg")
+    }
+    target("windows-2022") {
+        operatingSystem = OperatingSystemFamily.WINDOWS
+        architecture = MachineArchitecture.X86_64
+        packageTypes = listOf("exe")
+    }
+
+    primaryTarget(target("macos-14"))
+}
+
+jvmDependencyConflicts.patch {
+    listOf("base", "graphics", "controls", "fxml", "swing").forEach { jfxModule ->
+        module("org.openjfx:javafx-$jfxModule") {
+            addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
+            addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
+            addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
+            addTargetPlatformVariant("mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
+            addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
+        }
+    }
+}
+
 extraJavaModuleInfo {
     failOnMissingModuleInfo = false
     failOnAutomaticModules = false
     // skipLocalJars = true
     deriveAutomaticModuleNamesFromFileNames = true
     module("org.openjfx:javafx-base", "javafx.base") {
+        overrideModuleName()
         preserveExisting()
+        /*
         exports("com.sun.javafx.event")
-        opens("javafx.collections", "javafx.collections.transformation")
+        exports("com.sun.javafx.collections")
+        exports("com.sun.javafx.runtime")
+        opens("javafx.collections")
+        opens("javafx.collections.transformation")
+        */
     }
     module("org.openjfx:javafx-controls", "javafx.controls") {
+        overrideModuleName()
         preserveExisting()
+        /*
         exports("com.sun.javafx.scene.control")
         exports("com.sun.javafx.scene.control.behavior")
         exports("com.sun.javafx.scene.control.inputmat")
         opens("javafx.scene.control", "com.sun.javafx.scene.control", "javafx.scene.control.skin")
+        */
     }
-    module("org.openjfx:javafx-graphics", "org.controlsfx.controls") {
-        preserveExisting()
+    //module("org.openjfx:javafx-graphics", "javafx.graphics") {
+        //overrideModuleName()
+        //preserveExisting()
+        /*
         exports("com.sun.javafx.scene")
         exports("com.sun.javafx.scene.traversal")
         exports("com.sun.javafx.css")
-    }
-    module("org.openjfx:javafx-base", "org.controlsfx.controls") {
+        */
+    //}
+    module("org.openjfx:javafx-graphics", "javafx.fxml") {
+        overrideModuleName()
         preserveExisting()
-        exports("com.sun.javafx.event")
-        exports("com.sun.javafx.collections")
-        exports("com.sun.javafx.runtime")
     }
-    module("org.controlsfx:controlsfx", "controlsfx") {
-        preserveExisting()
-        opens("impl.org.controlsfx.skin")
-        exports("impl.org.controlsfx.skin")
+
+    /*
+    // Based on module-info.class in https://repo1.maven.org/maven2/org/controlsfx/controlsfx/11.2.2/
+    module("org.openjfx:javafx-controls", "org.controlsfx.controls") {
+        patchRealModule()
+
+        exportAllPackages() // shortcut to just export everything, can be replaced with a dedicated list
+
+        opens("org.controlsfx.control", "org.controlsfx.fxsampler")
+        opens("org.controlsfx.control.tableview2", "org.controlsfx.fxsampler");
+        opens("impl.org.controlsfx.skin");
+
+        uses("org.controlsfx.glyphfont.GlyphFont");
+
+        // Automatically reconstructed from META-INF
+        // provides org.controlsfx.glyphfont.GlyphFont with org.controlsfx.glyphfont.FontAwesome;
     }
+     */
 }
 
 testing {

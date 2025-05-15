@@ -5,6 +5,10 @@ plugins {
 dependencies {
     implementation(project(":jablib"))
 
+    implementation("org.openjfx:javafx-base:24.0.1")
+    implementation("org.openjfx:javafx-controls:24.0.1")
+    implementation("org.openjfx:javafx-fxml:24.0.1")
+
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")
     implementation("org.tinylog:slf4j-tinylog:2.7.0")
@@ -22,10 +26,4 @@ dependencies {
     implementation("net.bytebuddy:byte-buddy:1.17.5")
 
     implementation("org.jspecify:jspecify:1.0.0")
-}
-
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
 }

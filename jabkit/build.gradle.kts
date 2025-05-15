@@ -19,6 +19,10 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
+    implementation("org.openjfx:javafx-base:24.0.1")
+    implementation("org.openjfx:javafx-controls:24.0.1")
+    implementation("org.openjfx:javafx-fxml:24.0.1")
+
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
@@ -62,12 +66,6 @@ jacoco {
     toolVersion = "0.8.13"
 }
 */
-
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
-}
 
 application {
     mainClass.set("org.jabref.JabKit")

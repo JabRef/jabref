@@ -1,5 +1,4 @@
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.annotationProcessor
 
 plugins {
     id("buildlogic.java-common-conventions")
@@ -20,6 +19,12 @@ val pdfbox = "3.0.5"
 
 dependencies {
     implementation(project(":jablib"))
+
+    implementation("org.openjfx:javafx-base:24.0.1")
+    implementation("org.openjfx:javafx-graphics:24.0.1")
+    implementation("org.openjfx:javafx-fxml:24.0.1")
+    implementation("org.openjfx:javafx-web:24.0.1")
+    implementation("org.openjfx:javafx-swing:24.0.1")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")
@@ -128,12 +133,6 @@ dependencies {
     testImplementation("org.wiremock:wiremock-standalone:3.12.1")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
-}
-
-javafx {
-    version = "24"
-    // javafx.swing required by com.dlsc.gemsfx
-    modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web", "javafx.swing")
 }
 
 application {

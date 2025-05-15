@@ -21,6 +21,11 @@ val jaxbVersion by extra { "4.0.5" }
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
 
+    implementation("org.openjfx:javafx-base:24.0.1")
+    // implementation("org.openjfx:javafx-graphics:24.0.1")
+    implementation("org.openjfx:javafx-fxml:24.0.1")
+    implementation("org.openjfx:javafx-controls:24.0.1")
+
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
 
@@ -227,21 +232,6 @@ dependencies {
     "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
     "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }
-
-javafx {
-    version = "24"
-    modules = listOf(
-        // properties
-        "javafx.base",
-        // javafx.scene.paint.Color;
-        "javafx.graphics",
-
-        // because of afterburner.fx
-        "javafx.controls",
-        "javafx.fxml"
-    )
-}
-
 /*
 jacoco {
     toolVersion = "0.8.13"

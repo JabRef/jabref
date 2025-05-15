@@ -104,7 +104,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git;
 
     requires javafx.base;
-    requires javafx.graphics;
+    // requires javafx.graphics;
     requires afterburner.fx;
     requires com.tobiasdiez.easybind;
 
