@@ -1,0 +1,4 @@
+--add-modules
+   jul.to.slf4j
+--add-reads
+    org.jabref.jabsrv=jul.to.slf4j
