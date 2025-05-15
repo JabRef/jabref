@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.stream.Collectors;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
 import org.jabref.http.server.Server;
@@ -45,7 +44,7 @@ public class ServerCli implements Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException {
-        final List<Path> filesToServe = JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened().stream().collect(Collectors.toCollection(ArrayList::new));
+        final List<Path> filesToServe = new ArrayList<>(JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened());
 
         // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
         // In a testing environment, this might be difficult to handle
