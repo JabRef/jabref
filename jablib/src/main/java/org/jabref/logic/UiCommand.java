@@ -12,7 +12,11 @@ public sealed interface UiCommand {
 
     record AppendToCurrentLibrary(List<Path> toAppend) implements UiCommand { }
 
-    record ImportBibTexToCurrentLibrary(String bibtex) implements UiCommand { }
+    /// @deprecated used by the browser extension only
+    @Deprecated
+    record AppendBibTeXToCurrentLibrary(String bibtex) implements UiCommand { }
 
-    record ImportFileToCurrentLibrary(String file) implements UiCommand { }
+    /// @deprecated used by the browser extension only
+    @Deprecated
+    record AppendFileOrUrlToCurrentLibrary(String location) implements UiCommand { }
 }

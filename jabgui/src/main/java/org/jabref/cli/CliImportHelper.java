@@ -17,21 +17,23 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *  CLI import helper that are needed for importing stuff from the browser extension
- */
+///  CLI import helper that are needed for importing stuff from the browser extension
+///
+/// @deprecated used by the browser extension only
+@Deprecated
 public class CliImportHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(CliImportHelper.class);
 
     /**
      * Reads URIs as input
+     *
+     * @param location URL or file path to import
      */
-    public static Optional<ParserResult> importFile(String importArguments,
-                                             String importFormat,
+    public static Optional<ParserResult> importFile(String location,
                                              CliPreferences cliPreferences,
                                              boolean porcelain) {
-        LOGGER.debug("Importing file {}", importArguments);
-        String[] data = importArguments.split(",");
+        LOGGER.debug("Importing file from locaiton {}", location);
+        String[] data = location.split(",");
 
         String address = data[0];
         Path file;
@@ -52,7 +54,7 @@ public class CliImportHelper {
             }
         }
 
-        Optional<ParserResult> importResult = importFile(file, importFormat, cliPreferences, porcelain);
+        Optional<ParserResult> importResult = importFile(file, cliPreferences, porcelain);
         importResult.ifPresent(result -> {
             if (result.hasWarnings()) {
                 System.out.println(result.getErrorMessage());
@@ -62,7 +64,6 @@ public class CliImportHelper {
     }
 
    public static Optional<ParserResult> importFile(Path file,
-                                             String importFormat,
                                              CliPreferences cliPreferences,
                                              boolean porcelain) {
         try {
@@ -73,26 +74,11 @@ public class CliImportHelper {
                     new DummyFileUpdateMonitor()
             );
 
-            if (!"*".equals(importFormat)) {
-                if (!porcelain) {
-                    System.out.println(Localization.lang("Importing %0", file));
-                }
-                ParserResult result = importFormatReader.importFromFile(importFormat, file);
-                return Optional.of(result);
-            } else {
-                // * means "guess the format":
-                if (!porcelain) {
-                    System.out.println(Localization.lang("Importing file %0 as unknown format", file));
-                }
-
-                ImportFormatReader.UnknownFormatImport importResult =
-                        importFormatReader.importUnknownFormat(file, new DummyFileUpdateMonitor());
-
-                if (!porcelain) {
-                    System.out.println(Localization.lang("Format used: %0", importResult.format()));
-                }
-                return Optional.of(importResult.parserResult());
+            if (!porcelain) {
+                System.out.println(Localization.lang("Importing %0", file));
             }
+            ParserResult result = importFormatReader.importFromFile("bibtex", file);
+            return Optional.of(result);
         } catch (ImportException ex) {
             LOGGER.error("Error opening file '{}'", file, ex);
             return java.util.Optional.empty();

@@ -80,10 +80,10 @@ public class ArgumentProcessor {
         }
 
         if (guiCli.importToOpen != null) {
-            uiCommands.add(new UiCommand.ImportFileToCurrentLibrary(guiCli.importToOpen));
+            uiCommands.add(new UiCommand.AppendFileOrUrlToCurrentLibrary(guiCli.importToOpen));
         }
         if (guiCli.importBibtex != null) {
-            uiCommands.add(new UiCommand.ImportBibTexToCurrentLibrary(guiCli.importBibtex));
+            uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex));
         }
         return uiCommands;
     }
