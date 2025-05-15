@@ -54,17 +54,28 @@ public class ServerCli implements Callable<Void> {
                                           .filter(Files::exists)
                                           .filter(path -> !filesToServe.contains(path))
                                           .toList();
-            LOGGER.debug("Adding following files to the list of opened libraries: {}", filesToAdd);
+            LOGGER.info("Adding following files to the list of opened libraries: {}", filesToAdd);
             filesToServe.addAll(0, filesToAdd);
         }
 
         if (filesToServe.isEmpty()) {
-            LOGGER.debug("No library available to serve, serving the demo library...");
-            // Server.class.getResource("...") is always null here, thus trying relative path
-            // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
-            Path bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
-            LOGGER.debug("Location of demo library: {}", bibPath);
-            filesToServe.add(bibPath);
+            LOGGER.info("No library available to serve, serving the demo library...");
+            Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
+            if (bibPath == null) {
+                // Server.class.getResource("...") is null when executing with IntelliJ
+                bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
+                if (Files.notExists(bibPath)) {
+                    bibPath = null;
+                    LOGGER.debug("http-server-demo.bib not found");
+                }
+            }
+
+            if (bibPath == null) {
+                LOGGER.info("No library to serve. Please provide a library file as argument.");
+            } else {
+                LOGGER.debug("Location of demo library: {}", bibPath);
+                filesToServe.add(bibPath);
+            }
         }
 
         LOGGER.debug("Libraries to serve: {}", filesToServe);
