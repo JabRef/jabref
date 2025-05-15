@@ -13,7 +13,7 @@ dependencies {
     implementation("org.gradlex:java-module-dependencies:1.9")
     implementation("org.gradlex:java-module-packaging:1.0")
     implementation("org.gradlex:java-module-testing:1.7")
-    implementation("org.gradlex.jvm-dependency-conflict-detection:org.gradlex.jvm-dependency-conflict-detection.gradle.plugin:2.3")
+    implementation("org.gradlex.jvm-dependency-conflict-resolution:org.gradlex.jvm-dependency-conflict-resolution.gradle.plugin:2.3")
 
     configurations
         .matching { it.name.contains("downloadSources") }

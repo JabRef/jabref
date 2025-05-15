@@ -10,10 +10,11 @@ open module org.jabref {
 
     // region JavaFX
     requires javafx.base;
-    requires javafx.graphics;
     requires javafx.controls;
-    requires javafx.web;
     requires javafx.fxml;
+    requires javafx.graphics;
+    requires javafx.web;
+
     requires com.tobiasdiez.easybind;
 
     requires afterburner.fx;

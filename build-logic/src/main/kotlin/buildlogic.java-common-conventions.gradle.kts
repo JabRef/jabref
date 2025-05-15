@@ -10,7 +10,7 @@ plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.java-module-packaging")
     id("org.gradlex.java-module-testing")
-    id("org.gradlex.jvm-dependency-conflict-detection")
+    id("org.gradlex.jvm-dependency-conflict-resolution")
 }
 
 repositories {
@@ -52,12 +52,11 @@ javaModulePackaging {
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("exe")
     }
-
-    primaryTarget(target("macos-14"))
+    // primaryTarget(target("macos-14"))
 }
 
 jvmDependencyConflicts.patch {
-    listOf("base", "graphics", "controls", "fxml", "swing").forEach { jfxModule ->
+    listOf("base", "controls", "fxml", "graphics", "swing", "web").forEach { jfxModule ->
         module("org.openjfx:javafx-$jfxModule") {
             addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
             addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
@@ -73,6 +72,7 @@ extraJavaModuleInfo {
     failOnAutomaticModules = false
     // skipLocalJars = true
     deriveAutomaticModuleNamesFromFileNames = true
+    /*
     module("org.openjfx:javafx-base", "javafx.base") {
         overrideModuleName()
         preserveExisting()
@@ -84,6 +84,9 @@ extraJavaModuleInfo {
         opens("javafx.collections.transformation")
         */
     }
+
+     */
+    /*
     module("org.openjfx:javafx-controls", "javafx.controls") {
         overrideModuleName()
         preserveExisting()
@@ -94,6 +97,8 @@ extraJavaModuleInfo {
         opens("javafx.scene.control", "com.sun.javafx.scene.control", "javafx.scene.control.skin")
         */
     }
+
+     */
     //module("org.openjfx:javafx-graphics", "javafx.graphics") {
         //overrideModuleName()
         //preserveExisting()
@@ -103,10 +108,12 @@ extraJavaModuleInfo {
         exports("com.sun.javafx.css")
         */
     //}
+    /*
     module("org.openjfx:javafx-graphics", "javafx.fxml") {
         overrideModuleName()
         preserveExisting()
     }
+    */
 
     /*
     // Based on module-info.class in https://repo1.maven.org/maven2/org/controlsfx/controlsfx/11.2.2/
