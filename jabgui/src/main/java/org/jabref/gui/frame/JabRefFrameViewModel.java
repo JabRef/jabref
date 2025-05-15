@@ -19,7 +19,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
-import org.jabref.cli.CliImportHelper;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -178,12 +177,8 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                           waitForLoadingFinished(() -> appendToCurrentLibrary(toAppend));
                       });
 
-            uiCommands.stream().filter(UiCommand.ImportFileToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
-                      .findAny().ifPresent(importFile -> importFromFileAndOpen(importFile.file()));
-
-            uiCommands.stream().filter(UiCommand.ImportBibTexToCurrentLibrary.class::isInstance)
-                      .map(UiCommand.ImportBibTexToCurrentLibrary.class::cast)
+            uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)
                       .findAny().ifPresent(importBibTex -> importBibtexStringAndOpen(importBibTex.bibtex()));
         }
 
@@ -209,14 +204,6 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                           return new ParserResult(entries);
                       }).onSuccess(this::addParserResult)
                       .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
-                      .executeWith(taskExecutor);
-    }
-
-    private void importFromFileAndOpen(String importFilePath) {
-        LOGGER.debug("Import file {} requested", importFilePath);
-        BackgroundTask.wrap(() -> CliImportHelper.importFile(importFilePath, "bibtex", preferences, false))
-                      .onSuccess(result -> result.ifPresent(this::addParserResult))
-                      .onFailure(t -> LOGGER.error("Unable to import file {} ", importFilePath, t))
                       .executeWith(taskExecutor);
     }
 
