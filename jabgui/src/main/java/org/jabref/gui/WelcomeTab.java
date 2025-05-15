@@ -42,6 +42,8 @@ import org.slf4j.LoggerFactory;
 
 public class WelcomeTab extends Tab {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
+
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
     private final GuiPreferences preferences;
@@ -55,7 +57,6 @@ public class WelcomeTab extends Tab {
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
     private final BuildInfo buildInfo;
-    private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
 
     public WelcomeTab(LibraryTabContainer tabContainer,
                       GuiPreferences preferences,
