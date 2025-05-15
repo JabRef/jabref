@@ -25,6 +25,7 @@ import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.ReferImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
@@ -83,6 +84,7 @@ public class ImportFormatReader {
         }
         formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
+        formats.add(new ReferImporter());
         formats.add(new RisImporter());
         formats.add(new CffImporter(citationKeyPatternPreferences));
         formats.add(new BiblioscapeImporter());
