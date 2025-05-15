@@ -1,9 +1,11 @@
-package org.jabref.logic.msc;
+package org.jabref.logic.util;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.Map;
 import java.util.Optional;
+
+import org.jabref.logic.shared.exception.MscCodeLoadingException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;

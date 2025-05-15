@@ -8,9 +8,8 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.msc.MscCodeLoadingException;
-import org.jabref.logic.msc.MscCodeUtils;
-import org.jabref.migrations.MSCMigration;
+import org.jabref.logic.shared.exception.MscCodeLoadingException;
+import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
@@ -23,10 +22,10 @@ import com.google.common.collect.HashBiMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+* Converts MSC codes found in keywords editor to their descriptions
+*/
 public class ConvertMSCCodesCleanup implements CleanupJob {
-    /*
-     * Converts MSC codes found in keywords editor to their descriptions
-     */
 
     private static final Logger logger = LoggerFactory.getLogger(ConvertMSCCodesCleanup.class);
     private static final BiMap<String, String> MSCMAP;
@@ -121,10 +120,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
 
-            MSCMigration tool = new MSCMigration();
-            isEditorOpen = tool.isEditorOpen();
-
-            if (!Platform.isFxApplicationThread() && isEditorOpen.get()) {
+            if (!Platform.isFxApplicationThread()) {
                 // If the thread is not JavaFX and Editor is showing avoid error by adding to queue
                 Platform.runLater(() -> {
                     entry.setField(StandardField.KEYWORDS, newValue);

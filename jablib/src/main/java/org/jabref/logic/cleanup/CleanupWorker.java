@@ -38,9 +38,8 @@ public class CleanupWorker {
 
         List<CleanupJob> jobs = determineCleanupActions(preset);
         List<FieldChange> changes = new ArrayList<>();
-        for (CleanupJob job : jobs) { 
+        for (CleanupJob job : jobs) {
             changes.addAll(job.cleanup(entry));
-            
             if (job instanceof MoveFilesCleanup cleanup) {
                 failures.addAll(cleanup.getIoExceptions());
             }
@@ -52,7 +51,7 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
-        // Special handling for MSC code conversion
+        // Description Conversion
         if (preset.isActive(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES)) {
             jobs.add(new ConvertMSCCodesCleanup(bibEntryPreferences, true));
         } else {

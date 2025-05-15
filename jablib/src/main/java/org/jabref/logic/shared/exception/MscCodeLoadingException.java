@@ -1,4 +1,4 @@
-package org.jabref.logic.msc;
+package org.jabref.logic.shared.exception;
 
 public class MscCodeLoadingException extends Exception {
     public MscCodeLoadingException(String message) {

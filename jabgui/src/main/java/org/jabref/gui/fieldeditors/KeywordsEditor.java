@@ -34,9 +34,9 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.msc.MscCodeLoadingException;
-import org.jabref.logic.msc.MscCodeUtils;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.shared.exception.MscCodeLoadingException;
+import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
@@ -69,17 +69,16 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             Optional<HashBiMap<String, String>> optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
             
             if (optionalMscCodes.isPresent()) {
-                mscmap = optionalMscCodes.get();  // Unwrap the map if present
+                mscmap = optionalMscCodes.get();
             } else {
-                LOGGER.warn(Localization.lang("Resource not found: msc_codes.json"));
+                LOGGER.warn("Resource not found msc_codes.json");
                 mscmap = HashBiMap.create();
             }
         } catch (MscCodeLoadingException e) {
-            LOGGER.error(Localization.lang("Error loading MSC codes:", e));
+            LOGGER.error("Error loading MSC codes", e);
             mscmap = HashBiMap.create();
         }
     }
-
 
     @FXML private KeywordsEditorViewModel viewModel;
     @FXML private TagsField<Keyword> keywordTagsField;
@@ -189,12 +188,10 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         if (mscmap.containsKey(tagLabel.getText())) {
             String mscClassification = mscmap.get(tagLabel.getText());
             Tooltip tooltip = new Tooltip(mscClassification);
-
             tagLabel.setOnMouseEntered(event -> {
                 // Show tooltip when mouse enters
                 Tooltip.install(tagLabel, tooltip);
             });
-
             tagLabel.setOnMouseExited(event -> {
                 // Uninstall tooltip when mouse exits
                 Tooltip.uninstall(tagLabel, tooltip);
