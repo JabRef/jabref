@@ -1,5 +1,9 @@
 package org.jabref.gui;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,13 +27,22 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class WelcomeTab extends Tab {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
 
     private final VBox recentLibrariesBox;
     private final LibraryTabContainer tabContainer;
@@ -114,7 +127,7 @@ public class WelcomeTab extends Tab {
         Label startLabel = new Label(Localization.lang("Start"));
         startLabel.getStyleClass().add("welcome-header-label");
 
-        Hyperlink newLibraryLink = new Hyperlink(Localization.lang("New library"));
+        Hyperlink newLibraryLink = new Hyperlink(Localization.lang("New empty library"));
         newLibraryLink.getStyleClass().add("welcome-hyperlink");
         newLibraryLink.setOnAction(e -> new NewDatabaseAction(tabContainer, preferences).execute());
 
@@ -124,7 +137,27 @@ public class WelcomeTab extends Tab {
                 stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                 taskExecutor).execute());
 
-        return createVBoxContainer(startLabel, newLibraryLink, openLibraryLink);
+        Hyperlink openExampleLibraryLink = new Hyperlink(Localization.lang("New example library"));
+        openExampleLibraryLink.getStyleClass().add("welcome-hyperlink");
+        openExampleLibraryLink.setOnAction(e -> {
+            try (InputStream in = WelcomeTab.class.getClassLoader().getResourceAsStream("Chocolate.bib")) {
+                if (in == null) {
+                    LOGGER.warn("Example library file not found.");
+                    return;
+                }
+                Reader reader = Importer.getReader(in);
+                BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
+                ParserResult result = bibtexParser.parse(reader);
+                BibDatabaseContext databaseContext = result.getDatabaseContext();
+                LibraryTab libraryTab = LibraryTab.createLibraryTab(databaseContext, tabContainer, dialogService, aiService,
+                        preferences, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
+                tabContainer.addTab(libraryTab, true);
+            } catch (IOException ex) {
+                LOGGER.error("Failed to load example library", ex);
+            }
+        });
+
+        return createVBoxContainer(startLabel, newLibraryLink, openExampleLibraryLink, openLibraryLink);
     }
 
     private VBox createWelcomeRecentBox() {
