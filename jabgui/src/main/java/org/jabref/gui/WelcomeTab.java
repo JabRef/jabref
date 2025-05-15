@@ -124,7 +124,7 @@ public class WelcomeTab extends Tab {
         Label startLabel = new Label(Localization.lang("Start"));
         startLabel.getStyleClass().add("welcome-header-label");
 
-        Hyperlink newLibraryLink = new Hyperlink(Localization.lang("New library"));
+        Hyperlink newLibraryLink = new Hyperlink(Localization.lang("New empty library"));
         newLibraryLink.getStyleClass().add("welcome-hyperlink");
         newLibraryLink.setOnAction(e -> new NewDatabaseAction(tabContainer, preferences).execute());
 
@@ -134,7 +134,7 @@ public class WelcomeTab extends Tab {
                 stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager,
                 taskExecutor).execute());
 
-        Hyperlink openExampleLibraryLink = new Hyperlink(Localization.lang("Open example library"));
+        Hyperlink openExampleLibraryLink = new Hyperlink(Localization.lang("New example library"));
         openExampleLibraryLink.getStyleClass().add("welcome-hyperlink");
         openExampleLibraryLink.setOnAction(e -> {
             try (InputStream in = WelcomeTab.class.getClassLoader().getResourceAsStream("Chocolate.bib")) {
@@ -155,7 +155,7 @@ public class WelcomeTab extends Tab {
             }
         });
 
-        return createVBoxContainer(startLabel, newLibraryLink, openLibraryLink, openExampleLibraryLink);
+        return createVBoxContainer(startLabel, newLibraryLink, openExampleLibraryLink, openLibraryLink);
     }
 
     private VBox createWelcomeRecentBox() {
