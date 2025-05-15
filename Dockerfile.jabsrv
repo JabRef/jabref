@@ -1,5 +1,3 @@
-LABEL org.opencontainers.image.source https://github.com/JabRef/jabref
-
 FROM gradle:jdk24-noble AS build
 
 WORKDIR /app
@@ -16,6 +14,8 @@ RUN mv jabsrv-cli/build/distribution/jabsrv /dist
 
 # jpackage needs glibc; alpine does not work
 FROM debian:bookworm-slim AS runtime
+
+LABEL org.opencontainers.image.source https://github.com/JabRef/jabref
 
 WORKDIR /work
 
