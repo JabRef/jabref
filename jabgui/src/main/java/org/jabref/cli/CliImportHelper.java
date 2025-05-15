@@ -81,7 +81,7 @@ public class CliImportHelper {
             return Optional.of(result);
         } catch (ImportException ex) {
             LOGGER.error("Error opening file '{}'", file, ex);
-            return java.util.Optional.empty();
+            return Optional.empty();
         }
     }
 }
