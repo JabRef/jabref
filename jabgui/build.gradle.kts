@@ -20,6 +20,8 @@ val pdfbox = "3.0.5"
 val javafxVersion = "24.0.1"
 val javafxPlatform: String by project.extra
 
+println("JavaFX platform: $javafxPlatform")
+
 dependencies {
     implementation(project(":jablib"))
 
