@@ -2,7 +2,7 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -27,14 +27,13 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.importer.ParseException;
+import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -143,17 +142,15 @@ public class WelcomeTab extends Tab {
                     LOGGER.error("Example library file not found.");
                     return;
                 }
+                Reader reader;
+                reader = Importer.getReader(in);
                 BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
-                List<BibEntry> entries = bibtexParser.parseEntries(in);
-
-                BibDatabase database = new BibDatabase();
-                database.insertEntries(entries);
-
-                BibDatabaseContext databaseContext = new BibDatabaseContext(database);
+                ParserResult result = bibtexParser.parse(reader);
+                BibDatabaseContext databaseContext = result.getDatabaseContext();
                 LibraryTab libraryTab = LibraryTab.createLibraryTab(databaseContext, tabContainer, dialogService, aiService,
                         preferences, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
                 tabContainer.addTab(libraryTab, true);
-            } catch (IOException | ParseException ex) {
+            } catch (IOException ex) {
                 LOGGER.error("Failed to load example library", ex);
             }
         });
