@@ -79,12 +79,11 @@ public class ArgumentProcessor {
             }
         }
 
-        // Required for the browser plugin
         if (guiCli.importToOpen != null) {
-            uiCommands.add(new UiCommand.AppendToCurrentLibrary(List.of(guiCli.importToOpen)));
+            uiCommands.add(new UiCommand.ImportFileToCurrentLibrary(guiCli.importToOpen));
         }
         if (guiCli.importBibtex != null) {
-            uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex));
+            uiCommands.add(new UiCommand.ImportBibTexToCurrentLibrary(guiCli.importBibtex));
         }
         return uiCommands;
     }
