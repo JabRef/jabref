@@ -86,6 +86,14 @@ jobs:
           gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove label pinned (to enable automated pinging and unassignment with a message)
+        if: steps.check_assignee.outputs.assigned == 'yes'
+        run: |
+          set -e
+
+          gh issue edit ${{ needs.determine_issue_number.outputs.issue_number }} --remove-label "📌 Pinned"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move issue to "Free to take" in "Good First Issues"
         if: steps.check_assignee.outputs.assigned == 'no'
         uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
