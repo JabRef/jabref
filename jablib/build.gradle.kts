@@ -67,10 +67,6 @@ dependencies {
     implementation("io.github.thibaultmeyer:cuid:2.0.3")
     // endregion
 
-    // injection framework
-    // implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    // implementation("org.glassfish.hk2:hk2-api:3.1.1")
-
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
     implementation("info.debatty:java-string-similarity:2.0.0")
 
