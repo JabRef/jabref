@@ -18,13 +18,21 @@ val pdfbox = "3.0.5"
 val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
 
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
+
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
 
-    implementation("org.openjfx:javafx-base:24.0.1")
-    // implementation("org.openjfx:javafx-graphics:24.0.1")
-    implementation("org.openjfx:javafx-fxml:24.0.1")
-    implementation("org.openjfx:javafx-controls:24.0.1")
+    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
+
+    // Required by afterburner.fx
+    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-graphics:$javafxVersion:$javafxPlatform")
+
+    // Fix "error: module not found: javafx.controls" during compilation
+    // implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
 
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
@@ -391,11 +399,6 @@ tasks.javadoc {
         encoding = "UTF-8"
         // version = false
         // author = false
-
-        addMultilineStringsOption("-add-exports").value = listOf(
-            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
-            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
-        )
     }
 }
 

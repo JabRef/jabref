@@ -11,6 +11,9 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 
 val luceneVersion = "10.2.1"
 
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
+
 dependencies {
     implementation(project(":jablib"))
 
@@ -19,9 +22,10 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
-    implementation("org.openjfx:javafx-base:24.0.1")
-    implementation("org.openjfx:javafx-controls:24.0.1")
-    implementation("org.openjfx:javafx-fxml:24.0.1")
+    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
+    // implementation("org.openjfx:javafx-graphics:$javafxVersion:$javafxPlatform")
 
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")

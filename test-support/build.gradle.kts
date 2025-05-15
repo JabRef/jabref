@@ -2,12 +2,15 @@ plugins {
     id("buildlogic.java-common-conventions")
 }
 
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
+
 dependencies {
     implementation(project(":jablib"))
 
-    implementation("org.openjfx:javafx-base:24.0.1")
-    implementation("org.openjfx:javafx-controls:24.0.1")
-    implementation("org.openjfx:javafx-fxml:24.0.1")
+    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")

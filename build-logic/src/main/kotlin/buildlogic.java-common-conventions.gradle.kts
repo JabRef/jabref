@@ -31,6 +31,9 @@ dependencies {
     }
 }
 
+/*
+// Source: https://github.com/jjohannes/java-module-system/blob/main/gradle/plugins/src/main/kotlin/targets.gradle.kts
+// Configure variants for OS
 javaModulePackaging {
     target("ubuntu-22.04") {
         operatingSystem = OperatingSystemFamily.LINUX
@@ -54,7 +57,10 @@ javaModulePackaging {
     }
     // primaryTarget(target("macos-14"))
 }
+*/
 
+// Tell gradle which jar to use for which platform
+// Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
 jvmDependencyConflicts.patch {
     listOf("base", "controls", "fxml", "graphics", "swing", "web").forEach { jfxModule ->
         module("org.openjfx:javafx-$jfxModule") {
@@ -65,7 +71,26 @@ jvmDependencyConflicts.patch {
             addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
         }
     }
+    // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L9
+    module("com.google.guava:guava") {
+        removeDependency("com.google.code.findbugs:jsr305")
+        removeDependency("org.checkerframework:checker-qual")
+        removeDependency("com.google.errorprone:error_prone_annotations")
+    }
 }
+
+val os = org.gradle.internal.os.OperatingSystem.current()
+val arch = System.getProperty("os.arch")
+val javafxPlatform = when {
+    os.isWindows -> "win"
+    os.isMacOsX && arch == "aarch64" -> "mac-aarch64"
+    os.isMacOsX -> "mac"
+    os.isLinux && arch == "aarch64" -> "linux-aarch64"
+    os.isLinux -> "linux"
+    else -> error("Unsupported OS/arch: ${os.name} / $arch")
+}
+
+project.extra["javafxPlatform"] = javafxPlatform
 
 extraJavaModuleInfo {
     failOnMissingModuleInfo = false
@@ -86,19 +111,17 @@ extraJavaModuleInfo {
     }
 
      */
-    /*
     module("org.openjfx:javafx-controls", "javafx.controls") {
         overrideModuleName()
         preserveExisting()
-        /*
         exports("com.sun.javafx.scene.control")
+        /*
         exports("com.sun.javafx.scene.control.behavior")
         exports("com.sun.javafx.scene.control.inputmat")
         opens("javafx.scene.control", "com.sun.javafx.scene.control", "javafx.scene.control.skin")
         */
     }
 
-     */
     //module("org.openjfx:javafx-graphics", "javafx.graphics") {
         //overrideModuleName()
         //preserveExisting()
@@ -115,23 +138,23 @@ extraJavaModuleInfo {
     }
     */
 
-    /*
     // Based on module-info.class in https://repo1.maven.org/maven2/org/controlsfx/controlsfx/11.2.2/
-    module("org.openjfx:javafx-controls", "org.controlsfx.controls") {
+    module("org.openjfx:javafx-controls", "javafx.controls") {
+        overrideModuleName()
+
         patchRealModule()
 
         exportAllPackages() // shortcut to just export everything, can be replaced with a dedicated list
 
-        opens("org.controlsfx.control", "org.controlsfx.fxsampler")
-        opens("org.controlsfx.control.tableview2", "org.controlsfx.fxsampler");
+        // opens("org.controlsfx.control", "org.controlsfx.fxsampler")
+        // opens("org.controlsfx.control.tableview2", "org.controlsfx.fxsampler");
         opens("impl.org.controlsfx.skin");
 
-        uses("org.controlsfx.glyphfont.GlyphFont");
+        // uses("org.controlsfx.glyphfont.GlyphFont");
 
         // Automatically reconstructed from META-INF
         // provides org.controlsfx.glyphfont.GlyphFont with org.controlsfx.glyphfont.FontAwesome;
     }
-     */
 }
 
 testing {

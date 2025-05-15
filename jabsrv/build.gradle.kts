@@ -15,6 +15,9 @@ application{
     )
 }
 
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
+
 dependencies {
     implementation(project(":jablib"))
 
@@ -63,9 +66,9 @@ dependencies {
     implementation("org.jabref:afterburner.fx:2.0.0") {
         exclude( group = "org.openjfx")
     }
-    implementation("org.openjfx:javafx-base:24.0.1")
-    implementation("org.openjfx:javafx-controls:24.0.1")
-    implementation("org.openjfx:javafx-fxml:24.0.1")
+    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
 
     implementation("net.harawata:appdirs:1.4.0")
 
