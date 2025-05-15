@@ -199,6 +199,30 @@ jobs:
         if: failure()
         run: scripts/after-failure.sh
 
+  tests-windows:
+    name: Unit tests (Windows) – ${{ matrix.module }}
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        module: [jablib]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Run ${{ matrix.module }} tests
+        run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        env:
+          CI: "true"
+
   databasetests:
     name: Database tests
     runs-on: ubuntu-latest
