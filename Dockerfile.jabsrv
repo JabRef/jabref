@@ -1,3 +1,5 @@
+LABEL org.opencontainers.image.source https://github.com/JabRef/jabref
+
 FROM gradle:jdk24-noble AS build
 
 WORKDIR /app
