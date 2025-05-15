@@ -37,7 +37,8 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import static org.jabref.gui.edit.automaticfiededitor.AbstractAutomaticFieldEditorTabViewModel.LOGGER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WelcomeTab extends Tab {
 
@@ -54,6 +55,7 @@ public class WelcomeTab extends Tab {
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
     private final BuildInfo buildInfo;
+    private static final Logger LOGGER = LoggerFactory.getLogger(WelcomeTab.class);
 
     public WelcomeTab(LibraryTabContainer tabContainer,
                       GuiPreferences preferences,
@@ -139,11 +141,10 @@ public class WelcomeTab extends Tab {
         openExampleLibraryLink.setOnAction(e -> {
             try (InputStream in = WelcomeTab.class.getClassLoader().getResourceAsStream("Chocolate.bib")) {
                 if (in == null) {
-                    LOGGER.error("Example library file not found.");
+                    LOGGER.warn("Example library file not found.");
                     return;
                 }
-                Reader reader;
-                reader = Importer.getReader(in);
+                Reader reader = Importer.getReader(in);
                 BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
                 ParserResult result = bibtexParser.parse(reader);
                 BibDatabaseContext databaseContext = result.getDatabaseContext();
