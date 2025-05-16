@@ -1,0 +1,22 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+
+//DESCRIPTION jabkit - mange BibTeX files using JabRef
+
+//JAVA 24
+
+//SOURCES org/jabref/JabKit.java
+//SOURCES org/jabref/cli
+
+//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
+
+//DEPS org.jabref:jablib:0.1.0-SNAPSHOT
+//DEPS info.picocli:picocli:4.7.7
+
+/// This class is required for [jbang](https://www.jbang.dev/)
+import org.jabref.JabKit;
+
+public class Launcher {
+    public static void main(String[] args) {
+        JabKit.main(args);
+    }
+}
