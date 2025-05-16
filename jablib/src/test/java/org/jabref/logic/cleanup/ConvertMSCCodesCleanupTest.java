@@ -5,18 +5,18 @@ import java.util.Optional;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
+import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.FieldChange;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,23 +45,23 @@ class ConvertMSCCodesCleanupTest {
     @Test
     void cleanupConvertsValidMSCCode() {
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES);
-        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E72");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E75");
 
         worker.cleanup(preset, entry);
 
         Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertEquals("Theory of fuzzy sets - etc.", keywords.get());
+        assertEquals("Applications of set theory", keywords.get());
     }
 
     @Test
     void cleanupPreservesNonMSCKeywords() {
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES);
-        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E72, Machine Learning, Artificial Intelligence");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E75, Machine Learning, Artificial Intelligence");
 
         worker.cleanup(preset, entry);
 
         Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertEquals("Theory of fuzzy sets - etc.,Machine Learning,Artificial Intelligence", keywords.get());
+        assertEquals("Applications of set theory,Machine Learning,Artificial Intelligence", keywords.get());
     }
 
     @Test
@@ -88,12 +88,12 @@ class ConvertMSCCodesCleanupTest {
     @Test
     void cleanupHandlesMultipleMSCCodes() {
         CleanupPreferences preset = new CleanupPreferences(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES);
-        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E72, 68T01");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E75, 68T01");
 
         worker.cleanup(preset, entry);
 
         Optional<String> keywords = entry.getField(StandardField.KEYWORDS);
-        assertEquals("Theory of fuzzy sets - etc.,General topics in artificial intelligence", keywords.get());
+        assertEquals("Applications of set theory,General topics in artificial intelligence", keywords.get());
     }
 
     @Test
@@ -102,8 +102,8 @@ class ConvertMSCCodesCleanupTest {
         BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E72, Machine vision and scene understanding");
 
         List<FieldChange> changes = semicolonCleanup.cleanup(entry);
-        //"68T45": "Machine vision and scene understanding"
-        assertEquals("03E72,68T45", changes.get(0).getNewValue());
+        // "68T45": "Machine vision and scene understanding"
+        assertEquals("03E72,68T45", changes.getFirst().getNewValue());
     }
 
     @Test
@@ -128,22 +128,22 @@ class ConvertMSCCodesCleanupTest {
     void cleanupWorksWithDifferentSeparator() {
         // Test with semicolon separator
         ConvertMSCCodesCleanup semicolonCleanup = new ConvertMSCCodesCleanup(new BibEntryPreferences(';'), true);
-        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E72; Machine Learning");
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "03E75; Machine Learning");
 
         List<FieldChange> changes = semicolonCleanup.cleanup(entry);
 
-        assertEquals("Theory of fuzzy sets - etc.;Machine Learning", changes.get(0).getNewValue());
+        assertEquals("Applications of set theory;Machine Learning", changes.getFirst().getNewValue());
     }
 
     @Test
     void cleanupCanConvertDescriptionsBackToCodes() {
         // Test converting descriptions back to codes
-        ConvertMSCCodesCleanup inverseCleanup = new ConvertMSCCodesCleanup(new BibEntryPreferences(','),false);
-        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "Theory of fuzzy sets - etc., Machine Learning");
+        ConvertMSCCodesCleanup inverseCleanup = new ConvertMSCCodesCleanup(new BibEntryPreferences(','), false);
+        BibEntry entry = new BibEntry().withField(StandardField.KEYWORDS, "Applications of set theory, Machine Learning");
 
         List<FieldChange> changes = inverseCleanup.cleanup(entry);
 
         assertFalse(changes.isEmpty());
-        assertEquals("03E72,Machine Learning", changes.get(0).getNewValue());
+        assertEquals("03E75,Machine Learning", changes.getFirst().getNewValue());
     }
 }

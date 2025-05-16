@@ -4,10 +4,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 
-import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
 import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.FieldChange;
@@ -42,7 +40,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
 
         // Check for valid mapping of msc codes
         if (resourceUrl == null) {
-            logger.error(Localization.lang("Resource not found: msc_codes.json"));
+            logger.error("Resource not found: msc_codes.json");
             conversionPossible = false;
         } else {
             try {
@@ -51,7 +49,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                     conversionPossible = true;
                 }
             } catch (MscCodeLoadingException e) {
-                logger.error(Localization.lang("Error loading MSC codes:", e));
+                logger.error("Error loading MSC codes:", e);
                 conversionPossible = false;
             }
         }
@@ -120,16 +118,13 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
 
-//            if (!Platform.isFxApplicationThread()) {
-//                // If the thread is not JavaFX and Editor is showing avoid error by adding to queue
-//                Platform.runLater(() -> {
-//                    entry.setField(StandardField.KEYWORDS, newValue);
-//                    changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-//                });
-//            } else {
+//
+            try {
                 entry.setField(StandardField.KEYWORDS, newValue);
                 changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-//            }
+            } catch (RuntimeException e) {
+                logger.error("Error while converting MSC codes", e);
+            }
         }
 
         return changes;

@@ -42,6 +42,7 @@ jdk-14/
 
 # Python
 __pycache__/
+venv
 
 # Snap
 parts/

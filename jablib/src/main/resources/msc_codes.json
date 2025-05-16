@@ -1,5 +1,5 @@
 {
-git commit -a  "00-01": "Introductory exposition (textbooks tutorial papers etc.) pertaining to mathematics in general",
+  "00-01": "Introductory exposition (textbooks tutorial papers etc.) pertaining to mathematics in general",
   "00-02": "Research exposition (monographs survey articles) pertaining to mathematics in general",
   "00Axx": "General and miscellaneous specific topics",
   "00A05": "Mathematics in general",
@@ -184,7 +184,7 @@ git commit -a  "00-01": "Introductory exposition (textbooks tutorial papers etc.
   "03E60": "Determinacy principles",
   "03E65": "Other set-theoretic hypotheses and axioms",
   "03E70": "Nonclassical and second-order set theories",
-  "03E72": "28E10]",
+  "03E72": "Theory of fuzzy sets",
   "03E75": "Applications of set theory",
   "03E99": "03E99 None of the above but in this section",
   "03Fxx": "Proof theory and constructive mathematics",

@@ -11,12 +11,12 @@ import math
 def extract_text_from_pdf(pdf_path, start_page=0, end_page=None):
     """
     Extract text from a PDF file with page range limits.
-    
+
     Args:
         pdf_path (str): Path to the PDF file
         start_page (int): First page to extract (0-indexed)
         end_page (int): Last page to extract (exclusive), None for all pages
-        
+
     Returns:
         str: Extracted text from the specified PDF pages
     """
@@ -25,22 +25,22 @@ def extract_text_from_pdf(pdf_path, start_page=0, end_page=None):
         with open(pdf_path, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
             total_pages = len(pdf_reader.pages)
-            
+
             if start_page < 0:
                 start_page = 0
             if end_page is None or end_page > total_pages:
                 end_page = total_pages
-                
+
             #print(f"\nExtracting text from pages {start_page+1} to {end_page} (of {total_pages} total pages)\n")
-            
+
             # get from specified pages only
             for page_num in range(start_page, end_page):
                 page = pdf_reader.pages[page_num]
                 text += page.extract_text()
                 text += "\n"  # page separator
-                
-      
-                
+
+
+
         return text
     except Exception as e:
         print(f"Error extracting text from PDF: {e}")
@@ -63,7 +63,7 @@ def clean_pdf_text(text):
     # Â, Ê, Î, Ô, Û
     # à, è, ì, ò, ù,
     # À, È, Ì, Ò, Ù ≥
-    
+
     text = text.replace('\f', 'fi')
     text = text.replace(",", "")
     text = text.replace('\r;\u000e', 'gamma; delta')
@@ -94,7 +94,7 @@ def clean_pdf_text(text):
     text= text.replace('\u0013 Á', 'Á') #Á
     text= text.replace('\u0013 I', 'Í') #Í
     text= text.replace('\u0013 O', 'Ò') #Ò
-    text= text.replace('\u0013 U', 'Ù') #Ù 
+    text= text.replace('\u0013 U', 'Ù') #Ù
     text= text.replace('\u0013 n', 'ń') #ń
     text= text.replace('\u0014C', 'ˇC') #ˇC
     text= text.replace('\u0014A', 'ˇA') #ˇA
@@ -103,14 +103,14 @@ def clean_pdf_text(text):
     text= text.replace('\u0014', '≤') #≥ ≤
     text= text.replace('\u0015', '≥') #≥ ≤
     text= text.replace('\u0019', 'π')#π
-    text= text.replace('\u0000', '-')#- 
+    text= text.replace('\u0000', '-')#-
     text= text.replace('\u001a', ' ⊂ ')# ⊂
-    
+
 
     return text
 
 def fix_code_specific(code):
-    """ 
+    """
     returns description for codes that weren't properly sanitized by PyPDF
 
     Args:
@@ -167,9 +167,11 @@ def fix_code_specific(code):
             return "Complex manifolds"
         case "11Txx":
             return "Finite fields and commutative rings (number-theoretic aspects)"
+        case "03E72":
+            return "Theory of fuzzy sets"
         case _:
             return -1
-        
+
 def is_page_num(text):
     if (int(text) <= 300 and len(text)<= 3):
         return True
@@ -178,10 +180,10 @@ def is_page_num(text):
 def validate_unique_pairs(msc_dict):
     """
     Validates that all code-description pairs are unique (1:1 relationship).
-    
+
     Args:
         msc_dict (dict): Dictionary with MSC codes as keys and descriptions as values
-        
+
     Returns:
         tuple: (is_valid, issues)
             - is_valid (bool): True if all pairs are unique, False otherwise
@@ -192,14 +194,14 @@ def validate_unique_pairs(msc_dict):
         "duplicate_codes": [],
         "duplicate_descriptions": []
     }
-    
+
     # create reverse mapping (description -> [codes])
     desc_to_codes = {}
     for code, desc in msc_dict.items():
         if desc not in desc_to_codes:
             desc_to_codes[desc] = []
         desc_to_codes[desc].append(code)
-    
+
     # check for descriptions that map to multiple codes
     for desc, codes in desc_to_codes.items():
         if len(codes) > 1:
@@ -208,13 +210,13 @@ def validate_unique_pairs(msc_dict):
                 "description": desc,
                 "codes": codes
             })
-    
+
     return is_valid, issues
 
 def report_validation_issues(issues):
     """
     Reports validation issues found in the MSC code-description pairs.
-    
+
     Args:
         issues (dict): Dictionary with information about non-unique pairs
     """
@@ -236,29 +238,29 @@ def parse_msc_codes(pdf_path):
     """Parse Mathematics Subject Classification (MSC) codes from a PDF file."""
 
     msc_dict = {}
-    
+
     content = extract_text_from_pdf(pdf_path, 3, 224)
-    
+
     if not content:
         print("Failed to extract text from PDF or the PDF is empty.")
         return msc_dict
-    
+
     content = clean_pdf_text(content)
-    
+
     # identify all MSC codes
     code_pattern = r'\n(\d{2}[A-Z]?(?:-[A-Z]{2}|-\d{2}|\d{2}|[A-Z]{2}|[a-z]{2})?)\s+'
     code_positions = [(m.group(1), m.start()) for m in re.finditer(code_pattern, content)]
-    
+
     code_positions.append(("END", len(content)))
-    
+
     # extract full description
     for i in range(len(code_positions) - 1):
         code = code_positions[i][0]
         start_pos = code_positions[i][1]
         end_pos = code_positions[i+1][1]
-        
+
         section_text = content[start_pos:end_pos].strip()
-        
+
         if(len(code) <= 2 and is_page_num(code)):
             code = section_text.split(' ')[0].split('\n')[1] # used to replace page number with code
         if(not code.endswith("99")):
@@ -273,12 +275,12 @@ def parse_msc_codes(pdf_path):
             msc_dict["57N50"] = description2
 
         description = description.replace('\n', ' ').strip()
-        
+
         if not description.startswith("[See") and not description.startswith("For"):
 
             if fix_code_specific(code) != -1:
                 description = fix_code_specific(code)
-            
+
             msc_dict[code] = description
             print(f"\rFOUND {len(msc_dict)} MSC codes with descriptions", end="", flush=True)
 
@@ -304,11 +306,11 @@ def main():
        exit()
 
     pdf_path = sys.argv[1]
-    
+
     if(not '.pdf' in pdf_path):
         print(f"Expected pdf file, received {pdf_path}")
         exit()
-    
+
     # parse the file
     msc_dict = parse_msc_codes(pdf_path)
     print()
@@ -321,7 +323,7 @@ def main():
         print(f"Are values unique: {is_valid}")
     else:
         report_validation_issues(issues)
-    
+
     # save the dictionary to a file
     with open('msc_codes.json', 'w', encoding='utf-8') as f:
         json.dump(msc_dict, f, ensure_ascii=False, indent=2)

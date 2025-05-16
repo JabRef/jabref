@@ -61,13 +61,13 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         URL resourceUrl = KeywordsEditor.class.getClassLoader().getResource("msc_codes.json");
 
         if (resourceUrl == null) {
-            LOGGER.error(Localization.lang("Resource not found: msc_codes.json"));
+            LOGGER.error("Resource not found: msc_codes.json");
             mscmap = HashBiMap.create();
         }
 
         try {
             Optional<HashBiMap<String, String>> optionalMscCodes = MscCodeUtils.loadMscCodesFromJson(resourceUrl);
-            
+
             if (optionalMscCodes.isPresent()) {
                 mscmap = optionalMscCodes.get();
             } else {
@@ -153,7 +153,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             }
         });
 
-        Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());  
+        Bindings.bindContentBidirectional(keywordTagsField.getTags(), viewModel.keywordListProperty());
     }
 
     private Node createTag(Keyword keyword) {
@@ -196,8 +196,8 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
                 // Uninstall tooltip when mouse exits
                 Tooltip.uninstall(tagLabel, tooltip);
             });
-        }        
-        
+        }
+
         tagLabel.setOnDragDetected(event -> {
             Dragboard db = tagLabel.startDragAndDrop(TransferMode.MOVE);
             ClipboardContent content = new ClipboardContent();
