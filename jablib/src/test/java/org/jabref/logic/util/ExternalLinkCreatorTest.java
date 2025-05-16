@@ -41,26 +41,28 @@ class ExternalLinkCreatorTest {
     void getShortScienceSearchURLEncodesUnicodeCharacters() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "歷史書 📖 📚");
         Optional<String> url = getShortScienceSearchURL(entry);
-        assertTrue(url.isPresent());
-        assertTrue(urlIsValid(url.get()));
 
         // Expected behaviour is to link to the search results page, /internalsearch, and the unicode and emojis are percent-encoded
-        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=%E6%AD%B7%E5%8F%B2%E6%9B%B8%20%F0%9F%93%96%20%F0%9F%93%9A"), url);
+        assertEquals(
+                Optional.of("https://www.shortscience.org/internalsearch?q=%E6%AD%B7%E5%8F%B2%E6%9B%B8%20%F0%9F%93%96%20%F0%9F%93%9A"),
+                url
+        );
     }
 
     @Test
     void getShortScienceSearchURLTrimsWhitespaceInTitle() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "    History Textbook   ");
         Optional<String> url = getShortScienceSearchURL(entry);
-        assertTrue(url.isPresent());
-        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=History%20Textbook"), url);
+        assertEquals(
+                Optional.of("https://www.shortscience.org/internalsearch?q=History%20Textbook"),
+                url
+        );
     }
 
     @Test
     void getShortScienceSearchURLEncodesAlreadyEncodedCharacters() {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "History%20Textbook");
         Optional<String> url = getShortScienceSearchURL(entry);
-        assertTrue(url.isPresent());
 
         // Expected behaviour is that the already encoded %20 should be treated as a literal string
         // instead of a space and be re-encoded from % to %25, making %20 as %2520
@@ -82,6 +84,9 @@ class ExternalLinkCreatorTest {
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, "JabRef bibliography management");
         Optional<String> url = getShortScienceSearchURL(entry);
         // Expected behaviour is to link to the search results page, /internalsearch
-        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management"), url);
+        assertEquals(
+                Optional.of("https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management"),
+                url
+        );
     }
 }
