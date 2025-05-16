@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,6 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,7 +51,7 @@ public class ReferImporterTest {
 
     @Test
     void isRecognizedFormat() throws IOException, URISyntaxException {
-        List<String> list = Arrays.asList("refer.bibIX.Journal.ref", "refer.bibIX.ref");
+        List<String> list = List.of("refer.bibIX.Journal.ref", "refer.bibIX.ref");
 
         for (String str : list) {
             Path file = Path.of(ReferImporterTest.class.getResource(str).toURI());
@@ -63,7 +61,7 @@ public class ReferImporterTest {
 
     @Test
     void isRecognizedFormatReject() throws IOException, URISyntaxException {
-        List<String> list = Arrays.asList("Endnote.pattern.A.enw", "IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi",
+        List<String> list = List.of("Endnote.pattern.A.enw", "IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi",
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi", "RisImporterTest1.ris",
                 "Endnote.pattern.no_enw", "empty.pdf", "pdf/annotated.pdf");
 
@@ -77,25 +75,28 @@ public class ReferImporterTest {
     void importDatabaseSingleEntryTest() throws IOException, URISyntaxException {
         Path file = Path.of(ReferImporterTest.class.getResource("refer.bibIX.Journal.ref").toURI());
         List<BibEntry> bibEntryList = referImporter.importDatabase(file).getDatabase().getEntries();
-        BibEntry entry = bibEntryList.getFirst();
+        BibEntry actualEntry = bibEntryList.getFirst();
+
+        BibEntry expectedEntry = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "AuthorL, AuthorsF I. and ContributorL, ContributorF I. and Reviewed AuthorL, ReviewedF I.")
+                .withField(StandardField.JOURNAL, "Publication")
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.VOLUME, "Volume")
+                .withField(StandardField.ISSUE, "Issue")
+                .withField(StandardField.PAGES, "Pages")
+                .withField(StandardField.SERIES, "Series")
+                .withField(StandardField.URL, "Url")
+                .withField(StandardField.ABSTRACT, "Abstract")
+                .withField(StandardField.EDITOR, "EditorL, EditorF I.")
+                .withField(StandardField.TRANSLATOR, "TranslatorL, TranslatorF I")
+                .withField(StandardField.YEAR, "2025")
+                .withField(StandardField.NOTE, "Loc. in Archive; Rights");
 
         assertEquals(1, bibEntryList.size());
-        assertEquals(StandardEntryType.Article, entry.getType());
-        assertEquals(Optional.of("Title"), entry.getField(StandardField.TITLE));
-        assertEquals(Optional.of("Volume"), entry.getField(StandardField.VOLUME));
-        assertEquals(Optional.of("Issue"), entry.getField(StandardField.ISSUE));
-        assertEquals(Optional.of("Pages"), entry.getField(StandardField.PAGES));
-        assertEquals(Optional.of("Url"), entry.getField(StandardField.URL));
-        assertEquals(Optional.of("Abstract"), entry.getField(StandardField.ABSTRACT));
-        assertEquals(Optional.of("AuthorL, AuthorsF I. and ContributorL, ContributorF I. and Reviewed AuthorL, ReviewedF I."), entry.getField(StandardField.AUTHOR));
-        assertEquals(Optional.of("EditorL, EditorF I."), entry.getField(StandardField.EDITOR));
-        assertEquals(Optional.of("TranslatorL, TranslatorF I"), entry.getField(StandardField.TRANSLATOR));
-        assertEquals(Optional.of("2025"), entry.getField(StandardField.YEAR));
-        assertEquals(Optional.of("Loc. in Archive Rights"), entry.getField(StandardField.NOTE));
+        assertEquals(expectedEntry, actualEntry);
     }
 
     @Test
-    @Disabled
     void importMultipleEntries() throws IOException, URISyntaxException {
         Path file = Path.of(ReferImporterTest.class.getResource("refer.bibIX.ref").toURI());
         List<BibEntry> bibEntries = referImporter.importDatabase(file).getDatabase().getEntries();

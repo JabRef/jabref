@@ -220,7 +220,7 @@ public class ReferImporter extends Importer {
                 // other fields e.g. header(if any), rights, table of content, government ordering, call number, price, location of archive/conference etc.
                 if (m.containsKey(StandardField.NOTE)) {
                     String oldValue = m.get(StandardField.NOTE);
-                    String newValue = (oldValue == null ? "" : oldValue + " ") + val;
+                    String newValue = (oldValue == null ? "" : oldValue + "; ") + val;
                     m.put(StandardField.NOTE, newValue);
                 } else {
                     m.put(StandardField.NOTE, val);

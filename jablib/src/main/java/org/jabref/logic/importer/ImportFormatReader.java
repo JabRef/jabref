@@ -192,7 +192,8 @@ public class ImportFormatReader {
         // Cycle through all importers:
         for (Importer imFo : formats) {
             try {
-                if (!isRecognizedFormat.apply(imFo)) {
+                if (!isRecognizedFormat.apply(imFo) || imFo.equals(new ReferImporter())) {
+                    // Refer/BibIX should be explicitly chosen by user
                     continue;
                 }
 
