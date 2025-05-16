@@ -163,8 +163,8 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 
 > [!IMPORTANT]
 > Please keep these two principles in mind when you contribute:
-> 1. Never let an LLM speak for you.
-> 2. Never let an LLM think for you.
+>   1. Never let an LLM speak for you.
+>   2. Never let an LLM think for you.
 
 More reading on that is available at <https://roe.dev/blog/using-ai-in-open-source>.
 
