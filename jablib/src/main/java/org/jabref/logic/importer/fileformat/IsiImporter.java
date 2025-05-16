@@ -29,22 +29,13 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * <p>
- * Importer for the ISI Web of Science, INSPEC and Medline format.
- * </p>
- * <p>
- * Documentation about ISI WOS format:
- * <ul>
- *
- * <li>https://web.archive.org/web/20131031052339/http://wos.isitrial.com/help/helpprn.html</li>
- * </ul>
- * <p>
- * <ul>
- * <li>Deal with capitalization correctly</li>
- * </ul>
- * </p>
- */
+/// Importer for the ISI Web of Science, INSPEC and Medline format.
+///
+/// Documentation about ISI WOS format:
+///
+///   - https://web.archive.org/web/20131031052339/http://wos.isitrial.com/help/helpprn.html
+///
+/// - Deal with capitalization correctly
 public class IsiImporter extends Importer {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsiImporter.class);
     private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");

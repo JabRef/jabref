@@ -1,5 +1,8 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.util.*
+import java.util.Calendar;
 
 plugins {
     id("buildlogic.java-common-conventions")
@@ -14,11 +17,15 @@ plugins {
     id("org.openjfx.javafxplugin") version("0.1.0")
 
     id("me.champeau.jmh") version "0.7.3"
+
+    id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
 val pdfbox = "3.0.5"
 val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
+
+var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
@@ -67,10 +74,6 @@ dependencies {
     implementation("io.github.thibaultmeyer:cuid:2.0.3")
     // endregion
 
-    // injection framework
-    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    implementation("org.glassfish.hk2:hk2-api:3.1.1")
-
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
     implementation("info.debatty:java-string-similarity:2.0.0")
 
@@ -101,6 +104,7 @@ dependencies {
     implementation("com.konghq:unirest-java-core:4.4.7")
     implementation("com.konghq:unirest-modules-gson:4.4.7")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // endregion
 
     implementation("org.slf4j:slf4j-api:2.0.17")
@@ -183,7 +187,6 @@ dependencies {
         exclude(module = "fastparse_2.13")
     }
 
-    implementation("de.rototor.snuggletex:snuggletex:1.3.0")
     implementation ("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0") {
         exclude(group = "org.apache.xmlgraphics")
     }
@@ -412,19 +415,6 @@ tasks.named<JavaCompile>("compileJava") {
 }
 */
 
-tasks.javadoc {
-    (options as StandardJavadocDocletOptions).apply {
-        encoding = "UTF-8"
-        // version = false
-        // author = false
-
-        addMultilineStringsOption("-add-exports").value = listOf(
-            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
-            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
-        )
-    }
-}
-
 tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
@@ -496,3 +486,57 @@ jacocoTestReport {
     }
 }
 */
+
+mavenPublishing {
+  configure(JavaLibrary(
+    // configures the -javadoc artifact, possible values:
+    // - `JavadocJar.None()` don't publish this artifact
+    // - `JavadocJar.Empty()` publish an emprt jar
+    // - `JavadocJar.Javadoc()` to publish standard javadocs
+    javadocJar = JavadocJar.Javadoc(),
+    // whether to publish a sources jar
+    sourcesJar = true,
+  ))
+
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+  signAllPublications()
+
+  coordinates("org.jabref", "jablib", version + "-SNAPSHOT")
+
+  pom {
+    name.set("jablib")
+    description.set("JabRef's Java library to work with BibTeX")
+    inceptionYear.set("2025")
+    url.set("https://github.com/JabRef/jabref/")
+    licenses {
+      license {
+        name.set("MIT")
+        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+      }
+    }
+    developers {
+      developer {
+        id.set("jabref")
+        name.set("JabRef Developers")
+        url.set("https://github.com/JabRef/")
+      }
+    }
+    scm {
+        url.set("https://github.com/JabRef/jabref")
+        connection.set("scm:git:https://github.com/JabRef/jabref")
+        developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+    }
+  }
+}
+
+tasks.named<Jar>("sourcesJar") {
+    dependsOn(
+        tasks.named("generateGrammarSource"),
+        tasks.named("schemaGen_org-jabref-logic-importer-fileformat-citavi")
+    )
+}
+
+tasks.withType<GenerateModuleMetadata> {
+    suppressedValidationErrors.add("enforced-platform")
+}

@@ -187,7 +187,8 @@ recipeList:
   - org.openrewrite.staticanalysis.SortedSetStreamToLinkedHashSet
   - org.openrewrite.staticanalysis.StaticMethodNotFinal
   - org.openrewrite.staticanalysis.StringLiteralEquality
-  - org.openrewrite.staticanalysis.TypecastParenPad
+  # Disabled, because of https://github.com/openrewrite/rewrite-static-analysis/issues/561
+  # - org.openrewrite.staticanalysis.TypecastParenPad
   - org.openrewrite.staticanalysis.UnwrapRepeatableAnnotations
   - org.openrewrite.staticanalysis.UpperCaseLiteralSuffixes
   - org.openrewrite.staticanalysis.UseDiamondOperator
