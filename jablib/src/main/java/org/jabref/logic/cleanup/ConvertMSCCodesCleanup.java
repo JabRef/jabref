@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
@@ -117,14 +118,14 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
         if (hasChanges) {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
-
-//
-            try {
-                entry.setField(StandardField.KEYWORDS, newValue);
-                changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-            } catch (RuntimeException e) {
-                logger.error("Error while converting MSC codes", e);
+            if (!Platform.isFxApplicationThread()) {
+                Platform.runLater(() -> {
+                        entry.setField(StandardField.KEYWORDS, newValue);
+                        changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
+                });
             }
+            entry.setField(StandardField.KEYWORDS, newValue);
+            changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
         }
 
         return changes;
