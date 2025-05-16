@@ -56,7 +56,7 @@ java {
 }
 
 tasks.javadoc {
-    ( options asStandardJavadocDocletOptions).apply {
+    ( options as StandardJavadocDocletOptions).apply {
         encoding = "UTF-8"
         // version = false
         // author = false
