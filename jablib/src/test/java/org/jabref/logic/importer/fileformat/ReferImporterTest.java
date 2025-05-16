@@ -2,7 +2,7 @@ package org.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
@@ -144,16 +144,13 @@ public class ReferImporterTest {
                 %A editor
                 """;
 
-        try (StringReader stringReader = new StringReader(refEntry);
-             BufferedReader bufferedReader = new BufferedReader(stringReader)) {
-            List<BibEntry> bibEntryList = referImporter.importDatabase(bufferedReader).getDatabase().getEntries();
+        BibEntry entry = referImporter.importDatabase(new BufferedReader(Reader.of(refEntry)))
+                                                   .getDatabase()
+                                                   .getEntries()
+                                                   .getFirst();
 
-            BibEntry entry = bibEntryList.getFirst();
-
-            assertEquals(1, bibEntryList.size());
-            assertEquals(StandardEntryType.Book, entry.getType());
-            assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));
-            assertEquals(Optional.of("testE and testEL, testEF. and editor"), entry.getField(StandardField.EDITOR));
-        }
+        assertEquals(StandardEntryType.Book, entry.getType());
+        assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));
+        assertEquals(Optional.of("testE and testEL, testEF. and editor"), entry.getField(StandardField.EDITOR));
     }
 }
