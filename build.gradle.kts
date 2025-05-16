@@ -12,8 +12,6 @@ plugins {
 
     // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
     id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
-
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
 // OpenRewrite should rewrite all sources
@@ -121,14 +119,4 @@ tasks.register("run") {
     group = "application"
     description = "Runs the GUI"
     dependsOn(":jabgui:run")
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            stagingProfileId = System.getenv("SONATYPE_STAGING_PROFILE_ID")
-            username = System.getenv("SONATYPE_USERNAME")
-            password = System.getenv("SONATYPE_PASSWORD")
-        }
-    }
 }

@@ -15,7 +15,8 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    id("java-project-publishable")
+    `maven-publish`
+    `signing`
 }
 
 val pdfbox = "3.0.5"
@@ -497,6 +498,13 @@ jacocoTestReport {
 */
 
 publishing {
+        repositories {
+        maven {
+            val releasesRepoUrl = layout.buildDirectory.dir("repos/releases")
+            val snapshotsRepoUrl = layout.buildDirectory.dir("repos/snapshots")
+            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
+        }
+    }
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
@@ -519,4 +527,8 @@ publishing {
             }
         }
     }
+}
+
+signing {
+    sign(publishing.publications["mavenJava"])
 }
