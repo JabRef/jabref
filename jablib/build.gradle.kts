@@ -14,6 +14,9 @@ plugins {
     id("org.openjfx.javafxplugin") version("0.1.0")
 
     id("me.champeau.jmh") version "0.7.3"
+
+    `maven-publish`
+    `signing`
 }
 
 val pdfbox = "3.0.5"
@@ -493,3 +496,28 @@ jacocoTestReport {
     }
 }
 */
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            from(components["java"])
+
+            pom {
+                name.set("jablib")
+                description.set("JabRef's Java library to work with BibTeX")
+                url.set("https://github.com/JabRef/jabref/tree/main/jablib")
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/JabRef/jabref")
+                    connection.set("scm:git:https://github.com/JabRef/jabref")
+                    developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+                }
+            }
+        }
+    }
+}
