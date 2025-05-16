@@ -25,6 +25,8 @@ val pdfbox = "3.0.5"
 val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
 
+var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
+
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
 
@@ -501,7 +503,7 @@ mavenPublishing {
 
   signAllPublications()
 
-    coordinates("com.example.mylibrary", "mylibrary-runtime", "1.0.3-SNAPSHOT")
+  coordinates("org.jabref", "jablib", version)
 
   pom {
     name.set("jablib")
