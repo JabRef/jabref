@@ -61,7 +61,7 @@ tasks.javadoc {
         // version = false
         // author = false
 
-        addMultilineStringsOption("tag").setValue(listOf("implNote"))
+        addMultilineStringsOption("tag").setValue(listOf("apiNote", "implNote"))
 
         // We cross-link to (non-visible) tests; therefore: no reference check
         addBooleanOption("Xdoclint:all,-reference", true)
