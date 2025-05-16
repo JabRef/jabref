@@ -187,7 +187,6 @@ dependencies {
         exclude(module = "fastparse_2.13")
     }
 
-    implementation("de.rototor.snuggletex:snuggletex:1.3.0")
     implementation ("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0") {
         exclude(group = "org.apache.xmlgraphics")
     }
