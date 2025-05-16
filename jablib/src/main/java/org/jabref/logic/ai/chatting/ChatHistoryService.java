@@ -17,7 +17,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.eventbus.Subscribe;
@@ -30,9 +29,9 @@ import org.slf4j.LoggerFactory;
 /// It currently resides in the UI package because it relies on the `org.jabref.gui.StateManager` to get the open databases and to find the correct [BibDatabaseContext] based on an entry.
 ///
 /// The returned chat history is a [ObservableList]. So chat history exists for every possible
-/// [BibEntry] and [AbstractGroup]. The chat history is stored in runtime.
+/// [BibEntry] and [org.jabref.model.groups.AbstractGroup]. The chat history is stored in runtime.
 ///
-/// To save and load chat history, [BibEntry] and [AbstractGroup] must satisfy several constraints.
+/// To save and load chat history, [BibEntry] and [org.jabref.model.groups.AbstractGroup] must satisfy several constraints.
 /// Serialization and deserialization is handled in [ChatHistoryStorage].
 ///
 /// Constraints for serialization and deserialization of a chat history of a [BibEntry]:
