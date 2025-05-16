@@ -19,33 +19,25 @@ import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * This class is essentially a wrapper around {@link javafx.concurrent.Task}.
- * We cannot use {@link javafx.concurrent.Task} directly since it runs certain update notifications on the JavaFX thread,
- * and so makes testing harder.
- * We take the opportunity and implement a fluid interface.
- * <p>
- * A task created here is to be submitted to {@link TaskExecutor#execute(BackgroundTask)} to submit.
- * This class is injected at <code>@Inject TaskExecutor</code>
- * <p>
- * Example (for using the fluent interface)
- * <pre>{@code
- * BackgroundTask
- *     .wrap(() -> ...)
- *     .showToUser(true)
- *     .onRunning(() -> ...)
- *     .onSuccess(() -> ...)
- *     .onFailure(() -> ...)
- *     .executeWith(taskExecutor);
- * }</pre>
- * Background: The task executor one takes care to show it in the UI. See {@link org.jabref.gui.StateManager#addBackgroundTask(BackgroundTask, Task)} for details.
- * <p>
- * TODO: Think of migrating to <a href="https://github.com/ReactiveX/RxJava#simple-background-computation">RxJava</a>;
- *       <a href="https://www.baeldung.com/java-completablefuture">CompletableFuture</a> do not seem to support everything.
- *       If this is not possible, add an @implNote why.
- *
- * @param <V> type of the return value of the task
- */
+/// This class is essentially a wrapper around [javafx.concurrent.Task].
+/// We cannot use [javafx.concurrent.Task] directly since it runs certain update notifications on the JavaFX thread,
+/// and so makes testing harder.
+/// We take the opportunity and implement a fluid interface.
+///
+/// A task created here is to be submitted to `#execute(BackgroundTask)` to submit.
+/// This class is injected at `@Inject TaskExecutor`
+///
+/// Example (for using the fluent interface)
+///
+///     BackgroundTask.wrap(() -> ...).showToUser(true).onRunning(() -> ...).onSuccess(() -> ...).onFailure(() -> ...).executeWith(taskExecutor);
+///
+/// Background: The task executor one takes care to show it in the UI. See `org.jabref.gui.StateManager#addBackgroundTask(BackgroundTask, Task)` for details.
+///
+/// TODO: Think of migrating to <a href="https://github.com/ReactiveX/RxJava#simple-background-computation">RxJava</a>;
+///       <a href="https://www.baeldung.com/java-completablefuture">CompletableFuture</a> do not seem to support everything.
+///       If this is not possible, add an @implNote why.
+///
+/// @param <V> type of the return value of the task
 public abstract class BackgroundTask<V> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundTask.class);

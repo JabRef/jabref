@@ -17,19 +17,17 @@ import org.jabref.model.entry.BibEntry;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-/**
- * Intermediate class to bundle all PDF analysis steps. {@link PdfImporter}s are also {@link org.jabref.logic.importer.Importer}s,
- * which allows user for more fine-grained control of how {@link BibEntry} is extracted from a PDF file.
- * <p>
- * {@link PdfImporter}s are used in two places in JabRef:
- * 1. {@link PdfMergeMetadataImporter}: uses several {@link PdfImporter} and automatically
- *    merges them into 1 {@link BibEntry}.
- * 2. {@link org.jabref.gui.externalfiles.PdfMergeDialog}: also uses several {@link PdfImporter}, but
- *    it shows a merge dialog (instead of automatic merging).
- * <p>
- * Note, that this step should not add PDF file to {@link BibEntry}, it will be finally added either in
- * {@link PdfImporter#importDatabase(Path)} or {@link PdfMergeMetadataImporter}.
- */
+/// Intermediate class to bundle all PDF analysis steps. [PdfImporter]s are also [org.jabref.logic.importer.Importer]s,
+/// which allows user for more fine-grained control of how [BibEntry] is extracted from a PDF file.
+///
+/// [PdfImporter]s are used in two places in JabRef:
+/// 1. [PdfMergeMetadataImporter]: uses several [PdfImporter] and automatically
+///    merges them into 1 [BibEntry].
+/// 2. `org.jabref.gui.externalfiles.PdfMergeDialog` also uses several [PdfImporter], but
+///    it shows a merge dialog (instead of automatic merging).
+///
+/// Note, that this step should not add PDF file to [BibEntry], it will be finally added either in
+/// [#importDatabase(Path)] or [PdfMergeMetadataImporter].
 public abstract class PdfImporter extends Importer {
     public abstract List<BibEntry> importDatabase(Path filePath, PDDocument document) throws IOException, ParseException;
 
