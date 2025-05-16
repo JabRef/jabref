@@ -517,9 +517,9 @@ mavenPublishing {
     }
     developers {
       developer {
-        id.set("username")
-        name.set("User Name")
-        url.set("https://github.com/username/")
+        id.set("jabref")
+        name.set("JabRef Developers")
+        url.set("https://github.com/JabRef/")
       }
     }
     scm {
