@@ -162,8 +162,8 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 #### Notes on AI usage
 
 Please keep these two principles in mind when you contribute:
-
 > [!IMPORTANT]
+>
 > 1. Never let an LLM speak for you.
 > 2. Never let an LLM think for you.
 
