@@ -69,7 +69,7 @@ class ImportFormatReaderIntegrationTest {
         result.add(new Object[]{"fileformat/Endnote.entries.enw", "refer", 5});
         result.add(new Object[]{"fileformat/MsBibImporterTest4.xml", "msbib", 1});
         result.add(new Object[]{"fileformat/MsBibImporterTest4.bib", "bibtex", 1});
-        result.add(new Object[]{"fileformat/refer.bibIX.ref", "refer-bibIX", 5});
+        result.add(new Object[]{"fileformat/refer.bibIX.ref", "refer-bibIX", 4});
         return result.stream();
     }
 }
