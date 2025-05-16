@@ -11,11 +11,9 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.util.io.FileUtil;
 
-/**
- * URL utilities for URLs in the JabRef logic.
- * <p>
- * For GUI-oriented URL utilities see {@link org.jabref.gui.fieldeditors.URLUtil}.
- */
+/// URL utilities for URLs in the JabRef logic.
+///
+/// For GUI-oriented URL utilities see `org.jabref.gui.fieldeditors.URLUtil`
 public class URLUtil {
 
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
@@ -76,14 +74,12 @@ public class URLUtil {
         }
     }
 
-    /**
-     * Checks whether the given String is a URL.
-     * <p>
-     * Currently only checks for a protocol String.
-     *
-     * @param url the String to check for a URL
-     * @return true if <c>url</c> contains a valid URL
-     */
+    /// Checks whether the given String is a URL.
+    ///
+    /// Currently only checks for a protocol String.
+    ///
+    /// @param url the String to check for a URL
+    /// @return true if `url` contains a valid URL
     public static boolean isURL(String url) {
         try {
             create(url);

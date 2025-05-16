@@ -22,123 +22,122 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Imports a New Economics Papers-Message from the REPEC-NEP Service.
- * <p>
- * <p><a href="http://www.repec.org">RePEc (Research Papers in Economics)</a>
- * is a collaborative effort of over 100 volunteers in 49 countries
- * to enhance the dissemination of research in economics. The heart of
- * the project is a decentralized database of working papers, journal
- * articles and software components. All RePEc material is freely available.</p>
- * At the time of writing RePEc holds over 300.000 items.</p>
- * <p>
- * <p><a href="http://nep.repec.org">NEP (New Economic Papers)</a> is an announcement
- * service which filters information on new additions to RePEc into edited
- * reports. The goal is to provide subscribers with up-to-date information
- * to the research literature.</p>
- * <p>
- * <p>This importer is capable of importing NEP messages into JabRef.</p>
- * <p>
- * <p>There is no officially defined message format for NEP. NEP messages are assumed to have
- * (and almost always have) the form given by the following semi-formal grammar:
- * <pre>
- * NEPMessage:
- *       MessageSection NEPMessage
- *       MessageSection
- *
- * MessageSection:
- *       OverviewMessageSection
- *       OtherMessageSection
- *
- * # we skip the overview
- * OverviewMessageSection:
- *       'In this issue we have: ' SectionSeparator OtherStuff
- *
- * OtherMessageSection:
- *       SectionSeparator  OtherMessageSectionContent
- *
- * # we skip other stuff and read only full working paper references
- * OtherMessageSectionContent:
- *       WorkingPaper EmptyLine OtherMessageSectionContent
- *       OtherStuff EmptyLine OtherMessageSectionContent
- *       ''
- *
- * OtherStuff:
- *       NonEmptyLine OtherStuff
- *       NonEmptyLine
- *
- * NonEmptyLine:
- *       a non-empty String that does not start with a number followed by a '.'
- *
- * # working papers are recognized by a number followed by a '.'
- * # in a non-overview section
- * WorkingPaper:
- *       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
- *       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
- *
- * TitleString:
- *       a String that may span several lines and should be joined
- *
- * # there must be at least one author
- * Authors:
- *       Author '\n' Authors
- *       Author '\n'
- *
- * # optionally, an institution is given for an author
- * Author:
- *       AuthorName
- *       AuthorName '(' Institution ')'
- *
- * # there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
- * AuthorName:
- *       a non-empty String without '(' or ')' characters, not spanning more that one line
- *
- * Institution:
- *       a non-empty String that may span several lines
- *
- * Abstract:
- *       a (possibly empty) String that may span several lines
- *
- * AdditionalFields:
- *       AdditionalField '\n' AdditionalFields
- *       EmptyLine AdditionalFields
- *       ''
- *
- * AdditionalField:
- *       'Keywords:' KeywordList
- *       'URL:' non-empty String
- *       'Date:' DateString
- *       'JEL:' JelClassificationList
- *       'By': Authors
- *
- * KeywordList:
- *        Keyword ',' KeywordList
- *        Keyword ';' KeywordList
- *        Keyword
- *
- * Keyword:
- *        non-empty String that does not contain ',' (may contain whitespace)
- *
- * # if no date is given, the current year as given by the system clock is assumed
- * DateString:
- *        'yyyy-MM-dd'
- *        'yyyy-MM'
- *        'yyyy'
- *
- * JelClassificationList:
- *        JelClassification JelClassificationList
- *        JelClassification
- *
- * # the JEL Classifications are set into a new BIBTEX-field 'jel'
- * # they will appear if you add it as a field to one of the BIBTex Entry sections
- * JelClassification:
- *        one of the allowed classes, see http://ideas.repec.org/j/
- *
- * SectionSeparator:
- *       '\n-----------------------------'
- * </pre>
- * </p>
- */
+/// Imports a New Economics Papers-Message from the REPEC-NEP Service.
+///
+/// [RePEc (Research Papers in Economics)](http://www.repec.org)
+/// is a collaborative effort of over 100 volunteers in 49 countries
+/// to enhance the dissemination of research in economics. The heart of
+/// the project is a decentralized database of working papers, journal
+/// articles and software components. All RePEc material is freely available.
+/// At the time of writing RePEc holds over 300.000 items.
+///
+///
+/// [NEP (New Economic Papers](http://nep.repec.org) is an announcement
+/// service which filters information on new additions to RePEc into edited
+/// reports. The goal is to provide subscribers with up-to-date information
+/// to the research literature.
+///
+/// This importer is capable of importing NEP messages into JabRef.
+///
+/// There is no officially defined message format for NEP. NEP messages are assumed to have
+/// (and almost always have) the form given by the following semi-formal grammar:
+///
+/// ```
+/// NEPMessage:
+///       MessageSection NEPMessage
+///       MessageSection
+///
+/// MessageSection:
+///       OverviewMessageSection
+///       OtherMessageSection
+///
+/// # we skip the overview
+/// OverviewMessageSection:
+///       'In this issue we have: ' SectionSeparator OtherStuff
+///
+/// OtherMessageSection:
+///       SectionSeparator  OtherMessageSectionContent
+///
+/// # we skip other stuff and read only full working paper references
+/// OtherMessageSectionContent:
+///       WorkingPaper EmptyLine OtherMessageSectionContent
+///       OtherStuff EmptyLine OtherMessageSectionContent
+///       ''
+///
+/// OtherStuff:
+///       NonEmptyLine OtherStuff
+///       NonEmptyLine
+///
+/// NonEmptyLine:
+///       a non-empty String that does not start with a number followed by a '.'
+///
+/// # working papers are recognized by a number followed by a '.'
+/// # in a non-overview section
+/// WorkingPaper:
+///       Number'.' WhiteSpace TitleString EmptyLine Authors EmptyLine Abstract AdditionalFields
+///       Number'.' WhiteSpace TitleString AdditionalFields Abstract AdditionalFields
+///
+/// TitleString:
+///       a String that may span several lines and should be joined
+///
+/// # there must be at least one author
+/// Authors:
+///       Author '\n' Authors
+///       Author '\n'
+///
+/// # optionally, an institution is given for an author
+/// Author:
+///       AuthorName
+///       AuthorName '(' Institution ')'
+///
+/// # there are no rules about the name, it may be firstname lastname or lastname, firstname or anything else
+/// AuthorName:
+///       a non-empty String without '(' or ')' characters, not spanning more that one line
+///
+/// Institution:
+///       a non-empty String that may span several lines
+///
+/// Abstract:
+///       a (possibly empty) String that may span several lines
+///
+/// AdditionalFields:
+///       AdditionalField '\n' AdditionalFields
+///       EmptyLine AdditionalFields
+///       ''
+///
+/// AdditionalField:
+///       'Keywords:' KeywordList
+///       'URL:' non-empty String
+///       'Date:' DateString
+///       'JEL:' JelClassificationList
+///       'By': Authors
+///
+/// KeywordList:
+///        Keyword ',' KeywordList
+///        Keyword ';' KeywordList
+///        Keyword
+///
+/// Keyword:
+///        non-empty String that does not contain ',' (may contain whitespace)
+///
+/// # if no date is given, the current year as given by the system clock is assumed
+/// DateString:
+///        'yyyy-MM-dd'
+///        'yyyy-MM'
+///        'yyyy'
+///
+/// JelClassificationList:
+///        JelClassification JelClassificationList
+///        JelClassification
+///
+/// # the JEL Classifications are set into a new BIBTEX-field 'jel'
+/// # they will appear if you add it as a field to one of the BIBTex Entry sections
+/// JelClassification:
+///        one of the allowed classes, see http://ideas.repec.org/j/
+///
+/// SectionSeparator:
+///       '\n-----------------------------'
+/// ```
 public class RepecNepImporter extends Importer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RepecNepImporter.class);
