@@ -82,7 +82,8 @@ public abstract class Exporter {
                                            FilePreferences filePreferences,
                                            BibEntry entryToWriteOn,
                                            List<BibEntry> entriesToWrite,
-                                           JournalAbbreviationRepository abbreviationRepository) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+                                           JournalAbbreviationRepository abbreviationRepository)
+            throws IOException, SaveException, ParserConfigurationException, TransformerException {
         boolean writtenToAFile = false;
 
         for (LinkedFile file : entryToWriteOn.getFiles()) {
@@ -114,7 +115,8 @@ public abstract class Exporter {
     public boolean exportToFileByPath(BibDatabaseContext databaseContext,
                                       FilePreferences filePreferences,
                                       Path filePath,
-                                      JournalAbbreviationRepository abbreviationRepository) throws IOException, SaveException, ParserConfigurationException, TransformerException {
+                                      JournalAbbreviationRepository abbreviationRepository)
+            throws IOException, SaveException, ParserConfigurationException, TransformerException {
         if (!Files.exists(filePath)) {
             return false;
         }

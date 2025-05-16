@@ -67,10 +67,6 @@ dependencies {
     implementation("io.github.thibaultmeyer:cuid:2.0.3")
     // endregion
 
-    // injection framework
-    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    implementation("org.glassfish.hk2:hk2-api:3.1.1")
-
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
     implementation("info.debatty:java-string-similarity:2.0.0")
 
@@ -98,9 +94,10 @@ dependencies {
 
     // region HTTP clients
     implementation("org.jsoup:jsoup:1.20.1")
-    implementation("com.konghq:unirest-java-core:4.4.6")
-    implementation("com.konghq:unirest-modules-gson:4.4.6")
+    implementation("com.konghq:unirest-java-core:4.4.7")
+    implementation("com.konghq:unirest-modules-gson:4.4.7")
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // endregion
 
     implementation("org.slf4j:slf4j-api:2.0.17")
@@ -164,7 +161,7 @@ dependencies {
     }
 
     implementation("org.apache.velocity:velocity-engine-core:2.4.1")
-    implementation(platform("ai.djl:bom:0.32.0"))
+    implementation(platform("ai.djl:bom:0.33.0"))
     implementation("ai.djl:api")
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
@@ -214,7 +211,7 @@ dependencies {
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.0")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.0")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")

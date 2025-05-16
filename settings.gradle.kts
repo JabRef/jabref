@@ -26,4 +26,4 @@ plugins {
 
 rootProject.name = "JabRef"
 
-include("jablib", "jabkit", "jabgui", "jabsrv", "test-support")
+include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support")

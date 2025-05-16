@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
@@ -19,27 +19,23 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableBooleanValue;
 import javafx.scene.control.ButtonType;
 
+import org.jabref.cli.CliImportHelper;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiles.AutoLinkFilesAction;
 import org.jabref.gui.importer.ImportEntriesDialog;
-import org.jabref.gui.importer.ParserResultWarningDialog;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportCleanup;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.exception.NotASharedDatabaseException;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.util.io.FileUtil;
@@ -60,6 +56,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
     private final StateManager stateManager;
     private final DialogService dialogService;
     private final LibraryTabContainer tabContainer;
+    private final Supplier<OpenDatabaseAction> openDatabaseAction;
     private final BibEntryTypesManager entryTypesManager;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final UndoManager undoManager;
@@ -71,6 +68,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                 StateManager stateManager,
                                 DialogService dialogService,
                                 LibraryTabContainer tabContainer,
+                                Supplier<OpenDatabaseAction> openDatabaseAction,
                                 BibEntryTypesManager entryTypesManager,
                                 FileUpdateMonitor fileUpdateMonitor,
                                 UndoManager undoManager,
@@ -81,6 +79,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.tabContainer = tabContainer;
+        this.openDatabaseAction = openDatabaseAction;
         this.entryTypesManager = entryTypesManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
         this.undoManager = undoManager;
@@ -165,16 +164,28 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         // Handle OpenDatabases
         if (!blank) {
             uiCommands.stream()
-                    .filter(UiCommand.OpenDatabases.class::isInstance)
-                    .map(UiCommand.OpenDatabases.class::cast)
-                    .forEach(command -> openDatabases(command.parserResults()));
-        }
+                    .filter(UiCommand.OpenLibraries.class::isInstance)
+                    .map(UiCommand.OpenLibraries.class::cast)
+                    .forEach(command -> openDatabaseAction.get().openFiles(command.toImport()));
 
-        // Handle automatically setting file links
-        uiCommands.stream()
-                  .filter(UiCommand.AutoSetFileLinks.class::isInstance).findAny()
-                  .map(UiCommand.AutoSetFileLinks.class::cast)
-                  .ifPresent(autoSetFileLinks -> autoSetFileLinks(autoSetFileLinks.parserResults()));
+            uiCommands.stream()
+                      .filter(UiCommand.AppendToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.AppendToCurrentLibrary.class::cast)
+                      .map(UiCommand.AppendToCurrentLibrary::toAppend)
+                      .filter(Objects::nonNull)
+                      .findAny().ifPresent(toAppend -> {
+                          LOGGER.debug("Append to current library {} requested", toAppend);
+                          waitForLoadingFinished(() -> appendToCurrentLibrary(toAppend));
+                      });
+
+            uiCommands.stream().filter(UiCommand.AppendFileOrUrlToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.AppendFileOrUrlToCurrentLibrary.class::cast)
+                      .findAny().ifPresent(importFile -> importFromFileAndOpen(importFile.location()));
+
+            uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)
+                      .findAny().ifPresent(importBibTex -> importBibtexStringAndOpen(importBibTex.bibtex()));
+        }
 
         // Handle jumpToEntry
         // Needs to go last, because it requires all libraries opened
@@ -190,27 +201,33 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                   });
     }
 
+    /// @deprecated used by the browser extension only
+    private void importBibtexStringAndOpen(String importStr) {
+        LOGGER.debug("ImportBibtex {} requested", importStr);
+        BackgroundTask.wrap(() -> {
+                          BibtexParser parser = new BibtexParser(preferences.getImportFormatPreferences());
+                          List<BibEntry> entries = parser.parseEntries(importStr);
+                          return new ParserResult(entries);
+                      }).onSuccess(this::addParserResult)
+                      .onFailure(e -> LOGGER.error("Unable to parse provided bibtex {}", importStr, e))
+                      .executeWith(taskExecutor);
+    }
+
+    /// @deprecated used by the browser extension only
+    private void importFromFileAndOpen(String location) {
+        LOGGER.debug("Import file {} requested", location);
+        BackgroundTask.wrap(() -> CliImportHelper.importFile(location, preferences, false))
+                      .onSuccess(result -> result.ifPresent(this::addParserResult))
+                      .onFailure(t -> LOGGER.error("Unable to import file {} ", location, t))
+                      .executeWith(taskExecutor);
+    }
+
     private void checkForBibInUpperDir() {
         // "Open last edited databases" happened before this call
         // Moreover, there is not any CLI command (especially, not opening any new tab)
         // Thus, we check if there are any tabs open.
         if (tabContainer.getLibraryTabs().isEmpty()) {
-            Optional<Path> firstBibFile = firstBibFile();
-            if (firstBibFile.isPresent()) {
-                ParserResult parserResult;
-                try {
-                    parserResult = OpenDatabase.loadDatabase(
-                            firstBibFile.get(),
-                            preferences.getImportFormatPreferences(),
-                            fileUpdateMonitor);
-                } catch (IOException e) {
-                    LOGGER.error("Could not open bib file {}", firstBibFile.get(), e);
-                    return;
-                }
-                List<ParserResult> librariesToOpen = new ArrayList<>(1);
-                librariesToOpen.add(parserResult);
-                openDatabases(librariesToOpen);
-            }
+            firstBibFile().ifPresent(firstBibFile -> openDatabaseAction.get().openFile(firstBibFile));
         }
     }
 
@@ -266,11 +283,19 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         }
     }
 
-    /// Opens the libraries given in `parserResults`. This list needs to be modifiable, because invalidDatabases are removed.
-    ///
-    /// @param parserResults A modifiable list of parser results
-    private void openDatabases(List<ParserResult> parserResults) {
-        final List<ParserResult> toOpenTab = new ArrayList<>();
+    private void appendToCurrentLibrary(List<Path> libraries) {
+        List<ParserResult> parserResults = new ArrayList<>();
+        try {
+            for (Path file : libraries) {
+                parserResults.add(OpenDatabase.loadDatabase(
+                        file,
+                        preferences.getImportFormatPreferences(),
+                        fileUpdateMonitor));
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not open bib file {}", libraries, e);
+            return;
+        }
 
         // Remove invalid databases
         List<ParserResult> invalidDatabases = parserResults.stream()
@@ -279,61 +304,9 @@ public class JabRefFrameViewModel implements UiMessageHandler {
         final List<ParserResult> failed = new ArrayList<>(invalidDatabases);
         parserResults.removeAll(invalidDatabases);
 
-        // passed file (we take the first one) should be focused
-        Path focusedFile = parserResults.stream()
-                                        .findFirst()
-                                        .flatMap(ParserResult::getPath)
-                                        .orElse(preferences.getLastFilesOpenedPreferences()
-                                                           .getLastFocusedFile())
-                                        .toAbsolutePath();
-
-        // Add all bibDatabases databases to the frame:
-        boolean first = false;
+        // Add parserResult to the currently opened tab
         for (ParserResult parserResult : parserResults) {
-            // Define focused tab
-            if (parserResult.getPath().filter(path -> path.toAbsolutePath().equals(focusedFile)).isPresent()) {
-                first = true;
-            }
-
-            if (parserResult.getDatabase().isShared()) {
-                try {
-                    OpenDatabaseAction.openSharedDatabase(
-                            parserResult,
-                            tabContainer,
-                            dialogService,
-                            preferences,
-                            aiService,
-                            stateManager,
-                            entryTypesManager,
-                            fileUpdateMonitor,
-                            undoManager,
-                            clipBoardManager,
-                            taskExecutor);
-                } catch (SQLException
-                         | DatabaseNotSupportedException
-                         | InvalidDBMSConnectionPropertiesException
-                         | NotASharedDatabaseException e) {
-                    LOGGER.error("Connection error", e);
-                    dialogService.showErrorDialogAndWait(
-                            Localization.lang("Connection error"),
-                            Localization.lang("A local copy will be opened."),
-                            e);
-                    toOpenTab.add(parserResult);
-                }
-            } else if (parserResult.toOpenTab()) {
-                // things to be appended to an opened tab should be done after opening all tabs
-                // add them to the list
-                toOpenTab.add(parserResult);
-            } else {
-                addParserResult(parserResult, first);
-                first = false;
-            }
-        }
-
-        // finally add things to the currently opened tab
-        for (ParserResult parserResult : toOpenTab) {
-            addParserResult(parserResult, first);
-            first = false;
+            addParserResult(parserResult);
         }
 
         for (ParserResult parserResult : failed) {
@@ -342,67 +315,19 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                     parserResult.getErrorMessage();
             dialogService.showErrorDialogAndWait(Localization.lang("Error opening file"), message);
         }
-
-        // Display warnings, if any
-        for (ParserResult parserResult : parserResults) {
-            if (parserResult.hasWarnings()) {
-                ParserResultWarningDialog.showParserResultWarningDialog(parserResult, dialogService);
-                getLibraryTab(parserResult).ifPresent(tabContainer::showLibraryTab);
-            }
-        }
-
-        // After adding the databases, go through each and see if
-        // any post open actions need to be done. For instance, checking
-        // if we found new entry types that can be imported, or checking
-        // if the database contents should be modified due to new features
-        // in this version of JabRef.
-        parserResults.forEach(pr -> {
-            OpenDatabaseAction.performPostOpenActions(pr, dialogService, preferences);
-            if (pr.getChangedOnMigration()) {
-                getLibraryTab(pr).ifPresent(LibraryTab::markBaseChanged);
-            }
-        });
-
-        LOGGER.debug("Finished adding panels");
     }
 
-    private Optional<LibraryTab> getLibraryTab(ParserResult parserResult) {
-        return tabContainer.getLibraryTabs().stream()
-                           .filter(tab -> parserResult.getDatabase().equals(tab.getDatabase()))
-                           .findAny();
-    }
+    private void addParserResult(ParserResult parserResult) {
+        LOGGER.trace("Adding the entries to the open tab.");
+        LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
 
-    /**
-     * Should be called when a user asks JabRef at the command line
-     * i) to import a file or
-     * ii) to open a .bib file
-     */
-    private void addParserResult(ParserResult parserResult, boolean raisePanel) {
-        if (parserResult.toOpenTab()) {
-            LOGGER.trace("Adding the entries to the open tab.");
-            LibraryTab libraryTab = tabContainer.getCurrentLibraryTab();
-            if (libraryTab == null) {
-                LOGGER.debug("No open tab found to add entries to. Creating a new tab.");
-                tabContainer.addTab(parserResult.getDatabaseContext(), raisePanel);
-            } else {
-                addImportedEntries(libraryTab, parserResult);
-            }
-        } else {
-            // only add tab if library is not already open
-            Optional<LibraryTab> libraryTab = tabContainer.getLibraryTabs().stream()
-                                                          .filter(p -> p.getBibDatabaseContext()
-                                                                        .getDatabasePath()
-                                                                        .equals(parserResult.getPath()))
-                                                          .findFirst();
+        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
+        ImportCleanup cleanup = ImportCleanup.targeting(libraryTab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
+        cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
+        ImportEntriesDialog dialog = new ImportEntriesDialog(libraryTab.getBibDatabaseContext(), task);
 
-            if (libraryTab.isPresent()) {
-                tabContainer.showLibraryTab(libraryTab.get());
-            } else {
-                // On this place, a tab is added after loading using the command line
-                // This takes a different execution path than loading a library using the GUI
-                tabContainer.addTab(parserResult.getDatabaseContext(), raisePanel);
-            }
-        }
+        dialog.setTitle(Localization.lang("Import"));
+        dialogService.showCustomDialogAndWait(dialog);
     }
 
     private void waitForLoadingFinished(Runnable runnable) {
@@ -415,7 +340,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                                                             .collect(Collectors.toList());
 
         // Create a listener for each observable
-        ChangeListener<Boolean> listener = (observable, oldValue, newValue) -> {
+        ChangeListener<Boolean> listener = (observable, _, _) -> {
             // Instanceof implicitly checks for null value
             if (observable instanceof ObservableBooleanValue observableBoolean) {
                 loadings.remove(observableBoolean);
@@ -477,27 +402,6 @@ public class JabRefFrameViewModel implements UiMessageHandler {
 
         if (stateManager.getSelectedEntries().isEmpty()) {
             dialogService.notify(Localization.lang("Citation key '%0' to select not found in open libraries.", entryKey));
-        }
-    }
-
-    /**
-     * Opens the import inspection dialog to let the user decide which of the given entries to import.
-     *
-     * @param tab        The LibraryTab to add to.
-     * @param parserResult The entries to add.
-     */
-    void addImportedEntries(final LibraryTab tab, final ParserResult parserResult) {
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(() -> parserResult);
-        ImportCleanup cleanup = ImportCleanup.targeting(tab.getBibDatabaseContext().getMode(), preferences.getFieldPreferences());
-        cleanup.doPostCleanup(parserResult.getDatabase().getEntries());
-        ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
-        dialog.setTitle(Localization.lang("Import"));
-        dialogService.showCustomDialogAndWait(dialog);
-    }
-
-    void autoSetFileLinks(List<ParserResult> loaded) {
-        for (ParserResult parserResult : loaded) {
-            new AutoLinkFilesAction(dialogService, preferences, stateManager, undoManager, (UiTaskExecutor) taskExecutor).execute();
         }
     }
 }

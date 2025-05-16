@@ -1,4 +1,5 @@
 import org.gradle.internal.os.OperatingSystem
+import org.gradle.kotlin.dsl.annotationProcessor
 import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
 import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
@@ -96,7 +97,7 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
 
-    implementation("com.konghq:unirest-java-core:4.4.6")
+    implementation("com.konghq:unirest-java-core:4.4.7")
 
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
 
@@ -109,7 +110,8 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
-    implementation("commons-cli:commons-cli:1.9.0")
+    implementation("info.picocli:picocli:4.7.7")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
     implementation("de.undercouch:citeproc-java:3.3.0") {
         exclude(group = "org.antlr")
@@ -187,6 +189,9 @@ jacoco {
 */
 
 tasks.named<JavaExec>("run") {
+    // "assert" statements in the code should activated when running using gradle
+    enableAssertions = true
+
     doFirst {
         // Clear the default JVM arguments to avoid warnings
         // application.applicationDefaultJvmArgs = emptyList()
@@ -294,185 +299,72 @@ jlink {
     )
 
     mergedModule {
-        requires(
-            "com.google.gson"
-        )
-        requires(
-            "com.fasterxml.jackson.annotation"
-        )
-        requires(
-            "com.fasterxml.jackson.databind"
-        )
-        requires(
-            "com.fasterxml.jackson.core"
-        )
-        requires(
-            "com.fasterxml.jackson.datatype.jdk8"
-        )
-        requires(
-            "jakarta.xml.bind"
-        )
-        requires(
-            "java.compiler"
-        )
-        requires(
-            "java.datatransfer"
-        )
-        requires(
-            "java.desktop"
-        )
-        requires(
-            "java.logging"
-        )
-        requires(
-            "java.management"
-        )
-        requires(
-            "java.naming"
-        )
-        requires(
-            "java.net.http"
-        )
-        requires(
-            "java.rmi"
-        )
-        requires(
-            "java.scripting"
-        )
-        requires(
-            "java.security.jgss"
-        )
-        requires(
-            "java.security.sasl"
-        )
-        requires(
-            "java.sql"
-        )
-        requires(
-            "java.sql.rowset"
-        )
-        requires(
-            "java.transaction.xa"
-        )
-        requires(
-            "java.xml"
-        )
-        requires(
-            "javafx.base"
-        )
-        requires(
-            "javafx.controls"
-        )
-        requires(
-            "javafx.fxml"
-        )
-        requires(
-            "javafx.graphics"
-        )
-        requires(
-            "javafx.media"
-        )
-        requires(
-            "javafx.swing"
-        )
-        requires(
-            "jdk.security.jgss"
-        )
-        requires(
-            "jdk.unsupported"
-        )
-        requires(
-            "jdk.unsupported.desktop"
-        )
-        requires(
-            "jdk.xml.dom"
-        )
-        requires(
-            "org.apache.commons.lang3"
-        )
-        requires(
-            "org.apache.commons.logging"
-        )
-        requires(
-            "org.apache.commons.text"
-        )
-        requires(
-            "org.apache.commons.codec"
-        )
-        requires(
-            "org.apache.commons.io"
-        )
-        requires(
-            "org.apache.commons.compress"
-        )
-        requires(
-            "org.freedesktop.dbus"
-        )
-        requires(
-            "org.jsoup"
-        )
-        requires(
-            "org.slf4j"
-        )
-        requires(
-            "org.tukaani.xz"
-        );
-        uses(
-            "ai.djl.engine.EngineProvider"
-        )
-        uses(
-            "ai.djl.repository.RepositoryFactory"
-        )
-        uses(
-            "ai.djl.repository.zoo.ZooProvider"
-        )
-        uses(
-            "dev.langchain4j.spi.prompt.PromptTemplateFactory"
-        )
-        uses(
-            "kong.unirest.core.json.JsonEngine"
-        )
-        uses(
-            "org.eclipse.jgit.lib.Signer"
-        )
-        uses(
-            "org.eclipse.jgit.transport.SshSessionFactory"
-        )
-        uses(
-            "org.postgresql.shaded.com.ongres.stringprep.Profile"
-        )
+        requires("com.google.gson")
+        requires("com.fasterxml.jackson.annotation")
+        requires("com.fasterxml.jackson.databind")
+        requires("com.fasterxml.jackson.core")
+        requires("com.fasterxml.jackson.datatype.jdk8")
+        requires("jakarta.xml.bind")
+        requires("java.compiler")
+        requires("java.datatransfer")
+        requires("java.desktop")
+        requires("java.logging")
+        requires("java.management")
+        requires("java.naming")
+        requires("java.net.http")
+        requires("java.rmi")
+        requires("java.scripting")
+        requires("java.security.jgss")
+        requires("java.security.sasl")
+        requires("java.sql")
+        requires("java.sql.rowset")
+        requires("java.transaction.xa")
+        requires("java.xml")
+        requires("javafx.base")
+        requires("javafx.controls")
+        requires("javafx.fxml")
+        requires("javafx.graphics")
+        requires("javafx.media")
+        requires("javafx.swing")
+        requires("jdk.security.jgss")
+        requires("jdk.unsupported")
+        requires("jdk.unsupported.desktop")
+        requires("jdk.xml.dom")
+        requires("org.apache.commons.lang3")
+        requires("org.apache.commons.logging")
+        requires("org.apache.commons.text")
+        requires("org.apache.commons.codec")
+        requires("org.apache.commons.io")
+        requires("org.apache.commons.compress")
+        requires("org.freedesktop.dbus")
+        requires("org.jsoup")
+        requires("org.slf4j")
+        requires("org.tukaani.xz");
 
-        provides(
-            "java.sql.Driver"
-        ).with(
-            "org.postgresql.Driver"
-        )
-        provides(
-            "java.security.Provider"
-        ).with(
+        uses("ai.djl.engine.EngineProvider")
+        uses("ai.djl.repository.RepositoryFactory")
+        uses("ai.djl.repository.zoo.ZooProvider")
+        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
+        uses("kong.unirest.core.json.JsonEngine")
+        uses("org.eclipse.jgit.lib.Signer")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
+        uses("org.postgresql.shaded.com.ongres.stringprep.Profile")
+
+        provides("java.sql.Driver").with(
+            "org.postgresql.Driver")
+        provides("java.security.Provider").with(
             "org.bouncycastle.jce.provider.BouncyCastleProvider",
-            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider"
-        )
-        provides(
-            "kong.unirest.core.json.JsonEngine"
-        ).with(
-            "kong.unirest.modules.gson.GsonEngine"
-        )
-        provides(
-            "ai.djl.repository.zoo.ZooProvider"
-        ).with(
+            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
+        provides("kong.unirest.core.json.JsonEngine").with(
+            "kong.unirest.modules.gson.GsonEngine")
+        provides("ai.djl.repository.zoo.ZooProvider").with(
             "ai.djl.engine.rust.zoo.RsZooProvider",
             "ai.djl.huggingface.zoo.HfZooProvider",
             "ai.djl.pytorch.zoo.PtZooProvider",
-            "ai.djl.repository.zoo.DefaultZooProvider"
-        )
-        provides(
-            "ai.djl.engine.EngineProvider"
-        ).with(
+            "ai.djl.repository.zoo.DefaultZooProvider")
+        provides("ai.djl.engine.EngineProvider").with(
             "ai.djl.engine.rust.RsEngineProvider",
-            "ai.djl.pytorch.engine.PtEngineProvider"
-        )
-
+            "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
     jpackage {

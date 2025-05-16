@@ -22,7 +22,8 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
-    implementation("commons-cli:commons-cli:1.9.0")
+    implementation("info.picocli:picocli:4.7.7")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
     implementation("org.jspecify:jspecify:1.0.0")
@@ -72,12 +73,12 @@ javafx {
 }
 
 application {
-    mainClass.set("org.jabref.cli.JabKit")
+    mainClass.set("org.jabref.JabKit")
     mainModule.set("org.jabref.jabkit")
 
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=org.jabref.jabkit.merged.module,com.sun.jna,javafx.graphics,org.apache.lucene.core"
+        "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }
 
@@ -87,6 +88,8 @@ jlink {
     addExtraDependencies(
         "javafx"
     )
+
+    mergedModuleName = "jabkit.merged.module"
 
     // We keep debug statements - otherwise "--strip-debug" would be included
     addOptions(
@@ -287,6 +290,10 @@ jlink {
     }
     jpackage {
         outputDir = "distribution"
+        skipInstaller = true
+
+        imageOptions.addAll(listOf(
+            "--java-options", "--enable-native-access=jabkit.merged.module"))
 
         // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
         if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
@@ -295,7 +302,6 @@ jlink {
                     "--win-console"
                 )
             )
-           skipInstaller = true
         } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
             imageOptions.addAll(
                 listOf(
@@ -303,9 +309,6 @@ jlink {
                     "--app-version", "$version"
                 )
             )
-            skipInstaller = true
-        } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
-            skipInstaller = true
         }
     }
 }
