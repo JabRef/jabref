@@ -15,6 +15,8 @@ RUN mv jabkit/build/distribution/jabkit /dist
 # jpackage needs glibc; alpine does not work
 FROM debian:bookworm-slim AS runtime
 
+LABEL org.opencontainers.image.source https://github.com/JabRef/jabref
+
 WORKDIR /work
 
 COPY --from=build /dist /jabref
