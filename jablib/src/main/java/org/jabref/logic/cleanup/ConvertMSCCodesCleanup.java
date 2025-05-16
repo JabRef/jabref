@@ -37,7 +37,7 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
     static {
 
         HashBiMap<String, String> tempMap = HashBiMap.create();
-        
+
         URL resourceUrl = ConvertMSCCodesCleanup.class.getClassLoader().getResource("msc_codes.json");
 
         // Check for valid mapping of msc codes
@@ -120,16 +120,16 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
 
-            if (!Platform.isFxApplicationThread()) {
-                // If the thread is not JavaFX and Editor is showing avoid error by adding to queue
-                Platform.runLater(() -> {
-                    entry.setField(StandardField.KEYWORDS, newValue);
-                    changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-                });
-            } else {
+//            if (!Platform.isFxApplicationThread()) {
+//                // If the thread is not JavaFX and Editor is showing avoid error by adding to queue
+//                Platform.runLater(() -> {
+//                    entry.setField(StandardField.KEYWORDS, newValue);
+//                    changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
+//                });
+//            } else {
                 entry.setField(StandardField.KEYWORDS, newValue);
                 changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-            }
+//            }
         }
 
         return changes;
