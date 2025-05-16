@@ -502,7 +502,7 @@ mavenPublishing {
 
   signAllPublications()
 
-  coordinates("org.jabref", "jablib", version)
+  coordinates("org.jabref", "jablib", version + "-SNAPSHOT")
 
   pom {
     name.set("jablib")
