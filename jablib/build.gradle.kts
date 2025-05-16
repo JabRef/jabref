@@ -414,19 +414,6 @@ tasks.named<JavaCompile>("compileJava") {
 }
 */
 
-tasks.javadoc {
-    (options as StandardJavadocDocletOptions).apply {
-        encoding = "UTF-8"
-        // version = false
-        // author = false
-
-        addMultilineStringsOption("-add-exports").value = listOf(
-            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
-            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
-        )
-    }
-}
-
 tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
