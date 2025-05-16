@@ -1,3 +1,6 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.util.*
 
@@ -15,8 +18,7 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    `maven-publish`
-    `signing`
+    id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
 val pdfbox = "3.0.5"
@@ -497,38 +499,56 @@ jacocoTestReport {
 }
 */
 
-publishing {
-        repositories {
-        maven {
-            val releasesRepoUrl = layout.buildDirectory.dir("repos/releases")
-            val snapshotsRepoUrl = layout.buildDirectory.dir("repos/snapshots")
-            url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
-        }
-    }
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
+mavenPublishing {
+  configure(JavaLibrary(
+    // configures the -javadoc artifact, possible values:
+    // - `JavadocJar.None()` don't publish this artifact
+    // - `JavadocJar.Empty()` publish an emprt jar
+    // - `JavadocJar.Javadoc()` to publish standard javadocs
+    javadocJar = JavadocJar.Javadoc(),
+    // whether to publish a sources jar
+    sourcesJar = true,
+  ))
 
-            pom {
-                name.set("jablib")
-                description.set("JabRef's Java library to work with BibTeX")
-                url.set("https://github.com/JabRef/jabref/tree/main/jablib")
-                licenses {
-                    license {
-                        name.set("MIT")
-                        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
-                    }
-                }
-                scm {
-                    url.set("https://github.com/JabRef/jabref")
-                    connection.set("scm:git:https://github.com/JabRef/jabref")
-                    developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
-                }
-            }
-        }
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+  signAllPublications()
+
+    coordinates("com.example.mylibrary", "mylibrary-runtime", "1.0.3-SNAPSHOT")
+
+  pom {
+    name.set("jablib")
+    description.set("JabRef's Java library to work with BibTeX")
+    inceptionYear.set("2025")
+    url.set("https://github.com/JabRef/jabref/")
+    licenses {
+      license {
+        name.set("MIT")
+        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+      }
     }
+    developers {
+      developer {
+        id.set("username")
+        name.set("User Name")
+        url.set("https://github.com/username/")
+      }
+    }
+    scm {
+        url.set("https://github.com/JabRef/jabref")
+        connection.set("scm:git:https://github.com/JabRef/jabref")
+        developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+    }
+  }
 }
 
-signing {
-    sign(publishing.publications["mavenJava"])
+tasks.named<Jar>("sourcesJar") {
+    dependsOn(
+        tasks.named("generateGrammarSource"),
+        tasks.named("schemaGen_org-jabref-logic-importer-fileformat-citavi")
+    )
+}
+
+tasks.withType<GenerateModuleMetadata> {
+    suppressedValidationErrors.add("enforced-platform")
 }
