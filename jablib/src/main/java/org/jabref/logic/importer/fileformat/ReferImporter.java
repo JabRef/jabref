@@ -83,13 +83,13 @@ public class ReferImporter extends Importer {
             sb.append(str).append('\n');
         }
 
-        String[] allEntries = sb.toString().split(ENDOFRECORD);
+        List<String> allEntries = new ArrayList<>(List.of(sb.toString().split(ENDOFRECORD)));
         stringToBibEntry(bibEntryList, allEntries);
 
         return new ParserResult(bibEntryList);
     }
 
-    private void stringToBibEntry(List<BibEntry> bibEntryList, String[] allEntries) {
+    private void stringToBibEntry(List<BibEntry> bibEntryList, List<String> allEntries) {
         Map<Field, String> fieldMap = new HashMap<>();
         EntryType type;
         StringBuilder author;
@@ -97,7 +97,7 @@ public class ReferImporter extends Importer {
         AtomicBoolean isEdited;
 
         for (String entry : allEntries) {
-            String[] fields = entry.trim().substring(1).split("\n%");
+            List<String> fields = new ArrayList<>(List.of(entry.trim().substring(1).split("\n%")));
             type = BibEntry.DEFAULT_TYPE;
             author = new StringBuilder();
             editor = new StringBuilder();
@@ -145,6 +145,7 @@ public class ReferImporter extends Importer {
             if (!entry.isEmpty()) {
                 bibEntryList.add(singleBibEntry);
             }
+            fieldMap.clear();
         }
     }
 

@@ -97,45 +97,6 @@ public class ReferImporterTest {
     }
 
     @Test
-    void importMultipleEntries() throws IOException, URISyntaxException {
-        Path file = Path.of(ReferImporterTest.class.getResource("refer.bibIX.ref").toURI());
-        List<BibEntry> bibEntries = referImporter.importDatabase(file).getDatabase().getEntries();
-
-        assertEquals(5, bibEntries.size());
-
-        BibEntry first = bibEntries.getFirst();
-        assertEquals(StandardEntryType.Book, first.getType());
-        assertEquals(Optional.of("AuthorL, AuthorsF I."), first.getField(StandardField.AUTHOR));
-        assertEquals(Optional.of("TitleTest"), first.getField(StandardField.TITLE));
-        assertEquals(Optional.of("en"), first.getField(StandardField.LANGUAGE));
-        assertEquals(Optional.of("I-S-B-N"), first.getField(StandardField.ISBN));
-        assertEquals(Optional.of("Ed"), first.getField(StandardField.EDITION));
-
-        BibEntry second = bibEntries.get(1);
-        assertEquals(StandardEntryType.InProceedings, second.getType());
-        assertEquals(Optional.of("PlaceAddress"), second.getField(StandardField.ADDRESS));
-        assertEquals(Optional.of("Proceedings Title"), second.getField(StandardField.BOOKTITLE));
-        assertEquals(Optional.of("DateD"), second.getField(StandardField.YEAR));
-        assertEquals(Optional.of("TranslatorL, TranslatorF I"), second.getField(StandardField.TRANSLATOR));
-
-        BibEntry third = bibEntries.get(2);
-        assertEquals(StandardEntryType.Misc, third.getType());
-        assertEquals(Optional.of("Encyclopedia Title"), third.getField(StandardField.BOOKTITLE));
-
-        BibEntry fourth = bibEntries.get(3);
-        assertEquals(StandardEntryType.Misc, fourth.getType());
-        assertEquals(Optional.of("Publisher"), fourth.getField(StandardField.PUBLISHER));
-        assertEquals(Optional.of("Series"), fourth.getField(StandardField.SERIES));
-
-        BibEntry fifth = bibEntries.get(4);
-        assertEquals(StandardEntryType.PhdThesis, fifth.getType());
-        assertEquals(Optional.of("Abstract"), fifth.getField(StandardField.ABSTRACT));
-        assertEquals(Optional.of("Type"), fifth.getField(StandardField.DOI));
-        assertEquals(Optional.of("University"), fifth.getField(StandardField.SCHOOL));
-        assertEquals(Optional.of("Url"), fifth.getField(StandardField.URL));
-    }
-
-    @Test
     void editorNameInAuthorField() throws IOException {
         String refEntry = """
                 %0 Edited Book
@@ -152,5 +113,78 @@ public class ReferImporterTest {
         assertEquals(StandardEntryType.Book, entry.getType());
         assertEquals(Optional.empty(), entry.getField(StandardField.AUTHOR));
         assertEquals(Optional.of("testE and testEL, testEF. and editor"), entry.getField(StandardField.EDITOR));
+    }
+
+    @Test
+    void importMultipleEntries() throws IOException, URISyntaxException {
+        Path file = Path.of(ReferImporterTest.class.getResource("refer.bibIX.ref").toURI());
+        List<BibEntry> bibEntries = referImporter.importDatabase(file).getDatabase().getEntries();
+
+        BibEntry bookEntry = new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.AUTHOR, "AuthorL, AuthorsF I.")
+                .withField(StandardField.TITLE, "TitleTest")
+                .withField(StandardField.SERIES, "Series")
+                .withField(StandardField.VOLUME, "Volume")
+                .withField(StandardField.ADDRESS, "Place")
+                .withField(StandardField.PUBLISHER, "Publisher")
+                .withField(StandardField.NOTE, "Loc. in Archive B; Rights B; Call Number B")
+                .withField(StandardField.ISBN, "I-S-B-N")
+                .withField(StandardField.URL, "URL")
+                .withField(StandardField.EDITION, "Ed")
+                .withField(StandardField.ABSTRACT, "Abstract")
+                .withField(StandardField.LANGUAGE, "en")
+                .withField(StandardField.YEAR, "Date");
+
+        BibEntry conferencePaperEntry = new BibEntry(StandardEntryType.InProceedings)
+                .withField(StandardField.TITLE, "PTitle")
+                .withField(StandardField.SERIES, "Series")
+                .withField(StandardField.VOLUME, "Volume")
+                .withField(StandardField.ADDRESS, "PlaceAddress")
+                .withField(StandardField.PUBLISHER, "Publisher")
+                .withField(StandardField.PAGES, "Pages")
+                .withField(StandardField.NOTE, "Loc. in Archive CP; Rights CP; Call Number CP")
+                .withField(StandardField.ISBN, "ISBN")
+                .withField(StandardField.URL, "URL")
+                .withField(StandardField.ABSTRACT, "Abstract")
+                .withField(StandardField.BOOKTITLE, "Proceedings Title")
+                .withField(StandardField.AUTHOR, "AuthorL, AuthorsF I. and ContributorL, ContributorF I. and Series EditorL, SeriesF I.")
+                .withField(StandardField.EDITOR, "EditorL, EditorF I.")
+                .withField(StandardField.TRANSLATOR, "TranslatorL, TranslatorF I")
+                .withField(StandardField.YEAR, "DateD");
+
+        BibEntry encyclopediaEntry = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.SERIES, "Series")
+                .withField(StandardField.VOLUME, "Volume")
+                .withField(StandardField.ADDRESS, "Place")
+                .withField(StandardField.PUBLISHER, "Publisher")
+                .withField(StandardField.PAGES, "Pages")
+                .withField(StandardField.NOTE, "Loc. in Archive Ep; Rights Ep; Call Number Ep")
+                .withField(StandardField.ISBN, "ISBN")
+                .withField(StandardField.URL, "URL")
+                .withField(StandardField.EDITION, "Edition")
+                .withField(StandardField.ABSTRACT, "Abstract")
+                .withField(StandardField.BOOKTITLE, "Encyclopedia Title")
+                .withField(StandardField.AUTHOR, "AuthorL, AuthorsF I. and ContributorL, ContributorF I. and Series EditorL, SeriesF I.")
+                .withField(StandardField.EDITOR, "EditorL, EditorF I.")
+                .withField(StandardField.TRANSLATOR, "TranslatorL, TranslatorF I")
+                .withField(StandardField.YEAR, "Date");
+
+        BibEntry thesisEntry = new BibEntry(StandardEntryType.PhdThesis)
+                .withField(StandardField.TITLE, "Title")
+                .withField(StandardField.ADDRESS, "Place")
+                .withField(StandardField.SCHOOL, "University")
+                .withField(StandardField.DOI, "Type")
+                .withField(StandardField.NOTE, "Loc. in Archive Th; Rights Th; Call Number")
+                .withField(StandardField.URL, "Url")
+                .withField(StandardField.ABSTRACT, "Abstract")
+                .withField(StandardField.AUTHOR, "AuthorL, AuthorsF I. and ContributorL, ContributorF I.")
+                .withField(StandardField.YEAR, "Date");
+
+        assertEquals(4, bibEntries.size());
+        assertEquals(bookEntry, bibEntries.getFirst());
+        assertEquals(conferencePaperEntry, bibEntries.get(1));
+        assertEquals(encyclopediaEntry, bibEntries.get(2));
+        assertEquals(thesisEntry, bibEntries.get(3));
     }
 }

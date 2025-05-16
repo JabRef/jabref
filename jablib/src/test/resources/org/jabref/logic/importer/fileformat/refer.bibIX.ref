@@ -5,10 +5,10 @@
 %V Volume
 %C Place
 %I Publisher
-%W Loc. in Archive
-%* Rights
+%W Loc. in Archive B
+%* Rights B
 %@ I-S-B-N
-%L Call Number
+%L Call Number B
 %U URL
 %7 Ed
 %X Abstract
@@ -22,10 +22,10 @@
 %C PlaceAddress
 %I Publisher
 %P Pages
-%W Loc. in Archive
-%* Rights
+%W Loc. in Archive CP
+%* Rights CP
 %@ ISBN
-%L Call Number
+%L Call Number CP
 %U URL
 %X Abstract
 %B Proceedings Title
@@ -43,10 +43,10 @@
 %C Place
 %I Publisher
 %P Pages
-%W Loc. in Archive
-%* Rights
+%W Loc. in Archive Ep
+%* Rights Ep
 %@ ISBN
-%L Call Number
+%L Call Number Ep
 %U URL
 %7 Edition
 %X Abstract
@@ -58,34 +58,16 @@
 %? TranslatorL, TranslatorF I
 %D Date
 
-%0 Manuscript
-%A Alberts, C.
-%A Behrens, S.
-%A Pethia, R.
-%A Wilson, W.
-%T Operationally Critical Threat, Asset, and Vulnerability Evaluation
-(OCTAVE) Framework, Version 1
-%N CMU/SEI-99-TR-017
-%M ADA367718
-%1 Software Engineering Institute, Carnegie Mellon University
-%D 1999
-%U http://www.sei.cmu.edu/publications/documents/99.reports/99tr017/99tr017
-abstract.html
-
 %0 Thesis
 %T Title
 %C Place
 %I University
 %R Type
-%W Loc. in Archive
-%* Rights
+%W Loc. in Archive Th
+%* Rights Th
 %L Call Number
 %U Url
 %X Abstract
 %A AuthorL, AuthorsF I
 %A ContributorL, ContributorF I
 %D Date
-
-
-
-
