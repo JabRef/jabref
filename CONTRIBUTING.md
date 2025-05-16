@@ -8,7 +8,8 @@ As one consequence, for non-basic issues, you will have to work on the requireme
 
 > [!TIP]
 > If you are a newcomer, the two most helpful sections to navigate through are the [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) (to get JabRef's source code into your local machine and get the development version running), and [frequently asked questions](https://devdocs.jabref.org/code-howtos/faq) - where you will find solutions to issues that are most commonly faced by new contributors.
->
+
+
 > [!NOTE]
 > For non-programmers, a general overview on contributing is available at <https://docs.jabref.org/contributing>.
 
