@@ -4,8 +4,18 @@
 
 //JAVA 24
 
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/ArgumentProcessor.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/CheckConsistency.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/CheckIntegrity.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/Convert.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/Fetch.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/GenerateBibFromAux.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/GenerateCitationKeys.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/Pdf.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/PdfUpdate.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/Preferences.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/Search.java
 //SOURCES ../jabkit/src/main/java/org/jabref/JabKit.java
-//SOURCES ../jabkit/src/main/java/org/jabref/cli
 
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
 
