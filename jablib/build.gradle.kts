@@ -15,8 +15,7 @@ plugins {
 
     id("me.champeau.jmh") version "0.7.3"
 
-    `maven-publish`
-    `signing`
+    id("java-project-publishable")
 }
 
 val pdfbox = "3.0.5"
