@@ -1,0 +1,57 @@
+name: Docker Images
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/dockerimages.yml'
+      - 'Dockerfile.*'
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  workflow_dispatch:
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.head_ref || github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  actions: write
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        component: [jabkit, jabsrv]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ghcr.io/JabRef/${{ matrix.component }}
+          tags: |
+            type=schedule,pattern={{date 'YYYY-MM-DD'}}
+            type=ref,event=tag
+            type=edge,branch=main
+            type=ref,event=pr
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: koppor
+          password: ${{ secrets.CR_PAT }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: ${{ github.repository == 'JabRef/jabref' }}
+          platforms: linux/amd64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          file: Dockerfile.${{ matrix.component }}

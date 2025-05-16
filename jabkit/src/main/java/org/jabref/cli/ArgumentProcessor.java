@@ -88,7 +88,7 @@ public class ArgumentProcessor implements Runnable {
             try {
                 file = new URLDownload(address).toTemporaryFile();
             } catch (FetcherException | MalformedURLException e) {
-                System.err.println(Localization.lang("Problem downloading from %1", address) + e.getLocalizedMessage());
+                System.err.println(Localization.lang("Problem downloading from %0: %1", address, e.getLocalizedMessage()));
                 return Optional.empty();
             }
         } else {

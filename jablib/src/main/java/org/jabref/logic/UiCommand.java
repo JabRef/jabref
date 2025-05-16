@@ -11,4 +11,12 @@ public sealed interface UiCommand {
     record OpenLibraries(List<Path> toImport) implements UiCommand { }
 
     record AppendToCurrentLibrary(List<Path> toAppend) implements UiCommand { }
+
+    /// @deprecated used by the browser extension only
+    @Deprecated
+    record AppendBibTeXToCurrentLibrary(String bibtex) implements UiCommand { }
+
+    /// @deprecated used by the browser extension only
+    @Deprecated
+    record AppendFileOrUrlToCurrentLibrary(String location) implements UiCommand { }
 }

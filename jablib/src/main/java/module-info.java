@@ -144,9 +144,6 @@ open module org.jabref.jablib {
     requires org.glassfish.jaxb.runtime;
     // endregion
 
-    // dependency injection using HK2
-    requires org.glassfish.hk2.api;
-
     // region HTTP clients
     requires java.net.http;
     requires jakarta.ws.rs;
