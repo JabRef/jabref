@@ -185,7 +185,16 @@ jobs:
         with:
           fileName: 'secring.gpg'
           encodedString: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
-      - run: ./gradlew -Dsigning.keyId=${{ secrets.KOPPOR_SIGNING_PASSWORD }} -Dsigning.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }} -Dsigning.secretKeyRingFile=secring.gpg -DmavenCentralUsername=${{ secrets.KOPPOR_SIGNING_PASSWORD }} -DmavenCentralPassword=${{ secrets.KOPPOR_SIGNING_PASSWORD }} :jablib:publishAllPublicationsToMavenCentralRepository
+      - name: store secrets
+        run: |
+          cat >> gradle.properties <<EOF
+          signing.keyId=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          signing.secretKeyRingFile=secring.gpg
+          mavenCentralUsername=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          mavenCentralPassword=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          EOF
+      - run: ./gradlew :jablib:publishAllPublicationsToMavenCentralRepository
 
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
