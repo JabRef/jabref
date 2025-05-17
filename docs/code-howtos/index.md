@@ -5,7 +5,6 @@ has_children: true
 # Code Howtos
 
 This page provides some development support in the form of howtos.
-See also [High Level Documentation](../getting-into-the-code/high-level-documentation.md).
 
 ## Generic code how tos
 
@@ -62,7 +61,7 @@ This is implemented in `FileUtil`:
 org.jabref.logic.util.io.FileUtil.relativize(java.nio.file.Path, org.jabref.model.database.BibDatabaseContext, org.jabref.logic.FilePreferences)
 ```
 
-## Setting a Directory for a .bib File
+## Setting a directory for a `.bib` file
 
 * `@comment{jabref-meta: fileDirectory:<directory>`
 * “fileDirectory” is determined by Globals.pref.get(“userFileDir”) (which defaults to “fileDirectory”
