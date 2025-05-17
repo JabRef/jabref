@@ -5,7 +5,9 @@ import java.util.List;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
+import org.jabref.model.database.BibDatabaseContext;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.framework.junit5.ApplicationExtension;
@@ -15,6 +17,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ApplicationExtension.class)
 class GetLastSearchHistoryTest {
+    private StateManager stateManager;
+    private BibDatabaseContext dbContext1;
+    private BibDatabaseContext dbContext2;
+
+    @BeforeEach
+    void setUp() {
+        stateManager = new StateManager();
+        dbContext1 = new BibDatabaseContext();
+        dbContext2 = new BibDatabaseContext();
+    }
+
     @Start
     void onStart(Stage stage) {
         // Needed to init JavaFX thread
@@ -59,5 +72,20 @@ class GetLastSearchHistoryTest {
         lastSearchHistory = stateManager.getWholeSearchHistory();
         expected = List.of();
         assertEquals(expected, lastSearchHistory);
+    }
+
+    @Test
+    void searchHistory_isSharedAcrossMultipleDatabasesAndMaintainsCorrectOrder() {
+        stateManager.setActiveDatabase(dbContext1);
+        stateManager.addSearchHistory("queryA");
+
+        stateManager.setActiveDatabase(dbContext2);
+        stateManager.addSearchHistory("queryB");
+
+        stateManager.setActiveDatabase(dbContext1);
+        stateManager.addSearchHistory("queryC");
+
+        List<String> expected = List.of("queryA", "queryB", "queryC");
+        assertEquals(expected, stateManager.getWholeSearchHistory());
     }
 }
