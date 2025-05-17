@@ -10,18 +10,25 @@ import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CleanupWorker {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CleanupWorker.class);
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
+    private final BibEntryPreferences bibEntryPreferences;
     private final List<JabRefException> failures;
-
-    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences) {
+    
+    public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, BibEntryPreferences bibEntryPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
         this.timestampPreferences = timestampPreferences;
+        this.bibEntryPreferences = bibEntryPreferences;
         this.failures = new ArrayList<>();
     }
 
@@ -44,8 +51,18 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
+        // Description Conversion
+        if (preset.isActive(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES)) {
+            jobs.add(new ConvertMSCCodesCleanup(bibEntryPreferences, true));
+        } else {
+            jobs.add(new ConvertMSCCodesCleanup(bibEntryPreferences, false));
+        }
+
+        // Handle all other cleanup actions
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
-            jobs.add(toJob(action));
+            if (action != CleanupPreferences.CleanupStep.CONVERT_MSC_CODES) {
+                jobs.add(toJob(action));
+            }
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
