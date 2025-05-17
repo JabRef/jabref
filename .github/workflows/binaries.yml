@@ -49,9 +49,11 @@ jobs:
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
+      tagbuild: ${{ steps.binary.outputs.tagbuild }}
       # requried to avoid obsolete builds in case of labels != "dev: binary"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
+
     steps:
       - name: Determine conditions
         id: binary
@@ -90,6 +92,12 @@ jobs:
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             echo "🚫 merge queue – skipping upload"
             exit 0
+          fi
+
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tagbuild=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
@@ -200,7 +208,7 @@ jobs:
           file ${{ steps.secring.outputs.filePath }}
           md5sum ${{ steps.secring.outputs.filePath }}
       - name: publishAllPublicationsToMavenCentralRepository
-        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}"  :jablib:publishAllPublicationsToMavenCentralRepository
+        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ needs.conditions.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
       # endregion
 
