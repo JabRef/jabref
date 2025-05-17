@@ -188,11 +188,11 @@ jobs:
       - name: store secrets
         run: |
           cat >> gradle.properties <<EOF
-          signing.keyId=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          signing.keyId=${{ secrets.KOPPOR_SIGNING_KEYID }}
           signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
           signing.secretKeyRingFile=secring.gpg
-          mavenCentralUsername=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
-          mavenCentralPassword=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          mavenCentralUsername=${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
+          mavenCentralPassword=${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
           EOF
       - run: ./gradlew :jablib:publishAllPublicationsToMavenCentralRepository
 
