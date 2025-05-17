@@ -180,6 +180,7 @@ jobs:
 
       # region Publish JabLib on Maven Central
       - name: Decode secretKeyRingFile
+        id: secring
         if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
         uses: timheuer/base64-to-file@v1
         with:
@@ -190,13 +191,13 @@ jobs:
           cat >> gradle.properties <<EOF
           signing.keyId=${{ secrets.KOPPOR_SIGNING_KEYID }}
           signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
-          signing.secretKeyRingFile=$(pwd)/secring.gpg
+          signing.secretKeyRingFile=${{ steps.secring.outputs.filePath }}
           mavenCentralUsername=${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
           mavenCentralPassword=${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
           EOF
           grep secretKeyRingFile gradle.properties
-          file secring.gpg
-          md5sum secring.gpg
+          file ${{ steps.secring.outputs.filePath }}
+          md5sum ${{ steps.secring.outputs.filePath }}
       - run: ./gradlew :jablib:publishAllPublicationsToMavenCentralRepository
 
       - name: Prepare merged jars and modules dir
