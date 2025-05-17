@@ -177,6 +177,25 @@ jobs:
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      # region Publish JabLib on Maven Central
+      - name: Decode secretKeyRingFile
+        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'secring.gpg'
+          encodedString: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
+      - name: store secrets
+        run: |
+          cat >> gradle.properties <<EOF
+          signing.keyId=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          signing.secretKeyRingFile=secring.gpg
+          mavenCentralUsername=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          mavenCentralPassword=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          EOF
+      - run: ./gradlew :jablib:publishAllPublicationsToMavenCentralRepository
+
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (startsWith(matrix.os, 'macos')) || (needs.conditions.outputs.upload-to-builds-jabref-org == 'false')
