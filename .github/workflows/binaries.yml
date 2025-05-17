@@ -180,13 +180,14 @@ jobs:
 
       # region Publish JabLib on Maven Central
       - name: Decode secretKeyRingFile
+        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
         id: secring
-        if: needs.conditions.outputs.upload-to-builds-jabref-org == 'true'
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'secring.gpg'
           encodedString: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
       - name: store secrets
+        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
         run: |
           cat >> gradle.properties <<EOF
           signing.keyId=${{ secrets.KOPPOR_SIGNING_KEYID }}
@@ -198,7 +199,10 @@ jobs:
           grep secretKeyRingFile gradle.properties
           file ${{ steps.secring.outputs.filePath }}
           md5sum ${{ steps.secring.outputs.filePath }}
-      - run: ./gradlew :jablib:publishAllPublicationsToMavenCentralRepository
+      - name: publishAllPublicationsToMavenCentralRepository
+        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}"  :jablib:publishAllPublicationsToMavenCentralRepository
+        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
+      # endregion
 
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
@@ -354,6 +358,7 @@ jobs:
           set -e
           ${{ matrix.archivePortableJabKit }}
 
+      # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
         run: |
@@ -372,7 +377,6 @@ jobs:
           else
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
-
       - name: Setup rsync (macOS)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
         run: brew install rsync
@@ -424,6 +428,7 @@ jobs:
             jabgui/build/distribution
             jabkit/build/distribution
           compression-level: 0 # no compression
+      # endregion
 
   comment-on-pr:
     name: Comment on PR
