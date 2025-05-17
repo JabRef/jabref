@@ -190,10 +190,13 @@ jobs:
           cat >> gradle.properties <<EOF
           signing.keyId=${{ secrets.KOPPOR_SIGNING_KEYID }}
           signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
-          signing.secretKeyRingFile=secring.gpg
+          signing.secretKeyRingFile=$(pwd)/secring.gpg
           mavenCentralUsername=${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
           mavenCentralPassword=${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
           EOF
+          grep secretKeyRingFile gradle.properties
+          file secring.gpg
+          md5sum secring.gpg
       - run: ./gradlew :jablib:publishAllPublicationsToMavenCentralRepository
 
       - name: Prepare merged jars and modules dir
