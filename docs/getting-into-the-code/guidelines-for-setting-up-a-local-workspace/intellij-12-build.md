@@ -6,40 +6,19 @@ nav_order: 12
 
 # Step 2: Set up the build system: JDK and Gradle
 
-## Ensure that JDK 23 is available to IntelliJ
+## Ensure that the project is synchronized
 
-Ensure you have a Java 23 SDK configured by navigating to **File > Project Structure... > Platform Settings > SDKs**.<br>
-**Note:** In some MacBooks, `Project Structure` can be found at the "IntelliJ" button of the app menu instead of at "File".
+Press the synchronization button in the gradle menu.
 
-{% figure caption:"JDKs 11, 14, and 15 shown in available SDKs. JDK 23 is missing." %}
-![Platform Settings - SDKs](intellij-choose-jdk-adoptopenjdk-on-windows-project-settings.png)
+{% figure caption:"Gradle sync button" %}
+![Platform Settings - SDKs](13-01-gradle-sync.png)
 {% endfigure %}
 
-If there is another JDK than JDK 23 selected, click on the plus button and choose "Download JDK..."
+Then, on the left side the project folder is there:
 
-{% figure caption:"Download JDK..." %}
-![Platform Settings - SDKs - plus button - Download JDK...](guidelines-select-download-jdk.png)
+{% figure caption:"Project folder" %}
+![Project folder](13-02-project-folder.png)
 {% endfigure %}
-
-Select JDK version 23 and then Eclipse Temurin.
-
-{% figure caption:"Example for JDK 23 - Choose Eclipse Temurin" %}
-![Download Eclipse Temurin](guidelines-intellij-select-jdk-eclipse-temurin.png)
-{% endfigure %}
-
-After clicking "Download", IntelliJ installs Eclipse Temurin:
-
-{% figure caption:"IntelliJ installs Eclipse Temurin" %}
-![IntelliJ installs Eclipse Temurin](guidelines-intellij-installs-temurin.png)
-{% endfigure %}
-
-Navigate to **Project Settings > Project** and ensure that the projects' SDK is Java 23.
-
-{% figure caption:"Project SDK is pinned to the downloaded SDK (showing JDK 23 as example)" %}
-![Project SDK is JDK 23](guidelines-intellij-project-settings-jdk.png)
-{% endfigure %}
-
-Click "OK" to store the changes.
 
 ## Ensure correct JDK setting for Gradle
 
@@ -54,11 +33,7 @@ If that does not exist, just select JDK 23.
 
 To prepare IntelliJ's build system additional steps are required:
 
-Navigate to **Build, Execution, Deployment > Compiler > Java Compiler**, and under "Override compiler parameters per-module", click add (\[+]) and choose `JabRef.main`:
-
-{% figure caption:"Choose JabRef.main" %}
-![Gradle JVM is project SDK](guidelines-choose-module.png)
-{% endfigure %}
+Navigate to **Build, Execution, Deployment > Compiler > Java Compiler**, and under "Override compiler parameters per-module", click add (\[+]) and choose `JabRef`.
 
 Copy following text into your clipboard:
 
@@ -79,10 +54,6 @@ Otherwise, it seems like the setting is stored, but it is not there if you reope
 
 Note: If you use the expand arrow, you need to press <kbd>Shift</kbd>+<kbd>Enter</kbd> to close the expansion and then <kbd>Enter</kbd> to commit the value.
 
-{% figure caption:"Resulting settings for module JabRef.main" %}
-![Overridden compiler parameters](guidelines-overridden-compiler-parameters.png)
-{% endfigure %}
-
 Then click on "Apply" to store the setting.
 
 Note: If this step is omitted, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
@@ -100,27 +71,21 @@ Enable annotation processors by navigating to **Build, Execution, Deployment > C
 {: .note }
 Ensuring JabRef builds with Gradle should always be the first step because, e.g. it generates additional sources that are required for compiling the code.
 
-Open the Gradle Tool Window with the small button that can usually be found on the right side of IDEA or navigate to **View > Tool Windows > Gradle**.
-In the Gradle Tool Window, press the "Reload All Gradle Projects" button to ensure that all settings are up-to-date with the setting changes.
-
-{% figure caption:"Reload of Gradle project" %}
-![Highlighted reload button](guidelines-gradle-tool-windows-refresh.png)
-{% endfigure %}
-
-After that, you can use the Gradle Tool Window to build all parts of JabRef and run it.
-To do so, expand the JabRef project in the Gradle Tool Window and navigate to Tasks.
-From there, you can build and run JabRef by double-clicking **JabRef > Tasks > application > run**.
+Use the Gradle Tool Window to build all parts of JabRef and run it.
+To do so, expand the JabRef project in the Gradle Tool Window, navigate to "jabgui", expand it, navigate to "application", expand it, and double click "run".
 
 {% figure caption:"JabRef > Tasks > application > run" %}
-![JabRef > Tasks > application > run](guidelines-gradle-run.png)
+![JabRef > Tasks > application > run](13-05-run-gradle.png)
 {% endfigure %}
 
 The Gradle run window opens, shows compilation and then the output of JabRef.
 The spinner will run as long as JabRef is open.
 
-{% figure caption:"Gradle run Window" %}
-![Gradle run window](guidelines-gradle-run-output.png)
-{% endfigure %}
+You might get an out-of-memory-exception as follows:
+
+```text
+OpenJDK 64-Bit Server VM warning: INFO: os::commit_memory(0x00000000cb600000, 177209344, 0) failed; error='The paging file is too small for this operation to complete' (DOS error/errno=1455)
+```
 
 You can close JabRef again.
 
