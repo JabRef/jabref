@@ -23,7 +23,7 @@ public class GuiCommandLine {
 
     /// @deprecated used by the browser extension
     @Deprecated
-    @Option(names = {"-importToOpen","--importToOpen"}, description = "Same as --import, but will be imported to the opened tab")
+    @Option(names = {"-importToOpen", "--importToOpen"}, description = "Same as --import, but will be imported to the opened tab")
     public String importToOpen;
 
     @Option(names = {"--reset"}, description = "Reset all preferences to default values.")
