@@ -18,21 +18,19 @@ import org.jabref.architecture.AllowedToUseStandardStreams;
 
 import org.slf4j.LoggerFactory;
 
-/**
- * Provides handling for messages and menu entries in the preferred language of the user.
- * <p>
- * Notes: All messages and menu-entries in JabRef are stored in escaped form like "This_is_a_message". This message
- * serves as key inside the {@link l10n} properties files that hold the translation for many languages. When a message
- * is accessed, it needs to be unescaped and possible parameters that can appear in a message need to be filled with
- * values.
- * <p>
- * This implementation loads the appropriate language by importing all keys/values from the correct bundle and stores
- * them in unescaped form inside a {@link LocalizationBundle} which provides fast access because it caches the key-value
- * pairs.
- * <p>
- * The access to this is given by the functions {@link Localization#lang(String, String...)} and
- * that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
- */
+/// Provides handling for messages and menu entries in the preferred language of the user.
+///
+/// Notes: All messages and menu-entries in JabRef are stored in escaped form like "This_is_a_message". This message
+/// serves as key inside the `l10n` properties files that hold the translation for many languages. When a message
+/// is accessed, it needs to be unescaped and possible parameters that can appear in a message need to be filled with
+/// values.
+///
+/// This implementation loads the appropriate language by importing all keys/values from the correct bundle and stores
+/// them in unescaped form inside a [LocalizationBundle] which provides fast access because it caches the key-value
+/// pairs.
+///
+/// The access to this is given by the functions [#lang(String,String...)] and
+/// that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
 @AllowedToUseStandardStreams("Needs to have acess to System.err because it's called very early before our loggers")
 public class Localization {
     static final String RESOURCE_PREFIX = "l10n/JabRef";

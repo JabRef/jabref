@@ -108,16 +108,15 @@ public class MVStoreEmbeddingStore extends MVStoreBase implements EmbeddingStore
         embeddingsMap.clear();
     }
 
-    /**
-     * The main function of finding most relevant text segments.
-     * Note: the only filters supported are:
-     * - {@link IsIn} with key {@link LINK_METADATA_KEY}
-     * - {@link IsEqualTo} with key {@link LINK_METADATA_KEY}
-     *
-     * @param request embedding search request
-     *
-     * @return an {@link EmbeddingSearchResult}, which contains most relevant text segments
-     */
+    /// The main function of finding most relevant text segments.
+    /// Note: the only filters supported are:
+    ///
+    /// - [IsIn] with key [FileEmbeddingsManager#LINK_METADATA_KEY]
+    /// - [IsEqualTo] with key [FileEmbeddingsManager#LINK_METADATA_KEY]
+    ///
+    /// @param request embedding search request
+    ///
+    /// @return an [EmbeddingSearchResult], which contains most relevant text segments
     @Override
     public EmbeddingSearchResult<TextSegment> search(EmbeddingSearchRequest request) {
         // Source: {@link InMemoryEmbeddingStore}.

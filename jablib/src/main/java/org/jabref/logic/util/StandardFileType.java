@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.jabref.model.util.OptionalUtil;
 
-/**
- * @implNote Enter the extensions in lowercase without a dot! The dot is added implicitly.
- */
+/// @implNote Enter the extensions in lowercase without a dot! The dot is added implicitly.
 public enum StandardFileType implements FileType {
 
     ANY_FILE("Any", "*"),
