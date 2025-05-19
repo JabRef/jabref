@@ -24,7 +24,7 @@ import picocli.CommandLine;
 public class ServerCli implements Callable<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerCli.class);
 
-    @CommandLine.Parameters(arity = "0..*", paramLabel = "FILE")
+    @CommandLine.Parameters(arity = "0..*", paramLabel = "FILE", description = "the library files (*.bib) to serve")
     List<Path> files;
 
     @CommandLine.Option(names = {"-h", "--host"}, description = "the host name")
