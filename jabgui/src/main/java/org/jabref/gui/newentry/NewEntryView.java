@@ -273,6 +273,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             idLookupSpecify.selectedProperty().set(true);
         }
 
+        // [impl->req~newentry.clipboard.autofocus~1]
         Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
         if (validClipboardId.isPresent()) {
             idText.setText(ClipBoardManager.getContents().trim());
