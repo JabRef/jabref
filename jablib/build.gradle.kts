@@ -26,6 +26,9 @@ val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
+if (project.findProperty("tagbuild")?.toString() != "true") {
+    version += "-SNAPSHOT"
+}
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
@@ -178,7 +181,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
     // endregion
 
     implementation("commons-io:commons-io:2.19.0")
@@ -215,10 +218,10 @@ dependencies {
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    testImplementation("org.xmlunit:xmlunit-core:2.10.0")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
+    testImplementation("org.xmlunit:xmlunit-core:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-matchers:2.10.1")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
@@ -502,7 +505,7 @@ mavenPublishing {
 
   signAllPublications()
 
-  coordinates("org.jabref", "jablib", version + "-SNAPSHOT")
+  coordinates("org.jabref", "jablib", version)
 
   pom {
     name.set("jablib")

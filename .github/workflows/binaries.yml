@@ -49,9 +49,11 @@ jobs:
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
+      tagbuild: ${{ steps.binary.outputs.tagbuild }}
       # requried to avoid obsolete builds in case of labels != "dev: binary"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
+
     steps:
       - name: Determine conditions
         id: binary
@@ -90,6 +92,12 @@ jobs:
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
             echo "🚫 merge queue – skipping upload"
             exit 0
+          fi
+
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            echo "tagbuild=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tagbuild=false" >> "$GITHUB_OUTPUT"
           fi
 
           if [[ "${GITHUB_REF}" == refs/tags/* ]] || [[ "${{ inputs.notarization }}" == "true" ]]; then
@@ -158,7 +166,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-22.04')
+        if: (startsWith(matrix.os, 'ubuntu'))
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pigz
@@ -177,6 +185,33 @@ jobs:
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+
+      # region Publish JabLib on Maven Central
+      - name: Decode secretKeyRingFile
+        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
+        id: secring
+        uses: timheuer/base64-to-file@v1
+        with:
+          fileName: 'secring.gpg'
+          encodedString: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
+      - name: store secrets
+        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
+        run: |
+          cat >> gradle.properties <<EOF
+          signing.keyId=${{ secrets.KOPPOR_SIGNING_KEYID }}
+          signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
+          signing.secretKeyRingFile=${{ steps.secring.outputs.filePath }}
+          mavenCentralUsername=${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
+          mavenCentralPassword=${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
+          EOF
+          grep secretKeyRingFile gradle.properties
+          file ${{ steps.secring.outputs.filePath }}
+          md5sum ${{ steps.secring.outputs.filePath }}
+      - name: publishAllPublicationsToMavenCentralRepository
+        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ needs.conditions.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
+        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
+      # endregion
+
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (startsWith(matrix.os, 'macos')) || (needs.conditions.outputs.upload-to-builds-jabref-org == 'false')
@@ -307,7 +342,7 @@ jobs:
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
       - name: Repack deb file for Debian
-        if: (matrix.os == 'ubuntu-22.04')
+        if: (startsWith(matrix.os, 'ubuntu'))
         shell: bash
         run: |
           cd jabgui/build/distribution
@@ -331,6 +366,7 @@ jobs:
           set -e
           ${{ matrix.archivePortableJabKit }}
 
+      # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')
         run: |
@@ -349,7 +385,6 @@ jobs:
           else
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
-
       - name: Setup rsync (macOS)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') && (needs.conditions.outputs.upload-to-builds-jabref-org == 'true')) }}
         run: brew install rsync
@@ -401,6 +436,7 @@ jobs:
             jabgui/build/distribution
             jabkit/build/distribution
           compression-level: 0 # no compression
+      # endregion
 
   comment-on-pr:
     name: Comment on PR

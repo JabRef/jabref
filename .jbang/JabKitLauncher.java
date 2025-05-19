@@ -21,7 +21,7 @@
 
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
 
-//DEPS org.jabref:jablib:0.1.0-SNAPSHOT
+//DEPS org.jabref:jablib:6.+
 //DEPS info.picocli:picocli:4.7.7
 
 import org.jabref.JabKit;
