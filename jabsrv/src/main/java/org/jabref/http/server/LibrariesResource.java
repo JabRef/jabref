@@ -1,5 +1,6 @@
 package org.jabref.http.server;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.http.server.services.FilesToServe;
@@ -26,6 +27,8 @@ public class LibrariesResource {
         List<String> fileNamesWithUniqueSuffix = filesToServe.getFilesToServe().stream()
                                                             .map(p -> p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p))
                                                             .toList();
-        return gson.toJson(fileNamesWithUniqueSuffix);
+        List<String> result = new ArrayList<>(fileNamesWithUniqueSuffix);
+        result.add("demo");
+        return gson.toJson(result);
     }
 }

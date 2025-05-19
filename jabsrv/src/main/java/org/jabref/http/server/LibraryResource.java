@@ -61,7 +61,17 @@ public class LibraryResource {
     @Path("map")
     @Produces(MediaType.APPLICATION_JSON)
     public String getJabMapJson(@PathParam("id") String id) throws IOException {
-        java.nio.file.Path jabMapPath = getJabMapPath(id);
+        boolean isDemo = "demo".equals(id);
+        java.nio.file.Path jabMapPath;
+        if (isDemo) {
+            jabMapPath = getDemoPath();
+        } else {
+            jabMapPath = getJabMapPath(id);
+        }
+        if (isDemo && !Files.exists(jabMapPath)) {
+            Files.createFile(jabMapPath);
+            Files.writeString(jabMapPath, "[]");
+        }
         if (!Files.exists(jabMapPath)) {
             throw new NotFoundException("JabMap file not found");
         }
@@ -72,7 +82,13 @@ public class LibraryResource {
     @Path("map")
     @Consumes(MediaType.APPLICATION_JSON)
     public void updateJabMapJson(@PathParam("id") String id, String fileContent) throws IOException {
-        java.nio.file.Path targetPath = getJabMapPath(id);
+        boolean isDemo = "demo".equals(id);
+        java.nio.file.Path targetPath;
+        if (isDemo) {
+            targetPath = getDemoPath();
+        } else {
+            targetPath = getJabMapPath(id);
+        }
         Files.writeString(targetPath, fileContent);
     }
 
@@ -131,5 +147,11 @@ public class LibraryResource {
                                return p.getParent().resolve(newName);
                            })
                            .orElseThrow(NotFoundException::new);
+    }
+
+    private java.nio.file.Path getDemoPath() {
+        java.nio.file.Path result = java.nio.file.Path.of(System.getProperty("java.io.tmpdir")).resolve("demo.jmp");
+        System.out.println("Demo path: " + result);
+        return result;
     }
 }
