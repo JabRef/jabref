@@ -16,14 +16,14 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.ToolExecutionResultMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.output.FinishReason;
-import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.output.TokenUsage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Gpt4AllModel implements ChatLanguageModel {
+public class Gpt4AllModel implements ChatModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Gpt4AllModel.class);
 
@@ -37,7 +37,7 @@ public class Gpt4AllModel implements ChatLanguageModel {
     }
 
     @Override
-    public Response<AiMessage> generate(List<ChatMessage> list) {
+    public ChatResponse chat(List<ChatMessage> list) {
         LOGGER.debug("Generating response from Gpt4All model with {} messages: {}", list.size(), list);
 
         List<Message> messages = list.stream()
@@ -84,7 +84,10 @@ public class Gpt4AllModel implements ChatLanguageModel {
             // Note: We do not check the token usage and finish reason here.
             // This class is not a complete implementation of langchain4j's ChatLanguageModel.
             // We only implemented the functionality we specifically need.
-            return new Response<>(new AiMessage(generatedText), new TokenUsage(0, 0), FinishReason.OTHER);
+            return new ChatResponse.Builder().aiMessage(new AiMessage(generatedText))
+                                             .tokenUsage(new TokenUsage(0, 0))
+                                             .finishReason(FinishReason.OTHER)
+                                             .build();
         } catch (Exception e) {
             LOGGER.error("Error generating message from Gpt4All", e);
             throw new RuntimeException("Failed to generate AI message", e);

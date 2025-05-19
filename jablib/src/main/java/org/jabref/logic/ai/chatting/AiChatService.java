@@ -10,19 +10,19 @@ import org.jabref.model.entry.BibEntry;
 
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 
 public class AiChatService {
     private final AiPreferences aiPreferences;
-    private final ChatLanguageModel chatLanguageModel;
+    private final ChatModel chatLanguageModel;
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final TemplatesService templatesService;
 
     public AiChatService(AiPreferences aiPreferences,
-                       ChatLanguageModel chatLanguageModel,
+                       ChatModel chatLanguageModel,
                        EmbeddingModel embeddingModel,
                        EmbeddingStore<TextSegment> embeddingStore,
                        TemplatesService templatesService
