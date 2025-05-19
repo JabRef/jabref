@@ -19,9 +19,11 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -53,6 +55,25 @@ public class LibraryResource {
                                              .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldPreferences(), entryTypesManager))
                                              .toList();
         return gson.toJson(list);
+    }
+
+    @GET
+    @Path("map")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getJabMapJson(@PathParam("id") String id) throws IOException {
+        java.nio.file.Path jabMapPath = getJabMapPath(id);
+        if (!Files.exists(jabMapPath)) {
+            throw new NotFoundException("JabMap file not found");
+        }
+        return Files.readString(jabMapPath);
+    }
+
+    @PUT
+    @Path("map")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public void updateJabMapJson(@PathParam("id") String id, String fileContent) throws IOException {
+        java.nio.file.Path targetPath = getJabMapPath(id);
+        Files.writeString(targetPath, fileContent);
     }
 
     @GET
@@ -98,5 +119,17 @@ public class LibraryResource {
                           .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
                           .findAny()
                           .orElseThrow(NotFoundException::new);
+    }
+
+    private java.nio.file.Path getJabMapPath(String id) {
+        return filesToServe.getFilesToServe()
+                          .stream()
+                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
+                          .findAny()
+                           .map(p -> {
+                               String newName = p.getFileName().toString().replaceFirst("\\.bib$", ".jmp");
+                               return p.getParent().resolve(newName);
+                           })
+                           .orElseThrow(NotFoundException::new);
     }
 }
