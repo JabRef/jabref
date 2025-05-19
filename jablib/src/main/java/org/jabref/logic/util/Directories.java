@@ -59,4 +59,8 @@ public class Directories {
                                              "ssl",
                                              OS.APP_DIR_APP_AUTHOR));
     }
+
+    public static Path getTmpDirectory() {
+        return Path.of(System.getProperty("java.io.tmpdir"));
+    }
 }

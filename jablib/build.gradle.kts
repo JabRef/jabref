@@ -199,6 +199,8 @@ dependencies {
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
 
+    implementation("com.github.oshi:oshi-core:6.8.1")
+
     testImplementation(project(":test-support"))
 
     // loading of .fxml files in localization tests requires JabRef's GUI classes

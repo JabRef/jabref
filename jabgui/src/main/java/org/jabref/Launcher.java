@@ -23,6 +23,7 @@ import org.jabref.logic.net.ssl.TrustStoreManager;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.client.RemoteClient;
+import org.jabref.logic.search.PostgreProcessCleaner;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
@@ -45,6 +46,9 @@ public class Launcher {
 
     public static void main(String[] args) {
         initLogging(args);
+
+        // Clean up old Postgres instance if needed
+        PostgreProcessCleaner.getInstance().checkAndCleanupOldInstances();
 
         Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
@@ -76,6 +80,9 @@ public class Launcher {
         Injector.setModelOrService(PostgreServer.class, postgreServer);
 
         CSLStyleLoader.loadInternalStyles();
+
+        // Register shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(postgreServer::shutdown));
 
         JabRefGUI.setup(uiCommands, preferences);
         JabRefGUI.launch(JabRefGUI.class, args);

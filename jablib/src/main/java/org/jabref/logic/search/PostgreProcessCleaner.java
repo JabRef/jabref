@@ -1,8 +1,6 @@
 package org.jabref.logic.search;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,17 +9,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.jabref.logic.os.OS;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import oshi.SystemInfo;
+import oshi.software.os.OSProcess;
+import oshi.software.os.OperatingSystem;
 
 public class PostgreProcessCleaner {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostgreProcessCleaner.class);
     private static final PostgreProcessCleaner INSTANCE = new PostgreProcessCleaner();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final Path TEMP_DIR = Path.of(System.getProperty("java.io.tmpdir"));
+    private static final SystemInfo SYSTEM_INFO = new SystemInfo();
+    private static final OperatingSystem OS = SYSTEM_INFO.getOperatingSystem();
     private static final String FILE_PREFIX = "jabref-postgres-info-";
     private static final String FILE_SUFFIX = ".json";
     private static final int POSTGRES_SHUTDOWN_WAIT_MILLIS = 1500;
@@ -97,73 +98,13 @@ public class PostgreProcessCleaner {
     }
 
     private long getPidUsingPort(int port) {
-        try {
-            Process process = createPortLookupProcess(port);
-            if (process == null) {
-                return -1;
-            }
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                return extractPidFromOutput(reader);
-            }
-        } catch (Exception e) {
-            LOGGER.warn("Failed to get PID for port {}: {}", port, e.getMessage(), e);
-        }
-        return -1;
-    }
-
-    private Process createPortLookupProcess(int port) throws IOException {
-        if (OS.LINUX || OS.OS_X) {
-            return new ProcessBuilder("lsof", "-i", "tcp:" + port, "-sTCP:LISTEN", "-Pn")
-                    .redirectErrorStream(true).start();
-        } else if (OS.WINDOWS) {
-            return executeWindowsCommand(port);
-        }
-        return null;
-    }
-
-    private Process executeWindowsCommand(int port) throws IOException {
-        String systemRoot = System.getenv("SystemRoot");
-        if (systemRoot != null && !systemRoot.isBlank()) {
-            String netStatPath = systemRoot + "\\System32\\netstat.exe";
-            String findStrPath = systemRoot + "\\System32\\findstr.exe";
-            String command = netStatPath + " -ano | " + findStrPath + " :" + port;
-            return new ProcessBuilder("cmd.exe", "/c", command)
-                    .redirectErrorStream(true).start();
-        }
-        return null;
-    }
-
-    private long extractPidFromOutput(BufferedReader reader) throws IOException {
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (OS.LINUX || OS.OS_X) {
-                Long pid = parsePidFromLine(line);
-                if (pid != null) {
-                    return pid;
-                }
-            } else if (OS.WINDOWS) {
-                Long pid = parseWindowsPidFromLine(line);
-                if (pid != null) {
-                    return pid;
-                }
+        for (OSProcess process : OS.getProcesses()) {
+            String command = process.getCommandLine();
+            if (command != null && command.toLowerCase().contains("postgres")
+                    && command.contains(String.valueOf(port))) {
+                return process.getProcessID();
             }
         }
-        return -1;
-    }
-
-    private Long parsePidFromLine(String line) {
-        String[] parts = line.trim().split("\\s+");
-        if (parts.length > 1 && parts[1].matches("\\d+")) {
-            return Long.parseLong(parts[1]);
-        }
-        return null;
-    }
-
-    private Long parseWindowsPidFromLine(String line) {
-        String[] parts = line.trim().split("\\s+");
-        if (parts.length >= 5 && parts[parts.length - 1].matches("\\d+")) {
-            return Long.parseLong(parts[parts.length - 1]);
-        }
-        return null;
+        return -1L;
     }
 }
