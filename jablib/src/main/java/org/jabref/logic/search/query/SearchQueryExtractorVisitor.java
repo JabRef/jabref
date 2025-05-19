@@ -14,9 +14,7 @@ import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.search.SearchBaseVisitor;
 import org.jabref.search.SearchParser;
 
-/**
- * Tests are located in {@link org.jabref.logic.search.query.SearchQueryExtractorConversionTest}.
- */
+/// Tests are located in `org.jabref.logic.search.query.SearchQueryExtractorConversionTest`.
 public class SearchQueryExtractorVisitor extends SearchBaseVisitor<List<SearchQueryNode>> {
 
     private final boolean searchBarRegex;
