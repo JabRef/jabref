@@ -150,7 +150,7 @@ dependencies {
     // region AI
     implementation("dev.langchain4j:langchain4j:0.36.2")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.0") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
