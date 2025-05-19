@@ -50,10 +50,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | Article    | first        | o     | -         |
                 | Article    | second       | -     | ?         |
 
-                x | required field is present
-                o | optional field is present
-                ? | unknown field is present
-                - | field is absent
+                | Symbol | Meaning                   |
+                | ------ | ------------------------- |
+                | x      | required field is present |
+                | o      | optional field is present |
+                | ?      | unknown field is present  |
+                | -      | field is absent           |
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
@@ -81,10 +83,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | ---------- | ------------ | ------ | ----- | ----- |
                 | Article    | first        | ?      | o     | x     |
 
-                x | required field is present
-                o | optional field is present
-                ? | unknown field is present
-                - | field is absent
+                | Symbol | Meaning                   |
+                | ------ | ------------------------- |
+                | x      | required field is present |
+                | o      | optional field is present |
+                | ?      | unknown field is present  |
+                | -      | field is absent           |
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
@@ -112,10 +116,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | ---------- | ------------------- | ------ | ----- | ----- |
                 | Article    | first-very-long-key | ?      | o     | x     |
 
-                x | required field is present
-                o | optional field is present
-                ? | unknown field is present
-                - | field is absent
+                | Symbol | Meaning                   |
+                | ------ | ------------------------- |
+                | x      | required field is present |
+                | o      | optional field is present |
+                | ?      | unknown field is present  |
+                | -      | field is absent           |
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
@@ -158,10 +164,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | InProceedings | fourth       | -        | -     | o         |
                 | InProceedings | third        | ?        | o     | -         |
 
-                x | required field is present
-                o | optional field is present
-                ? | unknown field is present
-                - | field is absent
+                | Symbol | Meaning                   |
+                | ------ | ------------------------- |
+                | x      | required field is present |
+                | o      | optional field is present |
+                | ?      | unknown field is present  |
+                | -      | field is absent           |
                 """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
