@@ -18,7 +18,8 @@ import org.slf4j.LoggerFactory;
 public class MscCodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MscCodeUtils.class);
 
-    /** Load MSC codes and descriptions from a JSON resource URL into a HashMap
+    /** 
+     * Load MSC codes and descriptions from a JSON resource URL into a HashMap
      *
      * @param resourceUrl URL to the JSON resource containing MSC codes
      * @return Map with MSC codes as keys and descriptions as values
