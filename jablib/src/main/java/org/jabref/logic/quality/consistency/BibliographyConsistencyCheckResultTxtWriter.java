@@ -63,13 +63,8 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
 
     private void initializeColumnWidths() {
         columnWidths = new ArrayList<>(columnNames.size());
-
-        Integer max = getColumnWidthOfEntryTypes();
-        columnWidths.add(max);
-
-        max = getColumnWidthOfCitationKeys(max);
-        columnWidths.add(max);
-
+        columnWidths.add(getColumnWidthOfEntryTypes());
+        columnWidths.add(getColumnWidthOfCitationKeys());
         columnWidths.addAll(columnNames.stream().skip(2).map(String::length).toList());
     }
 
@@ -83,8 +78,8 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
         return max;
     }
 
-    private Integer getColumnWidthOfCitationKeys(Integer max) {
-        result.entryTypeToResultMap().values()
+    private Integer getColumnWidthOfCitationKeys() {
+        int max = result.entryTypeToResultMap().values()
               .stream()
               .flatMap(entryTypeResult -> entryTypeResult.sortedEntries().stream())
               .map(entry -> entry.getCitationKey().orElse("").length())

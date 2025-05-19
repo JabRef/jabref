@@ -89,6 +89,37 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
+    void checkVeryLongCitationKey(@TempDir Path tempDir) throws IOException {
+        UnknownField customField = new UnknownField("custom");
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first-very-long-key")
+                .withField(StandardField.AUTHOR, "Author One") // required
+                .withField(StandardField.TITLE, "Title") // required
+                .withField(StandardField.PAGES, "some pages") // optional
+                .withField(customField, "custom"); // unknown
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author One");
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+
+        Path txtFile = tempDir.resolve("checkDifferentOutputSymbols-result.txt");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+        }
+        assertEquals("""
+                Field Presence Consistency Check Result
+
+                | entry type | citation key        | Custom | Pages | Title |
+                | ---------- | ------------------- | ------ | ----- | ----- |
+                | Article    | first-very-long-key | ?      | o     | x     |
+
+                x | required field is present
+                o | optional field is present
+                ? | unknown field is present
+                - | field is absent
+                """, Files.readString(txtFile).replace("\r\n", "\n"));
+    }
+
+    @Test
     void checkComplexLibrary(@TempDir Path tempDir) throws IOException {
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One")
