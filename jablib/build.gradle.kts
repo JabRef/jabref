@@ -26,6 +26,9 @@ val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
+if (project.findProperty("tagbuild")?.toString() != "true") {
+    version += "-SNAPSHOT"
+}
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
@@ -504,7 +507,7 @@ mavenPublishing {
 
   signAllPublications()
 
-  coordinates("org.jabref", "jablib", version + "-SNAPSHOT")
+  coordinates("org.jabref", "jablib", version)
 
   pom {
     name.set("jablib")
