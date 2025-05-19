@@ -151,12 +151,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         assertEquals("""
                 Field Presence Consistency Check Result
 
-                | entry type    | citation key  | Location | Pages | Publisher |
-                | ------------- | ------------- | -------- | ----- | --------- |
-                | Article       | first         | -        | o     | -         |
-                | Article       | second        | -        | -     | ?         |
-                | InProceedings | fourth        | -        | -     | o         |
-                | InProceedings | third         | ?        | o     | -         |
+                | entry type    | citation key | Location | Pages | Publisher |
+                | ------------- | ------------ | -------- | ----- | --------- |
+                | Article       | first        | -        | o     | -         |
+                | Article       | second       | -        | -     | ?         |
+                | InProceedings | fourth       | -        | -     | o         |
+                | InProceedings | third        | ?        | o     | -         |
 
                 x | required field is present
                 o | optional field is present

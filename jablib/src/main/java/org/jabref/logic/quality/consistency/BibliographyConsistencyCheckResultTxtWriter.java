@@ -63,29 +63,20 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
 
     private void initializeColumnWidths() {
         columnWidths = new ArrayList<>(columnNames.size());
-        columnWidths.add(getColumnWidthOfEntryTypes());
-        columnWidths.add(getColumnWidthOfCitationKeys());
+
+        int entryTypeWidth = "entry type".length();
+        int citationKeyWidth = "citation key".length();
+
+        for (var keysAndValue : result.entryTypeToResultMap().entrySet()) {
+            entryTypeWidth = Math.max(entryTypeWidth, keysAndValue.getKey().getDisplayName().length());
+            for (var entry : keysAndValue.getValue().sortedEntries()) {
+                citationKeyWidth = Math.max(citationKeyWidth, entry.getCitationKey().orElse("").length());
+            }
+        }
+
+        columnWidths.add(entryTypeWidth);
+        columnWidths.add(citationKeyWidth);
         columnWidths.addAll(columnNames.stream().skip(2).map(String::length).toList());
-    }
-
-    private Integer getColumnWidthOfEntryTypes() {
-        int max = result.entryTypeToResultMap().keySet()
-                            .stream()
-                            .map(entryType -> entryType.getDisplayName().length())
-                            .max(Integer::compareTo)
-                            .get();
-        max = Math.max(max, "entry type".length());
-        return max;
-    }
-
-    private Integer getColumnWidthOfCitationKeys() {
-        int max = result.entryTypeToResultMap().values()
-              .stream()
-              .flatMap(entryTypeResult -> entryTypeResult.sortedEntries().stream())
-              .map(entry -> entry.getCitationKey().orElse("").length())
-              .max(Integer::compareTo)
-              .get();
-        return Math.max(max, "citation key".length());
     }
 
     @Override
