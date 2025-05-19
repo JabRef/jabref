@@ -38,7 +38,10 @@ import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
+import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -270,41 +273,18 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             idLookupSpecify.selectedProperty().set(true);
         }
 
-        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported identifier format.
-            idText.setText(clipboardText);
+        Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
+        if (validClipboardId.isPresent()) {
+            idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
-            Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
-            if (identifier.isPresent()) {
-                Identifier id = identifier.get();
-                boolean isValid = switch (id) {
-                    case DOI doi -> DOI.isValid(doi.asString());
-                    case ISBN isbn -> isbn.isValid();
-                    default -> true;
-                };
-
-                if (isValid) {
-                    Platform.runLater(() -> {
-                        idLookupSpecify.setSelected(true);
-                        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
-                            if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
-                                    (id instanceof ISBN && fetcher.getName().toLowerCase().contains("isbn")) ||
-                                    (id instanceof ArXivIdentifier && fetcher.getName().toLowerCase().contains("arxiv")) ||
-                                    (id instanceof RFC && fetcher.getName().toLowerCase().contains("rfc")) ||
-                                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
-                                idFetcher.setValue(fetcher);
-                                break;
-                            }
-                        }
-                    });
-                } else {
-                    Platform.runLater(() -> idLookupGuess.setSelected(true));
-                }
-            } else {
-                Platform.runLater(() -> idLookupGuess.setSelected(true));
-            }
+            Identifier id = validClipboardId.get();
+            Platform.runLater(() -> {
+                idLookupSpecify.setSelected(true);
+                fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
+            });
+        } else {
+            Platform.runLater(() -> idLookupGuess.setSelected(true));
         }
 
         idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
@@ -558,5 +538,44 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             }
         }
         return null;
+    }
+
+    private Optional<Identifier> extractValidIdentifierFromClipboard() {
+        String clipboardText = ClipBoardManager.getContents().trim();
+
+        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
+            Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
+            if (identifier.isPresent()) {
+                Identifier id = identifier.get();
+                boolean isValid = switch (id) {
+                    case DOI doi ->
+                            DOI.isValid(doi.asString());
+                    case ISBN isbn ->
+                            isbn.isValid();
+                    default ->
+                            true;
+                };
+                if (isValid) {
+                    return Optional.of(id);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
+        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
+            if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
+                    // Use instanceof for structured check; fallback to name matching since some ISBN fetchers (like IsbnFetcher) don't extend AbstractIsbnFetcher.
+                    (id instanceof ISBN && (fetcher instanceof AbstractIsbnFetcher ||
+                            fetcher.getName().toLowerCase().contains("isbn"))) ||
+                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
+                return Optional.of(fetcher);
+            }
+        }
+        return Optional.empty();
     }
 }
