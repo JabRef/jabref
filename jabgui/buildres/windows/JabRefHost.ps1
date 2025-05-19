@@ -36,7 +36,7 @@ try {
     # WriteAllLines should write the file as UTF-8 without BOM
     # unlike Out-File which writes UTF-16 with BOM in ps5.1
     [IO.File]::WriteAllLines($tempfile, $messageText)
-    $output = & $jabRefExe -importToOpen $tempfile *>&1
+    $output = & $jabRefExe --importToOpen $tempfile *>&1
     Remove-Item $tempfile *>$null
     # For debugging: uncomment the following lines to get the output of JabRef be displayed as a popup 
     #$wshell = New-Object -ComObject Wscript.Shell
