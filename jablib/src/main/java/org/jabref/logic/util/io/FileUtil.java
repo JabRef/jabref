@@ -531,14 +531,12 @@ public class FileUtil {
         return false;
     }
 
-    /**
-     * Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
-     * with maxLength = 20 is shortened into verylo...isthis.pdf
-     *
-     * @param fileName  the given file name to be shortened
-     * @param maxLength the maximum number of characters in the string after shortening (including the extension)
-     * @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
-     */
+    /// Shorten a given file name in the middle of the name using ellipsis. Example: verylongfilenameisthis.pdf
+    /// with maxLength = 20 is shortened into verylo...isthis.pdf
+    ///
+    /// @param fileName  the given file name to be shortened
+    /// @param maxLength the maximum number of characters in the string after shortening (including the extension)
+    /// @return the original fileName if fileName.length() <= maxLength. Otherwise, a shortened fileName
     public static String shortenFileName(String fileName, Integer maxLength) {
         if (fileName == null || maxLength == null || maxLength < ELLIPSIS_LENGTH) {
             return "";

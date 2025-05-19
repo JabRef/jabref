@@ -1,0 +1,26 @@
+FROM gradle:jdk24-noble AS build
+
+WORKDIR /app
+
+COPY . .
+
+RUN gradle --no-daemon :jabsrv-cli:jpackage
+
+RUN find jabsrv-cli/build/distribution
+
+RUN mkdir /dist
+
+RUN mv jabsrv-cli/build/distribution/jabsrv /dist
+
+# jpackage needs glibc; alpine does not work
+FROM debian:bookworm-slim AS runtime
+
+LABEL org.opencontainers.image.source=https://github.com/JabRef/jabref
+
+WORKDIR /work
+
+COPY --from=build /dist /jabref
+
+EXPOSE 6050
+
+ENTRYPOINT ["/jabref/jabsrv/bin/jabsrv"]
