@@ -125,14 +125,11 @@ public class ImportFormatReader {
         }
     }
 
-    /**
-     * All importers.
-     *
-     * Elements are sorted by name.
-     * </p>
-     *
-     * @return all custom importers, elements are of type InputFormat
-     */
+    /// All importers.
+    ///
+    /// Elements are sorted by name.
+    ///
+    /// @return all custom importers, elements are of type InputFormat
     public SortedSet<Importer> getImportFormats() {
         return new TreeSet<>(this.formats);
     }
@@ -140,14 +137,12 @@ public class ImportFormatReader {
     public record UnknownFormatImport(String format, ParserResult parserResult) {
     }
 
-    /**
-     * Tries to import a file by iterating through the available import filters,
-     * and keeping the import that seems most promising.
-     * <p/>
-     * This method first attempts to read this file as bibtex.
-     *
-     * @throws ImportException if the import fails (for example, if no suitable importer is found)
-     */
+    /// Tries to import a file by iterating through the available import filters,
+    /// and keeping the import that seems most promising.
+    ///
+    /// This method first attempts to read this file as bibtex.
+    ///
+    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     public UnknownFormatImport importUnknownFormat(Path filePath, FileUpdateMonitor fileMonitor) throws ImportException {
         Objects.requireNonNull(filePath);
 

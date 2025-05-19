@@ -3,9 +3,9 @@ package org.jabref.support;
 import org.jabref.model.TreeNode;
 
 public class TreeNodeTestData {
-    /**
-     * Gets the marked node in the following tree: Root A A (= parent) B (<-- this)
-     */
+    /// Gets the marked node in the following tree:
+    ///
+    ///     Root A A (= parent) B (<-- this)
     public static TreeNodeMock getNodeInSimpleTree(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
         TreeNodeMock parent = new TreeNodeMock();
@@ -19,10 +19,9 @@ public class TreeNodeTestData {
         return getNodeInSimpleTree(new TreeNodeMock());
     }
 
-    /**
-     * Gets the marked node in the following tree: Root A A A (= grand parent) B B (= parent) C (<-- this) D (= child) C
-     * C C B B A
-     */
+    /// Gets the marked node in the following tree:
+    ///
+    ///     Root A A A (= grand parent) B B (= parent) C (<-- this) D (= child) C
     public static TreeNodeMock getNodeInComplexTree(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
         root.addChild(new TreeNodeMock());
@@ -50,9 +49,9 @@ public class TreeNodeTestData {
         return getNodeInComplexTree(new TreeNodeMock());
     }
 
-    /**
-     * Gets the marked in the following tree: Root A A A (<- this) A
-     */
+    /// Gets the marked in the following tree:
+    ///
+    ///     Root A A A (<- this) A
     public static TreeNodeMock getNodeAsChild(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
         root.addChild(new TreeNodeMock());
