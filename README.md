@@ -93,7 +93,7 @@ Please take a look at our [guidelines for contributing](CONTRIBUTING.md).
 
 ## Building from Source
 
-Please see [here](https://docs.jabref.org/installation#building-from-source) for instructions on how to build JabRef from sources.
+Please see [Building from source](https://docs.jabref.org/installation#building-from-source) for instructions on how to build JabRef from sources.
 
 ## Research and Education
 
