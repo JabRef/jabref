@@ -75,4 +75,4 @@ This caused problems for
 1. numbering order\
    `(solved)` by keeping track of the order-in-footnote of citation markers during sorting using [getIndexInPosition](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/model/openoffice/rangesort/RangeSortable.java#L21))
 2. `click:Merge`: It examines _consecutive_ pairs of citation groups if they can be merged. Wrong order may result in not discovering some mergeable pairs or attempting to merge in wrong order.\
-   `(solved)` by not using visual order, only XTextRangeCompare-based order within each XText [here](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/logic/openoffice/action/EditMerge.java#L325))
+   `(solved)` by not using visual order, only XTextRangeCompare-based [order within each XText](https://github.com/antalk2/jabref/blob/122d5133fa6c7b44245c5ba5600d398775718664/src/main/java/org/jabref/logic/openoffice/action/EditMerge.java#L325))

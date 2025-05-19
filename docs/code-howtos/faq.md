@@ -27,7 +27,7 @@ Background: [OpenRewrite](https://docs.openrewrite.org/) is an automated refacto
 
 You have probably used Strings that are visible on the UI (to the user) but not wrapped them using `Localization.lang(...)` and added them to the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties).
 
-Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
+Read more about the [background and format of localization](https://devdocs.jabref.org/code-howtos/localization.html) in JabRef.
 
 ### `org.jabref.logic.l10n.LocalizationConsistencyTest findObsoleteLocalizationKeys` <span style="color:red">FAILED</span>
 
@@ -35,7 +35,7 @@ Navigate to the unused key-value pairs in the file and remove them.
 You can always click on the details of the failing test to pinpoint which keys are unused.
 
 Background: There are localization keys in the [localization properties file](https://github.com/JabRef/jabref/blob/main/src/main/resources/l10n/JabRef_en.properties) that are not used in the code, probably due to the removal of existing code.
-Read more about the background and format of localization in JabRef [here](https://devdocs.jabref.org/code-howtos/localization.html).
+Read more about the [background and format of localization](https://devdocs.jabref.org/code-howtos/localization.html) in JabRef.
 
 ### `org.jabref.logic.citationstyle.CitationStyleCatalogGenerator generateCitationStyleCatalog` <span style="color:red">ERROR: Could not find any citation style. Tried with /ieee.csl.</span>
 
@@ -54,7 +54,7 @@ If still not fixed, run `git reset --hard` **inside that directory**.
 
 Check if you've used `System.out.println(...)` (the standard output stream) to log anything into the console.
 This is an architectural violation, as you should use the Logger instead for logging.
-More details on how to log can be found [here](https://devdocs.jabref.org/code-howtos/logging.html).
+More details on [how to log](https://devdocs.jabref.org/code-howtos/logging.html).
 
 ### `org.jabref.architecture.MainArchitectureTest doNotUseLogicInModel` <span style="color:red">FAILED</span>
 
