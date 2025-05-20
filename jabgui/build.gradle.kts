@@ -147,8 +147,8 @@ application {
     applicationDefaultJvmArgs = listOf(
         // On a change here, also adapt
         //   1. "run > moduleOptions"
-        //   2. "deployment.yml" (macOS part)
-        //   3. "deployment-arm64.yml"
+        //   2. "binaries.yml" (macOS part)
+        //   3. "binaries-arm64.yml"
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
 
