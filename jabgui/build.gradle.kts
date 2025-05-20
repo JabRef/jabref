@@ -80,7 +80,7 @@ dependencies {
 
     implementation("com.google.guava:guava:33.4.8-jre")
 
-    implementation("dev.langchain4j:langchain4j:0.36.2")
+    implementation("dev.langchain4j:langchain4j:1.0.0")
 
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
 

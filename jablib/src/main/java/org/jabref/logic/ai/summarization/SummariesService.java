@@ -22,7 +22,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.eventbus.Subscribe;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class SummariesService {
 
     private final AiPreferences aiPreferences;
     private final SummariesStorage summariesStorage;
-    private final ChatLanguageModel chatLanguageModel;
+    private final ChatModel chatLanguageModel;
     private final TemplatesService templatesService;
     private final BooleanProperty shutdownSignal;
     private final FilePreferences filePreferences;
@@ -52,7 +52,7 @@ public class SummariesService {
 
     public SummariesService(AiPreferences aiPreferences,
                             SummariesStorage summariesStorage,
-                            ChatLanguageModel chatLanguageModel,
+                            ChatModel chatLanguageModel,
                             TemplatesService templatesService,
                             BooleanProperty shutdownSignal,
                             FilePreferences filePreferences,
@@ -113,26 +113,24 @@ public class SummariesService {
     }
 
     public ProcessingInfo<BibEntry, Summary> getProcessingInfo(BibEntry entry) {
-        return summariesStatusMap.computeIfAbsent(entry, file -> new ProcessingInfo<>(entry, ProcessingState.STOPPED));
+        return summariesStatusMap.computeIfAbsent(entry, _ -> new ProcessingInfo<>(entry, ProcessingState.STOPPED));
     }
 
     public List<ProcessingInfo<BibEntry, Summary>> getProcessingInfo(List<BibEntry> entries) {
         return entries.stream().map(this::getProcessingInfo).toList();
     }
 
-    public List<ProcessingInfo<BibEntry, Summary>> summarize(StringProperty groupName, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+    public void summarize(StringProperty groupName, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
         List<ProcessingInfo<BibEntry, Summary>> result = getProcessingInfo(entries);
 
         if (listsUnderSummarization.contains(entries)) {
-            return result;
+            return;
         }
 
         listsUnderSummarization.add(entries);
 
         List<ProcessingInfo<BibEntry, Summary>> needToProcess = result.stream().filter(processingInfo -> processingInfo.getState() == ProcessingState.STOPPED).toList();
         startSummarizationTask(groupName, needToProcess, bibDatabaseContext);
-
-        return result;
     }
 
     private void startSummarizationTask(BibEntry entry, BibDatabaseContext bibDatabaseContext, ProcessingInfo<BibEntry, Summary> processingInfo) {
