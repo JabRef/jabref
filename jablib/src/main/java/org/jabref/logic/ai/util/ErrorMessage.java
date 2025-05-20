@@ -25,7 +25,6 @@ public class ErrorMessage implements ChatMessage {
         return ChatMessageType.AI;
     }
 
-
     public String getText() {
         return text;
     }
