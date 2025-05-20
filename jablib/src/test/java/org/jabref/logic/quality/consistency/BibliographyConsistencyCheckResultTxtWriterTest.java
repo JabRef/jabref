@@ -143,11 +143,16 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024")
                 .withField(StandardField.PUBLISHER, "publisher");
+        // Entry added to check for alphabetical ordering of citation keys
         BibEntry fifth = new BibEntry(StandardEntryType.InProceedings, "fifth")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.LOCATION, "location")
+                .withField(StandardField.YEAR, "2024");
+        BibEntry sixth = new BibEntry(StandardEntryType.InProceedings, "sixth")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth, sixth));
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));

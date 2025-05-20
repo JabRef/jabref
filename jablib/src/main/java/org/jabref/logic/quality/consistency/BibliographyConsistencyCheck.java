@@ -4,12 +4,14 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 
+import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
+import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
+import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.types.EntryType;
@@ -55,36 +57,21 @@ public class BibliographyConsistencyCheck {
                 return;
             }
 
-            List<BibEntry> sortedEntries = entryTypeToEntriesMap
+            List<Comparator<BibEntry>> comparators = List.of(
+                    new BibEntryByCitationKeyComparator(),
+                    new BibEntryByFieldsComparator());
+            FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
+
+            List<BibEntry> differingEntries = entryTypeToEntriesMap
                     .get(entryType).stream()
                     .filter(entry -> !entry.getFields().equals(commonFields))
-                    .sorted(getBibEntryComparator()).toList();
-            resultMap.put(entryType, new EntryTypeResult(uniqueFields, sortedEntries));
+                    .sorted(comparatorStack)
+                    .toList();
+
+            resultMap.put(entryType, new EntryTypeResult(uniqueFields, differingEntries));
         });
 
         return new Result(resultMap);
-    }
-
-    /**
-     * Sorts entries by the number of fields and then by the field names.
-     */
-    private static Comparator<BibEntry> getBibEntryComparator() {
-        return (e1, e2) -> {
-            int sizeComparison = e1.getFields().size() - e2.getFields().size();
-            if (sizeComparison != 0) {
-                return sizeComparison;
-            }
-            Iterator<String> it1 = e1.getFields().stream().map(Field::getName).sorted().iterator();
-            Iterator<String> it2 = e2.getFields().stream().map(Field::getName).sorted().iterator();
-            while (it1.hasNext() && it2.hasNext()) {
-                int fieldComparison = it1.next().compareTo(it2.next());
-                if (fieldComparison != 0) {
-                    return fieldComparison;
-                }
-            }
-            assert !it1.hasNext() && !it2.hasNext();
-            return 0;
-        };
     }
 
     private static void collectEntriesIntoMaps(List<BibEntry> entries, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
