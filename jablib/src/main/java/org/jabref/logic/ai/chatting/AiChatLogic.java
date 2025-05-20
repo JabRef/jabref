@@ -25,9 +25,10 @@ import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.TokenWindowChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.openai.OpenAiTokenizer;
+import dev.langchain4j.model.openai.OpenAiChatModelName;
+import dev.langchain4j.model.openai.OpenAiTokenCountEstimator;
 import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingSearchResult;
@@ -41,7 +42,7 @@ public class AiChatLogic {
     private static final Logger LOGGER = LoggerFactory.getLogger(AiChatLogic.class);
 
     private final AiPreferences aiPreferences;
-    private final ChatLanguageModel chatLanguageModel;
+    private final ChatModel chatLanguageModel;
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final TemplatesService templatesService;
@@ -56,7 +57,7 @@ public class AiChatLogic {
     private Optional<Filter> filter = Optional.empty();
 
     public AiChatLogic(AiPreferences aiPreferences,
-                       ChatLanguageModel chatLanguageModel,
+                       ChatModel chatLanguageModel,
                        EmbeddingModel embeddingModel,
                        EmbeddingStore<TextSegment> embeddingStore,
                        TemplatesService templatesService,
@@ -96,9 +97,18 @@ public class AiChatLogic {
     }
 
     private void rebuildChatMemory(List<ChatMessage> chatMessages) {
+        // Because we can't get a tokenizer for each model, {@link AiChatLogic} assumes that
+        // every text is tokenized like it's tokenized for OpenAI's GPT-4o-mini model.
+        // 
+        // Reasons why we can't get tokenizer for each model:
+        // - Some tokenizers might not be available in langchain4j.
+        // - User may use a custom model, but there is no way to supply a custom tokenizer.
+        // - OpenAI API (and compatible ones) doesn't have an endpoint for tokenizing text.
+        //
+        // This is another dark workaround of AI integration. But it works "good-enough" for now.
         this.chatMemory = TokenWindowChatMemory
                 .builder()
-                .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer())
+                .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenCountEstimator(OpenAiChatModelName.GPT_4_O_MINI))
                 .build();
 
         chatMessages.stream().filter(chatMessage -> !(chatMessage instanceof ErrorMessage)).forEach(chatMemory::add);
@@ -166,7 +176,7 @@ public class AiChatLogic {
         // This is crazy, but langchain4j {@link ChatMemory} does not allow to remove single messages.
         ChatMemory tempChatMemory = TokenWindowChatMemory
                 .builder()
-                .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenizer())
+                .maxTokens(aiPreferences.getContextWindowSize(), new OpenAiTokenCountEstimator(OpenAiChatModelName.GPT_4_O_MINI))
                 .build();
 
         chatMemory.messages().forEach(tempChatMemory::add);
@@ -174,7 +184,7 @@ public class AiChatLogic {
         tempChatMemory.add(new UserMessage(templatesService.makeChattingUserMessage(entries, message.singleText(), excerpts)));
         chatMemory.add(message);
 
-        AiMessage aiMessage = chatLanguageModel.generate(tempChatMemory.messages()).content();
+        AiMessage aiMessage = chatLanguageModel.chat(tempChatMemory.messages()).aiMessage();
 
         chatMemory.add(aiMessage);
         chatHistory.add(aiMessage);

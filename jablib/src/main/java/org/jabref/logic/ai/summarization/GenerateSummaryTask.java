@@ -23,11 +23,12 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import dev.langchain4j.data.document.DefaultDocument;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private final BibDatabaseContext bibDatabaseContext;
     private final BibEntry entry;
     private final String citationKey;
-    private final ChatLanguageModel chatLanguageModel;
+    private final ChatModel chatLanguageModel;
     private final SummariesStorage summariesStorage;
     private final TemplatesService templatesService;
     private final ReadOnlyBooleanProperty shutdownSignal;
@@ -59,7 +60,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
     public GenerateSummaryTask(BibEntry entry,
                                BibDatabaseContext bibDatabaseContext,
                                SummariesStorage summariesStorage,
-                               ChatLanguageModel chatLanguageModel,
+                               ChatModel chatLanguageModel,
                                TemplatesService templatesService,
                                ReadOnlyBooleanProperty shutdownSignal,
                                AiPreferences aiPreferences,
@@ -141,11 +142,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
         // Stream API would look better here, but we need to catch InterruptedException.
         List<String> linkedFilesSummary = new ArrayList<>();
         for (LinkedFile linkedFile : entry.getFiles()) {
-            Optional<String> s = generateSummary(linkedFile);
-            if (s.isPresent()) {
-                String string = s.get();
-                linkedFilesSummary.add(string);
-            }
+            generateSummary(linkedFile).ifPresent(linkedFilesSummary::add);
         }
 
         if (linkedFilesSummary.isEmpty()) {
@@ -200,7 +197,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
 
         DocumentSplitter documentSplitter = DocumentSplitters.recursive(aiPreferences.getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_CHUNK)), MAX_OVERLAP_SIZE_IN_CHARS);
 
-        List<String> chunkSummaries = documentSplitter.split(new Document(document)).stream().map(TextSegment::text).toList();
+        List<String> chunkSummaries = documentSplitter.split(new DefaultDocument(document)).stream().map(TextSegment::text).toList();
 
         LOGGER.debug("The file \"{}\" of entry {} was split into {} chunk(s)", filePath, citationKey, chunkSummaries.size());
 
@@ -222,7 +219,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
                 String prompt = templatesService.makeSummarizationChunk(chunkSummary);
 
                 LOGGER.debug("Sending request to AI provider to summarize a chunk from file \"{}\" of entry {}", filePath, citationKey);
-                String chunk = chatLanguageModel.generate(prompt);
+                String chunk = chatLanguageModel.chat(prompt);
                 LOGGER.debug("Chunk summary for file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
                 list.add(chunk);
@@ -245,7 +242,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
         }
 
         LOGGER.debug("Sending request to AI provider to combine summary chunk(s) for file \"{}\" of entry {}", filePath, citationKey);
-        String result = chatLanguageModel.generate(prompt);
+        String result = chatLanguageModel.chat(prompt);
         LOGGER.debug("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
         doneOneWork();

@@ -9,12 +9,9 @@ import org.jabref.model.search.LinkedFilesConstants;
 
 import net.harawata.appdirs.AppDirsFactory;
 
-/**
- * This collects all directories based on AppDirs.
- *
- * OS-dependent directories are handled in the NativeDesktop class.
- * See e.g. {@link org.jabref.gui.desktop.os.NativeDesktop#getApplicationDirectory()}
- */
+/// This collects all directories based on AppDirs.
+/// OS-dependent directories are handled in the NativeDesktop class.
+/// See e.g. `org.jabref.gui.desktop.os.NativeDesktop#getApplicationDirectory()`
 public class Directories {
     /**
      * Returns the path to the system's user directory.

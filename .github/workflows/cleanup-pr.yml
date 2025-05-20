@@ -6,8 +6,11 @@ on:
 
 jobs:
   cleanup:
-    if: github.repository_owner == 'JabRef'
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Cancel deployment run
         uses: styfle/cancel-workflow-action@0.12.1
@@ -36,10 +39,10 @@ jobs:
           port: 9922
           username: jrrsync
           key: ${{ secrets.buildJabRefPrivateKey }}
-      - name: Update PR comment
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
-        uses: thollander/actions-comment-pull-request@v3
+      - name: Remove Docker Tag
+        # A separate action is needed to delete a tag - see https://github.com/orgs/community/discussions/26267
+        uses: rafalkk/remove-dockertag-action@v1
         with:
-          comment-tag: download-link
-          message: The build for this PR is no longer available. Please visit <https://builds.jabref.org/main/> for the latest build.
-          mode: upsert
+          tag_name: pr-${{ github.event.pull_request.number }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          is_organization: 'true'

@@ -20,6 +20,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a success dialog when using the "Copy to" option, indicating whether the entry was successfully copied and specifying if a cross-reference entry was included. [#12486](https://github.com/JabRef/jabref/issues/12486)
 - We added a new button to toggle the file path between an absolute and relative formats in context of library properties. [#13031](https://github.com/JabRef/jabref/issues/13031)
 - We added automatic selection of the “Enter Identifier” tab with pre-filled clipboard content if the clipboard contains a valid identifier when opening the “Create New Entry” dialog. [#13087](https://github.com/JabRef/jabref/issues/13087)
+- We added an "Open example library" button to Welcome Tab. [#13014](https://github.com/JabRef/jabref/issues/13014)
+- We added support for import of a Refer/BibIX file format. [#13069](https://github.com/JabRef/jabref/issues/13069)
 
 ### Changed
 

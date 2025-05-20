@@ -154,6 +154,7 @@ public class MetaDataSerializerTest {
 
         Map<String, String> serialized = MetaDataSerializer.getSerializedStringMap(metaData, pattern);
 
-        assertEquals("/home/user/test.blg;", serialized.get("blgFilePath-" + user));
+        // On Windows, the path separator is a backslash, which is escaped in JabRef (see org.jabref.logic.exporter.MetaDataSerializer.serializeMetaData)
+        assertEquals(blgPath.toString().replace("\\", "\\\\") + ";", serialized.get("blgFilePath-" + user));
     }
 }

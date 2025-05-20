@@ -49,12 +49,10 @@ public abstract class TreeNode<T extends TreeNode<T>> {
         /* Do nothing */
     };
 
-    /**
-     * Constructs a tree node without parent and no children.
-     *
-     * @param derivingClass class deriving from TreeNode&lt,T>. It should always be "T.class".
-     *                      We need this parameter since it is hard to get this information by other means.
-     */
+    /// Constructs a tree node without parent and no children.
+    ///
+    /// @param derivingClass class deriving from TreeNode<T>. It should always be "T.class".
+    ///                      We need this parameter since it is hard to get this information by other means.
     public TreeNode(Class<T> derivingClass) {
         parent = null;
         children = FXCollections.observableArrayList();
