@@ -46,7 +46,7 @@ java {
         // - .github/workflows/tests*.yml
         // - .github/workflows/update-gradle-wrapper.yml
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
-        // - mise.toml
+        // - .sdkmanrc
         languageVersion = JavaLanguageVersion.of(24)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
