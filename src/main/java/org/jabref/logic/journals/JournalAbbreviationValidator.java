@@ -215,5 +215,22 @@ public class JournalAbbreviationValidator {
         }
         return s.trim().split("[\\s\\-–.,:;'\"]+")[0];
     }
+
+    /**
+     * Checks if the abbreviation is the same as the full text
+     */
+    public ValidationResult checkAbbreviationEqualsFullText(String fullName, String abbreviation, int lineNumber) {
+        if (fullName.equalsIgnoreCase(abbreviation) && fullName.trim().split("\\s+").length > 1) {
+            return new ValidationResult(false,
+                    "Abbreviation is the same as the full text",
+                    ValidationType.WARNING,
+                    fullName,
+                    abbreviation,
+                    lineNumber,
+                    "Consider using a shorter abbreviation to distinguish it from the full name");
+        }
+
+        return new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber);
+    }
 }
 
