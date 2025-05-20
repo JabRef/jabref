@@ -12,23 +12,22 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.HashBiMap;
+import org.eclipse.jgit.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MscCodeUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MscCodeUtils.class);
 
-    /** 
+    /**
      * Load MSC codes and descriptions from a JSON resource URL into a HashMap
      *
      * @param resourceUrl URL to the JSON resource containing MSC codes
      * @return Map with MSC codes as keys and descriptions as values
      * @throws MscCodeLoadingException If there is an issue loading or parsing the JSON
      */
+    @NonNull
     public static Optional<HashBiMap<String, String>> loadMscCodesFromJson(URL resourceUrl) throws MscCodeLoadingException {
-        if (resourceUrl == null) {
-            return Optional.empty();
-        }
 
         ObjectMapper mapper = new ObjectMapper();
         try {

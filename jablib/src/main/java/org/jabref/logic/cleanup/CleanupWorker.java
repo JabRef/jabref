@@ -23,7 +23,7 @@ public class CleanupWorker {
     private final TimestampPreferences timestampPreferences;
     private final BibEntryPreferences bibEntryPreferences;
     private final List<JabRefException> failures;
-    
+
     public CleanupWorker(BibDatabaseContext databaseContext, FilePreferences filePreferences, TimestampPreferences timestampPreferences, BibEntryPreferences bibEntryPreferences) {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
@@ -51,18 +51,9 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
-        // Description Conversion
-        if (preset.isActive(CleanupPreferences.CleanupStep.CONVERT_MSC_CODES)) {
-            jobs.add(new ConvertMSCCodesCleanup(bibEntryPreferences, true));
-        } else {
-            jobs.add(new ConvertMSCCodesCleanup(bibEntryPreferences, false));
-        }
-
-        // Handle all other cleanup actions
+        // Add active jobs from preset panel
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
-            if (action != CleanupPreferences.CleanupStep.CONVERT_MSC_CODES) {
                 jobs.add(toJob(action));
-            }
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {
@@ -90,6 +81,8 @@ public class CleanupWorker {
                     new UpgradePdfPsToFileCleanup();
             case CLEAN_UP_DELETED_LINKED_FILES ->
                     new RemoveLinksToNotExistentFiles(databaseContext, filePreferences);
+            case CONVERT_MSC_CODES ->
+                    new ConvertMSCCodesCleanup(bibEntryPreferences, true);
             case CONVERT_TO_BIBLATEX ->
                     new ConvertToBiblatexCleanup();
             case CONVERT_TO_BIBTEX ->

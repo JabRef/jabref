@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 public class KeywordsEditor extends HBox implements FieldEditorFX {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditor.class);
     private static final PseudoClass FOCUSED = PseudoClass.getPseudoClass("focused");
-
     private static HashBiMap<String, String> mscmap;
 
     static {
@@ -188,14 +187,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         if (mscmap.containsKey(tagLabel.getText())) {
             String mscClassification = mscmap.get(tagLabel.getText());
             Tooltip tooltip = new Tooltip(mscClassification);
-            tagLabel.setOnMouseEntered(event -> {
-                // Show tooltip when mouse enters
-                Tooltip.install(tagLabel, tooltip);
-            });
-            tagLabel.setOnMouseExited(event -> {
-                // Uninstall tooltip when mouse exits
-                Tooltip.uninstall(tagLabel, tooltip);
-            });
+            tagLabel.setTooltip(tooltip);
         }
 
         tagLabel.setOnDragDetected(event -> {

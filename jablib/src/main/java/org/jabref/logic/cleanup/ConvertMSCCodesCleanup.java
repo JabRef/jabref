@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
@@ -83,10 +82,10 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
         }
 
         String keywordsStr = entry.getField(StandardField.KEYWORDS).orElse("");
+
         if (keywordsStr.trim().isEmpty()) {
             return changes;
         }
-
         KeywordList rawKeywords = KeywordList.parse(keywordsStr, keywordSeparator);
         List<Keyword> newKeywords = new ArrayList<>();
         boolean hasChanges = false;
@@ -113,17 +112,11 @@ public class ConvertMSCCodesCleanup implements CleanupJob {
                 }
             }
         }
-
         // If we made any changes, update the entry
         if (hasChanges) {
             String oldValue = keywordsStr;
             String newValue = KeywordList.serialize(newKeywords, keywordSeparator);
-            if (!Platform.isFxApplicationThread()) {
-                Platform.runLater(() -> {
-                        entry.setField(StandardField.KEYWORDS, newValue);
-                        changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
-                });
-            }
+
             entry.setField(StandardField.KEYWORDS, newValue);
             changes.add(new FieldChange(entry, StandardField.KEYWORDS, oldValue, newValue));
         }
