@@ -1,5 +1,5 @@
+
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.annotationProcessor
 import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
 import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
@@ -95,7 +95,7 @@ dependencies {
     // implementation("net.java.dev.jna:jna:5.16.0")
     implementation("net.java.dev.jna:jna-platform:5.17.0")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
 
     implementation("com.konghq:unirest-java-core:4.4.7")
 
@@ -391,7 +391,7 @@ jlink {
                     "--win-shortcut",
                     "--win-menu",
                     "--win-menu-group", "JabRef",
-                    "--temp", "$buildDir/installer",
+                    "--temp", "${layout.buildDirectory.get()}/installer",
                     "--resource-dir", "$projectDir/buildres/windows",
                     "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
                     "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
@@ -415,7 +415,7 @@ jlink {
                     "--linux-menu-group", "Office;",
                     "--linux-rpm-license-type", "MIT",
                     // "--license-file", "$projectDir/LICENSE.md",
-                    "--description", "JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.",
+                    "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
                     "--linux-shortcut",
                     "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
                 )
@@ -457,7 +457,7 @@ if (OperatingSystem.current().isWindows) {
                         "JabRefHost.ps1"
                     )
                 }
-                into(file("$buildDir/distribution/JabRef"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef"))
             }
         }
     }
@@ -468,7 +468,7 @@ if (OperatingSystem.current().isWindows) {
                 from(file("$projectDir/buildres/linux")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
-                into(file("$buildDir/distribution/JabRef/lib"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef/lib"))
             }
         }
     }
@@ -479,7 +479,7 @@ if (OperatingSystem.current().isWindows) {
                 from(file("$projectDir/buildres/mac")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
-                into(file("$buildDir/distribution/JabRef.app/Contents/Resources"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef.app/Contents/Resources"))
             }
         }
     }
