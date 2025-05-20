@@ -1,8 +1,6 @@
 package org.jabref.logic.importer;
 
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
@@ -15,7 +13,6 @@ import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
 import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.identifier.SSRN;
-import org.jabref.model.strings.StringUtil;
 
 public class CompositeIdFetcher {
 
@@ -67,25 +64,6 @@ public class CompositeIdFetcher {
     }
 
     public static boolean containsValidId(String identifier) {
-        return getIdentifier(identifier).isPresent();
-    }
-
-    public static Optional<Identifier> getIdentifier(String identifier) {
-        if (StringUtil.isBlank(identifier)) {
-            return Optional.empty();
-        }
-
-        return Stream.<Supplier<Optional<? extends Identifier>>>of(
-                             () -> DOI.findInText(identifier),
-                             () -> ArXivIdentifier.parse(identifier),
-                             () -> ISBN.parse(identifier),
-                             () -> SSRN.parse(identifier),
-                             () -> RFC.parse(identifier)
-                     )
-                     .map(Supplier::get)
-                     .filter(Optional::isPresent)
-                     .map(Optional::get)
-                     .map(id -> (Identifier) id)
-                     .findFirst();
+        return Identifier.from(identifier).isPresent();
     }
 }

@@ -138,7 +138,7 @@ class CompositeIdFetcherTest {
 
     @Test
     void detectsValidDOI() {
-        Optional<Identifier> result = CompositeIdFetcher.getIdentifier("10.1109/MCOM.2010.5673082");
+        Optional<Identifier> result = Identifier.from("10.1109/MCOM.2010.5673082");
         assertTrue(result.isPresent());
         assertInstanceOf(DOI.class, result.get());
         assertTrue(DOI.isValid(result.get().asString()));
@@ -146,14 +146,14 @@ class CompositeIdFetcherTest {
 
     @Test
     void rejectsInvalidDOI() {
-        Optional<Identifier> result = CompositeIdFetcher.getIdentifier("123456789");
+        Optional<Identifier> result = Identifier.from("123456789");
         boolean isInvalid = result.isEmpty() || (result.get() instanceof DOI && !DOI.isValid(result.get().asString()));
         assertTrue(isInvalid);
     }
 
     @Test
     void detectsValidISBN() {
-        Optional<Identifier> result = CompositeIdFetcher.getIdentifier("9780134685991");
+        Optional<Identifier> result = Identifier.from("9780134685991");
         assertTrue(result.isPresent());
         assertInstanceOf(ISBN.class, result.get());
         assertTrue(((ISBN) result.get()).isValid());
@@ -161,14 +161,14 @@ class CompositeIdFetcherTest {
 
     @Test
     void detectsValidArXiv() {
-        Optional<Identifier> result = CompositeIdFetcher.getIdentifier("arXiv:1706.03762");
+        Optional<Identifier> result = Identifier.from("arXiv:1706.03762");
         assertTrue(result.isPresent());
         assertInstanceOf(ArXivIdentifier.class, result.get());
     }
 
     @Test
     void detectsValidRFC() {
-        Optional<Identifier> result = CompositeIdFetcher.getIdentifier("rfc2616");
+        Optional<Identifier> result = Identifier.from("rfc2616");
         assertTrue(result.isPresent());
         assertInstanceOf(RFC.class, result.get());
     }

@@ -35,7 +35,6 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
 import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
@@ -155,7 +154,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (approach == null) {
             final String clipboardText = ClipBoardManager.getContents().trim();
             if (!StringUtil.isBlank(clipboardText)) {
-                Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
+                Optional<Identifier> identifier = Identifier.from(clipboardText);
                 if (identifier.isPresent()) {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     interpretText.setText(clipboardText);
@@ -545,7 +544,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         String clipboardText = ClipBoardManager.getContents().trim();
 
         if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
+            Optional<Identifier> identifier = Identifier.from(clipboardText);
             if (identifier.isPresent()) {
                 Identifier id = identifier.get();
                 boolean isValid = switch (id) {
