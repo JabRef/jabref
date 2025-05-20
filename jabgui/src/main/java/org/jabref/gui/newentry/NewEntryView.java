@@ -37,10 +37,10 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
-import org.jabref.logic.importer.fetcher.AbstractIsbnFetcher;
 import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.RfcFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -567,12 +567,10 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
         for (IdBasedFetcher fetcher : idFetcher.getItems()) {
             if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
-                    // Use instanceof for structured check; fallback to name matching since some ISBN fetchers (like IsbnFetcher) don't extend AbstractIsbnFetcher.
-                    (id instanceof ISBN && (fetcher instanceof AbstractIsbnFetcher ||
-                            fetcher.getName().toLowerCase().contains("isbn"))) ||
+                    (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
                     (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
                     (id instanceof RFC && fetcher instanceof RfcFetcher) ||
-                    (id instanceof SSRN && fetcher instanceof DoiFetcher)) {
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
                 return Optional.of(fetcher);
             }
         }
