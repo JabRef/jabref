@@ -82,7 +82,7 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
@@ -181,7 +181,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
     // endregion
 
     implementation("commons-io:commons-io:2.19.0")
@@ -220,10 +220,10 @@ dependencies {
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    testImplementation("org.xmlunit:xmlunit-core:2.10.0")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
+    testImplementation("org.xmlunit:xmlunit-core:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-matchers:2.10.1")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
