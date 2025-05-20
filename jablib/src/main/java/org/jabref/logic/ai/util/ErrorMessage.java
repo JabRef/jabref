@@ -25,12 +25,6 @@ public class ErrorMessage implements ChatMessage {
         return ChatMessageType.AI;
     }
 
-    @Override
-    @Deprecated
-    public String text() {
-        return text;
-    }
-
     public String getText() {
         return text;
     }
