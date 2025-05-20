@@ -166,6 +166,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | ------------- | ------------ | -------- | ----- | --------- |
                 | Article       | first        | -        | o     | -         |
                 | Article       | second       | -        | -     | ?         |
+                | InProceedings | fifth        | ?        | -     | -         |
                 | InProceedings | fourth       | -        | -     | o         |
                 | InProceedings | third        | ?        | o     | -         |
 
