@@ -113,7 +113,6 @@ extraJavaModuleInfo {
         patchRealModule()
         exportAllPackages()
     }
-    */
 
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         overrideModuleName()
@@ -123,6 +122,7 @@ extraJavaModuleInfo {
         requires("java.dekstop")
         requires("javafx.base")
     }
+    */
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         // overrideModuleName()
