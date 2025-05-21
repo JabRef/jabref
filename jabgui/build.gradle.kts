@@ -28,9 +28,10 @@ dependencies {
     implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
     implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
     implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
+    // implementation("org.openjfx:javafx-graphics:24.0.1:win")
     implementation("org.openjfx:javafx-graphics:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-web:$javafxVersion:$javafxPlatform")
     implementation("org.openjfx:javafx-swing:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-web:$javafxVersion:$javafxPlatform")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")

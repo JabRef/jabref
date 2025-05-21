@@ -10,6 +10,7 @@ plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.java-module-testing")
     id("org.gradlex.jvm-dependency-conflict-resolution")
+    id("org.gradlex.java-module-packaging")
 }
 
 repositories {
@@ -30,7 +31,18 @@ dependencies {
     }
 }
 
-/*
+val os = org.gradle.internal.os.OperatingSystem.current()
+
+val osTarget = when {
+    os.isMacOsX -> {
+        val osVersion = System.getProperty("os.version")
+        if (osVersion.startsWith("14")) "macos-14" else "macos-123"
+    }
+    os.isLinux -> "ubuntu-22.04"
+    os.isWindows -> "windows-2022"
+    else -> error("Unsupported OS")
+}
+
 // Source: https://github.com/jjohannes/java-module-system/blob/main/gradle/plugins/src/main/kotlin/targets.gradle.kts
 // Configure variants for OS
 javaModulePackaging {
@@ -54,9 +66,8 @@ javaModulePackaging {
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("exe")
     }
-    // primaryTarget(target("macos-14"))
+    primaryTarget(target(osTarget))
 }
-*/
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
@@ -78,7 +89,6 @@ jvmDependencyConflicts.patch {
     }
 }
 
-val os = org.gradle.internal.os.OperatingSystem.current()
 val arch = System.getProperty("os.arch")
 val javafxPlatform = when {
     os.isWindows -> "win"
@@ -96,46 +106,42 @@ extraJavaModuleInfo {
     failOnAutomaticModules = false
     // skipLocalJars = true
     deriveAutomaticModuleNamesFromFileNames = true
+
     /*
     module("org.openjfx:javafx-base", "javafx.base") {
         overrideModuleName()
-        preserveExisting()
-        /*
-        exports("com.sun.javafx.event")
-        exports("com.sun.javafx.collections")
-        exports("com.sun.javafx.runtime")
-        opens("javafx.collections")
-        opens("javafx.collections.transformation")
-        */
-    }
-
-     */
-    module("org.openjfx:javafx-controls", "javafx.controls") {
-        overrideModuleName()
-        preserveExisting()
-        exports("com.sun.javafx.scene.control")
-        /*
-        exports("com.sun.javafx.scene.control.behavior")
-        exports("com.sun.javafx.scene.control.inputmat")
-        opens("javafx.scene.control", "com.sun.javafx.scene.control", "javafx.scene.control.skin")
-        */
-    }
-
-    //module("org.openjfx:javafx-graphics", "javafx.graphics") {
-        //overrideModuleName()
-        //preserveExisting()
-        /*
-        exports("com.sun.javafx.scene")
-        exports("com.sun.javafx.scene.traversal")
-        exports("com.sun.javafx.css")
-        */
-    //}
-    /*
-    module("org.openjfx:javafx-graphics", "javafx.fxml") {
-        overrideModuleName()
-        preserveExisting()
+        patchRealModule()
+        exportAllPackages()
     }
     */
+
+    module("org.openjfx:javafx-graphics", "javafx.graphics") {
+        overrideModuleName()
+        patchRealModule()
+        exportAllPackages()
+
+        requires("java.dekstop")
+        requires("javafx.base")
+    }
+
+    module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
+        // overrideModuleName()
+        patchRealModule()
+
+        exports("impl.org.controlsfx.skin")
+        exports("org.controlsfx.control")
+        exports("org.controlsfx.control.action")
+        exports("org.controlsfx.control.decoration")
+        exports("org.controlsfx.control.table")
+        exports("org.controlsfx.control.textfield")
+        exports("org.controlsfx.dialog")
+        exports("org.controlsfx.validation")
+        exports("org.controlsfx.validation.decoration")
+
+        requires("javafx.base")
+        requires("javafx.controls")
+        requires("javafx.graphics")
+    }
 
     // Based on module-info.class in https://repo1.maven.org/maven2/org/controlsfx/controlsfx/11.2.2/
     module("org.openjfx:javafx-controls", "javafx.controls") {
@@ -143,11 +149,21 @@ extraJavaModuleInfo {
 
         patchRealModule()
 
-        exportAllPackages() // shortcut to just export everything, can be replaced with a dedicated list
+        // exportAllPackages() // shortcut to just export everything, can be replaced with a dedicated list
+        exports("com.sun.javafx.scene.control")
+        exports("javafx.scene.chart")
+        exports("javafx.scene.control")
+        exports("javafx.scene.control.cell")
+        exports("javafx.scene.control.skin")
+        exports("javafx.scene.control.table")
 
         // opens("org.controlsfx.control", "org.controlsfx.fxsampler")
         // opens("org.controlsfx.control.tableview2", "org.controlsfx.fxsampler");
         opens("impl.org.controlsfx.skin");
+
+        requires("javafx.base");
+        requires("javafx.controls");
+        requires("javafx.graphics");
 
         // uses("org.controlsfx.glyphfont.GlyphFont");
 
