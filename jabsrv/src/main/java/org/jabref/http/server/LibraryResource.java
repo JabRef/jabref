@@ -33,6 +33,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,7 +130,8 @@ public class LibraryResource {
         return parserResult;
     }
 
-    private InputStream getChocolateBibAsStream() {
+    /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
+    private @Nullable InputStream getChocolateBibAsStream() {
         return BibDatabase.class.getResourceAsStream("/Chocolate.bib");
     }
 }
