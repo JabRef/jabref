@@ -1,8 +1,9 @@
+
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.util.Calendar;
+import java.util.*
 
 plugins {
     id("buildlogic.java-common-conventions")
@@ -82,7 +83,7 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
@@ -148,23 +149,23 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // region AI
-    implementation("dev.langchain4j:langchain4j:0.36.2")
+    implementation("dev.langchain4j:langchain4j:1.0.0")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.0") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-mistral-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
     }
-    implementation("dev.langchain4j:langchain4j-hugging-face:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
@@ -181,7 +182,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
     // endregion
 
     implementation("commons-io:commons-io:2.19.0")
@@ -218,10 +219,10 @@ dependencies {
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    testImplementation("org.xmlunit:xmlunit-core:2.10.0")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
+    testImplementation("org.xmlunit:xmlunit-core:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-matchers:2.10.1")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
