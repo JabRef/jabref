@@ -10,19 +10,34 @@ The resource for a library is implemented at [`org.jabref.http.server.LibraryRes
 
 ## Start http server
 
+### Starting with IntelliJ
+
 The class starting the server is located in the project `jabsrv-cli` and is called `org.jabref.http.server.cli.ServerCli`.
 
 Test files to server can be passed as arguments.
-If no files are passed, the last opened files are served.
 If that list is also empty, the file `src/main/resources/org/jabref/http/server/http-server-demo.bib` is served.
+
+### Starting with JBang
+
+In case one wants to interact with the http server only and does not want to setup or run IntelliJ, [JBang](https://www.jbang.dev/download/) can be used.
+
+In the repository root, run following command:
+
+```shell
+jbang .jbang/JabSrvLauncher.java
+```
+
+JBang also offers running without explicit installation, if you have node installed (and WSL available in the case of Windows):
+
+```shell
+npx @jbangdev/jbang .jbang/JabSrvLauncher.java
+```
 
 ### Starting with gradle
 
 ```shell
 ./gradlew run :jabsrv:run
 ```
-
-The GUI is also started. Just close it.
 
 Gradle output:
 
@@ -49,6 +64,12 @@ INFO: [HttpServer] Started.
 2023-04-22 11:44:59 [ForkJoinPool.commonPool-worker-1] org.jabref.http.server.ServerCli.lambda$startServer$4()
 DEBUG: Server started.
 ```
+
+## Served libraries
+
+The last opened libraries are served.
+`demo` serves Chocolate.bib.
+Additional libraries can be served by passing them as arguments.
 
 ## Developing with IntelliJ
 
