@@ -16,16 +16,13 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Responsible for managing of all threads (<em>except</em> GUI threads) in JabRef.
- * <p>
- * GUI background tasks should run in {@link org.jabref.gui.util.UiTaskExecutor}.
- * <p>
- * This is a wrapper around {@link ExecutorService}
- * <p>
- *     Offers both high-priority and low-priority thread pools.
- * </p>
- */
+/// Responsible for managing of all threads (_except_ GUI threads) in JabRef.
+///
+/// GUI background tasks should run in `org.jabref.gui.util.UiTaskExecutor``
+///
+/// This is a wrapper around [ExecutorService]
+///
+/// Offers both high-priority and low-priority thread pools.
 public class HeadlessExecutorService implements Executor {
 
     public static final HeadlessExecutorService INSTANCE = new HeadlessExecutorService();

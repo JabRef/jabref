@@ -10,6 +10,7 @@ import org.jabref.logic.pdf.InterruptablePDFTextStripper;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
 
+import dev.langchain4j.data.document.DefaultDocument;
 import dev.langchain4j.data.document.Document;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
@@ -57,6 +58,6 @@ public class FileToDocument {
     }
 
     public Optional<Document> fromString(String content) {
-        return Optional.of(new Document(content));
+        return Optional.of(new DefaultDocument(content));
     }
 }

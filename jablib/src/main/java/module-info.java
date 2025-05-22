@@ -79,6 +79,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.integrity;
     exports org.jabref.logic.formatter.casechanger;
     exports org.jabref.logic.shared.exception;
+    exports org.jabref.logic.importer.fetcher.isbntobibtex;
     exports org.jabref.logic.importer.fetcher.transformers;
     exports org.jabref.logic.biblog;
     exports org.jabref.model.biblog;

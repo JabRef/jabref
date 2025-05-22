@@ -21,7 +21,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
     private final List<ProcessingInfo<BibEntry, Summary>> entries;
     private final BibDatabaseContext bibDatabaseContext;
     private final SummariesStorage summariesStorage;
-    private final ChatLanguageModel chatLanguageModel;
+    private final ChatModel chatLanguageModel;
     private final TemplatesService templatesService;
     private final ReadOnlyBooleanProperty shutdownSignal;
     private final AiPreferences aiPreferences;
@@ -53,7 +53,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
             List<ProcessingInfo<BibEntry, Summary>> entries,
             BibDatabaseContext bibDatabaseContext,
             SummariesStorage summariesStorage,
-            ChatLanguageModel chatLanguageModel,
+            ChatModel chatLanguageModel,
             TemplatesService templatesService,
             ReadOnlyBooleanProperty shutdownSignal,
             AiPreferences aiPreferences,
@@ -77,7 +77,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
     private void configure() {
         showToUser(true);
         titleProperty().set(Localization.lang("Generating summaries for %0", groupName.get()));
-        groupName.addListener((o, oldValue, newValue) -> titleProperty().set(Localization.lang("Generating summaries for %0", newValue)));
+        groupName.addListener((_, _, newValue) -> titleProperty().set(Localization.lang("Generating summaries for %0", newValue)));
 
         progressCounter.increaseWorkMax(entries.size());
         progressCounter.listenToAllProperties(this::updateProgress);

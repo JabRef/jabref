@@ -1,3 +1,7 @@
+
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.util.*
 
@@ -12,11 +16,18 @@ plugins {
     id("com.github.edeandrea.xjc-generation") version "1.6"
 
     id("me.champeau.jmh") version "0.7.3"
+
+    id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
 val pdfbox = "3.0.5"
 val luceneVersion = "10.2.1"
 val jaxbVersion by extra { "4.0.5" }
+
+var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
+if (project.findProperty("tagbuild")?.toString() != "true") {
+    version += "-SNAPSHOT"
+}
 
 val javafxVersion = "24.0.1"
 val javafxPlatform: String by project.extra
@@ -83,7 +94,7 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
@@ -149,23 +160,23 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // region AI
-    implementation("dev.langchain4j:langchain4j:0.36.2")
+    implementation("dev.langchain4j:langchain4j:1.0.0")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.0") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-mistral-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
     }
-    implementation("dev.langchain4j:langchain4j-hugging-face:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
@@ -182,7 +193,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
     // endregion
 
     implementation("commons-io:commons-io:2.19.0")
@@ -191,7 +202,6 @@ dependencies {
         exclude(module = "fastparse_2.13")
     }
 
-    implementation("de.rototor.snuggletex:snuggletex:1.3.0")
     implementation ("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0") {
         exclude(group = "org.apache.xmlgraphics")
     }
@@ -220,10 +230,10 @@ dependencies {
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    testImplementation("org.xmlunit:xmlunit-core:2.10.0")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
+    testImplementation("org.xmlunit:xmlunit-core:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-matchers:2.10.1")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
+    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
@@ -465,6 +475,60 @@ jacocoTestReport {
     }
 }
 */
+
+mavenPublishing {
+  configure(JavaLibrary(
+    // configures the -javadoc artifact, possible values:
+    // - `JavadocJar.None()` don't publish this artifact
+    // - `JavadocJar.Empty()` publish an emprt jar
+    // - `JavadocJar.Javadoc()` to publish standard javadocs
+    javadocJar = JavadocJar.Javadoc(),
+    // whether to publish a sources jar
+    sourcesJar = true,
+  ))
+
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+  signAllPublications()
+
+  coordinates("org.jabref", "jablib", version)
+
+  pom {
+    name.set("jablib")
+    description.set("JabRef's Java library to work with BibTeX")
+    inceptionYear.set("2025")
+    url.set("https://github.com/JabRef/jabref/")
+    licenses {
+      license {
+        name.set("MIT")
+        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+      }
+    }
+    developers {
+      developer {
+        id.set("jabref")
+        name.set("JabRef Developers")
+        url.set("https://github.com/JabRef/")
+      }
+    }
+    scm {
+        url.set("https://github.com/JabRef/jabref")
+        connection.set("scm:git:https://github.com/JabRef/jabref")
+        developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+    }
+  }
+}
+
+tasks.named<Jar>("sourcesJar") {
+    dependsOn(
+        tasks.named("generateGrammarSource"),
+        tasks.named("schemaGen_org-jabref-logic-importer-fileformat-citavi")
+    )
+}
+
+tasks.withType<GenerateModuleMetadata> {
+    suppressedValidationErrors.add("enforced-platform")
+}
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("io.github.classgraph")
