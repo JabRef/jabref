@@ -19,7 +19,7 @@ If that list is also empty, the file `src/main/resources/org/jabref/http/server/
 
 ### Starting with JBang
 
-In case one wants to interact with the http server only and does not want to setup or run IntelliJ, [JBang](https://www.jbang.dev/download/) can be used.
+In case you want to interact only with the http server and do not want to set up or run IntelliJ, [JBang](https://www.jbang.dev/download/) can be used.
 
 In the repository root, run following command:
 
