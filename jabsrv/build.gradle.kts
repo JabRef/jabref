@@ -4,9 +4,10 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     `java-library`
-
-    id("org.openjfx.javafxplugin") version("0.1.0")
 }
+
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
 
 dependencies {
     api(project(":jablib"))
@@ -48,6 +49,9 @@ dependencies {
     implementation("org.jabref:afterburner.fx:2.0.0") {
         exclude( group = "org.openjfx")
     }
+    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
 
     implementation("net.harawata:appdirs:1.4.0")
 
@@ -67,12 +71,6 @@ dependencies {
     // route all requests to log4j to SLF4J
     testImplementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
 
-}
-
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
 }
 
 tasks.test {
