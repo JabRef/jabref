@@ -2,7 +2,7 @@
 
 // This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
 
-// One can start an http server using following command:
+// You can start an http server using following command:
 //
 // npx @jbangdev/jbang https://github.com/JabRef/jabref/blob/main/.jbang/JabSrvLauncher.java
 //
