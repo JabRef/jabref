@@ -73,7 +73,7 @@ Additional libraries can be served by passing them as arguments.
 
 ## Developing with IntelliJ
 
-IntelliJ Ultimate offers a Markdown-based http-client. One has to open the file `jabsrv/src/test/rest-api.http`.
+IntelliJ Ultimate offers a Markdown-based http-client. You need to open the file `jabsrv/src/test/rest-api.http`.
 Then, there are play buttons appearing for interacting with the server.
 
 In case you want to debug on Windows, you need to choose "WSL" as the target for the debugger ("Run on") to avoid "command line too long" errors.
