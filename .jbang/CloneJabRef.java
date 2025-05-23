@@ -12,7 +12,7 @@ public class CloneJabRef {
     public static void main(String[] args) throws Exception {
         Path targetDir;
         if (args.length == 1) {
-            targetDir = Path.of(args[1]).toAbsolutePath();
+            targetDir = Path.of(args[0]).toAbsolutePath();
         } else {
             targetDir = Path.of(System.getProperty("java.io.tmpdir"), "JabRef");
         }
