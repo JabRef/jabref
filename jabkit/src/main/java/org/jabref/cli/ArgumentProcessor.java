@@ -39,15 +39,16 @@ import static picocli.CommandLine.Option;
 @Command(name = "jabkit",
         mixinStandardHelpOptions = true,
         subcommands = {
-                GenerateCitationKeys.class,
                 CheckConsistency.class,
 //                CheckIntegrity.class,
-                Fetch.class,
-                Search.class,
                 Convert.class,
+                Fetch.class,
                 GenerateBibFromAux.class,
+                GenerateCitationKeys.class,
+                Pdf.class,
                 Preferences.class,
-                Pdf.class
+                Pseudonymize.class,
+                Search.class
         })
 public class ArgumentProcessor implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
