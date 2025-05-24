@@ -169,4 +169,23 @@ class ArgumentProcessorTest {
 
         System.setOut(System.out);
     }
+
+    @Test
+    void performPseudonymize(@TempDir Path tempDir) throws URISyntaxException {
+        Path path = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("Chocolate.bib")).toURI());
+        String inputFile = path.toAbsolutePath().toString();
+
+        Path fileOutput = tempDir.resolve("Choco_pseudo.bib").toAbsolutePath();
+        Path keyOutput = tempDir.resolve("Choco_pseudo_keys.csv").toAbsolutePath();
+
+        List<String> args = List.of(
+                "pseudonymize", inputFile,
+                "--output", fileOutput.toString(),
+                "--key", keyOutput.toString());
+
+        commandLine.execute(args.toArray(String[]::new));
+
+        assertTrue(Files.exists(fileOutput));
+        assertTrue(Files.exists(keyOutput));
+    }
 }
