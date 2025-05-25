@@ -19,4 +19,7 @@ public sealed interface UiCommand {
     /// @deprecated used by the browser extension only
     @Deprecated
     record AppendFileOrUrlToCurrentLibrary(String location) implements UiCommand { }
+
+    record ImportFileToCurrentLibrary(String filePath, String format) implements UiCommand { }
+
 }

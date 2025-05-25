@@ -178,6 +178,10 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                           waitForLoadingFinished(() -> appendToCurrentLibrary(toAppend));
                       });
 
+            uiCommands.stream().filter(UiCommand.ImportFileToCurrentLibrary.class::isInstance)
+                      .map(UiCommand.ImportFileToCurrentLibrary.class::cast)
+                      .findAny().ifPresent(importFile -> importFromFileWithFormatInternal(importFile.filePath(), importFile.format()));
+
             uiCommands.stream().filter(UiCommand.AppendFileOrUrlToCurrentLibrary.class::isInstance)
                       .map(UiCommand.AppendFileOrUrlToCurrentLibrary.class::cast)
                       .findAny().ifPresent(importFile -> importFromFileAndOpen(importFile.location()));
@@ -185,6 +189,7 @@ public class JabRefFrameViewModel implements UiMessageHandler {
             uiCommands.stream().filter(UiCommand.AppendBibTeXToCurrentLibrary.class::isInstance)
                       .map(UiCommand.AppendBibTeXToCurrentLibrary.class::cast)
                       .findAny().ifPresent(importBibTex -> importBibtexStringAndOpen(importBibTex.bibtex()));
+
         }
 
         // Handle jumpToEntry
@@ -220,6 +225,28 @@ public class JabRefFrameViewModel implements UiMessageHandler {
                       .onSuccess(result -> result.ifPresent(this::addParserResult))
                       .onFailure(t -> LOGGER.error("Unable to import file {} ", location, t))
                       .executeWith(taskExecutor);
+    }
+
+    /**
+     * Common method to import a file with a specified format.
+     * 
+     * @param filePath the path to the file to import
+     * @param format the format to use for importing
+     */
+    private void importFromFileWithFormatInternal(String filePath, String format) {
+        BackgroundTask.wrap(() -> {
+            try {
+                // Create a Path from the file path
+                Path file = Path.of(filePath);
+                // Import the file with the specified format
+                return new org.jabref.logic.importer.ImportFormatReader(preferences.getImporterPreferences(), preferences.getImportFormatPreferences(), preferences.getCitationKeyPatternPreferences(), fileUpdateMonitor).importFromFile(format, file);
+            } catch (Exception e) {
+                LOGGER.error("Error importing file {} with format {}", filePath, format, e);
+                throw new org.jabref.logic.importer.ImportException("Error importing file: " + e.getMessage(), e);
+            }
+        }).onSuccess(this::addParserResult).onFailure(t -> {
+            LOGGER.error("Unable to import file {} with format {}", filePath, format, t);
+        }).executeWith(taskExecutor);
     }
 
     private void checkForBibInUpperDir() {

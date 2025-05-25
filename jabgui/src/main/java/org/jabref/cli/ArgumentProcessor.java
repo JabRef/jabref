@@ -23,6 +23,7 @@ public class ArgumentProcessor {
     private final Mode startupMode;
     private final GuiPreferences preferences;
     private final GuiCommandLine guiCli;
+    private final ImportSubCommand importSubCommandCli;
     private final CommandLine cli;
 
     private final List<UiCommand> uiCommands = new ArrayList<>();
@@ -34,8 +35,10 @@ public class ArgumentProcessor {
         this.startupMode = startupMode;
         this.preferences = preferences;
         this.guiCli = new GuiCommandLine();
+        this.importSubCommandCli = new ImportSubCommand();
 
         cli = new CommandLine(this.guiCli);
+        cli.addSubcommand(importSubCommandCli);
         cli.parseArgs(args);
     }
 
@@ -85,6 +88,16 @@ public class ArgumentProcessor {
         if (guiCli.importBibtex != null) {
             uiCommands.add(new UiCommand.AppendBibTeXToCurrentLibrary(guiCli.importBibtex));
         }
+
+        if (importSubCommandCli.inputFile != null) {
+            String filePath = importSubCommandCli.inputFile;
+            String format = importSubCommandCli.importFormat;
+
+            LOGGER.debug("Processing import command for file {} with format {}}", filePath, format);
+
+            uiCommands.add(new UiCommand.ImportFileToCurrentLibrary(filePath, format));
+        }
+
         return uiCommands;
     }
 
