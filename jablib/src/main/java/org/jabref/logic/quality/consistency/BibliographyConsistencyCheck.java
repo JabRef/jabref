@@ -8,15 +8,59 @@ import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
+
+    // ----------------------------------------------------------------
+    // Fields that we do *not* want to check for consistency:
+    //   – every field in StandardField.AUTOMATIC_FIELDS
+    //   – COMMENT, CROSSREF, CITES, PDF, REVIEW, SORTKEY, SORTNAME, TYPE, XREF, GROUPS
+    //   – plus any SpecialField or UserSpecificCommentField (filtered at runtime)
+    // ----------------------------------------------------------------
+    private static final Set<Field> FILTERED_FIELDS = Stream
+            // start with JabRef’s built‐in AUTOMATIC_FIELDS set
+            .concat(
+                    StandardField.AUTOMATIC_FIELDS.stream(),
+                    // then add the extra fields to ignore
+                    Stream.of(
+                            StandardField.COMMENT,
+                            StandardField.CROSSREF,
+                            StandardField.CITES,
+                            StandardField.PDF,
+                            StandardField.REVIEW,
+                            StandardField.SORTKEY,
+                            StandardField.SORTNAME,
+                            StandardField.TYPE,
+                            StandardField.XREF,
+                            StandardField.GROUPS
+                    )
+            )
+            .collect(Collectors.toSet());
+
+    /**
+     * Drop any field we don’t want to check.
+     */
+    private static Set<Field> filterFields(Collection<Field> fields) {
+        return fields.stream()
+                     .filter(f -> !FILTERED_FIELDS.contains(f))
+                     .filter(f -> !(f instanceof SpecialField))
+                     .filter(f -> !(f instanceof UserSpecificCommentField))
+                     .collect(Collectors.toSet());
+    }
+
+
 
     public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
     }
@@ -64,7 +108,10 @@ public class BibliographyConsistencyCheck {
 
             List<BibEntry> differingEntries = entryTypeToEntriesMap
                     .get(entryType).stream()
-                    .filter(entry -> !entry.getFields().equals(commonFields))
+                    .filter(entry -> {
+                        Set<Field> entryFiltered = filterFields(entry.getFields());
+                        return !entryFiltered.equals(commonFields);
+                    })
                     .sorted(comparatorStack)
                     .toList();
 
@@ -76,16 +123,24 @@ public class BibliographyConsistencyCheck {
 
     private static void collectEntriesIntoMaps(List<BibEntry> entries, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
         entries.forEach(entry -> {
-            EntryType entryType = entry.getType();
+                      EntryType entryType = entry.getType();
 
-            Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap.computeIfAbsent(entryType, k -> new HashSet<>());
-            fieldsInAnyEntry.addAll(entry.getFields());
+                      // 1) filter out AUTOMATIC_FIELDS + COMMENT, CROSSREF, CITES, PDF, REVIEW,
+                      //    SORTKEY, SORTNAME, TYPE, XREF, GROUPS
+                      // 2) remove any SpecialField or UserSpecificCommentField
+                      Set<Field> filteredFields = filterFields(entry.getFields());
 
-            Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.computeIfAbsent(entryType, k -> new HashSet<>(entry.getFields()));
-            fieldsInAllEntries.retainAll(entry.getFields());
+                      Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap
+                                       .computeIfAbsent(entryType, k -> new HashSet<>());
+                      fieldsInAnyEntry.addAll(filteredFields);
 
-            Set<BibEntry> entriesOfType = entryTypeToEntriesMap.computeIfAbsent(entryType, k -> new HashSet<>());
-            entriesOfType.add(entry);
-        });
+                      Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap
+                                        .computeIfAbsent(entryType, k -> new HashSet<>(filteredFields));
+                      fieldsInAllEntries.retainAll(filteredFields);
+
+                      Set<BibEntry> entriesOfType = entryTypeToEntriesMap
+                                        .computeIfAbsent(entryType, k -> new HashSet<>());
+                      entriesOfType.add(entry);
+                    });
     }
 }
