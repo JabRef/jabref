@@ -38,7 +38,6 @@ public class ArgumentProcessor {
         this.importSubCommandCli = new ImportSubCommand();
 
         cli = new CommandLine(this.guiCli);
-        cli.addSubcommand(importSubCommandCli);
         cli.parseArgs(args);
     }
 

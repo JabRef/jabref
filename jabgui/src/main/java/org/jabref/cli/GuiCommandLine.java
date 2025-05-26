@@ -8,7 +8,7 @@ import picocli.CommandLine.Parameters;
 
 import static picocli.CommandLine.Command;
 
-@Command(name = "jabref", mixinStandardHelpOptions = true)
+@Command(name = "jabref", mixinStandardHelpOptions = true, subcommands = { ImportSubCommand.class })
 public class GuiCommandLine {
     @Parameters(paramLabel = "<FILE>", description = "File(s) to be imported.")
     public List<Path> libraries;
