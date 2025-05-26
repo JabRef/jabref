@@ -161,7 +161,7 @@ dependencies {
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini:1.0.0-beta5") {
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
     }
