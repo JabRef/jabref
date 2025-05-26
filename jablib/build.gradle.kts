@@ -214,7 +214,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
     testImplementation("org.junit.platform:junit-platform-launcher:1.12.2")
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
