@@ -220,7 +220,7 @@ dependencies {
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.1")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-matchers:2.10.2")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 
