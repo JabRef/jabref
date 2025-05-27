@@ -38,7 +38,9 @@ public class PdfMergeDialog {
 
         dialog.setTitle(Localization.lang("Merge PDF metadata"));
 
-        dialog.addSource(Localization.lang("Entry"), entry);
+        if (!entry.getFields().isEmpty()) {
+            dialog.addSource(Localization.lang("Entry"), entry);
+        }
         dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
         dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
 
