@@ -143,6 +143,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   upload-pr-number:
+    if: ${{ github.repository == 'JabRef/jabref' }}
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
