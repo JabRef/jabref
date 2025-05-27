@@ -141,7 +141,7 @@
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
-- jobName: 'Issue number present'
+- jobName: 'Determine issue number'
   always: true
   message: |
     Your pull request needs to link an issue.
