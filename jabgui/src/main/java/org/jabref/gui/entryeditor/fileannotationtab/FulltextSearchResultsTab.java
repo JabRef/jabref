@@ -56,7 +56,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private DocumentViewerView documentViewerView;
     private final EntryEditor entryEditor;
 
-
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
@@ -94,8 +93,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         this.entry = entry;
         updateSearch();
         notifyAboutFocus(entry);
-
-
     }
 
     @Override
