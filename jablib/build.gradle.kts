@@ -1,8 +1,9 @@
+
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import java.util.Calendar;
+import java.util.*
 
 plugins {
     id("buildlogic.java-common-conventions")
@@ -148,23 +149,23 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // region AI
-    implementation("dev.langchain4j:langchain4j:0.36.2")
+    implementation("dev.langchain4j:langchain4j:1.0.0")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.0") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-mistral-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
     }
-    implementation("dev.langchain4j:langchain4j-hugging-face:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.0-beta5") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
@@ -213,13 +214,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
     testImplementation("org.junit.platform:junit-platform-launcher:1.12.2")
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     testImplementation("org.xmlunit:xmlunit-core:2.10.1")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-matchers:2.10.2")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 

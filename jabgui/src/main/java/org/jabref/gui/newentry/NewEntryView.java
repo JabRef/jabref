@@ -35,10 +35,12 @@ import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.RfcFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -46,7 +48,12 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
 import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.model.entry.identifier.RFC;
+import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -147,7 +154,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (approach == null) {
             final String clipboardText = ClipBoardManager.getContents().trim();
             if (!StringUtil.isBlank(clipboardText)) {
-                Optional<Identifier> identifier = CompositeIdFetcher.getIdentifier(clipboardText);
+                Optional<Identifier> identifier = Identifier.from(clipboardText);
                 if (identifier.isPresent()) {
                     approach = NewEntryDialogTab.ENTER_IDENTIFIER;
                     interpretText.setText(clipboardText);
@@ -254,14 +261,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
-        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported identifier format.
-            idText.setText(clipboardText);
-            idText.selectAll();
-        }
-
-        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
 
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
@@ -272,6 +271,23 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         } else {
             idLookupSpecify.selectedProperty().set(true);
         }
+
+        // [impl->req~newentry.clipboard.autofocus~1]
+        Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
+        if (validClipboardId.isPresent()) {
+            idText.setText(ClipBoardManager.getContents().trim());
+            idText.selectAll();
+
+            Identifier id = validClipboardId.get();
+            Platform.runLater(() -> {
+                idLookupSpecify.setSelected(true);
+                fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
+            });
+        } else {
+            Platform.runLater(() -> idLookupGuess.setSelected(true));
+        }
+
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
@@ -522,5 +538,42 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             }
         }
         return null;
+    }
+
+    private Optional<Identifier> extractValidIdentifierFromClipboard() {
+        String clipboardText = ClipBoardManager.getContents().trim();
+
+        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
+            Optional<Identifier> identifier = Identifier.from(clipboardText);
+            if (identifier.isPresent()) {
+                Identifier id = identifier.get();
+                boolean isValid = switch (id) {
+                    case DOI doi ->
+                            DOI.isValid(doi.asString());
+                    case ISBN isbn ->
+                            isbn.isValid();
+                    default ->
+                            true;
+                };
+                if (isValid) {
+                    return Optional.of(id);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
+        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
+            if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
+                    (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
+                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
+                return Optional.of(fetcher);
+            }
+        }
+        return Optional.empty();
     }
 }

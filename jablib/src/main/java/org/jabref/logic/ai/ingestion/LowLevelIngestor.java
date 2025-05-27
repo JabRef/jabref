@@ -7,6 +7,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 
 import org.jabref.logic.ai.AiPreferences;
 
+import dev.langchain4j.data.document.DefaultDocument;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
@@ -48,7 +49,7 @@ public class LowLevelIngestor {
     }
 
     private void setupListeningToPreferencesChanges() {
-        aiPreferences.customizeExpertSettingsProperty().addListener(obs -> rebuild());
+        aiPreferences.customizeExpertSettingsProperty().addListener(_ -> rebuild());
         aiPreferences.addListenerToEmbeddingsParametersChange(this::rebuild);
     }
 
@@ -68,7 +69,7 @@ public class LowLevelIngestor {
                 throw new InterruptedException();
             }
 
-            ingestor.ingest(new Document(documentPart.text(), document.metadata()));
+            ingestor.ingest(new DefaultDocument(documentPart.text(), document.metadata()));
 
             workDone.set(workDone.get() + 1);
         }

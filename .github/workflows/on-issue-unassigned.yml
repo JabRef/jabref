@@ -6,13 +6,27 @@ on:
        - unassigned
 
 jobs:
-  ensure_column:
+  columns_and_labels:
     if: ${{ github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      contents: read
     steps:
+      - name: Check assignees
+        id: check_assignee
+        run: |
+          issue=$(gh issue view ${{ github.event.issue.number }} --json assignees)
+          count=$(echo "$issue" | jq '.assignees | length')
+          if [ "$count" -gt 0 ]; then
+            echo "assigned=yes" >> $GITHUB_OUTPUT
+          else
+            echo "assigned=no" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move Issue to "Free to take" Column in "Candidates for University Projects"
+        if: steps.check_assignee.outputs.assigned == 'no'
         uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
@@ -23,6 +37,7 @@ jobs:
           default-column: "Free to take"
           skip-if-not-in-project: true
       - name: Move Issue to "Free to take" Column in "Good First Issues"
+        if: steps.check_assignee.outputs.assigned == 'no'
         uses: m7kvqbe1/github-action-move-issues@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
@@ -32,19 +47,16 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-  remove_labels:
-    if: ${{ github.repository_owner == 'JabRef' }}
-    runs-on: ubuntu-latest
-    permissions:
-      issues: write
-      contents: read
-    steps:
       - uses: actions/checkout@v4
-      - name: Remove assigned label
-        run: gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Remove FirstTimeCodeContribution label
-        run: gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+        if: steps.check_assignee.outputs.assigned == 'no'
+      - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
+        if: steps.check_assignee.outputs.assigned == 'no'
+        run: |
+          set -e
+
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "🔔 reminder-sent"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📌 Pinned"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
