@@ -248,5 +248,25 @@ public class JournalAbbreviationValidator {
         }
         return new ValidationResult(true, "", ValidationType.WARNING, fullName, abbreviation, lineNumber);
     }
-}
 
+    /**
+     * Check for duplicate full names with different abbreviations
+     */
+    private void checkDuplicateFullNames() {
+        for (Map.Entry<String, List<String>> entry : fullNameToAbbrev.entrySet()) {
+            if (entry.getValue().size() > 1) {
+                String fullName = entry.getKey();
+                List<String> abbreviations = entry.getValue();
+
+                issues.add(new ValidationResult(false,
+                        String.format("Duplicate full name '%s' with different abbreviations: %s",
+                                fullName, String.join(", ", abbreviations)),
+                        ValidationType.WARNING,
+                        fullName,
+                        abbreviations.get(0),
+                        -1,
+                        "Consider consolidating abbreviations or using more specific full names"));
+            }
+        }
+    }
+}
