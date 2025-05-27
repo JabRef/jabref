@@ -38,6 +38,7 @@ jobs:
             type=edge,branch=main
             type=ref,event=pr
       - name: Login to GitHub Container Registry
+        if: github.repository == 'JabRef/jabref'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
