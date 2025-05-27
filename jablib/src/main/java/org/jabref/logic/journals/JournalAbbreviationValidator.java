@@ -232,5 +232,21 @@ public class JournalAbbreviationValidator {
 
         return new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber);
     }
+
+    /**
+     * Checks if the abbreviation uses outdated "Manage." instead of "Manag."
+     */
+    public ValidationResult checkOutdatedManagementAbbreviation(String fullName, String abbreviation, int lineNumber) {
+        if (fullName.contains("Management") && abbreviation.contains("Manage.")) {
+            return new ValidationResult(false,
+                    "Management is abbreviated with outdated \"Manage.\" instead of \"Manag.\"",
+                    ValidationType.WARNING,
+                    fullName,
+                    abbreviation,
+                    lineNumber,
+                    "Update to use the standard abbreviation \"Manag.\"");
+        }
+        return new ValidationResult(true, "", ValidationType.WARNING, fullName, abbreviation, lineNumber);
+    }
 }
 
