@@ -119,15 +119,6 @@ tasks.named<JavaExec>("run") {
     }
 }
 
-tasks.named<JavaExec>("run") {
-    doFirst {
-        application.applicationDefaultJvmArgs =
-            listOf(
-                "--enable-native-access=com.sun.jna"
-            )
-    }
-}
-
 // This is more or less a clone of jabgui/build.gradle.kts -> jlink
 jlink {
     // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
