@@ -151,7 +151,7 @@ application {
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
 
-        // Enable JEP 519: Compact Object Headers
+        // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
         // Fix for https://github.com/JabRef/jabref/issues/11188

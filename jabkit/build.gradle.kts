@@ -78,7 +78,7 @@ application {
 
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
-        // Enable JEP 519: Compact Object Headers
+        // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
