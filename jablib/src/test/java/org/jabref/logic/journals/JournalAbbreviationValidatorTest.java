@@ -202,4 +202,37 @@ class JournalAbbreviationValidatorTest {
         assertTrue(issues.stream()
                          .anyMatch(issue -> issue.getSuggestion().contains("more specific abbreviations")));
     }
+
+    @Test
+    void checkWrongEscapeWithMultipleValidEscapes() {
+        String fullName = "Journal with \\n\\t\\r\\b\\f\\\"\\\\";
+        String abbreviation = "J. with \\n\\t\\r\\b\\f\\\"\\\\";
+
+        var result = validator.checkWrongEscape(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkWrongEscapeWithUnicodeEscape() {
+        String fullName = "Journal with \\u0041";
+        String abbreviation = "J. with \\u0042";
+
+        var result = validator.checkWrongEscape(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkWrongEscapeWithInvalidUnicodeEscape() {
+        String fullName = "Journal with \\u004";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkWrongEscape(fullName, abbreviation, 1);
+        assertFalse(result.isValid());
+        assertEquals("Invalid escape sequence in full name at position 13", result.getMessage());
+        assertTrue(result.getSuggestion().contains("valid escape sequences"));
+    }
 }
