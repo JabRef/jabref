@@ -312,4 +312,14 @@ public class JournalAbbreviationValidator {
 
         return results;
     }
+
+    /**
+     * Get all validation issues found
+     */
+    public List<ValidationResult> getIssues() {
+        // Check for duplicates
+        checkDuplicateFullNames();
+        checkDuplicateAbbreviations();
+        return issues;
+    }
 }
