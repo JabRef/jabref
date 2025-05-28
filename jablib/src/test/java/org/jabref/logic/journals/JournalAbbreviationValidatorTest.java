@@ -61,4 +61,27 @@ class JournalAbbreviationValidatorTest {
         assertTrue(result.getMessage().startsWith("Invalid escape sequence"));
         assertTrue(result.getSuggestion().contains("valid escape sequences"));
     }
+
+    @Test
+    void checkNonUtf8WithValidInput() {
+        String fullName = "Journal of Physics";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkNonUtf8(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkNonUtf8WithInvalidInput() {
+        // Using a non-UTF8 character
+        String fullName = "Journal of Physics\uFFFD";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkNonUtf8(fullName, abbreviation, 1);
+        assertFalse(result.isValid());
+        assertEquals("Journal name or abbreviation contains invalid UTF-8 sequences", result.getMessage());
+        assertEquals("Ensure all characters are valid UTF-8. Remove or replace any invalid characters.", result.getSuggestion());
+    }
 }
