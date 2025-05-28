@@ -20,7 +20,7 @@ application{
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
-        "-XX:+UseZGC",
+        "-XX:+UseZGC", "-XX:+ZUncommit",
 
         "--enable-native-access=com.sun.jna,org.apache.lucene.core"
     )
