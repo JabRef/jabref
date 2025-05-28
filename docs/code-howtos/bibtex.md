@@ -5,7 +5,7 @@ parent: Code Howtos
 
 The main class to handle a single BibTeX entry is `org.jabref.model.entry.BibEntry`.
 The content of a `.bib` file is handled in `org.jabref.model.database.BibDatabase`.
-Things not being BibTeX entries, but required for handling are stored in `org.jabref.model.database.BibDatabaseContext`.
+The BibTeX contents (as in the `BibDatabase`) along with some metadata required for handling are stored in `org.jabref.model.database.BibDatabaseContext`.
 For instance, this stores the mode of the library, which can be BibTeX or `biblatex`.
 
 Standard BibTeX fields known to JabRef are modeled in `org.jabref.model.entry.field.StandardField`.

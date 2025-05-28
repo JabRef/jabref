@@ -20,7 +20,7 @@ IntelliJ shows the following window:
 
 Click on "Open"
 
-Choose `build.gradle` in the root of the JabRef source folder:
+Choose `build.gradle.kts` at the root of the JabRef source folder:
 
 {% figure caption:"Choose `build.gradle.kts` in the “Open Project or File” dialog" %}
 ![Open File or Project dialog](11-3-choose-build-gradle-kts.png)

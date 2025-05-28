@@ -51,7 +51,7 @@ Enable JDK 24:
 Finally enable the JDK:
 
 1. Click "OK" to close the dialog "Project Structure".
-2. Wait for IntelliJ indexing the new JDK.
+2. Wait for IntelliJ to index the new JDK.
 3. If IntelliJ crashes, restart it. At "Help > Memory Settings", increase the "Maximum Heap Size".
 
 ## Enable annotation processors

@@ -29,7 +29,7 @@ It is strongly recommended that you have git installed.
 * We recommend using [Windows Terminal](https://aka.ms/terminal).
 
 {: note}
-One can use [chocolatey](https://chocolatey.org/) to install git more smoothly.
+You can use [chocolatey](https://chocolatey.org/) to install git more smoothly.
 First, install chocolatey, then run `choco install git.install -y --params "/GitAndUnixToolsOnPath /WindowsTerminal /Editor:VisualStudioCode` to a) install git and b) have Linux commands such as `grep` available in your `PATH`.
 
 ## Installed IDE
@@ -43,8 +43,8 @@ Most contributors use the Ultimate Edition, because they are students getting th
 {: .highlight }
 Install IntelliJ using [JetBrain's Toolbox App](https://www.jetbrains.com/toolbox-app/?from=jabref).
 This helps you keeping your JetBrains tools updated and allows for switching between different products easily.
-On Linux, the toolbox ensures a smooth start of IntelliJ IDEA.
-Note that you need to scroll down the list of available IDEs to find "IntelliJ IDEA Community Edition"
+Especially on Linux, the toolbox ensures a smooth start of IntelliJ IDEA.
+Note that you need to scroll down the list of available IDEs to find "IntelliJ IDEA Community Edition".
 
 {: note}
 In case you have less than 6 GiB of RAM, IntelliJ won't work.
