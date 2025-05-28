@@ -19,7 +19,6 @@ import org.jabref.logic.cleanup.FieldFormatterCleanup;
 import org.jabref.logic.cleanup.MoveFieldCleanup;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import org.jabref.logic.importer.EntryBasedParserFetcher;
-import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
@@ -77,7 +76,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
      * without subscription and, moreover, is optimized for finding a publication based on partial information.
      */
     @Override
-    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException {
         Optional<String> mrNumberInEntry = entry.getField(StandardField.MR_NUMBER);
         if (mrNumberInEntry.isPresent()) {
             // We are lucky and already know the id, so use it instead
@@ -135,7 +134,7 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
                         }
                     }
                 } else {
-                    var element = node.getObject();
+                    JSONObject element = node.getObject();
 
                     if (element.has("all")) {
                         JSONArray entriesArray = element.getJSONObject("all").getJSONArray("results");

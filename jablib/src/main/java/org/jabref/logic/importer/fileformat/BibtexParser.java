@@ -267,12 +267,13 @@ public class BibtexParser implements Parser {
                     importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
-                            var existingGroups = meta.get(MetaData.GROUPSTREE);
+                            String existingGroups = meta.get(MetaData.GROUPSTREE);
                             // We only have one Group BibDeskGroup with n children
                             // instead of iterating through the whole group structure every time we just search in the metadata for the group name
-                            var groupsToAdd = bibDeskGroupTreeNode.getChildren()
-                                                                  .stream().
-                                                                  filter(Predicate.not(groupTreeNode -> existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)));
+                            List<GroupTreeNode> groupsToAdd = bibDeskGroupTreeNode.getChildren()
+                                                                                  .stream()
+                                                                                  .filter(Predicate.not(groupTreeNode -> existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)))
+                                                                                  .toList();
                             groupsToAdd.forEach(existingGroupTree::moveTo);
                         },
                         // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
@@ -435,7 +436,7 @@ public class BibtexParser implements Parser {
                 for (int j = 0; j < keyList.getLength(); j++) {
                     if (keyList.item(j).getTextContent().matches("group name")) {
                         groupName = stringList.item(j).getTextContent();
-                        var staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                        ExplicitGroup staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                         bibDeskGroupTreeNode.addSubgroup(staticGroup);
                     } else if (keyList.item(j).getTextContent().matches("keys")) {
                         citationKeys = stringList.item(j).getTextContent(); // adds group entries
@@ -752,7 +753,7 @@ public class BibtexParser implements Parser {
                             entry.addFile(file);
                         } else if (plist.containsKey("$objects") && plist.objectForKey("$objects") instanceof NSArray nsArray) {
                             if (nsArray.getArray().length > INDEX_RELATIVE_PATH_IN_PLIST) {
-                                var relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
+                                NSString relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
                                 Path path = Path.of(relativePath.getContent());
 
                                 LinkedFile file = new LinkedFile("", path, "");

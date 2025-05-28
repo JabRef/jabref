@@ -157,7 +157,7 @@ public class BibtexImporter extends Importer {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 // % = char 37, we might have some bom chars in front that we need to skip, so we use index of
-                var percentPos = line.indexOf('%', 0);
+                int percentPos = line.indexOf('%');
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
                 if (percentPos == -1) {
                     return Optional.empty();

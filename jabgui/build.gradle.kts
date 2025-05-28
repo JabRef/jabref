@@ -123,7 +123,7 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
