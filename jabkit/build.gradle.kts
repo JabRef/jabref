@@ -83,6 +83,7 @@ application {
 
         // Default garbage collector is sufficient for CLI APP
         // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseStringDeduplication",
 
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )

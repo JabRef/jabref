@@ -21,6 +21,7 @@ application{
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
         "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
 
         "--enable-native-access=com.sun.jna,org.apache.lucene.core"
     )

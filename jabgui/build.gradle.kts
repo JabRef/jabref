@@ -155,6 +155,7 @@ application {
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
         "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
 
         // Fix for https://github.com/JabRef/jabref/issues/11188
         "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
