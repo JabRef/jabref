@@ -85,7 +85,7 @@ class RegExpBasedFileFinderTest {
 
     @Test
     void findAssociatedFilesFindFileContainingBracketsFromBracketedExpression() throws IOException {
-        var bibEntry = new BibEntry().withField(StandardField.TITLE, "Regexp from [A-Z]");
+        BibEntry bibEntry = new BibEntry().withField(StandardField.TITLE, "Regexp from [A-Z]");
 
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[TITLE]\\\\.[extension]", ',');
 
@@ -97,7 +97,7 @@ class RegExpBasedFileFinderTest {
 
     @Test
     void findAssociatedFilesFindCleanedFileFromBracketedExpression() throws IOException {
-        var bibEntry = new BibEntry().withField(StandardField.JOURNAL, "ACM/IEEE-CS");
+        BibEntry bibEntry = new BibEntry().withField(StandardField.JOURNAL, "ACM/IEEE-CS");
 
         RegExpBasedFileFinder fileFinder = new RegExpBasedFileFinder("[JOURNAL]\\\\.[extension]", ',');
 
@@ -109,7 +109,7 @@ class RegExpBasedFileFinderTest {
 
     @Test
     void findAssociatedFilesFindFileContainingParenthesizesFromBracketedExpression() throws IOException {
-        var bibEntry = new BibEntry().withCitationKey("Guo_ICC_2010")
+        BibEntry bibEntry = new BibEntry().withCitationKey("Guo_ICC_2010")
                                      .withField(StandardField.TITLE, "Ferroelectric Metal Organic Framework (MOF)")
                                      .withField(StandardField.AUTHOR, "Guo, M. and Cai, H.-L. and Xiong, R.-G.")
                                      .withField(StandardField.JOURNAL, "Inorganic Chemistry Communications")
