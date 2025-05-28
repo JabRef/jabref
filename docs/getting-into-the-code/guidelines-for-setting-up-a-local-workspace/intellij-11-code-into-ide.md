@@ -20,7 +20,7 @@ IntelliJ shows the following window:
 
 Click on "Open"
 
-Choose `build.gradle.kts` at the root of the JabRef source folder:
+Choose `build.gradle.kts` in the root of the `jabref` source folder:
 
 {% figure caption:"Choose `build.gradle.kts` in the “Open Project or File” dialog" %}
 ![Open File or Project dialog](11-3-choose-build-gradle-kts.png)
@@ -51,7 +51,7 @@ Click "Download".
 
 ## Allow JDK to access the internet
 
-Allow also access in private networks and click "Allow access".
+Allow also access for both cases and click "Allow access".
 
 {% figure caption:"Trust JDK" %}
 ![Windows Firewall JDK](12-07-trust-firewall.png)
