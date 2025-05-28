@@ -128,4 +128,27 @@ class JournalAbbreviationValidatorTest {
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
+
+    @Test
+    void checkAbbreviationEqualsFullTextWithValidInput() {
+        String fullName = "Journal of Physics";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkAbbreviationEqualsFullText(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkAbbreviationEqualsFullTextWithInvalidInput() {
+        String fullName = "Quantum";
+        String abbreviation = "Quantum";
+
+        var result = validator.checkAbbreviationEqualsFullText(fullName, abbreviation, 1);
+        assertFalse(result.isValid());
+        assertEquals("Abbreviation is the same as the full text", result.getMessage());
+        assertEquals("Consider using a shorter abbreviation to distinguish it from the full name", result.getSuggestion());
+    }
+
 }
