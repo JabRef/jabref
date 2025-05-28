@@ -1,6 +1,7 @@
 package org.jabref.gui.consistency;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import javafx.concurrent.Task;
@@ -49,9 +50,12 @@ public class ConsistencyCheckAction extends SimpleCommand {
         Task<BibliographyConsistencyCheck.Result> task = new Task<>() {
             @Override
             public BibliographyConsistencyCheck.Result call() throws Exception {
-                BibDatabaseContext databaseContext = stateManager.getActiveDatabase()
-                                                                 .orElseThrow(() -> new NullPointerException("Database null"));
-                List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+
+                Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
+                if (databaseContext.isEmpty()) {
+                    throw new IllegalStateException((Localization.lang("No library present")));
+                }
+                List<BibEntry> entries = databaseContext.get().getEntries();
 
                 BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
                 return consistencyCheck.check(entries, (count, total) ->
