@@ -36,7 +36,7 @@ dependencies {
     implementation("org.glassfish.grizzly:grizzly-framework:4.0.2")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     implementation("jakarta.validation:jakarta.validation-api:3.1.1")
-    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
+    implementation("org.hibernate.validator:hibernate-validator:9.0.0.Final")
 
     implementation("com.konghq:unirest-modules-gson:4.4.7")
 
@@ -55,7 +55,7 @@ dependencies {
         exclude(group = "org.antlr")
     }
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
