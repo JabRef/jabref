@@ -290,4 +290,26 @@ public class JournalAbbreviationValidator {
             }
         }
     }
+
+    /**
+     * Validates a journal entry against all rules
+     */
+    public List<ValidationResult> validate(String fullName, String abbreviation, int lineNumber) {
+        List<ValidationResult> results = new ArrayList<>();
+
+        // Error checks
+        results.add(checkWrongEscape(fullName, abbreviation, lineNumber));
+        results.add(checkNonUtf8(fullName, abbreviation, lineNumber));
+        results.add(checkStartingLetters(fullName, abbreviation, lineNumber));
+
+        // Warning checks
+        results.add(checkAbbreviationEqualsFullText(fullName, abbreviation, lineNumber));
+        results.add(checkOutdatedManagementAbbreviation(fullName, abbreviation, lineNumber));
+
+        // Track for duplicate checks
+        fullNameToAbbrev.computeIfAbsent(fullName, k -> new ArrayList<>()).add(abbreviation);
+        abbrevToFullName.computeIfAbsent(abbreviation, k -> new ArrayList<>()).add(fullName);
+
+        return results;
+    }
 }
