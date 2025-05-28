@@ -6,6 +6,8 @@ nav_order: 11
 
 # Step 1: Get the code into IntelliJ
 
+## IntelliJ Startup
+
 Start IntelliJ.
 
 IntelliJ shows the following window:
@@ -14,19 +16,38 @@ IntelliJ shows the following window:
 ![IntelliJ Start Window](guidelines-intellij-start-window.png)
 {% endfigure %}
 
+## Enable Plugin Updates
+
+In case "Plugins" shows a number, click on "Plugins".
+Then click on the settings button.
+
+{% figure caption:"Settings Button" %}
+![Settings Button](11-1-settings-button.png)
+{% endfigure %}
+
+Then enable automatic plugin updates:
+
+{% figure caption:"Update Plugins Automatically" %}
+![Update Plugins Automatically](11-2-update-plugins-automatically.png)
+{% endfigure %}
+
+Then click on "Projects" on the left.
+
+## Open the project
+
 Click on "Open"
 
 Choose `build.gradle` in the root of the JabRef source folder:
 
-{% figure caption:"Choose `build.gradle` in the “Open Project or File” dialog" %}
-![Open File or Project dialog](guidelines-intellij-choose-build-gradle.png)
+{% figure caption:"Choose `build.gradle.kts` in the “Open Project or File” dialog" %}
+![Open File or Project dialog](11-3-choose-build-gradle-kts.png)
 {% endfigure %}
 
 After clicking "Open," IntelliJ asks how that file should be opened.
 Answer: "Open as Project"
 
 {% figure caption:"Choose “Open as Project” in the Open Project dialog" %}
-![Open Project dialog](guidelines-choose-open-as-project.png)
+![Open Project dialog](11-4-guidelines-choose-open-as-project.png)
 {% endfigure %}
 
 Then, trust the project:
@@ -53,31 +74,25 @@ Allow also access in private networks and click "Allow access".
 ![Windows Firewall JDK](12-07-trust-firewall.png)
 {% endfigure %}
 
-## Wait for IntelliJ to import the gradle project
+## Wait for IntelliJ IDEA to import the gradle project
 
-IntelliJ shows "Importing 'JabRef' Gradle Project" at the lower right corner.
+IntelliJ shows "Importing 'jabref' Gradle Project" at the lower right corner.
+This will take several minutes.
 Wait until this disappears.
 
-{% figure caption:"Importing 'JabRef' Gradle Project" %}
-![Importing 'JabRef' Gradle Project](12-08-importing-project.png)
+{% figure caption:"Importing 'jabref' Gradle Project" %}
+![Importing 'jabref' Gradle Project](12-08-importing-project.png)
 {% endfigure %}
 
-## IntelliJ will crash
+## IntelliJ IDEA will report low memory
 
-IntelliJ will close.
+{% figure caption:"Low memory pop up" %}
+![alt text](12-09-low-memory.png)
+{% endfigure %}
 
-Restart IntelliJ.
-
-```text
-# There is insufficient memory for the Java Runtime Environment to continue.
-# Native memory allocation (malloc) failed to allocate 1048576 bytes. Error detail: AllocateHeap
-```
-
-Click on "Report and ClearAll".
-
-1. Click on the burger menu
-2. Go to "Help" and then "Change Memory Settings"
-3. Set "2000" MB (instead of 750) and click on "Save and Restart"
+1. Click on "Configure".
+2. Set "2100" MB (instead of 1262) and click on "Save and Restart".
+3. Wait until IntelliJ is up and running again.
 
 ## Ensure that committing via IntelliJ works
 
@@ -104,24 +119,9 @@ Then press the minus button on top.
 This will make these directories "Unregistered roots:", which is fine.
 
 {% figure caption:"Directory Mappings having three unregistered roots" %}
-![Directory Mappings having three repositories unregsitered](12-13-intellij-directory-mappings-unregistered-roots.png)
+![Directory Mappings having three repositories unregistered](12-13-intellij-directory-mappings-unregistered-roots.png)
 {% endfigure %}
 
 Click "OK"
-
-## Ensure that committing with other tools work
-
-Open a "git bash".
-On Windows, navigate to `C:\git-repositories\JabRef`.
-Open the context menu of the file explorer (using the right mouse button), choose "Open Git Bash here".
-
-Execute following command:
-
-```shell
-git update-index --assume-unchanged jablib/src/main/abbrv.jabref.org jablib/src/main/resources/csl-styles jablib/src/main/resources/csl-locales
-```
-
-{: .tip }
-If you do not see the context menu, re-install git following the steps given at [StackOverflow](https://stackoverflow.com/a/50667280/873282).
 
 <!-- markdownlint-disable-file MD033 -->
