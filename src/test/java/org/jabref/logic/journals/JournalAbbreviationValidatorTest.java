@@ -84,4 +84,48 @@ class JournalAbbreviationValidatorTest {
         assertEquals("Journal name or abbreviation contains invalid UTF-8 sequences", result.getMessage());
         assertEquals("Ensure all characters are valid UTF-8. Remove or replace any invalid characters.", result.getSuggestion());
     }
+
+    @Test
+    void checkStartingLettersWithValidInput() {
+        String fullName = "Journal of Physics";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkStartingLetters(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkStartingLettersWithInvalidInput() {
+        String fullName = "Journal of Physics";
+        String abbreviation = "Phys. J.";
+
+        var result = validator.checkStartingLetters(fullName, abbreviation, 1);
+        assertFalse(result.isValid());
+        assertEquals("Abbreviation does not begin with same letter as full journal name", result.getMessage());
+        assertEquals("Should start with 'j' (from 'Journal')", result.getSuggestion());
+    }
+
+    @Test
+    void checkStartingLettersWithThePrefix() {
+        String fullName = "The Journal of Physics";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkStartingLetters(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkStartingLettersWithAPrefix() {
+        String fullName = "A Journal of Physics";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkStartingLetters(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
 }
