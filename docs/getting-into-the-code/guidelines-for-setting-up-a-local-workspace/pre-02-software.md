@@ -46,6 +46,10 @@ This helps you keeping your JetBrains tools updated and allows for switching bet
 On Linux, the toolbox ensures a smooth start of IntelliJ IDEA.
 Note that you need to scroll down the list of available IDEs to find "IntelliJ IDEA Community Edition"
 
+{: note}
+In case you have less than 6 GiB of RAM, IntelliJ won't work.
+We recommend upgrading your system.
+
 ## Other Tooling
 
 We collected some other tooling recommendations.

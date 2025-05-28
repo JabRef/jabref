@@ -54,37 +54,6 @@ Finally enable the JDK:
 2. Wait for IntelliJ indexing the new JDK.
 3. If IntelliJ crashes, restart it. At "Help > Memory Settings", increase the "Maximum Heap Size".
 
-## Enable compilation by IntelliJ
-
-To prepare IntelliJ's build system additional steps are required:
-
-Navigate to **File > Settings > Build, Execution, Deployment > Compiler > Java Compiler**, and under "Override compiler parameters per-module", click add (\[+]) and choose `JabRef`.
-
-Copy following text into your clipboard:
-
-```text
---add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
---add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
---add-reads org.jabref=org.apache.commons.csv
---add-reads org.jabref=org.fxmisc.flowless
---add-reads org.jabref=langchain4j.core
---add-reads org.jabref=langchain4j.open.ai
-```
-
-Then double click inside the cell "Compilation options".
-Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to paste all text.
-Press <kbd>Enter</kbd> to have the value really stored.
-Otherwise, it seems like the setting is stored, but it is not there if you reopen this preference dialog.
-
-Note: If you use the expand arrow, you need to press <kbd>Shift</kbd>+<kbd>Enter</kbd> to close the expansion and then <kbd>Enter</kbd> to commit the value.
-
-Then click on "Apply" to store the setting.
-
-Note: If this step is omitted, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
-
-IntelliJ prompts with "Back Up Your Settings".
-You can choose "Skip" here.
-
 ## Enable annotation processors
 
 Enable annotation processors by navigating to **File > Settings > Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"
@@ -96,7 +65,7 @@ Enable annotation processors by navigating to **File > Settings > Build, Executi
 ## Using Gradle from within IntelliJ IDEA
 
 {: .note }
-Ensuring JabRef builds with Gradle should always be the first step because, e.g. it generates additional sources that are required for compiling the code.
+Ensuring JabRef builds with Gradle should always be the first step since this is the commonly supported way to build JabRef.
 
 Use the Gradle Tool Window to build all parts of JabRef and run it.
 To do so, expand the JabRef project in the Gradle Tool Window, navigate to "jabgui", expand it, navigate to "application", expand it, and double click "run".
@@ -122,7 +91,44 @@ Now you can also select "jabref \[run]" and either run or debug the application 
 {: .note }
 You can run any other development task similarly.
 
+## Enable compilation by IntelliJ
+
+This is currently not possible due to [IDEA-3733059](https://youtrack.jetbrains.com/issue/IDEA-373305).
+
+<!--
+
+To prepare IntelliJ's build system additional steps are required:
+
+Navigate to **File > Settings > Build, Execution, Deployment > Compiler > Java Compiler**, and under "Override compiler parameters per-module", click add (\[+]) and choose `JabRef`.
+
+Copy following text into your clipboard:
+
+```text
+--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref
+--add-exports=org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref
+```
+
+Then double click inside the cell "Compilation options".
+Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to paste all text.
+Press <kbd>Enter</kbd> to have the value really stored.
+Otherwise, it seems like the setting is stored, but it is not there if you reopen this preference dialog.
+
+Note: If you use the expand arrow, you need to press <kbd>Shift</kbd>+<kbd>Enter</kbd> to close the expansion and then <kbd>Enter</kbd> to commit the value.
+
+Then click on "Apply" to store the setting.
+
+Note: If this step is omitted, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
+
+IntelliJ prompts with "Back Up Your Settings".
+You can choose "Skip" here.
+
+-->
+
 ## Using IntelliJ's internal build system for tests
+
+This is currently not possible due to [IDEA-3733059](https://youtrack.jetbrains.com/issue/IDEA-373305).
+
+<!--
 
 In **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** the setting "Run tests using:" is set to "IntelliJ IDEA".
 
@@ -141,6 +147,8 @@ IntelliJ now compiles JabRef.
 This should happen without any error.
 
 Now you can use IntelliJ IDEA's internal build system by using **Build > Build Project**.
+
+-->
 
 ## Final build system checks
 

@@ -8,30 +8,13 @@ nav_order: 11
 
 ## IntelliJ Startup
 
-Start IntelliJ.
+Start IntelliJ IDEA.
 
 IntelliJ shows the following window:
 
 {% figure caption:"IntelliJ Start Window" %}
 ![IntelliJ Start Window](guidelines-intellij-start-window.png)
 {% endfigure %}
-
-## Enable Plugin Updates
-
-In case "Plugins" shows a number, click on "Plugins".
-Then click on the settings button.
-
-{% figure caption:"Settings Button" %}
-![Settings Button](11-1-settings-button.png)
-{% endfigure %}
-
-Then enable automatic plugin updates:
-
-{% figure caption:"Update Plugins Automatically" %}
-![Update Plugins Automatically](11-2-update-plugins-automatically.png)
-{% endfigure %}
-
-Then click on "Projects" on the left.
 
 ## Open the project
 
@@ -95,10 +78,6 @@ Wait until this disappears.
 3. Wait until IntelliJ is up and running again.
 
 ## Ensure that committing via IntelliJ works
-
-IntelliJ offers committing using the UI.
-Press <kbd>Alt</kbd>+<kbd>0</kbd> to open the commit dialog.
-If this works, everything is fine.
 
 Unfortunately, IntelliJ has no support for ignored sub modules [[IDEA-285237](https://youtrack.jetbrains.com/issue/IDEA-285237/ignored-changes-in-submodules-are-still-visible-in-the-commit-window)].
 Fortunately, there is a workaround:
