@@ -91,7 +91,7 @@ Wait until this disappears.
 {% endfigure %}
 
 1. Click on "Configure".
-2. Set "2100" MB (instead of 1262) and click on "Save and Restart".
+2. Set "2500" MB (instead of 1262) and click on "Save and Restart".
 3. Wait until IntelliJ is up and running again.
 
 ## Ensure that committing via IntelliJ works

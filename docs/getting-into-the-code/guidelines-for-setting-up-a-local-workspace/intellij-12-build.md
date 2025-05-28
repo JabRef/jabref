@@ -10,9 +10,14 @@ nav_order: 12
 
 Press the synchronization button in the gradle menu.
 
+1. Locate the gradle icon on the right side and click on it.
+2. Click on the arrows on the left side of this pane.
+
 {% figure caption:"Gradle sync button" %}
 ![Platform Settings - SDKs](13-01-gradle-sync.png)
 {% endfigure %}
+
+Press <kbd>Alt</kbd>+<kbd>1</kbd> to show the project view
 
 Then, on the left side the project folder is there:
 
@@ -20,20 +25,40 @@ Then, on the left side the project folder is there:
 ![Project folder](13-02-project-folder.png)
 {% endfigure %}
 
-## Ensure correct JDK setting for Gradle
+## Switch JDK to the latest one
 
-Navigate to **File > Settings... > Build, Execution, Deployment > Build Tools > Gradle** and select the "Project SDK" as the Gradle JVM at the bottom.
-If that does not exist, just select JDK 23.
+Open the module settings:
 
-{% figure caption:"Gradle JVM is project SDK (showing "Project SDK temurin-23" as example)" %}
-![Gradle JVM is project SDK](guidelines-intellij-settings-gradle-gradlejvm-is-projectjvm.png)
+1. Open the context menu of the project
+2. Choose "Open Module Settings"
+
+{% figure caption:"Open Module Settings" %}
+![Open Module Settings](13-03-open-module-settings.png)
 {% endfigure %}
+
+Enable JDK 24:
+
+1. On the left, navigate to "Project".
+2. Choose "Download JDK..."
+3. Select version 24
+4. Select vendor "Eclipse Temurin"
+5. Click on "Download"
+
+{% figure caption:"Download Eclipse Temurin" %}
+![Download Eclipse Temurin](13-04-download-temurin.png)
+{% endfigure %}
+
+Finally enable the JDK:
+
+1. Click "OK" to close the dialog "Project Structure".
+2. Wait for IntelliJ indexing the new JDK.
+3. If IntelliJ crashes, restart it. At "Help > Memory Settings", increase the "Maximum Heap Size".
 
 ## Enable compilation by IntelliJ
 
 To prepare IntelliJ's build system additional steps are required:
 
-Navigate to **Build, Execution, Deployment > Compiler > Java Compiler**, and under "Override compiler parameters per-module", click add (\[+]) and choose `JabRef`.
+Navigate to **File > Settings > Build, Execution, Deployment > Compiler > Java Compiler**, and under "Override compiler parameters per-module", click add (\[+]) and choose `JabRef`.
 
 Copy following text into your clipboard:
 
@@ -47,7 +72,6 @@ Copy following text into your clipboard:
 ```
 
 Then double click inside the cell "Compilation options".
-Press <kbd>Ctrl</kbd>+<kbd>A</kbd> to mark all text.
 Press <kbd>Ctrl</kbd>+<kbd>V</kbd> to paste all text.
 Press <kbd>Enter</kbd> to have the value really stored.
 Otherwise, it seems like the setting is stored, but it is not there if you reopen this preference dialog.
@@ -58,9 +82,12 @@ Then click on "Apply" to store the setting.
 
 Note: If this step is omitted, you will get: `java: package com.sun.javafx.scene.control is not visible (package com.sun.javafx.scene.control is declared in module javafx.controls, which does not export it to module org.jabref)`.
 
+IntelliJ prompts with "Back Up Your Settings".
+You can choose "Skip" here.
+
 ## Enable annotation processors
 
-Enable annotation processors by navigating to **Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"
+Enable annotation processors by navigating to **File > Settings > Build, Execution, Deployment > Compiler > Annotation processors** and check "Enable annotation processing"
 
 {% figure caption:"Enabled annotation processing" %}
 ![Enable annotation processing](guidelines-intellij-enable-annotation-processing.png)
