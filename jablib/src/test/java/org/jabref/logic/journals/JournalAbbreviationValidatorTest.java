@@ -150,7 +150,7 @@ class JournalAbbreviationValidatorTest {
         assertEquals("Abbreviation is the same as the full text", result.getMessage());
         assertEquals("Consider using a shorter abbreviation to distinguish it from the full name", result.getSuggestion());
     }
-    
+
     @Test
     void checkOutdatedManagementAbbreviationWithValidInput() {
         String fullName = "Management Science";
@@ -173,4 +173,33 @@ class JournalAbbreviationValidatorTest {
         assertEquals("Update to use the standard abbreviation \"Manag.\"", result.getSuggestion());
     }
 
+    @Test
+    void checkDuplicateFullNames() {
+        // Add first entry
+        validator.validate("Journal of Physics", "J. Phys.", 1);
+        // Add duplicate with different abbreviation
+        validator.validate("Journal of Physics", "J. Phys. A", 2);
+
+        var issues = validator.getIssues();
+        assertFalse(issues.isEmpty());
+        assertTrue(issues.stream()
+                         .anyMatch(issue -> issue.getMessage().contains("Duplicate full name")));
+        assertTrue(issues.stream()
+                         .anyMatch(issue -> issue.getSuggestion().contains("consolidating abbreviations")));
+    }
+
+    @Test
+    void checkDuplicateAbbreviations() {
+        // Add first entry
+        validator.validate("Journal of Physics", "J. Phys.", 1);
+        // Add different journal with same abbreviation
+        validator.validate("Journal of Physiology", "J. Phys.", 2);
+
+        var issues = validator.getIssues();
+        assertFalse(issues.isEmpty());
+        assertTrue(issues.stream()
+                         .anyMatch(issue -> issue.getMessage().contains("Duplicate abbreviation")));
+        assertTrue(issues.stream()
+                         .anyMatch(issue -> issue.getSuggestion().contains("more specific abbreviations")));
+    }
 }
