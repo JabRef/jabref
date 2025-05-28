@@ -150,5 +150,27 @@ class JournalAbbreviationValidatorTest {
         assertEquals("Abbreviation is the same as the full text", result.getMessage());
         assertEquals("Consider using a shorter abbreviation to distinguish it from the full name", result.getSuggestion());
     }
+    
+    @Test
+    void checkOutdatedManagementAbbreviationWithValidInput() {
+        String fullName = "Management Science";
+        String abbreviation = "Manag. Sci.";
+
+        var result = validator.checkOutdatedManagementAbbreviation(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkOutdatedManagementAbbreviationWithInvalidInput() {
+        String fullName = "Management Science";
+        String abbreviation = "Manage. Sci.";
+
+        var result = validator.checkOutdatedManagementAbbreviation(fullName, abbreviation, 1);
+        assertFalse(result.isValid());
+        assertEquals("Management is abbreviated with outdated \"Manage.\" instead of \"Manag.\"", result.getMessage());
+        assertEquals("Update to use the standard abbreviation \"Manag.\"", result.getSuggestion());
+    }
 
 }
