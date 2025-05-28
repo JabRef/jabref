@@ -2,9 +2,13 @@
 
 // This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
 
-// One can start an http server using following command:
+// You can start an http server using following command:
 //
-// npx @jbangdev/jbang https://github.com/iloveskittles82/jabref/blob/jabmap/.jbang/JabSrvLauncher.java
+// npx @jbangdev/jbang https://github.com/JabRef/jabref/blob/main/.jbang/JabSrvLauncher.java
+//
+// in case JBang is installed (https://www.jbang.dev/download/), following command works, too:
+//
+// jbang https://github.com/JabRef/jabref/blob/main/.jbang/JabSrvLauncher.java
 
 // Alternatively, you can push the green play button in org.jabref.http.server.cli.ServerCli.
 
@@ -18,6 +22,26 @@ GET http://localhost:6050/libraries
 Accept: application/json
 
 ## demo cases
+
+// JabRef ships with "Chocolate.bib", which is "magically" served when asking for "demo"
+
+### Get JSON of Chocolate.bib
+
+GET http://localhost:6050/libraries/demo
+Accept: application/json
+
+### Get plain BibTeX of Chocolate.bib
+
+GET http://localhost:6050/libraries/demo
+Accept: application/x-bibtex
+
+### Get CSL JSON of Chocolate.bib
+
+// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
+// will show the contents of your first opened library using CSL JSON
+
+GET http://localhost:6050/libraries/demo
+Accept: application/x-bibtex-library-csl+json
 
 ### Read demo JabMap
 
@@ -33,39 +57,28 @@ Content-Type: application/json
   "name": "demo"
 }
 
+## From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
+
+### Get BibTeX of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
+
+GET http://localhost:6050/libraries/Chocolate.bib-6a732609
+Accept: application/x-bibtex
+
+### Get JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
+
+GET http://localhost:6050/libraries/Chocolate.bib-6a732609
+Accept: application/json
+
+### Get CSL JSON of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
+
+// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
+// will show the contents of your first opened library using CSL JSON
+
+GET http://localhost:6050/libraries/Chocolate.bib-6a732609
+Accept: application/x-bibtex-library-csl+json
+
 ## Error cases
 
 ### GET not avaialble library
 
 GET http://localhost:6050/libraries/notfound
-
-## From here: Chocolate.bib is required
-
-### Get BibTeX of Chocolate.bib
-
-// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
-// will show the contents of your first opened library as BibTeX
-
-GET http://localhost:6050/libraries/Chocolate.bib-684308eb
-Accept: application/x-bibtex
-
-### Get JabMap of Chocolate.bib
-
-GET http://localhost:6050/libraries/Chocolate.bib-684308eb/map
-Accept: application/json
-
-### Get JSON of Chocolate.bib
-
-// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
-// will show the contents of Chocolae.bib using json + embedded BibTeX
-
-GET http://localhost:6050/libraries/Chocolate.bib-026bd7ec
-Accept: application/json
-
-### Get CSL JSON of Chocolate.bib
-
-// if you have checkout the JabRef code at c:\git-repositories\jabref, then this
-// will show the contents of your first opened library using CSL JSON
-
-GET http://localhost:6050/libraries/Chocolate.bib-026bd7ec
-Accept: application/x-bibtex-library-csl+json

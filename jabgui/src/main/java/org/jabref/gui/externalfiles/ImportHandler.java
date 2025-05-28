@@ -169,7 +169,7 @@ public class ImportHandler {
                                 });
                             }
                         } else if (FileUtil.isBibFile(file)) {
-                            var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
+                            ParserResult bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
                             List<BibEntry> entries = bibtexParserResult.getDatabaseContext().getEntries();
                             entriesToAdd.addAll(entries);
                             boolean success = !bibtexParserResult.hasWarnings();
@@ -207,7 +207,7 @@ public class ImportHandler {
             }
 
             private void addResultToList(Path newFile, boolean success, String logMessage) {
-                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
+                ImportFilesResultItemViewModel result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
                 results.add(result);
             }
         };
