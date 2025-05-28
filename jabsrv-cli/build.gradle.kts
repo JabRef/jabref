@@ -17,7 +17,12 @@ application{
     mainModule.set("org.jabref.jabsrv.cli")
 
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=com.sun.jna"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        "-XX:+UseZGC",
+
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
     )
 }
 
