@@ -80,6 +80,10 @@ application {
     applicationDefaultJvmArgs = listOf(
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        // Default garbage collector is sufficient for CLI APP
+        // "-XX:+UseZGC",
+
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }

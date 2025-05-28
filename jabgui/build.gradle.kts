@@ -154,6 +154,8 @@ application {
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
+        "-XX:+UseZGC",
+
         // Fix for https://github.com/JabRef/jabref/issues/11188
         "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
         "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
