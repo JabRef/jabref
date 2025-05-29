@@ -19,32 +19,20 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
 public class PdfMergeDialog {
+
     /**
      * Constructs a merge dialog for a PDF file. This dialog calls various {@link PdfImporter}s, collects the results, and lets the user choose between them.
      * <p>
      * {@link PdfImporter}s try to extract a {@link BibEntry} out of a PDF file,
      * but it does not perform this 100% perfectly, it is only a set of heuristics that in some cases might work, in others not.
      * Thus, JabRef provides this merge dialog that collects the results of all {@link PdfImporter}s
-     * and gives the user a choice between field values.
-     * <p>
-     * Two entry points are provided:
-     * <ul>
-     *   <li>{@link #createMergeDialog(BibEntry, Path, GuiPreferences, TaskExecutor)} to merge a known entry with extracted data.</li>
-     *   <li>{@link #createMergeDialog(Path, GuiPreferences, TaskExecutor)} to extract all data from the PDF without a preexisting entry.</li>
-     * </ul>
+     * and gives user a choice between field values.
      *
-     * Internally, this is split into two helper methods:
-     * <ul>
-     *   <li>{@code initDialog} sets up the dialog with preferences and title.</li>
-     *   <li>{@code finishDialog} populates the dialog with all available import sources.</li>
-     * </ul>
-     *
-     * @param entry the entry to merge with (only for {@link #createMergeDialog(BibEntry, Path, GuiPreferences, TaskExecutor)})
+     * @param entry the entry to merge with
      * @param filePath the path to the PDF file. This PDF is used as the source for the {@link PdfImporter}s.
      * @param preferences the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
      * @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
      */
-
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
 
