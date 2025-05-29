@@ -31,7 +31,7 @@ public class Pseudonymize implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     // ADR 0045
-    @Option(names = {"--input"}, description = "BibTex file to be pseudonymize", required = true)
+    @Option(names = {"--input"}, description = "BibTeX file to be pseudonymize", required = true)
     private String inputFile;
 
     @Option(names = {"--output"}, description = "Output pseudo-bib file")
@@ -85,14 +85,14 @@ public class Pseudonymize implements Runnable {
                 result.bibDatabaseContext(),
                 pseudoBibPath);
 
-        try {
-            if (Files.exists(pseudoKeyPath) && !force) {
-                System.out.println(Localization.lang("'%0' file already exists. Use -f or --force to overwrite.", pseudoKeys));
-                return;
-            } else if (Files.exists(pseudoKeyPath) && force) {
-                System.out.println(Localization.lang("'%0' file already exists. Overwriting.", pseudoKeys));
-            }
+        if (Files.exists(pseudoKeyPath) && !force) {
+            System.out.println(Localization.lang("'%0' file already exists. Use -f or --force to overwrite.", pseudoKeys));
+            return;
+        } else if (Files.exists(pseudoKeyPath) && force) {
+            System.out.println(Localization.lang("'%0' file already exists. Overwriting.", pseudoKeys));
+        }
 
+        try {
             System.out.println(Localization.lang("Saving: %0.", pseudoKeyPath));
             PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(pseudoKeyPath, result);
         } catch (IOException ex) {
