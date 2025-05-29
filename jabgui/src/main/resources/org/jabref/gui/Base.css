@@ -2519,3 +2519,99 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1.25em;
     -fx-border-color: transparent;
 }
+
+/* Walkthrough Styles */
+.walkthrough-panel {
+    -fx-background-color: -jr-white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+
+.walkthrough-title {
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center-left;
+}
+
+.walkthrough-step-counter {
+    -fx-background-color: -jr-base;
+    -fx-text-fill: -jr-gray-3;
+    -fx-font-size: 1em;
+    -fx-background-radius: 100;
+    -fx-padding: 0.125em 0.25em;
+    -fx-alignment: center;
+}
+
+.walkthrough-text-content {
+    -fx-text-fill: -jr-gray-3;
+    -fx-font-size: 1em;
+    -fx-wrap-text: true;
+    -fx-alignment: baseline-left;
+}
+
+.walkthrough-info-container {
+    -fx-border-color: -jr-theme;
+    -fx-border-width: 0 0 0 1;
+    -fx-padding: 0 0 0 0.75em;
+    -fx-spacing: 0.25em;
+}
+
+.walkthrough-info-icon {
+    -fx-text-fill: -jr-theme;
+}
+
+.walkthrough-info-label {
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1em;
+    -fx-wrap-text: true;
+    -fx-alignment: center-left;
+}
+
+.walkthrough-continue-button {
+    -fx-background-color: -jr-theme;
+    -fx-text-fill: -jr-white;
+    -fx-font-size: 1.1em;
+    -fx-border-radius: 2;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-skip-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.1em;
+    -fx-border-color: -jr-theme;
+    -fx-border-width: 0.5;
+    -fx-border-radius: 2;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-back-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.1em;
+    -fx-border-color: -jr-gray-2;
+    -fx-border-width: 0.5;
+    -fx-border-radius: 2;
+    -fx-padding: 0.25em 0.5em;
+}
+
+.walkthrough-fullscreen-content {
+    -fx-padding: 0.1875em;
+    -fx-spacing: 0.75em;
+    -fx-max-width: 32em;
+    -fx-fill-width: true;
+}
+
+.walkthrough-side-panel-vertical {
+    -fx-pref-width: 24em;
+    -fx-max-width: 24em;
+    -fx-min-width: 24em;
+}
+
+.walkthrough-side-panel-horizontal {
+    -fx-pref-height: 16em;
+    -fx-max-height: 16em;
+    -fx-min-height: 16em;
+}
