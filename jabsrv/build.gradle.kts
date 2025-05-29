@@ -49,9 +49,9 @@ dependencies {
     implementation("org.jabref:afterburner.fx:2.0.0") {
         exclude( group = "org.openjfx")
     }
-    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
 
     implementation("net.harawata:appdirs:1.4.0")
 
@@ -71,6 +71,12 @@ dependencies {
     // route all requests to log4j to SLF4J
     testImplementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
 
+}
+
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.mockito")
+    requires.add("jul.to.slf4j")
 }
 
 tasks.test {

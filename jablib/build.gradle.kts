@@ -35,15 +35,15 @@ val javafxPlatform: String by project.extra
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
 
-    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-base:$javafxVersion")
 
     // Required by afterburner.fx
-    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-graphics:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    implementation("org.openjfx:javafx-graphics:$javafxVersion")
 
     // Fix "error: module not found: javafx.controls" during compilation
-    // implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
+    // implementation("org.openjfx:javafx-controls:$javafxVersion")
 
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported

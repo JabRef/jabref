@@ -12,7 +12,6 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 val luceneVersion = "10.2.1"
 
 val javafxVersion = "24.0.1"
-val javafxPlatform: String by project.extra
 
 dependencies {
     implementation(project(":jablib"))
@@ -22,10 +21,10 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
-    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
-    // implementation("org.openjfx:javafx-graphics:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    // implementation("org.openjfx:javafx-graphics:$javafxVersion")
 
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
@@ -63,6 +62,12 @@ dependencies {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
+}
+
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.jabref.testsupport")
+    requires.add("org.mockito")
 }
 
 /*

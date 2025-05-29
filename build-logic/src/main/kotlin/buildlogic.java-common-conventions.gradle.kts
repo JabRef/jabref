@@ -36,7 +36,7 @@ val os = org.gradle.internal.os.OperatingSystem.current()
 val osTarget = when {
     os.isMacOsX -> {
         val osVersion = System.getProperty("os.version")
-        if (osVersion.startsWith("14")) "macos-14" else "macos-123"
+        if (osVersion.startsWith("14")) "macos-14" else "macos-13"
     }
     os.isLinux -> "ubuntu-22.04"
     os.isWindows -> "windows-2022"
@@ -72,8 +72,9 @@ javaModulePackaging {
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
 jvmDependencyConflicts.patch {
-    listOf("base", "controls", "fxml", "graphics", "swing", "web").forEach { jfxModule ->
+    listOf("base", "controls", "fxml", "graphics", "swing", "web", "media").forEach { jfxModule ->
         module("org.openjfx:javafx-$jfxModule") {
+            addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
             addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
             addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
             addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
@@ -88,18 +89,6 @@ jvmDependencyConflicts.patch {
         removeDependency("com.google.errorprone:error_prone_annotations")
     }
 }
-
-val arch = System.getProperty("os.arch")
-val javafxPlatform = when {
-    os.isWindows -> "win"
-    os.isMacOsX && arch == "aarch64" -> "mac-aarch64"
-    os.isMacOsX -> "mac"
-    os.isLinux && arch == "aarch64" -> "linux-aarch64"
-    os.isLinux -> "linux"
-    else -> error("Unsupported OS/arch: ${os.name} / $arch")
-}
-
-project.extra["javafxPlatform"] = javafxPlatform
 
 extraJavaModuleInfo {
     failOnMissingModuleInfo = false
@@ -125,7 +114,6 @@ extraJavaModuleInfo {
     */
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
-        // overrideModuleName()
         patchRealModule()
 
         exports("impl.org.controlsfx.skin")
@@ -143,32 +131,19 @@ extraJavaModuleInfo {
         requires("javafx.graphics")
     }
 
-    // Based on module-info.class in https://repo1.maven.org/maven2/org/controlsfx/controlsfx/11.2.2/
     module("org.openjfx:javafx-controls", "javafx.controls") {
-        overrideModuleName()
-
         patchRealModule()
 
-        // exportAllPackages() // shortcut to just export everything, can be replaced with a dedicated list
-        exports("com.sun.javafx.scene.control")
+        requiresTransitive("javafx.base");
+        requiresTransitive("javafx.graphics");
+
         exports("javafx.scene.chart")
         exports("javafx.scene.control")
         exports("javafx.scene.control.cell")
         exports("javafx.scene.control.skin")
-        exports("javafx.scene.control.table")
 
-        // opens("org.controlsfx.control", "org.controlsfx.fxsampler")
-        // opens("org.controlsfx.control.tableview2", "org.controlsfx.fxsampler");
-        opens("impl.org.controlsfx.skin");
-
-        requires("javafx.base");
-        requires("javafx.controls");
-        requires("javafx.graphics");
-
-        // uses("org.controlsfx.glyphfont.GlyphFont");
-
-        // Automatically reconstructed from META-INF
-        // provides org.controlsfx.glyphfont.GlyphFont with org.controlsfx.glyphfont.FontAwesome;
+        // PATCH REASON:
+        exports("com.sun.javafx.scene.control")
     }
 }
 

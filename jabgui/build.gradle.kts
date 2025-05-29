@@ -19,20 +19,17 @@ val luceneVersion = "10.2.1"
 val pdfbox = "3.0.5"
 
 val javafxVersion = "24.0.1"
-val javafxPlatform: String by project.extra
-
-println("JavaFX platform: $javafxPlatform")
 
 dependencies {
     implementation(project(":jablib"))
 
-    implementation("org.openjfx:javafx-base:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-controls:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-fxml:$javafxVersion:$javafxPlatform")
-    // implementation("org.openjfx:javafx-graphics:24.0.1:win")
-    implementation("org.openjfx:javafx-graphics:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-swing:$javafxVersion:$javafxPlatform")
-    implementation("org.openjfx:javafx-web:$javafxVersion:$javafxPlatform")
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    // implementation("org.openjfx:javafx-graphics:24.0.1")
+    implementation("org.openjfx:javafx-graphics:$javafxVersion")
+    implementation("org.openjfx:javafx-swing:$javafxVersion")
+    implementation("org.openjfx:javafx-web:$javafxVersion")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")
@@ -437,6 +434,15 @@ if (OperatingSystem.current().isWindows) {
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.api")
-    // opensTo.add("org.junit.platform.commons") <-- opensTo 'org.junit.platform.commons' is done by default
-    // exportsTo.add("...")
+    requires.add("org.junit.jupiter.params")
+    requires.add("org.mockito")
+    requires.add("org.jabref.testsupport")
+}
+
+tasks.test {
+    jvmArgs = listOf(
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
+        "--add-reads", "org.mockito=java.prefs",
+        "--add-reads", "org.mockito=javafx.scene",
+    )
 }
