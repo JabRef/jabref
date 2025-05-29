@@ -23,7 +23,7 @@ import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
-@Command(name = "check-consistency", description = "Check consistency of the database.")
+@Command(name = "check-consistency", description = "Check consistency of the library.")
 class CheckConsistency implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConsistency.class);
 
@@ -65,7 +65,9 @@ class CheckConsistency implements Runnable {
         List<BibEntry> entries = databaseContext.getDatabase().getEntries();
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries, (count, total) -> {
+            System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
+        });
 
         Writer writer = new OutputStreamWriter(System.out);
         BibliographyConsistencyCheckResultWriter checkResultWriter;

@@ -42,15 +42,34 @@ java {
         // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
         // - .devcontainer/devcontainer.json#L34 and
         // - .moderne/moderne.yml
-        // - .github/workflows/deployment*.yml
+        // - .github/workflows/binaries*.yml
         // - .github/workflows/tests*.yml
         // - .github/workflows/update-gradle-wrapper.yml
         // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
-        // - mise.toml
+        // - .sdkmanrc
         languageVersion = JavaLanguageVersion.of(24)
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
         // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
         vendor = JvmVendorSpec.AZUL
+    }
+}
+
+tasks.javadoc {
+    ( options as StandardJavadocDocletOptions).apply {
+        encoding = "UTF-8"
+        // version = false
+        // author = false
+
+        addMultilineStringsOption("tag").setValue(listOf("apiNote", "implNote"))
+
+        // We cross-link to (non-visible) tests; therefore: no reference check
+        addBooleanOption("Xdoclint:all,-reference", true)
+
+        addMultilineStringsOption("-add-exports").value = listOf(
+            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
+            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
+        )
+
     }
 }

@@ -13,14 +13,13 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiProvider;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.memory.ChatMemory;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
 import dev.langchain4j.model.huggingface.HuggingFaceChatModel;
 import dev.langchain4j.model.mistralai.MistralAiChatModel;
-import dev.langchain4j.model.output.Response;
 
 /**
  * Wrapper around langchain4j chat language model.
@@ -28,7 +27,7 @@ import dev.langchain4j.model.output.Response;
  * Notice, that the real chat model is created lazily, when it's needed. This is done, so API key is fetched only,
  * when user wants to chat with AI.
  */
-public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable {
+public class JabRefChatLanguageModel implements ChatModel, AutoCloseable {
     private static final Duration CONNECTION_TIMEOUT = Duration.ofSeconds(5);
 
     private final AiPreferences aiPreferences;
@@ -38,7 +37,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
             new ThreadFactoryBuilder().setNameFormat("ai-api-connection-pool-%d").build()
     );
 
-    private Optional<ChatLanguageModel> langchainChatModel = Optional.empty();
+    private Optional<ChatModel> langchainChatModel = Optional.empty();
 
     public JabRefChatLanguageModel(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
@@ -48,7 +47,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     }
 
     /**
-     * Update the underlying {@link dev.langchain4j.model.chat.ChatLanguageModel} by current {@link AiPreferences} parameters.
+     * Update the underlying {@link dev.langchain4j.model.chat.ChatModel} by current {@link AiPreferences} parameters.
      * When the model is updated, the chat messages are not lost.
      * See {@link AiChatLogic}, where messages are stored in {@link ChatMemory},
      * and see {@link org.jabref.logic.ai.chatting.chathistory.ChatHistoryStorage}.
@@ -101,10 +100,10 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     private void setupListeningToPreferencesChanges() {
         // Setting "langchainChatModel" to "Optional.empty()" will trigger a rebuild on the next usage
 
-        aiPreferences.enableAiProperty().addListener(obs -> langchainChatModel = Optional.empty());
-        aiPreferences.aiProviderProperty().addListener(obs -> langchainChatModel = Optional.empty());
-        aiPreferences.customizeExpertSettingsProperty().addListener(obs -> langchainChatModel = Optional.empty());
-        aiPreferences.temperatureProperty().addListener(obs -> langchainChatModel = Optional.empty());
+        aiPreferences.enableAiProperty().addListener(_ -> langchainChatModel = Optional.empty());
+        aiPreferences.aiProviderProperty().addListener(_ -> langchainChatModel = Optional.empty());
+        aiPreferences.customizeExpertSettingsProperty().addListener(_ -> langchainChatModel = Optional.empty());
+        aiPreferences.temperatureProperty().addListener(_ -> langchainChatModel = Optional.empty());
 
         aiPreferences.addListenerToChatModels(() -> langchainChatModel = Optional.empty());
         aiPreferences.addListenerToApiBaseUrls(() -> langchainChatModel = Optional.empty());
@@ -112,7 +111,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
     }
 
     @Override
-    public Response<AiMessage> generate(List<ChatMessage> list) {
+    public ChatResponse chat(List<ChatMessage> list) {
         // The rationale for RuntimeExceptions in this method:
         // 1. langchain4j error handling is a mess, and it uses RuntimeExceptions
         //    everywhere. Because this method implements a langchain4j interface,
@@ -134,7 +133,7 @@ public class JabRefChatLanguageModel implements ChatLanguageModel, AutoCloseable
             }
         }
 
-        return langchainChatModel.get().generate(list);
+        return langchainChatModel.get().chat(list);
     }
 
     @Override

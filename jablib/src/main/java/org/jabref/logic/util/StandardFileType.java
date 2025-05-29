@@ -5,9 +5,7 @@ import java.util.List;
 
 import org.jabref.model.util.OptionalUtil;
 
-/**
- * @implNote Enter the extensions in lowercase without a dot! The dot is added implicitly.
- */
+/// @implNote Enter the extensions in lowercase without a dot! The dot is added implicitly.
 public enum StandardFileType implements FileType {
 
     ANY_FILE("Any", "*"),
@@ -69,7 +67,7 @@ public enum StandardFileType implements FileType {
     }
 
     public static FileType fromExtensions(String... extensions) {
-        var exts = Arrays.asList(extensions);
+        List<String> exts = Arrays.asList(extensions);
 
         return OptionalUtil.orElse(Arrays.stream(StandardFileType.values())
                                          .filter(field -> field.getExtensions().stream().anyMatch(exts::contains))

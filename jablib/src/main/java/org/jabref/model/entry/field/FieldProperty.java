@@ -1,11 +1,9 @@
 package org.jabref.model.entry.field;
 
-/**
- * @implNote Introduce a new FieldProperty only if multiple fields with the same property exist.
- * For instance, "gender" exists only in field "Gender", whereas "identifier" is the property of multiple fields.
- * It is confusing to have a FieldProperty for a single field.
- * We accept that some developers might be confused for different handling at {@link org.jabref.gui.fieldeditors.FieldEditors#getForField}.
- */
+/// @implNote Introduce a new FieldProperty only if multiple fields with the same property exist.
+/// For instance, "gender" exists only in field "Gender", whereas "identifier" is the property of multiple fields.
+/// It is confusing to have a FieldProperty for a single field.
+/// We accept that some developers might be confused for different handling at [org.jabref.logic.integrity.FieldCheckers#getForField(Field)].
 public enum FieldProperty {
     BOOK_NAME,
     DATE,

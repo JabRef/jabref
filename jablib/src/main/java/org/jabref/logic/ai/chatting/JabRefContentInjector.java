@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.input.PromptTemplate;
 import dev.langchain4j.rag.content.Content;
@@ -26,11 +27,14 @@ public class JabRefContentInjector implements ContentInjector {
     }
 
     @Override
-    public UserMessage inject(List<Content> list, UserMessage userMessage) {
-        String contentText = list.stream().map(this::contentToString).collect(Collectors.joining("\n\n"));
+    public UserMessage inject(List<Content> contents, ChatMessage chatMessage) {
+        String contentText = contents.stream().map(this::contentToString).collect(Collectors.joining("\n\n"));
 
-        String res = applyPrompt(userMessage.singleText(), contentText);
-        return new UserMessage(res);
+        if (chatMessage instanceof UserMessage userMessage) {
+            String res = applyPrompt(userMessage.singleText(), contentText);
+            return new UserMessage(res);
+        }
+        return new UserMessage("INVALID");
     }
 
     private String contentToString(Content content) {

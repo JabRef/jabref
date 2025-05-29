@@ -25,6 +25,7 @@ import org.jabref.logic.importer.fileformat.ModsImporter;
 import org.jabref.logic.importer.fileformat.MsBibImporter;
 import org.jabref.logic.importer.fileformat.OvidImporter;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
+import org.jabref.logic.importer.fileformat.ReferImporter;
 import org.jabref.logic.importer.fileformat.RepecNepImporter;
 import org.jabref.logic.importer.fileformat.RisImporter;
 import org.jabref.logic.importer.fileformat.pdf.PdfContentImporter;
@@ -83,6 +84,7 @@ public class ImportFormatReader {
         }
         formats.add(new PdfXmpImporter(importFormatPreferences.xmpPreferences()));
         formats.add(new RepecNepImporter(importFormatPreferences));
+        formats.add(new ReferImporter());
         formats.add(new RisImporter());
         formats.add(new CffImporter(citationKeyPatternPreferences));
         formats.add(new BiblioscapeImporter());
@@ -125,14 +127,11 @@ public class ImportFormatReader {
         }
     }
 
-    /**
-     * All importers.
-     *
-     * Elements are sorted by name.
-     * </p>
-     *
-     * @return all custom importers, elements are of type InputFormat
-     */
+    /// All importers.
+    ///
+    /// Elements are sorted by name.
+    ///
+    /// @return all custom importers, elements are of type InputFormat
     public SortedSet<Importer> getImportFormats() {
         return new TreeSet<>(this.formats);
     }
@@ -140,14 +139,12 @@ public class ImportFormatReader {
     public record UnknownFormatImport(String format, ParserResult parserResult) {
     }
 
-    /**
-     * Tries to import a file by iterating through the available import filters,
-     * and keeping the import that seems most promising.
-     * <p/>
-     * This method first attempts to read this file as bibtex.
-     *
-     * @throws ImportException if the import fails (for example, if no suitable importer is found)
-     */
+    /// Tries to import a file by iterating through the available import filters,
+    /// and keeping the import that seems most promising.
+    ///
+    /// This method first attempts to read this file as bibtex.
+    ///
+    /// @throws ImportException if the import fails (for example, if no suitable importer is found)
     public UnknownFormatImport importUnknownFormat(Path filePath, FileUpdateMonitor fileMonitor) throws ImportException {
         Objects.requireNonNull(filePath);
 
@@ -190,7 +187,8 @@ public class ImportFormatReader {
         // Cycle through all importers:
         for (Importer imFo : formats) {
             try {
-                if (!isRecognizedFormat.apply(imFo)) {
+                if (!isRecognizedFormat.apply(imFo) || imFo.equals(new ReferImporter())) {
+                    // Refer/BibIX should be explicitly chosen by user
                     continue;
                 }
 

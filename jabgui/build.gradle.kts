@@ -1,5 +1,5 @@
+
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.annotationProcessor
 import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
 import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
@@ -58,7 +58,7 @@ dependencies {
     // Required by gemsfx
     implementation("tech.units:indriya:2.2.3")
     // Required by gemsfx and langchain4j
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0") {
+    implementation ("com.squareup.retrofit2:retrofit:3.0.0") {
         exclude(group = "com.squareup.okhttp3")
     }
 
@@ -80,7 +80,7 @@ dependencies {
 
     implementation("com.google.guava:guava:33.4.8-jre")
 
-    implementation("dev.langchain4j:langchain4j:0.36.2")
+    implementation("dev.langchain4j:langchain4j:1.0.0")
 
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
 
@@ -95,9 +95,9 @@ dependencies {
     // implementation("net.java.dev.jna:jna:5.16.0")
     implementation("net.java.dev.jna:jna-platform:5.17.0")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
 
-    implementation("com.konghq:unirest-java-core:4.4.6")
+    implementation("com.konghq:unirest-java-core:4.4.7")
 
     implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
 
@@ -123,7 +123,7 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
@@ -147,10 +147,15 @@ application {
     applicationDefaultJvmArgs = listOf(
         // On a change here, also adapt
         //   1. "run > moduleOptions"
-        //   2. "deployment.yml" (macOS part)
-        //   3. "deployment-arm64.yml"
+        //   2. "binaries.yml" (macOS part)
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
 
         // Fix for https://github.com/JabRef/jabref/issues/11188
         "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
@@ -299,185 +304,72 @@ jlink {
     )
 
     mergedModule {
-        requires(
-            "com.google.gson"
-        )
-        requires(
-            "com.fasterxml.jackson.annotation"
-        )
-        requires(
-            "com.fasterxml.jackson.databind"
-        )
-        requires(
-            "com.fasterxml.jackson.core"
-        )
-        requires(
-            "com.fasterxml.jackson.datatype.jdk8"
-        )
-        requires(
-            "jakarta.xml.bind"
-        )
-        requires(
-            "java.compiler"
-        )
-        requires(
-            "java.datatransfer"
-        )
-        requires(
-            "java.desktop"
-        )
-        requires(
-            "java.logging"
-        )
-        requires(
-            "java.management"
-        )
-        requires(
-            "java.naming"
-        )
-        requires(
-            "java.net.http"
-        )
-        requires(
-            "java.rmi"
-        )
-        requires(
-            "java.scripting"
-        )
-        requires(
-            "java.security.jgss"
-        )
-        requires(
-            "java.security.sasl"
-        )
-        requires(
-            "java.sql"
-        )
-        requires(
-            "java.sql.rowset"
-        )
-        requires(
-            "java.transaction.xa"
-        )
-        requires(
-            "java.xml"
-        )
-        requires(
-            "javafx.base"
-        )
-        requires(
-            "javafx.controls"
-        )
-        requires(
-            "javafx.fxml"
-        )
-        requires(
-            "javafx.graphics"
-        )
-        requires(
-            "javafx.media"
-        )
-        requires(
-            "javafx.swing"
-        )
-        requires(
-            "jdk.security.jgss"
-        )
-        requires(
-            "jdk.unsupported"
-        )
-        requires(
-            "jdk.unsupported.desktop"
-        )
-        requires(
-            "jdk.xml.dom"
-        )
-        requires(
-            "org.apache.commons.lang3"
-        )
-        requires(
-            "org.apache.commons.logging"
-        )
-        requires(
-            "org.apache.commons.text"
-        )
-        requires(
-            "org.apache.commons.codec"
-        )
-        requires(
-            "org.apache.commons.io"
-        )
-        requires(
-            "org.apache.commons.compress"
-        )
-        requires(
-            "org.freedesktop.dbus"
-        )
-        requires(
-            "org.jsoup"
-        )
-        requires(
-            "org.slf4j"
-        )
-        requires(
-            "org.tukaani.xz"
-        );
-        uses(
-            "ai.djl.engine.EngineProvider"
-        )
-        uses(
-            "ai.djl.repository.RepositoryFactory"
-        )
-        uses(
-            "ai.djl.repository.zoo.ZooProvider"
-        )
-        uses(
-            "dev.langchain4j.spi.prompt.PromptTemplateFactory"
-        )
-        uses(
-            "kong.unirest.core.json.JsonEngine"
-        )
-        uses(
-            "org.eclipse.jgit.lib.Signer"
-        )
-        uses(
-            "org.eclipse.jgit.transport.SshSessionFactory"
-        )
-        uses(
-            "org.postgresql.shaded.com.ongres.stringprep.Profile"
-        )
+        requires("com.google.gson")
+        requires("com.fasterxml.jackson.annotation")
+        requires("com.fasterxml.jackson.databind")
+        requires("com.fasterxml.jackson.core")
+        requires("com.fasterxml.jackson.datatype.jdk8")
+        requires("jakarta.xml.bind")
+        requires("java.compiler")
+        requires("java.datatransfer")
+        requires("java.desktop")
+        requires("java.logging")
+        requires("java.management")
+        requires("java.naming")
+        requires("java.net.http")
+        requires("java.rmi")
+        requires("java.scripting")
+        requires("java.security.jgss")
+        requires("java.security.sasl")
+        requires("java.sql")
+        requires("java.sql.rowset")
+        requires("java.transaction.xa")
+        requires("java.xml")
+        requires("javafx.base")
+        requires("javafx.controls")
+        requires("javafx.fxml")
+        requires("javafx.graphics")
+        requires("javafx.media")
+        requires("javafx.swing")
+        requires("jdk.security.jgss")
+        requires("jdk.unsupported")
+        requires("jdk.unsupported.desktop")
+        requires("jdk.xml.dom")
+        requires("org.apache.commons.lang3")
+        requires("org.apache.commons.logging")
+        requires("org.apache.commons.text")
+        requires("org.apache.commons.codec")
+        requires("org.apache.commons.io")
+        requires("org.apache.commons.compress")
+        requires("org.freedesktop.dbus")
+        requires("org.jsoup")
+        requires("org.slf4j")
+        requires("org.tukaani.xz");
 
-        provides(
-            "java.sql.Driver"
-        ).with(
-            "org.postgresql.Driver"
-        )
-        provides(
-            "java.security.Provider"
-        ).with(
+        uses("ai.djl.engine.EngineProvider")
+        uses("ai.djl.repository.RepositoryFactory")
+        uses("ai.djl.repository.zoo.ZooProvider")
+        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
+        uses("kong.unirest.core.json.JsonEngine")
+        uses("org.eclipse.jgit.lib.Signer")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
+        uses("org.postgresql.shaded.com.ongres.stringprep.Profile")
+
+        provides("java.sql.Driver").with(
+            "org.postgresql.Driver")
+        provides("java.security.Provider").with(
             "org.bouncycastle.jce.provider.BouncyCastleProvider",
-            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider"
-        )
-        provides(
-            "kong.unirest.core.json.JsonEngine"
-        ).with(
-            "kong.unirest.modules.gson.GsonEngine"
-        )
-        provides(
-            "ai.djl.repository.zoo.ZooProvider"
-        ).with(
+            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
+        provides("kong.unirest.core.json.JsonEngine").with(
+            "kong.unirest.modules.gson.GsonEngine")
+        provides("ai.djl.repository.zoo.ZooProvider").with(
             "ai.djl.engine.rust.zoo.RsZooProvider",
             "ai.djl.huggingface.zoo.HfZooProvider",
             "ai.djl.pytorch.zoo.PtZooProvider",
-            "ai.djl.repository.zoo.DefaultZooProvider"
-        )
-        provides(
-            "ai.djl.engine.EngineProvider"
-        ).with(
+            "ai.djl.repository.zoo.DefaultZooProvider")
+        provides("ai.djl.engine.EngineProvider").with(
             "ai.djl.engine.rust.RsEngineProvider",
-            "ai.djl.pytorch.engine.PtEngineProvider"
-        )
-
+            "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
     jpackage {
@@ -504,7 +396,7 @@ jlink {
                     "--win-shortcut",
                     "--win-menu",
                     "--win-menu-group", "JabRef",
-                    "--temp", "$buildDir/installer",
+                    "--temp", "${layout.buildDirectory.get()}/installer",
                     "--resource-dir", "$projectDir/buildres/windows",
                     "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
                     "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
@@ -528,7 +420,7 @@ jlink {
                     "--linux-menu-group", "Office;",
                     "--linux-rpm-license-type", "MIT",
                     // "--license-file", "$projectDir/LICENSE.md",
-                    "--description", "JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.",
+                    "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
                     "--linux-shortcut",
                     "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
                 )
@@ -570,7 +462,7 @@ if (OperatingSystem.current().isWindows) {
                         "JabRefHost.ps1"
                     )
                 }
-                into(file("$buildDir/distribution/JabRef"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef"))
             }
         }
     }
@@ -581,7 +473,7 @@ if (OperatingSystem.current().isWindows) {
                 from(file("$projectDir/buildres/linux")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
-                into(file("$buildDir/distribution/JabRef/lib"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef/lib"))
             }
         }
     }
@@ -592,7 +484,7 @@ if (OperatingSystem.current().isWindows) {
                 from(file("$projectDir/buildres/mac")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
-                into(file("$buildDir/distribution/JabRef.app/Contents/Resources"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef.app/Contents/Resources"))
             }
         }
     }

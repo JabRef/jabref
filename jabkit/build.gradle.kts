@@ -54,7 +54,7 @@ dependencies {
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
     testImplementation(project(":test-support"))
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
@@ -78,6 +78,13 @@ application {
 
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        // Default garbage collector is sufficient for CLI APP
+        // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseStringDeduplication",
+
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }
@@ -88,6 +95,8 @@ jlink {
     addExtraDependencies(
         "javafx"
     )
+
+    mergedModuleName = "jabkit.merged.module"
 
     // We keep debug statements - otherwise "--strip-debug" would be included
     addOptions(
@@ -288,6 +297,10 @@ jlink {
     }
     jpackage {
         outputDir = "distribution"
+        skipInstaller = true
+
+        imageOptions.addAll(listOf(
+            "--java-options", "--enable-native-access=jabkit.merged.module"))
 
         // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
         if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
@@ -296,7 +309,6 @@ jlink {
                     "--win-console"
                 )
             )
-           skipInstaller = true
         } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
             imageOptions.addAll(
                 listOf(
@@ -304,9 +316,6 @@ jlink {
                     "--app-version", "$version"
                 )
             )
-            skipInstaller = true
-        } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
-            skipInstaller = true
         }
     }
 }

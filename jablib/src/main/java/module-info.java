@@ -79,6 +79,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.integrity;
     exports org.jabref.logic.formatter.casechanger;
     exports org.jabref.logic.shared.exception;
+    exports org.jabref.logic.importer.fetcher.isbntobibtex;
     exports org.jabref.logic.importer.fetcher.transformers;
     exports org.jabref.logic.biblog;
     exports org.jabref.model.biblog;
@@ -143,9 +144,6 @@ open module org.jabref.jablib {
     // needs to be loaded here as it's otherwise not found at runtime, related to XJC
     requires org.glassfish.jaxb.runtime;
     // endregion
-
-    // dependency injection using HK2
-    requires org.glassfish.hk2.api;
 
     // region HTTP clients
     requires java.net.http;

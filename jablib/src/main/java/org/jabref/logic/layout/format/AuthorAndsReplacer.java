@@ -2,10 +2,8 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * Replaces and's for & (in case of two authors) and ; (in case
- * of more than two authors).
- */
+/// Replaces and's for & (in case of two authors) and ; (in case
+/// of more than two authors).
 public class AuthorAndsReplacer implements LayoutFormatter {
 
     /* (non-Javadoc)

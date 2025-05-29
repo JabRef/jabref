@@ -79,7 +79,7 @@ public class GroupNodeViewModel {
     @SuppressWarnings("FieldCanBeLocal")
     private final ObservableList<BibEntry> entriesList;
     @SuppressWarnings("FieldCanBeLocal")
-    private final InvalidationListener onInvalidatedGroup = listener -> refreshGroup();
+    private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -112,9 +112,9 @@ public class GroupNodeViewModel {
 
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
+        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), _ -> updateMatchedEntries());
         expandedProperty.set(groupNode.getGroup().isExpanded());
-        expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
+        expandedProperty.addListener((_, _, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
@@ -148,7 +148,7 @@ public class GroupNodeViewModel {
         //    return; // user aborted operation
         // }
 
-        var changes = groupNode.addEntriesToGroup(entries);
+        List<FieldChange> changes = groupNode.addEntriesToGroup(entries);
 
         // Update appearance of group
         anySelectedEntriesMatched.invalidate();
