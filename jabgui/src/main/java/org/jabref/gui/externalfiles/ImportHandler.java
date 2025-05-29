@@ -139,7 +139,7 @@ public class ImportHandler {
                             if (files.size() == 1) {
                                 pdfEntriesInFile = new ArrayList<>(1);
                                 UiTaskExecutor.runAndWaitInJavaFXThread(() -> {
-                                    MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(new BibEntry(), file, preferences, taskExecutor);
+                                    MultiMergeEntriesView dialog = PdfMergeDialog.createMergeDialog(file, preferences, taskExecutor);
                                     dialogService.showCustomDialogAndWait(dialog).ifPresent(pdfEntriesInFile::add);
                                 });
                             } else {

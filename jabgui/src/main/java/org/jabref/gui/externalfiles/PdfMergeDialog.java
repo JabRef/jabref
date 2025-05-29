@@ -19,39 +19,63 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
 
 public class PdfMergeDialog {
-
     /**
      * Constructs a merge dialog for a PDF file. This dialog calls various {@link PdfImporter}s, collects the results, and lets the user choose between them.
      * <p>
      * {@link PdfImporter}s try to extract a {@link BibEntry} out of a PDF file,
      * but it does not perform this 100% perfectly, it is only a set of heuristics that in some cases might work, in others not.
      * Thus, JabRef provides this merge dialog that collects the results of all {@link PdfImporter}s
-     * and gives user a choice between field values.
+     * and gives the user a choice between field values.
+     * <p>
+     * Two entry points are provided:
+     * <ul>
+     *   <li>{@link #createMergeDialog(BibEntry, Path, GuiPreferences, TaskExecutor)} to merge a known entry with extracted data.</li>
+     *   <li>{@link #createMergeDialog(Path, GuiPreferences, TaskExecutor)} to extract all data from the PDF without a preexisting entry.</li>
+     * </ul>
      *
-     * @param entry the entry to merge with
+     * Internally, this is split into two helper methods:
+     * <ul>
+     *   <li>{@code initDialog} sets up the dialog with preferences and title.</li>
+     *   <li>{@code finishDialog} populates the dialog with all available import sources.</li>
+     * </ul>
+     *
+     * @param entry the entry to merge with (only for {@link #createMergeDialog(BibEntry, Path, GuiPreferences, TaskExecutor)})
      * @param filePath the path to the PDF file. This PDF is used as the source for the {@link PdfImporter}s.
      * @param preferences the preferences to use. Full preference object is required, because of current implementation of {@link MultiMergeEntriesView}.
      * @param taskExecutor the task executor to use when the multi merge dialog executes the importers.
      */
+
     public static MultiMergeEntriesView createMergeDialog(BibEntry entry, Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
+        MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
+
+        dialog.addSource(Localization.lang("Entry"), entry);
+
+        finishDialog(dialog, filePath, preferences);
+        return dialog;
+    }
+
+    public static MultiMergeEntriesView createMergeDialog(Path filePath, GuiPreferences preferences, TaskExecutor taskExecutor) {
+        MultiMergeEntriesView dialog = initDialog(preferences, taskExecutor);
+
+        finishDialog(dialog, filePath, preferences);
+
+        return dialog;
+    }
+
+    private static MultiMergeEntriesView initDialog(GuiPreferences preferences, TaskExecutor taskExecutor) {
         MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
-
         dialog.setTitle(Localization.lang("Merge PDF metadata"));
+        return dialog;
+    }
 
-        if (!entry.getFields().isEmpty()) {
-            dialog.addSource(Localization.lang("Entry"), entry);
-        }
+    private static void finishDialog(MultiMergeEntriesView dialog, Path filePath, GuiPreferences preferences) {
         dialog.addSource(Localization.lang("Verbatim"), wrapImporterToSupplier(new PdfVerbatimBibtexImporter(preferences.getImportFormatPreferences()), filePath));
         dialog.addSource(Localization.lang("Embedded"), wrapImporterToSupplier(new PdfEmbeddedBibFileImporter(preferences.getImportFormatPreferences()), filePath));
-
         if (preferences.getGrobidPreferences().isGrobidEnabled()) {
             dialog.addSource("Grobid", wrapImporterToSupplier(new PdfGrobidImporter(preferences.getImportFormatPreferences()), filePath));
         }
-
         dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
         dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
-
-        return dialog;
     }
 
     private static Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
