@@ -101,9 +101,7 @@ public class RightClickMenu {
                 extractFileReferencesOffline,
 
                 factory.createMenuItem(StandardActions.OPEN_URL, new OpenUrlAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),
-                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences)),
-
+                createSearchSubMenu(factory, dialogService, stateManager, preferences),
                 new SeparatorMenuItem(),
 
                 new ChangeEntryTypeMenu(libraryTab.getSelectedEntries(), libraryTab.getBibDatabaseContext(), undoManager, entryTypesManager).asSubMenu(),
@@ -219,5 +217,17 @@ public class RightClickMenu {
         );
 
         return sendMenu;
+    }
+
+    private static Menu createSearchSubMenu(ActionFactory factory,
+                                            DialogService dialogService,
+                                            StateManager stateManager,
+                                            GuiPreferences preferences) {
+        Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
+        searchMenu.getItems().addAll(
+                factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences)),
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences))
+        );
+        return searchMenu;
     }
 }
