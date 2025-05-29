@@ -78,12 +78,12 @@ class Search implements Runnable {
         List<BibEntry> matches;
         try {
             // extract current thread task executor from indexManager
-            matches = new DatabaseSearcher(searchQuery,
+            matches = new DatabaseSearcher(
                     databaseContext,
                     new CurrentThreadTaskExecutor(),
                     argumentProcessor.cliPreferences,
                     postgreServer
-            ).getMatches();
+            ).getMatches(searchQuery);
         } catch (IOException ex) {
             LOGGER.error("Error occurred when searching", ex);
             return;
