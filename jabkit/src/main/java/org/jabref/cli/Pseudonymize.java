@@ -12,6 +12,7 @@ import org.jabref.logic.pseudonymization.PseudonymizationResultCsvWriter;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 
+import io.github.adr.linked.ADR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
@@ -30,7 +31,7 @@ public class Pseudonymize implements Runnable {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    // ADR 0045
+    @ADR(45)
     @Option(names = {"--input"}, description = "BibTeX file to be pseudonymize", required = true)
     private String inputFile;
 
@@ -67,16 +68,16 @@ public class Pseudonymize implements Runnable {
             return;
         }
 
-        System.out.println(Localization.lang("Pseudonymizing the library '%0'.", fileName));
+        System.out.println(Localization.lang("Pseudonymizing library '%0'.", fileName));
         Pseudonymization pseudonymization = new Pseudonymization();
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 
         if (Files.exists(pseudoBibPath) && !force) {
-            System.out.println(Localization.lang("'%0' file already exists. Use -f or --force to overwrite.", pseudoBib));
+            System.out.println(Localization.lang("File '%0' already exists. Use -f or --force to overwrite.", pseudoBib));
             return;
         } else if (Files.exists(pseudoBibPath) && force) {
-            System.out.println(Localization.lang("'%0' file already exists. Overwriting.", pseudoBib));
+            System.out.println(Localization.lang("File '%0' already exists. Overwriting.", pseudoBib));
         }
 
         ArgumentProcessor.saveDatabaseContext(
@@ -86,10 +87,10 @@ public class Pseudonymize implements Runnable {
                 pseudoBibPath);
 
         if (Files.exists(pseudoKeyPath) && !force) {
-            System.out.println(Localization.lang("'%0' file already exists. Use -f or --force to overwrite.", pseudoKeys));
+            System.out.println(Localization.lang("File '%0' already exists. Use -f or --force to overwrite.", pseudoKeys));
             return;
         } else if (Files.exists(pseudoKeyPath) && force) {
-            System.out.println(Localization.lang("'%0' file already exists. Overwriting.", pseudoKeys));
+            System.out.println(Localization.lang("File '%0' already exists. Overwriting.", pseudoKeys));
         }
 
         try {
