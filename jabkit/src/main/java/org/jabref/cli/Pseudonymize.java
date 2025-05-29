@@ -73,7 +73,7 @@ public class Pseudonymize implements Runnable {
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 
         if (Files.exists(pseudoBibPath) && !force) {
-            System.out.println(Localization.lang("'%0' file already exists! Use -f or --force to overwrite.", pseudoBib));
+            System.out.println(Localization.lang("'%0' file already exists. Use -f or --force to overwrite.", pseudoBib));
             return;
         } else if (Files.exists(pseudoBibPath) && force) {
             System.out.println(Localization.lang("'%0' file already exists. Overwriting.", pseudoBib));
@@ -87,7 +87,7 @@ public class Pseudonymize implements Runnable {
 
         try {
             if (Files.exists(pseudoKeyPath) && !force) {
-                System.out.println(Localization.lang("'%0' file already exists! Use -f or --force to overwrite.", pseudoKeys));
+                System.out.println(Localization.lang("'%0' file already exists. Use -f or --force to overwrite.", pseudoKeys));
                 return;
             } else if (Files.exists(pseudoKeyPath) && force) {
                 System.out.println(Localization.lang("'%0' file already exists. Overwriting.", pseudoKeys));
