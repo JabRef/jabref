@@ -53,6 +53,8 @@ dependencies {
 
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
+    implementation("io.github.adr:e-adr:2.0.0-SNAPSHOT")
+
     testImplementation(project(":test-support"))
     testImplementation("org.mockito:mockito-core:5.17.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
