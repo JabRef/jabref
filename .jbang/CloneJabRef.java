@@ -14,7 +14,7 @@ public class CloneJabRef {
         if (args.length == 1) {
             targetDir = Path.of(args[0]).toAbsolutePath();
         } else {
-            targetDir = Path.of(System.getProperty("java.io.tmpdir"), "JabRef");
+            targetDir = Path.of(System.getProperty("java.io.tmpdir"), "jabref");
         }
 
         if (Files.exists(targetDir)) {
