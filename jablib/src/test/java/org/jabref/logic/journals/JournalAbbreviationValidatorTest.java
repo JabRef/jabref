@@ -246,4 +246,37 @@ class JournalAbbreviationValidatorTest {
         assertEquals("Journal name or abbreviation contains invalid UTF-8 sequences", result.getMessage());
         assertTrue(result.getSuggestion().contains("valid UTF-8"));
     }
+
+    @Test
+    void checkStartingLettersWithMultiplePrefixes() {
+        String fullName = "The A An Journal of Physics";
+        String abbreviation = "J. Phys.";
+
+        var result = validator.checkStartingLetters(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkStartingLettersWithSpecialCharacters() {
+        String fullName = "The Journal of Physics & Chemistry";
+        String abbreviation = "J. Phys. Chem.";
+
+        var result = validator.checkStartingLetters(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
+
+    @Test
+    void checkStartingLettersWithNumbers() {
+        String fullName = "2D Materials";
+        String abbreviation = "2D Mater.";
+
+        var result = validator.checkStartingLetters(fullName, abbreviation, 1);
+        assertTrue(result.isValid());
+        assertEquals("", result.getMessage());
+        assertEquals("", result.getSuggestion());
+    }
 }
