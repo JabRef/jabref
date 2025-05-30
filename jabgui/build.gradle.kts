@@ -54,6 +54,7 @@ dependencies {
         exclude(group = "org.apache.logging.log4j")
         exclude(group = "tech.units")
     }
+    implementation("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
 
     // Required by gemsfx
     implementation("tech.units:indriya:2.2.3")

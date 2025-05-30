@@ -1,6 +1,5 @@
 package org.jabref.gui.documentviewer;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -20,15 +19,11 @@ import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import com.tobiasdiez.easybind.EasyBind;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,10 +33,10 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     private final StateManager stateManager;
     private final CliPreferences preferences;
-    private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
+    private final ObjectProperty<Path> currentDocument = new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
-    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
+    private final IntegerProperty currentPage = new SimpleIntegerProperty();
     private final IntegerProperty maxPages = new SimpleIntegerProperty();
 
     public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
@@ -62,9 +57,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             }
         });
 
-        // we need to wrap this in run later so that the max pages number is correctly shown
-        UiTaskExecutor.runInJavaFXThread(() -> maxPages.bind(
-                EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty)));
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
@@ -72,15 +64,11 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         return currentPage.get();
     }
 
-    public ObjectProperty<Integer> currentPageProperty() {
+    public IntegerProperty currentPageProperty() {
         return currentPage;
     }
 
-    public IntegerProperty maxPagesProperty() {
-        return maxPages;
-    }
-
-    public ObjectProperty<DocumentViewModel> currentDocumentProperty() {
+    public ObjectProperty<Path> currentDocumentProperty() {
         return currentDocument;
     }
 
@@ -99,13 +87,8 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     private void setCurrentDocument(Path path) {
-        try {
-            if (FileUtil.isPDFFile(path)) {
-                PDDocument document = Loader.loadPDF(path.toFile());
-                currentDocument.set(new PdfDocumentViewModel(document));
-            }
-        } catch (IOException e) {
-            LOGGER.error("Could not set Document Viewer for path {}", path, e);
+        if (FileUtil.isPDFFile(path)) {
+            currentDocument.set(path);
         }
     }
 
@@ -120,21 +103,9 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public void showPage(int pageNumber) {
         if (pageNumber >= 1 && pageNumber <= maxPages.get()) {
-            currentPage.set(pageNumber);
+            currentPage.set(pageNumber - 1); // we have to substract one page
         } else {
             currentPage.set(1);
-        }
-    }
-
-    public void showNextPage() {
-        if (getCurrentPage() < maxPages.get()) {
-            currentPage.set(getCurrentPage() + 1);
-        }
-    }
-
-    public void showPreviousPage() {
-        if (getCurrentPage() > 1) {
-            currentPage.set(getCurrentPage() - 1);
         }
     }
 
