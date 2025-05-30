@@ -3,7 +3,7 @@ import java.nio.file.Path;
 
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 
-//JAVA 24
+//JAVA 21+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
 //DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.2.1.202505142326-r
