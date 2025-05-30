@@ -149,7 +149,7 @@ public class AuthorList implements Iterable<Author> {
     }
 
     private static String andCoordinatedConjunction(List<Author> authors, Function<Author, String> style, boolean oxfordComma) {
-        var formattedAuthors = authors.stream().map(style).collect(Collectors.toUnmodifiableList());
+        List<String> formattedAuthors = authors.stream().map(style).toList();
         return andCoordinatedConjunction(formattedAuthors, oxfordComma);
     }
 
@@ -295,7 +295,7 @@ public class AuthorList implements Iterable<Author> {
         if (latexFreeAuthors == null) {
             latexFreeAuthors = new AuthorList(authors.stream()
                                                      .map(Author::latexFree)
-                                                     .collect(Collectors.toUnmodifiableList()));
+                                                     .toList());
             latexFreeAuthors.latexFreeAuthors = latexFreeAuthors;
         }
         return latexFreeAuthors;
@@ -314,7 +314,7 @@ public class AuthorList implements Iterable<Author> {
      * @return formatted list of authors.
      */
     public String getAsNatbib() {
-        var authors = getAuthors();
+        List<Author> authors = getAuthors();
         return switch (authors.size()) {
             case 0 -> "";
             case 1 -> authors.getFirst().getNamePrefixAndFamilyName();

@@ -11,7 +11,6 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.jbibtex.ParseException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,7 @@ public class FieldRowViewModelTest {
     BibEntryPreferences bibEntryPreferences = mock(BibEntryPreferences.class);
 
     @BeforeEach
-    void setup() throws ParseException {
+    void setup() {
         leftEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("LajnDiezScheinEtAl2012")
                 .withField(StandardField.AUTHOR, "Lajn, A and Diez, T and Schein, F and Frenzel, H and von Wenckstern, H and Grundmann, M")
@@ -79,36 +78,36 @@ public class FieldRowViewModelTest {
 
     @Test
     void selectNonEmptyValueShouldSelectLeftFieldValueIfItIsNotEmpty() {
-        var numberFieldViewModel = createViewModelForField(StandardField.NUMBER);
+        FieldRowViewModel numberFieldViewModel = createViewModelForField(StandardField.NUMBER);
         numberFieldViewModel.selectNonEmptyValue();
         assertEquals(FieldRowViewModel.Selection.LEFT, numberFieldViewModel.getSelection());
 
-        var authorFieldViewModel = createViewModelForField(StandardField.AUTHOR);
+        FieldRowViewModel authorFieldViewModel = createViewModelForField(StandardField.AUTHOR);
         authorFieldViewModel.selectNonEmptyValue();
         assertEquals(FieldRowViewModel.Selection.LEFT, authorFieldViewModel.getSelection());
     }
 
     @Test
     void selectNonEmptyValueShouldSelectRightFieldValueIfLeftValueIsEmpty() {
-        var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
+        FieldRowViewModel monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectNonEmptyValue();
         assertEquals(FieldRowViewModel.Selection.RIGHT, monthFieldViewModel.getSelection());
 
-        var addressFieldViewModel = createViewModelForField(StandardField.ADDRESS);
+        FieldRowViewModel addressFieldViewModel = createViewModelForField(StandardField.ADDRESS);
         addressFieldViewModel.selectNonEmptyValue();
         assertEquals(FieldRowViewModel.Selection.RIGHT, addressFieldViewModel.getSelection());
     }
 
     @Test
     void hasEqualLeftAndRightValuesShouldReturnFalseIfOneOfTheValuesIsEmpty() {
-        var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
+        FieldRowViewModel monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectNonEmptyValue();
         assertFalse(monthFieldViewModel.hasEqualLeftAndRightValues());
     }
 
     @Test
     void hasEqualLeftAndRightValuesShouldReturnTrueIfLeftAndRightAreEqual() {
-        var yearFieldViewModel = createViewModelForField(StandardField.YEAR);
+        FieldRowViewModel yearFieldViewModel = createViewModelForField(StandardField.YEAR);
         yearFieldViewModel.selectNonEmptyValue();
         assertTrue(yearFieldViewModel.hasEqualLeftAndRightValues());
     }
@@ -122,7 +121,7 @@ public class FieldRowViewModelTest {
 
     @Test
     void selectLeftValueShouldBeCorrect() {
-        var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
+        FieldRowViewModel monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectLeftValue();
         assertEquals(FieldRowViewModel.Selection.LEFT, monthFieldViewModel.getSelection());
         assertEquals(Optional.of(""), Optional.ofNullable(monthFieldViewModel.getMergedFieldValue()));
@@ -135,7 +134,7 @@ public class FieldRowViewModelTest {
 
     @Test
     void selectRightValueShouldBeCorrect() {
-        var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
+        FieldRowViewModel monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         monthFieldViewModel.selectRightValue();
         assertEquals(FieldRowViewModel.Selection.RIGHT, monthFieldViewModel.getSelection());
         assertEquals(rightEntry.getField(StandardField.MONTH), Optional.of(monthFieldViewModel.getMergedFieldValue()));
@@ -148,45 +147,45 @@ public class FieldRowViewModelTest {
 
     @Test
     void isFieldsMergedShouldReturnTrueIfLeftAndRightValuesAreEqual() {
-        var yearFieldViewModel = createViewModelForField(StandardField.YEAR);
+        FieldRowViewModel yearFieldViewModel = createViewModelForField(StandardField.YEAR);
         assertTrue(yearFieldViewModel.isFieldsMerged());
     }
 
     @Test
     void isFieldsMergedShouldReturnFalseIfLeftAndRightValuesAreNotEqual() {
-        var monthFieldViewModel = createViewModelForField(StandardField.MONTH);
+        FieldRowViewModel monthFieldViewModel = createViewModelForField(StandardField.MONTH);
         assertFalse(monthFieldViewModel.isFieldsMerged());
 
-        var addressFieldViewModel = createViewModelForField(StandardField.ADDRESS);
+        FieldRowViewModel addressFieldViewModel = createViewModelForField(StandardField.ADDRESS);
         assertFalse(addressFieldViewModel.isFieldsMerged());
 
-        var authorFieldViewModel = createViewModelForField(StandardField.AUTHOR);
+        FieldRowViewModel authorFieldViewModel = createViewModelForField(StandardField.AUTHOR);
         assertFalse(authorFieldViewModel.isFieldsMerged());
     }
 
     @Test
     void mergeFieldsShouldResultInLeftAndRightValuesBeingEqual() {
-        var groupsField = createViewModelForField(StandardField.GROUPS);
+        FieldRowViewModel groupsField = createViewModelForField(StandardField.GROUPS);
         groupsField.mergeFields();
         assertEquals(groupsField.getLeftFieldValue(), groupsField.getRightFieldValue());
     }
 
     @Test
     void mergeFieldsShouldBeCorrectEvenWhenOnOfTheValuesIsEmpty() {
-        var keywordsField = createViewModelForField(StandardField.KEYWORDS);
+        FieldRowViewModel keywordsField = createViewModelForField(StandardField.KEYWORDS);
         keywordsField.mergeFields();
         assertEquals(keywordsField.getLeftFieldValue(), keywordsField.getRightFieldValue());
     }
 
     @Test
     void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCanBeMerged() {
-        var authorField = createViewModelForField(StandardField.AUTHOR);
+        FieldRowViewModel authorField = createViewModelForField(StandardField.AUTHOR);
         assertThrows(UnsupportedOperationException.class, authorField::mergeFields);
     }
 
     @Test
     void mergeFieldsShouldSelectLeftFieldValue() {
-        var groupsField = createViewModelForField(StandardField.GROUPS);
+        FieldRowViewModel groupsField = createViewModelForField(StandardField.GROUPS);
         groupsField.mergeFields();
 
         assertEquals(FieldRowViewModel.Selection.LEFT, groupsField.getSelection());
@@ -194,9 +193,9 @@ public class FieldRowViewModelTest {
 
     @Test
     void unmergeFieldsShouldBeCorrect() {
-        var groupsField = createViewModelForField(StandardField.GROUPS);
-        var oldLeftGroups = groupsField.getLeftFieldValue();
-        var oldRightGroups = groupsField.getRightFieldValue();
+        FieldRowViewModel groupsField = createViewModelForField(StandardField.GROUPS);
+        String oldLeftGroups = groupsField.getLeftFieldValue();
+        String oldRightGroups = groupsField.getRightFieldValue();
         groupsField.mergeFields();
         groupsField.unmergeFields();
 
@@ -206,9 +205,9 @@ public class FieldRowViewModelTest {
 
     @Test
     void unmergeFieldsShouldDoNothingIfFieldsAreNotMerged() {
-        var groupsField = createViewModelForField(StandardField.GROUPS);
-        var oldLeftGroups = groupsField.getLeftFieldValue();
-        var oldRightGroups = groupsField.getRightFieldValue();
+        FieldRowViewModel groupsField = createViewModelForField(StandardField.GROUPS);
+        String oldLeftGroups = groupsField.getLeftFieldValue();
+        String oldRightGroups = groupsField.getRightFieldValue();
         groupsField.unmergeFields();
 
         assertEquals(oldLeftGroups, groupsField.getLeftFieldValue());

@@ -14,7 +14,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
@@ -71,7 +70,7 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
      */
     private static String toFileNameRegex(String expandedContent) {
-        var cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
+        String cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
         return expandedContent.equals(cleanedContent) ? Pattern.quote(expandedContent) :
                 "(" + Pattern.quote(expandedContent) + ")|(" + Pattern.quote(cleanedContent) + ")";
     }
@@ -166,20 +165,22 @@ class RegExpBasedFileFinder implements FileFinder {
                 actualDirectory = Path.of(dirToProcess + '/');
                 continue;
             }
-            if (".".equals(dirToProcess)) { // Stay in current directory
-                continue;
-            }
-            if ("..".equals(dirToProcess)) {
-                actualDirectory = actualDirectory.getParent();
-                continue;
-            }
-            if ("*".equals(dirToProcess)) { // Do for all direct subdirs
-                File[] subDirs = actualDirectory.toFile().listFiles();
-                if (subDirs != null) {
-                    String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
-                    for (File subDir : subDirs) {
-                        if (subDir.isDirectory()) {
-                            resultFiles.addAll(findFile(entry, subDir.toPath(), restOfFileString, extensionRegExp));
+            switch (dirToProcess) {
+                case "." -> {
+                    continue;  // Stay in current directory
+                }
+                case ".." -> {
+                    actualDirectory = actualDirectory.getParent();
+                    continue;
+                }
+                case "*" -> {
+                    File[] subDirs = actualDirectory.toFile().listFiles();
+                    if (subDirs != null) {
+                        String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
+                        for (File subDir : subDirs) {
+                            if (subDir.isDirectory()) {
+                                resultFiles.addAll(findFile(entry, subDir.toPath(), restOfFileString, extensionRegExp));
+                            }
                         }
                     }
                 }
@@ -191,7 +192,7 @@ class RegExpBasedFileFinder implements FileFinder {
                 final Path rootDirectory = actualDirectory;
                 try (Stream<Path> pathStream = Files.walk(actualDirectory)) {
                     // We only want to transverse directory (and not the current one; this is already done below)
-                    for (Path path : pathStream.filter(element -> isSubDirectory(rootDirectory, element)).collect(Collectors.toList())) {
+                    for (Path path : pathStream.filter(element -> isSubDirectory(rootDirectory, element)).toList()) {
                         resultFiles.addAll(findFile(entry, path, restOfFileString, extensionRegExp));
                     }
                 } catch (UncheckedIOException ioe) {
@@ -204,7 +205,7 @@ class RegExpBasedFileFinder implements FileFinder {
         Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);
         BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
         try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
-            resultFiles.addAll(pathStream.collect(Collectors.toList()));
+            resultFiles.addAll(pathStream.toList());
         } catch (UncheckedIOException uncheckedIOException) {
             // Previously, an empty list were returned here on both IOException and UncheckedIOException
             throw uncheckedIOException.getCause();

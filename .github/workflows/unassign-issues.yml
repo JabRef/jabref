@@ -7,7 +7,7 @@ on:
 
 jobs:
   unassign_issues:
-    if: github.repository == 'JabRef/jabref'
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -65,7 +65,7 @@ jobs:
         issue_number: ${{ fromJson(needs.unassign_issues.outputs.unassigned_issues) }}
     steps:
       - name: Move issue to "Free to take" in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -76,7 +76,7 @@ jobs:
           issue-number: ${{ matrix.issue_number }}
           skip-if-not-in-project: true
       - name: Move issue to "Free to take" in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"

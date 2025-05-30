@@ -6,6 +6,8 @@ nav_order: 89
 
 # Advanced: Build and run using IntelliJ IDEA
 
+Following is currently not possible due to [IDEA-3733059](https://youtrack.jetbrains.com/issue/IDEA-373305).
+
 In "Step 2: Setup the build system: JDK and Gradle", IntelliJ was configured to use Gradle as tool for launching JabRef.
 It is also possible to use IntelliJ's internal build and run system to launch JabRef.
 Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a bit more work.

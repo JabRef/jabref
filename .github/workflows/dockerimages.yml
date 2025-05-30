@@ -38,6 +38,9 @@ jobs:
             type=edge,branch=main
             type=ref,event=pr
       - name: Login to GitHub Container Registry
+        if: >
+          (github.event_name == 'push' && github.repository == 'JabRef/jabref') || 
+          (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref')
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -50,7 +53,11 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          push: ${{ github.repository == 'JabRef/jabref' }}
+          push: >
+            ${{ 
+              (github.event_name == 'push' && github.repository == 'JabRef/jabref') || 
+              (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref')
+            }}
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
