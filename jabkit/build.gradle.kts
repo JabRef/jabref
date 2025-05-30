@@ -54,7 +54,7 @@ dependencies {
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
     testImplementation(project(":test-support"))
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
@@ -78,6 +78,13 @@ application {
 
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        // Default garbage collector is sufficient for CLI APP
+        // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseStringDeduplication",
+
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }

@@ -49,7 +49,7 @@ public class CleanupUrlFormatter extends Formatter {
      */
     @Override
     public String format(String url) {
-        var toDecode = Objects
+        String toDecode = Objects
                 .requireNonNull(url, "Null url")
                 .replaceAll("\\+", "%2b");
         Matcher matcher = PATTERN_URL.matcher(toDecode);

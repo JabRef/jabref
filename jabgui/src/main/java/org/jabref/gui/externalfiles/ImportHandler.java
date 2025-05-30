@@ -56,6 +56,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.groups.GroupEntryChanger;
 import org.jabref.model.groups.GroupTreeNode;
+import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.util.FileUpdateMonitor;
 import org.jabref.model.util.OptionalUtil;
 
@@ -164,12 +165,13 @@ public class ImportHandler {
                                     // Modifiers do not work on macOS: https://bugs.openjdk.org/browse/JDK-8264172
                                     // Similar code as org.jabref.gui.preview.PreviewPanel.PreviewPanel
                                     DragDrop.handleDropOfFiles(List.of(file), transferMode, fileLinker, entry);
+                                    addToImportEntriesGroup(pdfEntriesInFile);
                                     entriesToAdd.addAll(pdfEntriesInFile);
                                     addResultToList(file, true, Localization.lang("File was successfully imported as a new entry"));
                                 });
                             }
                         } else if (FileUtil.isBibFile(file)) {
-                            var bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
+                            ParserResult bibtexParserResult = contentImporter.importFromBibFile(file, fileUpdateMonitor);
                             List<BibEntry> entries = bibtexParserResult.getDatabaseContext().getEntries();
                             entriesToAdd.addAll(entries);
                             boolean success = !bibtexParserResult.hasWarnings();
@@ -207,7 +209,7 @@ public class ImportHandler {
             }
 
             private void addResultToList(Path newFile, boolean success, String logMessage) {
-                var result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
+                ImportFilesResultItemViewModel result = new ImportFilesResultItemViewModel(newFile, success, logMessage);
                 results.add(result);
             }
         };
@@ -267,6 +269,7 @@ public class ImportHandler {
                               finalEntry = duplicateHandledEntry.get();
                           }
                           importCleanedEntries(bibDatabaseContext, List.of(finalEntry));
+                          addToImportEntriesGroup(List.of(finalEntry));
                           downloadLinkedFiles(finalEntry);
                           BibEntry entryToFocus = finalEntry;
                           stateManager.activeTabProperty().get().ifPresent(tab -> tab.clearAndSelect(entryToFocus));
@@ -508,6 +511,19 @@ public class ImportHandler {
         } catch (IOException ex) {
             LOGGER.error("Error importing PDF from URL - IO issue", ex);
             return List.of();
+        }
+    }
+
+    private void addToImportEntriesGroup(List<BibEntry> entriesToInsert) {
+        if (preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
+            // Only one SmartGroup
+            this.bibDatabaseContext.getMetaData()
+                                   .getGroups()
+                                   .flatMap(grp -> grp.getChildren()
+                                                      .stream()
+                                                      .filter(node -> node.getGroup() instanceof SmartGroup)
+                                                      .findFirst())
+                                   .ifPresent(smtGrp -> smtGrp.addEntriesToGroup(entriesToInsert));
         }
     }
 }

@@ -61,7 +61,7 @@ public class FileFilterConverter {
     }
 
     public static FileChooser.ExtensionFilter forAllImporters(SortedSet<Importer> importers) {
-        List<FileType> fileTypes = importers.stream().map(Importer::getFileType).collect(Collectors.toList());
+        List<FileType> fileTypes = importers.stream().map(Importer::getFileType).toList();
         List<String> flatExtensions = fileTypes.stream()
                                                .flatMap(type -> type.getExtensionsWithAsteriskAndDot().stream())
                                                .collect(Collectors.toList());
@@ -86,7 +86,7 @@ public class FileFilterConverter {
     }
 
     public static FileFilter toFileFilter(List<String> extensions) {
-        var filter = toDirFilter(extensions);
+        Filter<Path> filter = toDirFilter(extensions);
         return file -> {
             try {
                 return filter.accept(file.toPath());
@@ -100,10 +100,10 @@ public class FileFilterConverter {
         List<String> extensionsCleaned = extensions.stream()
                                                    .map(extension -> extension.replace(".", "").replace("*", ""))
                                                    .filter(StringUtil::isNotBlank)
-                                                   .collect(Collectors.toList());
+                                                   .toList();
         if (extensionsCleaned.isEmpty()) {
             // Except every file
-            return path -> true;
+            return _ -> true;
         } else {
             return path -> FileUtil.getFileExtension(path)
                                        .map(extensionsCleaned::contains)
