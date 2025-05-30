@@ -354,4 +354,21 @@ class JournalAbbreviationValidatorTest {
         // Should still perform all validations without throwing exceptions
         assertEquals(5, results.size());
     }
+
+    @Test
+    void validateWithAllChecks() {
+        String fullName = "Zeszyty Naukowe Wy\\";
+        String abbreviation = "Problemy Mat.";
+
+        var results = validator.validate(fullName, abbreviation, 1);
+        assertFalse(results.isEmpty());
+
+        // Should have 5 results (3 error checks + 2 warning checks)
+        assertEquals(5, results.size());
+
+        // First result should be the wrong escape check
+        assertFalse(results.get(0).isValid());
+        assertEquals("Invalid escape sequence in full name at position 15", results.get(0).getMessage());
+        assertTrue(results.get(0).getSuggestion().contains("valid escape sequences"));
+    }
 }
