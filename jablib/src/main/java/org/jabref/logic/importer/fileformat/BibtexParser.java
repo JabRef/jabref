@@ -59,7 +59,6 @@ import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import com.dd.plist.NSString;
-import com.dd.plist.PropertyListFormatException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -763,7 +762,7 @@ public class BibtexParser implements Parser {
                         } else {
                             LOGGER.error("Could not find attribute 'relativePath' for entry {} in decoded BibDesk field bdsk-file...) ", entry);
                         }
-                    } catch (PropertyListFormatException e) {
+                    } catch (Exception e) {
                         LOGGER.error("Could not parse Bibdesk files content (field: bdsk-file...) for entry {}", entry, e);
                     }
                 } else {

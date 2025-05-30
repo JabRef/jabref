@@ -209,7 +209,7 @@ class RegExpBasedFileFinder implements FileFinder {
 
         // Last step: check if the given file can be found in this directory
         Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);
-        BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
+        BiPredicate<Path, BasicFileAttributes> matcher = (path, _) -> toMatch.matcher(path.getFileName().toString()).matches();
         try (Stream<Path> pathStream = Files.find(currentDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
             resultFiles.addAll(pathStream.toList());
         } catch (UncheckedIOException uncheckedIOException) {
