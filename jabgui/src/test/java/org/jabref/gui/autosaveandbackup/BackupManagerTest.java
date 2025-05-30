@@ -131,27 +131,27 @@ class BackupManagerTest {
     }
 
     @Test
-    void shouldNotCreateABackup(@TempDir Path customDir) throws URISyntaxException, IOException {
+    void shouldNotCreateABackup(@TempDir Path customDir) throws IOException {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
 
-        var database = new BibDatabaseContext(new BibDatabase());
-        database.setDatabasePath(customDir.resolve("Bibfile.bib"));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setDatabasePath(customDir.resolve("Bibfile.bib"));
 
-        var preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        var filePreferences = mock(FilePreferences.class);
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        FilePreferences filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
         when(filePreferences.shouldCreateBackup()).thenReturn(false);
 
         BackupManager manager = BackupManager.start(
                 mock(LibraryTab.class),
-                database,
+                databaseContext,
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));
 
-        BackupManager.shutdown(database, filePreferences.getBackupDirectory(), filePreferences.shouldCreateBackup());
+        BackupManager.shutdown(databaseContext, filePreferences.getBackupDirectory(), filePreferences.shouldCreateBackup());
 
         List<Path> files = Files.list(backupDir).toList();
         assertEquals(List.of(), files);
@@ -162,18 +162,18 @@ class BackupManagerTest {
         Path backupDir = customDir.resolve("subBackupDir");
         Files.createDirectories(backupDir);
 
-        var database = new BibDatabaseContext(new BibDatabase());
-        database.setDatabasePath(customDir.resolve("Bibfile.bib"));
+        BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase());
+        databaseContext.setDatabasePath(customDir.resolve("Bibfile.bib"));
 
-        var preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        var filePreferences = mock(FilePreferences.class);
+        CliPreferences preferences = mock(CliPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        FilePreferences filePreferences = mock(FilePreferences.class);
         when(preferences.getFilePreferences()).thenReturn(filePreferences);
         when(filePreferences.getBackupDirectory()).thenReturn(backupDir);
         when(filePreferences.shouldCreateBackup()).thenReturn(true);
 
         BackupManager manager = BackupManager.start(
                 mock(LibraryTab.class),
-                database,
+                databaseContext,
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 preferences);
         manager.listen(new MetaDataChangedEvent(new MetaData()));
@@ -182,7 +182,7 @@ class BackupManagerTest {
         fullBackupPath.ifPresent(manager::performBackup);
         manager.listen(new GroupUpdatedEvent(new MetaData()));
 
-        BackupManager.shutdown(database, backupDir, true);
+        BackupManager.shutdown(databaseContext, backupDir, true);
 
         List<Path> files = Files.list(backupDir).sorted().toList();
         // we only know the first backup path because the second one is created on shutdown

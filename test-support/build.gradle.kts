@@ -18,7 +18,7 @@ dependencies {
 
     implementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
 
-    implementation("org.mockito:mockito-core:5.17.0") {
+    implementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     implementation("net.bytebuddy:byte-buddy:1.17.5")

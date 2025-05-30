@@ -52,6 +52,7 @@ jobs:
           echo "No valid ticket number found!"
           exit 1
   move_issue:
+    if: github.repository_owner == 'JabRef'
     name: Mark issue as in progress
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
@@ -82,6 +83,7 @@ jobs:
           issue-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           skip-if-not-in-project: true
   ensure_assignment:
+    if: github.repository_owner == 'JabRef'
     name: Ensure that contributor is assigned (fails if not commented on issue)
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
@@ -141,6 +143,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   upload-pr-number:
+    if: ${{ github.repository == 'JabRef/jabref' }}
     runs-on: ubuntu-latest
     steps:
       - name: Create pr_number.txt
