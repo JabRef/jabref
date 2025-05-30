@@ -279,4 +279,18 @@ class JournalAbbreviationValidatorTest {
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
+
+    @Test
+    void validateWithEmptyInputs() {
+        var results = validator.validate("", "", 1);
+        assertFalse(results.isEmpty());
+        assertTrue(results.stream().anyMatch(r -> !r.isValid()));
+    }
+
+    @Test
+    void validateWithWhitespaceOnly() {
+        var results = validator.validate("   ", "   ", 1);
+        assertFalse(results.isEmpty());
+        assertTrue(results.stream().anyMatch(r -> !r.isValid()));
+    }
 }
