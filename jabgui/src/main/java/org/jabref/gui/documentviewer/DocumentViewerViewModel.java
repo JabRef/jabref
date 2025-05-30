@@ -14,6 +14,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
@@ -37,7 +39,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final IntegerProperty currentPage = new SimpleIntegerProperty();
-    private final IntegerProperty maxPages = new SimpleIntegerProperty();
+    private final StringProperty highlightText = new SimpleStringProperty();
 
     public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -60,10 +62,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
-    private int getCurrentPage() {
-        return currentPage.get();
-    }
-
     public IntegerProperty currentPageProperty() {
         return currentPage;
     }
@@ -74,6 +72,10 @@ public class DocumentViewerViewModel extends AbstractViewModel {
 
     public ListProperty<LinkedFile> filesProperty() {
         return files;
+    }
+
+    public StringProperty highlightTextProperty() {
+        return highlightText;
     }
 
     private void setCurrentEntries(List<BibEntry> entries) {
@@ -102,14 +104,14 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     public void showPage(int pageNumber) {
-        if (pageNumber >= 1 && pageNumber <= maxPages.get()) {
-            currentPage.set(pageNumber - 1); // we have to substract one page
-        } else {
-            currentPage.set(1);
-        }
+        currentPage.set(pageNumber - 1);
     }
 
     public void setLiveMode(boolean value) {
         this.liveMode.set(value);
+    }
+
+    public void highlightText(String text) {
+        this.highlightText.set(text);
     }
 }

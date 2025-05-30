@@ -31,12 +31,12 @@ public class DocumentViewerView extends BaseDialog<Void> {
     @Inject private StateManager stateManager;
     @Inject private CliPreferences preferences;
 
-    private PdfDocumentViewer viewer;
+    private final PdfDocumentViewer viewer = new PdfDocumentViewer();
     private DocumentViewerViewModel viewModel;
 
     public DocumentViewerView() {
         this.setTitle(Localization.lang("Document viewer"));
-        this.initModality(Modality.APPLICATION_MODAL);
+        this.initModality(Modality.NONE);
 
         ViewLoader.view(this)
                   .load()
@@ -98,13 +98,13 @@ public class DocumentViewerView extends BaseDialog<Void> {
     }
 
     private void setupViewer() {
-        viewer = new PdfDocumentViewer();
         viewModel.currentDocumentProperty().addListener((observable, oldDocument, newDocument) -> {
             if (newDocument != null) {
                 viewer.show(newDocument);
             }
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
+        viewModel.highlightTextProperty().bindBidirectional(viewer.highlightTextProperty());
         mainPane.setCenter(viewer);
     }
 
@@ -118,5 +118,9 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     public void gotoPage(int pageNumber) {
         viewModel.showPage(pageNumber);
+    }
+
+    public void highlightText(String text) {
+        viewModel.highlightText(text);
     }
 }
