@@ -315,4 +315,16 @@ class JournalAbbreviationValidatorTest {
         assertTrue(issues.stream()
                          .anyMatch(issue -> issue.getMessage().contains("Duplicate abbreviation")));
     }
+
+    @Test
+    void checkAbbreviationEqualsFullTextWithSpecialCharacters() {
+        String fullName = "Physics & Chemistry";
+        String abbreviation = "Physics & Chemistry";
+
+        var result = validator.checkAbbreviationEqualsFullText(fullName, abbreviation, 1);
+        assertFalse(result.isValid());
+        assertEquals("Abbreviation is the same as the full text", result.getMessage());
+        assertTrue(result.getSuggestion().contains("shorter abbreviation"));
+    }
+
 }
