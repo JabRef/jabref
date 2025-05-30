@@ -1,7 +1,6 @@
 import java.io.File;
 import java.util.List;
 import java.util.Optional;
-import java.util.Spliterator;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
@@ -15,9 +14,8 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.kohsuke.github.PagedIterator;
-import org.kohsuke.github.GHPullRequestQueryBuilder.Sort;
 
-///usr/bin/env jbang "" "$@" ; exit $?
+///usr/bin/env jbang "$0" "$@" ; exit $?
 
 //JAVA 21+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
