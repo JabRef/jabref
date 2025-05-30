@@ -10,6 +10,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
@@ -22,11 +23,13 @@ public class SearchShortScienceAction extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences preferences;
+    private final ExternalLinkCreator externalLinkCreator;
 
-    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
+    public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences, ImporterPreferences importerPreferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.preferences = preferences;
+        this.externalLinkCreator = new ExternalLinkCreator(importerPreferences);
 
         BooleanExpression fieldIsSet = isFieldSetForSelectedEntry(StandardField.TITLE, stateManager);
         this.executable.bind(needsEntriesSelected(1, stateManager).and(fieldIsSet));
@@ -41,7 +44,7 @@ public class SearchShortScienceAction extends SimpleCommand {
                 dialogService.notify(Localization.lang("This operation requires exactly one item to be selected."));
                 return;
             }
-            ExternalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
+            externalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
                     NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
                 } catch (IOException ex) {

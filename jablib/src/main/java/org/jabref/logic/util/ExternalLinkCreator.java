@@ -3,14 +3,20 @@ package org.jabref.logic.util;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+import org.apache.hc.core5.net.URIBuilder;
+import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import org.apache.hc.core5.net.URIBuilder;
-
 public class ExternalLinkCreator {
-    private static final String SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
-    private static final String GOOGLE_SCHOLAR_SEARCH_URL = "https://scholar.google.com/scholar";
+    private static final String DEFAULT_SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
+    private static final String DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL = "https://scholar.google.com/scholar";
+
+    private final ImporterPreferences importerPreferences;
+
+    public ExternalLinkCreator(ImporterPreferences importerPreferences) {
+        this.importerPreferences = importerPreferences;
+    }
 
     /**
      * Get a URL to the search results of ShortScience for the BibEntry's title
@@ -18,18 +24,28 @@ public class ExternalLinkCreator {
      * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
      * @return The URL if it was successfully created
      */
-    public static Optional<String> getShortScienceSearchURL(BibEntry entry) {
+    public Optional<String> getShortScienceSearchURL(BibEntry entry) {
         return entry.getField(StandardField.TITLE).map(title -> {
-            URIBuilder uriBuilder;
-            try {
-                uriBuilder = new URIBuilder(SHORTSCIENCE_SEARCH_URL);
-            } catch (URISyntaxException e) {
-                // This should never be able to happen as it would require the field to be misconfigured.
-                throw new AssertionError("ShortScience URL is invalid.", e);
+            // Use custom URL template if available, otherwise use default
+            String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
+                                                .getOrDefault("Short Science", DEFAULT_SHORTSCIENCE_SEARCH_URL);
+
+            Optional<String> author = entry.getField(StandardField.AUTHOR);
+
+            // If URL doesn't contain {title}, it's invalid, use default
+            if (!baseUrl.contains("{title}")) {
+                try {
+                    URIBuilder uriBuilder = new URIBuilder(DEFAULT_SHORTSCIENCE_SEARCH_URL);
+                    uriBuilder.addParameter("q", title);
+                    author.ifPresent(a -> uriBuilder.addParameter("author", a));
+                    return uriBuilder.toString();
+                } catch (URISyntaxException ex) {
+                    throw new AssertionError("ShortScience URL is invalid.", ex);
+                }
             }
-            // Direct the user to the search results for the title.
-            uriBuilder.addParameter("q", title.trim());
-            return uriBuilder.toString();
+
+            String urlWithTitle = baseUrl.replace("{title}", title);
+            return author.map(a -> urlWithTitle.replace("{author}", a)).orElse(urlWithTitle);
         });
     }
 
@@ -39,18 +55,28 @@ public class ExternalLinkCreator {
      * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
      * @return The URL if it was successfully created
      */
-    public static Optional<String> getGoogleScholarSearchURL(BibEntry entry) {
+    public Optional<String> getGoogleScholarSearchURL(BibEntry entry) {
         return entry.getField(StandardField.TITLE).map(title -> {
-            URIBuilder uriBuilder;
-            try {
-                uriBuilder = new URIBuilder(GOOGLE_SCHOLAR_SEARCH_URL);
-            } catch (URISyntaxException e) {
-                // This should never be able to happen as it would require the field to be misconfigured.
-                throw new AssertionError("Google Scholar URL is invalid.", e);
+            // Use custom URL template if available, otherwise use default
+            String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
+                                                .getOrDefault("Google Scholar", DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL);
+
+            Optional<String> author = entry.getField(StandardField.AUTHOR);
+
+            // If URL doesn't contain {title}, it's invalid, use default
+            if (!baseUrl.contains("{title}")) {
+                try {
+                    URIBuilder uriBuilder = new URIBuilder(DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL);
+                    uriBuilder.addParameter("q", title);
+                    author.ifPresent(a -> uriBuilder.addParameter("author", a));
+                    return uriBuilder.toString();
+                } catch (URISyntaxException ex) {
+                    throw new AssertionError("Default Google Scholar URL is invalid.", ex);
+                }
             }
-            // Direct the user to the search results for the title.
-            uriBuilder.addParameter("q", title);
-            return uriBuilder.toString();
+
+            String urlWithTitle = baseUrl.replace("{title}", title);
+            return author.map(a -> urlWithTitle.replace("{author}", a)).orElse(urlWithTitle);
         });
     }
 }
