@@ -15,7 +15,6 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.LinkedFile;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -30,7 +29,6 @@ public class DocumentViewerView extends BaseDialog<Void> {
     @FXML private ToggleButton modeLock;
 
     @Inject private StateManager stateManager;
-    @Inject private TaskExecutor taskExecutor;
     @Inject private CliPreferences preferences;
 
     private PdfDocumentViewer viewer;
@@ -38,7 +36,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     public DocumentViewerView() {
         this.setTitle(Localization.lang("Document viewer"));
-        this.initModality(Modality.NONE);
+        this.initModality(Modality.APPLICATION_MODAL);
 
         ViewLoader.view(this)
                   .load()
