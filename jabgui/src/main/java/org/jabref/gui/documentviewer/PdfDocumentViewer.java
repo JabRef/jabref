@@ -33,17 +33,15 @@ public class PdfDocumentViewer extends StackPane {
     }
 
     public void show(Path document) {
-
         if (document != null) {
             try {
                 pdfView.load(Files.newInputStream(document));
                 currentPage.set(1);
-            } catch (
-                    IOException e) {
+            } catch (IOException e) {
                 LOGGER.error("Could not load PDF document {}", document, e);
             }
         } else {
-            LOGGER.error("Could not load PDF document: path is null");
+            LOGGER.error("Could not load PDF document: no document found");
         }
     }
 }
