@@ -343,4 +343,15 @@ class JournalAbbreviationValidatorTest {
             assertTrue(result.getSuggestion().contains("Manag."));
         }
     }
+
+    @Test
+    void validateWithVeryLongInputs() {
+        String longName = "A".repeat(1000);
+        String longAbbr = "B".repeat(1000);
+
+        var results = validator.validate(longName, longAbbr, 1);
+        assertFalse(results.isEmpty());
+        // Should still perform all validations without throwing exceptions
+        assertEquals(5, results.size());
+    }
 }
