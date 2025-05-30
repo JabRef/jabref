@@ -16,5 +16,9 @@ public enum RemoteMessage {
     /**
      * Request server to identify itself. No message content.
      */
-    PING
+    PING,
+    /**
+     * Request the running instance to focus its window. No message content.
+     */
+    FOCUS
 }
