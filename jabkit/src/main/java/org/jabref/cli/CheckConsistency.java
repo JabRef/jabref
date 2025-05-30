@@ -65,7 +65,9 @@ class CheckConsistency implements Runnable {
         List<BibEntry> entries = databaseContext.getDatabase().getEntries();
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries);
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries, (count, total) -> {
+            System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
+        });
 
         Writer writer = new OutputStreamWriter(System.out);
         BibliographyConsistencyCheckResultWriter checkResultWriter;

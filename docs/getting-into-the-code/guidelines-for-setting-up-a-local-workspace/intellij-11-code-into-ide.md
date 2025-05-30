@@ -6,7 +6,9 @@ nav_order: 11
 
 # Step 1: Get the code into IntelliJ
 
-Start IntelliJ.
+## IntelliJ Startup
+
+Start IntelliJ IDEA.
 
 IntelliJ shows the following window:
 
@@ -14,31 +16,68 @@ IntelliJ shows the following window:
 ![IntelliJ Start Window](guidelines-intellij-start-window.png)
 {% endfigure %}
 
+## Open the project
+
 Click on "Open"
 
-Choose `build.gradle` in the root of the jabref source folder:
+Choose `build.gradle.kts` in the root of the `jabref` source folder:
 
-{% figure caption:"Choose `build.gradle` in the “Open Project or File” dialog" %}
-![Open File or Project dialog](guidelines-intellij-choose-build-gradle.png)
+{% figure caption:"Choose `build.gradle.kts` in the “Open Project or File” dialog" %}
+![Open File or Project dialog](11-3-choose-build-gradle-kts.png)
 {% endfigure %}
 
-After pressing "OK", IntelliJ asks how that file should be opened.
+After clicking "Open," IntelliJ asks how that file should be opened.
 Answer: "Open as Project"
 
 {% figure caption:"Choose “Open as Project” in the Open Project dialog" %}
-![Open Project dialog](guidelines-choose-open-as-project.png)
+![Open Project dialog](11-4-guidelines-choose-open-as-project.png)
 {% endfigure %}
 
 Then, trust the project:
 
 {% figure caption:"Choose “Trust Project” in the “Trust and Open Project” dialog" %}
-![Trust and Open Project dialog](guidelines-trust-project.png)
+![Trust and Open Project dialog](12-05-guidelines-trust-project.png)
 {% endfigure %}
 
-## Ensure that committing via IntelliJ works
+## Confirm JDK Downloading
 
-IntelliJ offers committing using the UI.
-Press <kbd>Alt</kbd>+<kbd>0</kbd> to open the commit dialog.
+IntelliJ asks for JDK downloading.
+Keep the suggested Java version and choose "Eclipse Temurin" as Vendor.
+Click "Download".
+
+{% figure caption:"Choose “Eclipse Temurin” in the “Download JDK” dialog" %}
+![Choose Eclipse Temurin](12-06-download-jdk-temurin.png)
+{% endfigure %}
+
+## Allow JDK to access the internet
+
+Allow also access for both cases and click "Allow access".
+
+{% figure caption:"Trust JDK" %}
+![Windows Firewall JDK](12-07-trust-firewall.png)
+{% endfigure %}
+
+## Wait for IntelliJ IDEA to import the gradle project
+
+IntelliJ shows "Importing 'jabref' Gradle Project" at the lower right corner.
+This will take several minutes.
+Wait until this disappears.
+
+{% figure caption:"Importing 'jabref' Gradle Project" %}
+![Importing 'jabref' Gradle Project](12-08-importing-project.png)
+{% endfigure %}
+
+## IntelliJ IDEA will report low memory
+
+{% figure caption:"Low memory pop up" %}
+![alt text](12-09-low-memory.png)
+{% endfigure %}
+
+1. Click on "Configure".
+2. Set "2500" MB (instead of 1262) and click on "Save and Restart".
+3. Wait until IntelliJ is up and running again.
+
+## Ensure that committing via IntelliJ works
 
 Unfortunately, IntelliJ has no support for ignored sub modules [[IDEA-285237](https://youtrack.jetbrains.com/issue/IDEA-285237/ignored-changes-in-submodules-are-still-visible-in-the-commit-window)].
 Fortunately, there is a workaround:
@@ -49,32 +88,19 @@ Go to **File > Settings... > Version Control > Directory Mappings**.<br>
 Currently, it looks as follows:
 
 {% figure caption:"Directory Mappings unmodified" %}
-![Directory Mappings including sub modules](intellij-directory-mappings-unmodified.png)
+![Directory Mappings including sub modules](12-12-intellij-directory-mappings-unmodified.png)
 {% endfigure %}
 
 You need to tell IntelliJ to ignore the submodules `jablib\src\main\abbrv.jabref.org`, `jablib\src\main\resources\csl-locales`, and `jablib\src\main\resources\csl-styles`.
 Select all three (holding the <kbd>Ctrl</kbd> key).
-Then press the red minus button on top.
+Then press the minus button on top.
 
 This will make these directories "Unregistered roots:", which is fine.
 
 {% figure caption:"Directory Mappings having three unregistered roots" %}
-![Directory Mappings having three repositories unregistered](intellij-directory-mappings-unregistered-roots.png)
+![Directory Mappings having three repositories unregistered](12-13-intellij-directory-mappings-unregistered-roots.png)
 {% endfigure %}
 
-## Ensure that committing with other tools work
-
-Open a "git bash".
-On Windows, navigate to `C:\git-repositories\JabRef`.
-Open the context menu of the file explorer (using the right mouse button), choose "Open Git Bash here".
-
-Execute following command:
-
-```shell
-git update-index --assume-unchanged buildres/abbrv.jabref.org jablib/src/main/resources/csl-styles jablib/src/main/resources/csl-locales
-```
-
-{: .tip }
-If you do not see the context menu, re-install git following the steps given at [StackOverflow](https://stackoverflow.com/a/50667280/873282).
+Click "OK"
 
 <!-- markdownlint-disable-file MD033 -->

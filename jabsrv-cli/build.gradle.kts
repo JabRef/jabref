@@ -17,7 +17,13 @@ application{
     mainModule.set("org.jabref.jabsrv.cli")
 
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=com.sun.jna"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
+
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
     )
 }
 
@@ -108,15 +114,6 @@ tasks.test {
         exceptionFormat = TestExceptionFormat.FULL
     }
     maxParallelForks = 1
-}
-
-tasks.named<JavaExec>("run") {
-    doFirst {
-        application.applicationDefaultJvmArgs =
-            listOf(
-                "--enable-native-access=com.sun.jna"
-            )
-    }
 }
 
 tasks.named<JavaExec>("run") {
