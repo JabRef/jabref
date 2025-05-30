@@ -6,32 +6,35 @@ on:
 
 jobs:
   cleanup:
-    if: github.repository == 'JabRef/jabref'
+    if: github.event.pull_request.head.repo.full_name == 'JabRef/jabref'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
-      - name: Cancel deployment run
+      - name: Cancel workflow "binaries" run
         uses: styfle/cancel-workflow-action@0.12.1
         with:
           ignore_sha: true
-          workflow_id: 9813 # workflow "Deployment"
-      - name: Check secrets presence
-        id: checksecrets
-        shell: bash
+          workflow_id: 9160969135
+      - name: Cancel workflow "binaries (ea)" run
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          ignore_sha: true
+          workflow_id: 160969125
+      - name: "Check for 'dev: binaries' label"
+        id: check_label
         run: |
-          if [ "$BUILDJABREFPRIVATEKEY" == "" ]; then
-            echo "secretspresent=NO" >> $GITHUB_OUTPUT
-            echo "❌ Secret BUILDJABREFPRIVATEKEY not present"
+          labels=$(gh pr view ${{ github.event.pull_request.number }} --json labels -q '.labels[].name')
+          if echo "$labels" | grep -Fxq "dev: binaries"; then
+            echo "has_label_binaries=yes" >> $GITHUB_OUTPUT
           else
-            echo "secretspresent=YES" >> $GITHUB_OUTPUT
-            echo "✔️ Secret BUILDJABREFPRIVATEKEY present"
+            echo "has_label_binaries=no" >> $GITHUB_OUTPUT
           fi
         env:
-          BUILDJABREFPRIVATEKEY: ${{ secrets.buildJabRefPrivateKey }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Delete folder on builds.jabref.org
-        if: steps.checksecrets.outputs.secretspresent == 'YES'
+        if: steps.check_label.outputs.has_label_binaries == 'yes'
         uses: appleboy/ssh-action@v1.2.2
         with:
           script: rm -rf /var/www/builds.jabref.org/www/pull/${{ github.event.pull_request.number }} || true
@@ -39,7 +42,17 @@ jobs:
           port: 9922
           username: jrrsync
           key: ${{ secrets.buildJabRefPrivateKey }}
+      - name: Get changed docker files
+        # in line with dockerimages.yml -> lines 6 and 7
+        id: changed-docker-files
+        uses: tj-actions/changed-files@ed68ef82c095e0d48ec87eccea555d944a631a4c # v46
+        with:
+          # Avoid using single or double quotes for multiline patterns
+          files: |
+            .github/workflows/dockerimages.yml
+            Dockerfile.*
       - name: Remove Docker Tag
+        if: steps.changed-docker-files.outputs.any_changed == 'true'
         # A separate action is needed to delete a tag - see https://github.com/orgs/community/discussions/26267
         uses: rafalkk/remove-dockertag-action@v1
         with:

@@ -24,6 +24,7 @@ import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
@@ -98,6 +99,9 @@ public class GroupsParser {
         }
         if (s.startsWith(MetadataSerializationConfiguration.ALL_ENTRIES_GROUP_ID)) {
             return allEntriesGroupFromString(s);
+        }
+        if (s.startsWith(MetadataSerializationConfiguration.SMART_GROUP_ID)) {
+            return smartGroupFromString(s, keywordSeparator);
         }
         if (s.startsWith(MetadataSerializationConfiguration.SEARCH_GROUP_ID)) {
             return searchGroupFromString(s);
@@ -204,6 +208,24 @@ public class GroupsParser {
         }
         addGroupDetails(tok, newGroup);
         return newGroup;
+    }
+
+    private static SmartGroup smartGroupFromString(String input, Character keywordSeparator) throws ParseException {
+        if (!input.startsWith(MetadataSerializationConfiguration.SMART_GROUP_ID)) {
+            throw new IllegalArgumentException("SmartGroup cannot be created from \"" + input + "\".");
+        }
+        QuotedStringTokenizer tok = new QuotedStringTokenizer(input.substring(MetadataSerializationConfiguration.SMART_GROUP_ID.length()),
+                MetadataSerializationConfiguration.GROUP_UNIT_SEPARATOR, MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+
+        String name = StringUtil.unquote(tok.nextToken(), MetadataSerializationConfiguration.GROUP_QUOTE_CHAR);
+        try {
+            int context = Integer.parseInt(tok.nextToken());
+            SmartGroup newGroup = new SmartGroup(name, GroupHierarchyType.getByNumberOrDefault(context), keywordSeparator);
+            addGroupDetails(tok, newGroup);
+            return newGroup;
+        } catch (NumberFormatException exception) {
+            throw new ParseException("Could not parse context in " + input);
+        }
     }
 
     private static ExplicitGroup explicitGroupFromString(String input, Character keywordSeparator) throws ParseException {
