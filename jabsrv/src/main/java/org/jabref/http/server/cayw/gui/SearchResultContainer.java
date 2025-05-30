@@ -1,5 +1,7 @@
 package org.jabref.http.server.cayw.gui;
 
+import java.util.Arrays;
+
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ListCell;
@@ -8,11 +10,23 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
+import org.jabref.logic.os.OS;
+
 public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
+
+    private ObservableList<CAYWEntry<T>> selectedEntries = javafx.collections.FXCollections.observableArrayList();
+
+    private final static int MAX_LINES = 3;
+    private final static int ESTIMATED_CHARS_PER_LINE = 80;
+    private final static int TOOLTIP_WIDTH = 400;
 
     public SearchResultContainer(ObservableList<CAYWEntry<T>> entries, ObservableList<CAYWEntry<T>> selectedEntries) {
         super(entries);
+        this.selectedEntries = selectedEntries;
+        setup();
+    }
 
+    private void setup() {
         this.setCellFactory(listView -> {
             SearchResultCell<T> searchResultCell = new SearchResultCell<T>();
             searchResultCell.setOnMouseClicked(event -> {
@@ -75,7 +89,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
                 if (!fullDescription.equals(truncatedDescription)) {
                     tooltip.setText(fullDescription);
                     tooltip.setWrapText(true);
-                    tooltip.setMaxWidth(400);
+                    tooltip.setMaxWidth(TOOLTIP_WIDTH);
                     setTooltip(tooltip);
                 } else {
                     setTooltip(null);
@@ -90,26 +104,17 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
                 return "";
             }
 
-            String[] lines = text.split("\n", 4);
+            String[] lines = text.split("\n", MAX_LINES + 1);
 
-            if (lines.length <= 3) {
-                return estimateAndTruncate(text, 3);
+            if (lines.length <= MAX_LINES) {
+                return estimateAndTruncate(text);
             } else {
-                StringBuilder result = new StringBuilder();
-                for (int i = 0; i < 3; i++) {
-                    result.append(lines[i]);
-                    if (i < 2) {
-                        result.append("\n");
-                    }
-                }
-                result.append("...");
-                return result.toString();
+                return String.join(OS.NEWLINE, Arrays.copyOf(lines, MAX_LINES)) + "...";
             }
         }
 
-        private String estimateAndTruncate(String text, int maxLines) {
-            int avgCharsPerLine = 80;
-            int maxChars = avgCharsPerLine * maxLines;
+        private String estimateAndTruncate(String text) {
+            int maxChars = ESTIMATED_CHARS_PER_LINE * MAX_LINES;
 
             if (text.length() <= maxChars) {
                 return text;

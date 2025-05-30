@@ -100,22 +100,17 @@ public class CAYWResource {
 
         CompletableFuture<List<BibEntry>> future = new CompletableFuture<>();
         Platform.runLater(() -> {
-            try {
-
                 SearchDialog<BibEntry> dialog = new SearchDialog<>();
                 // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
                 //  searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
-                List<BibEntry> results = dialog.show(s -> {
-                    return entries.stream()
-                                  .filter(bibEntryCAYWEntry -> matches(bibEntryCAYWEntry, s))
-                                  .map(CAYWEntry::getValue)
-                                  .toList();
-                }, entries);
+            List<BibEntry> results = dialog.show(searchQuery ->
+                    entries.stream()
+                           .filter(bibEntryCAYWEntry -> matches(bibEntryCAYWEntry, searchQuery))
+                           .map(CAYWEntry::getValue)
+                           .toList(),
+                    entries);
 
                 future.complete(results);
-            } catch (Exception e) {
-                future.completeExceptionally(e);
-            }
         });
 
         List<String> citationKeys = future.get().stream()

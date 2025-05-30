@@ -16,7 +16,10 @@ public class SelectedItemsContainer<T> extends FlowPane {
 
     public SelectedItemsContainer(ObservableList<CAYWEntry<T>> items) {
         this.items = items;
+        setup();
+    }
 
+    public void setup() {
         this.setHgap(8);
         this.setVgap(8);
         this.setPadding(new Insets(10));
@@ -42,8 +45,7 @@ public class SelectedItemsContainer<T> extends FlowPane {
 
     private void removePill(CAYWEntry<T> entry) {
         getChildren().removeIf(node -> {
-            if (node instanceof Pill) {
-                Pill<?> pill = (Pill<?>) node;
+            if (node instanceof Pill pill) {
                 return pill.getEntry().equals(entry);
             }
             return false;

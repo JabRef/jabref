@@ -27,9 +27,6 @@ public class SearchDialog<T> {
     private final ObservableList<CAYWEntry<T>> selectedItems = FXCollections.observableArrayList();
     private Stage dialogStage;
 
-    public SearchDialog() {
-    }
-
     public List<T> show(Function<String, List<T>> searchFunction, List<CAYWEntry<T>> entries) {
         FilteredList<CAYWEntry<T>> searchResults = new FilteredList<>(FXCollections.observableArrayList(entries));
         selectedItems.clear();
