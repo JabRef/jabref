@@ -293,4 +293,26 @@ class JournalAbbreviationValidatorTest {
         assertFalse(results.isEmpty());
         assertTrue(results.stream().anyMatch(r -> !r.isValid()));
     }
+
+    @Test
+    void checkDuplicateFullNamesWithCaseInsensitivity() {
+        validator.validate("Journal of Physics", "J. Phys.", 1);
+        validator.validate("JOURNAL OF PHYSICS", "J. Phys.", 2);
+
+        var issues = validator.getIssues();
+        assertFalse(issues.isEmpty());
+        assertTrue(issues.stream()
+                         .anyMatch(issue -> issue.getMessage().contains("Duplicate full name")));
+    }
+
+    @Test
+    void checkDuplicateAbbreviationsWithCaseInsensitivity() {
+        validator.validate("Journal of Physics", "J. Phys.", 1);
+        validator.validate("Journal of Physiology", "j. phys.", 2);
+
+        var issues = validator.getIssues();
+        assertFalse(issues.isEmpty());
+        assertTrue(issues.stream()
+                         .anyMatch(issue -> issue.getMessage().contains("Duplicate abbreviation")));
+    }
 }
