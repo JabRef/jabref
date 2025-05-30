@@ -3,10 +3,10 @@ package org.jabref.gui.maintable;
 import java.io.IOException;
 import java.util.List;
 
+import javafx.beans.binding.BooleanExpression;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
-import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -16,7 +16,8 @@ import org.jabref.logic.util.ExternalLinkCreator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
-import javafx.beans.binding.BooleanExpression;
+import static org.jabref.gui.actions.ActionHelper.isFieldSetForSelectedEntry;
+import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 public class SearchGoogleScholarAction extends SimpleCommand {
     private final DialogService dialogService;

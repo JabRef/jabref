@@ -4,9 +4,9 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.logic.importer.ImporterPreferences;
 
 public class ExternalLinkCreator {
     private static final String DEFAULT_SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
