@@ -5,12 +5,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import org.jabref.gui.icon.JabRefIconView?>
-<?import com.dlsc.gemsfx.ExpandingTextArea?>
-<fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.Pane"
+<?import javafx.scene.layout.StackPane?>
+<fx:root nodeOrientation="LEFT_TO_RIGHT" type="javafx.scene.layout.HBox"
          xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.ai.components.aichat.chatmessage.ChatMessageComponent">
     <HBox fx:id="wrapperHBox" spacing="10.0">
@@ -23,7 +22,7 @@
                     <Font name="System Bold" size="12.0" />
                 </font>
             </Label>
-            <ExpandingTextArea fx:id="contentTextArea" editable="false" nodeOrientation="LEFT_TO_RIGHT" text="Content" styleClass="chat-message-text-area" />
+            <StackPane fx:id="markdownContentPane" />
         </VBox>
 
         <VBox fx:id="buttonsVBox" alignment="BASELINE_RIGHT">

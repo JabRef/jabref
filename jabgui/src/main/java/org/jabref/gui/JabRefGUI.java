@@ -18,6 +18,7 @@ import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -256,10 +257,10 @@ public class JabRefGUI extends Application {
         themeManager.installCss(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
-                scene,
-                event,
-                preferences.getKeyBindingRepository()));
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
+            SelectableTextFlowKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
+        });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());

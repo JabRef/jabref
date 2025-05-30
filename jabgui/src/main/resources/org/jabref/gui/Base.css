@@ -2519,3 +2519,58 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1.25em;
     -fx-border-color: transparent;
 }
+
+/* Markdown styles */
+.markdown-textflow {
+    -fx-line-spacing: 2;
+    -fx-text-overrun: CLIP;
+}
+
+.markdown-h1 {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h2 {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h3 {
+    -fx-font-size: 1.25em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h4 {
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h5 {
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h6 {
+    -fx-font-size: 0.875em;
+    -fx-font-weight: bold;
+}
+
+.markdown-bold {
+    -fx-font-weight: bold;
+}
+
+.markdown-italic {
+    -fx-font-style: italic;
+}
+
+.markdown-code {
+    -fx-font-family: monospace;
+    -fx-fill: #2e3440;
+    -fx-background-color: #eceff4;
+}
+
+.markdown-list-bullet,
+.markdown-list-number {
+    -fx-fill: #5e81ac;
+}

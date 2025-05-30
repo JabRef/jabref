@@ -189,5 +189,8 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires flexmark;
+    requires flexmark.util.data;
+    requires flexmark.util.ast;
     // endregion
 }
