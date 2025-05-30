@@ -327,4 +327,20 @@ class JournalAbbreviationValidatorTest {
         assertTrue(result.getSuggestion().contains("shorter abbreviation"));
     }
 
+    @Test
+    void checkOutdatedManagementAbbreviationWithVariations() {
+        String[] invalidAbbreviations = {
+                "Manage. Sci.",
+                "Manage Sci.",
+                "Manage.Sci.",
+                "Manage. Sci"
+        };
+
+        for (String abbreviation : invalidAbbreviations) {
+            var result = validator.checkOutdatedManagementAbbreviation("Management Science", abbreviation, 1);
+            assertFalse(result.isValid());
+            assertTrue(result.getMessage().contains("outdated"));
+            assertTrue(result.getSuggestion().contains("Manag."));
+        }
+    }
 }
