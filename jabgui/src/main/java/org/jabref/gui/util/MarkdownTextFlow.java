@@ -54,14 +54,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return;
         }
 
-        try {
-            Node document = parser.parse(markdownText);
-            MarkdownRenderer renderer = new MarkdownRenderer();
-            renderer.visit(document);
-        } catch (Exception e) {
-            Text plainText = new Text(markdownText);
-            this.getChildren().add(plainText);
-        }
+        Node document = parser.parse(markdownText);
+        MarkdownRenderer renderer = new MarkdownRenderer();
+        renderer.visit(document);
     }
 
     private void addLineBreak() {
