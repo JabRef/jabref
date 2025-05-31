@@ -46,6 +46,7 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
@@ -432,6 +433,8 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         if (group instanceof AllEntriesGroup) {
             return false;
+        } else if (group instanceof SmartGroup) {
+            return false;
         } else if (group instanceof ExplicitGroup) {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
@@ -458,7 +461,7 @@ public class GroupNodeViewModel {
     public boolean canBeDragged() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ -> false;
+            case AllEntriesGroup _, SmartGroup _ -> false;
             case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -477,13 +480,13 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _, ExplicitGroup _, SearchGroup _, TexGroup _ -> true;
+            case AutomaticKeywordGroup _, AutomaticPersonsGroup _, SmartGroup _ -> false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
                             .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
-            case AutomaticKeywordGroup _, AutomaticPersonsGroup _ -> false;
             case null -> throw new IllegalArgumentException("Group cannot be null");
             default -> throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
         };
@@ -492,7 +495,7 @@ public class GroupNodeViewModel {
     public boolean canRemove() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ -> false;
+            case AllEntriesGroup _, SmartGroup _ -> false;
             case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -508,7 +511,7 @@ public class GroupNodeViewModel {
     public boolean isEditable() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ -> false;
+            case AllEntriesGroup _, SmartGroup _ -> false;
             case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
