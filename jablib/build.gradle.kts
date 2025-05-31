@@ -537,10 +537,6 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
 
-    // --add-opens
-    opensTo.add("javafx.base/com.sun.javafx.beans=net.bytebuddy")
-    opensTo.add("javafx.fxml/javafx.fxml=org.jabref")
-
     // --add-reads
     //reads.add("org.jabref.jablib=io.github.classgraph")
     //reads.add("org.jabref.jablib=org.jabref.testsupport")
