@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     java
 
@@ -31,7 +33,7 @@ dependencies {
     }
 }
 
-val os = org.gradle.internal.os.OperatingSystem.current()
+val os = OperatingSystem.current()
 
 val osTarget = when {
     os.isMacOsX -> {
