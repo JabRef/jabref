@@ -71,7 +71,7 @@ public class RemoteClient {
     public boolean sendFocus() {
         try (Protocol protocol = openNewConnection()) {
             protocol.sendMessage(RemoteMessage.FOCUS);
-            javafx.util.Pair<RemoteMessage, Object> response = protocol.receiveMessage();
+            Pair<RemoteMessage, Object> response = protocol.receiveMessage();
             return response.getKey() == RemoteMessage.OK;
         } catch (IOException e) {
             LOGGER.debug("Could not send focus command to the server at port {}", port, e);
