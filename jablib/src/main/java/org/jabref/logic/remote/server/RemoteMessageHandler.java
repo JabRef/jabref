@@ -4,5 +4,5 @@ package org.jabref.logic.remote.server;
 public interface RemoteMessageHandler {
     void handleCommandLineArguments(String[] message);
 
-    default void handleFocus() {}
+    default void handleFocus() { }
 }
