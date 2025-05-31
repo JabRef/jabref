@@ -20,4 +20,8 @@ module org.jabref.jabkit {
     requires org.tinylog.api;
     requires org.tinylog.api.slf4j;
     requires org.tinylog.impl;
+
+    // region: other libraries (alphabetically)
+    requires io.github.adr;
+    // endregion
 }

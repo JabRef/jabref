@@ -24,6 +24,7 @@ import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BuildInfo;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -38,16 +39,18 @@ import static picocli.CommandLine.Option;
 
 @Command(name = "jabkit",
         mixinStandardHelpOptions = true,
+        // sorted alphabetically
         subcommands = {
-                GenerateCitationKeys.class,
                 CheckConsistency.class,
 //                CheckIntegrity.class,
-                Fetch.class,
-                Search.class,
                 Convert.class,
+                Fetch.class,
                 GenerateBibFromAux.class,
+                GenerateCitationKeys.class,
+                Pdf.class,
                 Preferences.class,
-                Pdf.class
+                Pseudonymize.class,
+                Search.class
         })
 public class ArgumentProcessor implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArgumentProcessor.class);
@@ -150,8 +153,18 @@ public class ArgumentProcessor implements Runnable {
                                        BibEntryTypesManager entryTypesManager,
                                        BibDatabase newBase,
                                        Path outputFile) {
+        saveDatabaseContext(cliPreferences, entryTypesManager, new BibDatabaseContext(newBase), outputFile);
+    }
+
+    protected static void saveDatabaseContext(CliPreferences cliPreferences,
+                                       BibEntryTypesManager entryTypesManager,
+                                       BibDatabaseContext bibDatabaseContext,
+                                       Path outputFile) {
         try {
-            System.out.println(Localization.lang("Saving") + ": " + outputFile);
+            if (!FileUtil.isBibFile(outputFile)) {
+                System.err.println(Localization.lang("Invalid output file type provided."));
+            }
+            System.out.println(Localization.lang("Saving: %0.", outputFile));
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
@@ -162,7 +175,7 @@ public class ArgumentProcessor implements Runnable {
                         cliPreferences.getFieldPreferences(),
                         cliPreferences.getCitationKeyPatternPreferences(),
                         entryTypesManager);
-                databaseWriter.saveDatabase(new BibDatabaseContext(newBase));
+                databaseWriter.saveDatabase(bibDatabaseContext);
 
                 // Show just a warning message if encoding did not work for all characters:
                 if (fileWriter.hasEncodingProblems()) {

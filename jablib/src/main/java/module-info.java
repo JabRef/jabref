@@ -103,6 +103,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.event;
     exports org.jabref.logic.crawler;
     exports org.jabref.logic.git;
+    exports org.jabref.logic.pseudonymization;
 
     requires javafx.base;
     requires javafx.graphics;
