@@ -36,4 +36,9 @@ public class CLIMessageHandler implements RemoteMessageHandler {
         List<UiCommand> uiCommands = argumentProcessor.processArguments();
         Platform.runLater(() -> uiMessageHandler.handleUiCommands(uiCommands));
     }
+
+    @Override
+    public void handleFocus() {
+        Platform.runLater(() -> uiMessageHandler.handleUiCommands(List.of(new UiCommand.Focus())));
+    }
 }

@@ -43,6 +43,12 @@ import org.tinylog.configuration.Configuration;
 public class Launcher {
     private static Logger LOGGER;
 
+    public enum MultipleInstanceAction {
+        CONTINUE,
+        SHUTDOWN,
+        FOCUS
+    }
+
     public static void main(String[] args) {
         initLogging(args);
 
@@ -53,7 +59,14 @@ public class Launcher {
         Injector.setModelOrService(GuiPreferences.class, preferences);
 
         // Early exit in case another instance is already running
-        if (!handleMultipleAppInstances(args, preferences.getRemotePreferences())) {
+        MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());
+        if (instanceAction == MultipleInstanceAction.SHUTDOWN) {
+            systemExit();
+        } else if (instanceAction == MultipleInstanceAction.FOCUS) {
+            // Send focus command to running instance
+            RemotePreferences remotePreferences = preferences.getRemotePreferences();
+            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+            remoteClient.sendFocus();
             systemExit();
         }
 
@@ -129,9 +142,9 @@ public class Launcher {
     }
 
     /**
-     * @return true if JabRef should continue starting up, false if it should quit.
+     * @return MultipleInstanceAction: CONTINUE if JabRef should continue starting up, SHUTDOWN if it should quit, FOCUS if it should focus the existing instance.
      */
-    private static boolean handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
+    private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         LOGGER.trace("Checking for remote handling...");
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
@@ -140,7 +153,8 @@ public class Launcher {
                 LOGGER.debug("Pinging other instance succeeded.");
                 if (args.length == 0) {
                     // There is already a server out there, avoid showing log "Passing arguments" while no arguments are provided.
-                    LOGGER.warn("This JabRef instance is already running. Please switch to that instance.");
+                    LOGGER.warn("A JabRef instance is already running. Switching to that instance.");
+                    return MultipleInstanceAction.FOCUS;
                 } else {
                     // We are not alone, there is already a server out there, send command line arguments to other instance
                     LOGGER.debug("Passing arguments passed on to running JabRef...");
@@ -148,17 +162,18 @@ public class Launcher {
                         // So we assume it's all taken care of, and quit.
                         // Output to both to the log and the screen. Therefore, we do not have an additional System.out.println.
                         LOGGER.info("Arguments passed on to running JabRef instance. Shutting down.");
+                        return MultipleInstanceAction.SHUTDOWN;
                     } else {
                         LOGGER.warn("Could not communicate with other running JabRef instance.");
                     }
                 }
                 // We do not launch a new instance in presence if there is another instance running
-                return false;
+                return MultipleInstanceAction.SHUTDOWN;
             } else {
                 LOGGER.debug("Could not ping JabRef instance.");
             }
         }
-        return true;
+        return MultipleInstanceAction.CONTINUE;
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
