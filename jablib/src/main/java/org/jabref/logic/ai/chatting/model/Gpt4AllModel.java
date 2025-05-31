@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.chatting.model;
 
+import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -88,7 +89,7 @@ public class Gpt4AllModel implements ChatModel {
                                              .tokenUsage(new TokenUsage(0, 0))
                                              .finishReason(FinishReason.OTHER)
                                              .build();
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             LOGGER.error("Error generating message from Gpt4All", e);
             throw new RuntimeException("Failed to generate AI message", e);
         }

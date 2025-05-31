@@ -34,6 +34,7 @@ import org.jabref.model.study.Study;
 import org.jabref.model.study.StudyDatabase;
 import org.jabref.model.study.StudyQuery;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,7 +196,7 @@ public class ManageStudyDefinitionViewModel {
 
         try {
             new GitHandler(studyDirectory).createCommitOnCurrentBranch("Update study definition", false);
-        } catch (Exception e) {
+        } catch (IOException | GitAPIException e) {
             LOGGER.error("Could not commit study definition file in directory {}", studyDirectory, e);
             dialogService.notify(Localization.lang("Please enter a valid file path.") +
                     ": " + studyDirectory);
