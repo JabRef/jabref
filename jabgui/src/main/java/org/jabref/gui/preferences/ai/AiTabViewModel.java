@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -20,6 +21,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplate;
@@ -88,6 +90,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             AiTemplate.SUMMARIZATION_CHUNK, new SimpleStringProperty(),
             AiTemplate.SUMMARIZATION_COMBINE, new SimpleStringProperty()
     );
+
+    private final OptionalObjectProperty<AiTemplate> selectedTemplate = OptionalObjectProperty.empty();
 
     private final StringProperty temperature = new SimpleStringProperty();
     private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
@@ -399,6 +403,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 templateSources.get(template).set(AiDefaultPreferences.TEMPLATES.get(template)));
     }
 
+    public void resetCurrentTemplate() {
+        selectedTemplateProperty().get().ifPresent(template -> {
+            String defaultTemplate = AiDefaultPreferences.TEMPLATES.get(template);
+            templateSources.get(template).set(defaultTemplate);
+        });
+    }
+
     @Override
     public boolean validateSettings() {
         if (enableAi.get()) {
@@ -500,6 +511,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public Map<AiTemplate, StringProperty> getTemplateSources() {
         return templateSources;
+    }
+
+    public OptionalObjectProperty<AiTemplate> selectedTemplateProperty() {
+        return selectedTemplate;
     }
 
     public StringProperty temperatureProperty() {
