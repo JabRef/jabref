@@ -60,9 +60,6 @@ public class SelectableTextFlow extends TextFlow {
         });
     }
 
-    /**
-     * Copy selected text.
-     */
     public void copySelectedText() {
         if (startHit.isEmpty() || endHit.isEmpty()) {
             return;
@@ -79,9 +76,6 @@ public class SelectableTextFlow extends TextFlow {
         }
     }
 
-    /**
-     * Select all text in the TextFlow.
-     */
     public void selectAll() {
         if (getChildren().isEmpty()) {
             return;
@@ -91,10 +85,7 @@ public class SelectableTextFlow extends TextFlow {
         updateSelectionHighlight();
     }
 
-    /**
-     * Clears selection.
-     */
-    public void clear() {
+    public void clearSelection() {
         getChildren().clear();
         startHit = Optional.empty();
         endHit = Optional.empty();

@@ -47,7 +47,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
      * @param markdownText The Markdown text to render. If null or empty, the TextFlow will be cleared.
      */
     public void setMarkdown(String markdownText) {
-        this.clear();
+        this.clearSelection();
         needsLineBreak = false;
 
         if (markdownText == null || markdownText.trim().isEmpty()) {
