@@ -107,7 +107,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                             for (SearchResult searchResult : iterator.getValue()) {
                                 for (String resultTextHtml : searchResult.getContentResultStringsHtml()) {
                                     content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
-                                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
+                                    content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));
                                 }
                                 if (!searchResult.getAnnotationsResultStringsHtml().isEmpty()) {
                                     Text annotationsText = new Text(System.lineSeparator() + Localization.lang("Found matches in annotations:") + System.lineSeparator() + System.lineSeparator());
@@ -116,7 +116,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
 
                                     for (String resultTextHtml : searchResult.getAnnotationsResultStringsHtml()) {
                                         content.getChildren().addAll(TooltipTextUtil.createTextsFromHtml(resultTextHtml.replace("</b> <b>", " ")));
-                                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber()));
+                                        content.getChildren().addAll(new Text(System.lineSeparator()), lineSeparator(0.8), createPageLink(linkedFile, searchResult.getPageNumber(), searchQuery.getSearchExpression()));
                                     }
                                 }
                             }
@@ -150,7 +150,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         return fileLinkText;
     }
 
-    private Text createPageLink(LinkedFile linkedFile, int pageNumber) {
+    private Text createPageLink(LinkedFile linkedFile, int pageNumber, String searchExpression) {
         Text pageLink = new Text(Localization.lang("On page %0", pageNumber) + System.lineSeparator() + System.lineSeparator());
         pageLink.setStyle("-fx-font-style: italic; -fx-font-weight: bold;");
 
@@ -161,6 +161,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 }
                 documentViewerView.switchToFile(linkedFile);
                 documentViewerView.gotoPage(pageNumber);
+                documentViewerView.highlightText(searchExpression);
                 documentViewerView.disableLiveMode();
                 dialogService.showCustomDialog(documentViewerView);
             }
