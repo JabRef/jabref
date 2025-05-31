@@ -103,6 +103,16 @@ extraJavaModuleInfo {
         exportAllPackages()
     }
 
+    // required for testing of jablib
+    module("org.openjfx:javafx-fxml", "javafx.fxml") {
+        overrideModuleName()
+        patchRealModule()
+        exportAllPackages()
+
+        requiresTransitive("javafx.base")
+        requiresTransitive("java.desktop")
+    }
+
     // required for testing
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         overrideModuleName()
