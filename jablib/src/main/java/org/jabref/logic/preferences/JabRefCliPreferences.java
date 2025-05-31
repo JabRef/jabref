@@ -386,6 +386,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY = "openFileExplorerInFileDirectory";
     private static final String OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY = "openFileExplorerInLastUsedDirectory";
 
+    private static final String WALKTHROUGH_COMPLETED = "walkthroughCompleted";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
 
@@ -429,6 +431,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+    private WalkthroughPreferences walkthroughPreferences;
 
     /**
      * @implNote The constructor is made protected to enforce this as a singleton class:
@@ -691,6 +694,9 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
 
         // endregion
+
+        // WalkThrough
+        defaults.put(WALKTHROUGH_COMPLETED, Boolean.FALSE);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -2273,5 +2279,19 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
+    }
+
+    @Override
+    public WalkthroughPreferences getWalkthroughPreferences() {
+        if (walkthroughPreferences != null) {
+            return walkthroughPreferences;
+        }
+
+        walkthroughPreferences = new WalkthroughPreferences(getBoolean(WALKTHROUGH_COMPLETED));
+
+        walkthroughPreferences.completedProperty().addListener((obs, oldValue, newValue) ->
+            putBoolean(WALKTHROUGH_COMPLETED, newValue));
+
+        return walkthroughPreferences;
     }
 }
