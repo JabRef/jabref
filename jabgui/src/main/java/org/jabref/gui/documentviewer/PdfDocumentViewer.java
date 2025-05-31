@@ -29,7 +29,7 @@ public class PdfDocumentViewer extends StackPane {
     public PdfDocumentViewer() {
         pdfView = new PDFView();
         getChildren().add(pdfView);
-        EasyBind.subscribe(currentPage, (current) -> pdfView.setPage(current.intValue()));
+        EasyBind.subscribe(currentPage, current -> pdfView.setPage(current.intValue()));
         // We can only set the search query at the moment not the results or mark them in the text
         EasyBind.subscribe(highlightText, pdfView::setSearchText);
     }
