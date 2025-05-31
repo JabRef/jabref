@@ -347,7 +347,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SHOW_PDF_VIEWER, new ShowDocumentViewerAction(stateManager, preferences)),
                 factory.createMenuItem(StandardActions.EDIT_ENTRY, new OpenEntryEditorAction(frame::getCurrentLibraryTab, stateManager)),
                 factory.createMenuItem(StandardActions.OPEN_CONSOLE, new OpenConsoleAction(stateManager, preferences, dialogService))
-                );
+        );
 
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferences.getExternalApplicationsPreferences())),

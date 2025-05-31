@@ -92,12 +92,6 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         }
         this.entry = entry;
         updateSearch();
-        notifyAboutFocus(entry);
-    }
-
-    @Override
-    protected void handleFocus() {
-            Platform.runLater(entryEditor::adaptVisibleTabs);
     }
 
     private void updateSearch() {
@@ -135,7 +129,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 }
             }
         });
-        handleFocus();
+        Platform.runLater(entryEditor::adaptVisibleTabs);
     }
 
     private Text createFileLink(LinkedFile linkedFile) {
