@@ -103,16 +103,15 @@ extraJavaModuleInfo {
         exportAllPackages()
     }
 
-/*
+    // required for testing
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         overrideModuleName()
         patchRealModule()
         exportAllPackages()
 
-        requires("java.dekstop")
-        requires("javafx.base")
+        requiresTransitive("javafx.base")
+        requiresTransitive("java.desktop")
     }
-    */
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()
