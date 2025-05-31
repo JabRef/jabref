@@ -260,18 +260,41 @@
     </HBox>
 
     <TabPane fx:id="templatesTabPane">
-        <Tab fx:id="systemMessageForChattingTab" text="%System message for chatting" closable="false">
+        <Tab fx:id="systemMessageForChattingTab"
+             text="%System message for chatting" closable="false">
             <TextArea fx:id="systemMessageTextArea"/>
         </Tab>
-        <Tab fx:id="userMessageForChattingTab" text="%User message for chatting" closable="false">
+        <Tab fx:id="userMessageForChattingTab"
+             text="%User message for chatting" closable="false">
             <TextArea fx:id="userMessageTextArea"/>
         </Tab>
-        <Tab fx:id="summarizationChunkTab" text="%Completion text for summarization of a chunk" closable="false">
-            <TextArea fx:id="summarizationChunkTextArea"/>
+        <Tab fx:id="summarizationChunkSystemMessageTab"
+             text="%System message for summarization of a chunk" closable="false">
+            <TextArea fx:id="summarizationChunkSystemMessageTextArea"/>
         </Tab>
-        <Tab fx:id="summarizationCombineTab" text="%Completion text for summarization of several chunks"
+        <Tab fx:id="summarizationChunkUserMessageTab"
+             text="%User message for summarization of a chunk" closable="false">
+            <TextArea fx:id="summarizationChunkUserMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="summarizationCombineSystemMessageTab"
+             text="%System message for summarization of several chunks"
              closable="false">
-            <TextArea fx:id="summarizationCombineTextArea"/>
+            <TextArea fx:id="summarizationCombineSystemMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="summarizationCombineUserMessageTab"
+             text="%User message for summarization of several chunks"
+             closable="false">
+            <TextArea fx:id="summarizationCombineUserMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="citationParsingSystemMessageTab"
+             text="%System message for parsing raw citations"
+             closable="false">
+            <TextArea fx:id="citationParsingSystemMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="citationParsingUserMessageTab"
+             text="%User message for parsing raw citations"
+             closable="false">
+            <TextArea fx:id="citationParsingUserMessageTextArea"/>
         </Tab>
     </TabPane>
 

@@ -60,13 +60,21 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private TabPane templatesTabPane;
     @FXML private Tab systemMessageForChattingTab;
     @FXML private Tab userMessageForChattingTab;
-    @FXML private Tab summarizationChunkTab;
-    @FXML private Tab summarizationCombineTab;
+    @FXML private Tab summarizationChunkSystemMessageTab;
+    @FXML private Tab summarizationChunkUserMessageTab;
+    @FXML private Tab summarizationCombineSystemMessageTab;
+    @FXML private Tab summarizationCombineUserMessageTab;
+    @FXML private Tab citationParsingSystemMessageTab;
+    @FXML private Tab citationParsingUserMessageTab;
 
     @FXML private TextArea systemMessageTextArea;
     @FXML private TextArea userMessageTextArea;
-    @FXML private TextArea summarizationChunkTextArea;
-    @FXML private TextArea summarizationCombineTextArea;
+    @FXML private TextArea summarizationChunkSystemMessageTextArea;
+    @FXML private TextArea summarizationChunkUserMessageTextArea;
+    @FXML private TextArea summarizationCombineSystemMessageTextArea;
+    @FXML private TextArea summarizationCombineUserMessageTextArea;
+    @FXML private TextArea citationParsingSystemMessageTextArea;
+    @FXML private TextArea citationParsingUserMessageTextArea;
 
     @FXML private Button generalSettingsHelp;
     @FXML private Button expertSettingsHelp;
@@ -103,8 +111,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     private void initializeTemplates() {
         systemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CHATTING_SYSTEM_MESSAGE));
         userMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CHATTING_USER_MESSAGE));
-        summarizationChunkTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_CHUNK));
-        summarizationCombineTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_COMBINE));
+        summarizationChunkSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE));
+        summarizationChunkUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE));
+        summarizationCombineSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE));
+        summarizationCombineUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE));
+        citationParsingSystemMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE));
+        citationParsingUserMessageTextArea.textProperty().bindBidirectional(viewModel.getTemplateSources().get(AiTemplate.CITATION_PARSING_USER_MESSAGE));
 
         templatesTabPane.getSelectionModel().selectedItemProperty().addListener(_ -> {
             viewModel.selectedTemplateProperty().set(getAiTemplate());
@@ -270,10 +282,18 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
             return Optional.of(AiTemplate.CHATTING_SYSTEM_MESSAGE);
         } else if (selectedTab == userMessageForChattingTab) {
             return Optional.of(AiTemplate.CHATTING_USER_MESSAGE);
-        } else if (selectedTab == summarizationChunkTab) {
-            return Optional.of(AiTemplate.SUMMARIZATION_CHUNK);
-        } else if (selectedTab == summarizationCombineTab) {
-            return Optional.of(AiTemplate.SUMMARIZATION_COMBINE);
+        } else if (selectedTab == summarizationChunkSystemMessageTab) {
+            return Optional.of(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE);
+        } else if (selectedTab == summarizationChunkUserMessageTab) {
+            return Optional.of(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE);
+        } else if (selectedTab == summarizationCombineSystemMessageTab) {
+            return Optional.of(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE);
+        } else if (selectedTab == summarizationCombineUserMessageTab) {
+            return Optional.of(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE);
+        } else if (selectedTab == citationParsingSystemMessageTab) {
+            return Optional.of(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE);
+        } else if (selectedTab == citationParsingUserMessageTab) {
+            return Optional.of(AiTemplate.CITATION_PARSING_USER_MESSAGE);
         }
 
         return Optional.empty();
