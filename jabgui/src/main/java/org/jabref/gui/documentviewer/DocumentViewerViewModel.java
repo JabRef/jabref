@@ -26,12 +26,7 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DocumentViewerViewModel extends AbstractViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
     private final CliPreferences preferences;
@@ -45,14 +40,14 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.preferences = Objects.requireNonNull(preferences);
 
-        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> {
+        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) _ -> {
             // Switch to currently selected entry in live mode
             if (liveMode.get()) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
             }
         });
 
-        this.liveMode.addListener((observable, oldValue, newValue) -> {
+        this.liveMode.addListener((_, oldValue, newValue) -> {
             // Switch to currently selected entry if mode is changed to live
             if ((oldValue != newValue) && newValue) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
@@ -99,7 +94,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             stateManager.getActiveDatabase()
                         .flatMap(database -> file.findIn(database, preferences.getFilePreferences()))
                         .ifPresent(this::setCurrentDocument);
-            currentPage.set(1);
         }
     }
 
