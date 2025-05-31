@@ -10,19 +10,34 @@ The resource for a library is implemented at [`org.jabref.http.server.LibraryRes
 
 ## Start http server
 
+### Starting with IntelliJ
+
 The class starting the server is located in the project `jabsrv-cli` and is called `org.jabref.http.server.cli.ServerCli`.
 
 Test files to server can be passed as arguments.
-If no files are passed, the last opened files are served.
 If that list is also empty, the file `src/main/resources/org/jabref/http/server/http-server-demo.bib` is served.
+
+### Starting with JBang
+
+In case you want to interact only with the http server and do not want to set up or run IntelliJ, [JBang](https://www.jbang.dev/download/) can be used.
+
+In the repository root, run following command:
+
+```shell
+jbang .jbang/JabSrvLauncher.java
+```
+
+JBang also offers running without explicit installation, if you have node installed (and WSL available in the case of Windows):
+
+```shell
+npx @jbangdev/jbang .jbang/JabSrvLauncher.java
+```
 
 ### Starting with gradle
 
 ```shell
 ./gradlew run :jabsrv:run
 ```
-
-The GUI is also started. Just close it.
 
 Gradle output:
 
@@ -50,10 +65,18 @@ INFO: [HttpServer] Started.
 DEBUG: Server started.
 ```
 
+## Served libraries
+
+The last opened libraries are served.
+`demo` serves Chocolate.bib.
+Additional libraries can be served by passing them as arguments.
+
 ## Developing with IntelliJ
 
-IntelliJ Ultimate offers a Markdown-based http-client. One has to open the file `jabsrv/src/test/rest-api.http`.
+IntelliJ Ultimate offers a Markdown-based http-client. You need to open the file `jabsrv/src/test/rest-api.http`.
 Then, there are play buttons appearing for interacting with the server.
+
+In case you want to debug on Windows, you need to choose "WSL" as the target for the debugger ("Run on") to avoid "command line too long" errors.
 
 ## Get SSL Working
 

@@ -2,7 +2,6 @@ package org.jabref.logic.search;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.TaskExecutor;
@@ -18,24 +17,20 @@ public class DatabaseSearcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseSearcher.class);
 
     private final BibDatabaseContext databaseContext;
-    private final SearchQuery query;
     private final IndexManager indexManager;
 
-    // TODO: get rid of task executor here or add a constructor overload?
-    public DatabaseSearcher(SearchQuery query,
-                            BibDatabaseContext databaseContext,
+    public DatabaseSearcher(BibDatabaseContext databaseContext,
                             TaskExecutor taskExecutor,
                             CliPreferences preferences,
                             PostgreServer postgreServer) throws IOException {
         this.databaseContext = databaseContext;
-        this.query = Objects.requireNonNull(query);
         this.indexManager = new IndexManager(databaseContext, taskExecutor, preferences, postgreServer);
     }
 
     /**
      * @return The matches in the order they appear in the library.
      */
-    public List<BibEntry> getMatches() {
+    public List<BibEntry> getMatches(SearchQuery query) {
         LOGGER.debug("Search term: {}", query);
 
         if (!query.isValid()) {

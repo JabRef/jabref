@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.StoredFields;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
@@ -62,7 +63,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
     public DefaultLinkedFilesIndexer(BibDatabaseContext databaseContext, FilePreferences filePreferences) throws IOException {
         this.databaseContext = databaseContext;
         this.filePreferences = filePreferences;
-        this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElseGet(() -> "untitled");
+        this.libraryName = databaseContext.getDatabasePath().map(path -> path.getFileName().toString()).orElse("untitled");
         this.indexedFiles = new ConcurrentHashMap<>();
 
         indexDirectoryPath = databaseContext.getFulltextIndexPath();
@@ -172,7 +173,7 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
         Map<String, Set<BibEntry>> currentFiles = new HashMap<>();
         for (BibEntry entry : databaseContext.getEntries()) {
             for (LinkedFile linkedFile : entry.getFiles()) {
-                currentFiles.computeIfAbsent(linkedFile.getLink(), k -> new HashSet<>()).add(entry);
+                currentFiles.computeIfAbsent(linkedFile.getLink(), _ -> new HashSet<>()).add(entry);
             }
         }
 
@@ -244,8 +245,8 @@ public class DefaultLinkedFilesIndexer implements LuceneIndexer {
             TopDocs allDocs = searcher.search(query, Integer.MAX_VALUE);
             for (ScoreDoc scoreDoc : allDocs.scoreDocs) {
                 Document doc = storedFields.document(scoreDoc.doc);
-                var pathField = doc.getField(LinkedFilesConstants.PATH.toString());
-                var modifiedField = doc.getField(LinkedFilesConstants.MODIFIED.toString());
+                IndexableField pathField = doc.getField(LinkedFilesConstants.PATH.toString());
+                IndexableField modifiedField = doc.getField(LinkedFilesConstants.MODIFIED.toString());
                 if (pathField != null && modifiedField != null) {
                     linkedFiles.put(pathField.stringValue(), Long.valueOf(modifiedField.stringValue()));
                 }

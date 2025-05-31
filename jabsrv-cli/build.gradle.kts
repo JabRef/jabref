@@ -17,7 +17,13 @@ application{
     mainModule.set("org.jabref.jabsrv.cli")
 
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=com.sun.jna"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
+
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
     )
 }
 
@@ -73,7 +79,7 @@ dependencies {
     implementation("org.glassfish.grizzly:grizzly-framework:4.0.2")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     implementation("jakarta.validation:jakarta.validation-api:3.1.1")
-    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
+    implementation("org.hibernate.validator:hibernate-validator:9.0.0.Final")
 
     implementation("com.konghq:unirest-modules-gson:4.4.7")
 
@@ -108,15 +114,6 @@ tasks.test {
         exceptionFormat = TestExceptionFormat.FULL
     }
     maxParallelForks = 1
-}
-
-tasks.named<JavaExec>("run") {
-    doFirst {
-        application.applicationDefaultJvmArgs =
-            listOf(
-                "--enable-native-access=com.sun.jna"
-            )
-    }
 }
 
 tasks.named<JavaExec>("run") {

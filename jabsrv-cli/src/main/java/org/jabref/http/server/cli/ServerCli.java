@@ -1,8 +1,6 @@
 package org.jabref.http.server.cli;
 
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ import picocli.CommandLine;
 public class ServerCli implements Callable<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerCli.class);
 
-    @CommandLine.Parameters(arity = "0..*", paramLabel = "FILE")
+    @CommandLine.Parameters(arity = "0..*", paramLabel = "FILE", description = "the library files (*.bib) to serve")
     List<Path> files;
 
     @CommandLine.Option(names = {"-h", "--host"}, description = "the host name")
@@ -46,11 +44,10 @@ public class ServerCli implements Callable<Void> {
 
     @Override
     public Void call() throws InterruptedException {
+        // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
         final List<Path> filesToServe = new ArrayList<>(JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened());
 
-        // The server serves the last opened files (see org.jabref.http.server.LibraryResource.getLibraryPath)
-        // In a testing environment, this might be difficult to handle
-        // This is a quick solution. The architectural fine solution would use some http context or other @Inject_ed variables in org.jabref.http.server.LibraryResource
+        // Additionally, files can be provided as args
         if (files != null) {
             List<Path> filesToAdd = files.stream()
                                           .filter(Files::exists)
@@ -60,32 +57,11 @@ public class ServerCli implements Callable<Void> {
             filesToServe.addAll(0, filesToAdd);
         }
 
-        if (filesToServe.isEmpty()) {
-            LOGGER.info("No library available to serve, serving the demo library...");
-            Path bibPath = null;
-            URL resource = Server.class.getResource("http-server-demo.bib");
-            if (resource != null) {
-                try {
-                    bibPath = Path.of(resource.toURI());
-                } catch (URISyntaxException e) {
-                    LOGGER.error("Error while converting URL to URI", e);
-                }
-            }
-            if (bibPath == null) {
-                // Server.class.getResource("...") is null when executing with IntelliJ
-                bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
-                if (Files.notExists(bibPath)) {
-                    bibPath = null;
-                    LOGGER.debug("http-server-demo.bib not found");
-                }
-            }
-
-            if (bibPath == null) {
-                LOGGER.info("No library to serve. Please provide a library file as argument.");
-            } else {
-                LOGGER.debug("Location of demo library: {}", bibPath);
-                filesToServe.add(bibPath);
-            }
+        // If we are on Windows and checked-out JabRef at the location given in the workspace setup guideline, we can serve Chocolate.bib, too
+        // Required by rest-api.http
+        Path exampleChocolateBib = Path.of("C:\\git-repositories\\JabRef\\jablib\\src\\main\\resources\\Chocolate.bib");
+        if (Files.exists(exampleChocolateBib)) {
+            filesToServe.add(exampleChocolateBib);
         }
 
         LOGGER.debug("Libraries to serve: {}", filesToServe);
