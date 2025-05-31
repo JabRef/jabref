@@ -5,6 +5,13 @@ checkout-pr pr-id:
     sh ./gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}}
 
 [unix]
+run branch:
+    sh ./gg.cmd jbang git@jbangdev checkout {{branch}}
+    sh ./gg.cmd jbang git@jbangdev fetch origin
+    sh ./gg.cmd jbang git@jbangdev merge origin/main
+    just run-gui
+
+[unix]
 run-gui:
     sh ./gg.cmd gradle :jabgui:run
 
@@ -19,6 +26,13 @@ run-jabsrv *FLAGS:
 [windows]
 checkout-pr pr-id:
     .\gg.cmd jbang https://github.com/JabRef/jabref/blob/main/.jbang/CheckoutPR.java {{pr-id}}
+
+[windows]
+run branch:
+    .\gg.cmd jbang git@jbangdev checkout {{branch}}
+    .\gg.cmd jbang git@jbangdev fetch origin
+    .\gg.cmd jbang git@jbangdev merge origin/main
+    just run-gui
 
 [windows]
 run-gui:
