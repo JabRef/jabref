@@ -1,16 +1,19 @@
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.transport.RemoteConfig;
 import org.eclipse.jgit.transport.URIish;
+import org.kohsuke.github.GHDirection;
 import org.kohsuke.github.GHIssueState;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.PagedIterator;
 
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 
@@ -31,19 +34,55 @@ public class CheckoutPR {
         }
 
         String arg = args[0];
+        int prNumber;
+        try {
+            prNumber = Integer.parseInt(arg);
+        } catch (NumberFormatException ex) {
+            prNumber = -1;
+        }
+
         GHPullRequest pr;
-        if (arg.contains(":")) {
+        if (prNumber == -1) {
+            System.out.println("Trying to find pull request with branch " + arg);
             String[] parts = arg.split(":");
-            String contributor = parts[0];
-            String branchName = parts[1];
-            pr = repo.getPullRequests(GHIssueState.OPEN)
-                                   .stream()
-                                   .filter(p -> p.getHead().getUser().getLogin().equals(contributor))
-                                   .filter(p -> p.getHead().getRef().equals(branchName))
-                                   .findFirst()
-                                   .orElseThrow(() -> new IllegalArgumentException("Pull request not found for branch: " + branchName));
+            String contributor;
+            String branchName;
+            if (parts.length == 1) {
+                contributor = "";
+                branchName = parts[0];
+            } else {
+                contributor = parts[0];
+                branchName = parts[1];
+            }
+
+            // We need to query all pull requests to be able to handle closed and merged ones
+            PagedIterator<GHPullRequest> prIterator = repo.queryPullRequests().direction(GHDirection.DESC).state(GHIssueState.ALL).list().iterator();
+            boolean found = false;
+            pr = null;
+            while (prIterator.hasNext()) {
+                pr = prIterator.next();
+                if ((contributor.isEmpty() || pr.getHead().getUser().getLogin().equals(contributor)) &&
+                    pr.getHead().getRef().equals(branchName)) {
+                    found = true;
+                    System.out.println("Found pull request #" + pr.getNumber());
+                    break;
+                }
+            }
+            if (!found) {
+                throw new IllegalArgumentException("Pull request not found for branch: " + branchName);
+            }
         } else {
-            pr = repo.getPullRequest(Integer.parseInt(args[0]));
+            pr = repo.getPullRequest(prNumber);
+        }
+
+        if (pr.isMerged()) {
+            System.out.println("Pull request is already merged - checking out main branch...");
+            checkoutUpstreamMain();
+            return;
+        }
+
+        if (pr.getState().equals(GHIssueState.CLOSED)) {
+            System.out.println("Warning: Pull request is closed. Trying to continue nevertheless.");
         }
 
         String headRef = pr.getHead().getRef();
@@ -106,5 +145,56 @@ public class CheckoutPR {
         }
 
         System.out.println("Checked out PR #" + pr.getNumber() + " (" + pr.getTitle() + ") to branch '" + localBranchName + "'.");
+    }
+
+    private static void checkoutUpstreamMain() throws Exception {
+        File repoDir = new File(".");
+        Repository repository = new FileRepositoryBuilder()
+                .setGitDir(new File(repoDir, ".git"))
+                .readEnvironment()
+                .findGitDir()
+                .build();
+
+        try (Git git = new Git(repository)) {
+            final String upstreamName = "upstream";
+            final String jabrefRepoUrl = "https://github.com/JabRef/jabref.git";
+
+            // Check if a remote pointing to JabRef/jabref already exists
+            List<RemoteConfig> remotes = git.remoteList().call();
+            Optional<RemoteConfig> jabrefRemote = remotes.stream()
+                // We use "contains", because there could be SSH remote URLs
+                .filter(r -> r.getURIs().stream().anyMatch(uri -> uri.toString().contains("JabRef/jabref")))
+                .findFirst();
+
+            String remoteToUse;
+            if (jabrefRemote.isPresent()) {
+                remoteToUse = jabrefRemote.get().getName();
+                System.out.println("Using existing remote: " + remoteToUse);
+            } else {
+                System.out.println("Adding remote 'upstream' pointing to " + jabrefRepoUrl);
+                git.remoteAdd()
+                    .setName(upstreamName)
+                    .setUri(new URIish(jabrefRepoUrl))
+                    .call();
+                remoteToUse = upstreamName;
+            }
+
+            // If current branch is not "main", checkout "main"
+            String currentBranch = repository.getBranch();
+            if (!"main".equals(currentBranch)) {
+                System.out.println("Checking out 'main' branch");
+                git.checkout().setName("main").call();
+            }
+
+            // Fetch from the selected remote
+            System.out.println("Fetching from " + remoteToUse);
+            String[] jGitArgsFetch = {"fetch", remoteToUse};
+            org.eclipse.jgit.pgm.Main.main(jGitArgsFetch);
+
+            // Merge upstream/main
+            System.out.println("Merging " + remoteToUse + "/main into main");
+            String[] jGitArgsMerge = {"merge", remoteToUse + "/main"};
+            org.eclipse.jgit.pgm.Main.main(jGitArgsMerge);
+        }
     }
 }

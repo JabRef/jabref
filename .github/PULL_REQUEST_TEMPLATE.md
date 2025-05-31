@@ -1,11 +1,11 @@
-<!-- YOU HAVE TO MODIFY THE TEXT BELOW TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
+Closes #_____
 
-<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD -->
-<!-- Example: Closes (link) OR Closes #12345 -->
+Describe the changes you have made here: what, where, why, ... in a short and crisp way.
 
-Closes _____
-Describe the changes you have made here: what, where, why, ...
 If your work is not yet complete, please open a draft pull request. In that case, outline your intended next steps. Do you need feedback? Will you continue in parallel? ...
+
+<!-- YOU HAVE TO MODIFY THE TEXT ABOVE TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
+<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD. Example: Closes (link) OR Closes #12345 -->
 
 ### Mandatory checks
 
