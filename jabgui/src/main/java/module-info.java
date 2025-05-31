@@ -129,10 +129,10 @@ open module org.jabref {
     // requires org.apache.xmpbox;
     // requires com.ibm.icu;
 
-    // requires flexmark;
+    requires flexmark;
     requires flexmark.html2md.converter;
-    // requires flexmark.util.ast;
-    // requires flexmark.util.data;
+    requires flexmark.util.data;
+    requires flexmark.util.ast;
 
     // requires com.h2database.mvstore;
 
@@ -189,8 +189,5 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires flexmark;
-    requires flexmark.util.data;
-    requires flexmark.util.ast;
     // endregion
 }
