@@ -96,13 +96,14 @@ extraJavaModuleInfo {
     // skipLocalJars = true
     deriveAutomaticModuleNamesFromFileNames = true
 
-    /*
     module("org.openjfx:javafx-base", "javafx.base") {
         overrideModuleName()
         patchRealModule()
+        // jabgui requires at least "javafx.collections"
         exportAllPackages()
     }
 
+/*
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         overrideModuleName()
         patchRealModule()
