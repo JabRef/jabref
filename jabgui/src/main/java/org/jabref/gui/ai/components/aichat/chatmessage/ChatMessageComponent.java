@@ -96,7 +96,7 @@ public class ChatMessageComponent extends HBox {
             }
 
             default ->
-                LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.get().type().name());
+                    LOGGER.error("ChatMessageComponent supports only user, AI, or error messages, but other type was passed: {}", chatMessage.get().type().name());
         }
     }
 
@@ -107,7 +107,7 @@ public class ChatMessageComponent extends HBox {
         markdownContentPane.getChildren().add(markdownTextFlow);
         markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
         markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
-        NumberBinding maxUsableWidth = Bindings.createDoubleBinding(() -> getScene() == null ? 600 : getScene().getWidth() - 20, sceneProperty(), getScene() == null ? widthProperty() : getScene().widthProperty());
+        NumberBinding maxUsableWidth = Bindings.createDoubleBinding(() -> getScene().getWidth() - 20, sceneProperty(), getScene().widthProperty());
         markdownTextFlow.maxWidthProperty().bind(maxUsableWidth);
         wrapperHBox.maxWidthProperty().bind(maxUsableWidth);
         setMaxWidth(Double.MAX_VALUE);
