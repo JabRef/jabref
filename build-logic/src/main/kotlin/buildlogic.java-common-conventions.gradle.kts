@@ -112,6 +112,7 @@ extraJavaModuleInfo {
         exportAllPackages()
 
         requiresTransitive("javafx.base")
+        requiresTransitive("javafx.graphics")
         requiresTransitive("java.desktop")
     }
 
