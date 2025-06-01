@@ -46,7 +46,8 @@ run-jabkit *FLAGS:
 run-jabsrv *FLAGS:
     .\gg.cmd gradle :jabsrv-cli:run --args="{{FLAGS}}"
 
-run-main: run main
+run-main:
+    just run main
 
 run-pr pr-id:
     just checkout-pr {{pr-id}}
