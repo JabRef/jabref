@@ -333,29 +333,28 @@ tasks.register("downloadLtwaFile") {
     description = "Downloads the LTWA file for journal abbreviations"
 
     val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
-    val ltwaDir = file("build/resources/main/journals")
-    val ltwaCsvFile = ltwaDir.resolve("ltwa_20210702.csv")
-
-    doLast {
-        if (!ltwaCsvFile.exists()) {
-            mkdir(ltwaDir)
-            ant.withGroovyBuilder {
-                "get"(
-                    mapOf(
-                        "src" to ltwaUrl,
-                        "dest" to ltwaCsvFile,
-                        "verbose" to true
-                    )
-                )
-            }
-            logger.lifecycle("Downloaded LTWA file to $ltwaCsvFile")
-        } else {
-            logger.lifecycle("LTWA file already exists at $ltwaCsvFile")
-        }
-    }
+    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
+    val ltwaCsvFile = ltwaDir.map { it.file("ltwa_20210702.csv") }
 
     onlyIf {
-        !ltwaCsvFile.exists()
+        !ltwaCsvFile.get().asFile.exists()
+    }
+
+    doLast {
+        val dir = ltwaDir.get().asFile
+        val file = ltwaCsvFile.get().asFile
+
+        if (!file.exists()) {
+            dir.mkdirs()
+            ant.withGroovyBuilder {
+                "get"(
+                    mapOf("src" to ltwaUrl, "dest" to file, "verbose" to true)
+                )
+            }
+            logger.lifecycle("Downloaded LTWA file to $file")
+        } else {
+            logger.lifecycle("LTWA file already exists at $file")
+        }
     }
 }
 
