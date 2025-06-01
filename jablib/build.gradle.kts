@@ -30,7 +30,6 @@ if (project.findProperty("tagbuild")?.toString() != "true") {
 }
 
 val javafxVersion = "24.0.1"
-val javafxPlatform: String by project.extra
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
