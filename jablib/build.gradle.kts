@@ -15,8 +15,6 @@ plugins {
     id("antlr")
     id("com.github.edeandrea.xjc-generation") version "1.6"
 
-    id("org.openjfx.javafxplugin") version("0.1.0")
-
     id("me.champeau.jmh") version "0.7.3"
 
     id("com.vanniktech.maven.publish") version "0.32.0"
@@ -31,8 +29,21 @@ if (project.findProperty("tagbuild")?.toString() != "true") {
     version += "-SNAPSHOT"
 }
 
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
+
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
+
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+
+    // Required by afterburner.fx
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    implementation("org.openjfx:javafx-graphics:$javafxVersion")
+
+    // Fix "error: module not found: javafx.controls" during compilation
+    // implementation("org.openjfx:javafx-controls:$javafxVersion")
 
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
@@ -236,21 +247,6 @@ dependencies {
     "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
     "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }
-
-javafx {
-    version = "24"
-    modules = listOf(
-        // properties
-        "javafx.base",
-        // javafx.scene.paint.Color;
-        "javafx.graphics",
-
-        // because of afterburner.fx
-        "javafx.controls",
-        "javafx.fxml"
-    )
-}
-
 /*
 jacoco {
     toolVersion = "0.8.13"
@@ -405,28 +401,17 @@ tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
 }
 
-/*
-tasks.named<JavaCompile>("compileJava") {
-    extensions.configure<org.javamodularity.moduleplugin.extensions.CompileModuleOptions>("moduleOptions") {
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal api
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
-            )
-        )
+tasks.javadoc {
+    (options as StandardJavadocDocletOptions).apply {
+        encoding = "UTF-8"
+        // version = false
+        // author = false
     }
 }
-*/
 
 tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
-    }
-
-    extensions.configure<org.javamodularity.moduleplugin.extensions.TestModuleOptions>("moduleOptions") {
-        // TODO: Remove this as soon as ArchUnit is modularized
-        runOnClasspath = true
     }
 }
 
@@ -543,4 +528,16 @@ tasks.named<Jar>("sourcesJar") {
 
 tasks.withType<GenerateModuleMetadata> {
     suppressedValidationErrors.add("enforced-platform")
+}
+
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("io.github.classgraph")
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.junit.jupiter.params")
+    requires.add("org.jabref.testsupport")
+    requires.add("org.mockito")
+
+    // --add-reads
+    //reads.add("org.jabref.jablib=io.github.classgraph")
+    //reads.add("org.jabref.jablib=org.jabref.testsupport")
 }
