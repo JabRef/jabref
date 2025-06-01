@@ -294,9 +294,14 @@ tasks.register<JavaExec>("generateJournalListMV") {
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.JournalListMvGenerator")
-    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
+
+    javaLauncher.convention(javaToolchains.launcherFor {
+        languageVersion.set(java.toolchain.languageVersion)
+    })
+
+    val outputFile = layout.buildDirectory.file("resources/main/journals/journal-list.mv")
     onlyIf {
-        !file("build/resources/main/journals/journal-list.mv").exists()
+        !outputFile.get().asFile.exists()
     }
 }
 
@@ -364,14 +369,16 @@ tasks.register<JavaExec>("generateLtwaListMV") {
 
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-    javaLauncher.set(javaToolchains.launcherFor {
+
+    javaLauncher.convention(javaToolchains.launcherFor {
         languageVersion.set(java.toolchain.languageVersion)
     })
 
     dependsOn("downloadLtwaFile")
 
+    val outputFile = layout.buildDirectory.file("resources/main/journals/ltwa-list.mv")
     onlyIf {
-        !file("build/resources/main/journals/ltwa-list.mv").exists()
+        !outputFile.get().asFile.exists()
     }
 }
 
