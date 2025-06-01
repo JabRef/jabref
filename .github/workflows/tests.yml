@@ -216,6 +216,7 @@ jobs:
 
   tests-windows:
     name: Unit tests (Windows) – ${{ matrix.module }}
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     strategy:
       matrix:
