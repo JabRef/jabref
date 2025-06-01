@@ -13,7 +13,7 @@ plugins {
     id("idea")
 
     id("antlr")
-    id("com.github.edeandrea.xjc-generation") version "1.6"
+    id("com.github.bjornvester.xjc") version "1.8.1"
 
     id("me.champeau.jmh") version "0.7.3"
 
@@ -22,7 +22,6 @@ plugins {
 
 val pdfbox = "3.0.5"
 val luceneVersion = "10.2.1"
-val jaxbVersion by extra { "4.0.5" }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
 if (project.findProperty("tagbuild")?.toString() != "true") {
@@ -242,9 +241,6 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
-
-    "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
-    "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }
 /*
 jacoco {
@@ -257,16 +253,11 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-xjcGeneration {
-    // plugin: https://github.com/edeandrea/xjc-generation-gradle-plugin#xjc-generation-gradle-plugin
-    // hint by https://stackoverflow.com/questions/62776832/how-to-generate-java-classes-from-xsd-using-java-11-and-gradle#comment130555840_62776832
-    defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
-    schemas {
-        create("citavi") {
-            schemaFile = "citavi/citavi.xsd"
-            javaPackageName = "org.jabref.logic.importer.fileformat.citavi"
-        }
-    }
+xjc {
+    xsdDir.set(layout.projectDirectory.dir("src/main/xsd"))
+    xjcVersion.set("4.0.5")
+    defaultPackage.set("org.jabref.logic.importer.fileformat.citavi")
+    options.set(listOf("encoding=UTF-8"))
 }
 
 tasks.processResources {
@@ -521,7 +512,6 @@ mavenPublishing {
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
-        tasks.named("schemaGen_org-jabref-logic-importer-fileformat-citavi")
     )
 }
 
