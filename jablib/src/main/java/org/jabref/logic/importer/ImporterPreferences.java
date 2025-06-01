@@ -1,6 +1,7 @@
 package org.jabref.logic.importer;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class ImporterPreferences {
     private final BooleanProperty persistCustomKeys;
     private final ObservableList<String> catalogs;
     private final ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParser;
+    private final Map<String, String> searchEngineUrlTemplates;
 
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
@@ -39,8 +41,8 @@ public class ImporterPreferences {
                                Map<String, String> defaultApiKeys,
                                boolean persistCustomKeys,
                                List<String> catalogs,
-                               PlainCitationParserChoice defaultPlainCitationParser
-    ) {
+                               PlainCitationParserChoice defaultPlainCitationParser,
+                               Map<String, String> searchEngineUrlTemplates) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
         this.importWorkingDirectory = new SimpleObjectProperty<>(importWorkingDirectory);
@@ -51,6 +53,7 @@ public class ImporterPreferences {
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
         this.catalogs = FXCollections.observableArrayList(catalogs);
         this.defaultPlainCitationParser = new SimpleObjectProperty<>(defaultPlainCitationParser);
+        this.searchEngineUrlTemplates = new HashMap<>(searchEngineUrlTemplates);
     }
 
     public boolean areImporterEnabled() {
@@ -145,7 +148,7 @@ public class ImporterPreferences {
     }
 
     public ObservableList<String> getCatalogs() {
-          return catalogs;
+        return catalogs;
     }
 
     public PlainCitationParserChoice getDefaultPlainCitationParser() {
@@ -158,5 +161,14 @@ public class ImporterPreferences {
 
     public void setDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
         this.defaultPlainCitationParser.set(defaultPlainCitationParser);
+    }
+
+    public Map<String, String> getSearchEngineUrlTemplates() {
+        return searchEngineUrlTemplates;
+    }
+
+    public void setSearchEngineUrlTemplates(Map<String, String> templates) {
+        searchEngineUrlTemplates.clear();
+        searchEngineUrlTemplates.putAll(templates);
     }
 }
