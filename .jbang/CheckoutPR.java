@@ -147,6 +147,7 @@ public class CheckoutPR {
         }
 
         System.out.println("Checked out PR #" + pr.getNumber() + " (" + pr.getTitle() + ") to branch '" + localBranchName + "'.");
+        System.out.println("Checked out commit " + pr.getHead().getSha() + "'.");
     }
 
     private static void checkoutUpstreamMain() throws Exception {
