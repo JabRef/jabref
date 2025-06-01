@@ -1,10 +1,8 @@
 package org.jabref.logic.importer.plaincitation;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -15,7 +13,6 @@ import org.jabref.model.entry.BibEntry;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.model.chat.ChatModel;
-import dev.langchain4j.model.input.PromptTemplate;
 
 public class LlmPlainCitationParser implements PlainCitationParser {
     private final AiTemplatesService aiTemplatesService;

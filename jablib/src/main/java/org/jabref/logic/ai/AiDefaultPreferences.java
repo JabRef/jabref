@@ -8,8 +8,6 @@ import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 
-import scala.runtime.AbstractFunction1$mcII$sp;
-
 public class AiDefaultPreferences {
     public enum PredefinedChatModel {
         GPT_4O_MINI(AiProvider.OPEN_AI, "gpt-4o-mini", 128000),
