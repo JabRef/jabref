@@ -109,7 +109,7 @@ recipeList:
   - org.openrewrite.java.migrate.lang.StringFormatted
 
   - org.openrewrite.java.RemoveObjectsIsNull
-  - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
+ # - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 
   - org.openrewrite.java.testing.junit5.AssertTrueInstanceofToAssertInstanceOf
   - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
