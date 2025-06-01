@@ -1,11 +1,16 @@
 plugins {
     id("buildlogic.java-common-conventions")
-
-    id("org.openjfx.javafxplugin") version("0.1.0")
 }
+
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
 
 dependencies {
     implementation(project(":jablib"))
+
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")
@@ -24,10 +29,4 @@ dependencies {
     implementation("net.bytebuddy:byte-buddy:1.17.5")
 
     implementation("org.jspecify:jspecify:1.0.0")
-}
-
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
 }

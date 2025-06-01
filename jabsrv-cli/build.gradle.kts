@@ -5,8 +5,6 @@ plugins {
 
     application
 
-    id("org.openjfx.javafxplugin") version("0.1.0")
-
     id("org.beryx.jlink") version "3.1.1"
 
     id("org.kordamp.gradle.jdeps") version "0.20.0"
@@ -17,13 +15,25 @@ application{
     mainModule.set("org.jabref.jabsrv.cli")
 
     applicationDefaultJvmArgs = listOf(
-        "--enable-native-access=com.sun.jna"
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
+
+        "--enable-native-access=com.sun.jna,org.apache.lucene.core"
     )
 }
+
+val javafxVersion = "24.0.1"
 
 dependencies {
     implementation(project(":jablib"))
     implementation(project(":jabsrv"))
+
+    implementation("org.openjfx:javafx-controls:${javafxVersion}")
+    implementation("org.openjfx:javafx-fxml:${javafxVersion}")
+    implementation ("org.openjfx:javafx-graphics:${javafxVersion}")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:slf4j-tinylog:2.7.0")
@@ -95,12 +105,6 @@ dependencies {
     // endregion
 }
 
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
-}
-
 tasks.test {
     testLogging {
         // set options for log level LIFECYCLE
@@ -108,15 +112,6 @@ tasks.test {
         exceptionFormat = TestExceptionFormat.FULL
     }
     maxParallelForks = 1
-}
-
-tasks.named<JavaExec>("run") {
-    doFirst {
-        application.applicationDefaultJvmArgs =
-            listOf(
-                "--enable-native-access=com.sun.jna"
-            )
-    }
 }
 
 tasks.named<JavaExec>("run") {

@@ -3,9 +3,6 @@ plugins {
 
     application
 
-    // afterburner.fx
-    id("org.openjfx.javafxplugin") version("0.1.0")
-
     id("org.beryx.jlink") version "3.1.1"
 }
 
@@ -14,6 +11,8 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 
 val luceneVersion = "10.2.1"
 
+val javafxVersion = "24.0.1"
+
 dependencies {
     implementation(project(":jablib"))
 
@@ -21,6 +20,11 @@ dependencies {
     implementation("org.jabref:afterburner.fx:2.0.0") {
         exclude( group = "org.openjfx")
     }
+
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    // implementation("org.openjfx:javafx-graphics:$javafxVersion")
 
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
@@ -60,17 +64,17 @@ dependencies {
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 }
 
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.jabref.testsupport")
+    requires.add("org.mockito")
+}
+
 /*
 jacoco {
     toolVersion = "0.8.13"
 }
 */
-
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
-}
 
 application {
     mainClass.set("org.jabref.JabKit")
@@ -78,6 +82,13 @@ application {
 
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        // Default garbage collector is sufficient for CLI APP
+        // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseStringDeduplication",
+
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
 }
@@ -97,7 +108,8 @@ jlink {
         "zip-6",
         "--no-header-files",
         "--no-man-pages",
-        "--bind-services"
+        "--bind-services",
+        "--add-modules", "jdk.incubator.vector"
     )
 
     launcher {
@@ -106,7 +118,6 @@ jlink {
 
     // TODO: Remove as soon as dependencies are fixed (upstream)
     forceMerge(
-        "controlsfx",
         "bcprov",
         "jaxb",
         "istack",
