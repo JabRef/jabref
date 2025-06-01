@@ -24,6 +24,8 @@ import picocli.CommandLine.ParentCommand;
 public class Pseudonymize implements Runnable {
     private final static Logger LOGGER = LoggerFactory.getLogger(Pseudonymize.class);
     private static final String PSEUDO_SUFFIX = ".pseudo";
+    private static final String BIB_EXTENSION = ".bib";
+    private static final String CSV_EXTENSION = ".csv";
 
     @ParentCommand
     private ArgumentProcessor argumentProcessor;
@@ -41,16 +43,15 @@ public class Pseudonymize implements Runnable {
     @Option(names = {"--key"}, description = "Output pseudo-keys file")
     private String keyFile;
 
-    @Option(names = {"-f", "--force"}, description = "Overwrite output file(s) if it exist")
+    @Option(names = {"-f", "--force"}, description = "Overwrite output file(s) if any exist(s)")
     private boolean force;
 
     @Override
     public void run() {
+        Path inputPath = Path.of(inputFile);
         String fileName = FileUtil.getBaseName(inputFile);
-        String pseudoBib = fileName + PSEUDO_SUFFIX + ".bib";
-        String pseudoKeys = fileName + PSEUDO_SUFFIX + ".csv";
-        Path pseudoBibPath = Path.of(outputFile != null ? outputFile : pseudoBib);
-        Path pseudoKeyPath = Path.of(keyFile != null ? keyFile : pseudoKeys);
+        Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
+        Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
 
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
                 inputFile,
@@ -73,11 +74,8 @@ public class Pseudonymize implements Runnable {
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
 
-        if (Files.exists(pseudoBibPath) && !force) {
-            System.out.println(Localization.lang("File '%0' already exists. Use -f or --force to overwrite.", pseudoBib));
+        if (!fileOverwriteCheck(pseudoBibPath)) {
             return;
-        } else if (Files.exists(pseudoBibPath) && force) {
-            System.out.println(Localization.lang("File '%0' already exists. Overwriting.", pseudoBib));
         }
 
         ArgumentProcessor.saveDatabaseContext(
@@ -86,11 +84,8 @@ public class Pseudonymize implements Runnable {
                 result.bibDatabaseContext(),
                 pseudoBibPath);
 
-        if (Files.exists(pseudoKeyPath) && !force) {
-            System.out.println(Localization.lang("File '%0' already exists. Use -f or --force to overwrite.", pseudoKeys));
+        if (!fileOverwriteCheck(pseudoKeyPath)) {
             return;
-        } else if (Files.exists(pseudoKeyPath) && force) {
-            System.out.println(Localization.lang("File '%0' already exists. Overwriting.", pseudoKeys));
         }
 
         try {
@@ -99,5 +94,25 @@ public class Pseudonymize implements Runnable {
         } catch (IOException ex) {
             LOGGER.error("Unable to save keys for pseudonymized library", ex);
         }
+    }
+
+    private Path resolveOutputPath(String customPath, Path inputPath, String defaultFileName) {
+        return customPath != null ? Path.of(customPath) : inputPath.getParent().resolve(defaultFileName);
+    }
+
+    private boolean fileOverwriteCheck(Path filePath) {
+        if (!Files.exists(filePath)) {
+            return true;
+        }
+
+        String fileName = filePath.getFileName().toString();
+
+        if (!force) {
+            System.out.println(Localization.lang("File '%0' already exists. Use -f or --force to overwrite.", fileName));
+            return false;
+        }
+
+        System.out.println(Localization.lang("File '%0' already exists. Overwriting.", fileName));
+        return true;
     }
 }
