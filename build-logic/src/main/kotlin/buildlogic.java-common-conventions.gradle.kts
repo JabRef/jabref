@@ -107,7 +107,6 @@ extraJavaModuleInfo {
 
     // required for testing of jablib
     module("org.openjfx:javafx-fxml", "javafx.fxml") {
-        overrideModuleName()
         patchRealModule()
         exportAllPackages()
 
@@ -118,12 +117,12 @@ extraJavaModuleInfo {
 
     // required for testing
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
-        overrideModuleName()
         patchRealModule()
         exportAllPackages()
 
         requiresTransitive("javafx.base")
         requiresTransitive("java.desktop")
+        requiresTransitive("jdk.unsupported")
     }
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
