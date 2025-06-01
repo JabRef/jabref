@@ -75,6 +75,8 @@ public class CheckoutPR {
             pr = repo.getPullRequest(prNumber);
         }
 
+        System.out.println("Determined PR URL is " + pr.getUrl());
+
         if (pr.isMerged()) {
             System.out.println("Pull request is already merged - checking out main branch...");
             checkoutUpstreamMain();
