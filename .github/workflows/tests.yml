@@ -274,7 +274,7 @@ jobs:
           DBMS: "postgresql"
 
   jbang:
-    name: JBang.md
+    name: JBang
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
