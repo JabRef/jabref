@@ -216,6 +216,7 @@ jobs:
 
   tests-windows:
     name: Unit tests (Windows) – ${{ matrix.module }}
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     strategy:
       matrix:
@@ -283,9 +284,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: Install JBang
-        run: |
-          curl -Ls https://sh.jbang.dev | bash -s - app setup
-          echo "$HOME/.jbang/bin" >> $GITHUB_PATH
+        uses: jbangdev/setup-jbang@main
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build .jbang/JabKitLauncher.java
