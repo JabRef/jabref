@@ -19,13 +19,10 @@ import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
 
-    public record Result(
-            Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
+    public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
     }
 
-    public record EntryTypeResult(
-            Collection<Field> fields,
-            SequencedCollection<BibEntry> sortedEntries) {
+    public record EntryTypeResult(Collection<Field> fields, SequencedCollection<BibEntry> sortedEntries) {
     }
 
     /**
