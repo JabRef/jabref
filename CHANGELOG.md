@@ -25,7 +25,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for import of a Refer/BibIX file format. [#13069](https://github.com/JabRef/jabref/issues/13069)
 - We added functionality to focus running instance when trying to start a second instance. [#13129](https://github.com/JabRef/jabref/issues/13129)
 
-
 ### Changed
 
 - We moved some functionality from the graphical application `jabref` with new command verbs `generate-citation-keys`, `check-consistency`, `fetch`, `search`, `convert`, `generate-bib-from-aux`, `preferences` and `pdf` to the new toolkit. [#13012](https://github.com/JabRef/jabref/pull/13012) [#110](https://github.com/JabRef/jabref/issues/110)
