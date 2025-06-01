@@ -643,6 +643,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
+        if (uiCommands.stream().anyMatch(UiCommand.Focus.class::isInstance)) {
+            mainStage.toFront();
+            return;
+        }
         viewModel.handleUiCommands(uiCommands);
     }
 

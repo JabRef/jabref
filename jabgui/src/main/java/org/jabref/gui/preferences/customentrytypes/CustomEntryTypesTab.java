@@ -106,7 +106,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         entryTypeActionsColumn.setReorderable(false);
         entryTypeActionsColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().entryType().get().getType().getDisplayName()));
         new ValueTableCellFactory<EntryTypeViewModel, String>()
-                .withGraphic((type, name) -> {
+                .withGraphic((type, _) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
                         return IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode();
                     } else {
@@ -120,11 +120,11 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
                         return null;
                     }
                 })
-                .withOnMouseClickedEvent((type, name) -> {
+                .withOnMouseClickedEvent((type, _) -> {
                     if (type instanceof CustomEntryTypeViewModel) {
-                        return evt -> viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());
+                        return _ -> viewModel.removeEntryType(entryTypesTable.getSelectionModel().getSelectedItem());
                     } else {
-                        return evt -> {
+                        return _ -> {
                         };
                     }
                 })
@@ -135,7 +135,7 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
 
         EasyBind.subscribe(viewModel.selectedEntryTypeProperty(), type -> {
             if (type != null) {
-                var items = type.fields();
+                ObservableList<FieldViewModel> items = type.fields();
                 fields.setItems(items);
             } else {
                 fields.setItems(null);
@@ -185,9 +185,9 @@ public class CustomEntryTypesTab extends AbstractPreferenceTabView<CustomEntryTy
         fieldTypeActionColumn.setCellValueFactory(cellData -> cellData.getValue().displayNameProperty());
 
         new ValueTableCellFactory<FieldViewModel, String>()
-                .withGraphic(item -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(name -> Localization.lang("Remove field %0 from currently selected entry type", name))
-                .withOnMouseClickedEvent(item -> evt -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
+                .withOnMouseClickedEvent(_ -> _ -> viewModel.removeField(fields.getSelectionModel().getSelectedItem()))
                 .install(fieldTypeActionColumn);
 
         new ViewModelTableRowFactory<FieldViewModel>()
