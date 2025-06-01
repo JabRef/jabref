@@ -131,8 +131,8 @@ open module org.jabref {
 
     requires flexmark;
     requires flexmark.html2md.converter;
-    requires flexmark.util.data;
     requires flexmark.util.ast;
+    requires flexmark.util.data;
 
     // requires com.h2database.mvstore;
 
@@ -189,5 +189,6 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires flexmark.ext.tables;
     // endregion
 }

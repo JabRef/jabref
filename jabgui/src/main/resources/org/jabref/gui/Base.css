@@ -2523,37 +2523,43 @@ journalInfo .grid-cell-b {
 /* Markdown styles */
 .markdown-textflow {
     -fx-line-spacing: 2;
-    -fx-text-overrun: CLIP;
+    -fx-text-alignment: left;
 }
 
 .markdown-h1 {
     -fx-font-size: 2em;
     -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
 }
 
 .markdown-h2 {
     -fx-font-size: 1.5em;
     -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
 }
 
 .markdown-h3 {
     -fx-font-size: 1.25em;
     -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
 }
 
 .markdown-h4 {
     -fx-font-size: 1.1em;
     -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
 }
 
 .markdown-h5 {
     -fx-font-size: 1em;
     -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
 }
 
 .markdown-h6 {
     -fx-font-size: 0.875em;
     -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
 }
 
 .markdown-bold {
@@ -2566,11 +2572,30 @@ journalInfo .grid-cell-b {
 
 .markdown-code {
     -fx-font-family: monospace;
-    -fx-fill: #2e3440;
-    -fx-background-color: #eceff4;
+    -fx-fill: -jr-theme;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
 }
 
-.markdown-list-bullet,
+.markdown-code-block {
+    -fx-font-family: monospace;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-list-bullet {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
 .markdown-list-number {
-    -fx-fill: #5e81ac;
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-blockquote-marker {
+    -fx-fill: transparent;
+}
+
+.markdown-blockquote {
+    -fx-fill: -fx-mid-text-color;
+    -fx-font-style: italic;
 }

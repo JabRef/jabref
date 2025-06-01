@@ -32,18 +32,23 @@ public class ChatMessageComponent extends HBox {
     private final ObjectProperty<ChatMessage> chatMessage = new SimpleObjectProperty<>();
     private final ObjectProperty<Consumer<ChatMessageComponent>> onDelete = new SimpleObjectProperty<>();
 
-    @FXML private HBox wrapperHBox;
-    @FXML private VBox vBox;
-    @FXML private Label sourceLabel;
-    @FXML private Pane markdownContentPane;
-    @FXML private VBox buttonsVBox;
+    @FXML
+    private HBox wrapperHBox;
+    @FXML
+    private VBox vBox;
+    @FXML
+    private Label sourceLabel;
+    @FXML
+    private Pane markdownContentPane;
+    @FXML
+    private VBox buttonsVBox;
 
     private MarkdownTextFlow markdownTextFlow;
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         chatMessage.addListener((_, _, newValue) -> {
             if (newValue != null) {
@@ -107,9 +112,14 @@ public class ChatMessageComponent extends HBox {
         markdownContentPane.getChildren().add(markdownTextFlow);
         markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
         markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
-        NumberBinding maxUsableWidth = Bindings.createDoubleBinding(() -> getScene().getWidth() - 20, sceneProperty(), getScene().widthProperty());
-        markdownTextFlow.maxWidthProperty().bind(maxUsableWidth);
-        wrapperHBox.maxWidthProperty().bind(maxUsableWidth);
+        this.sceneProperty().addListener((_, _, scene) -> {
+            if (scene == null) {
+                return;
+            }
+            NumberBinding maxUsableWidth = Bindings.createDoubleBinding(() -> getScene().getWidth() - 20, sceneProperty(), getScene().widthProperty());
+            markdownTextFlow.maxWidthProperty().bind(maxUsableWidth);
+            wrapperHBox.maxWidthProperty().bind(maxUsableWidth);
+        });
         setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(this, Priority.ALWAYS);
     }

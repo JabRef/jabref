@@ -22,9 +22,9 @@ import com.airhacks.afterburner.injection.Injector;
  * A TextFlow that allows text selection and copying.
  */
 public class SelectableTextFlow extends TextFlow {
-    private Optional<HitInfo> startHit = Optional.empty();
-    private Optional<HitInfo> endHit = Optional.empty();
-    private Optional<Path> selectionPath = Optional.empty();
+    protected Optional<HitInfo> startHit = Optional.empty();
+    protected Optional<HitInfo> endHit = Optional.empty();
+    protected Optional<Path> selectionPath = Optional.empty();
 
     private final Pane parentPane;
 
