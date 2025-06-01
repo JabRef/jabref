@@ -260,32 +260,82 @@ xjc {
     options.set(listOf("encoding=UTF-8"))
 }
 
-tasks.processResources {
+tasks.register("extractMaintainers") {
+    val inputFile = layout.projectDirectory.file("../MAINTAINERS")
+    val outputFile = layout.buildDirectory.file("tmp/maintainers.txt")
+
+    inputs.file(inputFile)
+    outputs.file(outputFile)
+
+    doLast {
+        val maintainers = inputFile.asFile
+            .readLines()
+            .filterNot { it.trim().startsWith("#") }
+            .joinToString(", ")
+
+        outputFile.get().asFile.apply {
+            parentFile.mkdirs()
+            writeText(maintainers)
+        }
+    }
+}
+
+val maintainersProvider = layout.buildDirectory
+    .file("tmp/maintainers.txt")
+    .map { it.asFile.readText() }
+
+val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.0")
+
+val year = Calendar.getInstance().get(Calendar.YEAR).toString()
+
+
+val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
+val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
+val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDataSystemAPIKey").orElse("")
+val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
+val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
+val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
+val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+
+tasks.named<ProcessResources>("processResources") {
+    dependsOn("extractMaintainers")
     filteringCharset = "UTF-8"
+
+    inputs.property("version", versionProvider)
+    inputs.property("year", year)
+    inputs.property("maintainers", maintainersProvider)
+    inputs.property("azureInstrumentationKey", azureInstrumentationKey)
+    inputs.property("springerNatureAPIKey", springerNatureAPIKey)
+    inputs.property("astrophysicsDataSystemAPIKey", astrophysicsDataSystemAPIKey)
+    inputs.property("ieeeAPIKey", ieeeAPIKey)
+    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
+    inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
+    inputs.property("semanticScholarApiKey", semanticScholarApiKey)
 
     filesMatching("build.properties") {
         expand(
             mapOf(
-                "version" to (project.findProperty("projVersionInfo") ?: "100.0.0"),
-                "year" to Calendar.getInstance().get(Calendar.YEAR).toString(),
-                "maintainers" to file("../MAINTAINERS")
-                    .readLines()
-                    .filterNot { it.startsWith("#") }
-                    .joinToString(", "),
-                "azureInstrumentationKey" to (System.getenv("AzureInstrumentationKey") ?: ""),
-                "springerNatureAPIKey" to (System.getenv("SpringerNatureAPIKey") ?: ""),
-                "astrophysicsDataSystemAPIKey" to (System.getenv("AstrophysicsDataSystemAPIKey") ?: ""),
-                "ieeeAPIKey" to (System.getenv("IEEEAPIKey") ?: ""),
-                "scienceDirectApiKey" to (System.getenv("SCIENCEDIRECTAPIKEY") ?: ""),
-                "biodiversityHeritageApiKey" to (System.getenv("BiodiversityHeritageApiKey") ?: ""),
-                "semanticScholarApiKey" to (System.getenv("SemanticScholarApiKey") ?: "")
+                "version" to inputs.properties["version"],
+                "year" to inputs.properties["year"],
+                "maintainers" to inputs.properties["maintainers"],
+                "azureInstrumentationKey" to inputs.properties["azureInstrumentationKey"],
+                "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
+                "astrophysicsDataSystemAPIKey" to inputs.properties["astrophysicsDataSystemAPIKey"],
+                "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
+                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
+                "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
+                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"]
             )
         )
-        filteringCharset = "UTF-8"
     }
 
-    filesMatching(listOf("resources/resource/ods/meta.xml", "resources/resource/openoffice/meta.xml")) {
-        expand(mapOf("version" to project.version))
+    filesMatching(
+        listOf(
+            "resources/resource/ods/meta.xml",
+            "resources/resource/openoffice/meta.xml"
+        )
+    ) {
+        expand(mapOf("version" to inputs.properties["version"]))
     }
 }
 
