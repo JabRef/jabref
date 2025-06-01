@@ -63,6 +63,22 @@ public class RemoteClient {
         }
     }
 
+    /**
+     * Attempt to send a focus command to already running JabRef instance.
+     *
+     * @return true if successful, false otherwise.
+     */
+    public boolean sendFocus() {
+        try (Protocol protocol = openNewConnection()) {
+            protocol.sendMessage(RemoteMessage.FOCUS);
+            Pair<RemoteMessage, Object> response = protocol.receiveMessage();
+            return response.getKey() == RemoteMessage.OK;
+        } catch (IOException e) {
+            LOGGER.debug("Could not send focus command to the server at port {}", port, e);
+            return false;
+        }
+    }
+
     private Protocol openNewConnection() throws IOException {
         Socket socket = new Socket();
         socket.setSoTimeout(TIMEOUT);

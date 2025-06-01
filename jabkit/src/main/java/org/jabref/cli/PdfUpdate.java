@@ -1,13 +1,18 @@
 package org.jabref.cli;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.exporter.EmbeddedBibFilePdfExporter;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.XmpPdfExporter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -180,7 +185,10 @@ class PdfUpdate implements Runnable {
                     System.out.println(Localization.lang("Cannot embed metadata on any linked files of %s. Make sure there is at least one linked file and the path is correct.", citeKey));
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException
+                 | ParserConfigurationException
+                 | SaveException
+                 | TransformerException e) {
             LOGGER.error("Failed writing metadata on a linked file of {}.", citeKey);
         }
     }
@@ -248,7 +256,10 @@ class PdfUpdate implements Runnable {
                         System.out.println(Localization.lang("File %0 is not linked to any entry in library.", filePath));
                     }
                 }
-            } catch (Exception e) {
+            } catch (IOException
+                     | ParserConfigurationException
+                     | SaveException
+                     | TransformerException e) {
                 LOGGER.error("Error writing entry to {}.", filePath);
             }
         }

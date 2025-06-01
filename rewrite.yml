@@ -109,7 +109,7 @@ recipeList:
   - org.openrewrite.java.migrate.lang.StringFormatted
 
   - org.openrewrite.java.RemoveObjectsIsNull
-  - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
+ # - org.openrewrite.java.ShortenFullyQualifiedTypeReferences
 
   - org.openrewrite.java.testing.junit5.AssertTrueInstanceofToAssertInstanceOf
   - org.openrewrite.java.testing.junit5.RemoveTryCatchFailBlocks
@@ -195,7 +195,7 @@ recipeList:
 #  - org.openrewrite.staticanalysis.UseJavaStyleArrayDeclarations
   - org.openrewrite.staticanalysis.UseLambdaForFunctionalInterface
 #  - org.openrewrite.staticanalysis.UseListSort
-  - org.openrewrite.staticanalysis.UseObjectNotifyAll
+#  - org.openrewrite.staticanalysis.UseObjectNotifyAll
   - org.openrewrite.staticanalysis.UseStandardCharset
   - org.openrewrite.staticanalysis.UseStringReplace
   - org.openrewrite.staticanalysis.UseSystemLineSeparator

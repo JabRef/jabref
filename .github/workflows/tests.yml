@@ -216,6 +216,7 @@ jobs:
 
   tests-windows:
     name: Unit tests (Windows) – ${{ matrix.module }}
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     strategy:
       matrix:
@@ -272,6 +273,22 @@ jobs:
         env:
           CI: "true"
           DBMS: "postgresql"
+
+  jbang:
+    name: JBang
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Install JBang
+        uses: jbangdev/setup-jbang@main
+      - run: jbang build .jbang/CheckoutPR.java
+      - run: jbang build .jbang/CloneJabRef.java
+      - run: jbang build .jbang/JabKitLauncher.java
+      - run: jbang build .jbang/JabSrvLauncher.java
 
   codecoverage:
     if: false

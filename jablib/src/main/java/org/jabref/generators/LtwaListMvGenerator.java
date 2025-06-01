@@ -57,14 +57,14 @@ public class LtwaListMvGenerator {
      */
     private static Path downloadLtwaFile() throws IOException, URISyntaxException {
         LOGGER.info("Downloading LTWA file from {}.", LtwaListMvGenerator.LTWA_URL);
-        InputStream inputStream = new URI(LTWA_URL).toURL().openStream();
-        Path path = Files.writeString(
-                Files.createTempFile("ltwa", ".csv"),
-                new String(inputStream.readAllBytes()),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-        inputStream.close();
-        return path;
+        try (InputStream inputStream = new URI(LTWA_URL).toURL().openStream()) {
+            Path path = Files.writeString(
+                    Files.createTempFile("ltwa", ".csv"),
+                    new String(inputStream.readAllBytes()),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
+            return path;
+        }
     }
 
     /**
