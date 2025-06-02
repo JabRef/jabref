@@ -29,28 +29,40 @@ jobs:
           gource_title: 'JabRef v6.0 (in development) | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
-          # 5s * 365 / 4 = 7.5min
           gource_seconds_per_day: 1
-          gource_start_date: '2024-07-11'
+          # Last alpha release 2025-04-27, but want to have some seconds before
+          gource_start_date: '2025-04-15'
           gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
           mkdir gource-videos
           mv ./gource/gource.mp4 ./gource-videos/jabref-v6.0-dev.mp4
-      - name: 'Development history of last release'
+      - name: 'Development history of v6.0-alpha2'
         uses: BoundfoxStudios/action-gource@v2
         with:
-          gource_title: 'JabRef v5.15 | more information at contribute.jabref.org'
+          gource_title: 'JabRef v6.0-alpha2 | more information at contribute.jabref.org'
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
-          # 5s * 365 / 4 = 7.5min
-          gource_seconds_per_day: 2
-          gource_start_date: '2024-07-09'
-          gource_stop_date: '2024-07-10'
+          gource_seconds_per_day: 1
+          gource_start_date: '2024-12-23'
+          gource_stop_date: '2025-04-27'
           gource_file_filter: 'buildres/csl|\.csl'
       - name: 'Store video'
         run: |
-          mv ./gource/gource.mp4 ./gource-videos/jabref-v5.15.mp4
+          mv ./gource/gource.mp4 ./gource-videos/jabref-v6.0-alpha2.mp4
+      - name: 'Development history of v6.0-alpha'
+        uses: BoundfoxStudios/action-gource@v2
+        with:
+          gource_title: 'JabRef v6.0-alpha | more information at contribute.jabref.org'
+          logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
+          avatars_auto_fetch: true
+          gource_seconds_per_day: 1
+          gource_start_date: '2024-07-10'
+          gource_stop_date: '2024-12-23'
+          gource_file_filter: 'buildres/csl|\.csl'
+      - name: 'Store video'
+        run: |
+          mv ./gource/gource.mp4 ./gource-videos/jabref-v6.0-alpha.mp4
       - name: 'Complete development history'
         uses: BoundfoxStudios/action-gource@v2
         with:
