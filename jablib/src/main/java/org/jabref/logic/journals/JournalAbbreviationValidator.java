@@ -95,9 +95,20 @@ public class JournalAbbreviationValidator {
     private final Map<String, List<String>> abbrevToFullName = new HashMap<>();
 
     /**
+     * Returns the list of validation issues found during validation
+     */
+    public List<ValidationResult> getIssues() {
+        return new ArrayList<>(issues);
+    }
+
+    /**
      * Checks if the journal name or abbreviation contains wrong escape characters
      */
     public Optional<ValidationResult> checkWrongEscape(String fullName, String abbreviation, int lineNumber) {
+        if (fullName == null || abbreviation == null) {
+            return Optional.empty();
+        }
+
         List<ValidationResult> escapeIssues = new ArrayList<>();
 
         // Check full name
@@ -133,6 +144,10 @@ public class JournalAbbreviationValidator {
      * Checks if the journal name or abbreviation contains non-UTF8 characters
      */
     public Optional<ValidationResult> checkNonUtf8(String fullName, String abbreviation, int lineNumber) {
+        if (fullName == null || abbreviation == null) {
+            return Optional.empty();
+        }
+
         if (!isValidUtf8(fullName) || !isValidUtf8(abbreviation)) {
             return Optional.of(new ValidationResult(false,
                     "Journal name or abbreviation contains invalid UTF-8 sequences",
@@ -158,6 +173,10 @@ public class JournalAbbreviationValidator {
      * Checks if the abbreviation starts with the same letter as the full name
      */
     public Optional<ValidationResult> checkStartingLetters(String fullName, String abbreviation, int lineNumber) {
+        if (fullName == null || abbreviation == null) {
+            return Optional.empty();
+        }
+
         fullName = fullName.trim();
         abbreviation = abbreviation.trim();
 
@@ -221,6 +240,10 @@ public class JournalAbbreviationValidator {
      * Checks if the abbreviation is the same as the full text
      */
     public Optional<ValidationResult> checkAbbreviationEqualsFullText(String fullName, String abbreviation, int lineNumber) {
+        if (fullName == null || abbreviation == null) {
+            return Optional.empty();
+        }
+
         if (fullName.equalsIgnoreCase(abbreviation) && fullName.trim().split("\\s+").length > 1) {
             return Optional.of(new ValidationResult(false,
                     "Abbreviation is the same as the full text",
@@ -238,6 +261,10 @@ public class JournalAbbreviationValidator {
      * Checks if the abbreviation uses outdated "Manage." instead of "Manag."
      */
     public Optional<ValidationResult> checkOutdatedManagementAbbreviation(String fullName, String abbreviation, int lineNumber) {
+        if (fullName == null || abbreviation == null) {
+            return Optional.empty();
+        }
+
         if (fullName.contains("Management") && abbreviation.contains("Manage.")) {
             return Optional.of(new ValidationResult(false,
                     "Management is abbreviated with outdated \"Manage.\" instead of \"Manag.\"",
