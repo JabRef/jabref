@@ -1,4 +1,3 @@
-
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
