@@ -53,7 +53,6 @@ public class AiPreferences {
     private final StringProperty gpt4AllApiBaseUrl;
 
     private final ObjectProperty<EmbeddingModel> embeddingModel;
-    private final StringProperty instruction;
     private final DoubleProperty temperature;
     private final IntegerProperty contextWindowSize;
     private final IntegerProperty documentSplitterChunkSize;
@@ -81,7 +80,6 @@ public class AiPreferences {
                          String huggingFaceApiBaseUrl,
                          String gpt4AllApiBaseUrl,
                          EmbeddingModel embeddingModel,
-                         String instruction,
                          double temperature,
                          int contextWindowSize,
                          int documentSplitterChunkSize,
@@ -111,7 +109,6 @@ public class AiPreferences {
         this.gpt4AllApiBaseUrl = new SimpleStringProperty(gpt4AllApiBaseUrl);
 
         this.embeddingModel = new SimpleObjectProperty<>(embeddingModel);
-        this.instruction = new SimpleStringProperty(instruction);
         this.temperature = new SimpleDoubleProperty(temperature);
         this.contextWindowSize = new SimpleIntegerProperty(contextWindowSize);
         this.documentSplitterChunkSize = new SimpleIntegerProperty(documentSplitterChunkSize);
@@ -122,8 +119,12 @@ public class AiPreferences {
         this.templates = Map.of(
                 AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_SYSTEM_MESSAGE)),
                 AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CHATTING_USER_MESSAGE)),
-                AiTemplate.SUMMARIZATION_CHUNK, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_CHUNK)),
-                AiTemplate.SUMMARIZATION_COMBINE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE))
+                AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE)),
+                AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE)),
+                AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE)),
+                AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE)),
+                AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE)),
+                AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty(templates.get(AiTemplate.CITATION_PARSING_USER_MESSAGE))
         );
     }
 
@@ -349,22 +350,6 @@ public class AiPreferences {
 
     public void setGpt4AllApiBaseUrl(String gpt4AllApiBaseUrl) {
         this.gpt4AllApiBaseUrl.set(gpt4AllApiBaseUrl);
-    }
-
-    public StringProperty instructionProperty() {
-        return instruction;
-    }
-
-    public String getInstruction() {
-        if (getCustomizeExpertSettings()) {
-            return instruction.get();
-        } else {
-            return AiDefaultPreferences.SYSTEM_MESSAGE;
-        }
-    }
-
-    public void setInstruction(String instruction) {
-        this.instruction.set(instruction);
     }
 
     public DoubleProperty temperatureProperty() {
