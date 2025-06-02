@@ -1630,6 +1630,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue when importing resulted in an exception [#7343](https://github.com/JabRef/jabref/issues/7343)
 - We fixed an issue where the field in the Field formatter dropdown selection were sorted in random order. [#7710](https://github.com/JabRef/jabref/issues/7710)
 - We fixed an issue where the maintainer names are not fully shown. [#12928](https://github.com/JabRef/jabref/issues/12928)
+
 ### Removed
 
 - The feature to "mark entries" was removed and merged with the groups functionality. For migration, a group is created for every value of the `__markedentry` field and the entry is added to this group.
