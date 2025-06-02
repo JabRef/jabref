@@ -1,4 +1,3 @@
-
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
@@ -13,7 +12,7 @@ plugins {
     id("idea")
 
     id("antlr")
-    id("com.github.edeandrea.xjc-generation") version "1.6"
+    id("com.github.bjornvester.xjc") version "1.8.1"
 
     id("me.champeau.jmh") version "0.7.3"
 
@@ -22,7 +21,6 @@ plugins {
 
 val pdfbox = "3.0.5"
 val luceneVersion = "10.2.1"
-val jaxbVersion by extra { "4.0.5" }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
 if (project.findProperty("tagbuild")?.toString() != "true") {
@@ -30,7 +28,6 @@ if (project.findProperty("tagbuild")?.toString() != "true") {
 }
 
 val javafxVersion = "24.0.1"
-val javafxPlatform: String by project.extra
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
@@ -243,9 +240,6 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
-
-    "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
-    "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }
 /*
 jacoco {
@@ -258,44 +252,92 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-xjcGeneration {
-    // plugin: https://github.com/edeandrea/xjc-generation-gradle-plugin#xjc-generation-gradle-plugin
-    // hint by https://stackoverflow.com/questions/62776832/how-to-generate-java-classes-from-xsd-using-java-11-and-gradle#comment130555840_62776832
-    defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
-    schemas {
-        create("citavi") {
-            schemaFile = "citavi/citavi.xsd"
-            javaPackageName = "org.jabref.logic.importer.fileformat.citavi"
-        }
+xjc {
+    xsdDir.set(layout.projectDirectory.dir("src/main/xsd"))
+    xjcVersion.set("4.0.5")
+    defaultPackage.set("org.jabref.logic.importer.fileformat.citavi")
+    options.set(listOf("encoding=UTF-8"))
+}
+
+abstract class JoinNonCommentedLines : DefaultTask() {
+
+    @get:InputFile
+    abstract val inputFile: RegularFileProperty
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    @TaskAction
+    fun extract() {
+        val input = inputFile.get().asFile
+        val result = input.readLines()
+            .filterNot { it.trim().startsWith("#") }
+            .joinToString(", ")
+
+        outputFile.get().asFile.writeText(result)
     }
 }
 
-tasks.processResources {
+val extractMaintainers by tasks.registering(JoinNonCommentedLines::class) {
+    inputFile.set(layout.projectDirectory.file("../MAINTAINERS"))
+    outputFile.set(layout.buildDirectory.file("maintainers.txt"))
+}
+
+val maintainersProvider: Provider<String> = extractMaintainers.flatMap {
+    it.outputFile.map { file -> file.asFile.readText() }
+}
+
+val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.0")
+
+val year = Calendar.getInstance().get(Calendar.YEAR).toString()
+
+val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
+val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
+val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDataSystemAPIKey").orElse("")
+val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
+val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
+val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
+val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+
+tasks.named<ProcessResources>("processResources") {
+    dependsOn("extractMaintainers")
     filteringCharset = "UTF-8"
+
+    inputs.property("version", versionProvider)
+    inputs.property("year", year)
+    inputs.property("maintainers", maintainersProvider)
+    inputs.property("azureInstrumentationKey", azureInstrumentationKey)
+    inputs.property("springerNatureAPIKey", springerNatureAPIKey)
+    inputs.property("astrophysicsDataSystemAPIKey", astrophysicsDataSystemAPIKey)
+    inputs.property("ieeeAPIKey", ieeeAPIKey)
+    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
+    inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
+    inputs.property("semanticScholarApiKey", semanticScholarApiKey)
 
     filesMatching("build.properties") {
         expand(
             mapOf(
-                "version" to (project.findProperty("projVersionInfo") ?: "100.0.0"),
-                "year" to Calendar.getInstance().get(Calendar.YEAR).toString(),
-                "maintainers" to file("../MAINTAINERS")
-                    .readLines()
-                    .filterNot { it.startsWith("#") }
-                    .joinToString(", "),
-                "azureInstrumentationKey" to (System.getenv("AzureInstrumentationKey") ?: ""),
-                "springerNatureAPIKey" to (System.getenv("SpringerNatureAPIKey") ?: ""),
-                "astrophysicsDataSystemAPIKey" to (System.getenv("AstrophysicsDataSystemAPIKey") ?: ""),
-                "ieeeAPIKey" to (System.getenv("IEEEAPIKey") ?: ""),
-                "scienceDirectApiKey" to (System.getenv("SCIENCEDIRECTAPIKEY") ?: ""),
-                "biodiversityHeritageApiKey" to (System.getenv("BiodiversityHeritageApiKey") ?: ""),
-                "semanticScholarApiKey" to (System.getenv("SemanticScholarApiKey") ?: "")
+                "version" to inputs.properties["version"],
+                "year" to inputs.properties["year"],
+                "maintainers" to inputs.properties["maintainers"],
+                "azureInstrumentationKey" to inputs.properties["azureInstrumentationKey"],
+                "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
+                "astrophysicsDataSystemAPIKey" to inputs.properties["astrophysicsDataSystemAPIKey"],
+                "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
+                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
+                "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
+                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"]
             )
         )
-        filteringCharset = "UTF-8"
     }
 
-    filesMatching(listOf("resources/resource/ods/meta.xml", "resources/resource/openoffice/meta.xml")) {
-        expand(mapOf("version" to project.version))
+    filesMatching(
+        listOf(
+            "resources/resource/ods/meta.xml",
+            "resources/resource/openoffice/meta.xml"
+        )
+    ) {
+        expand(mapOf("version" to inputs.properties["version"]))
     }
 }
 
@@ -304,9 +346,14 @@ tasks.register<JavaExec>("generateJournalListMV") {
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.JournalListMvGenerator")
-    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
+
+    javaLauncher.convention(javaToolchains.launcherFor {
+        languageVersion.set(java.toolchain.languageVersion)
+    })
+
+    val outputFile = layout.buildDirectory.file("resources/main/journals/journal-list.mv")
     onlyIf {
-        !file("build/resources/main/journals/journal-list.mv").exists()
+        !outputFile.get().asFile.exists()
     }
 }
 
@@ -343,29 +390,28 @@ tasks.register("downloadLtwaFile") {
     description = "Downloads the LTWA file for journal abbreviations"
 
     val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
-    val ltwaDir = file("build/resources/main/journals")
-    val ltwaCsvFile = ltwaDir.resolve("ltwa_20210702.csv")
-
-    doLast {
-        if (!ltwaCsvFile.exists()) {
-            mkdir(ltwaDir)
-            ant.withGroovyBuilder {
-                "get"(
-                    mapOf(
-                        "src" to ltwaUrl,
-                        "dest" to ltwaCsvFile,
-                        "verbose" to true
-                    )
-                )
-            }
-            logger.lifecycle("Downloaded LTWA file to $ltwaCsvFile")
-        } else {
-            logger.lifecycle("LTWA file already exists at $ltwaCsvFile")
-        }
-    }
+    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
+    val ltwaCsvFile = ltwaDir.map { it.file("ltwa_20210702.csv") }
 
     onlyIf {
-        !ltwaCsvFile.exists()
+        !ltwaCsvFile.get().asFile.exists()
+    }
+
+    doLast {
+        val dir = ltwaDir.get().asFile
+        val file = ltwaCsvFile.get().asFile
+
+        if (!file.exists()) {
+            dir.mkdirs()
+            ant.withGroovyBuilder {
+                "get"(
+                    mapOf("src" to ltwaUrl, "dest" to file, "verbose" to true)
+                )
+            }
+            logger.lifecycle("Downloaded LTWA file to $file")
+        } else {
+            logger.lifecycle("LTWA file already exists at $file")
+        }
     }
 }
 
@@ -375,14 +421,16 @@ tasks.register<JavaExec>("generateLtwaListMV") {
 
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-    javaLauncher.set(javaToolchains.launcherFor {
+
+    javaLauncher.convention(javaToolchains.launcherFor {
         languageVersion.set(java.toolchain.languageVersion)
     })
 
     dependsOn("downloadLtwaFile")
 
+    val outputFile = layout.buildDirectory.file("resources/main/journals/ltwa-list.mv")
     onlyIf {
-        !file("build/resources/main/journals/ltwa-list.mv").exists()
+        !outputFile.get().asFile.exists()
     }
 }
 
@@ -522,7 +570,6 @@ mavenPublishing {
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
-        tasks.named("schemaGen_org-jabref-logic-importer-fileformat-citavi")
     )
 }
 
