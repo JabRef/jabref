@@ -26,23 +26,23 @@ jobs:
             start: '2025-04-15'
             end: ''
             file: 'jabref-v6.0-dev.mp4'
-          - title: 'JabRef v6.0-alpha2 | more information at contribute.jabref.org'
-            start: '2024-12-23'
-            end: '2025-04-27'
-            file: 'jabref-v6.0-alpha2.mp4'
-          - title: 'JabRef v6.0-alpha | more information at contribute.jabref.org'
-            start: '2024-07-10'
-            end: '2024-12-23'
-            file: 'jabref-v6.0-alpha.mp4'
+#          - title: 'JabRef v6.0-alpha2 | more information at contribute.jabref.org'
+#            start: '2024-12-23'
+#            end: '2025-04-27'
+#            file: 'jabref-v6.0-alpha2.mp4'
+#          - title: 'JabRef v6.0-alpha | more information at contribute.jabref.org'
+#            start: '2024-07-10'
+#            end: '2024-12-23'
+#            file: 'jabref-v6.0-alpha.mp4'
           - title: 'JabRef v6.x | more information at contribute.jabref.org'
             start: '2024-07-10'
             end: ''
-            file: 'jabref-v5.x.mp4'
-          - title: 'JabRef v5.x | more information at contribute.jabref.org'
-            start: '2018-06-05'
-            end: '2024-07-10'
-            file: 'jabref-v5.x.mp4'
-            seconds_per_day: '0.5'
+            file: 'jabref-v6.x.mp4'
+#          - title: 'JabRef v5.x | more information at contribute.jabref.org'
+#            start: '2018-06-05'
+#            end: '2024-07-10'
+#            file: 'jabref-v5.x.mp4'
+#            seconds_per_day: '0.5'
           - title: 'JabRef | more information at contribute.jabref.org'
             start: ''
             end: ''
@@ -57,26 +57,26 @@ jobs:
           show-progress: 'false'
 
       - name: Generate Gource video
-        uses: BoundfoxStudios/action-gource@v2
+        uses: nbprojekt/gource-action@v1
         with:
-          gource_title: ${{ matrix.gource_config.title }}
+          gource_title: ${{ matrix.title }}
           logo_url: 'https://www.jabref.org/img/JabRef-icon-256.png'
           avatars_auto_fetch: true
-          gource_start_date: ${{ matrix.gource_config.start }}
-          gource_stop_date: ${{ matrix.gource_config.end }}
-          gource_seconds_per_day: ${{ matrix.gource_config.seconds_per_day || '1' }}
+          gource_start_date: ${{ matrix.start }}
+          gource_stop_date: ${{ matrix.end }}
+          gource_seconds_per_day: ${{ matrix.seconds_per_day || '1' }}
           gource_file_filter: 'buildres/csl|\.csl'
 
       - name: Store video
         run: |
           mkdir -p gource-videos
-          mv ./gource/gource.mp4 ./gource-videos/${{ matrix.gource_config.file }}
+          mv ./gource/gource.mp4 ${{ matrix.file }}
 
       - name: Upload gource video
         uses: actions/upload-artifact@v4
         with:
-          name: Gource-${{ matrix.gource_config.file }}
-          path: gource-videos/${{ matrix.gource_config.file }}
+          name: Gource-${{ matrix.file }}
+          path: ${{ matrix.file }}
           retention-days: 80
 
       - name: Upload to files.jabref.org
@@ -87,5 +87,5 @@ jobs:
           flags: -vaz --itemize-changes --stats --partial-dir=/tmp/partial
           options: ''
           ssh_options: '-p 9922'
-          src: 'gource-videos/${{ matrix.gource_config.file }}'
+          src: '${{ matrix.file }}'
           dest: jrrsync@build-upload.jabref.org:/var/www/files.jabref.org/www/gource/
