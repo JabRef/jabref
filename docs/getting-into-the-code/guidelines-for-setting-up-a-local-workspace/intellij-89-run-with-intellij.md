@@ -31,17 +31,17 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
     1. Now you have two Explorer windows opened. Copy all files and directories from the first one to the second one.
 11. Locate the class `Launcher` (e.g., by <kbd>ctrl</kbd>+<kbd>N</kbd> and then typing `Launcher`). Press <kbd>Enter</kbd> to jump to that class.
     <figure>
-      <img src="intellij-search-for-launcher.png" alt="IntelliJ search for class “Launcher”">
+      <img src="89-01-search-for-launcher.png" alt="IntelliJ search for class “Launcher”">
       <figcaption>IntelliJ search for class “Launcher”</figcaption>
     </figure>
 12. Click on the green play button next to the `main` method to create a Launch configuration. IntelliJ will fail in launching.
     <figure>
-      <img src="intellij-hover-on-play-button.png" alt="However on green play">
+      <img src="89-02-hover-on-play-button.png" alt="However on green play">
       <figcaption>However on green play</figcaption>
     </figure>
     <figure>
-      <img src="intellij-run-jabref-from-launcher.png" alt="Run JabRef via launcher">
-      <figcaption>Run JabRef via launcher</figcaption>
+      <img src="89-03-run-launcher-dropdown.png" alt="Run JabRef via launcher drop down">
+      <figcaption>Run JabRef via launcher drop down</figcaption>
     </figure>
 13. On the top right of the IntelliJ window, next to the newly created launch configuration, click on the drop down
 14. Click on "Edit Configurations..."
@@ -74,7 +74,7 @@ Due to [IDEA-119280](https://youtrack.jetbrains.com/issue/IDEA-119280), it is a 
 19. Click "Apply"
 20. Click "Run". You can also click on the debug symbol next to it to enable stopping at breakpoints.
      <figure>
-       <img src="intellij-run-launcher.png" alt="Launch menu contains “Launcher”">
+       <img src="89-04-run-jabref-from-launcher.png" alt="Launch menu contains “Launcher”">
        <figcaption>Launch menu contains “Launcher”</figcaption>
      </figure>
 

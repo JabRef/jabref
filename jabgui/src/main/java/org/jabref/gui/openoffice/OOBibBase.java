@@ -58,7 +58,6 @@ import com.sun.star.lang.DisposedException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextCursor;
 import com.sun.star.text.XTextDocument;
-import com.sun.star.uno.Exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -646,7 +645,7 @@ public class OOBibBase {
                  | NotRemoveableException ex) {
             LOGGER.warn("Could not insert entry", ex);
             OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
-        } catch (Exception e) {
+        } catch (com.sun.star.uno.Exception e) {
             throw new RuntimeException(e);
         } finally {
             UnoUndo.leaveUndoContext(doc);

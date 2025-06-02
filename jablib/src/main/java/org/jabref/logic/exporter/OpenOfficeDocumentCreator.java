@@ -18,6 +18,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -95,7 +96,7 @@ public class OpenOfficeDocumentCreator extends Exporter {
             Transformer trans = TransformerFactory.newInstance().newTransformer();
             trans.setOutputProperty(OutputKeys.INDENT, "yes");
             trans.transform(source, result);
-        } catch (Exception e) {
+        } catch (TransformerException | IOException e) {
             throw new Error(e);
         }
     }
