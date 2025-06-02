@@ -51,21 +51,23 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
+    private final EntryEditor entryEditor;
     private final TextFlow content;
+
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
-    private final EntryEditor entryEditor;
 
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    TaskExecutor taskExecutor, EntryEditor entryEditor) {
+                                    TaskExecutor taskExecutor,
+                                    EntryEditor entryEditor) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
-        this.entryEditor = entryEditor;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
+        this.entryEditor = entryEditor;
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
