@@ -23,7 +23,7 @@ import org.jabref.logic.preferences.WalkthroughPreferences;
 /**
  * Manages a walkthrough session by coordinating steps.
  */
-public class WalkthroughManager {
+public class Walkthrough {
     private final WalkthroughPreferences preferences;
     private final IntegerProperty currentStep;
     private final IntegerProperty totalSteps;
@@ -37,7 +37,7 @@ public class WalkthroughManager {
      *
      * @param preferences The walkthrough preferences to use
      */
-    public WalkthroughManager(WalkthroughPreferences preferences) {
+    public Walkthrough(WalkthroughPreferences preferences) {
         this.preferences = preferences;
         this.currentStep = new SimpleIntegerProperty(0);
         this.active = new SimpleBooleanProperty(false);

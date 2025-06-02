@@ -28,7 +28,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
-import org.jabref.gui.walkthrough.WalkthroughManager;
+import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -77,7 +77,7 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
-    private static WalkthroughManager walkthroughManager;
+    private static Walkthrough walkthroughManager;
     private static RemoteListenerServerManager remoteListenerServerManager;
 
     private Stage mainStage;
@@ -192,13 +192,13 @@ public class JabRefGUI extends Application {
 
         // Initialize walkthrough manager
         WalkthroughPreferences walkthroughPreferences = preferences.getWalkthroughPreferences();
-        JabRefGUI.walkthroughManager = new WalkthroughManager(walkthroughPreferences);
-        Injector.setModelOrService(WalkthroughManager.class, walkthroughManager);
+        JabRefGUI.walkthroughManager = new Walkthrough(walkthroughPreferences);
+        Injector.setModelOrService(Walkthrough.class, walkthroughManager);
     }
 
     private void setupProxy() {
         if (!preferences.getProxyPreferences().shouldUseProxy()
-                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
+            || !preferences.getProxyPreferences().shouldUseAuthentication()) {
             return;
         }
 

@@ -25,13 +25,13 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
     private final Stage parentStage;
-    private final WalkthroughManager manager;
+    private final Walkthrough manager;
     private final GridPane overlayPane;
     private final PulseAnimateIndicator pulseIndicator;
     private final Pane originalRoot;
     private final StackPane stackContainer;
 
-    public WalkthroughOverlay(Stage stage, WalkthroughManager manager) {
+    public WalkthroughOverlay(Stage stage, Walkthrough manager) {
         this.parentStage = stage;
         this.manager = manager;
 
@@ -94,12 +94,12 @@ public class WalkthroughOverlay {
 
         overlayPane.getRowConstraints().clear();
         overlayPane.getColumnConstraints().clear();
-        RowConstraints rc = new RowConstraints();
-        rc.setVgrow(Priority.ALWAYS);
-        overlayPane.getRowConstraints().add(rc);
-        ColumnConstraints cc = new ColumnConstraints();
-        cc.setHgrow(Priority.ALWAYS);
-        overlayPane.getColumnConstraints().add(cc);
+        RowConstraints rowConstraints = new RowConstraints();
+        rowConstraints.setVgrow(Priority.ALWAYS);
+        overlayPane.getRowConstraints().add(rowConstraints);
+        ColumnConstraints columnConstraints = new ColumnConstraints();
+        columnConstraints.setHgrow(Priority.ALWAYS);
+        overlayPane.getColumnConstraints().add(columnConstraints);
 
         GridPane.setHgrow(fullScreenContent, Priority.ALWAYS);
         GridPane.setVgrow(fullScreenContent, Priority.ALWAYS);
@@ -124,22 +124,22 @@ public class WalkthroughOverlay {
         GridPane.setFillWidth(panelContent, false);
         GridPane.setFillHeight(panelContent, false);
 
-        RowConstraints rc = new RowConstraints();
-        ColumnConstraints cc = new ColumnConstraints();
+        RowConstraints rowConstraints = new RowConstraints();
+        ColumnConstraints columnConstraints = new ColumnConstraints();
 
         overlayPane.setAlignment(position);
 
         switch (position) {
             case CENTER_LEFT:
             case CENTER_RIGHT:
-                rc.setVgrow(Priority.ALWAYS);
-                cc.setHgrow(Priority.NEVER);
+                rowConstraints.setVgrow(Priority.ALWAYS);
+                columnConstraints.setHgrow(Priority.NEVER);
                 GridPane.setFillHeight(panelContent, true);
                 break;
             case TOP_CENTER:
             case BOTTOM_CENTER:
-                cc.setHgrow(Priority.ALWAYS);
-                rc.setVgrow(Priority.NEVER);
+                columnConstraints.setHgrow(Priority.ALWAYS);
+                rowConstraints.setVgrow(Priority.NEVER);
                 GridPane.setFillWidth(panelContent, true);
                 break;
             default:
@@ -147,8 +147,8 @@ public class WalkthroughOverlay {
                 break;
         }
 
-        overlayPane.getRowConstraints().add(rc);
-        overlayPane.getColumnConstraints().add(cc);
+        overlayPane.getRowConstraints().add(rowConstraints);
+        overlayPane.getColumnConstraints().add(columnConstraints);
         overlayPane.setVisible(true);
 
         if (step.resolver().isPresent()) {

@@ -2289,7 +2289,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         walkthroughPreferences = new WalkthroughPreferences(getBoolean(WALKTHROUGH_COMPLETED));
 
-        walkthroughPreferences.completedProperty().addListener((obs, oldValue, newValue) ->
+        walkthroughPreferences.completedProperty().addListener((_, _, newValue) ->
             putBoolean(WALKTHROUGH_COMPLETED, newValue));
 
         return walkthroughPreferences;

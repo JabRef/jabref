@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 
@@ -99,7 +100,7 @@ public class NodeResolverFactory {
             return root;
         }
 
-        if (root instanceof javafx.scene.Parent parent) {
+        if (root instanceof Parent parent) {
             for (Node child : parent.getChildrenUnmodifiable()) {
                 Node result = findNode(child, predicate);
                 if (result != null) {

@@ -24,10 +24,9 @@ import org.jabref.logic.l10n.Localization;
  */
 public class WalkthroughUIFactory {
     /**
-     * Creates a full-screen page using dynamic content from a walkthrough
-     * step.
+     * Creates a full-screen page using dynamic content from a walkthrough step.
      */
-    public static VBox createFullscreen(WalkthroughStep step, WalkthroughManager manager) {
+    public static VBox createFullscreen(WalkthroughStep step, Walkthrough manager) {
         VBox container = makePanel();
         container.setAlignment(Pos.CENTER);
         VBox content = new VBox();
@@ -43,7 +42,7 @@ public class WalkthroughUIFactory {
     /**
      * Creates a side panel for walkthrough steps.
      */
-    public static VBox createSidePanel(WalkthroughStep step, WalkthroughManager manager) {
+    public static VBox createSidePanel(WalkthroughStep step, Walkthrough manager) {
         VBox panel = makePanel();
 
         if (step.stepType() == StepType.LEFT_PANEL || step.stepType() == StepType.RIGHT_PANEL) {
@@ -108,7 +107,7 @@ public class WalkthroughUIFactory {
                 infoWrapper.setAlignment(Pos.CENTER_LEFT);
                 return infoWrapper;
         }
-        return new Label("Impossible content block type: " + block.getType());
+        return new Label(Localization.lang("Impossible content block type", block.getType()));
     }
 
     private static VBox makePanel() {
@@ -117,7 +116,7 @@ public class WalkthroughUIFactory {
         return container;
     }
 
-    private static HBox makeActions(WalkthroughStep step, WalkthroughManager manager) {
+    private static HBox makeActions(WalkthroughStep step, Walkthrough manager) {
         HBox actions = new HBox();
         actions.setAlignment(Pos.CENTER_LEFT);
         actions.setSpacing(0);
@@ -153,7 +152,7 @@ public class WalkthroughUIFactory {
         return contentContainer;
     }
 
-    private static Button makeContinueButton(WalkthroughStep step, WalkthroughManager manager) {
+    private static Button makeContinueButton(WalkthroughStep step, Walkthrough manager) {
         String buttonText = step.actions()
                                 .flatMap(WalkthroughActionsConfig::continueButtonText)
                                 .orElse("Walkthrough continue button");
@@ -164,7 +163,7 @@ public class WalkthroughUIFactory {
         return continueButton;
     }
 
-    private static Button makeSkipButton(WalkthroughStep step, WalkthroughManager manager) {
+    private static Button makeSkipButton(WalkthroughStep step, Walkthrough manager) {
         String buttonText = step.actions()
                                 .flatMap(WalkthroughActionsConfig::skipButtonText)
                                 .orElse("Walkthrough skip to finish");
@@ -175,7 +174,7 @@ public class WalkthroughUIFactory {
         return skipButton;
     }
 
-    private static Button makeBackButton(WalkthroughStep step, WalkthroughManager manager) {
+    private static Button makeBackButton(WalkthroughStep step, Walkthrough manager) {
         String buttonText = step.actions()
                                 .flatMap(WalkthroughActionsConfig::backButtonText)
                                 .orElse("Walkthrough back button");
