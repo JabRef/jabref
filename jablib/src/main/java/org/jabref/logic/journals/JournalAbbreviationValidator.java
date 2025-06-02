@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,7 +97,7 @@ public class JournalAbbreviationValidator {
     /**
      * Checks if the journal name or abbreviation contains wrong escape characters
      */
-    public ValidationResult checkWrongEscape(String fullName, String abbreviation, int lineNumber) {
+    public Optional<ValidationResult> checkWrongEscape(String fullName, String abbreviation, int lineNumber) {
         List<ValidationResult> escapeIssues = new ArrayList<>();
 
         // Check full name
@@ -124,24 +125,24 @@ public class JournalAbbreviationValidator {
         }
 
         return escapeIssues.isEmpty() ?
-                new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber) :
-                escapeIssues.get(0);
+                Optional.of(new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber)) :
+                Optional.of(escapeIssues.get(0));
     }
 
     /**
      * Checks if the journal name or abbreviation contains non-UTF8 characters
      */
-    public ValidationResult checkNonUtf8(String fullName, String abbreviation, int lineNumber) {
+    public Optional<ValidationResult> checkNonUtf8(String fullName, String abbreviation, int lineNumber) {
         if (!isValidUtf8(fullName) || !isValidUtf8(abbreviation)) {
-            return new ValidationResult(false,
+            return Optional.of(new ValidationResult(false,
                     "Journal name or abbreviation contains invalid UTF-8 sequences",
                     ValidationType.ERROR,
                     fullName,
                     abbreviation,
                     lineNumber,
-                    "Ensure all characters are valid UTF-8. Remove or replace any invalid characters.");
+                    "Ensure all characters are valid UTF-8. Remove or replace any invalid characters."));
         }
-        return new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber);
+        return Optional.of(new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber));
     }
 
     private boolean isValidUtf8(String str) {
@@ -156,19 +157,19 @@ public class JournalAbbreviationValidator {
     /**
      * Checks if the abbreviation starts with the same letter as the full name
      */
-    public ValidationResult checkStartingLetters(String fullName, String abbreviation, int lineNumber) {
+    public Optional<ValidationResult> checkStartingLetters(String fullName, String abbreviation, int lineNumber) {
         fullName = fullName.trim();
         abbreviation = abbreviation.trim();
 
         if (isAllowedException(fullName, abbreviation)) {
-            return new ValidationResult(
+            return Optional.of(new ValidationResult(
                     true,
                     "Allowed abbreviation exception",
                     ValidationType.ERROR,
                     fullName,
                     abbreviation,
                     lineNumber
-            );
+            ));
         }
 
         String fullFirst = getFirstSignificantWord(fullName);
@@ -178,7 +179,7 @@ public class JournalAbbreviationValidator {
         if (!abbrFirst.isEmpty() &&
                 !fullFirst.isEmpty() &&
                 !abbrFirst.toLowerCase().startsWith(fullFirst.substring(0, 1).toLowerCase())) {
-            return new ValidationResult(
+            return Optional.of(new ValidationResult(
                     false,
                     "Abbreviation does not begin with same letter as full journal name",
                     ValidationType.ERROR,
@@ -188,17 +189,17 @@ public class JournalAbbreviationValidator {
                     String.format("Should start with '%c' (from '%s')",
                             fullFirst.toLowerCase().charAt(0),
                             fullFirst)
-            );
+            ));
         }
 
-        return new ValidationResult(
+        return Optional.of(new ValidationResult(
                 true,
                 "",
                 ValidationType.ERROR,
                 fullName,
                 abbreviation,
                 lineNumber
-        );
+        ));
     }
 
     private boolean isAllowedException(String fullName, String abbreviation) {
@@ -219,34 +220,34 @@ public class JournalAbbreviationValidator {
     /**
      * Checks if the abbreviation is the same as the full text
      */
-    public ValidationResult checkAbbreviationEqualsFullText(String fullName, String abbreviation, int lineNumber) {
+    public Optional<ValidationResult> checkAbbreviationEqualsFullText(String fullName, String abbreviation, int lineNumber) {
         if (fullName.equalsIgnoreCase(abbreviation) && fullName.trim().split("\\s+").length > 1) {
-            return new ValidationResult(false,
+            return Optional.of(new ValidationResult(false,
                     "Abbreviation is the same as the full text",
                     ValidationType.WARNING,
                     fullName,
                     abbreviation,
                     lineNumber,
-                    "Consider using a shorter abbreviation to distinguish it from the full name");
+                    "Consider using a shorter abbreviation to distinguish it from the full name"));
         }
 
-        return new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber);
+        return Optional.of(new ValidationResult(true, "", ValidationType.ERROR, fullName, abbreviation, lineNumber));
     }
 
     /**
      * Checks if the abbreviation uses outdated "Manage." instead of "Manag."
      */
-    public ValidationResult checkOutdatedManagementAbbreviation(String fullName, String abbreviation, int lineNumber) {
+    public Optional<ValidationResult> checkOutdatedManagementAbbreviation(String fullName, String abbreviation, int lineNumber) {
         if (fullName.contains("Management") && abbreviation.contains("Manage.")) {
-            return new ValidationResult(false,
+            return Optional.of(new ValidationResult(false,
                     "Management is abbreviated with outdated \"Manage.\" instead of \"Manag.\"",
                     ValidationType.WARNING,
                     fullName,
                     abbreviation,
                     lineNumber,
-                    "Update to use the standard abbreviation \"Manag.\"");
+                    "Update to use the standard abbreviation \"Manag.\""));
         }
-        return new ValidationResult(true, "", ValidationType.WARNING, fullName, abbreviation, lineNumber);
+        return Optional.of(new ValidationResult(true, "", ValidationType.WARNING, fullName, abbreviation, lineNumber));
     }
 
     /**
@@ -298,28 +299,18 @@ public class JournalAbbreviationValidator {
         List<ValidationResult> results = new ArrayList<>();
 
         // Error checks
-        results.add(checkWrongEscape(fullName, abbreviation, lineNumber));
-        results.add(checkNonUtf8(fullName, abbreviation, lineNumber));
-        results.add(checkStartingLetters(fullName, abbreviation, lineNumber));
+        checkWrongEscape(fullName, abbreviation, lineNumber).ifPresent(results::add);
+        checkNonUtf8(fullName, abbreviation, lineNumber).ifPresent(results::add);
+        checkStartingLetters(fullName, abbreviation, lineNumber).ifPresent(results::add);
 
         // Warning checks
-        results.add(checkAbbreviationEqualsFullText(fullName, abbreviation, lineNumber));
-        results.add(checkOutdatedManagementAbbreviation(fullName, abbreviation, lineNumber));
+        checkAbbreviationEqualsFullText(fullName, abbreviation, lineNumber).ifPresent(results::add);
+        checkOutdatedManagementAbbreviation(fullName, abbreviation, lineNumber).ifPresent(results::add);
 
         // Track for duplicate checks
         fullNameToAbbrev.computeIfAbsent(fullName, k -> new ArrayList<>()).add(abbreviation);
         abbrevToFullName.computeIfAbsent(abbreviation, k -> new ArrayList<>()).add(fullName);
 
         return results;
-    }
-
-    /**
-     * Get all validation issues found
-     */
-    public List<ValidationResult> getIssues() {
-        // Check for duplicates
-        checkDuplicateFullNames();
-        checkDuplicateAbbreviations();
-        return issues;
     }
 }
