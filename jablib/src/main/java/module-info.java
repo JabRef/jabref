@@ -249,5 +249,6 @@ open module org.jabref.jablib {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires com.github.oshi;
     // endregion
 }
