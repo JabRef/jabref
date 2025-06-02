@@ -24,8 +24,8 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preferences.keybindings.presets.BashKeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
 import org.jabref.gui.preferences.keybindings.presets.NewEntryBindingPreset;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.OptionalObjectProperty;
 
 public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 

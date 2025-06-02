@@ -9,6 +9,9 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -17,6 +20,7 @@ import org.jabref.logic.importer.fileformat.CitaviXmlImporter;
 import org.jabref.logic.importer.fileformat.CopacImporter;
 import org.jabref.logic.importer.fileformat.EndnoteImporter;
 import org.jabref.logic.importer.fileformat.EndnoteXmlImporter;
+import org.jabref.logic.importer.fileformat.EpubImporter;
 import org.jabref.logic.importer.fileformat.InspecImporter;
 import org.jabref.logic.importer.fileformat.IsiImporter;
 import org.jabref.logic.importer.fileformat.MedlineImporter;
@@ -38,9 +42,13 @@ import org.jabref.model.database.BibDatabases;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.util.FileUpdateMonitor;
 
-public class ImportFormatReader {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+public class ImportFormatReader {
     public static final String BIBTEX_FORMAT = "BibTeX";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImportFormatReader.class);
 
     /**
      * All import formats.
@@ -90,6 +98,15 @@ public class ImportFormatReader {
         formats.add(new BiblioscapeImporter());
         formats.add(new BibtexImporter(importFormatPreferences, fileUpdateMonitor));
         formats.add(new CitaviXmlImporter());
+
+        // {@link EpubImporter} constructs `XPath`s internally, and compilation may throw errors.
+        // {@link EpubReader} also constructs {@link DocumentBuilder}, whose "constructor" can also throw error.
+        // Hacky workaround.
+        try {
+            formats.add(new EpubImporter(importFormatPreferences));
+        } catch (XPathExpressionException | ParserConfigurationException e) {
+            LOGGER.error("Unable to construct `EpubImporter`. `EpubImporter` will not be added to available importers", e);
+        }
 
         // Get custom import formats
         formats.addAll(importerPreferences.getCustomImporters());

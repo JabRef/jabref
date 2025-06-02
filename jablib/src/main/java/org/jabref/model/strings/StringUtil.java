@@ -744,6 +744,14 @@ public class StringUtil {
     }
 
     /**
+     * @param string input string
+     * @return  {@link Optional#empty()} if the {@param string} is empty, otherwise wrap it in {@link Optional}.
+     */
+    public static Optional<String> optionalOfEmpty(String string) {
+        return Optional.ofNullable(string).filter(s -> !s.isEmpty());
+    }
+
+    /**
      * Checks if the given string contains any whitespace characters. The supported whitespace characters
      * are the set of characters matched by {@code \s} in regular expressions, which are {@code [ \t\n\x0B\f\r]}.
      *

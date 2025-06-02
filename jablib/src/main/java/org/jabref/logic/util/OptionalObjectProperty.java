@@ -1,4 +1,4 @@
-package org.jabref.gui.util;
+package org.jabref.logic.util;
 
 import java.util.Optional;
 
