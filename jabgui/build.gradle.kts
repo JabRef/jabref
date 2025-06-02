@@ -130,7 +130,7 @@ dependencies {
 
     testImplementation("io.github.classgraph:classgraph:4.8.179")
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
-    testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+    testImplementation("org.testfx:testfx-junit5:4.0.18")
 
     testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
