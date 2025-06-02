@@ -182,7 +182,7 @@ jobs:
       - run: ./gradlew javadoc
 
   tests:
-    name: Unit tests – ${{ matrix.module }}
+    name: "Unit tests – ${{ matrix.module }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -215,7 +215,7 @@ jobs:
         run: scripts/after-failure.sh
 
   tests-windows:
-    name: Unit tests (Windows) – ${{ matrix.module }}
+    name: "Unit tests (Windows) – ${{ matrix.module }}"
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     strategy:
