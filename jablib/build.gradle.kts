@@ -1,4 +1,3 @@
-
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
@@ -260,28 +259,32 @@ xjc {
     options.set(listOf("encoding=UTF-8"))
 }
 
-tasks.register("extractMaintainers") {
-    val inputFile = layout.projectDirectory.file("../MAINTAINERS")
-    val outputFile = layout.buildDirectory.file("maintainers.txt")
+abstract class ExtractMaintainers : DefaultTask() {
 
-    inputs.file(inputFile)
-    outputs.file(outputFile)
+    @get:InputFile
+    abstract val inputFile: RegularFileProperty
 
-    doLast {
-        val maintainers = inputFile.asFile
-            .readLines()
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    @TaskAction
+    fun extract() {
+        val input = inputFile.get().asFile
+        val result = input.readLines()
             .filterNot { it.trim().startsWith("#") }
             .joinToString(", ")
 
-        outputFile.get().asFile.apply {
-            parentFile.mkdirs()
-            writeText(maintainers)
-        }
+        outputFile.get().asFile.writeText(result)
     }
 }
 
-val maintainersProvider = providers.provider {
-    layout.buildDirectory.file("maintainers.txt").get().asFile.readText()
+val extractMaintainers by tasks.registering(ExtractMaintainers::class) {
+    inputFile.set(layout.projectDirectory.file("../MAINTAINERS"))
+    outputFile.set(layout.buildDirectory.file("maintainers.txt"))
+}
+
+val maintainersProvider: Provider<String> = extractMaintainers.flatMap {
+    it.outputFile.map { file -> file.asFile.readText() }
 }
 
 val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.0")
