@@ -104,8 +104,10 @@ open module org.jabref.jablib {
     exports org.jabref.logic.crawler;
     exports org.jabref.logic.git;
 
+    requires java.base;
+
     requires javafx.base;
-    requires javafx.graphics;
+    requires javafx.graphics; // because of javafx.scene.paint.Color
     requires afterburner.fx;
     requires com.tobiasdiez.easybind;
 

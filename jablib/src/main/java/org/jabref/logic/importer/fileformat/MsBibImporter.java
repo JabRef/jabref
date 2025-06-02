@@ -63,7 +63,7 @@ public class MsBibImporter extends Importer {
             });
 
             docin = dbuild.parse(new InputSource(reader));
-        } catch (Exception e) {
+        } catch (SAXException | ParserConfigurationException e) {
             return false;
         }
         return (docin == null) || docin.getDocumentElement().getTagName().contains("Sources");

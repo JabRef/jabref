@@ -10,10 +10,11 @@ open module org.jabref {
 
     // region JavaFX
     requires javafx.base;
-    requires javafx.graphics;
     requires javafx.controls;
-    requires javafx.web;
     requires javafx.fxml;
+    requires javafx.graphics;
+    requires javafx.web;
+
     requires com.tobiasdiez.easybind;
 
     requires afterburner.fx;
@@ -189,5 +190,6 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires com.dlsc.pdfviewfx;
     // endregion
 }
