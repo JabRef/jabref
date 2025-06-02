@@ -259,7 +259,7 @@ xjc {
     options.set(listOf("encoding=UTF-8"))
 }
 
-abstract class ExtractMaintainers : DefaultTask() {
+abstract class RemoveCommentedLines : DefaultTask() {
 
     @get:InputFile
     abstract val inputFile: RegularFileProperty
@@ -278,7 +278,7 @@ abstract class ExtractMaintainers : DefaultTask() {
     }
 }
 
-val extractMaintainers by tasks.registering(ExtractMaintainers::class) {
+val extractMaintainers by tasks.registering(RemoveCommentedLines::class) {
     inputFile.set(layout.projectDirectory.file("../MAINTAINERS"))
     outputFile.set(layout.buildDirectory.file("maintainers.txt"))
 }
