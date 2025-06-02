@@ -262,7 +262,7 @@ xjc {
 
 tasks.register("extractMaintainers") {
     val inputFile = layout.projectDirectory.file("../MAINTAINERS")
-    val outputFile = layout.buildDirectory.file("tmp/maintainers.txt")
+    val outputFile = layout.buildDirectory.file("maintainers.txt")
 
     inputs.file(inputFile)
     outputs.file(outputFile)
@@ -281,7 +281,7 @@ tasks.register("extractMaintainers") {
 }
 
 val maintainersProvider = providers.provider {
-    layout.buildDirectory.file("tmp/maintainers.txt").get().asFile.readText()
+    layout.buildDirectory.file("maintainers.txt").get().asFile.readText()
 }
 
 val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.0")
