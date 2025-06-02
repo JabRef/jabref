@@ -108,7 +108,7 @@ dependencies {
 
     implementation("com.konghq:unirest-java-core:4.4.7")
 
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
 
     implementation("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
 
