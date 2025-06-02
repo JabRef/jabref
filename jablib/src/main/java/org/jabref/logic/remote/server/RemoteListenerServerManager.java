@@ -8,14 +8,12 @@ import org.jabref.logic.util.HeadlessExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Manages the TeleServerThread through typical life cycle methods.
- * <p/>
- * open -> start -> stop
- * openAndStart -> stop
- * <p/>
- * Observer: isOpen, isNotStartedBefore
- */
+/// Manages the TeleServerThread through typical life cycle methods.
+///
+/// open -> start -> stop
+/// openAndStart -> stop
+///
+/// Observer: isOpen, isNotStartedBefore
 public class RemoteListenerServerManager implements AutoCloseable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoteListenerServerManager.class);

@@ -29,7 +29,7 @@ public class CitationKeyGenerator extends BracketedPattern {
 
     /// List of unwanted characters. These will be removed at the end.
     /// Note that `+` is a wanted character to indicate "et al." in authorsAlpha.
-    /// Example: `ABC+`. See {@link org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()} for examples.
+    /// Example: `ABC+`. See `org.jabref.logic.citationkeypattern.BracketedPatternTest#authorsAlpha()` for examples.
     ///
     /// See also #DISALLOWED_CHARACTERS
     public static final String DEFAULT_UNWANTED_CHARACTERS = "?!;^`ʹ";

@@ -10,10 +10,16 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.model.entry.identifier.RFC;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,6 +27,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -126,5 +134,42 @@ class CompositeIdFetcherTest {
     @MethodSource
     void performSearchByIdReturnsCorrectEntryForIdentifier(String name, BibEntry bibEntry, String identifier) throws FetcherException {
         assertEquals(Optional.of(bibEntry), compositeIdFetcher.performSearchById(identifier));
+    }
+
+    @Test
+    void detectsValidDOI() {
+        Optional<Identifier> result = Identifier.from("10.1109/MCOM.2010.5673082");
+        assertTrue(result.isPresent());
+        assertInstanceOf(DOI.class, result.get());
+        assertTrue(DOI.isValid(result.get().asString()));
+    }
+
+    @Test
+    void rejectsInvalidDOI() {
+        Optional<Identifier> result = Identifier.from("123456789");
+        boolean isInvalid = result.isEmpty() || (result.get() instanceof DOI && !DOI.isValid(result.get().asString()));
+        assertTrue(isInvalid);
+    }
+
+    @Test
+    void detectsValidISBN() {
+        Optional<Identifier> result = Identifier.from("9780134685991");
+        assertTrue(result.isPresent());
+        assertInstanceOf(ISBN.class, result.get());
+        assertTrue(((ISBN) result.get()).isValid());
+    }
+
+    @Test
+    void detectsValidArXiv() {
+        Optional<Identifier> result = Identifier.from("arXiv:1706.03762");
+        assertTrue(result.isPresent());
+        assertInstanceOf(ArXivIdentifier.class, result.get());
+    }
+
+    @Test
+    void detectsValidRFC() {
+        Optional<Identifier> result = Identifier.from("rfc2616");
+        assertTrue(result.isPresent());
+        assertInstanceOf(RFC.class, result.get());
     }
 }

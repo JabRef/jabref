@@ -11,7 +11,7 @@ import org.jabref.model.entry.BibEntry;
 
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.model.input.PromptTemplate;
 
 public class LlmPlainCitationParser implements PlainCitationParser {
@@ -19,9 +19,9 @@ public class LlmPlainCitationParser implements PlainCitationParser {
     private static final PromptTemplate USER_MESSAGE_TEMPLATE = PromptTemplate.from("Please convert this plain text citation to a BibTeX entry:\n{{citation}}\nIn your output, please provide only BibTex code as your message.");
 
     private final ImportFormatPreferences importFormatPreferences;
-    private final ChatLanguageModel llm;
+    private final ChatModel llm;
 
-    public LlmPlainCitationParser(ImportFormatPreferences importFormatPreferences, ChatLanguageModel llm) {
+    public LlmPlainCitationParser(ImportFormatPreferences importFormatPreferences, ChatModel llm) {
         this.importFormatPreferences = importFormatPreferences;
         this.llm = llm;
     }
@@ -36,9 +36,9 @@ public class LlmPlainCitationParser implements PlainCitationParser {
     }
 
     private String getBibtexStringFromLlm(String searchQuery) {
-        return llm.generate(new SystemMessage(SYSTEM_MESSAGE),
+        return llm.chat(new SystemMessage(SYSTEM_MESSAGE),
                 new UserMessage(
                         USER_MESSAGE_TEMPLATE.apply(Map.of("citation", searchQuery)).toString()
-                )).content().text();
+                )).aiMessage().text();
     }
 }

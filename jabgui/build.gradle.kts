@@ -1,14 +1,9 @@
 import org.gradle.internal.os.OperatingSystem
-import org.gradle.kotlin.dsl.annotationProcessor
-import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
-import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
 plugins {
     id("buildlogic.java-common-conventions")
 
     application
-
-    id("org.openjfx.javafxplugin") version("0.1.0")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
@@ -22,8 +17,18 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 val luceneVersion = "10.2.1"
 val pdfbox = "3.0.5"
 
+val javafxVersion = "24.0.1"
+
 dependencies {
     implementation(project(":jablib"))
+
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    // implementation("org.openjfx:javafx-graphics:24.0.1")
+    implementation("org.openjfx:javafx-graphics:$javafxVersion")
+    implementation("org.openjfx:javafx-swing:$javafxVersion")
+    implementation("org.openjfx:javafx-web:$javafxVersion")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")
@@ -54,11 +59,15 @@ dependencies {
         exclude(group = "org.apache.logging.log4j")
         exclude(group = "tech.units")
     }
+    implementation("com.dlsc.pdfviewfx:pdfviewfx:3.1.1") {
+        exclude(group = "org.openjfx")
+        exclude(module = "commons-lang3")
+    }
 
     // Required by gemsfx
     implementation("tech.units:indriya:2.2.3")
     // Required by gemsfx and langchain4j
-    implementation ("com.squareup.retrofit2:retrofit:2.11.0") {
+    implementation ("com.squareup.retrofit2:retrofit:3.0.0") {
         exclude(group = "com.squareup.okhttp3")
     }
 
@@ -80,7 +89,7 @@ dependencies {
 
     implementation("com.google.guava:guava:33.4.8-jre")
 
-    implementation("dev.langchain4j:langchain4j:0.36.2")
+    implementation("dev.langchain4j:langchain4j:1.0.0")
 
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
 
@@ -95,7 +104,7 @@ dependencies {
     // implementation("net.java.dev.jna:jna:5.16.0")
     implementation("net.java.dev.jna:jna-platform:5.17.0")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
 
     implementation("com.konghq:unirest-java-core:4.4.7")
 
@@ -123,7 +132,7 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
@@ -134,12 +143,6 @@ dependencies {
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
 }
 
-javafx {
-    version = "24"
-    // javafx.swing required by com.dlsc.gemsfx
-    modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web", "javafx.swing")
-}
-
 application {
     mainClass.set("org.jabref.Launcher")
     mainModule.set("org.jabref")
@@ -147,10 +150,15 @@ application {
     applicationDefaultJvmArgs = listOf(
         // On a change here, also adapt
         //   1. "run > moduleOptions"
-        //   2. "deployment.yml" (macOS part)
-        //   3. "deployment-arm64.yml"
+        //   2. "binaries.yml" (macOS part)
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
+
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
+
+        "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
 
         // Fix for https://github.com/JabRef/jabref/issues/11188
         "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
@@ -178,10 +186,6 @@ application {
     )
 }
 
-// Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
-// See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
-modularity.disableEffectiveArgumentsAdjustment()
-
 /*
 jacoco {
     toolVersion = "0.8.13"
@@ -195,65 +199,10 @@ tasks.named<JavaExec>("run") {
     doFirst {
         // Clear the default JVM arguments to avoid warnings
         // application.applicationDefaultJvmArgs = emptyList()
-        application.applicationDefaultJvmArgs = listOf("--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core")
-    }
-
-    extensions.configure<RunModuleOptions>("moduleOptions") {
-        // On a change here, also adapt "application > applicationDefaultJvmArgs"
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal API
-                "javafx.base/com.sun.javafx.event" to "org.jabref.merged.module",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-
-                // ControlsFX compatibility
-                // We need to restate the ControlsFX exports, because we get following error otherwise:
-                //   java.lang.IllegalAccessError:
-                //     class org.controlsfx.control.textfield.AutoCompletionBinding (in module org.controlsfx.controls)
-                //     cannot access class com.sun.javafx.event.EventHandlerManager (in module javafx.base) because
-                //     module javafx.base does not export com.sun.javafx.event to module org.controlsfx.controls
-                // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
-                "javafx.graphics/com.sun.javafx.scene" to "org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.scene.traversal" to "org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.css" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control.behavior" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control.inputmap" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.event" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.collections" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.runtime" to "org.controlsfx.controls",
-                "javafx.web/com.sun.webkit" to "org.controlsfx.controls"
+        application.applicationDefaultJvmArgs =
+            listOf(
+                "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
             )
-        )
-
-        addOpens.putAll(
-            mapOf(
-                "javafx.controls/javafx.scene.control" to "org.jabref",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref",
-                "org.controlsfx.controls/org.controlsfx.control.textfield" to "org.jabref",
-                "javafx.controls/javafx.scene.control.skin" to "org.controlsfx.controls",
-                "javafx.graphics/javafx.scene" to "org.controlsfx.controls",
-                "javafx.base/javafx.collections" to "org.jabref",
-                "javafx.base/javafx.collections.transformation" to "org.jabref"
-            )
-        )
-
-        addModules.add("jdk.incubator.vector")
-
-        createCommandLineArgumentFile = true
-    }
-}
-
-tasks.compileJava {
-    extensions.configure<CompileModuleOptions> {
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal api
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
-            )
-        )
     }
 }
 
@@ -281,7 +230,8 @@ jlink {
         "zip-6",
         "--no-header-files",
         "--no-man-pages",
-        "--bind-services"
+        "--bind-services",
+        "--add-modules", "jdk.incubator.vector"
     )
 
     launcher {
@@ -299,185 +249,72 @@ jlink {
     )
 
     mergedModule {
-        requires(
-            "com.google.gson"
-        )
-        requires(
-            "com.fasterxml.jackson.annotation"
-        )
-        requires(
-            "com.fasterxml.jackson.databind"
-        )
-        requires(
-            "com.fasterxml.jackson.core"
-        )
-        requires(
-            "com.fasterxml.jackson.datatype.jdk8"
-        )
-        requires(
-            "jakarta.xml.bind"
-        )
-        requires(
-            "java.compiler"
-        )
-        requires(
-            "java.datatransfer"
-        )
-        requires(
-            "java.desktop"
-        )
-        requires(
-            "java.logging"
-        )
-        requires(
-            "java.management"
-        )
-        requires(
-            "java.naming"
-        )
-        requires(
-            "java.net.http"
-        )
-        requires(
-            "java.rmi"
-        )
-        requires(
-            "java.scripting"
-        )
-        requires(
-            "java.security.jgss"
-        )
-        requires(
-            "java.security.sasl"
-        )
-        requires(
-            "java.sql"
-        )
-        requires(
-            "java.sql.rowset"
-        )
-        requires(
-            "java.transaction.xa"
-        )
-        requires(
-            "java.xml"
-        )
-        requires(
-            "javafx.base"
-        )
-        requires(
-            "javafx.controls"
-        )
-        requires(
-            "javafx.fxml"
-        )
-        requires(
-            "javafx.graphics"
-        )
-        requires(
-            "javafx.media"
-        )
-        requires(
-            "javafx.swing"
-        )
-        requires(
-            "jdk.security.jgss"
-        )
-        requires(
-            "jdk.unsupported"
-        )
-        requires(
-            "jdk.unsupported.desktop"
-        )
-        requires(
-            "jdk.xml.dom"
-        )
-        requires(
-            "org.apache.commons.lang3"
-        )
-        requires(
-            "org.apache.commons.logging"
-        )
-        requires(
-            "org.apache.commons.text"
-        )
-        requires(
-            "org.apache.commons.codec"
-        )
-        requires(
-            "org.apache.commons.io"
-        )
-        requires(
-            "org.apache.commons.compress"
-        )
-        requires(
-            "org.freedesktop.dbus"
-        )
-        requires(
-            "org.jsoup"
-        )
-        requires(
-            "org.slf4j"
-        )
-        requires(
-            "org.tukaani.xz"
-        );
-        uses(
-            "ai.djl.engine.EngineProvider"
-        )
-        uses(
-            "ai.djl.repository.RepositoryFactory"
-        )
-        uses(
-            "ai.djl.repository.zoo.ZooProvider"
-        )
-        uses(
-            "dev.langchain4j.spi.prompt.PromptTemplateFactory"
-        )
-        uses(
-            "kong.unirest.core.json.JsonEngine"
-        )
-        uses(
-            "org.eclipse.jgit.lib.Signer"
-        )
-        uses(
-            "org.eclipse.jgit.transport.SshSessionFactory"
-        )
-        uses(
-            "org.postgresql.shaded.com.ongres.stringprep.Profile"
-        )
+        requires("com.google.gson")
+        requires("com.fasterxml.jackson.annotation")
+        requires("com.fasterxml.jackson.databind")
+        requires("com.fasterxml.jackson.core")
+        requires("com.fasterxml.jackson.datatype.jdk8")
+        requires("jakarta.xml.bind")
+        requires("java.compiler")
+        requires("java.datatransfer")
+        requires("java.desktop")
+        requires("java.logging")
+        requires("java.management")
+        requires("java.naming")
+        requires("java.net.http")
+        requires("java.rmi")
+        requires("java.scripting")
+        requires("java.security.jgss")
+        requires("java.security.sasl")
+        requires("java.sql")
+        requires("java.sql.rowset")
+        requires("java.transaction.xa")
+        requires("java.xml")
+        requires("javafx.base")
+        requires("javafx.controls")
+        requires("javafx.fxml")
+        requires("javafx.graphics")
+        requires("javafx.media")
+        requires("javafx.swing")
+        requires("jdk.security.jgss")
+        requires("jdk.unsupported")
+        requires("jdk.unsupported.desktop")
+        requires("jdk.xml.dom")
+        requires("org.apache.commons.lang3")
+        requires("org.apache.commons.logging")
+        requires("org.apache.commons.text")
+        requires("org.apache.commons.codec")
+        requires("org.apache.commons.io")
+        requires("org.apache.commons.compress")
+        requires("org.freedesktop.dbus")
+        requires("org.jsoup")
+        requires("org.slf4j")
+        requires("org.tukaani.xz");
 
-        provides(
-            "java.sql.Driver"
-        ).with(
-            "org.postgresql.Driver"
-        )
-        provides(
-            "java.security.Provider"
-        ).with(
+        uses("ai.djl.engine.EngineProvider")
+        uses("ai.djl.repository.RepositoryFactory")
+        uses("ai.djl.repository.zoo.ZooProvider")
+        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
+        uses("kong.unirest.core.json.JsonEngine")
+        uses("org.eclipse.jgit.lib.Signer")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
+        uses("org.postgresql.shaded.com.ongres.stringprep.Profile")
+
+        provides("java.sql.Driver").with(
+            "org.postgresql.Driver")
+        provides("java.security.Provider").with(
             "org.bouncycastle.jce.provider.BouncyCastleProvider",
-            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider"
-        )
-        provides(
-            "kong.unirest.core.json.JsonEngine"
-        ).with(
-            "kong.unirest.modules.gson.GsonEngine"
-        )
-        provides(
-            "ai.djl.repository.zoo.ZooProvider"
-        ).with(
+            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
+        provides("kong.unirest.core.json.JsonEngine").with(
+            "kong.unirest.modules.gson.GsonEngine")
+        provides("ai.djl.repository.zoo.ZooProvider").with(
             "ai.djl.engine.rust.zoo.RsZooProvider",
             "ai.djl.huggingface.zoo.HfZooProvider",
             "ai.djl.pytorch.zoo.PtZooProvider",
-            "ai.djl.repository.zoo.DefaultZooProvider"
-        )
-        provides(
-            "ai.djl.engine.EngineProvider"
-        ).with(
+            "ai.djl.repository.zoo.DefaultZooProvider")
+        provides("ai.djl.engine.EngineProvider").with(
             "ai.djl.engine.rust.RsEngineProvider",
-            "ai.djl.pytorch.engine.PtEngineProvider"
-        )
-
+            "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
     jpackage {
@@ -504,7 +341,7 @@ jlink {
                     "--win-shortcut",
                     "--win-menu",
                     "--win-menu-group", "JabRef",
-                    "--temp", "$buildDir/installer",
+                    "--temp", "${layout.buildDirectory.get()}/installer",
                     "--resource-dir", "$projectDir/buildres/windows",
                     "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
                     "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
@@ -528,7 +365,7 @@ jlink {
                     "--linux-menu-group", "Office;",
                     "--linux-rpm-license-type", "MIT",
                     // "--license-file", "$projectDir/LICENSE.md",
-                    "--description", "JabRef is an open source bibliography reference manager. The native file format used by JabRef is BibTeX, the standard LaTeX bibliography format.",
+                    "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
                     "--linux-shortcut",
                     "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
                 )
@@ -570,7 +407,7 @@ if (OperatingSystem.current().isWindows) {
                         "JabRefHost.ps1"
                     )
                 }
-                into(file("$buildDir/distribution/JabRef"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef"))
             }
         }
     }
@@ -581,7 +418,7 @@ if (OperatingSystem.current().isWindows) {
                 from(file("$projectDir/buildres/linux")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
-                into(file("$buildDir/distribution/JabRef/lib"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef/lib"))
             }
         }
     }
@@ -592,8 +429,23 @@ if (OperatingSystem.current().isWindows) {
                 from(file("$projectDir/buildres/mac")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
-                into(file("$buildDir/distribution/JabRef.app/Contents/Resources"))
+                into(file("${layout.buildDirectory.get()}/distribution/JabRef.app/Contents/Resources"))
             }
         }
     }
+}
+
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.junit.jupiter.params")
+    requires.add("org.mockito")
+    requires.add("org.jabref.testsupport")
+}
+
+tasks.test {
+    jvmArgs = listOf(
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
+        "--add-reads", "org.mockito=java.prefs",
+        "--add-reads", "org.mockito=javafx.scene",
+    )
 }

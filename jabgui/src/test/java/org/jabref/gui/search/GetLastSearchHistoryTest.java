@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(ApplicationExtension.class)
 class GetLastSearchHistoryTest {
+    private final StateManager stateManager = new StateManager();
+    private final BibDatabaseContext dbContext1 = new BibDatabaseContext();
+    private final BibDatabaseContext dbContext2 = new BibDatabaseContext();
+
     @Start
     void onStart(Stage stage) {
         // Needed to init JavaFX thread
@@ -23,7 +28,7 @@ class GetLastSearchHistoryTest {
 
     @Test
     void getLastSearchHistory() {
-        StateManager stateManager = new StateManager();
+        stateManager.clearSearchHistory();
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
         stateManager.addSearchHistory("test3");
@@ -35,7 +40,7 @@ class GetLastSearchHistoryTest {
 
     @Test
     void duplicateSearchHistory() {
-        StateManager stateManager = new StateManager();
+        stateManager.clearSearchHistory();
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
         stateManager.addSearchHistory("test3");
@@ -48,7 +53,7 @@ class GetLastSearchHistoryTest {
 
     @Test
     void clearSearchHistory() {
-        StateManager stateManager = new StateManager();
+        stateManager.clearSearchHistory();
         stateManager.addSearchHistory("test1");
         stateManager.addSearchHistory("test2");
         stateManager.addSearchHistory("test3");
@@ -59,5 +64,21 @@ class GetLastSearchHistoryTest {
         lastSearchHistory = stateManager.getWholeSearchHistory();
         expected = List.of();
         assertEquals(expected, lastSearchHistory);
+    }
+
+    @Test
+    void searchHistory_isSharedAcrossMultipleDatabasesAndMaintainsCorrectOrder() {
+        stateManager.clearSearchHistory();
+        stateManager.setActiveDatabase(dbContext1);
+        stateManager.addSearchHistory("queryA");
+
+        stateManager.setActiveDatabase(dbContext2);
+        stateManager.addSearchHistory("queryB");
+
+        stateManager.setActiveDatabase(dbContext1);
+        stateManager.addSearchHistory("queryC");
+
+        List<String> expected = List.of("queryA", "queryB", "queryC");
+        assertEquals(expected, stateManager.getWholeSearchHistory());
     }
 }

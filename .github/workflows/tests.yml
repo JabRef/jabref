@@ -102,7 +102,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v19
+        uses: DavidAnson/markdownlint-cli2-action@v20
         with:
           globs: |
             *.md
@@ -166,6 +166,21 @@ jobs:
             <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
+  javadoc:
+    name: JavaDoc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew javadoc
+
   tests:
     name: Unit tests – ${{ matrix.module }}
     runs-on: ubuntu-latest
@@ -201,6 +216,7 @@ jobs:
 
   tests-windows:
     name: Unit tests (Windows) – ${{ matrix.module }}
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
     strategy:
       matrix:
@@ -257,6 +273,22 @@ jobs:
         env:
           CI: "true"
           DBMS: "postgresql"
+
+  jbang:
+    name: JBang
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Install JBang
+        uses: jbangdev/setup-jbang@main
+      - run: jbang build .jbang/CheckoutPR.java
+      - run: jbang build .jbang/CloneJabRef.java
+      - run: jbang build .jbang/JabKitLauncher.java
+      - run: jbang build .jbang/JabSrvLauncher.java
 
   codecoverage:
     if: false

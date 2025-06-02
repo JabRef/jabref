@@ -1,11 +1,16 @@
-<!-- YOU HAVE TO MODIFY THE TEXT BELOW TO FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
+Closes #_____
 
-<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD -->
-<!-- Example: Closes (link) OR Closes #12345 -->
+In about one to three sentences, describe the changes you have made: what, where, why, ...
 
-Closes _____
-Describe the changes you have made here: what, where, why, ...
-If your work is not yet complete, please open a draft pull request. In that case, outline your intended next steps. Do you need feedback? Will you continue in parallel? ...
+<!-- NOTE: If your work is not yet complete, please open a draft pull request. In that case, outline your intended next steps. Do you need feedback? Will you continue in parallel? ... -->
+
+### Steps to test
+
+Describe how reviewers can test this fix/feature. Ideally, think of how you would guide a beginner user of Jabef to try out your change.
+You can add screenshots or videos (using [Loom](https://www.loom.com/) or by just adding .mp4 files).
+
+<!-- YOU HAVE TO MODIFY THE ABOVE TEXT FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
+<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD. Example: Closes (link) OR Closes #12345 -->
 
 ### Mandatory checks
 

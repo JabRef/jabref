@@ -49,6 +49,7 @@ import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.exporter.TemplateExporter;
+import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.ACMPortalFetcher;
@@ -165,6 +166,9 @@ public class JabRefCliPreferences implements CliPreferences {
 
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
+
+    public static final String ADD_IMPORTED_ENTRIES = "addImportedEntries";
+    public static final String ADD_IMPORTED_ENTRIES_GROUP_NAME = "addImportedEntriesGroupName";
 
     public static final String BASE_DOI_URI = "baseDOIURI";
     public static final String USE_CUSTOM_DOI_URI = "useCustomDOIURI";
@@ -465,6 +469,9 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
+
+        defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
+        defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
 
         // region: Grobid
         defaults.put(GROBID_ENABLED, Boolean.FALSE);
@@ -1026,10 +1033,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getStringList(EXTERNAL_JOURNAL_LISTS),
                 getBoolean(USE_AMS_FJOURNAL));
 
-        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) change ->
+        journalAbbreviationPreferences.getExternalJournalLists().addListener((InvalidationListener) _ ->
                 putStringList(EXTERNAL_JOURNAL_LISTS, journalAbbreviationPreferences.getExternalJournalLists()));
         EasyBind.listen(journalAbbreviationPreferences.useFJournalFieldProperty(),
-                (obs, oldValue, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
+                (_, _, newValue) -> putBoolean(USE_AMS_FJOURNAL, newValue));
 
         return journalAbbreviationPreferences;
     }
@@ -1118,11 +1125,15 @@ public class JabRefCliPreferences implements CliPreferences {
         libraryPreferences = new LibraryPreferences(
                 getBoolean(BIBLATEX_DEFAULT_MODE) ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX,
                 getBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT),
-                getBoolean(LOCAL_AUTO_SAVE));
+                getBoolean(LOCAL_AUTO_SAVE),
+                getBoolean(ADD_IMPORTED_ENTRIES),
+                get(ADD_IMPORTED_ENTRIES_GROUP_NAME));
 
-        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (obs, oldValue, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));
-        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (obs, oldValue, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
-        EasyBind.listen(libraryPreferences.autoSaveProperty(), (obs, oldValue, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
+        EasyBind.listen(libraryPreferences.defaultBibDatabaseModeProperty(), (_, _, newValue) -> putBoolean(BIBLATEX_DEFAULT_MODE, newValue == BibDatabaseMode.BIBLATEX));
+        EasyBind.listen(libraryPreferences.alwaysReformatOnSaveProperty(), (_, _, newValue) -> putBoolean(REFORMAT_FILE_ON_SAVE_AND_EXPORT, newValue));
+        EasyBind.listen(libraryPreferences.autoSaveProperty(), (_, _, newValue) -> putBoolean(LOCAL_AUTO_SAVE, newValue));
+        EasyBind.listen(libraryPreferences.addImportedEntriesProperty(), (_, _, newValue) -> putBoolean(ADD_IMPORTED_ENTRIES, newValue));
+        EasyBind.listen(libraryPreferences.addImportedEntriesGroupNameProperty(), (_, _, newValue) -> put(ADD_IMPORTED_ENTRIES_GROUP_NAME, newValue));
 
         return libraryPreferences;
     }
@@ -1137,8 +1148,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(USE_CUSTOM_DOI_URI),
                 get(BASE_DOI_URI));
 
-        EasyBind.listen(doiPreferences.useCustomProperty(), (obs, oldValue, newValue) -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
-        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (obs, oldValue, newValue) -> put(BASE_DOI_URI, newValue));
+        EasyBind.listen(doiPreferences.useCustomProperty(), (_, _, newValue) -> putBoolean(USE_CUSTOM_DOI_URI, newValue));
+        EasyBind.listen(doiPreferences.defaultBaseURIProperty(), (_, _, newValue) -> put(BASE_DOI_URI, newValue));
 
         return doiPreferences;
     }
@@ -1154,8 +1165,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(DEFAULT_OWNER),
                 getBoolean(OVERWRITE_OWNER));
 
-        EasyBind.listen(ownerPreferences.useOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_OWNER, newValue));
-        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(ownerPreferences.useOwnerProperty(), (_, _, newValue) -> putBoolean(USE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.defaultOwnerProperty(), (_, _, newValue) -> {
             put(DEFAULT_OWNER, newValue);
             // trigger re-determination of userAndHost and the dependent preferences
             userAndHost = null;
@@ -1163,7 +1174,7 @@ public class JabRefCliPreferences implements CliPreferences {
             // this propagates down to filePreferences
             getInternalPreferences().getUserAndHostProperty().setValue(newValue);
         });
-        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (obs, oldValue, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
+        EasyBind.listen(ownerPreferences.overwriteOwnerProperty(), (_, _, newValue) -> putBoolean(OVERWRITE_OWNER, newValue));
 
         return ownerPreferences;
     }
@@ -1181,8 +1192,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 FieldFactory.parseField(get(TIME_STAMP_FIELD)),
                 get(TIME_STAMP_FORMAT));
 
-        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_CREATION_DATE, newValue));
-        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (obs, oldValue, newValue) -> putBoolean(ADD_MODIFICATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addCreationDateProperty(), (_, _, newValue) -> putBoolean(ADD_CREATION_DATE, newValue));
+        EasyBind.listen(timestampPreferences.addModificationDateProperty(), (_, _, newValue) -> putBoolean(ADD_MODIFICATION_DATE, newValue));
 
         return timestampPreferences;
     }
@@ -1201,8 +1212,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getInt(REMOTE_SERVER_PORT),
                 getBoolean(USE_REMOTE_SERVER));
 
-        EasyBind.listen(remotePreferences.portProperty(), (obs, oldValue, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
-        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (obs, oldValue, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
+        EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
+        EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
 
         return remotePreferences;
     }
@@ -1222,13 +1233,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 getProxyPassword(),
                 getBoolean(PROXY_PERSIST_PASSWORD));
 
-        EasyBind.listen(proxyPreferences.useProxyProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE, newValue));
-        EasyBind.listen(proxyPreferences.hostnameProperty(), (obs, oldValue, newValue) -> put(PROXY_HOSTNAME, newValue));
-        EasyBind.listen(proxyPreferences.portProperty(), (obs, oldValue, newValue) -> put(PROXY_PORT, newValue));
-        EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (obs, oldValue, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
-        EasyBind.listen(proxyPreferences.usernameProperty(), (obs, oldValue, newValue) -> put(PROXY_USERNAME, newValue));
-        EasyBind.listen(proxyPreferences.passwordProperty(), (obs, oldValue, newValue) -> setProxyPassword(newValue));
-        EasyBind.listen(proxyPreferences.persistPasswordProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(proxyPreferences.useProxyProperty(), (_, _, newValue) -> putBoolean(PROXY_USE, newValue));
+        EasyBind.listen(proxyPreferences.hostnameProperty(), (_, _, newValue) -> put(PROXY_HOSTNAME, newValue));
+        EasyBind.listen(proxyPreferences.portProperty(), (_, _, newValue) -> put(PROXY_PORT, newValue));
+        EasyBind.listen(proxyPreferences.useAuthenticationProperty(), (_, _, newValue) -> putBoolean(PROXY_USE_AUTHENTICATION, newValue));
+        EasyBind.listen(proxyPreferences.usernameProperty(), (_, _, newValue) -> put(PROXY_USERNAME, newValue));
+        EasyBind.listen(proxyPreferences.passwordProperty(), (_, _, newValue) -> setProxyPassword(newValue));
+        EasyBind.listen(proxyPreferences.persistPasswordProperty(), (_, _, newValue) -> {
             putBoolean(PROXY_PERSIST_PASSWORD, newValue);
             if (!newValue) {
                 try (final Keyring keyring = Keyring.create()) {
@@ -1359,23 +1370,23 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBibEntryPreferences().keywordSeparatorProperty());
 
         EasyBind.listen(citationKeyPatternPreferences.shouldAvoidOverwriteCiteKeyProperty(),
-                (obs, oldValue, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
+                (_, _, newValue) -> putBoolean(AVOID_OVERWRITING_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldWarnBeforeOverwriteCiteKeyProperty(),
-                (obs, oldValue, newValue) -> putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));
+                (_, _, newValue) -> putBoolean(WARN_BEFORE_OVERWRITING_KEY, newValue));
         EasyBind.listen(citationKeyPatternPreferences.shouldGenerateCiteKeysBeforeSavingProperty(),
-                (obs, oldValue, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
-        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (obs, oldValue, newValue) -> {
+                (_, _, newValue) -> putBoolean(GENERATE_KEYS_BEFORE_SAVING, newValue));
+        EasyBind.listen(citationKeyPatternPreferences.keySuffixProperty(), (_, _, newValue) -> {
             putBoolean(KEY_GEN_ALWAYS_ADD_LETTER, newValue == CitationKeyPatternPreferences.KeySuffix.ALWAYS);
             putBoolean(KEY_GEN_FIRST_LETTER_A, newValue == CitationKeyPatternPreferences.KeySuffix.SECOND_WITH_A);
         });
         EasyBind.listen(citationKeyPatternPreferences.keyPatternRegexProperty(),
-                (obs, oldValue, newValue) -> put(KEY_PATTERN_REGEX, newValue));
+                (_, _, newValue) -> put(KEY_PATTERN_REGEX, newValue));
         EasyBind.listen(citationKeyPatternPreferences.keyPatternReplacementProperty(),
-                (obs, oldValue, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
+                (_, _, newValue) -> put(KEY_PATTERN_REPLACEMENT, newValue));
         EasyBind.listen(citationKeyPatternPreferences.unwantedCharactersProperty(),
-                (obs, oldValue, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
+                (_, _, newValue) -> put(UNWANTED_CITATION_KEY_CHARACTERS, newValue));
         EasyBind.listen(citationKeyPatternPreferences.keyPatternsProperty(),
-                (obs, oldValue, newValue) -> storeGlobalCitationKeyPattern(newValue));
+                (_, _, newValue) -> storeGlobalCitationKeyPattern(newValue));
 
         return citationKeyPatternPreferences;
     }
@@ -1405,7 +1416,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(KEYWORD_SEPARATOR).charAt(0)
         );
 
-        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (observable, oldValue, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue)));
+        EasyBind.listen(bibEntryPreferences.keywordSeparatorProperty(), (_, _, newValue) -> put(KEYWORD_SEPARATOR, String.valueOf(newValue)));
 
         return bibEntryPreferences;
     }
@@ -1432,13 +1443,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
-                (obs, oldValue, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
+                (_, _, newValue) -> put(VERSION_IGNORED_UPDATE, newValue.toString()));
         EasyBind.listen(internalPreferences.versionCheckEnabledProperty(),
-                (obs, oldValue, newValue) -> putBoolean(VERSION_CHECK_ENABLED, newValue));
+                (_, _, newValue) -> putBoolean(VERSION_CHECK_ENABLED, newValue));
         EasyBind.listen(internalPreferences.lastPreferencesExportPathProperty(),
-                (obs, oldValue, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
+                (_, _, newValue) -> put(PREFS_EXPORT_PATH, newValue.toString()));
         // user is a static value, should only be changed for debugging
-        EasyBind.listen(internalPreferences.memoryStickModeProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(internalPreferences.memoryStickModeProperty(), (_, _, newValue) -> {
             putBoolean(MEMORY_STICK_MODE, newValue);
             if (!newValue) {
                 try {
@@ -1482,10 +1493,10 @@ public class JabRefCliPreferences implements CliPreferences {
                                                    .map(FieldFactory::parseField)
                                                    .collect(Collectors.toList()));
 
-        EasyBind.listen(fieldPreferences.resolveStringsProperty(), (obs, oldValue, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
-        fieldPreferences.getResolvableFields().addListener((InvalidationListener) change ->
+        EasyBind.listen(fieldPreferences.resolveStringsProperty(), (_, _, newValue) -> putBoolean(DO_NOT_RESOLVE_STRINGS, !newValue));
+        fieldPreferences.getResolvableFields().addListener((InvalidationListener) _ ->
                 put(RESOLVE_STRINGS_FOR_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getResolvableFields())));
-        fieldPreferences.getNonWrappableFields().addListener((InvalidationListener) change ->
+        fieldPreferences.getNonWrappableFields().addListener((InvalidationListener) _ ->
                 put(NON_WRAPPABLE_FIELDS, FieldFactory.serializeFieldsList(fieldPreferences.getNonWrappableFields())));
 
         return fieldPreferences;
@@ -1525,22 +1536,22 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY),
                 getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY));
 
-        EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (obs, oldValue, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
-        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (obs, oldValue, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
-        EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (obs, oldValue, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
-        EasyBind.listen(filePreferences.fileNamePatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
-        EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (obs, oldValue, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
-        EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
-        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (obs, oldValue, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
-        EasyBind.listen(filePreferences.workingDirectoryProperty(), (obs, oldValue, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.createBackupProperty(), (obs, oldValue, newValue) -> putBoolean(CREATE_BACKUP, newValue));
-        EasyBind.listen(filePreferences.backupDirectoryProperty(), (obs, oldValue, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (obs, oldValue, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
-        EasyBind.listen(filePreferences.moveToTrashProperty(), (obs, oldValue, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
-        EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (obs, oldValue, newValue) -> putBoolean(KEEP_DOWNLOAD_URL, newValue));
-        EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (obs, oldValue, newValue) -> put(LAST_USED_DIRECTORY, newValue.toString()));
-        EasyBind.listen(filePreferences.openFileExplorerInFileDirectoryProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, newValue));
-        EasyBind.listen(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), (obs, oldValue, newValue) -> putBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, newValue));
+        EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (_, _, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
+        EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (_, _, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));
+        EasyBind.listen(filePreferences.storeFilesRelativeToBibFileProperty(), (_, _, newValue) -> putBoolean(STORE_RELATIVE_TO_BIB, newValue));
+        EasyBind.listen(filePreferences.fileNamePatternProperty(), (_, _, newValue) -> put(IMPORT_FILENAMEPATTERN, newValue));
+        EasyBind.listen(filePreferences.fileDirectoryPatternProperty(), (_, _, newValue) -> put(IMPORT_FILEDIRPATTERN, newValue));
+        EasyBind.listen(filePreferences.downloadLinkedFilesProperty(), (_, _, newValue) -> putBoolean(DOWNLOAD_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.fulltextIndexLinkedFilesProperty(), (_, _, newValue) -> putBoolean(FULLTEXT_INDEX_LINKED_FILES, newValue));
+        EasyBind.listen(filePreferences.workingDirectoryProperty(), (_, _, newValue) -> put(WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(filePreferences.createBackupProperty(), (_, _, newValue) -> putBoolean(CREATE_BACKUP, newValue));
+        EasyBind.listen(filePreferences.backupDirectoryProperty(), (_, _, newValue) -> put(BACKUP_DIRECTORY, newValue.toString()));
+        EasyBind.listen(filePreferences.confirmDeleteLinkedFileProperty(), (_, _, newValue) -> putBoolean(CONFIRM_LINKED_FILE_DELETE, newValue));
+        EasyBind.listen(filePreferences.moveToTrashProperty(), (_, _, newValue) -> putBoolean(TRASH_INSTEAD_OF_DELETE, newValue));
+        EasyBind.listen(filePreferences.shouldKeepDownloadUrlProperty(), (_, _, newValue) -> putBoolean(KEEP_DOWNLOAD_URL, newValue));
+        EasyBind.listen(filePreferences.lastUsedDirectoryProperty(), (_, _, newValue) -> put(LAST_USED_DIRECTORY, newValue.toString()));
+        EasyBind.listen(filePreferences.openFileExplorerInFileDirectoryProperty(), (_, _, newValue) -> putBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY, newValue));
+        EasyBind.listen(filePreferences.openFileExplorerInLastUsedDirectoryProperty(), (_, _, newValue) -> putBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, newValue));
 
         return filePreferences;
     }
@@ -1557,15 +1568,15 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(ASK_AUTO_NAMING_PDFS_AGAIN),
                 bibEntryPreferences.keywordSeparatorProperty());
 
-        EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(autoLinkPreferences.citationKeyDependencyProperty(), (_, _, newValue) -> {
             // Starts bibtex only omitted, as it is not being saved
             putBoolean(AUTOLINK_EXACT_KEY_ONLY, newValue == AutoLinkPreferences.CitationKeyDependency.EXACT);
             putBoolean(AUTOLINK_USE_REG_EXP_SEARCH_KEY, newValue == AutoLinkPreferences.CitationKeyDependency.REGEX);
         });
         EasyBind.listen(autoLinkPreferences.askAutoNamingPdfsProperty(),
-                (obs, oldValue, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
+                (_, _, newValue) -> putBoolean(ASK_AUTO_NAMING_PDFS_AGAIN, newValue));
         EasyBind.listen(autoLinkPreferences.regularExpressionProperty(),
-                (obs, oldValue, newValue) -> put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));
+                (_, _, newValue) -> put(AUTOLINK_REG_EXP_SEARCH_EXPRESSION_KEY, newValue));
 
         return autoLinkPreferences;
     }
@@ -1597,10 +1608,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getExportSaveOrder(),
                 getCustomExportFormats());
 
-        EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (obs, oldValue, newValue) -> put(LAST_USED_EXPORT, newValue));
-        EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (obs, oldValue, newValue) -> storeExportSaveOrder(newValue));
-        exportPreferences.getCustomExporters().addListener((InvalidationListener) c -> storeCustomExportFormats(exportPreferences.getCustomExporters()));
+        EasyBind.listen(exportPreferences.lastExportExtensionProperty(), (_, _, newValue) -> put(LAST_USED_EXPORT, newValue));
+        EasyBind.listen(exportPreferences.exportWorkingDirectoryProperty(), (_, _, newValue) -> put(EXPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(exportPreferences.exportSaveOrderProperty(), (_, _, newValue) -> storeExportSaveOrder(newValue));
+        exportPreferences.getCustomExporters().addListener((InvalidationListener) _ -> storeCustomExportFormats(exportPreferences.getCustomExporters()));
 
         return exportPreferences;
     }
@@ -1721,10 +1732,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
                         FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))));
 
-        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) c ->
+        cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
                 putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
 
-        EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (fieldFormatters, oldValue, newValue) -> {
+        EasyBind.listen(cleanupPreferences.fieldFormatterCleanupsProperty(), (_, _, newValue) -> {
             putBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED, newValue.isEnabled());
             put(CLEANUP_FIELD_FORMATTERS, FieldFormatterCleanups.getMetaDataString(newValue.getConfiguredActions(), OS.NEWLINE));
         });
@@ -1779,14 +1790,14 @@ public class JabRefCliPreferences implements CliPreferences {
                                                                      .toList());
             }
         });
-        EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (obs, oldValue, newValue) -> {
+        EasyBind.listen(lastFilesOpenedPreferences.lastFocusedFileProperty(), (_, _, newValue) -> {
             if (newValue != null) {
                 put(LAST_FOCUSED, newValue.toAbsolutePath().toString());
             } else {
                 remove(LAST_FOCUSED);
             }
         });
-        lastFilesOpenedPreferences.getFileHistory().addListener((InvalidationListener) change -> storeFileHistory(lastFilesOpenedPreferences.getFileHistory()));
+        lastFilesOpenedPreferences.getFileHistory().addListener((InvalidationListener) _ -> storeFileHistory(lastFilesOpenedPreferences.getFileHistory()));
 
         return lastFilesOpenedPreferences;
     }
@@ -1847,39 +1858,39 @@ public class JabRefCliPreferences implements CliPreferences {
                         AiTemplate.SUMMARIZATION_COMBINE, get(AI_SUMMARIZATION_COMBINE_TEMPLATE)
                 ));
 
-        EasyBind.listen(aiPreferences.enableAiProperty(), (obs, oldValue, newValue) -> putBoolean(AI_ENABLED, newValue));
-        EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
-        EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (obs, oldValue, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
+        EasyBind.listen(aiPreferences.enableAiProperty(), (_, _, newValue) -> putBoolean(AI_ENABLED, newValue));
+        EasyBind.listen(aiPreferences.autoGenerateEmbeddingsProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_EMBEDDINGS, newValue));
+        EasyBind.listen(aiPreferences.autoGenerateSummariesProperty(), (_, _, newValue) -> putBoolean(AI_AUTO_GENERATE_SUMMARIES, newValue));
 
-        EasyBind.listen(aiPreferences.aiProviderProperty(), (obs, oldValue, newValue) -> put(AI_PROVIDER, newValue.name()));
+        EasyBind.listen(aiPreferences.aiProviderProperty(), (_, _, newValue) -> put(AI_PROVIDER, newValue.name()));
 
-        EasyBind.listen(aiPreferences.openAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_OPEN_AI_CHAT_MODEL, newValue));
-        EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
-        EasyBind.listen(aiPreferences.geminiChatModelProperty(), (obs, oldValue, newValue) -> put(AI_GEMINI_CHAT_MODEL, newValue));
-        EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
-        EasyBind.listen(aiPreferences.gpt4AllChatModelProperty(), (obs, oldValue, newValue) -> put(AI_GPT_4_ALL_MODEL, newValue));
+        EasyBind.listen(aiPreferences.openAiChatModelProperty(), (_, _, newValue) -> put(AI_OPEN_AI_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.mistralAiChatModelProperty(), (_, _, newValue) -> put(AI_MISTRAL_AI_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.geminiChatModelProperty(), (_, _, newValue) -> put(AI_GEMINI_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.huggingFaceChatModelProperty(), (_, _, newValue) -> put(AI_HUGGING_FACE_CHAT_MODEL, newValue));
+        EasyBind.listen(aiPreferences.gpt4AllChatModelProperty(), (_, _, newValue) -> put(AI_GPT_4_ALL_MODEL, newValue));
 
-        EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (obs, oldValue, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
+        EasyBind.listen(aiPreferences.customizeExpertSettingsProperty(), (_, _, newValue) -> putBoolean(AI_CUSTOMIZE_SETTINGS, newValue));
 
-        EasyBind.listen(aiPreferences.openAiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_OPEN_AI_API_BASE_URL, newValue));
-        EasyBind.listen(aiPreferences.mistralAiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_MISTRAL_AI_API_BASE_URL, newValue));
-        EasyBind.listen(aiPreferences.geminiApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_GEMINI_API_BASE_URL, newValue));
-        EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_HUGGING_FACE_API_BASE_URL, newValue));
-        EasyBind.listen(aiPreferences.gpt4AllApiBaseUrlProperty(), (obs, oldValue, newValue) -> put(AI_GPT_4_ALL_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.openAiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_OPEN_AI_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.mistralAiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_MISTRAL_AI_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.geminiApiBaseUrlProperty(), (_, _, newValue) -> put(AI_GEMINI_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.huggingFaceApiBaseUrlProperty(), (_, _, newValue) -> put(AI_HUGGING_FACE_API_BASE_URL, newValue));
+        EasyBind.listen(aiPreferences.gpt4AllApiBaseUrlProperty(), (_, _, newValue) -> put(AI_GPT_4_ALL_API_BASE_URL, newValue));
 
-        EasyBind.listen(aiPreferences.embeddingModelProperty(), (obs, oldValue, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
-        EasyBind.listen(aiPreferences.instructionProperty(), (obs, oldValue, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
-        EasyBind.listen(aiPreferences.temperatureProperty(), (obs, oldValue, newValue) -> putDouble(AI_TEMPERATURE, newValue.doubleValue()));
-        EasyBind.listen(aiPreferences.contextWindowSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_CONTEXT_WINDOW_SIZE, newValue));
-        EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
-        EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (obs, oldValue, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));
-        EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (obs, oldValue, newValue) -> putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));
-        EasyBind.listen(aiPreferences.ragMinScoreProperty(), (obs, oldValue, newValue) -> putDouble(AI_RAG_MIN_SCORE, newValue.doubleValue()));
+        EasyBind.listen(aiPreferences.embeddingModelProperty(), (_, _, newValue) -> put(AI_EMBEDDING_MODEL, newValue.name()));
+        EasyBind.listen(aiPreferences.instructionProperty(), (_, _, newValue) -> put(AI_SYSTEM_MESSAGE, newValue));
+        EasyBind.listen(aiPreferences.temperatureProperty(), (_, _, newValue) -> putDouble(AI_TEMPERATURE, newValue.doubleValue()));
+        EasyBind.listen(aiPreferences.contextWindowSizeProperty(), (_, _, newValue) -> putInt(AI_CONTEXT_WINDOW_SIZE, newValue));
+        EasyBind.listen(aiPreferences.documentSplitterChunkSizeProperty(), (_, _, newValue) -> putInt(AI_DOCUMENT_SPLITTER_CHUNK_SIZE, newValue));
+        EasyBind.listen(aiPreferences.documentSplitterOverlapSizeProperty(), (_, _, newValue) -> putInt(AI_DOCUMENT_SPLITTER_OVERLAP_SIZE, newValue));
+        EasyBind.listen(aiPreferences.ragMaxResultsCountProperty(), (_, _, newValue) -> putInt(AI_RAG_MAX_RESULTS_COUNT, newValue));
+        EasyBind.listen(aiPreferences.ragMinScoreProperty(), (_, _, newValue) -> putDouble(AI_RAG_MIN_SCORE, newValue.doubleValue()));
 
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_SYSTEM_MESSAGE), (obs, oldValue, newValue) -> put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_USER_MESSAGE), (obs, oldValue, newValue) -> put(AI_CHATTING_USER_MESSAGE_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_CHUNK), (obs, oldValue, newValue) -> put(AI_SUMMARIZATION_CHUNK_TEMPLATE, newValue));
-        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE), (obs, oldValue, newValue) -> put(AI_SUMMARIZATION_COMBINE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_SYSTEM_MESSAGE), (_, _, newValue) -> put(AI_CHATTING_SYSTEM_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.CHATTING_USER_MESSAGE), (_, _, newValue) -> put(AI_CHATTING_USER_MESSAGE_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_CHUNK), (_, _, newValue) -> put(AI_SUMMARIZATION_CHUNK_TEMPLATE, newValue));
+        EasyBind.listen(aiPreferences.templateProperty(AiTemplate.SUMMARIZATION_COMBINE), (_, _, newValue) -> put(AI_SUMMARIZATION_COMBINE_TEMPLATE, newValue));
 
         return aiPreferences;
     }
@@ -1901,14 +1912,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDouble(SEARCH_WINDOW_WIDTH),
                 getDouble(SEARCH_WINDOW_DIVIDER_POS));
 
-        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) c ->
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) _ ->
             putBoolean(SEARCH_FULLTEXT, searchPreferences.getObservableSearchFlags().contains(SearchFlags.FULLTEXT)));
-        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
-        EasyBind.listen(searchPreferences.keepSearchStingProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
-        EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (obs, oldValue, newValue) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
-        EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
-        EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
-        EasyBind.listen(searchPreferences.getSearchWindowDividerPositionProperty(), (obs, oldValue, newValue) -> putDouble(SEARCH_WINDOW_DIVIDER_POS, searchPreferences.getSearchWindowDividerPosition()));
+        EasyBind.listen(searchPreferences.searchDisplayModeProperty(), (_, _, newValue) -> putBoolean(SEARCH_DISPLAY_MODE, newValue == SearchDisplayMode.FILTER));
+        EasyBind.listen(searchPreferences.keepSearchStingProperty(), (_, _, newValue) -> putBoolean(SEARCH_KEEP_SEARCH_STRING, newValue));
+        EasyBind.listen(searchPreferences.keepWindowOnTopProperty(), (_, _, _) -> putBoolean(SEARCH_KEEP_GLOBAL_WINDOW_ON_TOP, searchPreferences.shouldKeepWindowOnTop()));
+        EasyBind.listen(searchPreferences.getSearchWindowHeightProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_HEIGHT, searchPreferences.getSearchWindowHeight()));
+        EasyBind.listen(searchPreferences.getSearchWindowWidthProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_WIDTH, searchPreferences.getSearchWindowWidth()));
+        EasyBind.listen(searchPreferences.getSearchWindowDividerPositionProperty(), (_, _, _) -> putDouble(SEARCH_WINDOW_DIVIDER_POS, searchPreferences.getSearchWindowDividerPosition()));
 
         return searchPreferences;
     }
@@ -1925,8 +1936,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBibEntryPreferences().keywordSeparatorProperty());
 
         EasyBind.listen(xmpPreferences.useXmpPrivacyFilterProperty(),
-                (obs, oldValue, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
-        xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) c ->
+                (_, _, newValue) -> putBoolean(USE_XMP_PRIVACY_FILTER, newValue));
+        xmpPreferences.getXmpPrivacyFilter().addListener((SetChangeListener<Field>) _ ->
                 putStringList(XMP_PRIVACY_FILTERS, xmpPreferences.getXmpPrivacyFilter().stream()
                                                                  .map(Field::getName)
                                                                  .collect(Collectors.toList())));
@@ -1944,9 +1955,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getStringList(NAME_FORMATER_KEY),
                 getStringList(NAME_FORMATTER_VALUE));
 
-        nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) change ->
+        nameFormatterPreferences.getNameFormatterKey().addListener((InvalidationListener) _ ->
                 putStringList(NAME_FORMATER_KEY, nameFormatterPreferences.getNameFormatterKey()));
-        nameFormatterPreferences.getNameFormatterValue().addListener((InvalidationListener) change ->
+        nameFormatterPreferences.getNameFormatterValue().addListener((InvalidationListener) _ ->
                 putStringList(NAME_FORMATTER_VALUE, nameFormatterPreferences.getNameFormatterValue()));
 
         return nameFormatterPreferences;
@@ -1964,10 +1975,10 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(SEND_OS_DATA),
                 getBoolean(SEND_TIMEZONE_DATA));
 
-        EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (obs, oldValue, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
-        EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_LANGUAGE_DATA, newValue));
-        EasyBind.listen(mrDlibPreferences.sendOsProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_OS_DATA, newValue));
-        EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (obs, oldValue, newValue) -> putBoolean(SEND_TIMEZONE_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.acceptRecommendationsProperty(), (_, _, newValue) -> putBoolean(ACCEPT_RECOMMENDATIONS, newValue));
+        EasyBind.listen(mrDlibPreferences.sendLanguageProperty(), (_, _, newValue) -> putBoolean(SEND_LANGUAGE_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.sendOsProperty(), (_, _, newValue) -> putBoolean(SEND_OS_DATA, newValue));
+        EasyBind.listen(mrDlibPreferences.sendTimezoneProperty(), (_, _, newValue) -> putBoolean(SEND_TIMEZONE_DATA, newValue));
 
         return mrDlibPreferences;
     }
@@ -1985,13 +1996,13 @@ public class JabRefCliPreferences implements CliPreferences {
                 getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL)
         );
 
-        protectedTermsPreferences.getEnabledExternalTermLists().addListener((InvalidationListener) change ->
+        protectedTermsPreferences.getEnabledExternalTermLists().addListener((InvalidationListener) _ ->
                 putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, protectedTermsPreferences.getEnabledExternalTermLists()));
-        protectedTermsPreferences.getDisabledExternalTermLists().addListener((InvalidationListener) change ->
+        protectedTermsPreferences.getDisabledExternalTermLists().addListener((InvalidationListener) _ ->
                 putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, protectedTermsPreferences.getDisabledExternalTermLists()));
-        protectedTermsPreferences.getEnabledInternalTermLists().addListener((InvalidationListener) change ->
+        protectedTermsPreferences.getEnabledInternalTermLists().addListener((InvalidationListener) _ ->
                 putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, protectedTermsPreferences.getEnabledInternalTermLists()));
-        protectedTermsPreferences.getDisabledInternalTermLists().addListener((InvalidationListener) change ->
+        protectedTermsPreferences.getDisabledInternalTermLists().addListener((InvalidationListener) _ ->
                 putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, protectedTermsPreferences.getDisabledInternalTermLists()));
 
         return protectedTermsPreferences;
@@ -2020,15 +2031,15 @@ public class JabRefCliPreferences implements CliPreferences {
                 PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER))
         );
 
-        EasyBind.listen(importerPreferences.importerEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
-        EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
-        EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (obs, oldValue, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
-        EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (obs, oldValue, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
-        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (obs, oldValue, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
-        importerPreferences.getApiKeys().addListener((InvalidationListener) c -> storeFetcherKeys(importerPreferences.getApiKeys()));
-        importerPreferences.getCustomImporters().addListener((InvalidationListener) c -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
-        importerPreferences.getCatalogs().addListener((InvalidationListener) c -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
-        EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (obs, oldValue, newValue) -> put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
+        EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
+        EasyBind.listen(importerPreferences.generateNewKeyOnImportProperty(), (_, _, newValue) -> putBoolean(GENERATE_KEY_ON_IMPORT, newValue));
+        EasyBind.listen(importerPreferences.importWorkingDirectoryProperty(), (_, _, newValue) -> put(IMPORT_WORKING_DIRECTORY, newValue.toString()));
+        EasyBind.listen(importerPreferences.warnAboutDuplicatesOnImportProperty(), (_, _, newValue) -> putBoolean(WARN_ABOUT_DUPLICATES_IN_INSPECTION, newValue));
+        EasyBind.listen(importerPreferences.persistCustomKeysProperty(), (_, _, newValue) -> putBoolean(FETCHER_CUSTOM_KEY_PERSIST, newValue));
+        importerPreferences.getApiKeys().addListener((InvalidationListener) _ -> storeFetcherKeys(importerPreferences.getApiKeys()));
+        importerPreferences.getCustomImporters().addListener((InvalidationListener) _ -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
+        importerPreferences.getCatalogs().addListener((InvalidationListener) _ -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
+        EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -> put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
 
         return importerPreferences;
     }
@@ -2046,7 +2057,7 @@ public class JabRefCliPreferences implements CliPreferences {
                     // Old format: name, cliId, className, basePath
                     importers.add(new CustomImporter(importerString.get(3), importerString.get(2)));
                 }
-            } catch (Exception e) {
+            } catch (ImportException e) {
                 LOGGER.warn("Could not load {} from preferences. Will ignore.", importerString.getFirst(), e);
             }
         }
@@ -2190,9 +2201,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(GROBID_PREFERENCE),
                 get(GROBID_URL));
 
-        EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_ENABLED, newValue));
-        EasyBind.listen(grobidPreferences.grobidUseAskedProperty(), (obs, oldValue, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
-        EasyBind.listen(grobidPreferences.grobidURLProperty(), (obs, oldValue, newValue) -> put(GROBID_URL, newValue));
+        EasyBind.listen(grobidPreferences.grobidEnabledProperty(), (_, _, newValue) -> putBoolean(GROBID_ENABLED, newValue));
+        EasyBind.listen(grobidPreferences.grobidUseAskedProperty(), (_, _, newValue) -> putBoolean(GROBID_PREFERENCE, newValue));
+        EasyBind.listen(grobidPreferences.grobidURLProperty(), (_, _, newValue) -> put(GROBID_URL, newValue));
 
         return grobidPreferences;
     }

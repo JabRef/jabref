@@ -1,0 +1,10 @@
+# LaTeX temp files
+
+*.aux
+*.out
+*.log
+
+*.synctex
+*.synctex.gz
+*.upa
+*.upb

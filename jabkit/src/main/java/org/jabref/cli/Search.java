@@ -5,8 +5,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -78,12 +82,12 @@ class Search implements Runnable {
         List<BibEntry> matches;
         try {
             // extract current thread task executor from indexManager
-            matches = new DatabaseSearcher(searchQuery,
+            matches = new DatabaseSearcher(
                     databaseContext,
                     new CurrentThreadTaskExecutor(),
                     argumentProcessor.cliPreferences,
                     postgreServer
-            ).getMatches();
+            ).getMatches(searchQuery);
         } catch (IOException ex) {
             LOGGER.error("Error occurred when searching", ex);
             return;
@@ -123,7 +127,10 @@ class Search implements Runnable {
                         matches,
                         List.of(),
                         Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-            } catch (Exception ex) {
+            } catch (IOException
+                     | SaveException
+                     | ParserConfigurationException
+                     | TransformerException ex) {
                 LOGGER.error("Could not export file '{}}'", outputFile.toAbsolutePath(), ex);
             }
         }
