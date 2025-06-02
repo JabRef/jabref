@@ -76,7 +76,7 @@
         </padding>
     </Label>
 
-    <Label text="%• Using LLM to turn a citation into a BibTeX or BibLaTeX entry.">
+    <Label text="%• Turn a citation into a BibTeX or BibLaTeX entry.">
         <font>
             <Font name="System Italic"
                   size="12.0"/>
