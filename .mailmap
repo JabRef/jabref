@@ -1,7 +1,4 @@
-
-# Generate AUTHORS: scripts/generate-authors.sh
-
-# Tip for finding duplicates (besides scanning the output of AUTHORS for name
+# Hint for finding duplicates (besides scanning the output of AUTHORS for name
 # duplicates that aren't also email duplicates): scan the output of:
 #   git log --format='%aE - %aN' | sort --unique --ignore-case
 #
