@@ -34,7 +34,7 @@ public class Pseudonymize implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @ADR(45)
-    @Option(names = {"--input"}, description = "BibTeX file to be pseudonymize", required = true)
+    @Option(names = {"--input"}, description = "BibTeX file to be pseudonymized", required = true)
     private String inputFile;
 
     @Option(names = {"--output"}, description = "Output pseudo-bib file")
@@ -89,8 +89,8 @@ public class Pseudonymize implements Runnable {
         }
 
         try {
-            System.out.println(Localization.lang("Saved %0.", pseudoKeyPath));
             PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(pseudoKeyPath, result);
+            System.out.println(Localization.lang("Saved %0.", pseudoKeyPath));
         } catch (IOException ex) {
             LOGGER.error("Unable to save keys for pseudonymized library", ex);
         }

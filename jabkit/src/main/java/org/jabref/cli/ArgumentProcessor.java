@@ -164,7 +164,6 @@ public class ArgumentProcessor implements Runnable {
             if (!FileUtil.isBibFile(outputFile)) {
                 System.err.println(Localization.lang("Invalid output file type provided."));
             }
-            System.out.println(Localization.lang("Saved %0.", outputFile));
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()
@@ -182,6 +181,7 @@ public class ArgumentProcessor implements Runnable {
                     System.err.println(Localization.lang("Warning") + ": "
                             + Localization.lang("UTF-8 could not be used to encode the following characters: %0", fileWriter.getEncodingProblems()));
                 }
+                System.out.println(Localization.lang("Saved %0.", outputFile));
             }
         } catch (IOException ex) {
             System.err.println(Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
