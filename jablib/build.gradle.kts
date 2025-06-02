@@ -115,7 +115,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.20.1")
     implementation("com.konghq:unirest-java-core:4.4.7")
     implementation("com.konghq:unirest-modules-gson:4.4.7")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // endregion
 
