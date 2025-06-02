@@ -280,14 +280,13 @@ tasks.register("extractMaintainers") {
     }
 }
 
-val maintainersProvider = layout.buildDirectory
-    .file("tmp/maintainers.txt")
-    .map { it.asFile.readText() }
+val maintainersProvider = providers.provider {
+    layout.buildDirectory.file("tmp/maintainers.txt").get().asFile.readText()
+}
 
 val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.0")
 
 val year = Calendar.getInstance().get(Calendar.YEAR).toString()
-
 
 val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
 val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
