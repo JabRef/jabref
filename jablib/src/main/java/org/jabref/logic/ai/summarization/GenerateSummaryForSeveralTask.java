@@ -13,7 +13,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
-import org.jabref.logic.ai.templates.TemplatesService;
+import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.ProgressCounter;
@@ -21,7 +21,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +37,8 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
     private final List<ProcessingInfo<BibEntry, Summary>> entries;
     private final BibDatabaseContext bibDatabaseContext;
     private final SummariesStorage summariesStorage;
-    private final ChatLanguageModel chatLanguageModel;
-    private final TemplatesService templatesService;
+    private final ChatModel chatLanguageModel;
+    private final AiTemplatesService aiTemplatesService;
     private final ReadOnlyBooleanProperty shutdownSignal;
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -53,8 +53,8 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
             List<ProcessingInfo<BibEntry, Summary>> entries,
             BibDatabaseContext bibDatabaseContext,
             SummariesStorage summariesStorage,
-            ChatLanguageModel chatLanguageModel,
-            TemplatesService templatesService,
+            ChatModel chatLanguageModel,
+            AiTemplatesService aiTemplatesService,
             ReadOnlyBooleanProperty shutdownSignal,
             AiPreferences aiPreferences,
             FilePreferences filePreferences,
@@ -65,7 +65,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
         this.bibDatabaseContext = bibDatabaseContext;
         this.summariesStorage = summariesStorage;
         this.chatLanguageModel = chatLanguageModel;
-        this.templatesService = templatesService;
+        this.aiTemplatesService = aiTemplatesService;
         this.shutdownSignal = shutdownSignal;
         this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
@@ -77,7 +77,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
     private void configure() {
         showToUser(true);
         titleProperty().set(Localization.lang("Generating summaries for %0", groupName.get()));
-        groupName.addListener((o, oldValue, newValue) -> titleProperty().set(Localization.lang("Generating summaries for %0", newValue)));
+        groupName.addListener((_, _, newValue) -> titleProperty().set(Localization.lang("Generating summaries for %0", newValue)));
 
         progressCounter.increaseWorkMax(entries.size());
         progressCounter.listenToAllProperties(this::updateProgress);
@@ -100,7 +100,7 @@ public class GenerateSummaryForSeveralTask extends BackgroundTask<Void> {
                                     bibDatabaseContext,
                                     summariesStorage,
                                     chatLanguageModel,
-                                    templatesService,
+                                    aiTemplatesService,
                                     shutdownSignal,
                                     aiPreferences,
                                     filePreferences

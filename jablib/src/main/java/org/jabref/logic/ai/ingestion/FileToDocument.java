@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.ingestion;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import org.jabref.logic.pdf.InterruptablePDFTextStripper;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.xmp.XmpUtilReader;
 
+import dev.langchain4j.data.document.DefaultDocument;
 import dev.langchain4j.data.document.Document;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.slf4j.Logger;
@@ -50,13 +52,13 @@ public class FileToDocument {
             }
 
             return fromString(writer.toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("An error occurred while reading the PDF file: {}", path, e);
             return Optional.empty();
         }
     }
 
     public Optional<Document> fromString(String content) {
-        return Optional.of(new Document(content));
+        return Optional.of(new DefaultDocument(content));
     }
 }

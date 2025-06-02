@@ -4,9 +4,10 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     `java-library`
-
-    id("org.openjfx.javafxplugin") version("0.1.0")
 }
+
+val javafxVersion = "24.0.1"
+val javafxPlatform: String by project.extra
 
 dependencies {
     api(project(":jablib"))
@@ -36,7 +37,7 @@ dependencies {
     implementation("org.glassfish.grizzly:grizzly-framework:4.0.2")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     implementation("jakarta.validation:jakarta.validation-api:3.1.1")
-    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
+    implementation("org.hibernate.validator:hibernate-validator:9.0.0.Final")
 
     implementation("com.konghq:unirest-modules-gson:4.4.7")
 
@@ -48,6 +49,9 @@ dependencies {
     implementation("org.jabref:afterburner.fx:2.0.0") {
         exclude( group = "org.openjfx")
     }
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
 
     implementation("net.harawata:appdirs:1.4.0")
 
@@ -55,7 +59,7 @@ dependencies {
         exclude(group = "org.antlr")
     }
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
@@ -69,10 +73,10 @@ dependencies {
 
 }
 
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.mockito")
+    requires.add("jul.to.slf4j")
 }
 
 tasks.test {

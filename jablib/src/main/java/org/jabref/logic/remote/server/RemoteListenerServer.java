@@ -63,6 +63,10 @@ public class RemoteListenerServer implements Runnable {
                     throw new IOException("Argument for 'SEND_COMMAND_LINE_ARGUMENTS' is not of type String[]. Got " + argument);
                 }
                 break;
+            case FOCUS:
+                messageHandler.handleFocus();
+                protocol.sendMessage(RemoteMessage.OK);
+                break;
             default:
                 throw new IOException("Unhandled message to server " + type);
         }

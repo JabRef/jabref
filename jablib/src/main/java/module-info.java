@@ -79,6 +79,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.integrity;
     exports org.jabref.logic.formatter.casechanger;
     exports org.jabref.logic.shared.exception;
+    exports org.jabref.logic.importer.fetcher.isbntobibtex;
     exports org.jabref.logic.importer.fetcher.transformers;
     exports org.jabref.logic.biblog;
     exports org.jabref.model.biblog;
@@ -102,9 +103,12 @@ open module org.jabref.jablib {
     exports org.jabref.logic.shared.event;
     exports org.jabref.logic.crawler;
     exports org.jabref.logic.git;
+    exports org.jabref.logic.pseudonymization;
+
+    requires java.base;
 
     requires javafx.base;
-    requires javafx.graphics;
+    requires javafx.graphics; // because of javafx.scene.paint.Color
     requires afterburner.fx;
     requires com.tobiasdiez.easybind;
 
