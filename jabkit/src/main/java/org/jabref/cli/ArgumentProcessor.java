@@ -164,7 +164,7 @@ public class ArgumentProcessor implements Runnable {
             if (!FileUtil.isBibFile(outputFile)) {
                 System.err.println(Localization.lang("Invalid output file type provided."));
             }
-            System.out.println(Localization.lang("Saving: %0.", outputFile));
+            System.out.println(Localization.lang("Saved %0.", outputFile));
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(outputFile, StandardCharsets.UTF_8)) {
                 BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
                 SelfContainedSaveConfiguration saveConfiguration = (SelfContainedSaveConfiguration) new SelfContainedSaveConfiguration()

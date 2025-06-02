@@ -69,7 +69,7 @@ public class Pseudonymize implements Runnable {
             return;
         }
 
-        System.out.println(Localization.lang("Pseudonymizing library '%0'.", fileName));
+        System.out.println(Localization.lang("Pseudonymizing library '%0'...", fileName));
         Pseudonymization pseudonymization = new Pseudonymization();
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
         Pseudonymization.Result result = pseudonymization.pseudonymizeLibrary(databaseContext);
@@ -89,7 +89,7 @@ public class Pseudonymize implements Runnable {
         }
 
         try {
-            System.out.println(Localization.lang("Saving: %0.", pseudoKeyPath));
+            System.out.println(Localization.lang("Saved %0.", pseudoKeyPath));
             PseudonymizationResultCsvWriter.writeValuesMappingAsCsv(pseudoKeyPath, result);
         } catch (IOException ex) {
             LOGGER.error("Unable to save keys for pseudonymized library", ex);
