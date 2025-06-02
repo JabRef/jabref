@@ -1,7 +1,15 @@
 version: 2
 updates:
   - package-ecosystem: gradle
-    directory: "/"
+    directories:
+      - "/build-logic"    # Seems to contain build-related logic
+      - "/jabgui"        # Likely the main GUI module
+      - "/jabkit"        # Another core library/module
+      - "/jablib"        # Core library
+      - "/jabsrv"        # Server-related module
+      - "/jabsrv-cli"    # CLI for the server
+      - "/test-support"  # Module for test utilities
+      # Add any other top-level directories that contain their
     schedule:
       interval: weekly
     labels:
