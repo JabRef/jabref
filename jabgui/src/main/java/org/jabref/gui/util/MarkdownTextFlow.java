@@ -1,6 +1,8 @@
 package org.jabref.gui.util;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.StringJoiner;
 
 import javafx.geometry.NodeOrientation;
 import javafx.scene.layout.Pane;
@@ -86,7 +88,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         int selStart = Math.min(hitStart, hitEnd);
         int selEnd = Math.max(hitStart + 1, hitEnd + 1);
 
-        StringBuilder result = new StringBuilder();
+        StringJoiner result = new StringJoiner("");
         int currentPos = 0;
 
         for (javafx.scene.Node fxNode : getChildren()) {
@@ -113,21 +115,21 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                 int endInSegment = overlapEnd - segmentStart;
 
                 if (startInSegment == 0 && endInSegment == renderedText.length()) {
-                    result.append(markdownText);
+                    result.add(markdownText);
                 } else {
                     String partialText = renderedText.substring(startInSegment, endInSegment);
                     if (mat.astNode instanceof DelimitedNode delimitedNode) {
                         // e.g., select "llo" inside "*hello*" would return "*llo*"
                         partialText = delimitedNode.getOpeningMarker() + partialText + delimitedNode.getClosingMarker();
                     }
-                    result.append(partialText);
+                    result.add(partialText);
                 }
             }
 
             currentPos = segmentEnd;
         }
 
-        if (result.isEmpty()) {
+        if (result.length() == 0) {
             return;
         }
 
@@ -168,7 +170,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     private class MarkdownRenderer {
         private final NodeVisitor visitor;
-        private final Stack<Integer> orderedListCounters = new Stack<>();
+        private final Deque<Integer> orderedListCounters = new ArrayDeque<>();
         private int listIndentationLevel = 0;
         private boolean isFirstBlockElement = true;
         private Node previousBlock = null;
