@@ -6,7 +6,6 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.preferences.TimestampPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +23,7 @@ class ISSNCleanupTest {
         worker = new CleanupWorker(
                 mock(BibDatabaseContext.class),
                 mock(FilePreferences.class),
-                mock(TimestampPreferences.class),
-                mock(BibEntryPreferences.class));
+                mock(TimestampPreferences.class));
     }
 
     @Test

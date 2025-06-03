@@ -53,10 +53,8 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         if (result.isEmpty() || !conversionPossible) {
             return result.toString();
         }
-        logger.info("initial result string: {}", result.toString());
         // text contains comma separated codes
         String[] codeList = result.toString().split(",");
-        logger.info("initial codeList array: {}", Arrays.toString(codeList));
         result = new StringBuilder();
         for (String code : codeList) {
             // check if key in map and add value to result string
@@ -67,7 +65,6 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         if (result.toString().endsWith(",")) {
             result.deleteCharAt(result.length() - 1);
         }
-        logger.info("End Result: {}", result.toString());
 
         return result.toString();
     }
