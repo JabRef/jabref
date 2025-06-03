@@ -283,6 +283,11 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
       - name: Install JBang
         uses: jbangdev/setup-jbang@main
       - run: jbang build .jbang/CheckoutPR.java
