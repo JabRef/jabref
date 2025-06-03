@@ -157,14 +157,14 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // region AI
-    implementation("dev.langchain4j:langchain4j:1.0.0")
+    implementation("dev.langchain4j:langchain4j:1.0.1")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:1.0.0") {
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.1") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.0-beta5") {
+    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
@@ -173,7 +173,7 @@ dependencies {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
     }
-    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.0-beta5") {
+    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
