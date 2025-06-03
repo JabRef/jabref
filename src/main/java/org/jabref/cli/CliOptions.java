@@ -2,6 +2,7 @@ package org.jabref.cli;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.util.Pair;
 
@@ -191,12 +192,8 @@ public class CliOptions {
         return commandLine.hasOption("jumpToKey");
     }
 
-    public boolean isValidateJournals() {
-        return commandLine.hasOption("validate-journals");
-    }
-
-    public String getValidateJournals() {
-        return commandLine.getOptionValue("validate-journals");
+    public Optional<String> getValidateJournals() {
+        return Optional.ofNullable(commandLine.getOptionValue("validate-journals"));
     }
 
     private static Options getOptions() {
