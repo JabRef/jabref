@@ -38,6 +38,7 @@ val os = OperatingSystem.current()
 val osTarget = when {
     os.isMacOsX -> {
         val osVersion = System.getProperty("os.version")
+        val arch = System.getProperty("os.arch")
         if (arch.contains("aarch")) "macos-14" else "macos-13"
     }
     os.isLinux -> "ubuntu-22.04"
