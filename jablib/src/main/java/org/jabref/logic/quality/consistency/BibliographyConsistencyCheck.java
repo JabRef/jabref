@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
@@ -35,7 +36,7 @@ public class BibliographyConsistencyCheck {
      *
      * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
      */
-    public Result check(List<BibEntry> entries) {
+    public Result check(List<BibEntry> entries, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
         // collects fields existing in all entries, scoped by entry type
@@ -47,14 +48,18 @@ public class BibliographyConsistencyCheck {
 
         Map<EntryType, EntryTypeResult> resultMap = new HashMap<>();
 
-        entryTypeToFieldsInAnyEntryMap.forEach((entryType, fields) -> {
+        int counter = 0;
+        for (Map.Entry<EntryType, Set<Field>> mapEntry : entryTypeToFieldsInAnyEntryMap.entrySet()) {
+            entriesGroupingProgress.accept(counter++, entryTypeToFieldsInAnyEntryMap.size());
+            EntryType entryType = mapEntry.getKey();
+            Set<Field> fields = mapEntry.getValue();
             Set<Field> commonFields = entryTypeToFieldsInAllEntriesMap.get(entryType);
             assert commonFields != null;
             Set<Field> uniqueFields = new HashSet<>(fields);
             uniqueFields.removeAll(commonFields);
 
             if (uniqueFields.isEmpty()) {
-                return;
+                continue;
             }
 
             List<Comparator<BibEntry>> comparators = List.of(
@@ -69,23 +74,23 @@ public class BibliographyConsistencyCheck {
                     .toList();
 
             resultMap.put(entryType, new EntryTypeResult(uniqueFields, differingEntries));
-        });
+        }
 
         return new Result(resultMap);
     }
 
     private static void collectEntriesIntoMaps(List<BibEntry> entries, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
-        entries.forEach(entry -> {
+        for (BibEntry entry : entries) {
             EntryType entryType = entry.getType();
 
-            Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap.computeIfAbsent(entryType, k -> new HashSet<>());
+            Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap.computeIfAbsent(entryType, _ -> new HashSet<>());
             fieldsInAnyEntry.addAll(entry.getFields());
 
-            Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.computeIfAbsent(entryType, k -> new HashSet<>(entry.getFields()));
+            Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.computeIfAbsent(entryType, _ -> new HashSet<>(entry.getFields()));
             fieldsInAllEntries.retainAll(entry.getFields());
 
-            Set<BibEntry> entriesOfType = entryTypeToEntriesMap.computeIfAbsent(entryType, k -> new HashSet<>());
+            Set<BibEntry> entriesOfType = entryTypeToEntriesMap.computeIfAbsent(entryType, _ -> new HashSet<>());
             entriesOfType.add(entry);
-        });
+        }
     }
 }

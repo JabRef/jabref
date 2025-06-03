@@ -9,6 +9,11 @@ repositories {
 }
 
 dependencies {
+    implementation("org.gradlex:extra-java-module-info:1.12")
+    implementation("org.gradlex:java-module-packaging:1.0") // required for platform-specific packaging of JavaFX dependencies
+    implementation("org.gradlex:java-module-testing:1.7")
+    implementation("org.gradlex.jvm-dependency-conflict-resolution:org.gradlex.jvm-dependency-conflict-resolution.gradle.plugin:2.3")
+
     configurations
         .matching { it.name.contains("downloadSources") }
         .configureEach {

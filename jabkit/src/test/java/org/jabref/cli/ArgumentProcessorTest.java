@@ -146,6 +146,7 @@ class ArgumentProcessorTest {
         commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
+        assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"));
         assertTrue(output.contains("Consistency check completed"));
 
         System.setOut(System.out);

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import javafx.application.Platform;
@@ -57,12 +57,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT = """
                                                                    function getSelectionHtml() {
-                                                                   var html = "";
+                                                                   let html = "";
                                                                    if (typeof window.getSelection != "undefined") {
-                                                                       var sel = window.getSelection();
+                                                                       let sel = window.getSelection();
                                                                        if (sel.rangeCount) {
-                                                                           var container = document.createElement("div");
-                                                                           for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                                                                           let container = document.createElement("div");
+                                                                           for (let i = 0, len = sel.rangeCount; i < len; ++i) {
                                                                                container.appendChild(sel.getRangeAt(i).cloneContents());
                                                                            }
                                                                            html = container.innerHTML;
@@ -266,13 +266,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void copyPreviewHtmlToClipBoard() {
         Document document = previewView.getEngine().getDocument();
-        ClipboardContent content = ClipboardContentGenerator.processHtml(Arrays.asList(document.getElementById("content").getTextContent()));
+        ClipboardContent content = ClipboardContentGenerator.processHtml(List.of(document.getElementById("content").getTextContent()));
         clipBoardManager.setContent(content);
     }
 
     public void copyPreviewTextToClipBoard() {
         Document document = previewView.getEngine().getDocument();
-        ClipboardContent content = ClipboardContentGenerator.processText(Arrays.asList(document.getElementById("content").getTextContent()));
+        ClipboardContent content = ClipboardContentGenerator.processText(List.of(document.getElementById("content").getTextContent()));
         clipBoardManager.setContent(content);
     }
 

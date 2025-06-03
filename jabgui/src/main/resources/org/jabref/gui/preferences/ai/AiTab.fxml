@@ -18,156 +18,168 @@
 <?import com.dlsc.unitfx.IntegerInputField?>
 <?import org.controlsfx.control.SearchableComboBox?>
 <?import org.controlsfx.control.textfield.CustomPasswordField?>
+<?import javafx.scene.layout.Region?>
+<?import com.dlsc.gemsfx.Spacer?>
+<?import javafx.scene.layout.Pane?>
 <fx:root
         spacing="10.0"
         type="VBox"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
         fx:controller="org.jabref.gui.preferences.ai.AiTab">
-    <children>
-        <Label styleClass="titleHeader"
-               text="%AI"/>
+    <Label styleClass="titleHeader"
+           text="%AI"/>
 
-        <HBox alignment="BASELINE_CENTER">
-            <Label styleClass="sectionHeader"
-                   text="%General"
-                   maxWidth="Infinity"
-                   HBox.hgrow="ALWAYS"/>
-            <Button fx:id="generalSettingsHelp"
-                    prefWidth="20.0"/>
-        </HBox>
-
-        <CheckBox
-                fx:id="enableAi"
-                mnemonicParsing="false"
-                text="%Enable AI functionality (summary generation and chatting) in JabRef"
-                HBox.hgrow="ALWAYS"
-                maxWidth="Infinity"/>
-
-        <CheckBox fx:id="autoGenerateEmbeddings"
-                  mnemonicParsing="false"
-                  text="%Automatically generate embeddings for new entries"
-                  HBox.hgrow="ALWAYS"
-                  maxWidth="Infinity"/>
-
-        <CheckBox fx:id="autoGenerateSummaries"
-                  mnemonicParsing="false"
-                  text="%Automatically generate summaries for new entries"
-                  HBox.hgrow="ALWAYS"
-                  maxWidth="Infinity"/>
-
+    <HBox alignment="BASELINE_CENTER">
         <Label styleClass="sectionHeader"
-               text="%Connection"/>
+               text="%General"
+               maxWidth="Infinity"
+               HBox.hgrow="ALWAYS"/>
+        <Button fx:id="generalSettingsHelp"
+                prefWidth="20.0"/>
+    </HBox>
 
-        <HBox alignment="CENTER_LEFT"
-              spacing="10.0">
-            <children>
-                <Label alignment="BASELINE_CENTER"
-                       text="%AI provider"/>
-                <ComboBox
-                        fx:id="aiProviderComboBox"
-                        maxWidth="1.7976931348623157E308"
-                        HBox.hgrow="ALWAYS"/>
-            </children>
-        </HBox>
+    <CheckBox
+            fx:id="enableAi"
+            mnemonicParsing="false"
+            text="%Enable AI functionality in JabRef"
+            HBox.hgrow="ALWAYS"
+            maxWidth="Infinity"/>
 
-        <HBox alignment="CENTER_LEFT"
-              spacing="10.0">
-            <children>
-                <Label alignment="BASELINE_CENTER"
-                       text="%Chat model"/>
-                <ComboBox
-                        fx:id="chatModelComboBox"
-                        editable="true"
-                        maxWidth="1.7976931348623157E308"
-                        HBox.hgrow="ALWAYS"/>
-            </children>
-            <padding>
-                <Insets left="20.0"/>
-            </padding>
-        </HBox>
+    <Label text="%AI functionality in Jabref includes:">
+        <font>
+            <Font name="System Italic"
+                  size="12.0"/>
+        </font>
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </Label>
 
-        <HBox alignment="CENTER_LEFT"
-              spacing="10.0">
-            <children>
-                <Label alignment="BASELINE_CENTER"
-                       text="%API key"/>
-                <CustomPasswordField
-                        fx:id="apiKeyTextField"
-                        HBox.hgrow="ALWAYS"/>
-            </children>
-            <padding>
-                <Insets left="20.0"/>
-            </padding>
-        </HBox>
+    <Label text="%• Chatting with entries.">
+        <font>
+            <Font name="System Italic"
+                  size="12.0"/>
+        </font>
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </Label>
 
-        <HBox alignment="BASELINE_LEFT">
-            <Label styleClass="sectionHeader"
-                   text="%Expert settings"
-                   maxWidth="Infinity"
-                   HBox.hgrow="ALWAYS"/>
-            <Button fx:id="expertSettingsHelp"
-                    prefWidth="20.0"/>
-        </HBox>
+    <Label text="%• Summarizing entries.">
+        <font>
+            <Font name="System Italic"
+                  size="12.0"/>
+        </font>
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </Label>
 
-        <VBox>
-            <children>
-                <Label text="%These parameters affect how the AI will answer your questions."/>
-                <Label text="%Leave these fields as is, if you are not sure of their purpose."/>
-            </children>
-        </VBox>
+    <Label text="%• Turn a citation into a BibTeX or BibLaTeX entry.">
+        <font>
+            <Font name="System Italic"
+                  size="12.0"/>
+        </font>
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </Label>
 
-        <CheckBox
-                fx:id="customizeExpertSettingsCheckbox"
+    <Label styleClass="sectionHeader"
+           text="%Connection"/>
+
+    <HBox alignment="CENTER_LEFT"
+          spacing="10.0">
+        <Label alignment="BASELINE_CENTER"
+               text="%AI provider"/>
+        <ComboBox
+                fx:id="aiProviderComboBox"
                 maxWidth="1.7976931348623157E308"
-                mnemonicParsing="false"
-                text="%Customize expert settings"/>
+                HBox.hgrow="ALWAYS"/>
+    </HBox>
+
+    <GridPane hgap="10" vgap="10">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT"/>
+            <ColumnConstraints hgrow="ALWAYS"/>
+        </columnConstraints>
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+
+        <Label alignment="BASELINE_CENTER"
+               text="%Chat model"
+               GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <ComboBox
+                fx:id="chatModelComboBox"
+                editable="true"
+                maxWidth="1.7976931348623157E308"
+                HBox.hgrow="ALWAYS"
+                GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label alignment="BASELINE_CENTER"
+               text="%API key"
+               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <CustomPasswordField
+                fx:id="apiKeyTextField"
+                HBox.hgrow="ALWAYS"
+                GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <HBox alignment="BASELINE_LEFT">
+        <Label styleClass="sectionHeader"
+               text="%Expert settings"
+               maxWidth="Infinity"
+               HBox.hgrow="ALWAYS"/>
+        <Button fx:id="expertSettingsHelp"
+                prefWidth="20.0"/>
+    </HBox>
+
+    <CheckBox
+            fx:id="customizeExpertSettingsCheckbox"
+            maxWidth="1.7976931348623157E308"
+            mnemonicParsing="false"
+            text="%Customize expert settings"/>
+
+    <Spacer/>
+
+    <VBox spacing="10" fx:id="expertSettingsPane">
+        <HBox alignment="CENTER_LEFT"
+              spacing="10.0">
+            <Label alignment="BASELINE_CENTER"
+                   text="%API base URL (used only for LLM)"/>
+            <TextField
+                    fx:id="apiBaseUrlTextField"
+                    disable="true"
+                    maxWidth="1.7976931348623157E308"
+                    HBox.hgrow="ALWAYS"/>
+        </HBox>
+
+        <Spacer/>
 
         <HBox alignment="CENTER_LEFT"
               spacing="10.0">
-            <children>
-                <Label alignment="BASELINE_CENTER"
-                       text="%API base URL (used only for LLM)"/>
-                <TextField
-                        fx:id="apiBaseUrlTextField"
-                        disable="true"
-                        maxWidth="1.7976931348623157E308"
-                        HBox.hgrow="ALWAYS"/>
-            </children>
+            <Label alignment="BASELINE_CENTER"
+                   text="%Embedding model"/>
+            <SearchableComboBox
+                    fx:id="embeddingModelComboBox"
+                    maxWidth="1.7976931348623157E308"
+                    HBox.hgrow="ALWAYS"/>
         </HBox>
 
-        <HBox alignment="CENTER_LEFT"
-              spacing="10.0">
-            <children>
-                <Label alignment="BASELINE_CENTER"
-                       text="%Embedding model"/>
-                <SearchableComboBox
-                        fx:id="embeddingModelComboBox"
-                        maxWidth="1.7976931348623157E308"
-                        HBox.hgrow="ALWAYS"/>
-            </children>
+        <HBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="%The size of the embedding model could be smaller than written in the list."
+                   style="-fx-font-style: italic;"/>
         </HBox>
 
-        <Label text="%The size of the embedding model could be smaller than written in the list.">
-            <font>
-                <Font name="System Italic"
-                      size="13.0"/>
-            </font>
-        </Label>
-
-        <HBox alignment="CENTER_LEFT"
-              spacing="10.0">
-            <children>
-                <Label maxWidth="1.7976931348623157E308"
-                       text="%Instruction for AI (also known as prompt or system message)"
-                       HBox.hgrow="ALWAYS"/>
-            </children>
-        </HBox>
+        <Spacer/>
 
         <GridPane hgap="10" vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" />
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="50"/>
             </columnConstraints>
 
             <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="0">
@@ -207,9 +219,9 @@
             </VBox>
 
             <VBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="2">
-            <Label HBox.hgrow="ALWAYS"
-                   maxWidth="Infinity"
-                   text="%Document splitter - chunk size"/>
+                <Label HBox.hgrow="ALWAYS"
+                       maxWidth="Infinity"
+                       text="%Document splitter - chunk size"/>
                 <IntegerInputField
                         fx:id="documentSplitterChunkSizeTextField"
                         HBox.hgrow="ALWAYS"/>
@@ -226,6 +238,8 @@
 
         </GridPane>
 
+        <Spacer/>
+
         <Button onAction="#onResetExpertSettingsButtonClick"
                 text="%Reset expert settings to default">
             <graphic>
@@ -234,36 +248,86 @@
             </graphic>
         </Button>
 
-        <HBox alignment="BASELINE_CENTER">
-            <Label styleClass="sectionHeader"
-                   text="%Templates"
-                   maxWidth="Infinity"
-                   HBox.hgrow="ALWAYS"/>
-            <Button fx:id="templatesHelp"
-                    prefWidth="20.0"/>
-        </HBox>
+    </VBox>
 
-        <TabPane>
-            <Tab text="%System message for chatting" closable="false">
-                <TextArea fx:id="systemMessageTextArea"/>
-            </Tab>
-            <Tab text="%User message for chatting" closable="false">
-                <TextArea fx:id="userMessageTextArea"/>
-            </Tab>
-            <Tab text="%Completion text for summarization of a chunk" closable="false">
-                <TextArea fx:id="summarizationChunkTextArea"/>
-            </Tab>
-            <Tab text="%Completion text for summarization of several chunks" closable="false">
-                <TextArea fx:id="summarizationCombineTextArea"/>
-            </Tab>
-        </TabPane>
+    <HBox alignment="BASELINE_CENTER">
+        <Label styleClass="sectionHeader"
+               text="%Templates"
+               maxWidth="Infinity"
+               HBox.hgrow="ALWAYS"/>
+        <Button fx:id="templatesHelp"
+                prefWidth="20.0"/>
+    </HBox>
 
-        <Button onAction="#onResetTemplatesButtonClick"
-                text="%Reset templates to default">
+    <TabPane fx:id="templatesTabPane">
+        <Tab fx:id="systemMessageForChattingTab"
+             text="%System message for chatting" closable="false">
+            <TextArea fx:id="systemMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="userMessageForChattingTab"
+             text="%User message for chatting" closable="false">
+            <TextArea fx:id="userMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="summarizationChunkSystemMessageTab"
+             text="%System message for summarization of a chunk" closable="false">
+            <TextArea fx:id="summarizationChunkSystemMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="summarizationChunkUserMessageTab"
+             text="%User message for summarization of a chunk" closable="false">
+            <TextArea fx:id="summarizationChunkUserMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="summarizationCombineSystemMessageTab"
+             text="%System message for summarization of several chunks"
+             closable="false">
+            <TextArea fx:id="summarizationCombineSystemMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="summarizationCombineUserMessageTab"
+             text="%User message for summarization of several chunks"
+             closable="false">
+            <TextArea fx:id="summarizationCombineUserMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="citationParsingSystemMessageTab"
+             text="%System message for parsing raw citations"
+             closable="false">
+            <TextArea fx:id="citationParsingSystemMessageTextArea"/>
+        </Tab>
+        <Tab fx:id="citationParsingUserMessageTab"
+             text="%User message for parsing raw citations"
+             closable="false">
+            <TextArea fx:id="citationParsingUserMessageTextArea"/>
+        </Tab>
+    </TabPane>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Button text="Reset current template" onAction="#onResetCurrentTemplateButtonClick">
             <graphic>
-                <JabRefIconView
-                        glyph="REFRESH"/>
+                <JabRefIconView glyph="REFRESH"/>
             </graphic>
         </Button>
-    </children>
+
+        <Region fx:id="spacer" HBox.hgrow="ALWAYS"/>
+
+        <Button onAction="#onResetTemplatesButtonClick" text="%Reset templates to default">
+            <graphic>
+                <JabRefIconView glyph="REFRESH"/>
+            </graphic>
+        </Button>
+    </HBox>
+
+    <Label styleClass="sectionHeader"
+           text="%Miscellaneous"
+           maxWidth="Infinity"
+           HBox.hgrow="ALWAYS"/>
+
+    <CheckBox fx:id="autoGenerateEmbeddings"
+              mnemonicParsing="false"
+              text="%Automatically generate embeddings for new entries"
+              HBox.hgrow="ALWAYS"
+              maxWidth="Infinity"/>
+
+    <CheckBox fx:id="autoGenerateSummaries"
+              mnemonicParsing="false"
+              text="%Automatically generate summaries for new entries"
+              HBox.hgrow="ALWAYS"
+              maxWidth="Infinity"/>
 </fx:root>
