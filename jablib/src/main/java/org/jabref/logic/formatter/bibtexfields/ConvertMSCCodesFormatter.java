@@ -1,7 +1,6 @@
 package org.jabref.logic.formatter.bibtexfields;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Objects;
 
 import org.jabref.logic.cleanup.Formatter;
