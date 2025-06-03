@@ -10,6 +10,17 @@ Following is a list of common errors encountered by developers which lead to fai
 * Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
 * Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
 
+## Failing GitHub workflow "Sync fork with upstream"
+
+To ease development, a GitHub workflow automatically updates your `main` branch daily.
+However, it is not allowed to update your files if GitHub workflows are touched.
+Therefore, GitHub notifies you now and then that "Sync fork with upstream failed for main branch" failed.
+
+To solve this issue, open your GitHub repository on a browser.
+You need to click "Sync fork" to get your fork up-to-date and the workflow running again.
+
+![Sync fork](https://github.com/user-attachments/assets/5c1b0a17-0fde-4ce8-ac46-d9477a65c345)
+
 ## Failing tests
 
 ### Failing <b>Checkstyle</b> tests
