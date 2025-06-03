@@ -49,6 +49,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
+    private final SimpleBooleanProperty validateAbbreviations = new SimpleBooleanProperty(true);
 
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -65,6 +66,9 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
         this.abbreviationsPreferences = abbreviationsPreferences;
+
+        useFJournal.setValue(abbreviationsPreferences.shouldUseFJournalField());
+        validateAbbreviations.setValue(abbreviationsPreferences.shouldValidateAbbreviations());
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldValue, newValue) -> {
@@ -103,6 +107,10 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                 }
             }
         });
+
+        // Bind preferences
+        useFJournal.addListener((obs, oldValue, newValue) -> abbreviationsPreferences.setUseFJournalField(newValue));
+        validateAbbreviations.addListener((obs, oldValue, newValue) -> abbreviationsPreferences.setValidateAbbreviations(newValue));
     }
 
     @Override
@@ -386,5 +394,18 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
 
     public SimpleBooleanProperty useFJournalProperty() {
         return useFJournal;
+    }
+
+    public BooleanProperty validateAbbreviationsProperty() {
+        return validateAbbreviations;
+    }
+
+    public void setValidateAbbreviations(boolean validateAbbreviations) {
+        this.validateAbbreviations.set(validateAbbreviations);
+    }
+
+    public List<ValidationResult> validateAbbreviation(String name, String abbreviation, String shortestUniqueAbbreviation) {
+        Abbreviation abbreviationObject = new Abbreviation(name, abbreviation, shortestUniqueAbbreviation);
+        return journalAbbreviationRepository.getValidationIssues();
     }
 }
