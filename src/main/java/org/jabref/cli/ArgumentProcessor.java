@@ -870,17 +870,16 @@ public class ArgumentProcessor {
     }
 
     private void validateJournalAbbreviations() {
-        JournalAbbreviationRepository repository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
         List<ValidationResult> issues = repository.getValidationIssues();
         
         if (issues.isEmpty()) {
-            System.out.println(Localization.lang("No validation issues found."));
-            return;
-        }
-
-        System.out.println(Localization.lang("Found %0 validation issues:", issues.size()));
-        for (ValidationResult issue : issues) {
-            System.out.printf("%s: %s%n", issue.getType(), issue.getMessage());
+            System.out.println(Localization.lang("No validation issues found in journal abbreviations."));
+        } else {
+            System.out.println(Localization.lang("Found %0 validation issues:", issues.size()));
+            for (ValidationResult issue : issues) {
+                System.out.println(Localization.lang("Type: %0, Message: %1", issue.getType(), issue.getMessage()));
+            }
         }
     }
 }
