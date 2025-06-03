@@ -85,7 +85,7 @@ class EpubImporterFilesTest {
 
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
-        assertEquals(Collections.singletonList(grimms(file)), result);
+        assertEquals(List.of(grimms(file)), result);
     }
 
     @Test
@@ -94,20 +94,17 @@ class EpubImporterFilesTest {
 
         List<BibEntry> result = importer.importDatabase(file).getDatabase().getEntries();
 
-        assertEquals(Collections.singletonList(grimms(file)), result);
+        assertEquals(List.of(grimms(file)), result);
     }
 
     // Both ePUB3 and older ePUB version should have the same {@link BibEntry} (expect `file` field).
     BibEntry grimms(Path file) {
-        BibEntry expected = new BibEntry(StandardEntryType.Book);
-        expected.setField(StandardField.AUTHOR, "Jacob Grimm and Wilhelm Grimm");
-        expected.setField(StandardField.TITLE, "Grimms' Fairy Tales");
-        expected.setField(StandardField.KEYWORDS, "Fairy tales -- Germany");
-        expected.setField(StandardField.LANGUAGE, "en");
-        expected.setField(StandardField.URL, "https://www.gutenberg.org/files/2591/2591-h/2591-h.htm");
-
-        expected.setFiles(List.of(new LinkedFile("", file.toAbsolutePath(), StandardFileType.EPUB.getName())));
-
-        return expected;
+        return new BibEntry(StandardEntryType.Book)
+                .withField(StandardField.AUTHOR, "Jacob Grimm and Wilhelm Grimm")
+                .withField(StandardField.TITLE, "Grimms' Fairy Tales")
+                .withField(StandardField.KEYWORDS, "Fairy tales -- Germany")
+                .withField(StandardField.LANGUAGE, "en")
+                .withField(StandardField.URL, "https://www.gutenberg.org/files/2591/2591-h/2591-h.htm")
+                .withFile(new LinkedFile("", file.toAbsolutePath(), StandardFileType.EPUB.getName()));
     }
 }

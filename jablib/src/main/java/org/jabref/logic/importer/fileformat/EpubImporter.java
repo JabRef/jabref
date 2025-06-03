@@ -33,7 +33,6 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.logic.util.io.XMLUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
-import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 
@@ -57,8 +56,6 @@ public class EpubImporter extends Importer {
     private final XPathExpression descriptionPath = xpath.compile("/package/metadata/description");
     private final XPathExpression subjectPath = xpath.compile("/package/metadata/subject");
 
-    private BibEntry entry = new BibEntry(StandardEntryType.Book);
-
     private final ImportFormatPreferences importFormatPreferences;
 
     public EpubImporter(ImportFormatPreferences importFormatPreferences) throws XPathExpressionException, ParserConfigurationException {
@@ -76,18 +73,12 @@ public class EpubImporter extends Importer {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
-        // Not in functional programming style, but making {@link entry} a local mutable variable makes it easier
-        // to write {@link addField}.
-        // Potentially, this class won't work properly in concurrent situations.
-
         // TODO: JabRef has {@link DublinCoreExtractor}, which is exactly the schema used in OPF. However, that class
         // is tied to {@link DublinCoreSchema}, which is tied to {@link XMPSchema}. It seems there are no way to pass
         // ordinary XML nodes to {@link DublinCoreSchema}.
         //
         // Current implementation uses some hand-crafted {@link XPath}s, which work okayish, but not as good as a
         // full-featured {@link DublinCoreExtractor}.
-
-        entry = new BibEntry(StandardEntryType.Book);
 
         try (FileSystem fileSystem = FileSystems.newFileSystem(filePath)) {
             OptionalObjectProperty<Path> metadataFilePath = OptionalObjectProperty.empty();
@@ -119,34 +110,21 @@ public class EpubImporter extends Importer {
             List<String> subjects = XMLUtil.getNodesContentByXPath(document, subjectPath);
             List<String> languages = XMLUtil.getNodesContentByXPath(document, languagePath);
 
-            addField(StandardField.TITLE, title);
-            addField(StandardField.ABSTRACT, description);
+            LinkedFile linkedFile = new LinkedFile("", filePath.toAbsolutePath(), StandardFileType.EPUB.getName());
 
-            if (source.isPresent()) {
-                addField(StandardField.URL, source);
-            } else {
-                addField(StandardField.URL, identifier);
-            }
-
-            addField(StandardField.AUTHOR, Optional.of(String.join(" and ", authors)));
-
-            // Might not be the right way. Leaving, as it still contains information.
-            addField(StandardField.LANGUAGE, Optional.of(String.join(" and ", languages)));
-
-            entry.addKeywords(subjects, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
-
-            entry.addFile(new LinkedFile("", filePath.toAbsolutePath(), StandardFileType.EPUB.getName()));
+            BibEntry entry = new BibEntry(StandardEntryType.Book)
+                    .withField(StandardField.TITLE, title)
+                    .withField(StandardField.ABSTRACT, description)
+                    .withField(StandardField.URL, source.isPresent() ? source : identifier)
+                    .withField(StandardField.AUTHOR, !authors.isEmpty() ? Optional.of(String.join(" and ", authors)) : Optional.empty())
+                    .withField(StandardField.LANGUAGE, !languages.isEmpty() ? Optional.of(String.join(" and ", languages)) : Optional.empty())
+                    .withKeywords(subjects, importFormatPreferences.bibEntryPreferences().getKeywordSeparator())
+                    .withFile(linkedFile);
 
             return ParserResult.fromEntry(entry);
         } catch (SAXException | XPathExpressionException e) {
             return ParserResult.fromError(e);
         }
-    }
-
-    // Tradeoff between conforming to controversial code standard and code simplicity.
-    // This refs: https://peps.python.org/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds.
-    private void addField(Field field, Optional<String> value) {
-        value.ifPresent(it -> entry.setField(field, it));
     }
 
     @Override
