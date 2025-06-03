@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
@@ -190,7 +191,7 @@ class OpenDocumentRepresentation {
             collection.appendChild(body);
 
             result.appendChild(collection);
-        } catch (Exception e) {
+        } catch (ParserConfigurationException e) {
             LOGGER.warn("Exception caught...", e);
         }
         return result;

@@ -4,7 +4,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 
 import org.jabref.logic.ai.AiPreferences;
-import org.jabref.logic.ai.templates.TemplatesService;
+import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -19,19 +19,19 @@ public class AiChatService {
     private final ChatModel chatLanguageModel;
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
-    private final TemplatesService templatesService;
+    private final AiTemplatesService aiTemplatesService;
 
     public AiChatService(AiPreferences aiPreferences,
                        ChatModel chatLanguageModel,
                        EmbeddingModel embeddingModel,
                        EmbeddingStore<TextSegment> embeddingStore,
-                       TemplatesService templatesService
+                       AiTemplatesService aiTemplatesService
     ) {
         this.aiPreferences = aiPreferences;
         this.chatLanguageModel = chatLanguageModel;
         this.embeddingModel = embeddingModel;
         this.embeddingStore = embeddingStore;
-        this.templatesService = templatesService;
+        this.aiTemplatesService = aiTemplatesService;
     }
 
     public AiChatLogic makeChat(
@@ -45,7 +45,7 @@ public class AiChatService {
                 chatLanguageModel,
                 embeddingModel,
                 embeddingStore,
-                templatesService,
+                aiTemplatesService,
                 name,
                 chatHistory,
                 entries,

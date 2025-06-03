@@ -214,7 +214,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             if (Files.exists(targetFile)) {
                 try {
                     Files.copy(targetFile, backupFile, StandardCopyOption.REPLACE_EXISTING);
-                } catch (Exception e) {
+                } catch (IOException e) {
                     LOGGER.warn("Could not create backup file {}", backupFile);
                 }
                 if (FileUtil.IS_POSIX_COMPLIANT) {
@@ -229,7 +229,7 @@ public class AtomicFileOutputStream extends FilterOutputStream {
             try {
                 // Move temporary file (replace original if it exists)
                 Files.move(temporaryFile, targetFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 LOGGER.warn("Could not move temporary file", e);
                 throw e;
             }
