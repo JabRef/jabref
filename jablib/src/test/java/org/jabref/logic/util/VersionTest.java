@@ -307,6 +307,13 @@ class VersionTest {
     }
 
     @Test
+    void alpha3IsNewerThanAlpha2WithoutDot() {
+        Version alphaNewer = Version.parse("6.0-alpha.3-2025-04-27--c52dc44");
+        Version alphaNotNewer = Version.parse("6.0-alpha2");
+        assertTrue(alphaNewer.isNewerThan(alphaNotNewer));
+    }
+
+    @Test
     void alphaShouldBeUpdatedToStables() {
         Version alpha = Version.parse("2.8-alpha");
         Version stable = Version.parse("2.8");
