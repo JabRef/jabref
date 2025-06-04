@@ -5,7 +5,7 @@ plugins {
 
     application
 
-    id("org.beryx.jlink") version "3.1.1"
+    id("org.panteleyev.jpackageplugin") version "1.6.1"
 }
 
 application{
@@ -121,72 +121,38 @@ tasks.named<JavaExec>("run") {
     }
 }
 
-// This is more or less a clone of jabgui/build.gradle.kts -> jlink
-jlink {
-    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
-    addExtraDependencies(
-        "javafx"
-    )
+task("copyDependencies", Copy::class) {
+    from(configurations.runtimeClasspath).into("${layout.buildDirectory.get()}/jmods")
+}
 
-    mergedModuleName = "jabsrv.merged.module"
+task("copyJar", Copy::class) {
+    from(tasks.jar).into("${layout.buildDirectory.get()}/jmods")
+}
 
-    // We keep debug statements - otherwise "--strip-debug" would be included
-    addOptions(
+val version: String = project.findProperty("projVersion") as? String ?: "100.0.0"
+
+tasks.jpackage {
+    dependsOn("build", "copyDependencies", "copyJar")
+
+    destination = "${layout.buildDirectory.get()}/distribution"
+
+    appName = "JabSrv"
+    appVersion = version
+    vendor = "JabRef e.V."
+    // copyright = "Copyright (c) 2020 Vendor"
+    module = "org.jabref.jabsrv/org.jabref.http.server.cli.ServerCLI"
+    modulePaths = listOf("${layout.buildDirectory.get()}/jmods")
+    javaOptions = listOf("-Dfile.encoding=UTF-8")
+    jLinkOptions = listOf(
+        "--strip-native-commands",
         "--compress",
         "zip-6",
         "--no-header-files",
         "--no-man-pages",
         "--bind-services"
     )
-
-    launcher {
-        name = "jabsrv"
-    }
-
-    // TODO: Remove as soon as dependencies are fixed (upstream)
-    forceMerge(
-        "bcprov",
-        "jaxb",
-        "istack",
-        "stax"
+    javaOptions = listOf(
+        "--add-reads jabsrv.merged.module=jakarta.inject",
+        "--enable-native-access=org.jabref.jabsrv"
     )
-
-    mergedModule {
-        uses("org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl")
-
-        uses("org.glassfish.jersey.internal.inject.InjectionManager")
-        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
-
-        excludeRequires("org.glassfish.hk2.locator")
-        excludeRequires("org.apache.logging.log4j")
-        excludeRequires("kotlin.stdlib")
-
-    }
-    jpackage {
-        outputDir = "distribution"
-
-        imageOptions.addAll(listOf(
-            "--java-options", "--add-reads jabsrv.merged.module=jakarta.inject",
-            "--java-options", "--enable-native-access=jabsrv.merged.module"))
-
-        // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
-        if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
-            imageOptions.addAll(
-                listOf(
-                    "--win-console"
-                )
-            )
-            skipInstaller = true
-        } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
-            imageOptions.addAll(
-                listOf(
-                    "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
-                    "--app-version", "$version"
-                )
-            )
-            skipInstaller = true
-        } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX) {
-            skipInstaller = true
-        }
-    }
 }
