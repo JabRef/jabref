@@ -4,8 +4,6 @@ plugins {
     id("buildlogic.java-common-conventions")
 
     application
-
-    id("org.panteleyev.jpackageplugin") version "1.6.1"
 }
 
 application{
@@ -121,38 +119,14 @@ tasks.named<JavaExec>("run") {
     }
 }
 
-task("copyDependencies", Copy::class) {
-    from(configurations.runtimeClasspath).into("${layout.buildDirectory.get()}/jmods")
-}
-
-task("copyJar", Copy::class) {
-    from(tasks.jar).into("${layout.buildDirectory.get()}/jmods")
-}
-
 val version: String = project.findProperty("projVersion") as? String ?: "100.0.0"
 
-tasks.jpackage {
-    dependsOn("build", "copyDependencies", "copyJar")
-
-    destination = "${layout.buildDirectory.get()}/distribution"
-
-    appName = "JabSrv"
-    appVersion = version
-    vendor = "JabRef e.V."
-    // copyright = "Copyright (c) 2020 Vendor"
-    module = "org.jabref.jabsrv/org.jabref.http.server.cli.ServerCLI"
-    modulePaths = listOf("${layout.buildDirectory.get()}/jmods")
-    javaOptions = listOf("-Dfile.encoding=UTF-8")
-    jLinkOptions = listOf(
-        "--strip-native-commands",
-        "--compress",
-        "zip-6",
-        "--no-header-files",
-        "--no-man-pages",
-        "--bind-services"
-    )
-    javaOptions = listOf(
-        "--add-reads jabsrv.merged.module=jakarta.inject",
-        "--enable-native-access=org.jabref.jabsrv"
-    )
+javaModulePackaging {
+    applicationName = "JabRef";
+    applicationVersion = version;
+    // applicationDescription = ""
+        vendor = "JabRef e.V."
+    copyright = "(c) JabRef e.V. and contributors"
+    // jpackageResources.setFrom(...);
+    // resources.from(...)
 }
