@@ -2,7 +2,6 @@ package org.jabref.gui.util;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Objects;
 import java.util.StringJoiner;
 
 import javafx.geometry.NodeOrientation;
@@ -36,6 +35,7 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+import org.jspecify.annotations.NonNull;
 
 public class MarkdownTextFlow extends SelectableTextFlow {
     private final Parser parser;
@@ -50,8 +50,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         this.htmlRenderer = HtmlRenderer.builder(options).build();
     }
 
-    public void setMarkdown(String markdownText) {
-        Objects.requireNonNull(markdownText);
+    public void setMarkdown(@NonNull String markdownText) {
         super.clearSelection();
         getChildren().clear();
 
