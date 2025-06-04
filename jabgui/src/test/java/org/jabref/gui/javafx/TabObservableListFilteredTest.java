@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class TabObservableListFilteredTest {
 
     @Test
-    public void testFilteredListDetectsPermutation() {
+    public void filteredListDetectsPermutation() {
         Tab lib1 = new Tab("lib1");
         Tab lib2 = new Tab("lib2");
         Tab other = new Tab("other");
@@ -32,7 +32,7 @@ public class TabObservableListFilteredTest {
 
         base.reorder(lib1, other);
 
-        assertNotEquals(other, filtered.get(0)); // This should not fail
+        assertNotEquals(other, filtered.getFirst()); // This should not fail
 
         assertEquals(List.of(lib2, lib1), filtered);
     }
