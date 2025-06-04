@@ -2,6 +2,7 @@ package org.jabref.gui.util;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import javafx.geometry.NodeOrientation;
@@ -50,10 +51,11 @@ public class MarkdownTextFlow extends SelectableTextFlow {
     }
 
     public void setMarkdown(String markdownText) {
+        Objects.requireNonNull(markdownText);
         super.clearSelection();
         getChildren().clear();
 
-        if (markdownText == null || markdownText.trim().isEmpty()) {
+        if (markdownText.trim().isEmpty()) {
             return;
         }
 

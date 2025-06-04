@@ -47,8 +47,8 @@ public class ChatMessageComponent extends HBox {
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                  .root(this)
+                  .load();
 
         chatMessage.addListener((_, _, newValue) -> {
             if (newValue != null) {
@@ -112,14 +112,12 @@ public class ChatMessageComponent extends HBox {
         markdownContentPane.getChildren().add(markdownTextFlow);
         markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
         markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
-        this.sceneProperty().addListener((_, _, scene) -> {
-            if (scene == null) {
-                return;
-            }
-            NumberBinding maxUsableWidth = Bindings.createDoubleBinding(() -> getScene().getWidth() - 20, sceneProperty(), getScene().widthProperty());
-            markdownTextFlow.maxWidthProperty().bind(maxUsableWidth);
-            wrapperHBox.maxWidthProperty().bind(maxUsableWidth);
-        });
+        NumberBinding maxUsableWidth = Bindings.createDoubleBinding(
+                () -> getScene() == null ? 600 : getScene().getWidth() - 20, sceneProperty(),
+                getScene() == null ? widthProperty() : getScene().widthProperty()
+        );
+        markdownTextFlow.maxWidthProperty().bind(maxUsableWidth);
+        wrapperHBox.maxWidthProperty().bind(maxUsableWidth);
         setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(this, Priority.ALWAYS);
     }
