@@ -376,8 +376,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private void initBindings() {
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
         openDatabaseList = EasyBind.map(tabbedPane.getTabs(), tab -> {
-            if (tab instanceof LibraryTab) {
-                return ((LibraryTab) tab).getBibDatabaseContext();
+            if (tab instanceof LibraryTab libraryTab) {
+                return libraryTab.getBibDatabaseContext();
             } else {
                 return null;
             }
