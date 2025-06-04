@@ -318,10 +318,10 @@ jobs:
           cd jabgui
           mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.dmg
           mv build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distribution/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.pkg
-      - name: Build runtime image and installer (linux, Windows)
+      - name: Build runtime JabSrv-CLI image and installer (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: bash
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabsrv-cli:jpackageUbuntu-22.04
       - name: Package JabGui application image (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: bash
