@@ -218,14 +218,14 @@ jobs:
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:prepareModulesDir
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
-        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
+        uses: slidoapp/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           keychain-password: jabref
       - name: Setup macOS key chain for app id cert
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
-        uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
+        uses: slidoapp/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d
         with:
           p12-file-base64: ${{ secrets.OSX_SIGNING_CERT_APPLICATION }}
           p12-password: ${{ secrets.OSX_CERT_PWD }}
