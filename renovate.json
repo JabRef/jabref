@@ -12,5 +12,11 @@
       ],
       "datasourceTemplate": "maven"
     }
+  ],
+  "packageRules": [
+    {
+      "managers": ["gradle", "gradle-wrapper", "github-actions"],
+      "enabled": false
+    }
   ]
 }
