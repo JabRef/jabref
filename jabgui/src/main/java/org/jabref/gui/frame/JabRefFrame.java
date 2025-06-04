@@ -374,13 +374,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
-        // Bind global state
-        FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
-        filteredTabs.setPredicate(LibraryTab.class::isInstance);
-
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
-        EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
+        openDatabaseList = EasyBind.map(tabbedPane.getTabs(), tab -> {
+            if (tab instanceof LibraryTab) {
+                return ((LibraryTab) tab).getBibDatabaseContext();
+            } else {
+                return null;
+            }
+        });
+        EasyBind.bindContent(stateManager.getOpenDatabases(), new FilteredList<>(openDatabaseList, Objects::nonNull));
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
