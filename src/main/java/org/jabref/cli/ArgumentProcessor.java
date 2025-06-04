@@ -39,7 +39,9 @@ import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.journals.JournalAbbreviationValidator;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.os.OS;
@@ -870,15 +872,24 @@ public class ArgumentProcessor {
     }
 
     private void validateJournalAbbreviations() {
-        JournalAbbreviationRepository repository = JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences());
-        List<ValidationResult> issues = repository.getValidationIssues();
-        
+        JournalAbbreviationRepository repository = loadJournalAbbreviationRepository();
+        List<JournalAbbreviationValidator.ValidationResult> issues = repository.getValidationIssues();
+        printValidationResults(issues);
+    }
+
+    private JournalAbbreviationRepository loadJournalAbbreviationRepository() {
+        return JournalAbbreviationLoader.loadRepository(cliPreferences.getJournalAbbreviationPreferences());
+    }
+
+    private void printValidationResults(List<JournalAbbreviationValidator.ValidationResult> issues) {
         if (issues.isEmpty()) {
-            System.out.println(Localization.lang("No validation issues found in journal abbreviations."));
+            System.out.println(Localization.lang("No validation issues found in journal abbreviations"));
         } else {
-            System.out.println(Localization.lang("Found %0 validation issues:", issues.size()));
-            for (ValidationResult issue : issues) {
-                System.out.println(Localization.lang("Type: %0, Message: %1", issue.getType(), issue.getMessage()));
+            System.out.println(Localization.lang("Found %0 validation issues", issues.size()));
+            for (JournalAbbreviationValidator.ValidationResult issue : issues) {
+                System.out.println(Localization.lang("Type: %0, Message: %1", 
+                    issue.getType().name(), 
+                    issue.getMessage()));
             }
         }
     }

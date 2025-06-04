@@ -192,6 +192,10 @@ public class CliOptions {
         return commandLine.hasOption("jumpToKey");
     }
 
+    public boolean isValidateJournals() {
+        return commandLine.hasOption("validate-journals");
+    }
+
     public Optional<String> getValidateJournals() {
         return Optional.ofNullable(commandLine.getOptionValue("validate-journals"));
     }
