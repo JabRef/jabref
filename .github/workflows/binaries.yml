@@ -141,17 +141,6 @@ jobs:
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distribution/jabkit
             suffix: ''
-          - os: windows-latest
-            displayName: windows
-            archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
-            archivePortableJabKit: 7z a -r jabkit/build/distribution/jabkit-portable_windows.zip ./jabkit/build/distribution/jabkit && rm -R jabkit/build/distribution/jabkit
-            suffix: ''
-          - os: macos-13  # intel image
-            displayName: macOS
-            suffix: ''
-          - os: macos-14
-            displayName: macOS (ARM64)
-            suffix: '_arm64'
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
