@@ -159,9 +159,9 @@ jlink {
         uses("org.glassfish.jersey.internal.inject.InjectionManager")
         uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
 
-        excluderequires("org.glassfish.hk2.locator")
-        excluderequires("org.apache.logging.log4j")
-        excluderequires("kotlin.stdlib")
+        excludeRequires("org.glassfish.hk2.locator")
+        excludeRequires("org.apache.logging.log4j")
+        excludeRequires("kotlin.stdlib")
 
     }
     jpackage {
