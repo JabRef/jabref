@@ -27,7 +27,7 @@ public class ExternalLinkCreator {
                 throw new AssertionError("ShortScience URL is invalid.", e);
             }
             // Direct the user to the search results for the title.
-            uriBuilder.addParameter("q", title);
+            uriBuilder.addParameter("q", title.trim());
             return uriBuilder.toString();
         });
     }
