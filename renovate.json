@@ -3,6 +3,8 @@
   "extends": [
     "config:base"
   ],
+  "dependencyDashboard": false,
+  "prConcurrentLimit": 1,
   "regexManagers": [
     {
       "managerFilePatterns": ".jbang/*.java",
@@ -17,6 +19,11 @@
     {
       "managers": ["gradle", "gradle-wrapper", "github-actions"],
       "enabled": false
+    },
+    {
+      "groupName": "all dependencies",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
+      "matchDepTypes": ["*"]
     }
   ],
   "maven": {
