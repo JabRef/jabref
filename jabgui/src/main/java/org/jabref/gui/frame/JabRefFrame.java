@@ -93,10 +93,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private final FileHistoryMenu fileHistory;
 
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private FilteredList<Tab> filteredTabs;
-    @SuppressWarnings({"FieldCanBeLocal"})
-    private EasyObservableList<BibDatabaseContext> openDatabaseList;
+    @SuppressWarnings({"FieldCanBeLocal"}) private EasyObservableList<BibDatabaseContext> openDatabaseList;
 
     private final Stage mainStage;
     private final StateManager stateManager;
@@ -377,16 +374,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
-        filteredTabs = new FilteredList<>(tabbedPane.getTabs(), tab -> {
-            System.out.println(tab);
-            return tab instanceof LibraryTab;
-        });
+        // Bind global state
+        FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
+        filteredTabs.setPredicate(LibraryTab.class::isInstance);
 
         // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(filteredTabs, tab -> {
-            System.out.println(tab);
-            return ((LibraryTab) tab).getBibDatabaseContext();
-        });
+        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
         EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
