@@ -465,7 +465,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         source.addListener((ListChangeListener<T>) c -> {
             while (c.next()) {
                 if (c.wasPermutated()) {
-                    // Full reorder pass
+                    // We need a fresh copy as permutation is much harder to mirror
                     List<T> reordered = source.stream().filter(filter).toList();
                     target.setAll(reordered);
                 }
