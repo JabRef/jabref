@@ -373,18 +373,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
-        // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(tabbedPane.getTabs(), tab -> {
-            if (tab instanceof LibraryTab libraryTab) {
-                return libraryTab.getBibDatabaseContext();
-            } else {
-                return null;
-            }
-        });
+        // FIXME: See https://github.com/JabRef/jabref-koppor/pull/713 - workaround in place until issue is resolved.
+        // Original code used FilteredList and EasyBind to filter and map tabs directly:
+        // FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
+        // filteredTabs.setPredicate(LibraryTab.class::isInstance);
+        // openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
+        // EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
+        // Once JabRef#713 is fixed, remove this comment and the bindContentFiltered() method, and restore the original code
 
-        // call compromised until further notice, See https://github.com/JabRef/jabref-koppor/pull/713 for details.
-        // EasyBind.bindContent(stateManager.getOpenDatabases(), new FilteredList<>(openDatabaseList));
-        bindContentFiltered(openDatabaseList, stateManager.getOpenDatabases(), Objects::nonNull);
+        bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
@@ -458,21 +455,30 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
     }
 
-    private static <T> void bindContentFiltered(ObservableList<T> source, ObservableList<T> target, java.util.function.Predicate<T> filter) {
+    private static void bindContentFiltered(ObservableList<Tab> source, ObservableList<BibDatabaseContext> target, java.util.function.Predicate<Tab> filter) {
+        java.util.function.Function<Tab, BibDatabaseContext> tabToContext = tab -> ((LibraryTab) tab).getBibDatabaseContext();
         // Initial sync
-        target.setAll(source.stream().filter(filter).toList());
+        target.setAll(source.stream()
+                            .filter(filter)
+                            .map(tabToContext)
+                            .toList());
 
-        source.addListener((ListChangeListener<T>) c -> {
+        source.addListener((ListChangeListener<Tab>) c -> {
             while (c.next()) {
                 if (c.wasPermutated()) {
                     // We need a fresh copy as permutation is much harder to mirror
-                    List<T> reordered = source.stream().filter(filter).toList();
+                    List<BibDatabaseContext> reordered = source.stream()
+                                                               .filter(filter)
+                                                               .map(tabToContext)
+                                                               .toList();
                     target.setAll(reordered);
                 }
 
                 if (c.wasRemoved()) {
-                    for (T removed : c.getRemoved()) {
-                        target.remove(removed);
+                    for (Tab removed : c.getRemoved()) {
+                        if (filter.test(removed)) {
+                            target.remove(tabToContext.apply(removed));
+                        }
                     }
                 }
 
@@ -482,15 +488,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
                     // We need to add at the correct place - therefore, we need to find out the correct position
                     for (int i = 0; i < sourceIndex; i++) {
-                        T element = source.get(i);
-                        if (filter.test(element)) {
+                        Tab tab = source.get(i);
+                        if (filter.test(tab)) {
                             targetIndex++;
                         }
                     }
 
-                    for (T added : c.getAddedSubList()) {
+                    for (Tab added : c.getAddedSubList()) {
                         if (filter.test(added)) {
-                            target.add(targetIndex++, added);
+                            target.add(targetIndex++, tabToContext.apply(added));
                         }
                     }
                 }
