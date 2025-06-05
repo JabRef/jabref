@@ -217,6 +217,9 @@ jobs:
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
       # endregion
 
+      - name: Basic build (assemble)
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" assemble
+
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
         if: (startsWith(matrix.os, 'macos')) || (needs.conditions.outputs.upload-to-builds-jabref-org == 'false')
