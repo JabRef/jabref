@@ -78,7 +78,7 @@ javaModulePackaging {
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("exe")
     }
-    // pick the target based os and arch
+    // The default target is the one determined above
     primaryTarget(target(osTarget))
 }
 
