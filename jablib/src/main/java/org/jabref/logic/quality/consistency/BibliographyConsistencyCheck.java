@@ -83,13 +83,13 @@ public class BibliographyConsistencyCheck {
         for (BibEntry entry : entries) {
             EntryType entryType = entry.getType();
 
-            Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap.computeIfAbsent(entryType, k -> new HashSet<>());
+            Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap.computeIfAbsent(entryType, _ -> new HashSet<>());
             fieldsInAnyEntry.addAll(entry.getFields());
 
-            Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.computeIfAbsent(entryType, k -> new HashSet<>(entry.getFields()));
+            Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.computeIfAbsent(entryType, _ -> new HashSet<>(entry.getFields()));
             fieldsInAllEntries.retainAll(entry.getFields());
 
-            Set<BibEntry> entriesOfType = entryTypeToEntriesMap.computeIfAbsent(entryType, k -> new HashSet<>());
+            Set<BibEntry> entriesOfType = entryTypeToEntriesMap.computeIfAbsent(entryType, _ -> new HashSet<>());
             entriesOfType.add(entry);
         }
     }

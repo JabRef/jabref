@@ -109,7 +109,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
                 List<BibEntry> extractedEntries = metadataImporter.importDatabase(filePath, document);
                 LOGGER.debug("Importer {} extracted {}", metadataImporter.getName(), extractedEntries);
                 candidates.addAll(extractedEntries);
-            } catch (Exception e) {
+            } catch (ParseException | IOException e) {
                 LOGGER.error("Got an exception while importing PDF file", e);
             }
         }
@@ -182,7 +182,7 @@ public class PdfMergeMetadataImporter extends PdfImporter {
         ParserResult parserResult = importDatabase(filePath);
 
         RelativePathsCleanup relativePathsCleanup = new RelativePathsCleanup(context, filePreferences);
-        parserResult.getDatabase().getEntries().forEach(entry -> relativePathsCleanup.cleanup(entry));
+        parserResult.getDatabase().getEntries().forEach(relativePathsCleanup::cleanup);
 
         return parserResult;
     }

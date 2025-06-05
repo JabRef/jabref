@@ -2,6 +2,7 @@ package org.jabref.generators;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,7 +50,7 @@ public class CitationStyleCatalogGenerator {
             List<CitationStyle> styles = discoverStyles(stylesDirectory);
 
             generateCatalog(styles);
-        } catch (Exception e) {
+        } catch (URISyntaxException | IOException e) {
             LOGGER.error("Error generating citation style catalog", e);
         }
     }

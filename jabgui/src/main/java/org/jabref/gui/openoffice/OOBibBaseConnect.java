@@ -95,7 +95,7 @@ public class OOBibBaseConnect {
                     queryInterface(XComponent.class, bridge).dispose();
                 }
             }
-        } catch (Exception ex) {
+        } catch (com.sun.star.uno.Exception ex) {
             LOGGER.error("Exception disposing office process connection bridge", ex);
         }
     }
