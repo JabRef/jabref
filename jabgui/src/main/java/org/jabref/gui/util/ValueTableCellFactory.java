@@ -141,7 +141,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     }
 
                     setOnMouseEntered(event -> {
-                        if (tooltip != null) {
+                        if (tooltip != null && getTableRow().getIndex() < getTableView().getItems().size()) {
                             setTooltip(tooltip.apply(rowItem, item));
                         }
                     });
