@@ -53,6 +53,7 @@ import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
+import org.jabref.gui.mergebibfilesintocurrentbib.MergeBibFilesIntoCurrentBibAction;
 import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
@@ -174,6 +175,10 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.EXPORT_ALL, new ExportCommand(ExportCommand.ExportMethod.EXPORT_ALL, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.EXPORT_SELECTED, new ExportCommand(ExportCommand.ExportMethod.EXPORT_SELECTED, frame::getCurrentLibraryTab, stateManager, dialogService, preferences, entryTypesManager, abbreviationRepository, taskExecutor)),
                         factory.createMenuItem(StandardActions.SAVE_SELECTED_AS_PLAIN_BIBTEX, new SaveAction(SaveAction.SaveMethod.SAVE_SELECTED, frame::getCurrentLibraryTab, dialogService, preferences, stateManager))),
+
+                new SeparatorMenuItem(),
+
+                factory.createMenuItem(StandardActions.MERGE_BIB_FILES_INTO_CURRENT_BIB, new MergeBibFilesIntoCurrentBibAction(frame, dialogService, preferences, stateManager, undoManager, fileUpdateMonitor, aiService, entryTypesManager, clipBoardManager, taskExecutor)),
 
                 new SeparatorMenuItem(),
 

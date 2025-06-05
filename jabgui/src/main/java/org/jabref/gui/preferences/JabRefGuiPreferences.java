@@ -38,6 +38,7 @@ import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
+import org.jabref.gui.mergebibfilesintocurrentbib.MergeBibFilesIntoCurrentBibPreferences;
 import org.jabref.gui.mergeentries.DiffMode;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.newentry.NewEntryDialogTab;
@@ -234,6 +235,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CREATE_ENTRY_INTERPRET_PARSER_NAME = "latestInterpretParserName";
     // endregion
 
+    // region MergeBibFilesPreferences
+    private static final String MERGE_SAME_KEY_ENTRIES = "mergeSameKeyEntries";
+    private static final String MERGE_DUPLICATE_ENTRIES = "mergeDuplicateEntries";
+    // endregion
+
     private static JabRefGuiPreferences singleton;
 
     private EntryEditorPreferences entryEditorPreferences;
@@ -255,6 +261,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private KeyBindingRepository keyBindingRepository;
     private CopyToPreferences copyToPreferences;
     private NewEntryPreferences newEntryPreferences;
+    private MergeBibFilesIntoCurrentBibPreferences mergeBibFilesIntoCurrentBibPreferences;
 
     private JabRefGuiPreferences() {
         super();
@@ -430,6 +437,11 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(CREATE_ENTRY_ID_LOOKUP_GUESSING, true);
         defaults.put(CREATE_ENTRY_ID_FETCHER_NAME, DoiFetcher.NAME);
         defaults.put(CREATE_ENTRY_INTERPRET_PARSER_NAME, PlainCitationParserChoice.RULE_BASED.getLocalizedName());
+        // endregion
+
+        // region MergeBibEntriesPreferences
+        defaults.put(MERGE_SAME_KEY_ENTRIES, true);
+        defaults.put(MERGE_DUPLICATE_ENTRIES, true);
         // endregion
     }
 
@@ -1299,6 +1311,24 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         return newEntryPreferences;
     }
+
+    // region MergeBibFilesPreferences
+    @Override
+    public MergeBibFilesIntoCurrentBibPreferences getMergeBibFilesIntoCurrentBibPreferences() {
+        if (mergeBibFilesIntoCurrentBibPreferences != null) {
+            return mergeBibFilesIntoCurrentBibPreferences;
+        }
+        mergeBibFilesIntoCurrentBibPreferences = new MergeBibFilesIntoCurrentBibPreferences(
+                getBoolean(MERGE_SAME_KEY_ENTRIES),
+                getBoolean(MERGE_DUPLICATE_ENTRIES)
+        );
+
+        EasyBind.listen(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SAME_KEY_ENTRIES, newValue));
+        EasyBind.listen(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_DUPLICATE_ENTRIES, newValue));
+
+        return mergeBibFilesIntoCurrentBibPreferences;
+    }
+    // endregion
 
     /**
      * In GUI mode, we can lookup the directory better
