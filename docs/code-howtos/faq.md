@@ -13,11 +13,11 @@ Following is a list of common errors encountered by developers which lead to fai
 ## Failing GitHub workflow "Sync fork with upstream"
 
 To ease development, a GitHub workflow automatically updates your `main` branch daily.
-However, it is not allowed to update your files if GitHub workflows are touched.
-Therefore, GitHub notifies you now and then that "Sync fork with upstream failed for main branch" failed.
+However, it is not allowed to update your files if the GitHub workflows are updated by the JabRef team.
+Therefore, GitHub notifies you now and then that "Sync fork with upstream failed for main branch".
 
-To solve this issue, open your GitHub repository on a browser.
-You need to click "Sync fork" to get your fork up-to-date and the workflow running again.
+To solve this issue, open your GitHub repository in your browser.
+Then, click "Sync fork" to get your fork up-to-date and get the workflow passing again.
 
 ![Sync fork](https://github.com/user-attachments/assets/5c1b0a17-0fde-4ce8-ac46-d9477a65c345)
 
