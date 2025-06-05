@@ -31,11 +31,12 @@ public class StringUtil {
      * Pattern for normalizing whitespace and punctuation using named capture groups
      */
     private static final Pattern NORMALIZE_PATTERN = Pattern.compile(
-    "(?<whitespace>\\s+)|" +           // multiple whitespace
-    "(?<hyphen>\\s*-+\\s*)|" +         // hyphens with surrounding spaces
-    "(?<comma>\\s*,\\s*)|" +           // commas with surrounding spaces
-    "(?<semicolon>\\s*;\\s*)|" +       // semicolons with surrounding spaces
-    "(?<colon>\\s*:\\s*)");            // colons with surrounding spaces
+            "(?<whitespace>\\s+)|" +                   // multiple whitespace
+                    "(?<hyphen>\\s*-+\\s*)|" +         // hyphens with surrounding spaces
+                    "(?<comma>\\s*,\\s*)|" +           // commas with surrounding spaces
+                    "(?<semicolon>\\s*;\\s*)|" +       // semicolons with surrounding spaces
+                    "(?<colon>\\s*:\\s*)"              // colons with surrounding spaces
+    );
 
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
