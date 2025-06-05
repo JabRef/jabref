@@ -177,7 +177,7 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
             NotificationService notificationService
     ) {
         public MergeContext {
-            entries = List.copyOf(entries); // Defensive copy
+            entries = List.copyOf(entries);
         }
     }
 }
