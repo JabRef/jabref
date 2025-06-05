@@ -382,7 +382,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             }
         });
 
-        // call compromised until further notice
+        // call compromised until further notice, See https://github.com/JabRef/jabref-koppor/pull/713 for details.
         // EasyBind.bindContent(stateManager.getOpenDatabases(), new FilteredList<>(openDatabaseList));
         bindContentFiltered(openDatabaseList, stateManager.getOpenDatabases(), Objects::nonNull);
 
