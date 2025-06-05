@@ -299,8 +299,6 @@ public class MainMenu extends MenuBar {
                         StandardActions.MERGE_WITH_FETCHED_ENTRY,
                         new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
 
-                new SeparatorMenuItem(),
-
                 factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
                         new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor))
