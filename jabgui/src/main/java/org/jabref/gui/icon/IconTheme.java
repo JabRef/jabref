@@ -325,6 +325,10 @@ public class IconTheme {
         NEW_GROUP(MaterialDesignP.PLUS),
         OPEN_LINK(MaterialDesignO.OPEN_IN_NEW),
         LOOKUP_IDENTIFIER(MaterialDesignS.SEARCH_WEB),
+        CREATE_ENTRY_IMMEDIATE(MaterialDesignP.PLUS),
+        CREATE_ENTRY(MaterialDesignP.PLAYLIST_PLUS),
+        CREATE_ENTRY_IDENTIFIER(MaterialDesignC.CALL_RECEIVED),
+        CREATE_ENTRY_PLAINTEXT(MaterialDesignP.PLUS_BOX),
         LINKED_FILE_ADD(MaterialDesignP.PLUS),
         FETCH_FULLTEXT(MaterialDesignS.SEARCH_WEB),
         FETCH_BY_IDENTIFIER(MaterialDesignC.CLIPBOARD_ARROW_DOWN),
@@ -347,7 +351,6 @@ public class IconTheme {
         REMOVE_ABBREVIATION_LIST(MaterialDesignM.MINUS),
         ADD_ABBREVIATION(MaterialDesignP.PLAYLIST_PLUS),
         REMOVE_ABBREVIATION(MaterialDesignP.PLAYLIST_MINUS),
-        NEW_ENTRY_FROM_PLAIN_TEXT(MaterialDesignP.PLUS_BOX),
         REMOTE_DATABASE(MaterialDesignD.DATABASE),
         HOME(MaterialDesignH.HOME),
         LINK(MaterialDesignL.LINK),
@@ -366,7 +369,9 @@ public class IconTheme {
         CONSISTENCY_UNSET_FIELD(MaterialDesignM.MINUS),
         CONSISTENCY_REQUIRED_FIELD(MaterialDesignC.CLOSE),
         CONSISTENCY_OPTIONAL_FIELD(MaterialDesignC.CIRCLE_OUTLINE),
-        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP);
+        CONSISTENCY_UNKNOWN_FIELD(MaterialDesignH.HELP),
+        ABSOLUTE_PATH(MaterialDesignF.FAMILY_TREE),
+        RELATIVE_PATH(MaterialDesignF.FILE_TREE_OUTLINE);
 
         private final JabRefIcon icon;
 

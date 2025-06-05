@@ -24,6 +24,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.ai.components.aichat.AiChatWindow;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.logic.ai.AiService;
@@ -36,9 +37,11 @@ import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.AutomaticKeywordGroup;
 import org.jabref.model.groups.AutomaticPersonsGroup;
 import org.jabref.model.groups.ExplicitGroup;
+import org.jabref.model.groups.GroupHierarchyType;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.groups.WordKeywordGroup;
 import org.jabref.model.metadata.MetaData;
@@ -54,6 +57,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
     private final DialogService dialogService;
     private final AiService aiService;
     private final GuiPreferences preferences;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final TaskExecutor taskExecutor;
     private final CustomLocalDragboard localDragboard;
     private final ObjectProperty<Predicate<GroupNodeViewModel>> filterPredicate = new SimpleObjectProperty<>();
@@ -80,6 +84,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                               DialogService dialogService,
                               AiService aiService,
                               GuiPreferences preferences,
+                              AdaptVisibleTabs adaptVisibleTabs,
                               TaskExecutor taskExecutor,
                               CustomLocalDragboard localDragboard
     ) {
@@ -87,6 +92,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
         this.dialogService = Objects.requireNonNull(dialogService);
         this.aiService = Objects.requireNonNull(aiService);
         this.preferences = Objects.requireNonNull(preferences);
+        this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.localDragboard = Objects.requireNonNull(localDragboard);
 
@@ -172,6 +178,29 @@ public class GroupTreeViewModel extends AbstractViewModel {
             rootGroup.setValue(null);
         }
         currentDatabase = newDatabase;
+        newDatabase.ifPresent(db -> addGroupImportEntries(rootGroup.get()));
+    }
+
+    private void addGroupImportEntries(GroupNodeViewModel parent) {
+        if (!preferences.getLibraryPreferences().isAddImportedEntriesEnabled()) {
+            return;
+        }
+
+        String grpName = preferences.getLibraryPreferences().getAddImportedEntriesGroupName();
+        AbstractGroup importEntriesGroup = new SmartGroup(grpName, GroupHierarchyType.INDEPENDENT, ',');
+        boolean isGrpExist = parent.getGroupNode()
+                                 .getChildren()
+                                 .stream()
+                                 .map(GroupTreeNode::getGroup)
+                                 .anyMatch(grp -> grp instanceof SmartGroup);
+        if (!isGrpExist) {
+            currentDatabase.ifPresent(db -> {
+                GroupTreeNode newSubgroup = parent.addSubgroup(importEntriesGroup);
+                newSubgroup.moveTo(parent.getGroupNode(), 0);
+                selectedGroups.setAll(new GroupNodeViewModel(db, stateManager, taskExecutor, newSubgroup, localDragboard, preferences));
+                writeGroupChangesToMetaData();
+            });
+        }
     }
 
     /**
@@ -207,6 +236,42 @@ public class GroupTreeViewModel extends AbstractViewModel {
 
     private boolean isGroupTypeEqual(AbstractGroup oldGroup, AbstractGroup newGroup) {
         return oldGroup.getClass().equals(newGroup.getClass());
+    }
+
+    /**
+     * Adds JabRef suggested groups under the "All Entries" parent node.
+     * Assumes the parent is already validated as "All Entries" by the caller.
+     *
+     * @param parent The "All Entries" parent node.
+     */
+    public void addSuggestedGroups(GroupNodeViewModel parent) {
+        currentDatabase.ifPresent(database -> {
+            GroupTreeNode rootNode = parent.getGroupNode();
+            List<GroupTreeNode> newSuggestedSubgroups = new ArrayList<>();
+
+            // 1. Create "Entries without linked files" group if it doesn't exist
+            SearchGroup withoutFilesGroup = JabRefSuggestedGroups.createWithoutFilesGroup();
+            if (!parent.hasSimilarSearchGroup(withoutFilesGroup)) {
+                GroupTreeNode subGroup = rootNode.addSubgroup(withoutFilesGroup);
+                newSuggestedSubgroups.add(subGroup);
+            }
+
+            // 2. Create "Entries without groups" group if it doesn't exist
+            SearchGroup withoutGroupsGroup = JabRefSuggestedGroups.createWithoutGroupsGroup();
+            if (!parent.hasSimilarSearchGroup(withoutGroupsGroup)) {
+                GroupTreeNode subGroup = rootNode.addSubgroup(withoutGroupsGroup);
+                newSuggestedSubgroups.add(subGroup);
+            }
+
+            selectedGroups.setAll(newSuggestedSubgroups
+                    .stream()
+                    .map(newSubGroup -> new GroupNodeViewModel(database, stateManager, taskExecutor, newSubGroup, localDragboard, preferences))
+                    .toList());
+
+            writeGroupChangesToMetaData();
+
+            dialogService.notify(Localization.lang("Created %0 suggested groups.", String.valueOf(newSuggestedSubgroups.size())));
+        });
     }
 
     /**
@@ -416,6 +481,7 @@ public class GroupTreeViewModel extends AbstractViewModel {
                     dialogService,
                     preferences.getAiPreferences(),
                     preferences.getExternalApplicationsPreferences(),
+                    adaptVisibleTabs,
                     taskExecutor
             );
 

@@ -16,30 +16,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class NewEntryActionTest {
-
     private NewEntryAction newEntryAction;
+
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
     private final LibraryTab libraryTab = mock(LibraryTab.class);
     private final LibraryTabContainer tabContainer = mock(LibraryTabContainer.class);
-    private final DialogService dialogService = spy(DialogService.class);
-    private final GuiPreferences preferences = mock(GuiPreferences.class);
+    private final DialogService dialogService = mock(DialogService.class);
     private final StateManager stateManager = mock(StateManager.class);
 
     @BeforeEach
     void setUp() {
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
-        newEntryAction = new NewEntryAction(() -> libraryTab, dialogService, preferences, stateManager);
+        newEntryAction = new NewEntryAction(false, () -> libraryTab, dialogService, preferences, stateManager);
     }
 
     @Test
     void executeOnSuccessWithFixedType() {
         EntryType type = StandardEntryType.Article;
-        newEntryAction = new NewEntryAction(() -> libraryTab, type, dialogService, preferences, stateManager);
+        newEntryAction = new NewEntryAction(type, () -> libraryTab, dialogService, preferences, stateManager);
         when(tabContainer.getLibraryTabs()).thenReturn(FXCollections.observableArrayList(libraryTab));
 
         newEntryAction.execute();

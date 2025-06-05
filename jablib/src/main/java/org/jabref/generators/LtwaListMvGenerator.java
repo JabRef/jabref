@@ -1,6 +1,7 @@
 package org.jabref.generators;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -56,14 +57,14 @@ public class LtwaListMvGenerator {
      */
     private static Path downloadLtwaFile() throws IOException, URISyntaxException {
         LOGGER.info("Downloading LTWA file from {}.", LtwaListMvGenerator.LTWA_URL);
-        var in = new URI(LTWA_URL).toURL().openStream();
-        var path = Files.writeString(
-                Files.createTempFile("ltwa", ".csv"),
-                new String(in.readAllBytes()),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
-        in.close();
-        return path;
+        try (InputStream inputStream = new URI(LTWA_URL).toURL().openStream()) {
+            Path path = Files.writeString(
+                    Files.createTempFile("ltwa", ".csv"),
+                    new String(inputStream.readAllBytes()),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING);
+            return path;
+        }
     }
 
     /**
@@ -95,12 +96,12 @@ public class LtwaListMvGenerator {
                                   .ifPresent(word -> {
                                       if (word.startsWith("-")) {
                                           String key = word.substring(1);
-                                          suffixMap.computeIfAbsent(key, k ->
+                                          suffixMap.computeIfAbsent(key, _ ->
                                                   Stream.<LtwaEntry>builder().build().collect(Collectors.toList())
                                           ).add(entry);
                                       } else {
                                           String key = word.endsWith("-") ? word.substring(0, word.length() - 1) : word;
-                                          prefixMap.computeIfAbsent(key, k ->
+                                          prefixMap.computeIfAbsent(key, _ ->
                                                   Stream.<LtwaEntry>builder().build().collect(Collectors.toList())
                                           ).add(entry);
                                       }

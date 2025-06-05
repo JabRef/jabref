@@ -148,13 +148,13 @@ public class StyleSelectDialogViewModel {
 
     public void storeStylePreferences() {
         // save external jstyles
-        List<String> externalStyles = jStyles.stream()
+        List<String> externalJStyles = jStyles.stream()
                                              .map(this::toJStyle)
                                              .filter(style -> !style.isInternalStyle())
                                              .map(JStyle::getPath)
                                              .toList();
 
-        openOfficePreferences.setExternalStyles(externalStyles);
+        openOfficePreferences.setExternalJStyles(externalJStyles);
 
         // save the current style selection
         OOStyle selectedStyle = getSelectedStyle();

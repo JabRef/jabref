@@ -1,17 +1,17 @@
 module org.jabref.jabsrv {
     exports org.jabref.http.server;
-    opens org.jabref.http.server
-            to org.glassfish.hk2.utilities,
-            org.glassfish.hk2.locator;
+
+    exports org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator;
+
+    opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
+
+    // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
+    requires org.glassfish.hk2.locator;
+    uses org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl;
 
     requires org.jabref.jablib;
 
     requires org.slf4j;
-    requires jul.to.slf4j;
-    requires org.apache.logging.log4j.to.slf4j;
-    requires org.tinylog.api;
-    requires org.tinylog.api.slf4j;
-    requires org.tinylog.impl;
 
     requires com.google.common;
     requires com.google.gson;
@@ -29,7 +29,12 @@ module org.jabref.jabsrv {
     // requires org.glassfish.jaxb.runtime;
 
     requires org.glassfish.grizzly;
+    requires org.glassfish.grizzly.http;
+    requires org.glassfish.grizzly.http.server;
+    requires jakarta.validation;
     requires jakarta.ws.rs;
+
+    requires jersey.common;
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
@@ -39,4 +44,7 @@ module org.jabref.jabsrv {
     requires citeproc.java;
 
     requires transitive org.jspecify;
+    requires java.logging;
+    requires jersey.container.grizzly2.http;
+    requires jersey.server;
 }

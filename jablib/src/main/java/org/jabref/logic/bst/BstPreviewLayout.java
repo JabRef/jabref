@@ -44,7 +44,7 @@ public final class BstPreviewLayout implements PreviewLayout {
         }
         try {
             bstVM = new BstVM(path);
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("Could not read {}.", path.toAbsolutePath(), e);
             error = Localization.lang("Error opening file '%0'", path.toString());
         }

@@ -23,6 +23,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -52,6 +53,9 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final IntegerProperty citationsRelationStoreTTL = new SimpleIntegerProperty();
 
+    private final BooleanProperty addImportedEntries = new SimpleBooleanProperty();
+    private final StringProperty addImportedEntriesGroupName = new SimpleStringProperty("");
+
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
@@ -71,6 +75,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final LibraryPreferences libraryPreferences;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
@@ -82,6 +87,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.doiPreferences = preferences.getDOIPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.importFormatPreferences = preferences.getImportFormatPreferences();
+        this.libraryPreferences = preferences.getLibraryPreferences();
 
         this.refAiEnabled = refAiEnabled;
 
@@ -132,6 +138,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
+        addImportedEntries.setValue(libraryPreferences.isAddImportedEntriesEnabled());
+        addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
         citationsRelationStoreTTL.setValue(importerPreferences.getCitationsRelationsStoreTTL());
 
@@ -164,8 +172,15 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
+        libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
+        if (addImportedEntriesGroupName.getValue().isEmpty() || addImportedEntriesGroupName.getValue().startsWith(" ")) {
+            libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
+        } else {
+            libraryPreferences.setAddImportedEntriesGroupName(addImportedEntriesGroupName.getValue());
+        }
         importerPreferences.setDefaultPlainCitationParser(defaultPlainCitationParser.getValue());
         importerPreferences.setCitationsRelationsStoreTTL(citationsRelationStoreTTL.getValue());
+
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidUseAsked(grobidPreferences.isGrobidUseAsked());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
@@ -193,6 +208,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParserProperty() {
         return defaultPlainCitationParser;
+    }
+
+    public BooleanProperty getAddImportedEntries() {
+        return addImportedEntries;
+    }
+
+    public StringProperty getAddImportedEntriesGroupName() {
+        return addImportedEntriesGroupName;
     }
 
     public BooleanProperty useCustomDOIProperty() {

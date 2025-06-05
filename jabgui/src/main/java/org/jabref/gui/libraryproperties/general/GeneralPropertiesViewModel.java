@@ -146,21 +146,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(getBrowseDirectory(librarySpecificDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> librarySpecificDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> setDirectory(librarySpecificDirectoryProperty, dir));
     }
 
     public void browseUserDir() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(getBrowseDirectory(userSpecificFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> userSpecificFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> setDirectory(userSpecificFileDirectoryProperty, dir));
     }
 
     public void browseLatexDir() {
         DirectoryDialogConfiguration directoryDialogConfiguration = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(getBrowseDirectory(laTexFileDirectoryProperty.getValue())).build();
         dialogService.showDirectorySelectionDialog(directoryDialogConfiguration)
-                     .ifPresent(dir -> laTexFileDirectoryProperty.setValue(dir.toAbsolutePath().toString()));
+                     .ifPresent(dir -> setDirectory(laTexFileDirectoryProperty, dir));
     }
 
     public BooleanProperty encodingDisableProperty() {
@@ -183,7 +183,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return selectedDatabaseModeProperty;
     }
 
-    public StringProperty librarySpecificDirectoryPropertyProperty() {
+    public StringProperty librarySpecificDirectoryProperty() {
         return this.librarySpecificDirectoryProperty;
     }
 
@@ -196,24 +196,40 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
     }
 
     private Path getBrowseDirectory(String configuredDir) {
-        if (configuredDir.isEmpty()) {
-            return preferences.getFilePreferences().getWorkingDirectory();
-        }
-        Optional<Path> foundPath = this.databaseContext.getFileDirectories(preferences.getFilePreferences()).stream()
-                                                       .filter(path -> path.toString().endsWith(configuredDir))
-                                                       .filter(Files::exists).findFirst();
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+        Path workingDir = preferences.getFilePreferences().getWorkingDirectory();
 
-        if (foundPath.isEmpty()) {
-            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working dir.", configuredDir));
-            return preferences.getFilePreferences().getWorkingDirectory();
+        if (libPath.isEmpty()) {
+            Path potentialAbsolutePath = Path.of(configuredDir);
+            return Files.isDirectory(potentialAbsolutePath) ? potentialAbsolutePath : workingDir;
         }
-        return foundPath.get();
+        if (configuredDir.isEmpty()) {
+            return workingDir;
+        }
+
+        Path configuredPath = libPath.get().getParent().resolve(configuredDir).normalize();
+
+        // configuredDir can be input manually, which may lead it to being invalid
+        if (!Files.isDirectory(configuredPath)) {
+            dialogService.notify(Localization.lang("Path %0 could not be resolved. Using working directory.", configuredDir));
+            return workingDir;
+        }
+
+        return configuredPath;
     }
 
     private ValidationMessage validateDirectory(String directoryPath, String messageKey) {
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+        Path potentialAbsolutePath = Path.of(directoryPath);
+
+        // check absolute path separately in case of unsaved libraries
+        if (libPath.isEmpty() && Files.isDirectory(potentialAbsolutePath)) {
+            return null;
+        }
         try {
-            Path path = Path.of(directoryPath);
-            if (!Files.isDirectory(path)) {
+            if (!libPath.map(p -> p.getParent().resolve(directoryPath).normalize())
+                        .map(Files::isDirectory)
+                        .orElse(false)) {
                 return ValidationMessage.error(
                         Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
                 );
@@ -234,5 +250,53 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
             return false;
         }
         return true;
+    }
+
+    public void togglePath(StringProperty fileDirectory) {
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+
+        if (libPath.isEmpty() || fileDirectory.get().isEmpty()) {
+            return;
+        }
+
+        try {
+            Path parentPath = libPath.get().getParent();
+            Path currPath = Path.of(fileDirectory.get());
+            String newPath;
+
+            if (!currPath.isAbsolute()) {
+                newPath = parentPath.resolve(fileDirectory.get()).toAbsolutePath().toString();
+            } else if (currPath.isAbsolute()) {
+                newPath = parentPath.relativize(currPath).toString();
+            } else {
+                // case: convert to relative path and currPath is relative
+                return;
+            }
+
+            fileDirectory.setValue(newPath);
+        } catch (InvalidPathException ex) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Error occurred %0", ex.getMessage()));
+        }
+    }
+
+    /**
+     * For a saved library, any directory relative to the library path will be set as relative; otherwise, it will be set as absolute.
+     *
+     * @param fileDirectory file directory to be updated (lib/user/laTex)
+     * @param selectedDirPath path of directory (selected by user)
+     */
+    private void setDirectory(StringProperty fileDirectory, Path selectedDirPath) {
+        Optional<Path> libPath = this.databaseContext.getDatabasePath();
+
+        if (libPath.isEmpty() || !selectedDirPath.startsWith(libPath.get().getParent())) {
+            // set absolute path
+            fileDirectory.setValue(selectedDirPath.toAbsolutePath().toString());
+            return;
+        }
+
+        // set relative path
+        fileDirectory.setValue(libPath.get()
+                .getParent()
+                .relativize(selectedDirPath).toString());
     }
 }

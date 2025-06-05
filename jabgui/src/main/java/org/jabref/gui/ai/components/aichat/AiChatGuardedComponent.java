@@ -6,6 +6,7 @@ import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.util.EmbeddingModelGuardedComponent;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.AiService;
@@ -22,7 +23,7 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
     /// This field is used for two purposes:
     /// 1. Logging
     /// 2. Title of group chat window
-    /// Thus, if you use {@link AiChatGuardedComponent} for one entry in {@link EntryEditor}, then you may not localize
+    /// Thus, if you use {@link AiChatGuardedComponent} for one entry in {@link org.jabref.gui.entryeditor.EntryEditor}, then you may not localize
     /// this parameter. However, for group chat window, you should.
     private final StringProperty name;
 
@@ -42,9 +43,10 @@ public class AiChatGuardedComponent extends EmbeddingModelGuardedComponent {
                                   DialogService dialogService,
                                   AiPreferences aiPreferences,
                                   ExternalApplicationsPreferences externalApplicationsPreferences,
+                                  AdaptVisibleTabs adaptVisibleTabs,
                                   TaskExecutor taskExecutor
     ) {
-        super(aiService, aiPreferences, externalApplicationsPreferences, dialogService);
+        super(aiService, aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
         this.name = name;
         this.chatHistory = chatHistory;

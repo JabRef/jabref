@@ -20,6 +20,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
+import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplate;
@@ -85,9 +86,15 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final Map<AiTemplate, StringProperty> templateSources = Map.of(
             AiTemplate.CHATTING_SYSTEM_MESSAGE, new SimpleStringProperty(),
             AiTemplate.CHATTING_USER_MESSAGE, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_CHUNK, new SimpleStringProperty(),
-            AiTemplate.SUMMARIZATION_COMBINE, new SimpleStringProperty()
+            AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, new SimpleStringProperty(),
+            AiTemplate.CITATION_PARSING_USER_MESSAGE, new SimpleStringProperty()
     );
+
+    private final OptionalObjectProperty<AiTemplate> selectedTemplate = OptionalObjectProperty.empty();
 
     private final StringProperty temperature = new SimpleStringProperty();
     private final IntegerProperty contextWindowSize = new SimpleIntegerProperty();
@@ -119,16 +126,16 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
         this.aiPreferences = preferences.getAiPreferences();
 
-        this.enableAi.addListener((observable, oldValue, newValue) -> {
+        this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
             disableExpertSettings.set(!newValue || !customizeExpertSettings.get());
         });
 
-        this.customizeExpertSettings.addListener((observableValue, oldValue, newValue) ->
+        this.customizeExpertSettings.addListener((_, _, newValue) ->
             disableExpertSettings.set(!newValue || !enableAi.get())
         );
 
-        this.selectedAiProvider.addListener((observable, oldValue, newValue) -> {
+        this.selectedAiProvider.addListener((_, oldValue, newValue) -> {
             List<String> models = AiDefaultPreferences.getAvailableModels(newValue);
 
             disableApiBaseUrl.set(newValue == AiProvider.HUGGING_FACE || newValue == AiProvider.GEMINI);
@@ -198,7 +205,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        this.currentChatModel.addListener((observable, oldValue, newValue) -> {
+        this.currentChatModel.addListener((_, _, newValue) -> {
             if (newValue == null) {
                 return;
             }
@@ -214,7 +221,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             contextWindowSize.set(AiDefaultPreferences.getContextWindowSize(selectedAiProvider.get(), newValue));
         });
 
-        this.currentApiKey.addListener((observable, oldValue, newValue) -> {
+        this.currentApiKey.addListener((_, _, newValue) -> {
             switch (selectedAiProvider.get()) {
                 case OPEN_AI -> openAiApiKey.set(newValue);
                 case MISTRAL_AI -> mistralAiApiKey.set(newValue);
@@ -224,7 +231,7 @@ public class AiTabViewModel implements PreferenceTabViewModel {
             }
         });
 
-        this.currentApiBaseUrl.addListener((observable, oldValue, newValue) -> {
+        this.currentApiBaseUrl.addListener((_, _, newValue) -> {
             switch (selectedAiProvider.get()) {
                 case OPEN_AI -> openAiApiBaseUrl.set(newValue);
                 case MISTRAL_AI -> mistralAiApiBaseUrl.set(newValue);
@@ -399,6 +406,13 @@ public class AiTabViewModel implements PreferenceTabViewModel {
                 templateSources.get(template).set(AiDefaultPreferences.TEMPLATES.get(template)));
     }
 
+    public void resetCurrentTemplate() {
+        selectedTemplateProperty().get().ifPresent(template -> {
+            String defaultTemplate = AiDefaultPreferences.TEMPLATES.get(template);
+            templateSources.get(template).set(defaultTemplate);
+        });
+    }
+
     @Override
     public boolean validateSettings() {
         if (enableAi.get()) {
@@ -500,6 +514,10 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public Map<AiTemplate, StringProperty> getTemplateSources() {
         return templateSources;
+    }
+
+    public OptionalObjectProperty<AiTemplate> selectedTemplateProperty() {
+        return selectedTemplate;
     }
 
     public StringProperty temperatureProperty() {

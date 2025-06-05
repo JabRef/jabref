@@ -53,6 +53,30 @@ public class ConvertToBiblatexCleanup implements CleanupJob {
                 }
             });
         }
+        // If still no 'date' field, try fallback logic
+        if (!entry.hasField(StandardField.DATE)) {
+            changes.addAll(applyDateFallback(entry));
+        }
+
+        return changes;
+    }
+
+    private List<FieldChange> applyDateFallback(BibEntry entry) {
+        Optional<String> yearValue = entry.getFieldOrAlias(StandardField.YEAR);
+        if (yearValue.isEmpty()) {
+            return List.of();
+        }
+
+        String yearText = yearValue.get();
+        if (Date.parse(yearText).isEmpty()) {
+            return List.of();
+        }
+
+        List<FieldChange> changes = new ArrayList<>();
+        // If year was a full date, move it from year to date field.
+        entry.setField(StandardField.DATE, yearText).ifPresent(changes::add);
+        entry.clearField(StandardField.YEAR).ifPresent(changes::add);
+
         return changes;
     }
 }

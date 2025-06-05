@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.privacynotice.AiPrivacyNoticeGuardedComponent;
 import org.jabref.gui.ai.components.util.errorstate.ErrorStateComponent;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiPreferences;
@@ -24,9 +25,10 @@ public abstract class EmbeddingModelGuardedComponent extends AiPrivacyNoticeGuar
     public EmbeddingModelGuardedComponent(AiService aiService,
                                           AiPreferences aiPreferences,
                                           ExternalApplicationsPreferences externalApplicationsPreferences,
-                                          DialogService dialogService
+                                          DialogService dialogService,
+                                          AdaptVisibleTabs adaptVisibleTabs
     ) {
-        super(aiPreferences, externalApplicationsPreferences, dialogService);
+        super(aiPreferences, externalApplicationsPreferences, dialogService, adaptVisibleTabs);
 
         this.aiService = aiService;
 
