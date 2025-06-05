@@ -460,7 +460,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     private static <T> void bindContentFiltered(ObservableList<T> source, ObservableList<T> target, java.util.function.Predicate<T> filter) {
         // Initial sync
-        target.setAll(source.stream().filter(Objects::nonNull).toList());
+        target.setAll(source.stream().filter(filter).toList());
 
         source.addListener((ListChangeListener<T>) c -> {
             while (c.next()) {
