@@ -480,6 +480,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                     int sourceIndex = c.getFrom();
                     int targetIndex = 0;
 
+                    // We need to add at the correct place - therefore, we need to find out the correct position
                     for (int i = 0; i < sourceIndex; i++) {
                         T element = source.get(i);
                         if (filter.test(element)) {
