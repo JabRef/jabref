@@ -15,7 +15,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -382,7 +381,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 return null;
             }
         });
-        EasyBind.bindContent(stateManager.getOpenDatabases(), new FilteredList<>(openDatabaseList, Objects::nonNull));
+
+        // call compromised until further notice
+        // EasyBind.bindContent(stateManager.getOpenDatabases(), new FilteredList<>(openDatabaseList));
+        bindContentFiltered(openDatabaseList, stateManager.getOpenDatabases(), Objects::nonNull);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
@@ -454,6 +456,45 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Hide tab bar
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
         EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
+    }
+
+    private static <T> void bindContentFiltered(ObservableList<T> source, ObservableList<T> target, java.util.function.Predicate<T> filter) {
+        // Initial sync
+        target.setAll(source.stream().filter(Objects::nonNull).toList());
+
+        source.addListener((ListChangeListener<T>) c -> {
+            while (c.next()) {
+                if (c.wasPermutated()) {
+                    // Full reorder pass
+                    List<T> reordered = source.stream().filter(filter).toList();
+                    target.setAll(reordered);
+                }
+
+                if (c.wasRemoved()) {
+                    for (T removed : c.getRemoved()) {
+                        target.remove(removed);
+                    }
+                }
+
+                if (c.wasAdded()) {
+                    int sourceIndex = c.getFrom();
+                    int targetIndex = 0;
+
+                    for (int i = 0; i < sourceIndex; i++) {
+                        T element = source.get(i);
+                        if (filter.test(element)) {
+                            targetIndex++;
+                        }
+                    }
+
+                    for (T added : c.getAddedSubList()) {
+                        if (filter.test(added)) {
+                            target.add(targetIndex++, added);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void updateTabBarVisible() {
