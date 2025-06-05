@@ -22,7 +22,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "Problemy Mat.";
 
         var result = validator.checkWrongEscape(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Invalid escape sequence in full name at position 15", result.getMessage());
         assertEquals("Use valid escape sequences: \\\\, \\\", \\n, \\t, \\r, \\b, \\f, \\uXXXX", result.getSuggestion());
         assertEquals(1, result.getLineNumber());
@@ -34,7 +34,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Evol. Biochem. Physiol.\\";
 
         var result = validator.checkWrongEscape(fullName, abbreviation, 2).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Invalid escape sequence in abbreviation at position 22", result.getMessage());
         assertEquals("Use valid escape sequences: \\\\, \\\", \\n, \\t, \\r, \\b, \\f, \\uXXXX", result.getSuggestion());
         assertEquals(2, result.getLineNumber());
@@ -46,7 +46,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. with \\r return and \\b backspace";
 
         var result = validator.checkWrongEscape(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -57,9 +57,9 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. with \\y invalid";
 
         var result = validator.checkWrongEscape(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
-        assertTrue(result.getMessage().startsWith("Invalid escape sequence"));
-        assertTrue(result.getSuggestion().contains("valid escape sequences"));
+        assertEquals(false, result.isValid());
+        assertEquals("Invalid escape sequence in full name at position 13", result.getMessage());
+        assertEquals("Use valid escape sequences: \\\\, \\\", \\n, \\t, \\r, \\b, \\f, \\uXXXX", result.getSuggestion());
     }
 
     @Test
@@ -68,7 +68,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkNonUtf8(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -80,7 +80,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkNonUtf8(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Journal name or abbreviation contains invalid UTF-8 sequences", result.getMessage());
         assertEquals("Ensure all characters are valid UTF-8. Remove or replace any invalid characters.", result.getSuggestion());
     }
@@ -91,7 +91,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkStartingLetters(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -102,7 +102,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "Phys. J.";
 
         var result = validator.checkStartingLetters(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Abbreviation does not begin with same letter as full journal name", result.getMessage());
         assertEquals("Should start with 'j' (from 'Journal')", result.getSuggestion());
     }
@@ -113,7 +113,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkStartingLetters(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -124,7 +124,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkStartingLetters(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -135,7 +135,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkAbbreviationEqualsFullText(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -146,7 +146,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "Quantum";
 
         var result = validator.checkAbbreviationEqualsFullText(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Abbreviation is the same as the full text", result.getMessage());
         assertEquals("Consider using a shorter abbreviation to distinguish it from the full name", result.getSuggestion());
     }
@@ -157,7 +157,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "Manag. Sci.";
 
         var result = validator.checkOutdatedManagementAbbreviation(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -168,7 +168,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "Manage. Sci.";
 
         var result = validator.checkOutdatedManagementAbbreviation(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Management is abbreviated with outdated \"Manage.\" instead of \"Manag.\"", result.getMessage());
         assertEquals("Update to use the standard abbreviation \"Manag.\"", result.getSuggestion());
     }
@@ -181,11 +181,9 @@ class JournalAbbreviationValidatorTest {
         validator.validate("Journal of Physics", "J. Phys. A", 2);
 
         var issues = validator.getIssues();
-        assertFalse(issues.isEmpty());
-        assertTrue(issues.stream()
-                         .anyMatch(issue -> issue.getMessage().contains("Duplicate full name")));
-        assertTrue(issues.stream()
-                         .anyMatch(issue -> issue.getSuggestion().contains("consolidating abbreviations")));
+        assertEquals(1, issues.size());
+        assertEquals("Duplicate full name 'Journal of Physics' with different abbreviations: J. Phys., J. Phys. A", issues.get(0).getMessage());
+        assertEquals("Consider consolidating abbreviations or using more specific full names", issues.get(0).getSuggestion());
     }
 
     @Test
@@ -196,11 +194,9 @@ class JournalAbbreviationValidatorTest {
         validator.validate("Journal of Physiology", "J. Phys.", 2);
 
         var issues = validator.getIssues();
-        assertFalse(issues.isEmpty());
-        assertTrue(issues.stream()
-                         .anyMatch(issue -> issue.getMessage().contains("Duplicate abbreviation")));
-        assertTrue(issues.stream()
-                         .anyMatch(issue -> issue.getSuggestion().contains("more specific abbreviations")));
+        assertEquals(1, issues.size());
+        assertEquals("Duplicate abbreviation 'J. Phys.' used for different journals: Journal of Physics; Journal of Physiology", issues.get(0).getMessage());
+        assertEquals("Consider using more specific abbreviations to avoid ambiguity", issues.get(0).getSuggestion());
     }
 
     @Test
@@ -209,7 +205,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. with \\n\\t\\r\\b\\f\\\"\\\\";
 
         var result = validator.checkWrongEscape(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -220,7 +216,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. with \\u0042";
 
         var result = validator.checkWrongEscape(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -231,9 +227,9 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkWrongEscape(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Invalid escape sequence in full name at position 13", result.getMessage());
-        assertTrue(result.getSuggestion().contains("valid escape sequences"));
+        assertEquals("Use valid escape sequences: \\\\, \\\", \\n, \\t, \\r, \\b, \\f, \\uXXXX", result.getSuggestion());
     }
 
     @Test
@@ -242,9 +238,9 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.\uFFFD";
 
         var result = validator.checkNonUtf8(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Journal name or abbreviation contains invalid UTF-8 sequences", result.getMessage());
-        assertTrue(result.getSuggestion().contains("valid UTF-8"));
+        assertEquals("Ensure all characters are valid UTF-8. Remove or replace any invalid characters.", result.getSuggestion());
     }
 
     @Test
@@ -253,7 +249,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys.";
 
         var result = validator.checkStartingLetters(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -264,7 +260,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "J. Phys. Chem.";
 
         var result = validator.checkStartingLetters(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -275,7 +271,7 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "2D Mater.";
 
         var result = validator.checkStartingLetters(fullName, abbreviation, 1).orElseThrow();
-        assertTrue(result.isValid());
+        assertEquals(true, result.isValid());
         assertEquals("", result.getMessage());
         assertEquals("", result.getSuggestion());
     }
@@ -283,15 +279,15 @@ class JournalAbbreviationValidatorTest {
     @Test
     void validateWithEmptyInputs() {
         var results = validator.validate("", "", 1);
-        assertFalse(results.isEmpty());
-        assertTrue(results.stream().anyMatch(r -> !r.isValid()));
+        assertEquals(5, results.size());
+        assertEquals(false, results.get(0).isValid());
     }
 
     @Test
     void validateWithWhitespaceOnly() {
         var results = validator.validate("   ", "   ", 1);
-        assertFalse(results.isEmpty());
-        assertTrue(results.stream().anyMatch(r -> !r.isValid()));
+        assertEquals(5, results.size());
+        assertEquals(false, results.get(0).isValid());
     }
 
     @Test
@@ -300,9 +296,8 @@ class JournalAbbreviationValidatorTest {
         validator.validate("JOURNAL OF PHYSICS", "J. Phys.", 2);
 
         var issues = validator.getIssues();
-        assertFalse(issues.isEmpty());
-        assertTrue(issues.stream()
-                         .anyMatch(issue -> issue.getMessage().contains("Duplicate full name")));
+        assertEquals(1, issues.size());
+        assertEquals("Duplicate full name 'JOURNAL OF PHYSICS' with different abbreviations: J. Phys., J. Phys.", issues.get(0).getMessage());
     }
 
     @Test
@@ -311,9 +306,8 @@ class JournalAbbreviationValidatorTest {
         validator.validate("Journal of Physiology", "j. phys.", 2);
 
         var issues = validator.getIssues();
-        assertFalse(issues.isEmpty());
-        assertTrue(issues.stream()
-                         .anyMatch(issue -> issue.getMessage().contains("Duplicate abbreviation")));
+        assertEquals(1, issues.size());
+        assertEquals("Duplicate abbreviation 'j. phys.' used for different journals: Journal of Physics; Journal of Physiology", issues.get(0).getMessage());
     }
 
     @Test
@@ -322,9 +316,9 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "Physics & Chemistry";
 
         var result = validator.checkAbbreviationEqualsFullText(fullName, abbreviation, 1).orElseThrow();
-        assertFalse(result.isValid());
+        assertEquals(false, result.isValid());
         assertEquals("Abbreviation is the same as the full text", result.getMessage());
-        assertTrue(result.getSuggestion().contains("shorter abbreviation"));
+        assertEquals("Consider using a shorter abbreviation to distinguish it from the full name", result.getSuggestion());
     }
 
     @Test
@@ -338,9 +332,9 @@ class JournalAbbreviationValidatorTest {
 
         for (String abbreviation : invalidAbbreviations) {
             var result = validator.checkOutdatedManagementAbbreviation("Management Science", abbreviation, 1).orElseThrow();
-            assertFalse(result.isValid());
-            assertTrue(result.getMessage().contains("outdated"));
-            assertTrue(result.getSuggestion().contains("Manag."));
+            assertEquals(false, result.isValid());
+            assertEquals("Management is abbreviated with outdated \"Manage.\" instead of \"Manag.\"", result.getMessage());
+            assertEquals("Update to use the standard abbreviation \"Manag.\"", result.getSuggestion());
         }
     }
 
@@ -350,9 +344,8 @@ class JournalAbbreviationValidatorTest {
         String longAbbr = "B".repeat(1000);
 
         var results = validator.validate(longName, longAbbr, 1);
-        assertFalse(results.isEmpty());
-        // Should still perform all validations without throwing exceptions
         assertEquals(5, results.size());
+        assertEquals(false, results.get(0).isValid());
     }
 
     @Test
@@ -361,14 +354,9 @@ class JournalAbbreviationValidatorTest {
         String abbreviation = "Problemy Mat.";
 
         var results = validator.validate(fullName, abbreviation, 1);
-        assertFalse(results.isEmpty());
-
-        // Should have 5 results (3 error checks + 2 warning checks)
         assertEquals(5, results.size());
-
-        // First result should be the wrong escape check
-        assertFalse(results.get(0).isValid());
+        assertEquals(false, results.get(0).isValid());
         assertEquals("Invalid escape sequence in full name at position 15", results.get(0).getMessage());
-        assertTrue(results.get(0).getSuggestion().contains("valid escape sequences"));
+        assertEquals("Use valid escape sequences: \\\\, \\\", \\n, \\t, \\r, \\b, \\f, \\uXXXX", results.get(0).getSuggestion());
     }
 }
