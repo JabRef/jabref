@@ -286,14 +286,8 @@ public class MainMenu extends MenuBar {
         }
 
         lookup.getItems().addAll(
+                // region identifier-related
                 lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
-
-                new SeparatorMenuItem(),
-
-                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager)),
-
-                new SeparatorMenuItem(),
 
                 factory.createMenuItem(
                         StandardActions.MERGE_WITH_FETCHED_ENTRY,
@@ -301,7 +295,16 @@ public class MainMenu extends MenuBar {
 
                 factory.createMenuItem(
                         StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
-                        new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor))
+                        new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor)),
+                // endregion
+
+                new SeparatorMenuItem(),
+
+                // region file-related
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
+                factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager)),
+                // endregion
+
         );
 
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
