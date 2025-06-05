@@ -103,7 +103,10 @@ dependencies {
 
     implementation("org.postgresql:postgresql:42.7.5")
 
-    antlr("org.antlr:antlr4:4.13.2")
+    antlr("org.antlr:antlr4:4.13.2") {
+        // JabRef ships its own variant of icu4j as binary jar
+        exclude(group = "com.ibm.icu")
+    }
     implementation("org.antlr:antlr4-runtime:4.13.2")
 
     implementation("com.google.guava:guava:33.4.8-jre")
