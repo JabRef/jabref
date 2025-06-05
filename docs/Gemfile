@@ -1,11 +1,17 @@
 source 'https://rubygems.org'
 
-gem "jekyll", "~> 4.3.4" # installed by `gem jekyll`
+gem "jekyll", "~> 4.4.0" # installed by `gem jekyll`
 
 # Homepage: https://github.com/paulrobertlloyd/jekyll-figure#jekyll-figure
 gem 'jekyll-figure'
 
-gem "just-the-docs", "0.10.0"
+gem "just-the-docs", "0.10.1"
+
+# "required" by just-the-docs
+gem 'jekyll-seo-tag'
+gem 'jekyll-github-metadata'
+gem 'jekyll-include-cache'
+gem 'jekyll-sitemap'
 
 gem "jekyll-remote-theme"
 
@@ -20,3 +26,4 @@ gem 'jekyll-titles-from-headings'
 
 # Homepage: https://github.com/benbalter/jekyll-relative-links
 gem 'jekyll-relative-links'
+

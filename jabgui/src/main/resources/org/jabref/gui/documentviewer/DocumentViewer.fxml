@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<DialogPane xmlns:fx="http://javafx.com/fxml/1" depthTest="DISABLE" prefHeight="600.0" prefWidth="750.0"
+            xmlns="http://javafx.com/javafx/8.0.112"
+            fx:controller="org.jabref.gui.documentviewer.DocumentViewerView"
+            id="documentViewerDialog">
+    <content>
+        <BorderPane fx:id="mainPane">
+            <fx:define>
+                <ToggleGroup fx:id="toggleGroupMode"/>
+            </fx:define>
+            <top>
+                <ToolBar fx:id="topPane" BorderPane.alignment="CENTER_RIGHT">
+                    <ComboBox fx:id="fileChoice" minWidth="200.0" styleClass="icon-button"/>
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0" HBox.hgrow="ALWAYS">
+                        <ToggleButton fx:id="modeLive" mnemonicParsing="false" selected="true" styleClass="icon-button"
+                                      text="%Live" toggleGroup="$toggleGroupMode">
+                            <tooltip>
+                                <Tooltip text="%Show the document of the currently selected entry."/>
+                            </tooltip>
+                        </ToggleButton>
+                        <ToggleButton fx:id="modeLock" mnemonicParsing="false" styleClass="icon-button" text="%Locked"
+                                      toggleGroup="$toggleGroupMode">
+                            <tooltip>
+                                <Tooltip text="%Show this document until unlocked."/>
+                            </tooltip>
+                        </ToggleButton>
+                    </HBox>
+                </ToolBar>
+            </top>
+        </BorderPane>
+    </content>
+</DialogPane>

@@ -9,6 +9,7 @@ jobs:
     if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       issues: write
     steps:
       - name: Assign the user or unassign stale assignments
@@ -17,19 +18,19 @@ jobs:
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
           days_until_unassign: 14
-          maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,LinusDietz'
+          maintainers: 'koppor,Siedlerchr,ThiloteE,calixtus,HoussemNasri,subhramit,InAnYan,LinusDietz'
           assigned_comment: |
             👋 Hey @{{ handle }}, thank you for your interest in this issue! 🎉
 
             We're excited to have you on board. Start by exploring our [Contributing](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) guidelines, and don't forget to check out our [workspace setup guidelines](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace) to get started smoothly.
+
+            For questions on JabRef functionality and the code base, you can consult the [JabRef Guru](https://gurubase.io/g/jabref) or ask on our Gitter chat.
 
             In case you encounter failing tests during development, please check our [developer FAQs](https://devdocs.jabref.org/code-howtos/faq.html)!
 
             Having any questions or issues? Feel free to ask here on GitHub. Need help setting up your local workspace? Join the conversation on [JabRef's Gitter chat](https://gitter.im/JabRef/jabref). And don't hesitate to open a (draft) pull request early on to show the direction it is heading towards. This way, you will receive valuable feedback.
 
             Happy coding! 🚀
-
-            ⏳ Please note, you will be automatically unassigned if there is not a (draft) pull request within **{{ total_days }} days** (by **{{ unassigned_date }}**).
           assignment_suggestion_comment: >
             👋 Hey @{{ handle }}, looks like you’re eager to work on this issue—great! 🎉
             It also looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.

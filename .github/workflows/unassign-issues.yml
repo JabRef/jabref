@@ -7,25 +7,46 @@ on:
 
 jobs:
   unassign_issues:
-    if: github.repository == 'JabRef/jabref'
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     permissions:
       issues: write
     outputs:
-      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues }}
+      unassigned_issues: ${{ steps.unassign.outputs.unassigned_issues || '[]' }}
     steps:
       - name: Unassign stale assignments
         id: unassign
         uses: takanome-dev/assign-issue-action@edge
         with:
           github_token: '${{ secrets.GITHUB_TOKEN }}'
-          days_until_unassign: 14
+          reminder_comment: |
+              ### ⏰ Assignment Reminder
+
+              Hi @{{ handle }}, this is a friendly reminder about your assignment to this issue.
+
+              > [!WARNING]
+              > This issue will be **automatically unassigned** in **{{ days_remaining }} days** if there's no activity.
+
+              Remember that you can ask the [JabRef Guru](https://gurubase.io/g/jabref) about anything regarding JabRef. Additionally, our contributing guide has [hints on creating a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) and a link to our Gitter chat.
+
+              <details open>
+              <summary>How to keep your assignment</summary>
+
+              \
+              If you are working on it, you can prevent automatic unassignment by:
+
+              - Submitting a draft PR with your progress
+              - Asking for the **{{{ pin_label }}}** label if you need more time
+              </details>
+
+              We appreciate your contribution and are here to help if needed!
+          days_until_unassign: 21
           unassigned_comment: |
             ### 📋 Assignment Update
 
             Hi @{{ handle }}, due to inactivity, you have been unassigned from this issue.
 
-            <details open>
+            <details>
             <summary>Next steps</summary>
 
             \
@@ -33,6 +54,10 @@ jobs:
             - Submit a pull request showing your current state. You will be automatically assigned again.
             - Ask a maintainer to assign you again.
             </details>
+      - name: Print unassigned issues
+        run: >
+          echo "Unassigned issues: ${{ steps.unassign.outputs.unassigned_issues }}"
+
   move_unassigned_issues:
     needs: unassign_issues
     if: ${{ needs.unassign_issues.outputs.unassigned_issues != '[]' }}
@@ -42,7 +67,7 @@ jobs:
         issue_number: ${{ fromJson(needs.unassign_issues.outputs.unassigned_issues) }}
     steps:
       - name: Move issue to "Free to take" in "Good First Issues"
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -53,7 +78,7 @@ jobs:
           issue-number: ${{ matrix.issue_number }}
           skip-if-not-in-project: true
       - name: Move issue to "Free to take" in "Candidates for University Projects"
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
