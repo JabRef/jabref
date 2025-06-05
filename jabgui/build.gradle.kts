@@ -141,6 +141,12 @@ dependencies {
     testImplementation("org.wiremock:wiremock-standalone:3.12.1")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
+
+    testImplementation("com.google.jimfs:jimfs:1.2") {
+        exclude(group = "com.google.auto.service")
+        exclude(group = "com.google.code.findbugs")
+        exclude(group = "org.checkerframework")
+    }
 }
 
 application {
