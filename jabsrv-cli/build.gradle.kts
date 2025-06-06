@@ -6,8 +6,6 @@ plugins {
     application
 
     id("org.beryx.jlink") version "3.1.1"
-
-    id("org.kordamp.gradle.jdeps") version "0.20.0"
 }
 
 application{
