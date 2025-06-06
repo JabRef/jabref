@@ -2530,9 +2530,26 @@ journalInfo .grid-cell-b {
 
 .walkthrough-title {
     -fx-text-fill: -jr-theme;
-    -fx-font-size: 1.5em;
+    -fx-font-size: 3em;
     -fx-font-weight: bold;
     -fx-text-alignment: center-left;
+}
+
+.walkthrough-side-panel-vertical .walkthrough-title,
+.walkthrough-side-panel-horizontal .walkthrough-title {
+    -fx-font-size: 2em;
+}
+
+.walkthrough-side-panel-vertical {
+    -fx-pref-width: 32em;
+    -fx-max-width: 32em;
+    -fx-min-width: 32em;
+}
+
+.walkthrough-side-panel-horizontal {
+    -fx-pref-height: 16em;
+    -fx-max-height: 16em;
+    -fx-min-height: 16em;
 }
 
 .walkthrough-step-counter {
@@ -2540,13 +2557,13 @@ journalInfo .grid-cell-b {
     -fx-text-fill: -jr-gray-3;
     -fx-font-size: 1em;
     -fx-background-radius: 100;
-    -fx-padding: 0.125em 0.25em;
+    -fx-padding: 0.25em 0.75em;
     -fx-alignment: center;
 }
 
 .walkthrough-text-content {
     -fx-text-fill: -jr-gray-3;
-    -fx-font-size: 1em;
+    -fx-font-size: 1.2em;
     -fx-wrap-text: true;
     -fx-alignment: baseline-left;
 }
@@ -2559,12 +2576,13 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-info-icon {
-    -fx-text-fill: -jr-theme;
+    -fx-icon-color: -jr-theme;
+    -fx-font-size: 1.2em;
 }
 
 .walkthrough-info-label {
     -fx-text-fill: -jr-theme;
-    -fx-font-size: 1em;
+    -fx-font-size: 1.2em;
     -fx-wrap-text: true;
     -fx-alignment: center-left;
 }
@@ -2573,7 +2591,7 @@ journalInfo .grid-cell-b {
     -fx-background-color: -jr-theme;
     -fx-text-fill: -jr-white;
     -fx-font-size: 1.1em;
-    -fx-border-radius: 2;
+    -fx-border-radius: 4;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2583,7 +2601,7 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1.1em;
     -fx-border-color: -jr-theme;
     -fx-border-width: 0.5;
-    -fx-border-radius: 2;
+    -fx-border-radius: 4;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2591,27 +2609,14 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.1em;
-    -fx-border-color: -jr-gray-2;
-    -fx-border-width: 0.5;
-    -fx-border-radius: 2;
+    -fx-border-radius: 4;
     -fx-padding: 0.25em 0.5em;
 }
 
 .walkthrough-fullscreen-content {
     -fx-padding: 0.1875em;
-    -fx-spacing: 0.75em;
-    -fx-max-width: 32em;
+    -fx-spacing: 1em;
+    -fx-max-width: 48em;
     -fx-fill-width: true;
 }
 
-.walkthrough-side-panel-vertical {
-    -fx-pref-width: 24em;
-    -fx-max-width: 24em;
-    -fx-min-width: 24em;
-}
-
-.walkthrough-side-panel-horizontal {
-    -fx-pref-height: 16em;
-    -fx-max-height: 16em;
-    -fx-min-height: 16em;
-}
