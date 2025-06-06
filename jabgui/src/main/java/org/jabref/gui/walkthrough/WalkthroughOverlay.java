@@ -1,23 +1,29 @@
 package org.jabref.gui.walkthrough;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.value.ChangeListener;
+import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import org.jabref.gui.util.BackdropHighlight;
 import org.jabref.gui.walkthrough.declarative.step.FullScreenStep;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughNode;
-import org.jabref.logic.l10n.Localization;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,23 +34,28 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
     private final Stage parentStage;
-    private final Walkthrough manager;
+    private final Walkthrough walkthrough;
     private final GridPane overlayPane;
     private final BackdropHighlight backdropHighlight;
     private final Pane originalRoot;
     private final StackPane stackPane;
-    private final WalkthroughRenderer uiFactory;
+    private final WalkthroughRenderer renderer;
+    private final List<Runnable> cleanUpTasks = new ArrayList<>();
 
-    public WalkthroughOverlay(Stage stage, Walkthrough manager) {
+    public WalkthroughOverlay(Stage stage, Walkthrough walkthrough) {
         this.parentStage = stage;
-        this.manager = manager;
-        this.uiFactory = new WalkthroughRenderer();
+        this.walkthrough = walkthrough;
+        this.renderer = new WalkthroughRenderer();
 
         overlayPane = new GridPane();
         overlayPane.setStyle("-fx-background-color: transparent;");
-        overlayPane.setVisible(false);
+        overlayPane.setPickOnBounds(false);
         overlayPane.setMaxWidth(Double.MAX_VALUE);
         overlayPane.setMaxHeight(Double.MAX_VALUE);
+        overlayPane.setOnMouseClicked(event -> {
+            System.out.println("Event clicked!");
+            System.out.println(event);
+        });
 
         Scene scene = stage.getScene();
         assert scene != null;
@@ -60,35 +71,41 @@ public class WalkthroughOverlay {
     }
 
     public void displayStep(WalkthroughNode step) {
+        backdropHighlight.detach();
+        overlayPane.getChildren().clear();
+        cleanUpTasks.forEach(Runnable::run);
+        cleanUpTasks.clear();
+
         if (step == null) {
-            hide();
             return;
         }
 
-        show();
-
-        backdropHighlight.detach();
-        overlayPane.getChildren().clear();
-
         Node stepContent;
         if (step instanceof FullScreenStep fullScreenStep) {
-            stepContent = uiFactory.render(fullScreenStep, manager);
+            stepContent = renderer.render(fullScreenStep, walkthrough);
             displayFullScreenContent(stepContent);
         } else if (step instanceof PanelStep panelStep) {
-            stepContent = uiFactory.render(panelStep, manager);
+            stepContent = renderer.render(panelStep, walkthrough);
             displayPanelContent(stepContent, panelStep.position());
 
-            if (step.resolver().isPresent()) {
-                Optional<Node> targetNodeOpt = step.resolver().get().apply(parentStage.getScene());
-                if (targetNodeOpt.isPresent()) {
-                    Node targetNode = targetNodeOpt.get();
-                    backdropHighlight.attach(targetNode);
-                    step.clickOnNodeAction().ifPresent(action ->
-                            targetNode.setOnMouseClicked(_ -> action.accept(manager)));
-                } else {
-                    LOGGER.warn(Localization.lang("Could not resolve target node for step: %1", step.title()));
-                }
-            }
+            step.resolver().ifPresent(
+                    resolver ->
+                            resolver.apply(parentStage.getScene()).ifPresentOrElse(
+                                    node -> {
+                                        backdropHighlight.attach(node);
+                                        step.clickOnNodeAction().ifPresent(
+                                                action -> {
+                                                    EventHandler<? super MouseEvent> originalHandler = node.getOnMouseClicked();
+                                                    node.setOnMouseClicked(event -> {
+                                                        Optional.ofNullable(originalHandler).ifPresent(handler -> handler.handle(event));
+                                                        action.accept(walkthrough);
+                                                    });
+                                                    cleanUpTasks.add(() -> node.setOnMouseClicked(originalHandler));
+                                                });
+                                    },
+                                    () -> LOGGER.warn("Could not resolve target node for step: {}", step.title())
+                            )
+            );
         }
     }
 
@@ -111,13 +128,19 @@ public class WalkthroughOverlay {
         GridPane.setFillHeight(content, true);
 
         overlayPane.setAlignment(Pos.CENTER);
-        overlayPane.setVisible(true);
     }
 
     private void displayPanelContent(Node panelContent, Pos position) {
         overlayPane.getChildren().clear();
         overlayPane.getChildren().add(panelContent);
-        panelContent.setMouseTransparent(false);
+
+        ChangeListener<? super Bounds> listener = (_, _, bounds) -> {
+            Rectangle clip = new Rectangle(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
+            overlayPane.setClip(clip);
+        };
+        panelContent.boundsInParentProperty().addListener(listener);
+        cleanUpTasks.add(() -> panelContent.boundsInParentProperty().removeListener(listener));
+        cleanUpTasks.add(() -> overlayPane.setClip(null));
 
         overlayPane.getRowConstraints().clear();
         overlayPane.getColumnConstraints().clear();
@@ -160,9 +183,9 @@ public class WalkthroughOverlay {
      */
     public void detach() {
         backdropHighlight.detach();
-
-        overlayPane.setVisible(false);
         overlayPane.getChildren().clear();
+        cleanUpTasks.forEach(Runnable::run);
+        cleanUpTasks.clear();
 
         Scene scene = parentStage.getScene();
         if (scene != null && originalRoot != null) {
@@ -170,14 +193,5 @@ public class WalkthroughOverlay {
             scene.setRoot(originalRoot);
             LOGGER.debug("Restored original scene root: {}", originalRoot.getClass().getName());
         }
-    }
-
-    private void show() {
-        overlayPane.setVisible(true);
-        overlayPane.toFront();
-    }
-
-    private void hide() {
-        overlayPane.setVisible(false);
     }
 }

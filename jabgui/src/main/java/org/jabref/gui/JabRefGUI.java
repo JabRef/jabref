@@ -36,7 +36,6 @@ import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.WalkthroughPreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
@@ -77,7 +76,6 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
-    private static Walkthrough walkthroughManager;
     private static RemoteListenerServerManager remoteListenerServerManager;
 
     private Stage mainStage;
@@ -189,11 +187,6 @@ public class JabRefGUI extends Application {
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
-
-        // Initialize walkthrough manager
-        WalkthroughPreferences walkthroughPreferences = preferences.getWalkthroughPreferences();
-        JabRefGUI.walkthroughManager = new Walkthrough(walkthroughPreferences);
-        Injector.setModelOrService(Walkthrough.class, walkthroughManager);
     }
 
     private void setupProxy() {
@@ -304,8 +297,8 @@ public class JabRefGUI extends Application {
             }
 
             // Check if walkthrough should be shown
-            if (!walkthroughManager.isCompleted()) {
-                walkthroughManager.start(mainStage);
+            if (!preferences.getWalkthroughPreferences().isCompleted()) {
+                mainFrame.showWalkthrough();
             }
         });
     }

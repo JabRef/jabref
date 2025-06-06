@@ -54,6 +54,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -492,6 +493,14 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         tabbedPane.getSelectionModel().select(libraryTab);
     }
 
+    public void showWalkthrough() {
+        Walkthrough walkthrough = new Walkthrough(
+                preferences.getWalkthroughPreferences(),
+                this
+        );
+        walkthrough.start(mainStage);
+    }
+
     public void showWelcomeTab() {
         // The loop iterates through all tabs in tabbedPane to check if a WelcomeTab already exists. If yes, it is selected.
         for (Tab tab : tabbedPane.getTabs()) {
@@ -521,9 +530,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     /**
-     * Opens a new tab with existing data.
-     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
-     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
+     * Opens a new tab with existing data. Asynchronous loading is done at
+     * {@link LibraryTab#createLibraryTab}. Similar method:
+     * {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -681,7 +690,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         /**
-         * Using this constructor will result in executing the command on the currently open library tab
+         * Using this constructor will result in executing the command on the currently
+         * open library tab
          */
         public CloseDatabaseAction(LibraryTabContainer tabContainer, StateManager stateManager) {
             this(tabContainer, null, stateManager);
