@@ -33,6 +33,7 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import static picocli.CommandLine.Command;
 import static picocli.CommandLine.Mixin;
 import static picocli.CommandLine.Option;
