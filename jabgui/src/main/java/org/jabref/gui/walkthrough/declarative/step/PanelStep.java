@@ -24,10 +24,73 @@ public record PanelStep(
         Optional<Consumer<Walkthrough>> clickOnNodeAction,
         Pos position
 ) implements WalkthroughNode {
-    public PanelStep(String title, List<WalkthroughRichTextBlock> content,
-                     Function<Scene, Optional<Node>> resolver, Pos position) {
-        this(title, content, Optional.of(resolver),
-                Optional.of(new WalkthroughActionsConfig(Optional.of("Continue"), Optional.of("Skip"), Optional.of("Back"))),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), position);
+    public static Builder builder(String title) {
+        return new Builder(title);
+    }
+
+    public static class Builder {
+        private final String title;
+        private List<WalkthroughRichTextBlock> content = List.of();
+        private Optional<Function<Scene, Optional<Node>>> resolver = Optional.empty();
+        private Optional<WalkthroughActionsConfig> actions = Optional.empty();
+        private Optional<Consumer<Walkthrough>> nextStepAction = Optional.empty();
+        private Optional<Consumer<Walkthrough>> previousStepAction = Optional.empty();
+        private Optional<Consumer<Walkthrough>> skipAction = Optional.empty();
+        private Optional<Consumer<Walkthrough>> clickOnNodeAction = Optional.empty();
+        private Pos position = Pos.CENTER;
+
+        private Builder(String title) {
+            this.title = title;
+        }
+
+        public Builder content(WalkthroughRichTextBlock... blocks) {
+            this.content = List.of(blocks);
+            return this;
+        }
+
+        public Builder content(List<WalkthroughRichTextBlock> content) {
+            this.content = content;
+            return this;
+        }
+
+        public Builder resolver(Function<Scene, Optional<Node>> resolver) {
+            this.resolver = Optional.of(resolver);
+            return this;
+        }
+
+        public Builder actions(WalkthroughActionsConfig actions) {
+            this.actions = Optional.of(actions);
+            return this;
+        }
+
+        public Builder nextStepAction(Consumer<Walkthrough> nextStepAction) {
+            this.nextStepAction = Optional.of(nextStepAction);
+            return this;
+        }
+
+        public Builder previousStepAction(Consumer<Walkthrough> previousStepAction) {
+            this.previousStepAction = Optional.of(previousStepAction);
+            return this;
+        }
+
+        public Builder skipAction(Consumer<Walkthrough> skipAction) {
+            this.skipAction = Optional.of(skipAction);
+            return this;
+        }
+
+        public Builder clickOnNodeAction(Consumer<Walkthrough> clickOnNodeAction) {
+            this.clickOnNodeAction = Optional.of(clickOnNodeAction);
+            return this;
+        }
+
+        public Builder position(Pos position) {
+            this.position = position;
+            return this;
+        }
+
+        public PanelStep build() {
+            return new PanelStep(title, content, resolver, actions, nextStepAction,
+                    previousStepAction, skipAction, clickOnNodeAction, position);
+        }
     }
 }

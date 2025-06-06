@@ -28,4 +28,13 @@ public sealed interface WalkthroughNode permits PanelStep, FullScreenStep {
     Optional<Consumer<Walkthrough>> skipAction();
 
     Optional<Consumer<Walkthrough>> clickOnNodeAction();
+
+    // Static factory methods for builders
+    static FullScreenStep.Builder fullScreen(String key) {
+        return FullScreenStep.builder(key);
+    }
+
+    static PanelStep.Builder panel(String title) {
+        return PanelStep.builder(title);
+    }
 }
