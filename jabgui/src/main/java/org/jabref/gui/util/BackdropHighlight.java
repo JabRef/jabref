@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
+import com.sun.javafx.scene.NodeHelper;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -67,11 +68,17 @@ public class BackdropHighlight {
         addListener(pane.widthProperty());
         addListener(pane.heightProperty());
         addListener(pane.sceneProperty(), (_, _, newScene) -> {
-            if (newScene != null) {
-                addListener(newScene.widthProperty());
-                addListener(newScene.heightProperty());
-            }
             updateOverlayLayout();
+            if (newScene == null) {
+                return;
+            }
+            addListener(newScene.heightProperty());
+            addListener(newScene.widthProperty());
+            if (newScene.getWindow() == null) {
+                return;
+            }
+            addListener(newScene.getWindow().widthProperty());
+            addListener(newScene.getWindow().heightProperty());
         });
     }
 
@@ -102,7 +109,8 @@ public class BackdropHighlight {
             return;
         }
 
-        if (!targetNode.isVisible()) {
+        // ref: https://stackoverflow.com/questions/43887427/alternative-for-removed-impl-istreevisible
+        if (!targetNode.isVisible() || !NodeHelper.isTreeVisible(targetNode)) {
             overlayShape.setVisible(false);
             return;
         }
