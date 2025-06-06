@@ -35,7 +35,7 @@ public class Walkthrough {
     private Stage currentStage;
 
     /**
-     * Creates a new walkthrough manager with the specified preferences.
+     * Creates a new walkthrough with the specified preferences.
      *
      * @param preferences The walkthrough preferences to use
      */

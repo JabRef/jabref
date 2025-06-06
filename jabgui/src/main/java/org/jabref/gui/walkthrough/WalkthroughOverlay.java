@@ -1,6 +1,5 @@
 package org.jabref.gui.walkthrough;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.geometry.Pos;
@@ -48,7 +47,7 @@ public class WalkthroughOverlay {
         overlayPane.setMaxHeight(Double.MAX_VALUE);
 
         Scene scene = stage.getScene();
-        Objects.requireNonNull(scene);
+        assert scene != null;
 
         originalRoot = (Pane) scene.getRoot();
         stackPane = new StackPane();
