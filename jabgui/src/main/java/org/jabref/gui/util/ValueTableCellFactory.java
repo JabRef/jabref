@@ -140,8 +140,11 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                         });
                     }
 
+                    int rowIndex = getTableRow().getIndex();
+                    int totalItems = getTableView().getItems().size();
                     setOnMouseEntered(event -> {
-                        if (tooltip != null && getTableRow().getIndex() < getTableView().getItems().size()) {
+                        // check to prevent tooltip from being set when the row is beyond the last item, i.e., when the row is empty
+                        if (tooltip != null && rowIndex < totalItems) {
                             setTooltip(tooltip.apply(rowItem, item));
                         }
                     });
