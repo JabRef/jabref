@@ -1,6 +1,7 @@
 package org.jabref.gui.walkthrough.components;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -18,14 +19,11 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Chooses the main directory for storing and searching PDF files in JabRef.
  */
 public class PaperDirectoryChooser extends HBox {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PaperDirectoryChooser.class);
     private final Label currentDirectoryLabel;
     private final StringProperty currentDirectory;
 
@@ -69,9 +67,9 @@ public class PaperDirectoryChooser extends HBox {
 
         String currentDir = currentDirectory.get();
         if (currentDir != null && !currentDir.trim().isEmpty()) {
-            File currentFile = new File(currentDir);
-            if (currentFile.exists() && currentFile.isDirectory()) {
-                directoryChooser.setInitialDirectory(currentFile);
+            Path currentPath = Path.of(currentDir);
+            if (Files.exists(currentPath) && Files.isDirectory(currentPath)) {
+                directoryChooser.setInitialDirectory(currentPath.toFile());
             }
         }
 
@@ -82,13 +80,9 @@ public class PaperDirectoryChooser extends HBox {
             return;
         }
 
-        try {
-            GuiPreferences guiPreferences = Injector.instantiateModelOrService(GuiPreferences.class);
-            FilePreferences filePreferences = guiPreferences.getFilePreferences();
-            filePreferences.setMainFileDirectory(selectedDirectory.getAbsolutePath());
-            currentDirectory.set(selectedDirectory.getAbsolutePath());
-        } catch (Exception e) {
-            currentDirectory.set(selectedDirectory.getAbsolutePath());
-        }
+        GuiPreferences guiPreferences = Injector.instantiateModelOrService(GuiPreferences.class);
+        FilePreferences filePreferences = guiPreferences.getFilePreferences();
+        filePreferences.setMainFileDirectory(selectedDirectory.getAbsolutePath());
+        currentDirectory.set(selectedDirectory.getAbsolutePath());
     }
 }
