@@ -1,7 +1,6 @@
 package org.jabref.gui.commonfxcontrols;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
