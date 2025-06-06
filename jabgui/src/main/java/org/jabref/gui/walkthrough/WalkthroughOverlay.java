@@ -13,7 +13,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-import org.jabref.gui.util.component.PulseAnimateIndicator;
+import org.jabref.gui.util.BackdropHighlight;
 import org.jabref.gui.walkthrough.declarative.WalkthroughStep;
 
 import org.slf4j.Logger;
@@ -27,9 +27,9 @@ public class WalkthroughOverlay {
     private final Stage parentStage;
     private final Walkthrough manager;
     private final GridPane overlayPane;
-    private final PulseAnimateIndicator pulseIndicator;
+    private final BackdropHighlight backdropHighlight;
     private final Pane originalRoot;
-    private final StackPane stackContainer;
+    private final StackPane stackPane;
 
     public WalkthroughOverlay(Stage stage, Walkthrough manager) {
         this.parentStage = stage;
@@ -48,13 +48,13 @@ public class WalkthroughOverlay {
         }
 
         originalRoot = (Pane) scene.getRoot();
-        stackContainer = new StackPane();
+        stackPane = new StackPane();
 
-        stackContainer.getChildren().add(originalRoot);
-        stackContainer.getChildren().add(overlayPane);
-        pulseIndicator = new PulseAnimateIndicator(stackContainer);
+        stackPane.getChildren().add(originalRoot);
+        backdropHighlight = new BackdropHighlight(stackPane);
+        stackPane.getChildren().add(overlayPane);
 
-        scene.setRoot(stackContainer);
+        scene.setRoot(stackPane);
     }
 
     public void displayStep(WalkthroughStep step) {
@@ -65,7 +65,7 @@ public class WalkthroughOverlay {
 
         show();
 
-        pulseIndicator.stop();
+        backdropHighlight.detach();
         overlayPane.getChildren().clear();
 
         switch (step.stepType()) {
@@ -155,7 +155,7 @@ public class WalkthroughOverlay {
             Optional<Node> targetNodeOpt = step.resolver().get().apply(parentStage.getScene());
             if (targetNodeOpt.isPresent()) {
                 Node targetNode = targetNodeOpt.get();
-                pulseIndicator.attachToNode(targetNode);
+                backdropHighlight.attach(targetNode);
             } else {
                 LOGGER.warn("Could not resolve target node for step: {}", step.title());
             }
@@ -166,14 +166,14 @@ public class WalkthroughOverlay {
      * Detaches the overlay and cleans up resources.
      */
     public void detach() {
-        pulseIndicator.stop();
+        backdropHighlight.detach();
 
         overlayPane.setVisible(false);
         overlayPane.getChildren().clear();
 
         Scene scene = parentStage.getScene();
         if (scene != null && originalRoot != null) {
-            stackContainer.getChildren().remove(originalRoot);
+            stackPane.getChildren().remove(originalRoot);
             scene.setRoot(originalRoot);
             LOGGER.debug("Restored original scene root: {}", originalRoot.getClass().getName());
         }
