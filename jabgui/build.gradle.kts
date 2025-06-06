@@ -1,4 +1,3 @@
-
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -49,7 +48,7 @@ dependencies {
     implementation("de.saxsys:mvvmfx:1.8.0")
     implementation("org.fxmisc.flowless:flowless:0.7.4")
     implementation("org.fxmisc.richtext:richtextfx:0.11.5")
-    implementation("com.dlsc.gemsfx:gemsfx:2.104.0") {
+    implementation("com.dlsc.gemsfx:gemsfx:3.1.1") {
         exclude(module = "javax.inject") // Split package, use only jakarta.inject
         exclude(module = "commons-lang3")
         exclude(group = "org.apache.commons.validator")
@@ -90,7 +89,7 @@ dependencies {
 
     implementation("com.google.guava:guava:33.4.8-jre")
 
-    implementation("dev.langchain4j:langchain4j:1.0.0")
+    implementation("dev.langchain4j:langchain4j:1.0.1")
 
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
 
@@ -109,7 +108,7 @@ dependencies {
 
     implementation("com.konghq:unirest-java-core:4.4.7")
 
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
 
     implementation("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
 

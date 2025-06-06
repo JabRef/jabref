@@ -17,7 +17,7 @@ import org.jabref.logic.ai.ingestion.model.JabRefEmbeddingModel;
 import org.jabref.logic.ai.ingestion.storages.MVStoreFullyIngestedDocumentsTracker;
 import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
-import org.jabref.logic.ai.templates.TemplatesService;
+import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
@@ -53,6 +53,7 @@ public class AiService implements AutoCloseable {
     private final MVStoreFullyIngestedDocumentsTracker mvStoreFullyIngestedDocumentsTracker;
     private final MVStoreSummariesStorage mvStoreSummariesStorage;
 
+    private final AiTemplatesService templatesService;
     private final ChatHistoryService chatHistoryService;
     private final JabRefChatLanguageModel jabRefChatLanguageModel;
     private final JabRefEmbeddingModel jabRefEmbeddingModel;
@@ -72,7 +73,7 @@ public class AiService implements AutoCloseable {
         this.mvStoreFullyIngestedDocumentsTracker = new MVStoreFullyIngestedDocumentsTracker(Directories.getAiFilesDirectory().resolve(FULLY_INGESTED_FILE_NAME), notificationService);
         this.mvStoreSummariesStorage = new MVStoreSummariesStorage(Directories.getAiFilesDirectory().resolve(SUMMARIES_FILE_NAME), notificationService);
 
-        TemplatesService templatesService = new TemplatesService(aiPreferences);
+        this.templatesService = new AiTemplatesService(aiPreferences);
         this.chatHistoryService = new ChatHistoryService(citationKeyPatternPreferences, mvStoreChatHistoryStorage);
         this.jabRefChatLanguageModel = new JabRefChatLanguageModel(aiPreferences);
         this.jabRefEmbeddingModel = new JabRefEmbeddingModel(aiPreferences, notificationService, taskExecutor);
@@ -122,6 +123,10 @@ public class AiService implements AutoCloseable {
 
     public SummariesService getSummariesService() {
         return summariesService;
+    }
+
+    public AiTemplatesService getTemplatesService() {
+        return templatesService;
     }
 
     public void setupDatabase(BibDatabaseContext context) {
