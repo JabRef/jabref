@@ -45,7 +45,7 @@ public class Walkthrough {
         this.active = new SimpleBooleanProperty(false);
 
         this.steps = List.of(
-                WalkthroughNode.fullScreen(Localization.lang("Welcome to JabRef!"))
+                WalkthroughNode.fullScreen(Localization.lang("Welcome to JabRef"))
                                .content(
                                        new TextBlock(Localization.lang("This quick walkthrough will introduce you to some key features.")),
                                        new InfoBlock(Localization.lang("You can always access this walkthrough from the Help menu."))
@@ -56,7 +56,7 @@ public class Walkthrough {
                                                                 .build())
                                .build(),
 
-                WalkthroughNode.fullScreen(Localization.lang("Configure Paper Directory"))
+                WalkthroughNode.fullScreen(Localization.lang("Configure paper directory"))
                                .content(
                                        new TextBlock(Localization.lang("Set up your main file directory where JabRef will look for and store your PDF files and other associated documents.")),
                                        new InfoBlock(Localization.lang("This directory helps JabRef organize your paper files. You can change this later in Preferences.")),
@@ -68,7 +68,7 @@ public class Walkthrough {
                                        Localization.lang("Back")))
                                .build(),
 
-                WalkthroughNode.panel(Localization.lang("Creating a New Entry"))
+                WalkthroughNode.panel(Localization.lang("Creating a new entry"))
                                .content(
                                        new TextBlock(Localization.lang("Click the highlighted button to start creating a new bibliographic entry.")),
                                        new InfoBlock(Localization.lang("JabRef supports various entry types like articles, books, and more."))
@@ -81,7 +81,7 @@ public class Walkthrough {
                                        Localization.lang("Back")))
                                .build(),
 
-                WalkthroughNode.panel(Localization.lang("Saving Your Work"))
+                WalkthroughNode.panel(Localization.lang("Saving your work"))
                                .content(
                                        new TextBlock(Localization.lang("Don't forget to save your library. Click the save button.")),
                                        new InfoBlock(Localization.lang("Regularly saving prevents data loss."))
@@ -94,7 +94,7 @@ public class Walkthrough {
                                        Localization.lang("Back")))
                                .build(),
 
-                WalkthroughNode.fullScreen(Localization.lang("Walkthrough Complete!"))
+                WalkthroughNode.fullScreen(Localization.lang("Walkthrough complete"))
                                .content(
                                        new TextBlock(Localization.lang("You've completed the basic feature tour.")),
                                        new TextBlock(Localization.lang("Explore more features like groups, fetchers, and customization options.")),
