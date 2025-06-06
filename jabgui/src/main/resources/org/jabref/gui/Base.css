@@ -2532,12 +2532,16 @@ journalInfo .grid-cell-b {
     -fx-text-fill: -jr-theme;
     -fx-font-size: 3em;
     -fx-font-weight: bold;
-    -fx-text-alignment: center-left;
 }
 
 .walkthrough-side-panel-vertical .walkthrough-title,
 .walkthrough-side-panel-horizontal .walkthrough-title {
     -fx-font-size: 2em;
+}
+
+.walkthrough-side-panel-vertical,
+.walkthrough-side-panel-horizontal {
+    -fx-padding: 2em;
 }
 
 .walkthrough-side-panel-vertical {
@@ -2547,9 +2551,9 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-side-panel-horizontal {
-    -fx-pref-height: 16em;
-    -fx-max-height: 16em;
-    -fx-min-height: 16em;
+    -fx-pref-height: 18em;
+    -fx-max-height: 18em;
+    -fx-min-height: 18em;
 }
 
 .walkthrough-step-counter {

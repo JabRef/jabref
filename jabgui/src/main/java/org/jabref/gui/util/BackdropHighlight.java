@@ -6,10 +6,8 @@ import java.util.List;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -46,7 +44,6 @@ public class BackdropHighlight {
 
         this.overlayShape = Shape.subtract(backdrop, hole);
         this.overlayShape.setFill(OVERLAY_COLOR);
-        this.overlayShape.setMouseTransparent(true);
         this.overlayShape.setVisible(false);
 
         this.pane.getChildren().add(overlayShape);
@@ -62,7 +59,6 @@ public class BackdropHighlight {
 
         this.targetNode = node;
         updateOverlayLayout();
-
         addListener(targetNode.localToSceneTransformProperty());
         addListener(targetNode.visibleProperty());
         addListener(pane.widthProperty());
@@ -104,13 +100,13 @@ public class BackdropHighlight {
     }
 
     private void updateOverlayLayout() {
-        if (targetNode == null || targetNode.getScene() == null || pane.getScene() == null) {
+        if (targetNode == null || targetNode.getScene() == null) {
             overlayShape.setVisible(false);
             return;
         }
 
         // ref: https://stackoverflow.com/questions/43887427/alternative-for-removed-impl-istreevisible
-        if (!targetNode.isVisible() || !NodeHelper.isTreeVisible(targetNode)) {
+        if (!NodeHelper.isTreeVisible(targetNode)) {
             overlayShape.setVisible(false);
             return;
         }
@@ -124,13 +120,6 @@ public class BackdropHighlight {
         }
 
         if (nodeBoundsInScene == null || nodeBoundsInScene.getWidth() <= 0 || nodeBoundsInScene.getHeight() <= 0) {
-            overlayShape.setVisible(false);
-            return;
-        }
-
-        Scene currentScene = pane.getScene();
-        Bounds sceneViewportBounds = new BoundingBox(0, 0, currentScene.getWidth(), currentScene.getHeight());
-        if (!nodeBoundsInScene.intersects(sceneViewportBounds)) {
             overlayShape.setVisible(false);
             return;
         }
@@ -155,7 +144,6 @@ public class BackdropHighlight {
 
         this.overlayShape = Shape.subtract(backdrop, hole);
         this.overlayShape.setFill(OVERLAY_COLOR);
-        this.overlayShape.setMouseTransparent(true);
         this.overlayShape.setVisible(true);
         this.pane.getChildren().add(oldIndex, this.overlayShape);
     }
