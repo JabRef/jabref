@@ -18,22 +18,19 @@ import org.jabref.architecture.AllowedToUseStandardStreams;
 
 import org.slf4j.LoggerFactory;
 
-/// Provides handling for messages and menu entries in the preferred language of the
-/// user.
+/// Provides handling for messages and menu entries in the preferred language of the user.
 ///
-/// Notes: All messages and menu-entries in JabRef are stored in escaped form like
-/// "This_is_a_message". This message serves as key inside the `l10n` properties files
-/// that hold the translation for many languages. When a message is accessed, it needs
-/// to be unescaped and possible parameters that can appear in a message need to be
-/// filled with values.
+/// Notes: All messages and menu-entries in JabRef are stored in escaped form like "This_is_a_message". This message
+/// serves as key inside the `l10n` properties files that hold the translation for many languages. When a message
+/// is accessed, it needs to be unescaped and possible parameters that can appear in a message need to be filled with
+/// values.
 ///
-/// This implementation loads the appropriate language by importing all keys/values from
-/// the correct bundle and stores them in unescaped form inside a [LocalizationBundle]
-/// which provides fast access because it caches the key-value pairs.
+/// This implementation loads the appropriate language by importing all keys/values from the correct bundle and stores
+/// them in unescaped form inside a [LocalizationBundle] which provides fast access because it caches the key-value
+/// pairs.
 ///
-/// The access to this is given by the functions [#lang(String,String...)] and that
-/// developers should use whenever they use strings for the e.g. GUI that need to be
-/// translatable.
+/// The access to this is given by the functions [#lang(String,String...)] and
+/// that developers should use whenever they use strings for the e.g. GUI that need to be translatable.
 @AllowedToUseStandardStreams("Needs to have acess to System.err because it's called very early before our loggers")
 public class Localization {
     static final String RESOURCE_PREFIX = "l10n/JabRef";
@@ -60,8 +57,8 @@ public class Localization {
     }
 
     /**
-     * Sets the language and loads the appropriate translations. Note, that this
-     * function should be called before any other function of this class.
+     * Sets the language and loads the appropriate translations. Note, that this function should be called before any
+     * other function of this class.
      *
      * @param language Language identifier like "en", "de", etc.
      */
@@ -104,10 +101,9 @@ public class Localization {
     }
 
     /**
-     * Creates and caches the language bundles used in JabRef for a particular language.
-     * This function first loads correct version of the "escaped" bundles that are given
-     * in {@link l10n}. After that, it stores the unescaped version in a cached
-     * {@link LocalizationBundle} for fast access.
+     * Creates and caches the language bundles used in JabRef for a particular language. This function first loads
+     * correct version of the "escaped" bundles that are given in {@link l10n}. After that, it stores the unescaped
+     * version in a cached {@link LocalizationBundle} for fast access.
      *
      * @param locale Localization to use.
      */
@@ -134,12 +130,10 @@ public class Localization {
     }
 
     /**
-     * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the
-     * respective params given. Note that the keys are the "unescaped" strings from the
-     * bundle property files.
+     * This looks up a key in the bundle and replaces parameters %0, ..., %9 with the respective params given. Note that
+     * the keys are the "unescaped" strings from the bundle property files.
      *
-     * @param bundle The {@link LocalizationBundle} which is usually
-     *               {@link Localization#localizedMessages}.
+     * @param bundle The {@link LocalizationBundle} which is usually {@link Localization#localizedMessages}.
      * @param key    The lookup key.
      * @param params The parameters that should be inserted into the message
      * @return The final message with replaced parameters.
