@@ -49,24 +49,17 @@ public class PaperDirectoryChooser extends HBox {
     }
 
     private void updateCurrentDirectory() {
-        try {
-            GuiPreferences guiPreferences = Injector.instantiateModelOrService(GuiPreferences.class);
-            FilePreferences filePreferences = guiPreferences.getFilePreferences();
-            Optional<Path> mainFileDirectory = filePreferences.getMainFileDirectory();
-            currentDirectory.set(mainFileDirectory
-                    .map(Path::toString)
-                    .orElse(""));
-        } catch (Exception e) {
-            LOGGER.error("Error while updating current directory", e);
-            currentDirectory.set("");
-        }
+        GuiPreferences guiPreferences = Injector.instantiateModelOrService(GuiPreferences.class);
+        FilePreferences filePreferences = guiPreferences.getFilePreferences();
+        Optional<Path> mainFileDirectory = filePreferences.getMainFileDirectory();
+        currentDirectory.set(mainFileDirectory.map(Path::toString).orElse(""));
     }
 
     private void updateDirectoryDisplay(String directory) {
         if (!directory.trim().isEmpty()) {
             currentDirectoryLabel.setText(Localization.lang("Current paper directory: %0", directory));
         } else {
-            currentDirectoryLabel.setText(Localization.lang("No directory currently set"));
+            currentDirectoryLabel.setText(Localization.lang("No directory currently set."));
         }
     }
 
