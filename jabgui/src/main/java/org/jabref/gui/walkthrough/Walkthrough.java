@@ -11,12 +11,13 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.stage.Stage;
 
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.walkthrough.declarative.InfoBlockContentBlock;
 import org.jabref.gui.walkthrough.declarative.NodeResolverFactory;
-import org.jabref.gui.walkthrough.declarative.StepType;
-import org.jabref.gui.walkthrough.declarative.TextContentBlock;
 import org.jabref.gui.walkthrough.declarative.WalkthroughActionsConfig;
-import org.jabref.gui.walkthrough.declarative.WalkthroughStep;
+import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
+import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
+import org.jabref.gui.walkthrough.declarative.step.FullScreenStep;
+import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+import org.jabref.gui.walkthrough.declarative.step.WalkthroughNode;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.WalkthroughPreferences;
 
@@ -28,8 +29,8 @@ public class Walkthrough {
     private final IntegerProperty currentStep;
     private final IntegerProperty totalSteps;
     private final BooleanProperty active;
-    private final WalkthroughStep[] steps;
-    private WalkthroughOverlay overlay;
+    private final WalkthroughNode[] steps;
+    private Optional<WalkthroughOverlay> overlay = Optional.empty();
     private Stage currentStage;
 
     /**
@@ -42,40 +43,38 @@ public class Walkthrough {
         this.currentStep = new SimpleIntegerProperty(0);
         this.active = new SimpleBooleanProperty(false);
 
-        this.steps = new WalkthroughStep[] {
-                new WalkthroughStep(
+        this.steps = new WalkthroughNode[] {
+                new FullScreenStep(
                         Localization.lang("Walkthrough welcome title"),
-                        StepType.FULL_SCREEN,
                         List.of(
-                                new TextContentBlock(Localization.lang("Walkthrough welcome intro")),
-                                new InfoBlockContentBlock(Localization.lang("Walkthrough welcome tip"))),
+                                new TextBlock(Localization.lang("Walkthrough welcome intro")),
+                                new InfoBlock(Localization.lang("Walkthrough welcome tip"))),
                         new WalkthroughActionsConfig(Optional.of("Start walkthrough"),
                                 Optional.of("Skip to finish"), Optional.empty())),
 
-                new WalkthroughStep(
+                new PanelStep(
                         Localization.lang("Walkthrough create entry title"),
-                        StepType.BOTTOM_PANEL,
                         List.of(
-                                new TextContentBlock(Localization.lang("Walkthrough create entry description")),
-                                new InfoBlockContentBlock(Localization.lang("Walkthrough create entry tip"))),
-                        NodeResolverFactory.forAction(StandardActions.CREATE_ENTRY)
+                                new TextBlock(Localization.lang("Walkthrough create entry description")),
+                                new InfoBlock(Localization.lang("Walkthrough create entry tip"))),
+                        NodeResolverFactory.forAction(StandardActions.CREATE_ENTRY),
+                        javafx.geometry.Pos.BOTTOM_CENTER
                 ),
 
-                new WalkthroughStep(
+                new PanelStep(
                         Localization.lang("Walkthrough save title"),
-                        StepType.RIGHT_PANEL,
                         List.of(
-                                new TextContentBlock(Localization.lang("Walkthrough save description")),
-                                new InfoBlockContentBlock(Localization.lang("Walkthrough save important"))),
-                        NodeResolverFactory.forAction(StandardActions.SAVE_LIBRARY)),
+                                new TextBlock(Localization.lang("Walkthrough save description")),
+                                new InfoBlock(Localization.lang("Walkthrough save important"))),
+                        NodeResolverFactory.forAction(StandardActions.SAVE_LIBRARY),
+                        javafx.geometry.Pos.CENTER_RIGHT),
 
-                new WalkthroughStep(
+                new FullScreenStep(
                         Localization.lang("Walkthrough completion title"),
-                        StepType.FULL_SCREEN,
                         List.of(
-                                new TextContentBlock(Localization.lang("Walkthrough completion message")),
-                                new TextContentBlock(Localization.lang("Walkthrough completion next_steps")),
-                                new InfoBlockContentBlock(Localization.lang("Walkthrough completion resources"))),
+                                new TextBlock(Localization.lang("Walkthrough completion message")),
+                                new TextBlock(Localization.lang("Walkthrough completion next_steps")),
+                                new InfoBlock(Localization.lang("Walkthrough completion resources"))),
                         new WalkthroughActionsConfig(Optional.of("Complete walkthrough"), Optional.empty(),
                                 Optional.of("Back")))
         };
@@ -120,17 +119,17 @@ public class Walkthrough {
             return;
         }
 
-        if (currentStage != stage || overlay == null) {
-            if (overlay != null) {
-                overlay.detach();
-            }
+        if (currentStage != stage) {
+            overlay.ifPresent(WalkthroughOverlay::detach);
             currentStage = stage;
-            overlay = new WalkthroughOverlay(stage, this);
+            overlay = Optional.of(new WalkthroughOverlay(stage, this));
         }
 
         currentStep.set(0);
         active.set(true);
-        overlay.displayStep(getCurrentStep());
+        getCurrentStep().ifPresent((step) -> overlay.ifPresent(
+                overlay -> overlay.displayStep(step)
+        ));
     }
 
     /**
@@ -140,9 +139,9 @@ public class Walkthrough {
         int nextIndex = currentStep.get() + 1;
         if (nextIndex < steps.length) {
             currentStep.set(nextIndex);
-            if (overlay != null) {
-                overlay.displayStep(getCurrentStep());
-            }
+            getCurrentStep().ifPresent((step) -> overlay.ifPresent(
+                    overlay -> overlay.displayStep(step)
+            ));
         } else {
             preferences.setCompleted(true);
             stop();
@@ -150,18 +149,16 @@ public class Walkthrough {
     }
 
     /**
-     * Moves to the next step in the walkthrough with stage switching.
-     * This method handles stage changes by recreating the overlay on the new stage.
+     * Moves to the next step in the walkthrough with stage switching. This method
+     * handles stage changes by recreating the overlay on the new stage.
      *
      * @param stage The stage to display the next step on
      */
     public void nextStep(Stage stage) {
         if (currentStage != stage) {
-            if (overlay != null) {
-                overlay.detach();
-            }
+            overlay.ifPresent(WalkthroughOverlay::detach);
             currentStage = stage;
-            overlay = new WalkthroughOverlay(stage, this);
+            overlay = Optional.of(new WalkthroughOverlay(stage, this));
         }
         nextStep();
     }
@@ -173,9 +170,9 @@ public class Walkthrough {
         int prevIndex = currentStep.get() - 1;
         if (prevIndex >= 0) {
             currentStep.set(prevIndex);
-            if (overlay != null) {
-                overlay.displayStep(getCurrentStep());
-            }
+            getCurrentStep().ifPresent((step) -> overlay.ifPresent(
+                    overlay -> overlay.displayStep(step)
+            ));
         }
     }
 
@@ -188,17 +185,15 @@ public class Walkthrough {
     }
 
     private void stop() {
-        if (overlay != null) {
-            overlay.detach();
-        }
+        overlay.ifPresent(WalkthroughOverlay::detach);
         active.set(false);
     }
 
-    private WalkthroughStep getCurrentStep() {
+    private Optional<WalkthroughNode> getCurrentStep() {
         int index = currentStep.get();
         if (index >= 0 && index < steps.length) {
-            return steps[index];
+            return Optional.of(steps[index]);
         }
-        return null;
+        return Optional.empty();
     }
 }

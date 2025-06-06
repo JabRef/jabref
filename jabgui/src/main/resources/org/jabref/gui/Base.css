@@ -2573,14 +2573,15 @@ journalInfo .grid-cell-b {
     -fx-border-width: 0 0 0 1;
     -fx-padding: 0 0 0 0.75em;
     -fx-spacing: 0.25em;
+    -fx-alignment: center-left;
 }
 
-.walkthrough-info-icon {
+.walkthrough-info-container .ikonli-font-icon {
     -fx-icon-color: -jr-theme;
     -fx-font-size: 1.2em;
 }
 
-.walkthrough-info-label {
+.walkthrough-info-container label {
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.2em;
     -fx-wrap-text: true;

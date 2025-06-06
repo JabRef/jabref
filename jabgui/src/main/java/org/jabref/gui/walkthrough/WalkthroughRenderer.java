@@ -11,45 +11,40 @@ import javafx.scene.layout.VBox;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
-import org.jabref.gui.walkthrough.declarative.InfoBlockContentBlock;
-import org.jabref.gui.walkthrough.declarative.StepType;
-import org.jabref.gui.walkthrough.declarative.TextContentBlock;
 import org.jabref.gui.walkthrough.declarative.WalkthroughActionsConfig;
-import org.jabref.gui.walkthrough.declarative.WalkthroughContentBlock;
-import org.jabref.gui.walkthrough.declarative.WalkthroughStep;
+import org.jabref.gui.walkthrough.declarative.richtext.ArbitraryJFXBlock;
+import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
+import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
+import org.jabref.gui.walkthrough.declarative.step.FullScreenStep;
+import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+import org.jabref.gui.walkthrough.declarative.step.WalkthroughNode;
 import org.jabref.logic.l10n.Localization;
 
 /**
- * Factory for creating walkthrough UI components.
+ * Renders the walkthrough steps and content blocks into JavaFX Nodes.
  */
-public class WalkthroughUIFactory {
-    /**
-     * Creates a full-screen page using dynamic content from a walkthrough step.
-     */
-    public static VBox createFullscreen(WalkthroughStep step, Walkthrough manager) {
+public class WalkthroughRenderer {
+    public Node render(FullScreenStep step, Walkthrough manager) {
         VBox container = makePanel();
         container.setAlignment(Pos.CENTER);
         VBox content = new VBox();
         content.getStyleClass().add("walkthrough-fullscreen-content");
         Label titleLabel = new Label(Localization.lang(step.title()));
         titleLabel.getStyleClass().add("walkthrough-title");
-        VBox contentContainer = makeContent(step);
+        VBox contentContainer = makeContent(step, manager);
         content.getChildren().addAll(titleLabel, contentContainer, makeActions(step, manager));
         container.getChildren().add(content);
         return container;
     }
 
-    /**
-     * Creates a side panel for walkthrough steps.
-     */
-    public static VBox createSidePanel(WalkthroughStep step, Walkthrough manager) {
+    public Node render(PanelStep step, Walkthrough manager) {
         VBox panel = makePanel();
 
-        if (step.stepType() == StepType.LEFT_PANEL || step.stepType() == StepType.RIGHT_PANEL) {
+        if (step.position() == Pos.CENTER_LEFT || step.position() == Pos.CENTER_RIGHT) {
             panel.getStyleClass().add("walkthrough-side-panel-vertical");
             VBox.setVgrow(panel, Priority.ALWAYS);
             panel.setMaxHeight(Double.MAX_VALUE);
-        } else if (step.stepType() == StepType.TOP_PANEL || step.stepType() == StepType.BOTTOM_PANEL) {
+        } else if (step.position() == Pos.TOP_CENTER || step.position() == Pos.BOTTOM_CENTER) {
             panel.getStyleClass().add("walkthrough-side-panel-horizontal");
             HBox.setHgrow(panel, Priority.ALWAYS);
             panel.setMaxWidth(Double.MAX_VALUE);
@@ -71,7 +66,7 @@ public class WalkthroughUIFactory {
 
         header.getChildren().addAll(titleLabel, spacer, stepCounter);
 
-        VBox contentContainer = makeContent(step);
+        VBox contentContainer = makeContent(step, manager);
         Region bottomSpacer = new Region();
         VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
         HBox actions = makeActions(step, manager);
@@ -80,43 +75,35 @@ public class WalkthroughUIFactory {
         return panel;
     }
 
-    private static Node createContentBlock(WalkthroughContentBlock block) {
-        switch (block.getType()) {
-            case TEXT:
-                TextContentBlock textBlock = (TextContentBlock) block;
-                Label textLabel = new Label(Localization.lang(textBlock.getText()));
-                textLabel.getStyleClass().add("walkthrough-text-content");
-                return textLabel;
-            case INFO_BLOCK:
-                InfoBlockContentBlock infoBlock = (InfoBlockContentBlock) block;
-                HBox infoContainer = new HBox();
-                infoContainer.getStyleClass().add("walkthrough-info-container");
-                infoContainer.setAlignment(Pos.CENTER_LEFT);
-                infoContainer.setSpacing(4);
-
-                JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
-                icon.getStyleClass().add("walkthrough-info-icon");
-
-                Label infoLabel = new Label(Localization.lang(infoBlock.getText()));
-                infoLabel.getStyleClass().add("walkthrough-info-label");
-                HBox.setHgrow(infoLabel, Priority.ALWAYS);
-
-                infoContainer.getChildren().addAll(icon, infoLabel);
-
-                VBox infoWrapper = new VBox(infoContainer);
-                infoWrapper.setAlignment(Pos.CENTER_LEFT);
-                return infoWrapper;
-        }
-        return new Label(Localization.lang("Impossible content block type", block.getType()));
+    public Node render(ArbitraryJFXBlock block, Walkthrough manager) {
+        return block.componentFactory().apply(manager);
     }
 
-    private static VBox makePanel() {
+    public Node render(TextBlock textBlock) {
+        Label textLabel = new Label(Localization.lang(textBlock.text()));
+        textLabel.getStyleClass().add("walkthrough-text-content");
+        return textLabel;
+    }
+
+    public Node render(InfoBlock infoBlock) {
+        HBox infoContainer = new HBox();
+        infoContainer.getStyleClass().add("walkthrough-info-container");
+        JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
+        Label infoLabel = new Label(Localization.lang(infoBlock.text()));
+        HBox.setHgrow(infoLabel, Priority.ALWAYS);
+        infoContainer.getChildren().addAll(icon, infoLabel);
+        VBox infoWrapper = new VBox(infoContainer);
+        infoWrapper.setAlignment(Pos.CENTER_LEFT);
+        return infoWrapper;
+    }
+
+    private VBox makePanel() {
         VBox container = new VBox();
         container.getStyleClass().add("walkthrough-panel");
         return container;
     }
 
-    private static HBox makeActions(WalkthroughStep step, Walkthrough manager) {
+    private HBox makeActions(WalkthroughNode step, Walkthrough manager) {
         HBox actions = new HBox();
         actions.setAlignment(Pos.CENTER_LEFT);
         actions.setSpacing(0);
@@ -129,7 +116,7 @@ public class WalkthroughUIFactory {
         }
         HBox rightActions = new HBox();
         rightActions.setAlignment(Pos.CENTER_RIGHT);
-        rightActions.setSpacing(2.5);
+        rightActions.setSpacing(4);
         if (step.actions().flatMap(WalkthroughActionsConfig::skipButtonText).isPresent()) {
             rightActions.getChildren().add(makeSkipButton(step, manager));
         }
@@ -142,46 +129,56 @@ public class WalkthroughUIFactory {
         return actions;
     }
 
-    private static VBox makeContent(WalkthroughStep step) {
-        VBox contentContainer = new VBox();
-        contentContainer.setSpacing(12);
-        for (WalkthroughContentBlock contentBlock : step.content()) {
-            Node contentNode = createContentBlock(contentBlock);
-            contentContainer.getChildren().add(contentNode);
-        }
-        return contentContainer;
+    private VBox makeContent(WalkthroughNode step, Walkthrough manager) {
+        return new VBox(12, step.content().stream().map(block ->
+                switch (block) {
+                    case TextBlock textBlock -> render(textBlock);
+                    case InfoBlock infoBlock -> render(infoBlock);
+                    case ArbitraryJFXBlock arbitraryBlock ->
+                            render(arbitraryBlock, manager);
+                }
+        ).toArray(Node[]::new));
     }
 
-    private static Button makeContinueButton(WalkthroughStep step, Walkthrough manager) {
+    private Button makeContinueButton(WalkthroughNode step, Walkthrough manager) {
         String buttonText = step.actions()
                                 .flatMap(WalkthroughActionsConfig::continueButtonText)
                                 .orElse("Walkthrough continue button");
 
         Button continueButton = new Button(Localization.lang(buttonText));
         continueButton.getStyleClass().add("walkthrough-continue-button");
-        continueButton.setOnAction(_ -> manager.nextStep());
+        continueButton.setOnAction(_ -> {
+            step.nextStepAction().ifPresent(action -> action.accept(manager));
+            manager.nextStep();
+        });
         return continueButton;
     }
 
-    private static Button makeSkipButton(WalkthroughStep step, Walkthrough manager) {
+    private Button makeSkipButton(WalkthroughNode step, Walkthrough manager) {
         String buttonText = step.actions()
                                 .flatMap(WalkthroughActionsConfig::skipButtonText)
                                 .orElse("Walkthrough skip to finish");
 
         Button skipButton = new Button(Localization.lang(buttonText));
         skipButton.getStyleClass().add("walkthrough-skip-button");
-        skipButton.setOnAction(_ -> manager.skip());
+        skipButton.setOnAction(_ -> {
+            step.skipAction().ifPresent(action -> action.accept(manager));
+            manager.skip();
+        });
         return skipButton;
     }
 
-    private static Button makeBackButton(WalkthroughStep step, Walkthrough manager) {
+    private Button makeBackButton(WalkthroughNode step, Walkthrough manager) {
         String buttonText = step.actions()
                                 .flatMap(WalkthroughActionsConfig::backButtonText)
                                 .orElse("Walkthrough back button");
 
         Button backButton = new Button(Localization.lang(buttonText));
         backButton.getStyleClass().add("walkthrough-back-button");
-        backButton.setOnAction(_ -> manager.previousStep());
+        backButton.setOnAction(_ -> {
+            step.previousStepAction().ifPresent(action -> action.accept(manager));
+            manager.previousStep();
+        });
         return backButton;
     }
 }

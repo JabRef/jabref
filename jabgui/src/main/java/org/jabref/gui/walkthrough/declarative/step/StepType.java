@@ -1,4 +1,4 @@
-package org.jabref.gui.walkthrough.declarative;
+package org.jabref.gui.walkthrough.declarative.step;
 
 /**
  * Defines the different types of walkthrough steps.
