@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
@@ -455,8 +457,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
     }
 
-    private static void bindContentFiltered(ObservableList<Tab> source, ObservableList<BibDatabaseContext> target, java.util.function.Predicate<Tab> filter) {
-        java.util.function.Function<Tab, BibDatabaseContext> tabToContext = tab -> ((LibraryTab) tab).getBibDatabaseContext();
+    private static void bindContentFiltered(ObservableList<Tab> source, ObservableList<BibDatabaseContext> target, Predicate<Tab> filter) {
+        Function<Tab, BibDatabaseContext> tabToContext = tab -> ((LibraryTab) tab).getBibDatabaseContext();
         // Initial sync
         target.setAll(source.stream()
                             .filter(filter)
