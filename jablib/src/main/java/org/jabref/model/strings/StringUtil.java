@@ -275,7 +275,7 @@ public class StringUtil {
             }
             escaped = false;
         }
-        if (sb.length() > 0) {
+        if (!sb.isEmpty()) {
             thisEntry.add(sb.toString());
         }
         if (!thisEntry.isEmpty()) {

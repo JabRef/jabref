@@ -233,31 +233,34 @@ public class NewEntryViewModel {
                 dialogService.showInformationDialogAndWait(
                     dialogTitle,
                     Localization.lang(
-                        "Bibliographic data could not be retrieved.\n" +
-                        "This is likely due to an issue with your input, or your network connection.\n" +
-                        "Check your provided identifier (and identifier type), and try again.\n" +
-                        "%0",
+                            """
+                                    Bibliographic data could not be retrieved.
+                                    This is likely due to an issue with your input, or your network connection.
+                                    Check your provided identifier (and identifier type), and try again.
+                                    %0""",
                         exceptionMessage));
             } else if (exception instanceof FetcherServerException) {
                 dialogService.showInformationDialogAndWait(
                     dialogTitle,
                     Localization.lang(
-                        "Bibliographic data could not be retrieved.\n" +
-                        "This is likely due to an issue being experienced by the server.\n" +
-                        "Try again later.\n" +
-                        "%0",
+                            """
+                                    Bibliographic data could not be retrieved.
+                                    This is likely due to an issue being experienced by the server.
+                                    Try again later.
+                                    %0""",
                         exceptionMessage));
             } else {
                 dialogService.showInformationDialogAndWait(
                     dialogTitle,
                     Localization.lang(
-                        "Bibliographic data could not be retrieved.\n" +
-                        "The following error was encountered:\n" +
-                        "%0",
+                            """
+                                    Bibliographic data could not be retrieved.
+                                    The following error was encountered:
+                                    %0""",
                         exceptionMessage));
             }
 
-            LOGGER.error("An exception occurred with the '{}' fetcher when resolving '{}': '{}'.", fetcherName, textString, exception);
+            LOGGER.error("An exception occurred with the '{}' fetcher when resolving '{}'.", fetcherName, textString, exception);
 
             executing.set(false);
         });
@@ -336,9 +339,10 @@ public class NewEntryViewModel {
                 dialogService.showInformationDialogAndWait(
                     dialogTitle,
                     Localization.lang(
-                        "Failed to interpret citations.\n" +
-                        "The following error was encountered:\n" +
-                        "%0",
+                            """
+                                    Failed to interpret citations.
+                                    The following error was encountered:
+                                    %0""",
                         exceptionMessage));
             } else {
                 dialogService.showInformationDialogAndWait(
@@ -349,7 +353,7 @@ public class NewEntryViewModel {
                         exceptionMessage));
             }
 
-            LOGGER.error("An exception occurred with the '{}' parser: '{}'.", parserName, exception);
+            LOGGER.error("An exception occurred with the '{}' parser.", parserName, exception);
 
             executing.set(false);
         });
@@ -421,9 +425,10 @@ public class NewEntryViewModel {
                 dialogService.showInformationDialogAndWait(
                     dialogTitle,
                     Localization.lang(
-                        "Failed to parse entries.\n" +
-                        "The following error was encountered:\n" +
-                        "%0",
+                            """
+                                    Failed to parse entries.
+                                    The following error was encountered:
+                                    %0""",
                         exceptionMessage));
             } else {
                 dialogService.showInformationDialogAndWait(
@@ -434,7 +439,7 @@ public class NewEntryViewModel {
                         exceptionMessage));
             }
 
-            LOGGER.error("An exception occurred when parsing Bib(La)Tex entries: '{}'.", exception);
+            LOGGER.error("An exception occurred when parsing Bib(La)Tex entries.", exception);
 
             executing.set(false);
         });

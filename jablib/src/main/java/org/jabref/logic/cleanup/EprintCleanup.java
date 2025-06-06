@@ -46,10 +46,9 @@ public class EprintCleanup implements CleanupJob {
                 entry.setField(StandardField.EPRINTTYPE, "arxiv")
                      .ifPresent(changes::add);
 
-                arXivIdentifier.get().getClassification().ifPresent(classification ->
-                        entry.setField(StandardField.EPRINTCLASS, classification)
-                             .ifPresent(changes::add)
-                );
+                arXivIdentifier.get().getClassification()
+                        .flatMap(classification -> entry.setField(StandardField.EPRINTCLASS, classification))
+                        .ifPresent(changes::add);
 
                 entry.clearField(field)
                      .ifPresent(changes::add);

@@ -1121,15 +1121,15 @@ public class BibEntry implements Cloneable {
      */
     public SequencedSet<String> getCites() {
         return this.getField(StandardField.CITES)
-                   .map(content -> Arrays.stream(content.split(",")))
-                   .orElseGet(Stream::empty)
+                   .stream()
+                   .flatMap(content -> Arrays.stream(content.split(",")))
                    .map(String::trim)
                    .filter(key -> !key.isEmpty())
                    .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Optional<FieldChange> setCites(SequencedSet<String> keys) {
-        return this.setField(StandardField.CITES, keys.stream().collect(Collectors.joining(",")));
+        return this.setField(StandardField.CITES, String.join(",", keys));
     }
 
     public void setDate(Date date) {

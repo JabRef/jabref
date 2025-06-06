@@ -194,11 +194,11 @@ public class SaveDatabaseAction {
             // Workaround for linux systems not adding file extension
             if (!savePath.getFileName().toString().toLowerCase().endsWith(".bib")) {
                 savePath = Path.of(savePath.toString() + ".bib");
-                if (!Files.notExists(savePath)) {
-                    if (!dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"), Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
+                if (!Files.notExists(savePath) && !dialogService.showConfirmationDialogAndWait(Localization.lang("Overwrite file"),
+                        Localization.lang("'%0' exists. Overwrite file?", savePath.getFileName()))) {
                         return Optional.empty();
                     }
-                }
+
                 selectedPath = Optional.of(savePath);
             }
         }
@@ -246,7 +246,7 @@ public class SaveDatabaseAction {
             dialogService.notify(Localization.lang("Library saved"));
             return success;
         } catch (SaveException ex) {
-            LOGGER.error("A problem occurred when trying to save the file %s".formatted(targetPath), ex);
+            LOGGER.error("A problem occurred when trying to save the file {}", targetPath, ex);
             dialogService.showErrorDialogAndWait(Localization.lang("Save library"), Localization.lang("Could not save file."), ex);
             return false;
         } finally {
@@ -307,7 +307,8 @@ public class SaveDatabaseAction {
                 .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
                 .isPresent();
         if (saveWithDifferentEncoding) {
-            Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"), Localization.lang("Save library"), encoding, Encodings.getCharsets());
+            Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"),
+                    Localization.lang("Save library"), encoding, Encodings.getCharsets());
             if (newEncoding.isPresent()) {
                 // Make sure to remember which encoding we used.
                 libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);

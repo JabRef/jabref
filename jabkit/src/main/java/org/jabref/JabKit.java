@@ -52,9 +52,9 @@ import picocli.CommandLine;
 ///
 /// Does not do any preference migrations.
 public class JabKit {
-    private static Logger LOGGER;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabKit.class);
 
-    private static String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
+    private static final String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
 
     public static void main(String[] args) {
         initLogging(args);
@@ -133,7 +133,7 @@ public class JabKit {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug
-        boolean isDebugEnabled = Arrays.stream(args).anyMatch(arg -> "--debug".equalsIgnoreCase(arg));
+        boolean isDebugEnabled = Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase);
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
@@ -141,7 +141,6 @@ public class JabKit {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
-            LOGGER = LoggerFactory.getLogger(JabKit.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
         }
@@ -158,8 +157,6 @@ public class JabKit {
                 "writerFile.policies", "startup",
                 "writerFile.backups", "30");
         configuration.forEach(Configuration::set);
-
-        LOGGER = LoggerFactory.getLogger(JabKit.class);
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {

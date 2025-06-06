@@ -175,7 +175,7 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     private Optional<URL> findDistinctLinks(List<URL> urls) {
-        List<URL> distinctLinks = urls.stream().distinct().collect(Collectors.toList());
+        List<URL> distinctLinks = urls.stream().distinct().toList();
 
         if (distinctLinks.isEmpty()) {
             return Optional.empty();

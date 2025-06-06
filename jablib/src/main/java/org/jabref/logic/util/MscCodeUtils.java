@@ -32,7 +32,8 @@ public class MscCodeUtils {
         ObjectMapper mapper = new ObjectMapper();
         try {
             Map<String, String> mapping =
-                    mapper.readValue(resourceUrl, new TypeReference<Map<String, String>>() { });
+                    mapper.readValue(resourceUrl, new TypeReference<>() {
+                    });
             HashBiMap<String, String> result = HashBiMap.create(mapping);
 
             if (result.isEmpty()) {

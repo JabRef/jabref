@@ -32,7 +32,7 @@ public class FileChecker implements ValueChecker {
         List<LinkedFile> linkedFiles = FileFieldParser
                 .parse(value).stream()
                 .filter(file -> !file.isOnlineLink())
-                .collect(Collectors.toList());
+                .toList();
 
         for (LinkedFile file : linkedFiles) {
             Optional<Path> linkedFile = file.findIn(context, filePreferences);

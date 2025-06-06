@@ -278,7 +278,7 @@ public class RepecNepImporter extends Importer {
 
             if (!institution.isEmpty()) {
                 institutions.append(
-                        institutions.isEmpty() ? institution.toString() : " and " + institution.toString());
+                        institutions.isEmpty() ? institution.toString() : " and " + institution);
             }
         }
 

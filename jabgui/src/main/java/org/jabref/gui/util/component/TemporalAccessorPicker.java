@@ -89,7 +89,7 @@ public class TemporalAccessorPicker extends DatePicker {
 
         try {
             return YearMonth.from(dateTime).atDay(1);
-        } catch (DateTimeException exception) {
+        } catch (DateTimeException _) {
             return Year.from(dateTime).atDay(1);
         }
     }
@@ -110,7 +110,7 @@ public class TemporalAccessorPicker extends DatePicker {
                 if (StringUtil.isNotBlank(value)) {
                     try {
                         return defaultFormatter.parse(value);
-                    } catch (DateTimeParseException exception) {
+                    } catch (DateTimeParseException _) {
                         return Date.parse(value).map(Date::toTemporalAccessor).orElse(null);
                     }
                 } else {
@@ -118,7 +118,7 @@ public class TemporalAccessorPicker extends DatePicker {
                 }
             }
         };
-        return Objects.requireNonNullElseGet(stringConverterProperty().get(), () -> newConverter);
+        return Objects.requireNonNullElse(stringConverterProperty().get(), newConverter);
     }
 
     public final void setStringConverter(StringConverter<TemporalAccessor> value) {

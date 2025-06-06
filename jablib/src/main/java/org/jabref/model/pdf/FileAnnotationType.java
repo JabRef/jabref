@@ -46,8 +46,8 @@ public enum FileAnnotationType {
     public static FileAnnotationType parse(PDAnnotation annotation) {
         try {
             return FileAnnotationType.valueOf(annotation.getSubtype().toUpperCase(Locale.ROOT));
-        } catch (IllegalArgumentException e) {
-            LOGGER.info("FileAnnotationType %s is not supported and was converted into 'Unknown'!".formatted(annotation.getSubtype()));
+        } catch (IllegalArgumentException _) {
+            LOGGER.info("FileAnnotationType {} is not supported and was converted into 'Unknown'!", annotation.getSubtype());
             return UNKNOWN;
         }
     }
@@ -61,7 +61,7 @@ public enum FileAnnotationType {
     public static boolean isMarkedFileAnnotationType(String annotationType) {
         try {
             return FileAnnotationType.valueOf(annotationType.toUpperCase(Locale.ROOT)).linkedFileAnnotationType;
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException _) {
             return false;
         }
     }
@@ -70,6 +70,7 @@ public enum FileAnnotationType {
         return linkedFileAnnotationType;
     }
 
+    @Override
     public String toString() {
         return this.name;
     }
