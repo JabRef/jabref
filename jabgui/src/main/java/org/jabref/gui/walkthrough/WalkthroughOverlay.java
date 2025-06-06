@@ -86,7 +86,7 @@ public class WalkthroughOverlay {
                     step.clickOnNodeAction().ifPresent(action ->
                             targetNode.setOnMouseClicked(_ -> action.accept(manager)));
                 } else {
-                    LOGGER.warn(Localization.lang("Could not resolve target node for step", step.title()));
+                    LOGGER.warn(Localization.lang("Could not resolve target node for step: %1", step.title()));
                 }
             }
         }

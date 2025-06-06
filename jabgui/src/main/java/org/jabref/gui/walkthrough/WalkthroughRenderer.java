@@ -59,7 +59,7 @@ public class WalkthroughRenderer {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        Label stepCounter = new Label(Localization.lang("Step of",
+        Label stepCounter = new Label(Localization.lang("Step %0 of %1",
                 String.valueOf(manager.currentStepProperty().get() + 1),
                 String.valueOf(manager.totalStepsProperty().get())));
         stepCounter.getStyleClass().add("walkthrough-step-counter");
