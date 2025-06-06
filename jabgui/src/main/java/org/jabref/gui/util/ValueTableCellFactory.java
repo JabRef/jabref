@@ -143,7 +143,8 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     int rowIndex = getTableRow().getIndex();
                     int totalItems = getTableView().getItems().size();
                     setOnMouseEntered(event -> {
-                        // check to prevent tooltip from being set when the row is beyond the last item, i.e., when the row is empty
+                    // The condition ensures that cell is reset to a clean state when it is empty, uninitialized, or detached from a valid table row,
+                    // preventing stale or incorrect data from being displayed in the cell.
                         if (tooltip != null && rowIndex < totalItems) {
                             setTooltip(tooltip.apply(rowItem, item));
                         }
