@@ -2,8 +2,6 @@ package org.jabref.gui.ai.components.aichat.chatmessage;
 
 import java.util.function.Consumer;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.fxml.FXML;
@@ -112,13 +110,6 @@ public class ChatMessageComponent extends HBox {
         markdownContentPane.getChildren().add(markdownTextFlow);
         markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
         markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
-        NumberBinding maxUsableWidth = Bindings.createDoubleBinding(
-                () -> getScene() == null ? 600 : getScene().getWidth() - 20, sceneProperty(),
-                getScene() == null ? widthProperty() : getScene().widthProperty()
-        );
-        markdownTextFlow.maxWidthProperty().bind(maxUsableWidth);
-        wrapperHBox.maxWidthProperty().bind(maxUsableWidth);
-        setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(this, Priority.ALWAYS);
     }
 
