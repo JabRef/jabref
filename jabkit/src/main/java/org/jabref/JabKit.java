@@ -106,7 +106,7 @@ public class JabKit {
             boolean hasInputOption = subCommand.getCommandSpec().options().stream()
                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--input-format"));
             boolean hasOutputOption = subCommand.getCommandSpec().options().stream()
-                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output-format"));
+                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output"));
 
             String footerText = "";
             footerText += hasInputOption ? inputFooter : "";
