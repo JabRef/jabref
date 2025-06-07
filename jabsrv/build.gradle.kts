@@ -7,7 +7,6 @@ plugins {
 }
 
 val javafxVersion = "24.0.1"
-val javafxPlatform: String by project.extra
 
 dependencies {
     api(project(":jablib"))

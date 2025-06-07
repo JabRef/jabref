@@ -1,65 +1,16 @@
-import org.gradle.internal.os.OperatingSystem
-
 plugins {
     id("java")
     id("project-report")
     id("org.gradlex.extra-java-module-info")
-    id("org.gradlex.java-module-packaging")
-    id("org.gradlex.java-module-testing")
     id("org.gradlex.jvm-dependency-conflict-resolution")
 
+    id("org.jabref.gradle.base.repositories")
+    id("org.jabref.gradle.base.targets")
+    id("org.jabref.gradle.feature.compile")
+    id("org.jabref.gradle.feature.javadoc")
+    id("org.jabref.gradle.feature.test")
     id("org.jabref.gradle.check.checkstyle")
     id("org.jabref.gradle.check.modernizer")
-}
-
-repositories {
-    mavenCentral()
-    maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") }
-    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
-    maven { url = uri("https://jitpack.io") }
-    maven { url = uri("https://oss.sonatype.org/content/groups/public") }
-
-    // Required for one.jpro.jproutils:tree-showing
-    maven { url = uri("https://sandec.jfrog.io/artifactory/repo") }
-}
-
-val os = OperatingSystem.current()
-
-val osTarget = when {
-    os.isMacOsX -> {
-        val osVersion = System.getProperty("os.version")
-        val arch = System.getProperty("os.arch")
-        if (arch.contains("aarch")) "macos-14" else "macos-13"
-    }
-    os.isLinux -> "ubuntu-22.04"
-    os.isWindows -> "windows-2022"
-    else -> error("Unsupported OS")
-}
-
-// Source: https://github.com/jjohannes/java-module-system/blob/main/gradle/plugins/src/main/kotlin/targets.gradle.kts
-// Configure variants for OS
-javaModulePackaging {
-    target("ubuntu-22.04") {
-        operatingSystem = OperatingSystemFamily.LINUX
-        architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("deb")
-    }
-    target("macos-13") {
-        operatingSystem = OperatingSystemFamily.MACOS
-        architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("dmg")
-    }
-    target("macos-14") {
-        operatingSystem = OperatingSystemFamily.MACOS
-        architecture = MachineArchitecture.ARM64
-        packageTypes = listOf("dmg")
-    }
-    target("windows-2022") {
-        operatingSystem = OperatingSystemFamily.WINDOWS
-        architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("exe")
-    }
-    primaryTarget(target(osTarget))
 }
 
 // Tell gradle which jar to use for which platform
@@ -147,43 +98,5 @@ extraJavaModuleInfo {
 
         // PATCH REASON:
         exports("com.sun.javafx.scene.control")
-    }
-}
-
-java {
-    toolchain {
-        // If this is updated, also update
-        // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
-        // - .devcontainer/devcontainer.json#L34 and
-        // - .moderne/moderne.yml
-        // - .github/workflows/binaries*.yml
-        // - .github/workflows/tests*.yml
-        // - .github/workflows/update-gradle-wrapper.yml
-        // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
-        // - .sdkmanrc
-        languageVersion = JavaLanguageVersion.of(24)
-        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
-        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
-        // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
-        vendor = JvmVendorSpec.AZUL
-    }
-}
-
-tasks.javadoc {
-    (options as StandardJavadocDocletOptions).apply {
-        encoding = "UTF-8"
-        // version = false
-        // author = false
-
-        addMultilineStringsOption("tag").setValue(listOf("apiNote", "implNote"))
-
-        // We cross-link to (non-visible) tests; therefore: no reference check
-        addBooleanOption("Xdoclint:all,-reference", true)
-
-        addMultilineStringsOption("-add-exports").value = listOf(
-            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
-            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
-        )
-
     }
 }

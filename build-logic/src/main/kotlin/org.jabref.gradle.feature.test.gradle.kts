@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    id("org.gradlex.java-module-testing")
     // Hint from https://stackoverflow.com/a/46533151/873282
     id("com.adarshr.test-logger")
 }
