@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    id("buildlogic.java-common-conventions")
+    id("org.jabref.gradle.module")
 
     `java-library`
 }

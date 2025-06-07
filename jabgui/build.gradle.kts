@@ -1,7 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id("buildlogic.java-common-conventions")
+    id("org.jabref.gradle.module")
 
     application
 
