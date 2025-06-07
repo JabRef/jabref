@@ -5,8 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.application.Platform;
@@ -375,15 +373,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
-        // FIXME: See https://github.com/JabRef/jabref-koppor/pull/713 - workaround in place until issue is resolved.
-        // Original code used FilteredList and EasyBind to filter and map tabs directly:
-        // FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
-        // filteredTabs.setPredicate(LibraryTab.class::isInstance);
-        // openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
-        // EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
-        // Once JabRef#713 is fixed, remove this comment and the bindContentFiltered() method, and restore the original code
-
-        bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
+        BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
@@ -455,55 +445,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         // Hide tab bar
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
         EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
-    }
-
-    private static void bindContentFiltered(ObservableList<Tab> source, ObservableList<BibDatabaseContext> target, Predicate<Tab> filter) {
-        Function<Tab, BibDatabaseContext> tabToContext = tab -> ((LibraryTab) tab).getBibDatabaseContext();
-        // Initial sync
-        target.setAll(source.stream()
-                            .filter(filter)
-                            .map(tabToContext)
-                            .toList());
-
-        source.addListener((ListChangeListener<Tab>) c -> {
-            while (c.next()) {
-                if (c.wasPermutated()) {
-                    // We need a fresh copy as permutation is much harder to mirror
-                    List<BibDatabaseContext> reordered = source.stream()
-                                                               .filter(filter)
-                                                               .map(tabToContext)
-                                                               .toList();
-                    target.setAll(reordered);
-                }
-
-                if (c.wasRemoved()) {
-                    for (Tab removed : c.getRemoved()) {
-                        if (filter.test(removed)) {
-                            target.remove(tabToContext.apply(removed));
-                        }
-                    }
-                }
-
-                if (c.wasAdded()) {
-                    int sourceIndex = c.getFrom();
-                    int targetIndex = 0;
-
-                    // We need to add at the correct place - therefore, we need to find out the correct position
-                    for (int i = 0; i < sourceIndex; i++) {
-                        Tab tab = source.get(i);
-                        if (filter.test(tab)) {
-                            targetIndex++;
-                        }
-                    }
-
-                    for (Tab added : c.getAddedSubList()) {
-                        if (filter.test(added)) {
-                            target.add(targetIndex++, tabToContext.apply(added));
-                        }
-                    }
-                }
-            }
-        });
     }
 
     private void updateTabBarVisible() {
