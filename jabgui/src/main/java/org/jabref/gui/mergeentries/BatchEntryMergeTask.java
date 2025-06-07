@@ -25,13 +25,24 @@ import org.slf4j.LoggerFactory;
 public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BatchEntryMergeTask.class);
-    private final MergeContext context;
+
     private final NamedCompound compoundEdit;
     private final AtomicInteger processedEntries;
     private final AtomicInteger successfulUpdates;
+    private final List<BibEntry> entries;
+    private final MergingIdBasedFetcher fetcher;
+    private final UndoManager undoManager;
+    private final NotificationService notificationService;
 
-    public BatchEntryMergeTask(MergeContext context) {
-        this.context = context;
+    public BatchEntryMergeTask(List<BibEntry> entries,
+                               MergingIdBasedFetcher fetcher,
+                               UndoManager undoManager,
+                               NotificationService notificationService) {
+        this.entries = entries;
+        this.fetcher = fetcher;
+        this.undoManager = undoManager;
+        this.notificationService = notificationService;
+
         this.compoundEdit = new NamedCompound(Localization.lang("Merge entries"));
         this.processedEntries = new AtomicInteger(0);
         this.successfulUpdates = new AtomicInteger(0);
@@ -46,8 +57,7 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
     }
 
     @Override
-    public List<String> call() throws Exception {
-        try {
+    public List<String> call() {
             if (isCancelled()) {
                 notifyCancellation();
                 return List.of();
@@ -66,28 +76,19 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
                     processedEntries.get(), successfulUpdates.get());
             notifySuccess(successfulUpdates.get());
             return updatedEntries;
-        } catch (Exception e) {
-            if (isCancelled()) {
-                notifyCancellation();
-                return List.of();
-            }
-            LOGGER.error("Critical error during merge operation", e);
-            notifyError(e);
-            throw e;
-        }
     }
 
     private void notifyCancellation() {
         LOGGER.debug("Merge operation was cancelled. Processed: {}, Successfully updated: {}",
                 processedEntries.get(), successfulUpdates.get());
-        context.notificationService().notify(
+        notificationService.notify(
                 Localization.lang("Merge operation cancelled after updating %0 entry(s)", successfulUpdates.get()));
     }
 
     private List<String> processMergeEntries() {
         List<String> updatedEntries = new ArrayList<>();
 
-        for (BibEntry entry : context.entries()) {
+        for (BibEntry entry : entries) {
             Optional<String> result = processSingleEntryWithProgress(entry);
             result.ifPresent(updatedEntries::add);
 
@@ -101,17 +102,17 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
     }
 
     private Optional<String> processSingleEntryWithProgress(BibEntry entry) {
-        updateProgress(processedEntries.incrementAndGet(), context.entries().size());
+        updateProgress(processedEntries.incrementAndGet(), entries.size());
         updateMessage(Localization.lang("Processing entry %0 of %1",
                 processedEntries.get(),
-                context.entries().size()));
+                entries.size()));
         return processSingleEntry(entry);
     }
 
     private Optional<String> processSingleEntry(BibEntry entry) {
         try {
             LOGGER.debug("Processing entry: {}", entry);
-            return context.fetcher().fetchEntry(entry)
+            return fetcher.fetchEntry(entry)
                           .filter(MergingIdBasedFetcher.FetcherResult::hasChanges)
                           .flatMap(result -> {
                               boolean changesApplied = applyMerge(entry, result);
@@ -142,14 +143,14 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
         String citationKey = entry.getCitationKey().orElse("unknown");
         String message = Localization.lang("Error processing entry", citationKey, e.getMessage());
         LOGGER.error(message, e);
-        context.notificationService().notify(message);
+        notificationService.notify(message);
     }
 
     private void finalizeOperation(List<String> updatedEntries) {
         if (!updatedEntries.isEmpty()) {
             synchronized (compoundEdit) {
                 compoundEdit.end();
-                context.undoManager.addEdit(compoundEdit);
+                undoManager.addEdit(compoundEdit);
             }
         }
     }
@@ -158,26 +159,6 @@ public class BatchEntryMergeTask extends BackgroundTask<List<String>> {
         String message = updateCount == 0
                 ? Localization.lang("No updates found.")
                 : Localization.lang("Batch update successful. %0 entry(s) updated.", updateCount);
-        context.notificationService().notify(message);
-    }
-
-    private void notifyError(Exception e) {
-        context.notificationService().notify(
-                Localization.lang("Merge operation failed: %0", e.getMessage()));
-    }
-
-    /**
-     * Record containing all the context needed for the merge operation.
-     * Implements defensive copying to ensure immutability.
-     */
-    public record MergeContext(
-            List<BibEntry> entries,
-            MergingIdBasedFetcher fetcher,
-            UndoManager undoManager,
-            NotificationService notificationService
-    ) {
-        public MergeContext {
-            entries = List.copyOf(entries);
-        }
+        notificationService.notify(message);
     }
 }

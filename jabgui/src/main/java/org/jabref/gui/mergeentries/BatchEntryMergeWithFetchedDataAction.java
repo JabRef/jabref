@@ -57,10 +57,10 @@ public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
 
         MergingIdBasedFetcher fetcher = new MergingIdBasedFetcher(preferences.getImportFormatPreferences());
         BatchEntryMergeTask mergeTask = new BatchEntryMergeTask(
-                new BatchEntryMergeTask.MergeContext(entries,
-                        fetcher,
-                        undoManager,
-                        notificationService));
+                entries,
+                fetcher,
+                undoManager,
+                notificationService);
 
         mergeTask.executeWith(taskExecutor);
     }
