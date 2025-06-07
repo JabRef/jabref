@@ -27,38 +27,36 @@ public final class MergeEntriesHelper {
     private MergeEntriesHelper() {
     }
 
-    /**
-     * Merges two BibEntry objects with undo support.
-     *
-     * @param entryFromFetcher The entry containing new information (source, from the fetcher)
-     * @param entryFromLibrary The entry to be updated (target, from the library)
-     * @param undoManager Compound edit to collect undo information
-     */
-    public static boolean mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
+    /// Merges two BibEntry objects with undo support.
+    ///
+    /// @param entryFromFetcher The entry containing new information (source, from the fetcher)
+    /// @param entryFromLibrary The entry to be updated (target, from the library)
+    /// @param namedCompound Compound edit to collect undo information
+    public static boolean mergeEntries(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound namedCompound) {
         LOGGER.debug("Entry from fetcher: {}", entryFromFetcher);
         LOGGER.debug("Entry from library: {}", entryFromLibrary);
 
-        boolean typeChanged = mergeEntryType(entryFromFetcher, entryFromLibrary, undoManager);
-        boolean fieldsChanged = mergeFields(entryFromFetcher, entryFromLibrary, undoManager);
-        boolean fieldsRemoved = removeFieldsNotPresentInFetcher(entryFromFetcher, entryFromLibrary, undoManager);
+        boolean typeChanged = mergeEntryType(entryFromFetcher, entryFromLibrary, namedCompound);
+        boolean fieldsChanged = mergeFields(entryFromFetcher, entryFromLibrary, namedCompound);
+        boolean fieldsRemoved = removeFieldsNotPresentInFetcher(entryFromFetcher, entryFromLibrary, namedCompound);
 
         return typeChanged || fieldsChanged || fieldsRemoved;
     }
 
-    private static boolean mergeEntryType(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
+    private static boolean mergeEntryType(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound namedCompound) {
         EntryType fetcherType = entryFromFetcher.getType();
         EntryType libraryType = entryFromLibrary.getType();
 
         if (!libraryType.equals(fetcherType)) {
             LOGGER.debug("Updating type {} -> {}", libraryType, fetcherType);
             entryFromLibrary.setType(fetcherType);
-            undoManager.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, fetcherType));
+            namedCompound.addEdit(new UndoableChangeType(entryFromLibrary, libraryType, fetcherType));
             return true;
         }
         return false;
     }
 
-    private static boolean mergeFields(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
+    private static boolean mergeFields(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound namedCompound) {
         Set<Field> allFields = new LinkedHashSet<>();
         allFields.addAll(entryFromFetcher.getFields());
         allFields.addAll(entryFromLibrary.getFields());
@@ -72,14 +70,14 @@ public final class MergeEntriesHelper {
             if (fetcherValue.isPresent() && shouldUpdateField(fetcherValue.get(), libraryValue)) {
                 LOGGER.debug("Updating field {}: {} -> {}", field, libraryValue.orElse(null), fetcherValue.get());
                 entryFromLibrary.setField(field, fetcherValue.get());
-                undoManager.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
+                namedCompound.addEdit(new UndoableFieldChange(entryFromLibrary, field, libraryValue.orElse(null), fetcherValue.get()));
                 anyFieldsChanged = true;
             }
         }
         return anyFieldsChanged;
     }
 
-    private static boolean removeFieldsNotPresentInFetcher(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound undoManager) {
+    private static boolean removeFieldsNotPresentInFetcher(BibEntry entryFromFetcher, BibEntry entryFromLibrary, NamedCompound namedCompound) {
         Set<Field> obsoleteFields = new LinkedHashSet<>(entryFromLibrary.getFields());
         obsoleteFields.removeAll(entryFromFetcher.getFields());
 
@@ -94,7 +92,7 @@ public final class MergeEntriesHelper {
             if (value.isPresent()) {
                 LOGGER.debug("Removing obsolete field {} with value {}", field, value.get());
                 entryFromLibrary.clearField(field);
-                undoManager.addEdit(new UndoableFieldChange(entryFromLibrary, field, value.get(), null));
+                namedCompound.addEdit(new UndoableFieldChange(entryFromLibrary, field, value.get(), null));
                 anyFieldsRemoved = true;
             }
         }
@@ -102,7 +100,10 @@ public final class MergeEntriesHelper {
     }
 
     private static boolean shouldUpdateField(String fetcherValue, Optional<String> libraryValue) {
-        return libraryValue.map(value -> fetcherValue.length() > value.length())
-                           .orElse(true);
+        // TODO: Think of a better heuristics - better "quality" is the ultimate goal (e.g., more sensible year, better page ranges, longer abstract ...)
+        //       This is difficult to get 100% right
+        //       Read more at https://github.com/JabRef/jabref/issues/12549
+        // Currently: Only overwrite if there is nothing in the library
+        return libraryValue.isEmpty();
     }
 }

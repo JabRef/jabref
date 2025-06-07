@@ -15,9 +15,7 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-/**
- * Handles batch merging of bibliography entries with fetched data.
- */
+/// Handles batch merging of bibliography entries with fetched data.
 public class BatchEntryMergeWithFetchedDataAction extends SimpleCommand {
 
     private final StateManager stateManager;

@@ -17,13 +17,11 @@ import org.jabref.model.entry.field.StandardField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Fetches and merges bibliographic information from external sources into existing BibEntry objects.
- * Supports multiple identifier types (DOI, ISBN, Eprint) and attempts fetching in a defined order
- * until successful.
- * The merging only adds new fields from the fetched entry and does not modify existing fields
- * in the library entry.
- */
+/// Fetches and merges bibliographic information from external sources into existing BibEntry objects.
+/// Supports multiple identifier types (DOI, ISBN, Eprint) and attempts fetching in a defined order
+/// until successful.
+/// The merging only adds new fields from the fetched entry and does not modify existing fields
+/// in the library entry.
 public class MergingIdBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergingIdBasedFetcher.class);
     private static final List<StandardField> SUPPORTED_FIELDS =
