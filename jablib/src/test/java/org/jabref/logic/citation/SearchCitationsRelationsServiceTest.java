@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
 import org.jabref.logic.citation.repository.BibEntryRelationsRepositoryTestHelpers;
+import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherHelpersForTest;
 import org.jabref.model.entry.BibEntry;
 
@@ -16,17 +18,47 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SearchCitationsRelationsServiceTest {
 
+    /**
+     * Creates a mock CitationFetcher that returns specific results for citations and references
+     */
+    private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn) {
+        return CitationFetcherHelpersForTest.Mocks.from(
+                entry -> {
+                    if (entry == targetEntry) {
+                        return citationsToReturn != null ? citationsToReturn : List.of();
+                    }
+                    return List.of();
+                },
+                entry -> {
+                    if (entry == targetEntry) {
+                        return referencesToReturn != null ? referencesToReturn : List.of();
+                    }
+                    return List.of();
+                }
+        );
+    }
+
+    /**
+     * Creates a mock CitationFetcher that returns empty lists for all entries
+     */
+    private CitationFetcher createEmptyMockFetcher() {
+        return CitationFetcherHelpersForTest.Mocks.from(
+                _ -> List.of(),
+                _ -> List.of()
+        );
+    }
+
     @Nested
     class CitationsTests {
         @Test
         void serviceShouldSearchForCitations() {
             // GIVEN
-            var cited = new BibEntry();
-            var citationsToReturn = List.of(new BibEntry());
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                e -> citationsToReturn, null, null, null, entry -> false, entry -> false
+            BibEntry cited = new BibEntry();
+            List<BibEntry> citationsToReturn = List.of(new BibEntry());
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
+                    _ -> citationsToReturn, null, null, null, _ -> false, _ -> false
             );
-            var searchService = new SearchCitationsRelationsService(null, repository);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
             List<BibEntry> citations = searchService.searchCitations(cited);
@@ -38,31 +70,23 @@ class SearchCitationsRelationsServiceTest {
         @Test
         void serviceShouldCallTheFetcherForCitationsWhenRepositoryIsUpdatable() {
             // GiVEN
-            var cited = new BibEntry();
-            var newCitations = new BibEntry();
-            var citationsToReturn = List.of(newCitations);
+            BibEntry cited = new BibEntry();
+            BibEntry newCitations = new BibEntry();
+            List<BibEntry> citationsToReturn = List.of(newCitations);
             Map<BibEntry, List<BibEntry>> citationsDatabase = HashMap.newHashMap(300);
-            var fetcher = CitationFetcherHelpersForTest.Mocks.from(
-                entry -> {
-                    if (entry == cited) {
-                        return citationsToReturn;
-                    }
-                    return List.of();
-                },
-                null
+            CitationFetcher fetcher = createMockFetcher(cited, citationsToReturn, null);
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
+                    _ -> citationsToReturn,
+                    citationsDatabase::put,
+                    List::of,
+                    (_, _) -> { },
+                    _ -> true,
+                    _ -> false
             );
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                e -> citationsToReturn,
-                citationsDatabase::put,
-                List::of,
-                (e, r) -> { },
-                e -> true,
-                e -> false
-            );
-            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchCitations(cited);
+            List<BibEntry> citations = searchService.searchCitations(cited);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -72,26 +96,16 @@ class SearchCitationsRelationsServiceTest {
 
         @Test
         void serviceShouldFetchCitationsIfRepositoryIsEmpty() {
-            var cited = new BibEntry();
-            var newCitations = new BibEntry();
-            var citationsToReturn = List.of(newCitations);
+            BibEntry cited = new BibEntry();
+            BibEntry newCitations = new BibEntry();
+            List<BibEntry> citationsToReturn = List.of(newCitations);
             Map<BibEntry, List<BibEntry>> citationsDatabase = HashMap.newHashMap(300);
-            var fetcher = CitationFetcherHelpersForTest.Mocks.from(
-                entry -> {
-                    if (entry == cited) {
-                        return citationsToReturn;
-                    }
-                    return List.of();
-                },
-                null
-            );
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                citationsDatabase, null
-            );
-            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+            CitationFetcher fetcher = createMockFetcher(cited, citationsToReturn, null);
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchCitations(cited);
+            List<BibEntry> citations = searchService.searchCitations(cited);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -101,18 +115,14 @@ class SearchCitationsRelationsServiceTest {
 
         @Test
         void insertingAnEmptyCitationsShouldBePossible() {
-            var cited = new BibEntry();
-            var citationsDatabase = new HashMap<BibEntry, List<BibEntry>>();
-            var fetcher = CitationFetcherHelpersForTest.Mocks.from(
-                entry -> List.of(), null
-            );
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                citationsDatabase, null
-            );
-            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+            BibEntry cited = new BibEntry();
+            Map<BibEntry, List<BibEntry>> citationsDatabase = new HashMap<>();
+            CitationFetcher fetcher = createEmptyMockFetcher();
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchCitations(cited);
+            List<BibEntry> citations = searchService.searchCitations(cited);
 
             // THEN
             assertTrue(citations.isEmpty());
@@ -126,12 +136,12 @@ class SearchCitationsRelationsServiceTest {
         @Test
         void serviceShouldSearchForReferences() {
             // GIVEN
-            var referencer = new BibEntry();
-            var referencesToReturn = List.of(new BibEntry());
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                null, null, e -> referencesToReturn, null, e -> false, e -> false
+            BibEntry referencer = new BibEntry();
+            List<BibEntry> referencesToReturn = List.of(new BibEntry());
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
+                    null, null, _ -> referencesToReturn, null, _ -> false, _ -> false
             );
-            var searchService = new SearchCitationsRelationsService(null, repository);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
             List<BibEntry> references = searchService.searchReferences(referencer);
@@ -143,28 +153,23 @@ class SearchCitationsRelationsServiceTest {
         @Test
         void serviceShouldCallTheFetcherForReferencesWhenRepositoryIsUpdatable() {
             // GIVEN
-            var referencer = new BibEntry();
-            var newReference = new BibEntry();
-            var referencesToReturn = List.of(newReference);
-            var referencesDatabase = new HashMap<BibEntry, List<BibEntry>>();
-            var fetcher = CitationFetcherHelpersForTest.Mocks.from(null, entry -> {
-                if (entry == referencer) {
-                    return referencesToReturn;
-                }
-                return List.of();
-            });
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                List::of,
-                (e, c) -> { },
-                e -> referencesToReturn,
-                referencesDatabase::put,
-                e -> false,
-                e -> true
+            BibEntry referencer = new BibEntry();
+            BibEntry newReference = new BibEntry();
+            List<BibEntry> referencesToReturn = List.of(newReference);
+            Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
+            CitationFetcher fetcher = createMockFetcher(referencer, null, referencesToReturn);
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
+                    List::of,
+                    (_, _) -> { },
+                    _ -> referencesToReturn,
+                    referencesDatabase::put,
+                    _ -> false,
+                    _ -> true
             );
-            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var references = searchService.searchReferences(referencer);
+            List<BibEntry> references = searchService.searchReferences(referencer);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(referencer));
@@ -174,26 +179,18 @@ class SearchCitationsRelationsServiceTest {
 
         @Test
         void serviceShouldFetchReferencesIfRepositoryIsEmpty() {
-            var reference = new BibEntry();
-            var newCitations = new BibEntry();
-            var referencesToReturn = List.of(newCitations);
-            var referencesDatabase = new HashMap<BibEntry, List<BibEntry>>();
-            var fetcher = CitationFetcherHelpersForTest.Mocks.from(
-                null,
-                entry -> {
-                    if (entry == reference) {
-                        return referencesToReturn;
-                    }
-                    return List.of();
-                }
+            BibEntry reference = new BibEntry();
+            BibEntry newCitations = new BibEntry();
+            List<BibEntry> referencesToReturn = List.of(newCitations);
+            Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
+            CitationFetcher fetcher = createMockFetcher(reference, null, referencesToReturn);
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
+                    null, referencesDatabase
             );
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                null, referencesDatabase
-            );
-            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var references = searchService.searchReferences(reference);
+            List<BibEntry> references = searchService.searchReferences(reference);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(reference));
@@ -203,18 +200,16 @@ class SearchCitationsRelationsServiceTest {
 
         @Test
         void insertingAnEmptyReferencesShouldBePossible() {
-            var referencer = new BibEntry();
-            var referenceDatabase = new HashMap<BibEntry, List<BibEntry>>();
-            var fetcher = CitationFetcherHelpersForTest.Mocks.from(
-                null, entry -> List.of()
+            BibEntry referencer = new BibEntry();
+            Map<BibEntry, List<BibEntry>> referenceDatabase = new HashMap<>();
+            CitationFetcher fetcher = createEmptyMockFetcher();
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
+                    null, referenceDatabase
             );
-            var repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                null, referenceDatabase
-            );
-            var searchService = new SearchCitationsRelationsService(fetcher, repository);
+            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            var citations = searchService.searchReferences(referencer);
+            List<BibEntry> citations = searchService.searchReferences(referencer);
 
             // THEN
             assertTrue(citations.isEmpty());

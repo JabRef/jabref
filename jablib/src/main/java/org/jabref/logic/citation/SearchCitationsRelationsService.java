@@ -20,8 +20,7 @@ import org.slf4j.LoggerFactory;
 
 public class SearchCitationsRelationsService {
 
-    private static final Logger LOGGER = LoggerFactory
-        .getLogger(SearchCitationsRelationsService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SearchCitationsRelationsService.class);
 
     private final CitationFetcher citationFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
@@ -51,18 +50,18 @@ public class SearchCitationsRelationsService {
         this.relationsRepository = repository;
     }
 
-    public List<BibEntry> searchReferences(BibEntry referencer) {
-        boolean isFetchingAllowed = this.relationsRepository.isReferencesUpdatable(referencer)
-            || !this.relationsRepository.containsReferences(referencer);
+    public List<BibEntry> searchReferences(BibEntry referenced) {
+        boolean isFetchingAllowed = relationsRepository.isReferencesUpdatable(referenced)
+            || !relationsRepository.containsReferences(referenced);
         if (isFetchingAllowed) {
             try {
-                var references = this.citationFetcher.searchCiting(referencer);
-                this.relationsRepository.insertReferences(referencer, references);
+                List<BibEntry> referencedBy = citationFetcher.searchCiting(referenced);
+                relationsRepository.insertReferences(referenced, referencedBy);
             } catch (FetcherException e) {
-                LOGGER.error("Error while fetching references for entry {}", referencer.getTitle(), e);
+                LOGGER.error("Error while fetching references for entry {}", referenced.getTitle(), e);
             }
         }
-        return this.relationsRepository.readReferences(referencer);
+        return this.relationsRepository.readReferences(referenced);
     }
 
     /**
@@ -71,12 +70,12 @@ public class SearchCitationsRelationsService {
      * If the store was not empty and an error occurs while fetching => will return the content of the store
      */
     public List<BibEntry> searchCitations(BibEntry cited) {
-        boolean isFetchingAllowed = this.relationsRepository.isCitationsUpdatable(cited)
+        boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(cited)
             || !this.relationsRepository.containsCitations(cited);
         if (isFetchingAllowed) {
             try {
-                var citations = this.citationFetcher.searchCitedBy(cited);
-                this.relationsRepository.insertCitations(cited, citations);
+                List<BibEntry> citedBy = citationFetcher.searchCitedBy(cited);
+                this.relationsRepository.insertCitations(cited, citedBy);
             } catch (FetcherException e) {
                 LOGGER.error("Error while fetching citations for entry {}", cited.getTitle(), e);
             }

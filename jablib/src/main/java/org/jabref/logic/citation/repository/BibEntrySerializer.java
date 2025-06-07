@@ -67,7 +67,7 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
 
     @Override
     public void write(WriteBuffer buff, BibEntry bibEntry) {
-        var asBytes = toString(bibEntry).getBytes(StandardCharsets.UTF_8);
+        byte[] asBytes = toString(bibEntry).getBytes(StandardCharsets.UTF_8);
         buff.putInt(asBytes.length);
         buff.put(asBytes);
     }
@@ -75,7 +75,7 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
     @Override
     public BibEntry read(ByteBuffer buff) {
         int serializedEntrySize = buff.getInt();
-        var serializedEntry = new byte[serializedEntrySize];
+        byte[] serializedEntry = new byte[serializedEntrySize];
         buff.get(serializedEntry);
         return fromString(new String(serializedEntry, StandardCharsets.UTF_8)).orElse(new BibEntry());
     }
@@ -100,4 +100,3 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
         return false;
     }
 }
-

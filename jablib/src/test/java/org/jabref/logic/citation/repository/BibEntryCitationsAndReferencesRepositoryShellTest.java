@@ -62,10 +62,10 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
     @Test
     void repositoryShouldWriteAndReadCitationsToAndFromExpectedDAO() {
         // GIVEN
-        var bibEntry = createBibEntry();
-        var citations = createRelations(bibEntry);
-        var citationsDAO = new BibEntryRelationRepositoryMock();
-        var bibEntryRelationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
+        BibEntry bibEntry = createBibEntry();
+        List<BibEntry> citations = createRelations(bibEntry);
+        BibEntryRelationRepositoryMock citationsDAO = new BibEntryRelationRepositoryMock();
+        BibEntryCitationsAndReferencesRepositoryShell bibEntryRelationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
             citationsDAO,
             new BibEntryRelationRepositoryMock()
         );
@@ -83,10 +83,10 @@ class BibEntryCitationsAndReferencesRepositoryShellTest {
     @Test
     void repositoryShouldWriteAndReadReferencesToAndFromExpectedDAO() {
         // GIVEN
-        var bibEntry = createBibEntry();
-        var references = createRelations(bibEntry);
-        var referencesDAO = new BibEntryRelationRepositoryMock();
-        var bibEntryRelationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
+        BibEntry bibEntry = createBibEntry();
+        List<BibEntry> references = createRelations(bibEntry);
+        BibEntryRelationRepositoryMock referencesDAO = new BibEntryRelationRepositoryMock();
+        BibEntryCitationsAndReferencesRepositoryShell bibEntryRelationsRepository = new BibEntryCitationsAndReferencesRepositoryShell(
                 new BibEntryRelationRepositoryMock(),
                 referencesDAO
         );

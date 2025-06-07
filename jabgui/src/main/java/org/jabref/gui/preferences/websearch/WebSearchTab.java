@@ -91,14 +91,14 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         defaultPlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultPlainCitationParserProperty());
 
         viewModel.citationsRelationsStoreTTLProperty()
-                 .addListener((observable, oldValue, newValue) -> {
+                 .addListener((_, _, newValue) -> {
                      if (newValue != null && !newValue.toString().equals(citationsRelationStoreTTL.getText())) {
                          citationsRelationStoreTTL.setText(newValue.toString());
                      }
                  });
         citationsRelationStoreTTL
                 .textProperty()
-                .addListener((observable, oldValue, newValue) -> {
+                .addListener((_, _, newValue) -> {
                     if (Strings.isBlank(newValue)) {
                         return;
                     }
@@ -142,7 +142,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         new ViewModelTableRowFactory<FetcherApiKey>()
                 .install(apiKeySelectorTable);
 
-        apiKeySelectorTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        apiKeySelectorTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
             if (oldValue != null) {
                 updateFetcherApiKey(oldValue);
             }
@@ -182,7 +182,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         apiKeySelectorTable.setItems(viewModel.fetcherApiKeys());
 
         // Content is set later
-        viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> {
+        viewModel.fetcherApiKeys().addListener((InvalidationListener) _ -> {
             if (!apiKeySelectorTable.getItems().isEmpty()) {
                 apiKeySelectorTable.getSelectionModel().selectFirst();
             }
