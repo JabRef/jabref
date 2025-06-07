@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +49,10 @@ public class ParserResult {
         parserResult.addWarning(message);
         parserResult.setInvalid(true);
         return parserResult;
+    }
+
+    public static ParserResult fromEntry(BibEntry entry) {
+        return new ParserResult(Collections.singleton(entry));
     }
 
     private static String getErrorMessage(Exception exception) {
