@@ -12,7 +12,6 @@ import javafx.util.Pair;
 
 import org.jabref.logic.os.OS;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -433,26 +432,5 @@ class StringUtilTest {
                 """.replace("\n", OS.NEWLINE);
 
         assertEquals(expected, StringUtil.alignStringTable(given));
-    }
-
-    @ParameterizedTest(name = "{index}: normalize(\"{0}\") = \"{1}\"")
-    @MethodSource("provideNormalizationCases")
-    @DisplayName("Should normalize input strings as expected")
-    void testNormalize(String input, String expected) {
-        assertEquals(expected, StringUtil.normalize(input));
-    }
-
-    static Stream<org.junit.jupiter.params.provider.Arguments> provideNormalizationCases() {
-        return Stream.of(
-                Arguments.of(null, ""),
-                Arguments.of("", ""),
-                Arguments.of("   Hello   World  ", "Hello World"),
-                Arguments.of("apple  ,banana", "apple, banana"),
-                Arguments.of("key : value", "key: value"),
-                Arguments.of("a  -  b", "a-b"),
-                Arguments.of("a ; b ;c", "a; b; c"),
-                Arguments.of("Line1\nLine2\r\nLine3", "Line1 Line2 Line3"),
-                Arguments.of("text  , more ; words : with - spacing", "text, more; words: with-spacing")
-        );
     }
 }

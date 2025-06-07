@@ -797,42 +797,4 @@ public class StringUtil {
 
         return sb.toString();
     }
-
-    /**
-     * Normalizes a string by standardizing whitespace and punctuation. This includes:
-     * - Trimming outer whitespace
-     * - Converting multiple whitespace characters to a single space
-     * - Converting line breaks to spaces
-     * - Standardizing formatting around punctuation (hyphens, commas, semicolons, colons)
-     *
-     * @param value The string to normalize
-     * @return The normalized string, or empty string if input is null
-     */
-    public static String normalize(String value) {
-        if (value == null) {
-            return "";
-        }
-
-        String withoutLineBreaks = LINE_BREAKS.matcher(value).replaceAll(" ");
-        String trimmed = withoutLineBreaks.trim();
-
-        return NORMALIZE_PATTERN.matcher(trimmed).replaceAll(match -> {
-            if (match.group("whitespace") != null) {
-                return " ";
-            }
-            if (match.group("hyphen") != null) {
-                return "-";
-            }
-            if (match.group("comma") != null) {
-                return ", ";
-            }
-            if (match.group("semicolon") != null) {
-                return "; ";
-            }
-            if (match.group("colon") != null) {
-                return ": ";
-            }
-            return match.group();
-        });
-    }
 }

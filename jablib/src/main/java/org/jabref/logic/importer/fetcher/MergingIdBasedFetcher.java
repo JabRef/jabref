@@ -9,10 +9,10 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.layout.format.RemoveWhitespace;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +28,7 @@ public class MergingIdBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergingIdBasedFetcher.class);
     private static final List<StandardField> SUPPORTED_FIELDS =
             List.of(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT);
+    private static final RemoveWhitespace REMOVE_WHITESPACE_FORMATTER = new RemoveWhitespace();
     private final ImportFormatPreferences importFormatPreferences;
 
     public MergingIdBasedFetcher(ImportFormatPreferences importFormatPreferences) {
@@ -119,10 +120,10 @@ public class MergingIdBasedFetcher {
 
     private boolean shouldUpdateField(Field field, BibEntry sourceEntry, BibEntry targetEntry) {
         String sourceValue = sourceEntry.getField(field)
-                                        .map(StringUtil::normalize)
+                                        .map(REMOVE_WHITESPACE_FORMATTER::format)
                                         .orElse("");
         String targetValue = targetEntry.getField(field)
-                                        .map(StringUtil::normalize)
+                                        .map(REMOVE_WHITESPACE_FORMATTER::format)
                                         .orElse("");
         return !sourceValue.equals(targetValue);
     }
