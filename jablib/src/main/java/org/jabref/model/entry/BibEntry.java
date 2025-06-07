@@ -86,7 +86,7 @@ import org.slf4j.LoggerFactory;
 /// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
 ///
 @AllowedToUseLogic("because it needs access to parser and writers")
-public class BibEntry implements Cloneable, Serializable {
+public class BibEntry implements Cloneable {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
@@ -707,14 +707,20 @@ public class BibEntry implements Cloneable, Serializable {
         return clone;
     }
 
-    /// This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
-    /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
-    /// used, it is output as "field = {#value#}", which may cause headaches in debugging. We nevertheless do it this way
-    /// to a) enable debugging the internal representation and b) save time at this method.
-    ///
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
+    /// We do it this way to
+    ///   a) enable debugging the internal representation and
+    ///   b) save time at this method.
+    ///
+    ///
+    /// This returns canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
+    /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
+    /// used, it is output as "field = {#value#}", which may cause headaches in debugging.
+    ///
     /// Alternative for some more readable output: [#getAuthorTitleYear(int)]
+    ///
+    /// @return A user-readable string NOT A VALID BibTeX string
     @Override
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
@@ -982,11 +988,6 @@ public class BibEntry implements Cloneable, Serializable {
     public BibEntry withMonth(Month parsedMonth) {
         setMonth(parsedMonth);
         this.setChanged(false);
-        return this;
-    }
-
-    public BibEntry withType(EntryType type) {
-        this.setType(type);
         return this;
     }
 

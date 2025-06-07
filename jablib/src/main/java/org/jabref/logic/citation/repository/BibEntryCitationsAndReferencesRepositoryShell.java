@@ -4,7 +4,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryTypesManager;
 
 public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCitationsAndReferencesRepository {
 
@@ -78,12 +80,15 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
         this.referencesDao.close();
     }
 
-    public static BibEntryCitationsAndReferencesRepositoryShell of(Path citationsRelationsDirectory, int storeTTL) {
+    public static BibEntryCitationsAndReferencesRepositoryShell of(Path citationsRelationsDirectory,
+                                                                   int storeTTL,
+                                                                   ImportFormatPreferences importFormatPreferences,
+                                                                   BibEntryTypesManager entryTypesManager) {
         var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
         var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
         return new BibEntryCitationsAndReferencesRepositoryShell(
-            new MVStoreBibEntryRelationRepository(citationsPath, CITATIONS_STORE, storeTTL),
-            new MVStoreBibEntryRelationRepository(relationsPath, REFERENCES_STORE, storeTTL)
+                new MVStoreBibEntryRelationRepository(citationsPath, CITATIONS_STORE, storeTTL, entryTypesManager, importFormatPreferences),
+                new MVStoreBibEntryRelationRepository(relationsPath, REFERENCES_STORE, storeTTL, entryTypesManager, importFormatPreferences)
         );
     }
 }

@@ -192,7 +192,9 @@ public class JabRefGUI extends Application {
         Injector.setModelOrService(AiService.class, aiService);
 
         JabRefGUI.citationsAndRelationsSearchService = new SearchCitationsRelationsService(
-                preferences.getImporterPreferences()
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                entryTypesManager
         );
         Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
     }

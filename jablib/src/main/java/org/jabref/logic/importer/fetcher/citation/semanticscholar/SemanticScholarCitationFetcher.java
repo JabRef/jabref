@@ -16,8 +16,9 @@ import com.google.gson.Gson;
 
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
-
     private static final String SEMANTIC_SCHOLAR_API = "https://api.semanticscholar.org/graph/v1/";
+
+    private static final Gson GSON = new Gson();
 
     private final ImporterPreferences importerPreferences;
 
@@ -47,7 +48,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
 
-        CitationsResponse citationsResponse = new Gson()
+        CitationsResponse citationsResponse = GSON
                 .fromJson(urlDownload.asString(), CitationsResponse.class);
 
         return citationsResponse.getData()
@@ -70,8 +71,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
-        ReferencesResponse referencesResponse = new Gson()
-                .fromJson(urlDownload.asString(), ReferencesResponse.class);
+        ReferencesResponse referencesResponse = GSON.fromJson(urlDownload.asString(), ReferencesResponse.class);
 
         return referencesResponse.getData()
                                  .stream()

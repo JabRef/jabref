@@ -16,6 +16,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,12 +166,9 @@ public abstract class BackgroundTask<V> {
     }
 
     /**
-     * Curry a consumer to on an on running runnable and invoke it after the task is started.
-     *
-     * @param onRunningConsumer should not be null
-     * @see BackgroundTask#consumeOnRunning(Consumer)
+     * Carry a consumer to a running runnable and invoke it after the task is started.
      */
-    public BackgroundTask<V> consumeOnRunning(Consumer<BackgroundTask<V>> onRunningConsumer) {
+    public @NonNull BackgroundTask<V> consumeOnRunning(@NonNull Consumer<BackgroundTask<V>> onRunningConsumer) {
         return this.onRunning(() -> onRunningConsumer.accept(this));
     }
 
