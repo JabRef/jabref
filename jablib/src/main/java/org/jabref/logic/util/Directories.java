@@ -59,4 +59,13 @@ public class Directories {
                                              "ssl",
                                              OS.APP_DIR_APP_AUTHOR));
     }
+
+    public static Path getCitationsRelationsDirectory() {
+        return Path.of(
+                AppDirsFactory.getInstance()
+                              .getUserDataDir(
+                                      OS.APP_DIR_APP_NAME,
+                                      "relations",
+                                      OS.APP_DIR_APP_AUTHOR));
+    }
 }

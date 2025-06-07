@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarFetcher;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -50,7 +50,7 @@ public class SemanticScholarTest implements PagedSearchFetcherTest {
 
     @BeforeEach
     void setUp() {
-        when(importerPreferences.getApiKey(SemanticScholarFetcher.FETCHER_NAME)).thenReturn(apiKey);
+        when(importerPreferences.getApiKey(SemanticScholarCitationFetcher.FETCHER_NAME)).thenReturn(apiKey);
         fetcher = new SemanticScholar(importerPreferences);
     }
 
