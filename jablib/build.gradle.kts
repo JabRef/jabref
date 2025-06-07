@@ -1,3 +1,6 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.util.*
 
@@ -9,19 +12,35 @@ plugins {
     id("idea")
 
     id("antlr")
-    id("com.github.edeandrea.xjc-generation") version "1.6"
-
-    id("org.openjfx.javafxplugin") version("0.1.0")
+    id("com.github.bjornvester.xjc") version "1.8.1"
 
     id("me.champeau.jmh") version "0.7.3"
+
+    id("com.vanniktech.maven.publish") version "0.32.0"
 }
 
-val pdfbox = "3.0.4"
-val luceneVersion = "10.2.0"
-val jaxbVersion by extra { "4.0.5" }
+val pdfbox = "3.0.5"
+val luceneVersion = "10.2.1"
+
+var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
+if (project.findProperty("tagbuild")?.toString() != "true") {
+    version += "-SNAPSHOT"
+}
+
+val javafxVersion = "24.0.1"
 
 dependencies {
     implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
+
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+
+    // Required by afterburner.fx
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    implementation("org.openjfx:javafx-graphics:$javafxVersion")
+
+    // Fix "error: module not found: javafx.controls" during compilation
+    // implementation("org.openjfx:javafx-controls:$javafxVersion")
 
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
@@ -67,16 +86,12 @@ dependencies {
     implementation("io.github.thibaultmeyer:cuid:2.0.3")
     // endregion
 
-    // injection framework
-    implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    implementation("org.glassfish.hk2:hk2-api:3.1.1")
-
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
     implementation("info.debatty:java-string-similarity:2.0.0")
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.0.202503040940-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
@@ -88,7 +103,10 @@ dependencies {
 
     implementation("org.postgresql:postgresql:42.7.5")
 
-    antlr("org.antlr:antlr4:4.13.2")
+    antlr("org.antlr:antlr4:4.13.2") {
+        // JabRef ships its own variant of icu4j as binary jar
+        exclude(group = "com.ibm.icu")
+    }
     implementation("org.antlr:antlr4-runtime:4.13.2")
 
     implementation("com.google.guava:guava:33.4.8-jre")
@@ -97,10 +115,11 @@ dependencies {
     implementation("jakarta.inject:jakarta.inject-api:2.0.1")
 
     // region HTTP clients
-    implementation("org.jsoup:jsoup:1.19.1")
-    implementation("com.konghq:unirest-java-core:4.4.6")
-    implementation("com.konghq:unirest-modules-gson:4.4.6")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("org.jsoup:jsoup:1.20.1")
+    implementation("com.konghq:unirest-java-core:4.4.7")
+    implementation("com.konghq:unirest-modules-gson:4.4.7")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // endregion
 
     implementation("org.slf4j:slf4j-api:2.0.17")
@@ -141,30 +160,30 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // region AI
-    implementation("dev.langchain4j:langchain4j:0.36.2")
+    implementation("dev.langchain4j:langchain4j:1.0.1")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.1") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-mistral-ai:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
     }
-    implementation("dev.langchain4j:langchain4j-hugging-face:0.36.2") {
+    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
 
     implementation("org.apache.velocity:velocity-engine-core:2.4.1")
-    implementation(platform("ai.djl:bom:0.32.0"))
+    implementation(platform("ai.djl:bom:0.33.0"))
     implementation("ai.djl:api")
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
@@ -174,7 +193,7 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
     }
     // GemxFX also (transitively) depends on kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
     // endregion
 
     implementation("commons-io:commons-io:2.19.0")
@@ -183,7 +202,6 @@ dependencies {
         exclude(module = "fastparse_2.13")
     }
 
-    implementation("de.rototor.snuggletex:snuggletex:1.3.0")
     implementation ("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0") {
         exclude(group = "org.apache.xmlgraphics")
     }
@@ -207,12 +225,15 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
     testImplementation("org.junit.platform:junit-platform-launcher:1.12.2")
 
-    testImplementation("org.mockito:mockito-core:5.17.0")
+    testImplementation("org.mockito:mockito-core:5.18.0") {
+        exclude(group = "net.bytebuddy", module = "byte-buddy")
+    }
+    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    testImplementation("org.xmlunit:xmlunit-core:2.10.0")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.0")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.0")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.0")
+    testImplementation("org.xmlunit:xmlunit-core:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-matchers:2.10.2")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
+    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
@@ -222,25 +243,7 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
-
-    "xjc"("org.glassfish.jaxb:jaxb-xjc:$jaxbVersion")
-    "xjc"("org.glassfish.jaxb:jaxb-runtime:$jaxbVersion")
 }
-
-javafx {
-    version = "24"
-    modules = listOf(
-        // properties
-        "javafx.base",
-        // javafx.scene.paint.Color;
-        "javafx.graphics",
-
-        // because of afterburner.fx
-        "javafx.controls",
-        "javafx.fxml"
-    )
-}
-
 /*
 jacoco {
     toolVersion = "0.8.13"
@@ -252,44 +255,92 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-xjcGeneration {
-    // plugin: https://github.com/edeandrea/xjc-generation-gradle-plugin#xjc-generation-gradle-plugin
-    // hint by https://stackoverflow.com/questions/62776832/how-to-generate-java-classes-from-xsd-using-java-11-and-gradle#comment130555840_62776832
-    defaultAdditionalXjcOptions = mapOf("encoding" to "UTF-8")
-    schemas {
-        create("citavi") {
-            schemaFile = "citavi/citavi.xsd"
-            javaPackageName = "org.jabref.logic.importer.fileformat.citavi"
-        }
+xjc {
+    xsdDir.set(layout.projectDirectory.dir("src/main/xsd"))
+    xjcVersion.set("4.0.5")
+    defaultPackage.set("org.jabref.logic.importer.fileformat.citavi")
+    options.set(listOf("encoding=UTF-8"))
+}
+
+abstract class JoinNonCommentedLines : DefaultTask() {
+
+    @get:InputFile
+    abstract val inputFile: RegularFileProperty
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    @TaskAction
+    fun extract() {
+        val input = inputFile.get().asFile
+        val result = input.readLines()
+            .filterNot { it.trim().startsWith("#") }
+            .joinToString(", ")
+
+        outputFile.get().asFile.writeText(result)
     }
 }
 
-tasks.processResources {
+val extractMaintainers by tasks.registering(JoinNonCommentedLines::class) {
+    inputFile.set(layout.projectDirectory.file("../MAINTAINERS"))
+    outputFile.set(layout.buildDirectory.file("maintainers.txt"))
+}
+
+val maintainersProvider: Provider<String> = extractMaintainers.flatMap {
+    it.outputFile.map { file -> file.asFile.readText() }
+}
+
+val versionProvider = providers.gradleProperty("projVersionInfo").orElse("100.0.0")
+
+val year = Calendar.getInstance().get(Calendar.YEAR).toString()
+
+val azureInstrumentationKey = providers.environmentVariable("AzureInstrumentationKey").orElse("")
+val springerNatureAPIKey = providers.environmentVariable("SpringerNatureAPIKey").orElse("")
+val astrophysicsDataSystemAPIKey = providers.environmentVariable("AstrophysicsDataSystemAPIKey").orElse("")
+val ieeeAPIKey = providers.environmentVariable("IEEEAPIKey").orElse("")
+val scienceDirectApiKey = providers.environmentVariable("SCIENCEDIRECTAPIKEY").orElse("")
+val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeritageApiKey").orElse("")
+val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
+
+tasks.named<ProcessResources>("processResources") {
+    dependsOn("extractMaintainers")
     filteringCharset = "UTF-8"
+
+    inputs.property("version", versionProvider)
+    inputs.property("year", year)
+    inputs.property("maintainers", maintainersProvider)
+    inputs.property("azureInstrumentationKey", azureInstrumentationKey)
+    inputs.property("springerNatureAPIKey", springerNatureAPIKey)
+    inputs.property("astrophysicsDataSystemAPIKey", astrophysicsDataSystemAPIKey)
+    inputs.property("ieeeAPIKey", ieeeAPIKey)
+    inputs.property("scienceDirectApiKey", scienceDirectApiKey)
+    inputs.property("biodiversityHeritageApiKey", biodiversityHeritageApiKey)
+    inputs.property("semanticScholarApiKey", semanticScholarApiKey)
 
     filesMatching("build.properties") {
         expand(
             mapOf(
-                "version" to (project.findProperty("projVersionInfo") ?: "100.0.0"),
-                "year" to Calendar.getInstance().get(Calendar.YEAR).toString(),
-                "maintainers" to file("../MAINTAINERS")
-                    .readLines()
-                    .filterNot { it.startsWith("#") }
-                    .joinToString(", "),
-                "azureInstrumentationKey" to (System.getenv("AzureInstrumentationKey") ?: ""),
-                "springerNatureAPIKey" to (System.getenv("SpringerNatureAPIKey") ?: ""),
-                "astrophysicsDataSystemAPIKey" to (System.getenv("AstrophysicsDataSystemAPIKey") ?: ""),
-                "ieeeAPIKey" to (System.getenv("IEEEAPIKey") ?: ""),
-                "scienceDirectApiKey" to (System.getenv("SCIENCEDIRECTAPIKEY") ?: ""),
-                "biodiversityHeritageApiKey" to (System.getenv("BiodiversityHeritageApiKey") ?: ""),
-                "semanticScholarApiKey" to (System.getenv("SemanticScholarApiKey") ?: "")
+                "version" to inputs.properties["version"],
+                "year" to inputs.properties["year"],
+                "maintainers" to inputs.properties["maintainers"],
+                "azureInstrumentationKey" to inputs.properties["azureInstrumentationKey"],
+                "springerNatureAPIKey" to inputs.properties["springerNatureAPIKey"],
+                "astrophysicsDataSystemAPIKey" to inputs.properties["astrophysicsDataSystemAPIKey"],
+                "ieeeAPIKey" to inputs.properties["ieeeAPIKey"],
+                "scienceDirectApiKey" to inputs.properties["scienceDirectApiKey"],
+                "biodiversityHeritageApiKey" to inputs.properties["biodiversityHeritageApiKey"],
+                "semanticScholarApiKey" to inputs.properties["semanticScholarApiKey"]
             )
         )
-        filteringCharset = "UTF-8"
     }
 
-    filesMatching(listOf("resources/resource/ods/meta.xml", "resources/resource/openoffice/meta.xml")) {
-        expand(mapOf("version" to project.version))
+    filesMatching(
+        listOf(
+            "resources/resource/ods/meta.xml",
+            "resources/resource/openoffice/meta.xml"
+        )
+    ) {
+        expand(mapOf("version" to inputs.properties["version"]))
     }
 }
 
@@ -298,9 +349,14 @@ tasks.register<JavaExec>("generateJournalListMV") {
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.JournalListMvGenerator")
-    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
+
+    javaLauncher.convention(javaToolchains.launcherFor {
+        languageVersion.set(java.toolchain.languageVersion)
+    })
+
+    val outputFile = layout.buildDirectory.file("resources/main/journals/journal-list.mv")
     onlyIf {
-        !file("build/resources/main/journals/journal-list.mv").exists()
+        !outputFile.get().asFile.exists()
     }
 }
 
@@ -337,29 +393,28 @@ tasks.register("downloadLtwaFile") {
     description = "Downloads the LTWA file for journal abbreviations"
 
     val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
-    val ltwaDir = file("build/resources/main/journals")
-    val ltwaCsvFile = ltwaDir.resolve("ltwa_20210702.csv")
-
-    doLast {
-        if (!ltwaCsvFile.exists()) {
-            mkdir(ltwaDir)
-            ant.withGroovyBuilder {
-                "get"(
-                    mapOf(
-                        "src" to ltwaUrl,
-                        "dest" to ltwaCsvFile,
-                        "verbose" to true
-                    )
-                )
-            }
-            logger.lifecycle("Downloaded LTWA file to $ltwaCsvFile")
-        } else {
-            logger.lifecycle("LTWA file already exists at $ltwaCsvFile")
-        }
-    }
+    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
+    val ltwaCsvFile = ltwaDir.map { it.file("ltwa_20210702.csv") }
 
     onlyIf {
-        !ltwaCsvFile.exists()
+        !ltwaCsvFile.get().asFile.exists()
+    }
+
+    doLast {
+        val dir = ltwaDir.get().asFile
+        val file = ltwaCsvFile.get().asFile
+
+        if (!file.exists()) {
+            dir.mkdirs()
+            ant.withGroovyBuilder {
+                "get"(
+                    mapOf("src" to ltwaUrl, "dest" to file, "verbose" to true)
+                )
+            }
+            logger.lifecycle("Downloaded LTWA file to $file")
+        } else {
+            logger.lifecycle("LTWA file already exists at $file")
+        }
     }
 }
 
@@ -369,14 +424,16 @@ tasks.register<JavaExec>("generateLtwaListMV") {
 
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-    javaLauncher.set(javaToolchains.launcherFor {
+
+    javaLauncher.convention(javaToolchains.launcherFor {
         languageVersion.set(java.toolchain.languageVersion)
     })
 
     dependsOn("downloadLtwaFile")
 
+    val outputFile = layout.buildDirectory.file("resources/main/journals/ltwa-list.mv")
     onlyIf {
-        !file("build/resources/main/journals/ltwa-list.mv").exists()
+        !outputFile.get().asFile.exists()
     }
 }
 
@@ -395,41 +452,17 @@ tasks.withType<JavaCompile>().configureEach {
     options.isFork = true
 }
 
-/*
-tasks.named<JavaCompile>("compileJava") {
-    extensions.configure<org.javamodularity.moduleplugin.extensions.CompileModuleOptions>("moduleOptions") {
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal api
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
-            )
-        )
-    }
-}
-*/
-
 tasks.javadoc {
     (options as StandardJavadocDocletOptions).apply {
         encoding = "UTF-8"
         // version = false
         // author = false
-
-        addMultilineStringsOption("-add-exports").value = listOf(
-            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
-            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
-        )
     }
 }
 
 tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
-    }
-
-    extensions.configure<org.javamodularity.moduleplugin.extensions.TestModuleOptions>("moduleOptions") {
-        // TODO: Remove this as soon as ArchUnit is modularized
-        runOnClasspath = true
     }
 }
 
@@ -493,3 +526,68 @@ jacocoTestReport {
     }
 }
 */
+
+mavenPublishing {
+  configure(JavaLibrary(
+    // configures the -javadoc artifact, possible values:
+    // - `JavadocJar.None()` don't publish this artifact
+    // - `JavadocJar.Empty()` publish an emprt jar
+    // - `JavadocJar.Javadoc()` to publish standard javadocs
+    javadocJar = JavadocJar.Javadoc(),
+    // whether to publish a sources jar
+    sourcesJar = true,
+  ))
+
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+  signAllPublications()
+
+  coordinates("org.jabref", "jablib", version)
+
+  pom {
+    name.set("jablib")
+    description.set("JabRef's Java library to work with BibTeX")
+    inceptionYear.set("2025")
+    url.set("https://github.com/JabRef/jabref/")
+    licenses {
+      license {
+        name.set("MIT")
+        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+      }
+    }
+    developers {
+      developer {
+        id.set("jabref")
+        name.set("JabRef Developers")
+        url.set("https://github.com/JabRef/")
+      }
+    }
+    scm {
+        url.set("https://github.com/JabRef/jabref")
+        connection.set("scm:git:https://github.com/JabRef/jabref")
+        developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+    }
+  }
+}
+
+tasks.named<Jar>("sourcesJar") {
+    dependsOn(
+        tasks.named("generateGrammarSource"),
+    )
+}
+
+tasks.withType<GenerateModuleMetadata> {
+    suppressedValidationErrors.add("enforced-platform")
+}
+
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("io.github.classgraph")
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.junit.jupiter.params")
+    requires.add("org.jabref.testsupport")
+    requires.add("org.mockito")
+
+    // --add-reads
+    //reads.add("org.jabref.jablib=io.github.classgraph")
+    //reads.add("org.jabref.jablib=org.jabref.testsupport")
+}

@@ -9,7 +9,6 @@ import java.util.SequencedSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.exporter.MetaDataSerializer;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.field.BibField;
 import org.jabref.model.entry.field.Field;
@@ -146,14 +145,10 @@ public class BibEntryType implements Comparable<BibEntryType> {
         return Objects.hash(type, requiredFields, allFields);
     }
 
-    /**
-     * Generates a **single line** string containing the information. This is used for debugging purposes.
-     *
-     * See "<a href="https://biratkirat.medium.com/learning-effective-java-item-10-84cc3ab553bc">Effective Java, Item 10</a>" for a discussion on contracts.
-     *
-     * We are sure, we are using this method in a) logs (which should use single lines for output) and b) in the UI. For the UI, we use {@link org.jabref.gui.importer.BibEntryTypePrefsAndFileViewModel},
-     * which in turn uses {@link MetaDataSerializer#serializeCustomEntryTypes(BibEntryType)}
-     */
+    /// Generates a **single line** string containing the information. This is used for debugging purposes.
+    /// See "<a href="https://biratkirat.medium.com/learning-effective-java-item-10-84cc3ab553bc">Effective Java, Item 10</a>" for a discussion on contracts.
+    /// We are sure, we are using this method in a) logs (which should use single lines for output) and b) in the UI. For the UI, we use [org.jabref.gui.importer.BibEntryTypePrefsAndFileViewModel],
+    /// which in turn uses [#serializeCustomEntryTypes(BibEntryType)]
     @Override
     public String toString() {
         return "BibEntryType{" +

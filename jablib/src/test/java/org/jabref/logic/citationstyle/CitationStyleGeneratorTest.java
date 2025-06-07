@@ -649,4 +649,256 @@ class CitationStyleGeneratorTest {
                 ENTRY_TYPES_MANAGER).getFirst();
         assertEquals(expected, citation);
     }
+
+    static Stream<Arguments> doiFieldMapping() {
+        return Stream.of(
+
+                // region: output format TEXT
+
+                // Test 1: Regular DOI format (no URL)
+                Arguments.of(
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/10.1161/circulationaha.108.827022\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "10.1161/circulationaha.108.827022")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.TEXT
+                ),
+
+                // Test 2: DOI with https://doi.org/ prefix (behavior: another https://doi.org/ prefix is added from APA style regardless)
+                Arguments.of(
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/https://doi.org/10.1161/circulationaha.108.827022\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "https://doi.org/10.1161/circulationaha.108.827022")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.TEXT
+                ),
+
+                // Test 3: DOI with dx.doi.org prefix
+                Arguments.of(
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/http://dx.doi.org/10.1161/circulationaha.108.827022\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "http://dx.doi.org/10.1161/circulationaha.108.827022")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.TEXT
+                ),
+
+                // Test 4: Missing DOI field
+                Arguments.of(
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.TEXT
+                ),
+
+                // Test 5: Empty DOI field
+                Arguments.of(
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441.\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.TEXT
+                ),
+
+                // Test 6: DOI with unusual characters
+                Arguments.of(
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/10.1161/circ.108_827022 special\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "10.1161/circ.108_827022~special")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.TEXT
+                ),
+
+                // Test 7: Malformed DOI (invalid syntax)
+                Arguments.of(
+                        "Corti, R., Flammer, A. J., Hollenberg, N. K., & Lüscher, T. F. (2009). Cocoa and Cardiovascular Health. Circulation, 119(10), 1433–1441. https://doi.org/invalid-doi-format\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "invalid-doi-format")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.TEXT
+                ),
+                // endregion
+
+                // region: output format HTML
+
+                // Test 1: Regular DOI format (no URL)
+                Arguments.of(
+                        "  <div class=\"csl-entry\">Corti, R., Flammer, A. J., Hollenberg, N. K., &amp; L&uuml;scher, T. F. (2009). Cocoa and Cardiovascular Health. <span style=\"font-style: italic\">Circulation</span>, <span style=\"font-style: italic\">119</span>(10), 1433&ndash;1441. https://doi.org/10.1161/circulationaha.108.827022</div>\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "10.1161/circulationaha.108.827022")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.HTML
+                ),
+
+                // Test 2: DOI with https://doi.org/ prefix
+                Arguments.of(
+                        "  <div class=\"csl-entry\">Corti, R., Flammer, A. J., Hollenberg, N. K., &amp; L&uuml;scher, T. F. (2009). Cocoa and Cardiovascular Health. <span style=\"font-style: italic\">Circulation</span>, <span style=\"font-style: italic\">119</span>(10), 1433&ndash;1441. https://doi.org/https://doi.org/10.1161/circulationaha.108.827022</div>\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "https://doi.org/10.1161/circulationaha.108.827022")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.HTML
+                ),
+
+                // Test 3: DOI with dx.doi.org prefix
+                Arguments.of(
+                        "  <div class=\"csl-entry\">Corti, R., Flammer, A. J., Hollenberg, N. K., &amp; L&uuml;scher, T. F. (2009). Cocoa and Cardiovascular Health. <span style=\"font-style: italic\">Circulation</span>, <span style=\"font-style: italic\">119</span>(10), 1433&ndash;1441. https://doi.org/http://dx.doi.org/10.1161/circulationaha.108.827022</div>\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "http://dx.doi.org/10.1161/circulationaha.108.827022")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.HTML
+                ),
+
+                // Test 4: Missing DOI field
+                Arguments.of(
+                        "  <div class=\"csl-entry\">Corti, R., Flammer, A. J., Hollenberg, N. K., &amp; L&uuml;scher, T. F. (2009). Cocoa and Cardiovascular Health. <span style=\"font-style: italic\">Circulation</span>, <span style=\"font-style: italic\">119</span>(10), 1433&ndash;1441.</div>\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.HTML
+                ),
+
+                // Test 5: Empty DOI field
+                Arguments.of(
+                        "  <div class=\"csl-entry\">Corti, R., Flammer, A. J., Hollenberg, N. K., &amp; L&uuml;scher, T. F. (2009). Cocoa and Cardiovascular Health. <span style=\"font-style: italic\">Circulation</span>, <span style=\"font-style: italic\">119</span>(10), 1433&ndash;1441.</div>\n",
+                        BibDatabaseMode.BIBLATEX,
+                        new BibEntry(StandardEntryType.Article)
+                                .withField(StandardField.AUTHOR, "Corti, Roberto and Flammer, Andreas J. and Hollenberg, Norman K. and Lüscher, Thomas F.")
+                                .withField(StandardField.DATE, "2009-03")
+                                .withField(StandardField.JOURNALTITLE, "Circulation")
+                                .withField(StandardField.TITLE, "Cocoa and Cardiovascular Health")
+                                .withField(StandardField.DOI, "")
+                                .withField(StandardField.ISSN, "1524-4539")
+                                .withField(StandardField.NUMBER, "10")
+                                .withField(StandardField.PAGES, "1433--1441")
+                                .withField(StandardField.VOLUME, "119")
+                                .withField(StandardField.PUBLISHER, "Ovid Technologies (Wolters Kluwer Health)"),
+                        "apa.csl",
+                        CitationStyleOutputFormat.HTML
+                )
+                // endregion
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    void doiFieldMapping(String expected, BibDatabaseMode mode, BibEntry entry, String cslFileName, CitationStyleOutputFormat outputFormat) {
+        BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(List.of(entry)));
+        context.setMode(mode);
+
+        String citation = CitationStyleGenerator.generateBibliography(
+                List.of(entry),
+                CSLStyleUtils.createCitationStyleFromFile(cslFileName).orElseThrow().getSource(),
+                outputFormat,
+                context,
+                new BibEntryTypesManager()).getFirst();
+        assertEquals(expected, citation);
+    }
 }

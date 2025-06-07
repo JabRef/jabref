@@ -14,7 +14,7 @@ jobs:
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
           startsWith(github.event.pull_request.title, 'Bump ') ||
-          startsWith(github.event.pull_request.title, 'New Crowdin Translations') ||
+          startsWith(github.event.pull_request.title, 'New Crowdin updates') ||
           startsWith(github.event.pull_request.title, 'Update Gradle Wrapper from')
         )
       )
@@ -88,7 +88,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move issue to "Free to take" in "Good First Issues"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -100,7 +100,7 @@ jobs:
           skip-if-not-in-project: true
       - name: Move issue to "Free to take" in "Candidates for University Projects"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"
@@ -126,8 +126,6 @@ jobs:
         with:
           pr-number: ${{ needs.determine_issue_number.outputs.issue_number }}
           message: |
-            Closed by ${{ github.event.pull_request.html_url }}
-
-            Please head to <https://builds.jabref.org/main> to try it out.
+            We think that this issue was fixed. Please head to <https://builds.jabref.org/main> to download a development build and try it out.
 
             For any feedback, add a comment to the pull request at ${{ github.event.pull_request.html_url }}.

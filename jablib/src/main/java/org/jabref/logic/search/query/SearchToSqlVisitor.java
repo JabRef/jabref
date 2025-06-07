@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.jabref.logic.search.indexing.BibFieldsIndexer;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
@@ -27,10 +26,9 @@ import static org.jabref.model.search.SearchFlags.INEXACT_MATCH;
 import static org.jabref.model.search.SearchFlags.NEGATION;
 import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
 
-/**
- * Converts to a query processable by the scheme created by {@link BibFieldsIndexer}.
- * Tests are located in {@link org.jabref.logic.search.query.SearchQuerySQLConversionTest}.
- */
+/// Converts to a query processable by the scheme created by [org.jabref.logic.search.indexing.BibFieldsIndexer].
+
+/// Tests are located in `org.jabref.logic.search.query.SearchQuerySQLConversionTest`
 public class SearchToSqlVisitor extends SearchBaseVisitor<SqlQueryNode> {
 
     private static final String MAIN_TABLE = "main_table";

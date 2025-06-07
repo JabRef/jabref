@@ -4,21 +4,18 @@ plugins {
     id("checkstyle")
 
     id("com.github.andygoossens.modernizer") version "1.11.0"
-    id("org.openrewrite.rewrite") version "7.5.0"
+    id("org.openrewrite.rewrite") version "7.6.1"
 
     id("org.itsallcode.openfasttrace") version "3.0.1"
 
     id("com.adarshr.test-logger") version "4.0.0"
-
-    // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
-    id("com.github.koppor.gradle-modules-plugin") version "v1.8.15-cmd-1"
 }
 
 // OpenRewrite should rewrite all sources
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
 dependencies {
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.7.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.8.0"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -29,11 +26,11 @@ rewrite {
     activeRecipe("org.jabref.config.rewrite.cleanup")
     exclusion(
         "settings.gradle",
-        "**/build.gradle.kts",
         "**/generated-sources/**",
         "**/src/main/resources/**",
         "**/src/test/resources/**",
         "**/module-info.java",
+        "**/*.kts",
         "**/*.py",
         "**/*.xml",
         "**/*.yml"
@@ -56,9 +53,11 @@ requirementTracing {
 
 subprojects {
     plugins.apply("checkstyle")
+
     plugins.apply("com.github.andygoossens.modernizer")
+
+    // Hint from https://stackoverflow.com/a/46533151/873282
     plugins.apply("com.adarshr.test-logger")
-    plugins.apply("com.github.koppor.gradle-modules-plugin")
 
     checkstyle {
         toolVersion = "10.23.0"

@@ -2,6 +2,7 @@ package org.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 
@@ -15,6 +16,7 @@ import org.jabref.testutils.category.FetcherTest;
 
 import kong.unirest.core.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -26,17 +28,18 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @FetcherTest
+@Disabled("https://github.com/JabRef/jabref-issue-melting-pot/issues/844")
 class BiodiversityLibraryTest {
     private final String RESPONSE_FORMAT = "&format=json";
 
-    private String apiKey;
+    private final String apiKey = new BuildInfo().biodiversityHeritageApiKey;
     private BiodiversityLibrary fetcher;
 
     @BeforeEach
     void setUp() {
-        apiKey = new BuildInfo().biodiversityHeritageApiKey;
         ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
+        when(importerPreferences.getApiKey(BiodiversityLibrary.FETCHER_NAME)).thenReturn(Optional.of(apiKey));
         fetcher = new BiodiversityLibrary(importerPreferences);
     }
 

@@ -8,11 +8,8 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.util.strings.StringLengthComparator;
 
-/**
- * Adds {} brackets around acronyms, month names and countries to preserve their case.
- *
- * Related formatter: {@link org.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter}
- */
+/// Adds {} brackets around acronyms, month names and countries to preserve their case.
+/// Related formatter: [org.jabref.logic.formatter.bibtexfields.RemoveEnclosingBracesFormatter]
 public class ProtectTermsFormatter extends Formatter {
 
     private final ProtectedTermsLoader protectedTermsLoader;

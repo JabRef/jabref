@@ -24,16 +24,22 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
+import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
+import org.jabref.logic.citation.SearchCitationsRelationsService;
+import org.jabref.logic.journals.JournalAbbreviationLoader;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
+import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.PostgreServer;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.FallbackExceptionHandler;
@@ -58,11 +64,13 @@ public class JabRefGUI extends Application {
 
     private static List<UiCommand> uiCommands;
     private static GuiPreferences preferences;
-    private static FileUpdateMonitor fileUpdateMonitor;
 
     // AI Service handles chat messages etc. Therefore, it is tightly coupled to the GUI.
     private static AiService aiService;
+    // CitationsAndRelationsSearchService is here configured for a local machine and so to the GUI.
+    private static SearchCitationsRelationsService citationsAndRelationsSearchService;
 
+    private static FileUpdateMonitor fileUpdateMonitor;
     private static StateManager stateManager;
     private static ThemeManager themeManager;
     private static CountingUndoManager countingUndoManager;
@@ -76,11 +84,9 @@ public class JabRefGUI extends Application {
     private Stage mainStage;
 
     public static void setup(List<UiCommand> uiCommands,
-                             GuiPreferences preferences,
-                             FileUpdateMonitor fileUpdateMonitor) {
+                             GuiPreferences preferences) {
         JabRefGUI.uiCommands = uiCommands;
         JabRefGUI.preferences = preferences;
-        JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
     }
 
     @Override
@@ -134,8 +140,20 @@ public class JabRefGUI extends Application {
     public void initialize() {
         WebViewStore.init();
 
+        DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();
+        JabRefGUI.fileUpdateMonitor = fileUpdateMonitor;
+        HeadlessExecutorService.INSTANCE.executeInterruptableTask(fileUpdateMonitor, "FileUpdateMonitor");
+        Injector.setModelOrService(FileUpdateMonitor.class, fileUpdateMonitor);
+
         DirectoryMonitor directoryMonitor = new DirectoryMonitor();
         Injector.setModelOrService(DirectoryMonitor.class, directoryMonitor);
+
+        BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+        Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
+        Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
+        Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
+
+        IndexManager.clearOldSearchIndices();
 
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
         Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
@@ -172,6 +190,14 @@ public class JabRefGUI extends Application {
                 dialogService,
                 taskExecutor);
         Injector.setModelOrService(AiService.class, aiService);
+
+        JabRefGUI.citationsAndRelationsSearchService = new SearchCitationsRelationsService(
+                preferences.getImporterPreferences(),
+                preferences.getImportFormatPreferences(),
+                preferences.getFieldPreferences(),
+                entryTypesManager
+        );
+        Injector.setModelOrService(SearchCitationsRelationsService.class, citationsAndRelationsSearchService);
     }
 
     private void setupProxy() {
@@ -373,8 +399,7 @@ public class JabRefGUI extends Application {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
-                            preferences,
-                            fileUpdateMonitor),
+                            preferences),
                     remotePreferences.getPort());
         }
     }
@@ -393,6 +418,8 @@ public class JabRefGUI extends Application {
         stopBackgroundTasks();
         LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
+        LOGGER.trace("Closing citations and relations search service");
+        citationsAndRelationsSearchService.close();
         LOGGER.trace("Finished stop");
     }
 

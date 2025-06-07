@@ -56,6 +56,7 @@ import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.bibtex.TypedBibEntry;
+import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.EntryBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
@@ -86,7 +87,7 @@ import org.jspecify.annotations.NonNull;
  * <p>
  * The editors for fields are created via {@link org.jabref.gui.fieldeditors.FieldEditors}.
  */
-public class EntryEditor extends BorderPane implements PreviewControls {
+public class EntryEditor extends BorderPane implements PreviewControls, AdaptVisibleTabs {
     private final Supplier<LibraryTab> tabSupplier;
     private final ExternalFilesEntryLinker fileLinker;
     private final PreviewPanel previewPanel;
@@ -118,6 +119,7 @@ public class EntryEditor extends BorderPane implements PreviewControls {
     @Inject private KeyBindingRepository keyBindingRepository;
     @Inject private JournalAbbreviationRepository journalAbbreviationRepository;
     @Inject private AiService aiService;
+    @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
     private final List<EntryEditorTab> allPossibleTabs = new ArrayList<>();
 
@@ -323,7 +325,16 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         tabs.add(new MathSciNetTab());
         tabs.add(new FileAnnotationTab(stateManager));
         tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
-        tabs.add(new CitationRelationsTab(dialogService, undoManager, stateManager, fileMonitor, preferences, taskExecutor, bibEntryTypesManager));
+        tabs.add(new CitationRelationsTab(
+                dialogService,
+                undoManager,
+                stateManager,
+                fileMonitor,
+                preferences,
+                taskExecutor,
+                bibEntryTypesManager,
+                searchCitationsRelationsService
+        ));
         tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
         sourceTab = new SourceTab(
                 undoManager,
@@ -336,9 +347,9 @@ public class EntryEditor extends BorderPane implements PreviewControls {
                 stateManager);
         tabs.add(sourceTab);
         tabs.add(new LatexCitationsTab(preferences, dialogService, stateManager, directoryMonitor));
-        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor));
-        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, preferences));
-        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, taskExecutor));
+        tabs.add(new FulltextSearchResultsTab(stateManager, preferences, dialogService, taskExecutor, this));
+        tabs.add(new AiSummaryTab(aiService, dialogService, stateManager, this, preferences));
+        tabs.add(new AiChatTab(aiService, dialogService, preferences, stateManager, this, taskExecutor));
 
         return tabs;
     }
@@ -375,10 +386,8 @@ public class EntryEditor extends BorderPane implements PreviewControls {
         return entryEditorTabList;
     }
 
-    /**
-     * Adapt the visible tabs to the current entry type.
-     */
-    private void adaptVisibleTabs() {
+    @Override
+    public void adaptVisibleTabs() {
         // We need to find out, which tabs will be shown (and which not anymore) and remove and re-add the appropriate tabs
         // to the editor. We cannot to simply remove all and re-add the complete list of visible tabs, because
         // the tabs give an ugly animation the looks like all tabs are shifting in from the right. In other words:

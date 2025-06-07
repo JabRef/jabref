@@ -15,6 +15,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -38,6 +39,7 @@ public class SidePane extends VBox {
                     DialogService dialogService,
                     AiService aiService,
                     StateManager stateManager,
+                    AdaptVisibleTabs adaptVisibleTabs,
                     FileUpdateMonitor fileUpdateMonitor,
                     BibEntryTypesManager entryTypesManager,
                     ClipBoardManager clipBoardManager,
@@ -50,6 +52,7 @@ public class SidePane extends VBox {
                 abbreviationRepository,
                 stateManager,
                 taskExecutor,
+                adaptVisibleTabs,
                 dialogService,
                 aiService,
                 fileUpdateMonitor,

@@ -205,7 +205,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (newLanguage != workspacePreferences.getLanguage()) {
             workspacePreferences.setLanguage(newLanguage);
             Localization.setLanguage(newLanguage);
-            restartWarning.add(Localization.lang("Changed language") + ": " + newLanguage.getDisplayName());
+            restartWarning.add(Localization.lang("Changed language to %0", newLanguage.getDisplayName()));
         }
 
         workspacePreferences.setShouldOverrideDefaultFontSize(fontOverrideProperty.getValue());
@@ -256,7 +256,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor),
+                    new CLIMessageHandler(uiMessageHandler, preferences),
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);
@@ -266,7 +266,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences, fileUpdateMonitor),
+                    new CLIMessageHandler(uiMessageHandler, preferences),
                     remotePreferences.getPort());
         } else {
             remotePreferences.setUseRemoteServer(false);

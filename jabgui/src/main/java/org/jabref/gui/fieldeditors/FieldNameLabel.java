@@ -97,7 +97,7 @@ public class FieldNameLabel extends Label {
                             Localization.lang("This could be a section of an archive, a path indicating a service, a classification of some sort.");
                 case EPRINTTYPE:
                 case ARCHIVEPREFIX:
-                    return Localization.lang("Type of the eprint identifier, e. g., the name of the archive, repository, service, or system the eprint field refers to.");
+                    return Localization.lang("Type of the eprint identifier, e.g., the name of the archive, repository, service, or system the eprint field refers to.");
                 case EVENTDATE:
                     return Localization.lang("Date of a conference, a symposium, or some other event.");
                 case EVENTTITLE:
@@ -177,7 +177,7 @@ public class FieldNameLabel extends Label {
                 case PUBLISHER:
                     return Localization.lang("Name(s) of the publisher(s).");
                 case PUBSTATE:
-                    return Localization.lang("Publication state of the work, e. g., \"in press\".");
+                    return Localization.lang("Publication state of the work, e.g., \"in press\".");
                 case SERIES:
                     return Localization.lang("Name of a publication series, such as \"Studies in...\", or the number of a journal series.");
                 case SHORTTITLE:

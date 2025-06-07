@@ -9,6 +9,22 @@ import java.util.Optional;
 import java.util.Properties;
 
 public final class BuildInfo {
+    public static final String JABREF_BANNER = """
+    \u001B[35m
+       &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
+       &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
+       &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
+       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&
+       &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
+       &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
+    &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
+
+    \u001B[97mVersion: %s
+    \u001B[0m
+    Staying on top of your literature since 2003 - https://www.jabref.org/
+
+    Please report issues at https://github.com/JabRef/jabref/issues
+    """;
 
     public static final String UNKNOWN_VERSION = "UNKNOWN";
 

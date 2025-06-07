@@ -53,6 +53,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -91,6 +92,7 @@ public class GroupTreeView extends BorderPane {
     private final DialogService dialogService;
     private final AiService aiService;
     private final TaskExecutor taskExecutor;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final GuiPreferences preferences;
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -119,6 +121,7 @@ public class GroupTreeView extends BorderPane {
      */
     public GroupTreeView(TaskExecutor taskExecutor,
                          StateManager stateManager,
+                         AdaptVisibleTabs adaptVisibleTabs,
                          GuiPreferences preferences,
                          DialogService dialogService,
                          AiService aiService,
@@ -126,6 +129,7 @@ public class GroupTreeView extends BorderPane {
                          FileUpdateMonitor fileUpdateMonitor) {
         this.taskExecutor = taskExecutor;
         this.stateManager = stateManager;
+        this.adaptVisibleTabs = adaptVisibleTabs;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.aiService = aiService;
@@ -188,7 +192,7 @@ public class GroupTreeView extends BorderPane {
 
     private void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
-        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, taskExecutor, localDragboard);
+        viewModel = new GroupTreeViewModel(stateManager, dialogService, aiService, preferences, adaptVisibleTabs, taskExecutor, localDragboard);
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -599,7 +603,15 @@ public class GroupTreeView extends BorderPane {
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_EMBEDDINGS, new ContextAction(StandardActions.GROUP_GENERATE_EMBEDDINGS, group)),
                 factory.createMenuItem(StandardActions.GROUP_GENERATE_SUMMARIES, new ContextAction(StandardActions.GROUP_GENERATE_SUMMARIES, group)),
                 removeGroup,
-                new SeparatorMenuItem(),
+                new SeparatorMenuItem()
+        );
+
+        if (group.isAllEntriesGroup()) {
+            contextMenu.getItems().add(factory.createMenuItem(StandardActions.GROUP_SUGGESTED_GROUPS_ADD,
+                    new ContextAction(StandardActions.GROUP_SUGGESTED_GROUPS_ADD, group)));
+        }
+
+        contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_ADD, new ContextAction(StandardActions.GROUP_SUBGROUP_ADD, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_RENAME, new ContextAction(StandardActions.GROUP_SUBGROUP_RENAME, group)),
                 factory.createMenuItem(StandardActions.GROUP_SUBGROUP_REMOVE, new ContextAction(StandardActions.GROUP_SUBGROUP_REMOVE, group)),
@@ -693,6 +705,8 @@ public class GroupTreeView extends BorderPane {
                                 group.isEditable();
                         case GROUP_REMOVE, GROUP_REMOVE_WITH_SUBGROUPS, GROUP_REMOVE_KEEP_SUBGROUPS ->
                                 group.isEditable() && group.canRemove();
+                        case GROUP_SUGGESTED_GROUPS_ADD ->
+                                !group.hasAllSuggestedGroups();
                         case GROUP_SUBGROUP_ADD ->
                                 group.isEditable() && group.canAddGroupsIn()
                                         || group.isRoot();
@@ -726,6 +740,8 @@ public class GroupTreeView extends BorderPane {
                         viewModel.generateSummaries(group);
                 case GROUP_CHAT ->
                         viewModel.chatWithGroup(group);
+                case GROUP_SUGGESTED_GROUPS_ADD ->
+                        viewModel.addSuggestedGroups(group);
                 case GROUP_SUBGROUP_ADD ->
                         viewModel.addNewSubgroup(group, GroupDialogHeader.SUBGROUP);
                 case GROUP_SUBGROUP_REMOVE ->

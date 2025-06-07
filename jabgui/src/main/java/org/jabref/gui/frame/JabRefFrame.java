@@ -15,7 +15,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -147,6 +146,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 stateManager,
                 dialogService,
                 this,
+                this::getOpenDatabaseAction,
                 entryTypesManager,
                 fileUpdateMonitor,
                 undoManager,
@@ -168,6 +168,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 SearchType.NORMAL_SEARCH);
 
+        this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
+                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
+                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
+                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
+        Injector.setModelOrService(EntryEditor.class, entryEditor);
+
         this.sidePane = new SidePane(
                 this,
                 this.preferences,
@@ -176,16 +182,11 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 dialogService,
                 aiService,
                 stateManager,
+                entryEditor,
                 fileUpdateMonitor,
                 entryTypesManager,
                 clipBoardManager,
                 undoManager);
-
-        this.entryEditor = new EntryEditor(this::getCurrentLibraryTab,
-                // Actions are recreated here since this avoids passing more parameters and the amount of additional memory consumption is neglegtable.
-                new UndoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager),
-                new RedoAction(this::getCurrentLibraryTab, undoManager, dialogService, stateManager));
-        Injector.setModelOrService(EntryEditor.class, entryEditor);
 
         this.pushToApplicationCommand = new PushToApplicationCommand(
                 stateManager,
@@ -339,31 +340,31 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         globalSearchBar.openGlobalSearchDialog();
                         break;
                     case NEW_ARTICLE:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Article, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Article, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_BOOK:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Book, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Book, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INBOOK:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InBook, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.InBook, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_MASTERSTHESIS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.MastersThesis, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.MastersThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PHDTHESIS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.PhdThesis, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.PhdThesis, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_PROCEEDINGS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Proceedings, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Proceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_TECHREPORT:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.TechReport, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.TechReport, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_UNPUBLISHED:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.Unpublished, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.Unpublished, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     case NEW_INPROCEEDINGS:
-                        new NewEntryAction(this::getCurrentLibraryTab, StandardEntryType.InProceedings, dialogService, preferences, stateManager).execute();
+                        new NewEntryAction(StandardEntryType.InProceedings, this::getCurrentLibraryTab, dialogService, preferences, stateManager).execute();
                         break;
                     default:
                 }
@@ -372,13 +373,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
-        // Bind global state
-        FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
-        filteredTabs.setPredicate(LibraryTab.class::isInstance);
-
-        // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
-        EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
+        BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
@@ -641,6 +636,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     @Override
     public void handleUiCommands(List<UiCommand> uiCommands) {
+        if (uiCommands.stream().anyMatch(UiCommand.Focus.class::isInstance)) {
+            mainStage.toFront();
+            return;
+        }
         viewModel.handleUiCommands(uiCommands);
     }
 

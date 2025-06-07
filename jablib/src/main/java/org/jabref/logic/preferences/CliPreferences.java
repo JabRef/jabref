@@ -33,9 +33,6 @@ import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import org.jvnet.hk2.annotations.Contract;
-
-@Contract
 public interface CliPreferences {
     void clear() throws BackingStoreException;
 

@@ -52,7 +52,7 @@ public class CSLStyleLoader {
                               .filter(style -> DEFAULT_STYLE.equals(style.getFilePath()))
                               .findFirst()
                               .orElseGet(() -> CSLStyleUtils.createCitationStyleFromFile(DEFAULT_STYLE)
-                                                            .orElse(new CitationStyle("", "Empty", false, false, "", true)));
+                                                            .orElse(new CitationStyle("", "Empty", false, false, false, "", true)));
     }
 
     /**
@@ -79,12 +79,13 @@ public class CSLStyleLoader {
                     String title = (String) info.get("title");
                     boolean isNumeric = (boolean) info.get("isNumeric");
                     boolean hasBibliography = (boolean) info.get("hasBibliography");
+                    boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
 
                     // We use these metadata and just load the content instead of re-parsing for them
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
-                            CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography, source, true);
+                            CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography, usesHangingIndent, source, true);
                             INTERNAL_STYLES.add(style);
                         }
                     } catch (IOException e) {
@@ -109,12 +110,8 @@ public class CSLStyleLoader {
 
         List<String> stylePaths = openOfficePreferences.getExternalCslStyles();
         for (String stylePath : stylePaths) {
-            try {
-                Optional<CitationStyle> style = CSLStyleUtils.createCitationStyleFromFile(stylePath);
-                style.ifPresent(EXTERNAL_STYLES::add);
-            } catch (Exception e) {
-                LOGGER.info("Problem reading external style file {}", stylePath, e);
-            }
+            Optional<CitationStyle> style = CSLStyleUtils.createCitationStyleFromFile(stylePath);
+            style.ifPresent(EXTERNAL_STYLES::add);
         }
     }
 

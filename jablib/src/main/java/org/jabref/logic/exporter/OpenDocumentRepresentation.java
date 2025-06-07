@@ -5,12 +5,13 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.layout.format.GetOpenOfficeType;
+import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
 import org.jabref.logic.layout.format.RemoveBrackets;
-import org.jabref.logic.layout.format.RemoveWhitespace;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -170,7 +171,7 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, StandardField.REVISION));
                 addTableCell(result, row, getField(e, StandardField.SCHOOL));
                 addTableCell(result, row, getField(e, StandardField.SERIES));
-                addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, StandardField.TITLE))));
+                addTableCell(result, row, new NonSpaceWhitespaceRemover().format(new RemoveBrackets().format(getField(e, StandardField.TITLE))));
                 addTableCell(result, row, getField(e, new UnknownField("reporttype")));
                 addTableCell(result, row, getField(e, StandardField.VOLUME));
                 addTableCell(result, row, getField(e, StandardField.YEAR));
@@ -190,7 +191,7 @@ class OpenDocumentRepresentation {
             collection.appendChild(body);
 
             result.appendChild(collection);
-        } catch (Exception e) {
+        } catch (ParserConfigurationException e) {
             LOGGER.warn("Exception caught...", e);
         }
         return result;

@@ -52,6 +52,28 @@ The [latest stable release is available at FossHub](https://downloads.jabref.org
 
 Please see our [Installation Guide](https://docs.jabref.org/installation).
 
+## JabKit
+
+JabRef offers a CLI application.
+
+You can run it using docker:
+
+```terminal
+docker run ghcr.io/jabref/jabkit:edge --help
+```
+
+### Running JabKit using `JBang`
+
+[`JBang`](https://www.jbang.dev/) allows for running Java applications without having a JDK installed (before).
+
+Steps:
+
+1. [Install `JBang`](https://www.jbang.dev/download/). E.g., by `brew install jbangdev/tap/jbang` or `choco install jbang`
+2. Make `jabkit` available on the command line: `jbang app install jabkit@jabref`
+3. Run `jabkit --help`
+
+Now, you have all JabKit functionality available as `jabkit`.
+
 ## Bug Reports, Suggestions, Other Feedback
 
 [![Donation](https://img.shields.io/badge/donate%20to-jabref-orange.svg)](https://donations.jabref.org)
@@ -68,6 +90,10 @@ An explanation of donation possibilities and usage of donations is available at 
 
 Want to be part of a free and open-source project that tens of thousands of researchers use every day?
 Please take a look at our [guidelines for contributing](CONTRIBUTING.md).
+
+## Building from Source
+
+Please see [Building from source](https://docs.jabref.org/installation#building-from-source) for instructions on how to build JabRef from sources.
 
 ## Research and Education
 

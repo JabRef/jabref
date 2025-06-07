@@ -129,7 +129,7 @@ public class WebFetchers {
         set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new BiodiversityLibrary(importerPreferences));
-        set.add(new LOBIDFetcher(importerPreferences));
+        set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
         return set;
     }
@@ -153,6 +153,7 @@ public class WebFetchers {
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new LibraryOfCongress(importFormatPreferences));
+        set.add(new LOBIDFetcher());
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());

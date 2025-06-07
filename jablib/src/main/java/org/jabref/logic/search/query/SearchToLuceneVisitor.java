@@ -11,9 +11,7 @@ import org.jabref.search.SearchParser;
 
 import org.apache.lucene.queryparser.classic.QueryParser;
 
-/**
- * Tests are located in {@link org.jabref.logic.search.query.SearchQueryLuceneConversionTest}.
- */
+/// Tests are located in `org.jabref.logic.search.query.SearchQueryLuceneConversionTest`.
 public class SearchToLuceneVisitor extends SearchBaseVisitor<String> {
     private final EnumSet<SearchFlags> searchFlags;
 

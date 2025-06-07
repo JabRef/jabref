@@ -1,4 +1,0 @@
---add-modules
-  org.jabref.testsupport
---add-reads
-  org.jabref.jabkit=org.jabref.testsupport

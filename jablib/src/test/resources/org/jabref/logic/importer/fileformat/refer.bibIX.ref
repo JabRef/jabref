@@ -1,0 +1,73 @@
+%0 Book
+%A AuthorL, AuthorsF I
+%T TitleTest
+%S Series
+%V Volume
+%C Place
+%I Publisher
+%W Loc. in Archive B
+%* Rights B
+%@ I-S-B-N
+%L Call Number B
+%U URL
+%7 Ed
+%X Abstract
+%G en
+%D Date
+
+%0 Conference Paper
+%T PTitle
+%S Series
+%V Volume
+%C PlaceAddress
+%I Publisher
+%P Pages
+%W Loc. in Archive CP
+%* Rights CP
+%@ ISBN
+%L Call Number CP
+%U URL
+%X Abstract
+%B Proceedings Title
+%A AuthorL, AuthorsF I
+%A ContributorL, ContributorF I
+%E EditorL, EditorF I
+%A Series EditorL, SeriesF I
+%? TranslatorL, TranslatorF I
+%D DateD
+
+%0 Encyclopedia
+%T Title
+%S Series
+%V Volume
+%C Place
+%I Publisher
+%P Pages
+%W Loc. in Archive Ep
+%* Rights Ep
+%@ ISBN
+%L Call Number Ep
+%U URL
+%7 Edition
+%X Abstract
+%B Encyclopedia Title
+%A AuthorL, AuthorsF I
+%A ContributorL, ContributorF I
+%E EditorL, EditorF I
+%A Series EditorL, SeriesF I
+%? TranslatorL, TranslatorF I
+%D Date
+
+%0 Thesis
+%T Title
+%C Place
+%I University
+%R Type
+%W Loc. in Archive Th
+%* Rights Th
+%L Call Number
+%U Url
+%X Abstract
+%A AuthorL, AuthorsF I
+%A ContributorL, ContributorF I
+%D Date

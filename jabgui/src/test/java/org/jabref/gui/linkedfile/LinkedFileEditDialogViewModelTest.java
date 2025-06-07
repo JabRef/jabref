@@ -17,6 +17,8 @@ import org.jabref.model.entry.LinkedFile;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
@@ -40,8 +42,8 @@ class LinkedFileEditDialogViewModelTest {
     }
 
     @Test
+    @DisabledOnOs(value = OS.WINDOWS, disabledReason = "? is an invalid filename character in Windows")
     void badFilenameCharWillBeReplacedByUnderscore(@TempDir Path tempDir) throws IOException {
-
         Path invalidFile = tempDir.resolve("?invalid.pdf");
         Files.createFile(invalidFile);
         when(dialogService.showConfirmationDialogAndWait(any(), any(), any())).thenReturn(true);

@@ -143,10 +143,8 @@ public abstract class AbstractQueryTransformer {
      */
     protected abstract String handleYear(String year);
 
-    /**
-     * Parses the year range and fills startYear and endYear.
-     * Ensures that startYear <= endYear
-     */
+    /// Parses the year range and fills startYear and endYear.
+    /// Ensures that startYear <= endYear
     protected void parseYearRange(String yearRange) {
         String[] split = yearRange.split("-");
         int parsedStartYear = Integer.parseInt(split[0]);
