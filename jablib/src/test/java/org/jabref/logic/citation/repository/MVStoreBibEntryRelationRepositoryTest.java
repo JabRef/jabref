@@ -14,6 +14,7 @@ import java.util.random.RandomGenerator;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
@@ -88,7 +89,8 @@ class MVStoreBibEntryRelationRepositoryTest {
                 MAP_NAME,
                 7,
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
     }
 
     @AfterEach
@@ -187,7 +189,8 @@ class MVStoreBibEntryRelationRepositoryTest {
                 MAP_NAME,
                 30,
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS));
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
         Assertions.assertTrue(daoUnderTest.isUpdatable(entry, clock));
 
         // WHEN
@@ -206,9 +209,11 @@ class MVStoreBibEntryRelationRepositoryTest {
     @MethodSource("createBibEntries")
     void deserializerErrorShouldReturnEmptyList(BibEntry entry) throws IOException {
         // GIVEN
-        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         var serializer = new BibEntryHashSetSerializer(
-                new BibEntrySerializer(new BibEntryTypesManager(), importFormatPreferences) {
+                new BibEntrySerializer(
+                        new BibEntryTypesManager(),
+                        mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                        mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS)) {
                     @Override
                     public BibEntry read(ByteBuffer buffer) {
                         // Fake the return after an exception

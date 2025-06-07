@@ -8,17 +8,16 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.jabref.logic.bibtex.BibEntryWriter;
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.bibtex.comparator.BibEntryCompare;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.fileformat.BibtexParser;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.h2.mvstore.WriteBuffer;
 import org.h2.mvstore.type.BasicDataType;
 import org.jspecify.annotations.NonNull;
@@ -31,18 +30,19 @@ class BibEntrySerializer extends BasicDataType<BibEntry> {
 
     private final BibEntryTypesManager entryTypesManager;
     private final ImportFormatPreferences importFormatPreferences;
+    private final FieldPreferences fieldPreferences;
 
-    public BibEntrySerializer(BibEntryTypesManager entryTypesManager, ImportFormatPreferences importFormatPreferences) {
+    public BibEntrySerializer(BibEntryTypesManager entryTypesManager, ImportFormatPreferences importFormatPreferences, FieldPreferences fieldPreferences) {
         this.entryTypesManager = entryTypesManager;
         this.importFormatPreferences = importFormatPreferences;
+        this.fieldPreferences = fieldPreferences;
     }
 
     private String toString(BibEntry entry) {
-        CliPreferences preferences = Injector.instantiateModelOrService(CliPreferences.class);
         // BibEntry is not Java serializable. Thus, we need to do the serialization manually
         // At reading of the clipboard in JabRef, we parse the plain string in all cases, so we don't need to flag we put BibEntries here
         // Furthermore, storing a string also enables other applications to work wih the data
-        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(preferences.getFieldPreferences()), entryTypesManager);
+        BibEntryWriter writer = new BibEntryWriter(new FieldWriter(fieldPreferences), entryTypesManager);
         try {
             return writer.serializeAll(List.of(entry), BibDatabaseMode.BIBTEX);
         } catch (IOException e) {

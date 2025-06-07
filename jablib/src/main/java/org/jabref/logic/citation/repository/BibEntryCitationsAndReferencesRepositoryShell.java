@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -83,12 +84,13 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
     public static BibEntryCitationsAndReferencesRepositoryShell of(Path citationsRelationsDirectory,
                                                                    int storeTTL,
                                                                    ImportFormatPreferences importFormatPreferences,
+                                                                   FieldPreferences fieldPreferences,
                                                                    BibEntryTypesManager entryTypesManager) {
         var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
         var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
         return new BibEntryCitationsAndReferencesRepositoryShell(
-                new MVStoreBibEntryRelationRepository(citationsPath, CITATIONS_STORE, storeTTL, entryTypesManager, importFormatPreferences),
-                new MVStoreBibEntryRelationRepository(relationsPath, REFERENCES_STORE, storeTTL, entryTypesManager, importFormatPreferences)
+                new MVStoreBibEntryRelationRepository(citationsPath, CITATIONS_STORE, storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences),
+                new MVStoreBibEntryRelationRepository(relationsPath, REFERENCES_STORE, storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences)
         );
     }
 }

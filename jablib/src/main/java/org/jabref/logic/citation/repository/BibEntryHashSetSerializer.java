@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -16,8 +17,8 @@ class BibEntryHashSetSerializer extends BasicDataType<LinkedHashSet<BibEntry>> {
 
     private final BasicDataType<BibEntry> bibEntryDataType;
 
-    BibEntryHashSetSerializer(BibEntryTypesManager entryTypesManager, ImportFormatPreferences importFormatPreferences) {
-        this.bibEntryDataType = new BibEntrySerializer(entryTypesManager, importFormatPreferences);
+    BibEntryHashSetSerializer(BibEntryTypesManager entryTypesManager, ImportFormatPreferences importFormatPreferences, FieldPreferences fieldPreferences) {
+        this.bibEntryDataType = new BibEntrySerializer(entryTypesManager, importFormatPreferences, fieldPreferences);
     }
 
     BibEntryHashSetSerializer(BasicDataType<BibEntry> bibEntryDataType) {

@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -44,12 +45,13 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
                                       String mapName,
                                       int storeTTLInDays,
                                       BibEntryTypesManager entryTypesManager,
-                                      ImportFormatPreferences importFormatPreferences) {
+                                      ImportFormatPreferences importFormatPreferences,
+                                      FieldPreferences fieldPreferences) {
         this(
                 path,
                 mapName,
                 storeTTLInDays,
-                new BibEntryHashSetSerializer(entryTypesManager, importFormatPreferences)
+                new BibEntryHashSetSerializer(entryTypesManager, importFormatPreferences, fieldPreferences)
         );
     }
 
