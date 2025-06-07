@@ -1,6 +1,5 @@
 package org.jabref.model.entry;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
