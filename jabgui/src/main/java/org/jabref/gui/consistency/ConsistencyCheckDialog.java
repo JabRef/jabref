@@ -87,11 +87,10 @@ public class ConsistencyCheckDialog extends BaseDialog<Void> {
                 message.message().getFirst().equals(viewModel.selectedEntryTypeProperty().get())
         );
 
-        viewModel.selectedEntryTypeProperty().addListener((obs, oldValue, newValue) -> {
-            filteredData.setPredicate(message ->
-                    message.message().getFirst().equals(newValue)
-            );
-        });
+        viewModel.selectedEntryTypeProperty().addListener((_, _, newValue) ->
+                filteredData.setPredicate(message ->
+                        message.message().getFirst().equals(newValue)
+        ));
 
         tableView.setItems(filteredData);
 

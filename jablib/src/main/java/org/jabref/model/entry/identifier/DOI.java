@@ -32,8 +32,7 @@ public class DOI implements Identifier {
 
     // Regex
     // (see http://www.doi.org/doi_handbook/2_Numbering.html)
-    private static final String DOI_EXP = ""
-            + "(?:urn:)?"                       // optional urn
+    private static final String DOI_EXP = "(?:urn:)?"                       // optional urn
             + "(?:doi:)?"                       // optional doi
             + "("                               // begin group \1
             + "10"                              // directory indicator
@@ -41,8 +40,7 @@ public class DOI implements Identifier {
             + "[/:%]"                           // divider
             + "(?:.+)"                          // suffix alphanumeric string
             + ")";                              // end group \1
-    private static final String FIND_DOI_EXP = ""
-            + "(?:urn:)?"                       // optional urn
+    private static final String FIND_DOI_EXP = "(?:urn:)?"                       // optional urn
             + "(?:doi:)?"                       // optional doi
             + "("                               // begin group \1
             + "10"                              // directory indicator
@@ -52,17 +50,13 @@ public class DOI implements Identifier {
             + ")";                              // end group \1
 
     // Regex (Short DOI)
-    private static final String SHORT_DOI_SHORTCUT = ""
-            + "^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
-    private static final String IN_TEXT_SHORT_DOI_SHORTCUT = ""
-            + "(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})"; // eg https://doi.org/bfrhmx somewhere in the text
-    private static final String SHORT_DOI_EXP_PREFIX = ""
-            + "^(?:" // can begin with...
+    private static final String SHORT_DOI_SHORTCUT = "^\\s*(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})\\s*$"; // eg https://doi.org/bfrhmx
+    private static final String IN_TEXT_SHORT_DOI_SHORTCUT = "(?:https?://)?(?:www\\.)?(?:doi\\.org/)([a-z0-9]{4,10})"; // eg https://doi.org/bfrhmx somewhere in the text
+    private static final String SHORT_DOI_EXP_PREFIX = "^(?:" // can begin with...
             + "\\s*(?:https?://)?(?:www\\.)?"   // optional url parts "http(s)://"+"www."
             + "[a-zA-Z\\.]*doi[a-zA-Z\\.]*"     //  eg "dx.doi." or "doi.acm." or "doi." if with url, must include "doi", otherwise too ambiguous
             + "\\.[a-zA-Z]{2,10}/)?";           // ".org" or ".de" or ".academy"
-    private static final String SHORT_DOI_EXP = ""
-            + "(?:"                             // begin "any one of these"
+    private static final String SHORT_DOI_EXP = "(?:"                             // begin "any one of these"
             + "(?:[\\s/]?(?:(?:urn:)|(?:doi:)|(?:urn:doi:)))" // "doi:10/12ab" or " urn:10/12ab" or "/urn:doi:/10/12ab" ...
             + "|(?:\\s?/?)"                     // or "/10/12ab" or " /10/12ab" or "10/12ab" or " 10/12ab"
             + ")"                               // end "any one of these"
@@ -72,8 +66,7 @@ public class DOI implements Identifier {
             + "[a-zA-Z0-9]{3,}"                 // at least 3 characters
             + ")"                               // end group  \1
             + "\\s*$";                          // must be the end
-    private static final String FIND_SHORT_DOI_EXP = ""
-            + "(?:"                             // begin "any one of these" (but not none of those!)
+    private static final String FIND_SHORT_DOI_EXP = "(?:"                             // begin "any one of these" (but not none of those!)
             + "(?:(?:www\\.)?doi\\.org/)"       // either doi.org
             + "|"                               // or any of the following with doi.org or not...
             + "(?:(?:doi.org/)?(?:(?:urn:)|(?:doi:)|(?:urn:doi:)))" // "doi:10/12ab" or " urn:10/12ab" or "/urn:doi:/10/12ab" or "doi.org/doi:10/12ab"...

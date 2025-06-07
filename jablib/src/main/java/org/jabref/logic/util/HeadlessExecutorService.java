@@ -192,13 +192,13 @@ public class HeadlessExecutorService implements Executor {
             // This is non-blocking. See https://stackoverflow.com/a/57383461/873282.
             executorService.shutdown();
             if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
-                LOGGER.debug("One minute passed, {} still not completed. Trying forced shutdown.", executorService.toString());
+                LOGGER.debug("One minute passed, {} still not completed. Trying forced shutdown.", executorService);
                 // those threads will be interrupted in their current task
                 executorService.shutdownNow();
                 if (executorService.awaitTermination(60, TimeUnit.SECONDS)) {
-                    LOGGER.debug("One minute passed again - forced shutdown of {} worked.", executorService.toString());
+                    LOGGER.debug("One minute passed again - forced shutdown of {} worked.", executorService);
                 } else {
-                    LOGGER.error("{} did not terminate", executorService.toString());
+                    LOGGER.error("{} did not terminate", executorService);
                 }
             }
         } catch (InterruptedException ie) {

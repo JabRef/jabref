@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
@@ -121,7 +120,7 @@ public class FileUtil {
         if (nameWithoutExtension.length() > MAXIMUM_FILE_NAME_LENGTH) {
             Optional<String> extension = getFileExtension(fileName);
             String shortName = nameWithoutExtension.substring(0, MAXIMUM_FILE_NAME_LENGTH - extension.map(s -> s.length() + 1).orElse(0));
-            LOGGER.info("Truncated the too long filename '%s' (%d characters) to '%s'.".formatted(fileName, fileName.length(), shortName));
+            LOGGER.info("Truncated the too long filename '{}' ({}} characters) to '{}'.", fileName, fileName.length(), shortName);
             return extension.map(s -> shortName + "." + s).orElse(shortName);
         }
 
@@ -314,7 +313,7 @@ public class FileUtil {
         return bes.stream()
                   .flatMap(entry -> entry.getFiles().stream())
                   .flatMap(file -> file.findIn(fileDirs).stream())
-                  .collect(Collectors.toList());
+                  .toList();
     }
 
     /**
@@ -376,7 +375,7 @@ public class FileUtil {
                              .filter(f -> f.getFileName().toString().equals(filename))
                              .findFirst();
         } catch (UncheckedIOException | IOException ex) {
-            LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory);
+            LOGGER.error("Error trying to locate the file {} inside the directory {}", filename, rootDirectory, ex);
         }
         return Optional.empty();
     }
@@ -517,7 +516,7 @@ public class FileUtil {
         //         but a perfectly legal one in the path at this position
         try {
             fileName = Path.of(fileName).getFileName().toString();
-        } catch (InvalidPathException e) {
+        } catch (InvalidPathException _) {
             // in case the internal method cannot parse the path, it is surely illegal
             return true;
         }

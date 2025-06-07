@@ -63,7 +63,8 @@ public abstract class MapBasedEditorViewModel<T> extends OptionEditorViewModel<T
         try {
             return (T) string;
         } catch (ClassCastException ex) {
-            LOGGER.error("Could not cast string to type %1$s. Try overriding the method in a subclass and provide a conversion from string to the concrete type %1$s".formatted(string.getClass()), ex);
+            LOGGER.error("Could not cast string to type {}. Try overriding the method in a subclass and provide a conversion from string to the concrete type {}",
+                    string.getClass(), string.getClass(), ex);
         }
         return null;
     }

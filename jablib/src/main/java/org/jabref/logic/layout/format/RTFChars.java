@@ -94,11 +94,11 @@ public class RTFChars implements LayoutFormatter {
                     assert incommand;
 
                     // First test for braces that may be part of a LaTeX command:
-                    if ((c == '{') && (currentCommand.length() == 0)) {
+                    if ((c == '{') && (currentCommand.isEmpty())) {
                         // We have seen something like \{, which is probably the start
                         // of a command like \{aa}. Swallow the brace.
                         continue;
-                    } else if ((c == '}') && (currentCommand.length() > 0)) {
+                    } else if ((c == '}') && (!currentCommand.isEmpty())) {
                         // Seems to be the end of a command like \{aa}. Look it up:
                         String command = currentCommand.toString();
                         String result = RTF_CHARS.get(command);
@@ -116,7 +116,7 @@ public class RTFChars implements LayoutFormatter {
                         break testContent;
                     }
 
-                    if (((c == '{') || (c == ' ')) && (currentCommand.length() > 0)) {
+                    if (((c == '{') || (c == ' ')) && (!currentCommand.isEmpty())) {
                         String command = currentCommand.toString();
                         // Then test if we are dealing with a italics or bold
                         // command. If so, handle.

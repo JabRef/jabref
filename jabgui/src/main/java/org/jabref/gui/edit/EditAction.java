@@ -72,7 +72,6 @@ public class EditAction extends SimpleCommand {
                 }
             } else if ((focusOwner instanceof CodeArea) || (focusOwner instanceof WebView)) {
                 LOGGER.debug("Ignoring request in CodeArea or WebView");
-                return;
             } else {
                 LOGGER.debug("Else: {}", focusOwner.getClass().getSimpleName());
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea

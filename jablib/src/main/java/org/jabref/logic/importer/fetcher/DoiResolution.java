@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.jabref.logic.importer.FulltextFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -150,7 +149,7 @@ public class DoiResolution implements FulltextFetcher {
         if (citationPdfUrl.isPresent()) {
             try {
                 return Optional.of(URLUtil.create(citationPdfUrl.get()));
-            } catch (MalformedURLException e) {
+            } catch (MalformedURLException _) {
                 return Optional.empty();
             }
         }
@@ -167,7 +166,7 @@ public class DoiResolution implements FulltextFetcher {
             try {
                 URL url = base.toURI().resolve(pdfUrl.get()).toURL();
                 return Optional.of(url);
-            } catch (MalformedURLException | URISyntaxException e) {
+            } catch (MalformedURLException | URISyntaxException _) {
                 return Optional.empty();
             }
         }
@@ -175,7 +174,7 @@ public class DoiResolution implements FulltextFetcher {
     }
 
     private Optional<URL> findDistinctLinks(List<URL> urls) {
-        List<URL> distinctLinks = urls.stream().distinct().collect(Collectors.toList());
+        List<URL> distinctLinks = urls.stream().distinct().toList();
 
         if (distinctLinks.isEmpty()) {
             return Optional.empty();
