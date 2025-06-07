@@ -17,7 +17,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarFetcher;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
@@ -77,7 +77,7 @@ class CompositeSearchBasedFetcherTest {
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
     void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws FetcherException {
-        List fetcherNames = fetchers.stream().map(WebFetcher::getName).toList();
+        List<String> fetcherNames = fetchers.stream().map(WebFetcher::getName).toList();
         ObservableList<String> observableList = FXCollections.observableArrayList(fetcherNames);
         when(importerPreferences.getCatalogs()).thenReturn(observableList);
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
@@ -113,7 +113,7 @@ class CompositeSearchBasedFetcherTest {
         BuildInfo buildInfo = new BuildInfo();
         when(importerPreferences.getApiKeys()).thenReturn(FXCollections.emptyObservableSet());
         when(importerPreferences.getApiKey(eq(AstrophysicsDataSystem.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.astrophysicsDataSystemAPIKey));
-        when(importerPreferences.getApiKey(eq(SemanticScholarFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.semanticScholarApiKey));
+        when(importerPreferences.getApiKey(eq(SemanticScholarCitationFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.semanticScholarApiKey));
         when(importerPreferences.getApiKey(eq(BiodiversityLibrary.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.biodiversityHeritageApiKey));
         when(importerPreferences.getApiKey(eq(ScienceDirect.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.scienceDirectApiKey));
         when(importerPreferences.getApiKey(eq(SpringerFetcher.FETCHER_NAME))).thenReturn(Optional.of(buildInfo.springerNatureAPIKey));

@@ -60,7 +60,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarFetcher;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
@@ -220,6 +220,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
     public static final String SEARCH_CATALOGS = "searchCatalogs";
     public static final String DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
+    public static final String CITATIONS_RELATIONS_STORE_TTL = "citationsRelationsStoreTTL";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
@@ -473,6 +474,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
+        defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);
 
         defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
         defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
@@ -2043,7 +2045,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
-                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER))
+                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER)),
+                getInt(CITATIONS_RELATIONS_STORE_TTL)
         );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
@@ -2055,6 +2058,7 @@ public class JabRefCliPreferences implements CliPreferences {
         importerPreferences.getCustomImporters().addListener((InvalidationListener) _ -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
         importerPreferences.getCatalogs().addListener((InvalidationListener) _ -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
         EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -> put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
+        EasyBind.listen(importerPreferences.citationsRelationsStoreTTLProperty(), (_, _, newValue) -> put(CITATIONS_RELATIONS_STORE_TTL, newValue.toString()));
 
         return importerPreferences;
     }
@@ -2138,7 +2142,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         Map<String, String> keys = new HashMap<>();
-        keys.put(SemanticScholarFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
+        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);

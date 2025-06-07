@@ -26,6 +26,7 @@ import org.jabref.logic.preferences.FetcherApiKey;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
+import org.apache.logging.log4j.util.Strings;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
@@ -36,6 +37,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox addImportedEntries;
     @FXML private TextField addImportedEntriesGroupName;
     @FXML private ComboBox<PlainCitationParserChoice> defaultPlainCitationParser;
+    @FXML private TextField citationsRelationStoreTTL;
 
     @FXML private CheckBox useCustomDOI;
     @FXML private TextField useCustomDOIName;
@@ -88,6 +90,25 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         defaultPlainCitationParser.itemsProperty().bind(viewModel.plainCitationParsers());
         defaultPlainCitationParser.valueProperty().bindBidirectional(viewModel.defaultPlainCitationParserProperty());
 
+        viewModel.citationsRelationsStoreTTLProperty()
+                 .addListener((_, _, newValue) -> {
+                     if (newValue != null && !newValue.toString().equals(citationsRelationStoreTTL.getText())) {
+                         citationsRelationStoreTTL.setText(newValue.toString());
+                     }
+                 });
+        citationsRelationStoreTTL
+                .textProperty()
+                .addListener((_, _, newValue) -> {
+                    if (Strings.isBlank(newValue)) {
+                        return;
+                    }
+                    if (!newValue.matches("\\d*")) {
+                        citationsRelationStoreTTL.setText(newValue.replaceAll("\\D", ""));
+                        return;
+                    }
+                    viewModel.citationsRelationsStoreTTLProperty().set(Integer.parseInt(newValue));
+                });
+
         grobidEnabled.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidURL.textProperty().bindBidirectional(viewModel.grobidURLProperty());
         grobidURL.disableProperty().bind(grobidEnabled.selectedProperty().not());
@@ -121,7 +142,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         new ViewModelTableRowFactory<FetcherApiKey>()
                 .install(apiKeySelectorTable);
 
-        apiKeySelectorTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        apiKeySelectorTable.getSelectionModel().selectedItemProperty().addListener((_, oldValue, newValue) -> {
             if (oldValue != null) {
                 updateFetcherApiKey(oldValue);
             }
@@ -161,7 +182,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         apiKeySelectorTable.setItems(viewModel.fetcherApiKeys());
 
         // Content is set later
-        viewModel.fetcherApiKeys().addListener((InvalidationListener) change -> {
+        viewModel.fetcherApiKeys().addListener((InvalidationListener) _ -> {
             if (!apiKeySelectorTable.getItems().isEmpty()) {
                 apiKeySelectorTable.getSelectionModel().selectFirst();
             }
