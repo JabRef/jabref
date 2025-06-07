@@ -3,6 +3,12 @@ plugins {
     id("org.gradlex.jvm-dependency-conflict-resolution")
 }
 
+jvmDependencyConflicts {
+    consistentResolution {
+        platform(":versions")
+    }
+}
+
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
 jvmDependencyConflicts.patch {
