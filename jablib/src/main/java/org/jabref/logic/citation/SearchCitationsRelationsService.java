@@ -25,7 +25,7 @@ public class SearchCitationsRelationsService {
     private final CitationFetcher citationFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
-    public SearchCitationsRelationsService(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, BibEntryTypesManager entryTypesManager) {
+    public SearchCitationsRelationsService(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) {
         this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);
         this.relationsRepository = BibEntryCitationsAndReferencesRepositoryShell.of(
                 Directories.getCitationsRelationsDirectory(),
