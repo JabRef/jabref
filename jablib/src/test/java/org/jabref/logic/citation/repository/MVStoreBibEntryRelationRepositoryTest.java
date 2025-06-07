@@ -106,19 +106,19 @@ class MVStoreBibEntryRelationRepositoryTest {
     void DAOShouldMergeRelationsWhenInserting(BibEntry bibEntry) {
         // GIVEN
         assertFalse(dao.containsKey(bibEntry));
-        var firstRelations = createRelations(bibEntry);
-        var secondRelations = createRelations(bibEntry);
+        List<BibEntry> firstRelations = createRelations(bibEntry);
+        List<BibEntry> secondRelations = createRelations(bibEntry);
 
         // WHEN
         dao.addRelations(bibEntry, firstRelations);
         dao.addRelations(bibEntry, secondRelations);
-        var relationFromCache = dao
+        List<BibEntry> relationFromCache = dao
                 .getRelations(bibEntry)
                 .stream()
                 .toList();
 
         // THEN
-        var uniqueRelations = Stream
+        List<BibEntry> uniqueRelations = Stream
             .concat(firstRelations.stream(), secondRelations.stream())
             .distinct()
             .toList();
@@ -137,7 +137,7 @@ class MVStoreBibEntryRelationRepositoryTest {
     @MethodSource("createBibEntries")
     void containsKeyShouldReturnTrueIfRelationsWereInserted(BibEntry entry) {
         // GIVEN
-        var relations = createRelations(entry);
+        List<BibEntry> relations = createRelations(entry);
 
         // WHEN
         dao.addRelations(entry, relations);
@@ -164,8 +164,8 @@ class MVStoreBibEntryRelationRepositoryTest {
     @MethodSource("createBibEntries")
     void shouldUpdateShouldReturnTrueAfterOneWeek(BibEntry entry) {
         // GIVEN
-        var relations = createRelations(entry);
-        var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
+        List<BibEntry> relations = createRelations(entry);
+        Clock clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
         assertTrue(dao.shouldUpdate(entry, clock));
 
         // WHEN
@@ -173,7 +173,7 @@ class MVStoreBibEntryRelationRepositoryTest {
 
         // THEN
         assertFalse(dao.shouldUpdate(entry, clock));
-        var clockOneWeekAfter = Clock.fixed(
+        Clock clockOneWeekAfter = Clock.fixed(
             LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")
         );
@@ -184,10 +184,10 @@ class MVStoreBibEntryRelationRepositoryTest {
     @MethodSource("createBibEntries")
     void shouldUpdateShouldReturnFalseAfterOneWeekWhenTTLisSetTo30(BibEntry entry) throws IOException {
         // GIVEN
-        var relations = createRelations(entry);
-        var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
-        var file = Files.createFile(temporaryFolder.resolve("update_test" + MV_STORE_NAME));
-        var daoUnderTest = new MVStoreBibEntryRelationRepository(
+        List<BibEntry> relations = createRelations(entry);
+        Clock clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
+        Path file = Files.createFile(temporaryFolder.resolve("update_test" + MV_STORE_NAME));
+        MVStoreBibEntryRelationRepository daoUnderTest = new MVStoreBibEntryRelationRepository(
                 file.toAbsolutePath(),
                 MAP_NAME,
                 30,
@@ -201,7 +201,7 @@ class MVStoreBibEntryRelationRepositoryTest {
 
         // THEN
         assertFalse(daoUnderTest.shouldUpdate(entry, clock));
-        var clockOneWeekAfter = Clock.fixed(
+        Clock clockOneWeekAfter = Clock.fixed(
                 LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).toInstant(ZoneOffset.UTC),
                 ZoneId.of("UTC")
         );
@@ -212,7 +212,7 @@ class MVStoreBibEntryRelationRepositoryTest {
     @MethodSource("createBibEntries")
     void deserializerErrorShouldReturnEmptyList(BibEntry entry) throws IOException {
         // GIVEN
-        var serializer = new BibEntryHashSetSerializer(
+        BibEntryHashSetSerializer serializer = new BibEntryHashSetSerializer(
                 new BibEntrySerializer(
                         new BibEntryTypesManager(),
                         mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
@@ -224,15 +224,15 @@ class MVStoreBibEntryRelationRepositoryTest {
                     }
                 }
         );
-        var file = Files.createFile(temporaryFolder.resolve("serialization_error_" + MV_STORE_NAME));
-        var daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
-        var relations = createRelations(entry);
+        Path file = Files.createFile(temporaryFolder.resolve("serialization_error_" + MV_STORE_NAME));
+        MVStoreBibEntryRelationRepository daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
+        List<BibEntry> relations = createRelations(entry);
 
         // WHEN
         daoUnderTest.addRelations(entry, relations);
         daoUnderTest.close();
         daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
-        var deserializedRelations = daoUnderTest.getRelations(entry);
+        List<BibEntry> deserializedRelations = daoUnderTest.getRelations(entry);
 
         // THEN
         assertTrue(deserializedRelations.isEmpty());

@@ -199,24 +199,48 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
-        refreshCitingButton.setOnMouseClicked(event -> {
-            searchForRelations(entry, citingListView, abortCitingButton,
-                    refreshCitingButton, CitationFetcher.SearchType.CITES, importCitingButton, citingProgress);
+        refreshCitingButton.setOnMouseClicked(_ -> {
+            searchForRelations(
+                    entry, 
+                    citingListView, 
+                    abortCitingButton,
+                    refreshCitingButton, 
+                    CitationFetcher.SearchType.CITES, 
+                    importCitingButton, 
+                    citingProgress);
         });
 
-        refreshCitedByButton.setOnMouseClicked(event -> searchForRelations(entry, citedByListView, abortCitedButton,
-                refreshCitedByButton, CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress));
+        refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(
+                entry, 
+                citedByListView, 
+                abortCitedButton,
+                refreshCitedByButton, 
+                CitationFetcher.SearchType.CITED_BY, 
+                importCitedByButton, 
+                citedByProgress));
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
         styleFetchedListView(citedByListView);
         styleFetchedListView(citingListView);
 
-        searchForRelations(entry, citingListView, abortCitingButton, refreshCitingButton,
-                CitationFetcher.SearchType.CITES, importCitingButton, citingProgress);
+        searchForRelations(
+                entry, 
+                citingListView, 
+                abortCitingButton, 
+                refreshCitingButton,
+                CitationFetcher.SearchType.CITES, 
+                importCitingButton, 
+                citingProgress);
 
-        searchForRelations(entry, citedByListView, abortCitedButton, refreshCitedByButton,
-                CitationFetcher.SearchType.CITED_BY, importCitedByButton, citedByProgress);
+        searchForRelations(
+                entry, 
+                citedByListView, 
+                abortCitedButton, 
+                refreshCitedByButton,
+                CitationFetcher.SearchType.CITED_BY, 
+                importCitedByButton, 
+                citedByProgress);
 
         return container;
     }
@@ -245,7 +269,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                         Button jumpTo = IconTheme.JabRefIcons.LINK.asButton();
                         jumpTo.setTooltip(new Tooltip(Localization.lang("Jump to entry in library")));
                         jumpTo.getStyleClass().add("addEntryButton");
-                        jumpTo.setOnMouseClicked(event -> jumpToEntry(entry));
+                        jumpTo.setOnMouseClicked(_ -> jumpToEntry(entry));
                         hContainer.setOnMouseClicked(event -> {
                                 if (event.getClickCount() == 2) {
                                     jumpToEntry(entry);
@@ -255,7 +279,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                         Button compareButton = IconTheme.JabRefIcons.MERGE_ENTRIES.asButton();
                         compareButton.setTooltip(new Tooltip(Localization.lang("Compare with existing entry")));
-                        compareButton.setOnMouseClicked(event -> openPossibleDuplicateEntriesWindow(entry, listView));
+                        compareButton.setOnMouseClicked(_ -> openPossibleDuplicateEntriesWindow(entry, listView));
                         vContainer.getChildren().add(compareButton);
                     } else {
                         ToggleButton addToggle = IconTheme.JabRefIcons.ADD.asToggleButton();
@@ -275,7 +299,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                     if (entry.entry().getDOI().isPresent() || entry.entry().getField(StandardField.URL).isPresent()) {
                         Button openWeb = IconTheme.JabRefIcons.OPEN_LINK.asButton();
                         openWeb.setTooltip(new Tooltip(Localization.lang("Open URL or DOI")));
-                        openWeb.setOnMouseClicked(event -> {
+                        openWeb.setOnMouseClicked(_ -> {
                             String url = entry.entry().getDOI().flatMap(DOI::getExternalURI).map(URI::toString)
                                               .or(() -> entry.entry().getField(StandardField.URL)).orElse("");
                             if (StringUtil.isNullOrEmpty(url)) {
@@ -292,7 +316,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     Button showEntrySource = IconTheme.JabRefIcons.SOURCE.asButton();
                     showEntrySource.setTooltip(new Tooltip(Localization.lang("%0 source", "BibTeX")));
-                    showEntrySource.setOnMouseClicked(event -> showEntrySourceDialog(entry.entry()));
+                    showEntrySource.setOnMouseClicked(_ -> showEntrySourceDialog(entry.entry()));
 
                     vContainer.getChildren().addLast(showEntrySource);
 
@@ -301,9 +325,9 @@ public class CitationRelationsTab extends EntryEditorTab {
 
                     return hContainer;
                 })
-                .withOnMouseClickedEvent((ee, event) -> {
-                    if (!ee.isLocal()) {
-                        listView.getCheckModel().toggleCheckState(ee);
+                .withOnMouseClickedEvent((citationRelationItem, _) -> {
+                    if (!citationRelationItem.isLocal()) {
+                        listView.getCheckModel().toggleCheckState(citationRelationItem);
                     }
                 })
                 .withPseudoClass(entrySelected, listView::getItemBooleanProperty)

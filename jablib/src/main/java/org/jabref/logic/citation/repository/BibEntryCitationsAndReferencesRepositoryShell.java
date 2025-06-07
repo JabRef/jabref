@@ -86,8 +86,8 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
                                                                    ImportFormatPreferences importFormatPreferences,
                                                                    FieldPreferences fieldPreferences,
                                                                    BibEntryTypesManager entryTypesManager) {
-        var citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
-        var relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
+        Path citationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(CITATIONS_STORE));
+        Path relationsPath = citationsRelationsDirectory.resolve("%s.mv".formatted(REFERENCES_STORE));
         return new BibEntryCitationsAndReferencesRepositoryShell(
                 new MVStoreBibEntryRelationRepository(citationsPath, CITATIONS_STORE, storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences),
                 new MVStoreBibEntryRelationRepository(relationsPath, REFERENCES_STORE, storeTTL, entryTypesManager, importFormatPreferences, fieldPreferences)

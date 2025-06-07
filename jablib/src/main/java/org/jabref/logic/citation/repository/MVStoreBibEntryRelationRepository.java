@@ -97,13 +97,13 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
         entry.getDOI().ifPresent(doi -> {
             if (!relations.isEmpty()) {
                 // Save the relations
-                var relationsAlreadyStored = relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>());
+                LinkedHashSet<BibEntry> relationsAlreadyStored = relationsMap.getOrDefault(doi.asString(), new LinkedHashSet<>());
                 relationsAlreadyStored.addAll(relations);
                 relationsMap.put(doi.asString(), relationsAlreadyStored);
             }
 
             // Save insertion timestamp
-            var insertionTime = LocalDateTime.now(TIME_STAMP_ZONE_ID);
+            LocalDateTime insertionTime = LocalDateTime.now(TIME_STAMP_ZONE_ID);
             insertionTimeStampMap.put(doi.asString(), insertionTime);
         });
     }
