@@ -22,7 +22,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
-import org.jabref.support.DisabledOnCIServer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@DisabledOnCIServer("Strange out of memory exceptions, works with manual testing")
 class MVStoreBibEntryRelationRepositoryTest {
 
     private final static String MV_STORE_NAME = "test-relations.mv";
@@ -63,7 +61,7 @@ class MVStoreBibEntryRelationRepositoryTest {
 
     @AfterEach
     void closeStore() {
-        this.dao.close();
+        this.dao.closeImmediately();
         // On the CI, we sometimes get "OutOfMemoryException"s. This tries to prevent that.
         System.gc();
     }
@@ -234,7 +232,7 @@ class MVStoreBibEntryRelationRepositoryTest {
 
         // WHEN
         daoUnderTest.addRelations(entry, relations);
-        daoUnderTest.close();
+        daoUnderTest.closeImmediately();
         daoUnderTest = new MVStoreBibEntryRelationRepository(file.toAbsolutePath(), MAP_NAME, 7, serializer);
         List<BibEntry> deserializedRelations = daoUnderTest.getRelations(entry);
 
