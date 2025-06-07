@@ -1738,7 +1738,9 @@ public class JabRefCliPreferences implements CliPreferences {
                                                           .map(CleanupPreferences.CleanupStep::valueOf)
                                                           .collect(Collectors.toSet())),
                 new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))));
+                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), "")),
+                        getBibEntryPreferences()
+                ));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
                 putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
@@ -1757,7 +1759,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultCleanupJobs(),
                 new FieldFormatterCleanups(
                         (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))));
+                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS)),
+                        getBibEntryPreferences()
+                ));
     }
 
     private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
