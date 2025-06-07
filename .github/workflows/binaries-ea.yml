@@ -121,7 +121,7 @@ jobs:
     needs: [conditions]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
     env:
-      javafx: '25'
+      javafx: '25-ea+18'
       jdk_version: '25'
       jdk: 'openjdk-25.0.0-ea+21'
     strategy:
@@ -216,66 +216,14 @@ jobs:
       # endregion
 
       # region JavaFX
-      - name: Download and extract JavaFX ${{ env.javafx }}
-        if: (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
-        shell: bash
-        run: |
-          set -e
-          set -x
-          mkdir javafx
-          cd javafx
-          curl --no-progress-meter https://jdk.java.net/javafx${{ env.javafx }}/ > javafx.html
-
-          case "${{ matrix.os }}" in
-            "ubuntu-22.04")
-              OS="linux-x64"
-              EXTRACT="tar xzf *.tar.gz"
-              EXT="tar.gz"
-              ;;
-            "windows-latest")
-              OS="windows-x64"
-              EXTRACT="unzip -qq *.zip"
-              EXT="zip"
-              ;;
-            "macos-13")
-              OS="macos-x64"
-              EXTRACT="tar xzf *.tar.gz"
-              EXT="tar.gz"
-              ;;
-            "macos-14")
-              OS="macos-aarch64"
-              EXTRACT="tar xzf *.tar.gz"
-              EXT="tar.gz"
-              ;;
-            *)
-              echo "Unsupported OS"
-              exit 1
-              ;;
-          esac
-          echo "OS set to $OS"
-
-          URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}_bin-sdk.${EXT}" javafx.html | head -n 1)
-          echo "Downloading $URL_SDK..."
-          curl -OJ --no-progress-meter $URL_SDK
-          $EXTRACT
-          rm *.$EXT
-
-          URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}_bin-jmods.${EXT}" javafx.html | head -n 1)
-          echo "Downloading $URL_JMODS..."
-          curl -OJ --no-progress-meter $URL_JMODS
-          $EXTRACT
-          rm *.$EXT
-
-          ls -la
       - name: 'Set JavaFX ${{ env.javafx }} (linux, Windows)'
-        if: ${{ !startsWith(matrix.os, 'macos') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm') }}
+        if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: bash
         run: |
           set -e
           shopt -s globstar
           for buildgradle in **/build.gradle.kts; do
-            sed -i '/javafx {/{n;s#version = ".*"#sdk = "../javafx/javafx-sdk-${{ env.javafx }}"#}' $buildgradle
-            sed -i "s#jlink {#jlink { addExtraModulePath(\"../javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
+            sed -i '/val javafxVersion = ".*/val javafxVersion = "${{ env.javafx }}"' $buildgradle
             echo "=========="
             echo $buidgradle
             echo "=========="
@@ -286,22 +234,10 @@ jobs:
         run: |
           set -e
           find . -name 'build.gradle.kts' | while read -r buildgradle; do
-            sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "../javafx/javafx-sdk-${{ env.javafx }}"#;}' $buildgradle
-            sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath(\"../javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
-            cat $buildgradle
-          done
-      - name: 'Set JavaFX ${{ env.javafx }} (linux-arm)'
-        if: (matrix.os == 'buildjet-8vcpu-ubuntu-2204-arm')
-        # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
-        run: |
-          set -e
-          curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=10&core=gav" > /tmp/versions.json
-          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17|^18|^19|^20|^21|^22") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
-          JAVAFX=$(jq -r '.[-1].version' /tmp/versions-latest.json)
-          echo "Using JavaFX ${JAVAFX}"
-          shopt -s globstar
-          for buildgradle in **/build.gradle.kts; do
-            sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" $buildgradle
+            sed -i '.bak' -e '/val javafxVersion = ".*/val javafxVersion = "${{ env.javafx }}"' $buildgradle
+            echo "=========="
+            echo $buidgradle
+            echo "=========="
             cat $buildgradle
           done
       # endregion
