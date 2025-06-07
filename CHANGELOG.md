@@ -44,6 +44,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 - We added a fallback for the "Convert to biblatex" cleanup when it failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). [#11868](https://github.com/JabRef/jabref/issues/11868)
 - We fixed an issue where directory check for relative path was not handled properly under library properties. [#13017](https://github.com/JabRef/jabref/issues/13017)
+- We fixed an exception on tab dragging. [#12921](https://github.com/JabRef/jabref/issues/12921)
 - We fixed an issue where the option for which method to use when parsing plaintext citations was unavailable in the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 - We fixed an issue where the "Make/Sync bibliography" button in the OpenOffice/LibreOffice sidebar was not enabled when a jstyle was selected. [#13055](https://github.com/JabRef/jabref/pull/13055)
 - We fixed an issue where CSL bibliography title properties would be saved even if the "Modify bibliography title" dialog was closed without pressing the "OK" button. [#13074](https://github.com/JabRef/jabref/pull/13074)
