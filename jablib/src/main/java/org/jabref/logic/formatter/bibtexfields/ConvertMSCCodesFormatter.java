@@ -26,7 +26,9 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
     private static boolean conversionPossible;
     private static BibEntryPreferences preferences;
 
-    public ConvertMSCCodesFormatter() { }
+    public ConvertMSCCodesFormatter() {
+        preferences = new BibEntryPreferences(',');
+    }
 
     public ConvertMSCCodesFormatter(BibEntryPreferences pref) {
         preferences = pref;
@@ -75,20 +77,17 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
         // get preferences
         Character dlim = preferences.getKeywordSeparator();
         Character hdlim = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
-//        LOGGER.info("Delimiter = {}", dlim);
-//        LOGGER.info("Hierarchical Delimiter = {}", hdlim);
 
         // create KeywordList to tokenize
         KeywordList keyList = KeywordList.parse(text, dlim, hdlim);
         Iterator<Keyword> list = keyList.iterator();
-        List<Keyword> modifiedList = new ArrayList<Keyword>();
+        List<Keyword> modifiedList = new ArrayList<>();
         while (list.hasNext()) {
             // check if key in map and add value to result string
             // non-code keyword is present leave as-is
             Keyword item = list.next();
             String code = item.toString().trim(); // remove whitespace
             String convertedText = MSCMAP.getOrDefault(code, code);
-//            LOGGER.info("Original: {}\n After Conversion: {}\n", code, convertedText);
 
             modifiedList.add(new Keyword(convertedText));
         }

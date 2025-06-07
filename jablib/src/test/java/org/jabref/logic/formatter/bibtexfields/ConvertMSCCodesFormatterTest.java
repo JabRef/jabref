@@ -1,5 +1,7 @@
 package org.jabref.logic.formatter.bibtexfields;
 
+import org.jabref.model.entry.BibEntryPreferences;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +13,8 @@ public class ConvertMSCCodesFormatterTest {
 
     @BeforeEach
     void setup() {
+        BibEntryPreferences preferences = new BibEntryPreferences(',');
+        ConvertMSCCodesFormatter.setPreferences(preferences);
         formatter = new ConvertMSCCodesFormatter();
     }
 
@@ -25,27 +29,27 @@ public class ConvertMSCCodesFormatterTest {
     */
 
     @Test
-    void ConvertSingleMSCCode() {
+    void convertSingleMSCCode() {
         assertEquals("Applications of boundary value problems involving ordinary differential equations",
                 formatter.format("34B60"));
     }
 
     @Test
-    void ConvertMultipleMSCCodes() {
+    void convertMultipleMSCCodes() {
         assertEquals(
                 "53C99 None of the above but in this section,Biopropulsion in water and in air,Search theory",
                 formatter.format("53C99,76Z10,90B40"));
     }
 
     @Test
-    void PreserveNonMSCKeyword() {
+    void preserveNonMSCKeyword() {
         assertEquals(
                 "Jabref123,Search theory,Hello Jabref,Direct methods ( G-spaces of Busemann etc.)",
                 formatter.format("Jabref123,90B40,Hello Jabref,53C70"));
     }
 
     @Test
-    void NoCodesPresentInKeywordsField() {
+    void noCodesPresentInKeywordsField() {
         assertEquals(
                 "Jabref Here,Jabref There,Jabref Everywhere",
                 formatter.format("Jabref Here,Jabref There,Jabref Everywhere"));
