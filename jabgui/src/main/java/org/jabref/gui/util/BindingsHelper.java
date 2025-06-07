@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.ObjectBinding;
@@ -19,6 +20,10 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.css.PseudoClass;
 import javafx.scene.Node;
+import javafx.scene.control.Tab;
+
+import org.jabref.gui.LibraryTab;
+import org.jabref.model.database.BibDatabaseContext;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.PreboundBinding;
@@ -187,6 +192,63 @@ public class BindingsHelper {
         ChangeListener<? super T> listener = (obs, oldValue, newValue) -> subscriber.accept(newValue);
         observable.addListener(listener);
         return () -> observable.removeListener(listener);
+    }
+
+    public static void bindContentFiltered(ObservableList<Tab> source, ObservableList<BibDatabaseContext> target, Predicate<Tab> filter) {
+        // FIXME: See https://github.com/JabRef/jabref-koppor/pull/713 - workaround in place until issue is resolved.
+        // Original code used FilteredList and EasyBind to filter and map tabs directly:
+        // FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
+        // filteredTabs.setPredicate(LibraryTab.class::isInstance);
+        // openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
+        // EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
+        // Once JabRef#713 is fixed, remove this comment and the bindContentFiltered() method, and restore the original code
+
+        Function<Tab, BibDatabaseContext> tabToContext = tab -> ((LibraryTab) tab).getBibDatabaseContext();
+        // Initial sync
+        target.setAll(source.stream()
+                            .filter(filter)
+                            .map(tabToContext)
+                            .toList());
+
+        source.addListener((ListChangeListener<Tab>) change -> {
+            while (change.next()) {
+                if (change.wasPermutated()) {
+                    // We need a fresh copy as permutation is much harder to mirror
+                    List<BibDatabaseContext> reordered = source.stream()
+                                                               .filter(filter)
+                                                               .map(tabToContext)
+                                                               .toList();
+                    target.setAll(reordered);
+                }
+
+                if (change.wasRemoved()) {
+                    for (Tab removed : change.getRemoved()) {
+                        if (filter.test(removed)) {
+                            target.remove(tabToContext.apply(removed));
+                        }
+                    }
+                }
+
+                if (change.wasAdded()) {
+                    int sourceIndex = change.getFrom();
+                    int targetIndex = 0;
+
+                    // We need to add at the correct place - therefore, we need to find out the correct position
+                    for (int i = 0; i < sourceIndex; i++) {
+                        Tab tab = source.get(i);
+                        if (filter.test(tab)) {
+                            targetIndex++;
+                        }
+                    }
+
+                    for (Tab added : change.getAddedSubList()) {
+                        if (filter.test(added)) {
+                            target.add(targetIndex++, tabToContext.apply(added));
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private static class BidirectionalBinding<A, B> {
