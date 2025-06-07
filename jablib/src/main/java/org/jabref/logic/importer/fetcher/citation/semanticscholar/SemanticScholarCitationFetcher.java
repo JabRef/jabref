@@ -13,6 +13,7 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
+import org.jspecify.annotations.NonNull;
 
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
     public static final String FETCHER_NAME = "Semantic Scholar Citations Fetcher";
@@ -57,7 +58,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public List<BibEntry> searchCiting(BibEntry entry) throws FetcherException {
+    public @NonNull List<BibEntry> searchCiting(@NonNull BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return List.of();
         }
@@ -72,6 +73,10 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
         ReferencesResponse referencesResponse = GSON.fromJson(urlDownload.asString(), ReferencesResponse.class);
+
+        if (referencesResponse.getData() == null) {
+            return List.of();
+        }
 
         return referencesResponse.getData()
                                  .stream()
