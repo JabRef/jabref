@@ -54,7 +54,6 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
-import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -491,14 +490,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
     public void showLibraryTab(@NonNull LibraryTab libraryTab) {
         tabbedPane.getSelectionModel().select(libraryTab);
-    }
-
-    public void showWalkthrough() {
-        Walkthrough walkthrough = new Walkthrough(
-                preferences.getWalkthroughPreferences(),
-                this
-        );
-        walkthrough.start(mainStage);
     }
 
     public void showWelcomeTab() {

@@ -119,17 +119,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
- * class.
+ * The {@code JabRefPreferences} class provides the preferences and their defaults using
+ * the JDK {@code java.util.prefs} class.
  * <p>
- * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
- * with all the default values.
+ * Internally it defines symbols used to pick a value from the {@code java.util.prefs}
+ * interface and keeps a hashmap with all the default values.
  * <p>
- * There are still some similar preferences classes ({@link OpenOfficePreferences} and {@link SharedDatabasePreferences}) which also use
- * the {@code java.util.prefs} API.
+ * There are still some similar preferences classes ({@link OpenOfficePreferences} and
+ * {@link SharedDatabasePreferences}) which also use the {@code java.util.prefs} API.
  * <p>
- * contents of the defaults HashMap that are defined in this class.
- * There are more default parameters in this map which belong to separate preference classes.
+ * contents of the defaults HashMap that are defined in this class. There are more
+ * default parameters in this map which belong to separate preference classes.
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
@@ -267,7 +267,15 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SHOW_SCITE_TAB = "showSciteTab";
 
     /**
-     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
+     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for
+     * OO/LO installation, used to detect location on Win/macOS when using manual
+     * connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that
+     * contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the
+     * reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO
+     * panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should
+     * be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
+     * OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size
+     * and position of "Select style" dialog
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
@@ -391,7 +399,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY = "openFileExplorerInFileDirectory";
     private static final String OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY = "openFileExplorerInLastUsedDirectory";
 
-    private static final String WALKTHROUGH_COMPLETED = "walkthroughCompleted";
+    private static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED = "mainFileDirectoryWalkthroughCompleted";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -439,7 +447,8 @@ public class JabRefCliPreferences implements CliPreferences {
     private WalkthroughPreferences walkthroughPreferences;
 
     /**
-     * @implNote The constructor is made protected to enforce this as a singleton class:
+     * @implNote The constructor is made protected to enforce this as a singleton
+     * class:
      */
     protected JabRefCliPreferences() {
         try {
@@ -705,7 +714,7 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
 
         // WalkThrough
-        defaults.put(WALKTHROUGH_COMPLETED, Boolean.FALSE);
+        defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -720,9 +729,10 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * @deprecated Never ever add a call to this method. There should be only one caller.
-     *             All other usages should get the preferences passed (or injected).
-     *             The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
+     * @deprecated Never ever add a call to this method. There should be only one
+     * caller. All other usages should get the preferences passed (or injected). The
+     * JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing
+     * this method with a strike-through.
      */
     @Deprecated
     public static JabRefCliPreferences getInstance() {
@@ -838,7 +848,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
+     * Puts a list of strings into the Preferences, by linking its elements with a
+     * STRINGLIST_DELIMITER into a single string. Escape characters make the process
+     * transparent even if strings contains a STRINGLIST_DELIMITER.
      */
     public void putStringList(String key, List<String> value) {
         if (value == null) {
@@ -867,7 +879,8 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * Clear all preferences.
      *
-     * @throws BackingStoreException if JabRef is unable to write to the registry/the preferences storage
+     * @throws BackingStoreException if JabRef is unable to write to the registry/the
+     *                               preferences storage
      */
     @Override
     public void clear() throws BackingStoreException {
@@ -975,7 +988,8 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * Removes all entries keyed by prefix+number, where number is equal to or higher than the given number.
+     * Removes all entries keyed by prefix+number, where number is equal to or higher
+     * than the given number.
      *
      * @param number or higher.
      */
@@ -1010,7 +1024,8 @@ public class JabRefCliPreferences implements CliPreferences {
      * Imports Preferences from an XML file.
      *
      * @param file Path of file to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an
+     *                         InvalidPreferencesFormatException or an IOException
      */
     @Override
     public void importPreferences(Path file) throws JabRefException {
@@ -1685,10 +1700,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
-            case SPECIFIED ->
-                    SelfContainedSaveOrder.of(exportSaveOrder);
-            case ORIGINAL ->
-                    SaveOrder.getDefaultSaveOrder();
+            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
+            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
 
         return new SelfContainedSaveConfiguration(
@@ -2303,11 +2316,8 @@ public class JabRefCliPreferences implements CliPreferences {
             return walkthroughPreferences;
         }
 
-        walkthroughPreferences = new WalkthroughPreferences(getBoolean(WALKTHROUGH_COMPLETED));
-
-        walkthroughPreferences.completedProperty().addListener((_, _, newValue) ->
-            putBoolean(WALKTHROUGH_COMPLETED, newValue));
-
+        walkthroughPreferences = new WalkthroughPreferences(getBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED));
+        EasyBind.listen(walkthroughPreferences.mainFileDirectoryCompletedProperty(), (_, _, newValue) -> putBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, newValue));
         return walkthroughPreferences;
     }
 }

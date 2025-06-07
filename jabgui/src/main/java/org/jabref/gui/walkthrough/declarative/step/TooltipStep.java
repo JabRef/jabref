@@ -3,8 +3,6 @@ package org.jabref.gui.walkthrough.declarative.step;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.geometry.Pos;
-
 import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
@@ -12,10 +10,11 @@ import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
+import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 
-public record PanelStep(
+public record TooltipStep(
         String title,
         List<WalkthroughRichTextBlock> content,
         NodeResolver resolver,
@@ -23,15 +22,15 @@ public record PanelStep(
         Optional<String> skipButtonText,
         Optional<String> backButtonText,
         Optional<NavigationPredicate> navigationPredicate,
-        Pos position,
+        TooltipPosition position,
         Optional<Double> preferredWidth,
         Optional<Double> preferredHeight,
         Optional<MultiWindowHighlight> highlight,
         boolean autoFallback,
         Optional<WindowResolver> activeWindowResolver
 ) implements WalkthroughNode {
-    public static Builder builder(String title) {
-        return new Builder(title);
+    public static Builder builder(String key, Object... params) {
+        return new Builder(Localization.lang(key, params));
     }
 
     public static class Builder {
@@ -42,7 +41,7 @@ public record PanelStep(
         private Optional<String> skipButtonText = Optional.empty();
         private Optional<String> backButtonText = Optional.empty();
         private Optional<NavigationPredicate> navigationPredicate = Optional.empty();
-        private Pos position = Pos.CENTER;
+        private TooltipPosition position = TooltipPosition.AUTO;
         private Optional<Double> preferredWidth = Optional.empty();
         private Optional<Double> preferredHeight = Optional.empty();
         private Optional<MultiWindowHighlight> highlight = Optional.empty();
@@ -88,7 +87,7 @@ public record PanelStep(
             return this;
         }
 
-        public Builder position(@NonNull Pos position) {
+        public Builder position(@NonNull TooltipPosition position) {
             this.position = position;
             return this;
         }
@@ -123,11 +122,12 @@ public record PanelStep(
             return this;
         }
 
-        public PanelStep build() {
+        public TooltipStep build() {
             if (resolver == null) {
-                throw new IllegalStateException("Node resolver is required for PanelStep");
+                throw new IllegalStateException("Node resolver is required for TooltipStep");
             }
-            return new PanelStep(title, content, resolver, continueButtonText, skipButtonText, backButtonText, navigationPredicate, position, preferredWidth, preferredHeight, highlight, autoFallback, activeWindowResolver);
+            return new TooltipStep(title, content, resolver, continueButtonText, skipButtonText, backButtonText, navigationPredicate, position, preferredWidth, preferredHeight, highlight, autoFallback, activeWindowResolver);
         }
     }
 }
+

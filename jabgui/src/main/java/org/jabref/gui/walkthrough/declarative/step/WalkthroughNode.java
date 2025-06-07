@@ -2,36 +2,41 @@ package org.jabref.gui.walkthrough.declarative.step;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
-import javafx.scene.Node;
-import javafx.scene.Scene;
-
-import org.jabref.gui.walkthrough.Walkthrough;
-import org.jabref.gui.walkthrough.declarative.WalkthroughActionsConfig;
+import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
+import org.jabref.gui.walkthrough.declarative.NodeResolver;
+import org.jabref.gui.walkthrough.declarative.WindowResolver;
+import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 
-public sealed interface WalkthroughNode permits PanelStep, FullScreenStep {
+public sealed interface WalkthroughNode permits PanelStep, TooltipStep {
     String title();
 
     List<WalkthroughRichTextBlock> content();
 
-    Optional<Function<Scene, Optional<Node>>> resolver();
+    // FIXME: Refactor to make this optional
+    NodeResolver resolver();
 
-    Optional<WalkthroughActionsConfig> actions();
+    Optional<String> continueButtonText();
 
-    Optional<Consumer<Walkthrough>> nextStepAction();
+    Optional<String> skipButtonText();
 
-    Optional<Consumer<Walkthrough>> previousStepAction();
+    Optional<String> backButtonText();
 
-    Optional<Consumer<Walkthrough>> skipAction();
+    Optional<NavigationPredicate> navigationPredicate();
 
-    Optional<Consumer<Walkthrough>> clickOnNodeAction();
+    Optional<Double> preferredWidth();
 
-    // Static factory methods for builders
-    static FullScreenStep.Builder fullScreen(String key) {
-        return FullScreenStep.builder(key);
+    Optional<Double> preferredHeight();
+
+    boolean autoFallback();
+
+    Optional<MultiWindowHighlight> highlight();
+
+    Optional<WindowResolver> activeWindowResolver();
+
+    static TooltipStep.Builder tooltip(String key) {
+        return TooltipStep.builder(key);
     }
 
     static PanelStep.Builder panel(String title) {

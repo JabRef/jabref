@@ -7,21 +7,21 @@ import javafx.beans.property.SimpleBooleanProperty;
  * Preferences related to the application walkthrough functionality.
  */
 public class WalkthroughPreferences {
-    private final BooleanProperty completed;
+    private final BooleanProperty mainFileDirectoryCompleted;
 
     public WalkthroughPreferences(boolean completed) {
-        this.completed = new SimpleBooleanProperty(completed);
+        this.mainFileDirectoryCompleted = new SimpleBooleanProperty(completed);
     }
 
-    public BooleanProperty completedProperty() {
-        return completed;
+    public BooleanProperty mainFileDirectoryCompletedProperty() {
+        return mainFileDirectoryCompleted;
     }
 
-    public boolean isCompleted() {
-        return completed.get();
+    public boolean getMainFileDirectoryCompleted() {
+        return mainFileDirectoryCompleted.get();
     }
 
-    public void setCompleted(boolean completed) {
-        this.completed.set(completed);
+    public void setMainFileDirectoryCompleted(boolean mainFileDirectoryCompleted) {
+        this.mainFileDirectoryCompleted.set(mainFileDirectoryCompleted);
     }
 }
