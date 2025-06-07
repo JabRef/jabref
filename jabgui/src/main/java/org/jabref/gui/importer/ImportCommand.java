@@ -89,25 +89,38 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
                 .withInitialDirectory(preferences.getImporterPreferences().getImportWorkingDirectory())
                 .build();
-        dialogService.showFileOpenDialog(fileDialogConfiguration)
-                     .ifPresent(path -> importSingleFile(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
+        // dialogService.showFileOpenDialog(fileDialogConfiguration)
+        //             .ifPresent(path -> importSingleFile(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
+        List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
+
+        if (selectedFiles.isEmpty()) {
+            return; // User cancelled or no files selected
+        }
+
+        importMultipleFiles(selectedFiles, importers, fileDialogConfiguration.getSelectedExtensionFilter());
     }
 
-    private void importSingleFile(Path file, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
-        if (!Files.exists(file)) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Import"),
-                    Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
-
-            return;
+    private void importMultipleFiles(List<Path> files, SortedSet<Importer> importers, FileChooser.ExtensionFilter selectedExtensionFilter) {
+        for (Path file : files) {
+            if (!Files.exists(file)) {
+                dialogService.showErrorDialogAndWait(Localization.lang("Import"),
+                        Localization.lang("File not found") + ": '" + file.getFileName() + "'.");
+                return;
+            }
         }
 
-        if (selectedExtensionFilter == FileFilterConverter.ANY_FILE || "Available import formats".equals(selectedExtensionFilter.getDescription())) {
-            selectedExtensionFilter = FileFilterConverter.determineExtensionFilter(file);
-        }
+        BackgroundTask<ParserResult> task;
 
-        Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-        BackgroundTask<ParserResult> task = BackgroundTask.wrap(
-                () -> doImport(List.of(file), format.orElse(null)));
+        if (selectedExtensionFilter == null
+                || selectedExtensionFilter == FileFilterConverter.ANY_FILE
+                || "Available import formats".equals(selectedExtensionFilter.getDescription())) {
+            task = BackgroundTask.wrap(
+                    () -> doImport(files, null));
+        } else {
+            Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
+            task = BackgroundTask.wrap(
+                    () -> doImport(files, format.orElse(null)));
+        }
 
         if (importMethod == ImportMethod.AS_NEW) {
             task.onSuccess(parserResult -> {
@@ -126,7 +139,7 @@ public class ImportCommand extends SimpleCommand {
         }
 
         // Set last working dir for import
-        preferences.getImporterPreferences().setImportWorkingDirectory(file.getParent());
+        preferences.getImporterPreferences().setImportWorkingDirectory(files.getLast().getParent());
     }
 
     /**
