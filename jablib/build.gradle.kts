@@ -464,9 +464,6 @@ tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
     }
-
-    // because of MVStore issues
-    maxParallelForks = 1
 }
 
 jmh {
