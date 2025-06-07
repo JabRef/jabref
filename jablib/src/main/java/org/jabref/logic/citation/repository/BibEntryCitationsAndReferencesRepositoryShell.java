@@ -47,7 +47,7 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
 
     @Override
     public boolean isCitationsUpdatable(BibEntry entry) {
-        return citationsDao.isUpdatable(entry);
+        return citationsDao.shouldUpdate(entry);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class BibEntryCitationsAndReferencesRepositoryShell implements BibEntryCi
 
     @Override
     public boolean isReferencesUpdatable(BibEntry entry) {
-        return referencesDao.isUpdatable(entry);
+        return referencesDao.shouldUpdate(entry);
     }
 
     @Override

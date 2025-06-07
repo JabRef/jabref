@@ -31,6 +31,7 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     private static final Logger LOGGER = LoggerFactory.getLogger(MVStoreBibEntryRelationRepository.class);
 
     private final static ZoneId TIME_STAMP_ZONE_ID = ZoneId.of("UTC");
+    private final static Clock CLOCK = Clock.system(TIME_STAMP_ZONE_ID);
     private final static String MAP_SUFFIX_TIME_STAMP = "-insertion-timestamp";
 
     private final int storeTTLInDays;
@@ -116,17 +117,21 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     }
 
     @Override
-    synchronized public boolean isUpdatable(BibEntry entry) {
-        return isUpdatable(entry, Clock.system(TIME_STAMP_ZONE_ID));
+    synchronized public boolean shouldUpdate(BibEntry entry) {
+        return shouldUpdate(entry, CLOCK);
     }
 
     @VisibleForTesting
-    boolean isUpdatable(final BibEntry entry, final Clock clock) {
+    boolean shouldUpdate(final BibEntry entry, final Clock clock) {
         LocalDateTime now = LocalDateTime.now(clock);
         return entry.getDOI()
                     .map(doi -> {
-                        LocalDateTime lastRun = insertionTimeStampMap.getOrDefault(doi.asString(), now);
-                        return lastRun.equals(now) || lastRun.isBefore(now.minusDays(storeTTLInDays));
+                        String doiString = doi.asString();
+                        if (!insertionTimeStampMap.containsKey(doiString)) {
+                            return true;
+                        }
+                        LocalDateTime lastRun = insertionTimeStampMap.get(doiString);
+                        return lastRun.isBefore(now.minusDays(storeTTLInDays));
                     })
                     // No DOI existing - allow update
                     .orElse(true);

@@ -24,7 +24,6 @@ import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,6 +33,7 @@ import org.mockito.Answers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class MVStoreBibEntryRelationRepositoryTest {
@@ -41,8 +41,28 @@ class MVStoreBibEntryRelationRepositoryTest {
     private final static String MV_STORE_NAME = "test-relations.mv";
     private final static String MAP_NAME = "test-relations";
 
-    @TempDir Path temporaryFolder;
+    @TempDir
+    Path temporaryFolder;
+
     private MVStoreBibEntryRelationRepository dao;
+
+    @BeforeEach
+    void initStore() throws Exception {
+        Path file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
+
+        this.dao = new MVStoreBibEntryRelationRepository(
+                file.toAbsolutePath(),
+                MAP_NAME,
+                7,
+                new BibEntryTypesManager(),
+                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
+                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
+    }
+
+    @AfterEach
+    void closeStore() {
+        this.dao.close();
+    }
 
     private static Stream<BibEntry> createBibEntries() {
         return IntStream
@@ -64,7 +84,7 @@ class MVStoreBibEntryRelationRepositoryTest {
      * @param entry should not be null
      * @return never empty
      */
-    private static List<BibEntry> createRelations(BibEntry entry) {
+    private List<BibEntry> createRelations(BibEntry entry) {
         return entry
             .getCitationKey()
             .map(key -> RandomGenerator.StreamableGenerator
@@ -81,26 +101,9 @@ class MVStoreBibEntryRelationRepositoryTest {
             .toList();
     }
 
-    @BeforeEach
-    void initStore() throws Exception {
-        var file = Files.createFile(temporaryFolder.resolve(MV_STORE_NAME));
-        this.dao = new MVStoreBibEntryRelationRepository(
-                file.toAbsolutePath(),
-                MAP_NAME,
-                7,
-                mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
-                mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
-                mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
-    }
-
-    @AfterEach
-    void closeStore() {
-        this.dao.close();
-    }
-
     @ParameterizedTest
     @MethodSource("createBibEntries")
-    void DAOShouldMergeRelationsWhenInserting(BibEntry bibEntry) throws IOException {
+    void DAOShouldMergeRelationsWhenInserting(BibEntry bibEntry) {
         // GIVEN
         assertFalse(dao.containsKey(bibEntry));
         var firstRelations = createRelations(bibEntry);
@@ -140,46 +143,46 @@ class MVStoreBibEntryRelationRepositoryTest {
         dao.addRelations(entry, relations);
 
         // THEN
-        Assertions.assertTrue(dao.containsKey(entry));
+        assertTrue(dao.containsKey(entry));
     }
 
     @ParameterizedTest
     @MethodSource("createBibEntries")
-    void isUpdatableShouldReturnTrueBeforeInsertionsAndFalseAfterInsertions(BibEntry entry) {
+    void shouldUpdateShouldReturnTrueBeforeInsertionsAndFalseAfterInsertions(BibEntry entry) {
         // GIVEN
-        var relations = createRelations(entry);
-        Assertions.assertTrue(dao.isUpdatable(entry));
+        List<BibEntry> relations = createRelations(entry);
+        assertTrue(dao.shouldUpdate(entry));
 
         // WHEN
         dao.addRelations(entry, relations);
 
         // THEN
-        assertFalse(dao.isUpdatable(entry));
+        assertFalse(dao.shouldUpdate(entry));
     }
 
     @ParameterizedTest
     @MethodSource("createBibEntries")
-    void isUpdatableShouldReturnTrueAfterOneWeek(BibEntry entry) {
+    void shouldUpdateShouldReturnTrueAfterOneWeek(BibEntry entry) {
         // GIVEN
         var relations = createRelations(entry);
         var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
-        Assertions.assertTrue(dao.isUpdatable(entry, clock));
+        assertTrue(dao.shouldUpdate(entry, clock));
 
         // WHEN
         dao.addRelations(entry, relations);
 
         // THEN
-        assertFalse(dao.isUpdatable(entry, clock));
+        assertFalse(dao.shouldUpdate(entry, clock));
         var clockOneWeekAfter = Clock.fixed(
             LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")
         );
-        Assertions.assertTrue(dao.isUpdatable(entry, clockOneWeekAfter));
+        assertTrue(dao.shouldUpdate(entry, clockOneWeekAfter));
     }
 
     @ParameterizedTest
     @MethodSource("createBibEntries")
-    void isUpdatableShouldReturnFalseAfterOneWeekWhenTTLisSetTo30(BibEntry entry) throws IOException {
+    void shouldUpdateShouldReturnFalseAfterOneWeekWhenTTLisSetTo30(BibEntry entry) throws IOException {
         // GIVEN
         var relations = createRelations(entry);
         var clock = Clock.fixed(Instant.now(), ZoneId.of("UTC"));
@@ -191,18 +194,18 @@ class MVStoreBibEntryRelationRepositoryTest {
                 mock(BibEntryTypesManager.class, Answers.RETURNS_DEEP_STUBS),
                 mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS),
                 mock(FieldPreferences.class, Answers.RETURNS_DEEP_STUBS));
-        Assertions.assertTrue(daoUnderTest.isUpdatable(entry, clock));
+        assertTrue(daoUnderTest.shouldUpdate(entry, clock));
 
         // WHEN
         daoUnderTest.addRelations(entry, relations);
 
         // THEN
-        assertFalse(daoUnderTest.isUpdatable(entry, clock));
+        assertFalse(daoUnderTest.shouldUpdate(entry, clock));
         var clockOneWeekAfter = Clock.fixed(
                 LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).toInstant(ZoneOffset.UTC),
                 ZoneId.of("UTC")
         );
-        assertFalse(daoUnderTest.isUpdatable(entry, clockOneWeekAfter));
+        assertFalse(daoUnderTest.shouldUpdate(entry, clockOneWeekAfter));
     }
 
     @ParameterizedTest
@@ -232,6 +235,6 @@ class MVStoreBibEntryRelationRepositoryTest {
         var deserializedRelations = daoUnderTest.getRelations(entry);
 
         // THEN
-        Assertions.assertTrue(deserializedRelations.isEmpty());
+        assertTrue(deserializedRelations.isEmpty());
     }
 }

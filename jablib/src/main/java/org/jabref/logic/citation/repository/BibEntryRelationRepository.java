@@ -18,7 +18,7 @@ public interface BibEntryRelationRepository {
 
     boolean containsKey(BibEntry entry);
 
-    default boolean isUpdatable(BibEntry entry) {
+    default boolean shouldUpdate(BibEntry entry) {
         return true;
     }
 
