@@ -101,9 +101,7 @@ class SearchCitationsRelationsServiceTest {
             List<BibEntry> citationsToReturn = List.of(newCitations);
             Map<BibEntry, List<BibEntry>> citationsDatabase = HashMap.newHashMap(300);
             CitationFetcher fetcher = createMockFetcher(cited, citationsToReturn, null);
-            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    citationsDatabase, null
-            );
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null);
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
@@ -120,9 +118,7 @@ class SearchCitationsRelationsServiceTest {
             BibEntry cited = new BibEntry();
             Map<BibEntry, List<BibEntry>> citationsDatabase = new HashMap<>();
             CitationFetcher fetcher = createEmptyMockFetcher();
-            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    citationsDatabase, null
-            );
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null);
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
