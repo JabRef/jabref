@@ -176,7 +176,7 @@ class MVStoreBibEntryRelationRepositoryTest {
         // THEN
         assertFalse(dao.shouldUpdate(entry, clock));
         Clock clockOneWeekAfter = Clock.fixed(
-            LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).toInstant(ZoneOffset.UTC),
+            LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).plusSeconds(1).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")
         );
         assertTrue(dao.shouldUpdate(entry, clockOneWeekAfter));
