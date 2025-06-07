@@ -13,8 +13,6 @@ testing {
 }
 
 tasks.withType<Test>().configureEach {
-    reports.html.outputLocation.set(file("${reporting.baseDirectory}/${name}"))
-
     // Enable parallel tests (on desktop).
     // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
     if (!providers.environmentVariable("CI").isPresent) {
