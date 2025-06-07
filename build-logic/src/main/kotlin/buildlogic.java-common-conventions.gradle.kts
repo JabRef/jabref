@@ -1,18 +1,15 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    java
-
-    id("idea")
-
-    // id("jacoco")
-
+    id("java")
     id("project-report")
-
     id("org.gradlex.extra-java-module-info")
+    id("org.gradlex.java-module-packaging")
     id("org.gradlex.java-module-testing")
     id("org.gradlex.jvm-dependency-conflict-resolution")
-    id("org.gradlex.java-module-packaging")
+
+    id("org.jabref.gradle.check.checkstyle")
+    id("org.jabref.gradle.check.modernizer")
 }
 
 repositories {
@@ -24,13 +21,6 @@ repositories {
 
     // Required for one.jpro.jproutils:tree-showing
     maven { url = uri("https://sandec.jfrog.io/artifactory/repo") }
-}
-
-dependencies {
-    constraints {
-        // Define dependency versions as constraints
-        // implementation("org.apache.commons:commons-text:1.12.0")
-    }
 }
 
 val os = OperatingSystem.current()
@@ -160,17 +150,7 @@ extraJavaModuleInfo {
     }
 }
 
-testing {
-    suites {
-        val test by getting(JvmTestSuite::class) {
-            useJUnitJupiter()
-        }
-    }
-}
-
 java {
-    sourceCompatibility = JavaVersion.VERSION_24
-    targetCompatibility = JavaVersion.VERSION_24
     toolchain {
         // If this is updated, also update
         // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
@@ -190,7 +170,7 @@ java {
 }
 
 tasks.javadoc {
-    ( options as StandardJavadocDocletOptions).apply {
+    (options as StandardJavadocDocletOptions).apply {
         encoding = "UTF-8"
         // version = false
         // author = false
