@@ -184,10 +184,10 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         // Create import buttons for both sides
         Button importCitingButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
-        importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
+        importCitingButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
         styleTopBarNode(importCitingButton, 50.0);
         Button importCitedByButton = IconTheme.JabRefIcons.ADD_ENTRY.asButton();
-        importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entries to database")));
+        importCitedByButton.setTooltip(new Tooltip(Localization.lang("Add selected entry(s) to library")));
         styleTopBarNode(importCitedByButton, 50.0);
         hideNodes(importCitingButton, importCitedByButton);
 

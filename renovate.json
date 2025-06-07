@@ -17,7 +17,7 @@
   ],
   "packageRules": [
     {
-      "managers": ["gradle", "gradle-wrapper", "github-actions"],
+      "managers": ["dockerfile", "gradle", "gradle-wrapper", "github-actions"],
       "enabled": false
     },
     {
