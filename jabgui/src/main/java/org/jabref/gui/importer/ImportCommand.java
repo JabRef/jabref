@@ -89,8 +89,7 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
                 .withInitialDirectory(preferences.getImporterPreferences().getImportWorkingDirectory())
                 .build();
-        // dialogService.showFileOpenDialog(fileDialogConfiguration)
-        //             .ifPresent(path -> importSingleFile(path, importers, fileDialogConfiguration.getSelectedExtensionFilter()));
+        
         List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
 
         if (selectedFiles.isEmpty()) {
