@@ -9,7 +9,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.WebFetchers;
-import org.jabref.logic.layout.format.RemoveWhitespace;
+import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
@@ -28,7 +28,7 @@ public class MergingIdBasedFetcher {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergingIdBasedFetcher.class);
     private static final List<StandardField> SUPPORTED_FIELDS =
             List.of(StandardField.DOI, StandardField.ISBN, StandardField.EPRINT);
-    private static final RemoveWhitespace REMOVE_WHITESPACE_FORMATTER = new RemoveWhitespace();
+    private static final NonSpaceWhitespaceRemover REMOVE_WHITESPACE_FORMATTER = new NonSpaceWhitespaceRemover();
     private final ImportFormatPreferences importFormatPreferences;
 
     public MergingIdBasedFetcher(ImportFormatPreferences importFormatPreferences) {
