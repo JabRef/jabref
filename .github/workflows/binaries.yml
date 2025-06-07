@@ -141,6 +141,11 @@ jobs:
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distribution/jabkit
             suffix: ''
+          - os: ubuntu-22.04-arm
+            displayName: linux-arm
+            archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/distribution/JabRef
+            archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/distribution/jabkit
+            suffix: '_arm64'
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
@@ -211,6 +216,9 @@ jobs:
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ needs.conditions.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
       # endregion
+
+      - name: Basic build (assemble)
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" assemble
 
       - name: Prepare merged jars and modules dir
         # prepareModulesDir is executing a build, which should run through even if no upload to builds.jabref.org is made
