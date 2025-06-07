@@ -51,6 +51,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where bibliography entries generated from CSL styles had leading spaces. [#13074](https://github.com/JabRef/jabref/pull/13074)
 - We fixed an issue where the preview area in the "Select Style" dialog of the LibreOffice integration was too small to display full content. [#13051](https://github.com/JabRef/jabref/issues/13051)
 - We fixed an issue where the tab showing the fulltext search results was not displayed. [#12865](https://github.com/JabRef/jabref/issues/12865)
+- We fixed an issue showing an empty tooltip in maintable. [#11681](https://github.com/JabRef/jabref/issues/11681)
 
 ### Removed
 
