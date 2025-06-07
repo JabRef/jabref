@@ -28,6 +28,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
+import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
@@ -75,7 +76,6 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
-
     private static RemoteListenerServerManager remoteListenerServerManager;
 
     private Stage mainStage;
@@ -191,7 +191,7 @@ public class JabRefGUI extends Application {
 
     private void setupProxy() {
         if (!preferences.getProxyPreferences().shouldUseProxy()
-                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
+            || !preferences.getProxyPreferences().shouldUseAuthentication()) {
             return;
         }
 
@@ -294,6 +294,11 @@ public class JabRefGUI extends Application {
             // We need to check at this point, because here, all libraries are loaded (e.g., load previously opened libraries) and all UI commands (e.g., load libraries, blank workspace, ...) are handled.
             if (stateManager.getOpenDatabases().isEmpty()) {
                 mainFrame.showWelcomeTab();
+            }
+
+            // Check if walkthrough should be shown
+            if (!preferences.getWalkthroughPreferences().isCompleted()) {
+                mainFrame.showWalkthrough();
             }
         });
     }
