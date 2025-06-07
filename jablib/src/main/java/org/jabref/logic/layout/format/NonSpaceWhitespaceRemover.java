@@ -23,7 +23,7 @@ public class NonSpaceWhitespaceRemover implements LayoutFormatter {
         // First pass: detect the first whitespace to avoid building anything unnecessarily
         for (int i = 0; i < length; i++) {
             char c = fieldEntry.charAt(i);
-            if (!(shouldKeep(c))) {
+            if (!shouldKeep(c)) {
                 firstRemoveIndex = i;
                 break;
             }
