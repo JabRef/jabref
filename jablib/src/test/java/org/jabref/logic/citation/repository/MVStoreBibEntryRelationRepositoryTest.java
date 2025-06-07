@@ -62,6 +62,8 @@ class MVStoreBibEntryRelationRepositoryTest {
     @AfterEach
     void closeStore() {
         this.dao.close();
+        // On the CI, we sometimes get "OutOfMemoryException"s. This tries to prevent that.
+        System.gc();
     }
 
     private static Stream<BibEntry> createBibEntries() {
