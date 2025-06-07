@@ -26,7 +26,10 @@ public class SearchCitationsRelationsService {
     private final CitationFetcher citationFetcher;
     private final BibEntryCitationsAndReferencesRepository relationsRepository;
 
-    public SearchCitationsRelationsService(ImporterPreferences importerPreferences, ImportFormatPreferences importFormatPreferences, FieldPreferences fieldPreferences, BibEntryTypesManager entryTypesManager) {
+    public SearchCitationsRelationsService(ImporterPreferences importerPreferences,
+                                           ImportFormatPreferences importFormatPreferences,
+                                           FieldPreferences fieldPreferences,
+                                           BibEntryTypesManager entryTypesManager) {
         this.citationFetcher = new SemanticScholarCitationFetcher(importerPreferences);
         this.relationsRepository = BibEntryCitationsAndReferencesRepositoryShell.of(
                 Directories.getCitationsRelationsDirectory(),
@@ -41,8 +44,8 @@ public class SearchCitationsRelationsService {
      * @implNote Typically, this would be a Shim in JavaFX
      */
     @VisibleForTesting
-    public SearchCitationsRelationsService(
-            CitationFetcher citationFetcher, BibEntryCitationsAndReferencesRepository repository
+    public SearchCitationsRelationsService(CitationFetcher citationFetcher,
+                                           BibEntryCitationsAndReferencesRepository repository
     ) {
         this.citationFetcher = citationFetcher;
         this.relationsRepository = repository;
