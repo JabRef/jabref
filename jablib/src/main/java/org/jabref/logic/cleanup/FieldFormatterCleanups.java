@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.formatter.Formatters;
 import org.jabref.logic.formatter.IdentityFormatter;
+import org.jabref.logic.formatter.bibtexfields.ConvertMSCCodesFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import org.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import org.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
@@ -24,6 +25,7 @@ import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.layout.format.ReplaceUnicodeLigaturesFormatter;
 import org.jabref.model.FieldChange;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -62,7 +64,8 @@ public class FieldFormatterCleanups {
                 new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()),
                 new FieldFormatterCleanup(StandardField.DATE, new NormalizeDateFormatter()),
                 new FieldFormatterCleanup(StandardField.MONTH, new NormalizeMonthFormatter()),
-                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()));
+                new FieldFormatterCleanup(InternalField.INTERNAL_ALL_TEXT_FIELDS_FIELD, new ReplaceUnicodeLigaturesFormatter()),
+                new FieldFormatterCleanup(StandardField.KEYWORDS, new ConvertMSCCodesFormatter()));
 
         List<FieldFormatterCleanup> recommendedBibtexFormatters = new ArrayList<>(DEFAULT_SAVE_ACTIONS);
         recommendedBibtexFormatters.addAll(List.of(
@@ -85,6 +88,13 @@ public class FieldFormatterCleanups {
     public FieldFormatterCleanups(boolean enabled, List<FieldFormatterCleanup> actions) {
         this.enabled = enabled;
         this.actions = Objects.requireNonNull(actions);
+    }
+
+    public FieldFormatterCleanups(boolean enabled, List<FieldFormatterCleanup> actions, BibEntryPreferences preferences) {
+        this.enabled = enabled;
+        this.actions = Objects.requireNonNull(actions);
+
+        ConvertMSCCodesFormatter.setPreferences(preferences);
     }
 
     /**
