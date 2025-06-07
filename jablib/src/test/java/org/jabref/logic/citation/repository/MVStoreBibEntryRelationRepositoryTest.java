@@ -64,6 +64,8 @@ class MVStoreBibEntryRelationRepositoryTest {
     @AfterEach
     void closeStore() {
         this.dao.close();
+        // On the CI, we sometimes get "OutOfMemoryException"s. This tries to prevent that.
+        System.gc();
     }
 
     private static Stream<BibEntry> createBibEntries() {
@@ -176,7 +178,7 @@ class MVStoreBibEntryRelationRepositoryTest {
         // THEN
         assertFalse(dao.shouldUpdate(entry, clock));
         Clock clockOneWeekAfter = Clock.fixed(
-            LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).toInstant(ZoneOffset.UTC),
+            LocalDateTime.now(ZoneId.of("UTC")).plusWeeks(1).plusSeconds(1).toInstant(ZoneOffset.UTC),
             ZoneId.of("UTC")
         );
         assertTrue(dao.shouldUpdate(entry, clockOneWeekAfter));

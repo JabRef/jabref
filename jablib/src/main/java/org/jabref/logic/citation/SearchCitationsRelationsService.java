@@ -61,7 +61,7 @@ public class SearchCitationsRelationsService {
                 LOGGER.error("Error while fetching references for entry {}", referenced.getTitle(), e);
             }
         }
-        return this.relationsRepository.readReferences(referenced);
+        return relationsRepository.readReferences(referenced);
     }
 
     /**
@@ -71,19 +71,19 @@ public class SearchCitationsRelationsService {
      */
     public List<BibEntry> searchCitations(BibEntry cited) {
         boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(cited)
-            || !this.relationsRepository.containsCitations(cited);
+            || !relationsRepository.containsCitations(cited);
         if (isFetchingAllowed) {
             try {
                 List<BibEntry> citedBy = citationFetcher.searchCitedBy(cited);
-                this.relationsRepository.insertCitations(cited, citedBy);
+                relationsRepository.insertCitations(cited, citedBy);
             } catch (FetcherException e) {
                 LOGGER.error("Error while fetching citations for entry {}", cited.getTitle(), e);
             }
         }
-        return this.relationsRepository.readCitations(cited);
+        return relationsRepository.readCitations(cited);
     }
 
     public void close() {
-        this.relationsRepository.close();
+        relationsRepository.close();
     }
 }
