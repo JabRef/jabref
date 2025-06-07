@@ -36,6 +36,9 @@ import com.tobiasdiez.easybind.EasyBind;
 import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * This class controls the user interface of the journal abbreviations dialog. The UI elements and their layout are
  * defined in the FXML file.
@@ -59,6 +62,7 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
     @FXML private CustomTextField searchBox;
     @FXML private CheckBox useFJournal;
+    @FXML private CheckBox validateAbbreviations;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private JournalAbbreviationRepository abbreviationRepository;
@@ -87,17 +91,61 @@ public class JournalAbbreviationsTab extends AbstractPreferenceTabView<JournalAb
 
         searchBox.setPromptText(Localization.lang("Search..."));
         searchBox.setLeft(IconTheme.JabRefIcons.SEARCH.getGraphicNode());
+
+        validateAbbreviations.selectedProperty().bindBidirectional(viewModel.validateAbbreviationsProperty());
     }
 
     private void setUpTable() {
         journalTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         journalTableNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        journalTableNameColumn.setOnEditCommit(event -> {
+            if (viewModel.validateAbbreviationsProperty().get()) {
+                AbbreviationViewModel item = event.getRowValue();
+                String newValue = event.getNewValue();
+                List<ValidationResult> results = viewModel.validateAbbreviation(item.getName(), newValue, item.getAbbreviation());
+                if (!results.isEmpty()) {
+                    event.consume();
+                    dialogService.showErrorDialogAndWait(Localization.lang("Validation Error"), 
+                        results.stream()
+                            .map(ValidationResult::getMessage)
+                            .collect(Collectors.joining("\n")));
+                }
+            }
+        });
 
         journalTableAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().abbreviationProperty());
         journalTableAbbreviationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        journalTableAbbreviationColumn.setOnEditCommit(event -> {
+            if (viewModel.validateAbbreviationsProperty().get()) {
+                AbbreviationViewModel item = event.getRowValue();
+                String newValue = event.getNewValue();
+                List<ValidationResult> results = viewModel.validateAbbreviation(item.getName(), item.getAbbreviation(), newValue);
+                if (!results.isEmpty()) {
+                    event.consume();
+                    dialogService.showErrorDialogAndWait(Localization.lang("Validation Error"), 
+                        results.stream()
+                            .map(ValidationResult::getMessage)
+                            .collect(Collectors.joining("\n")));
+                }
+            }
+        });
 
         journalTableShortestUniqueAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().shortestUniqueAbbreviationProperty());
         journalTableShortestUniqueAbbreviationColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        journalTableShortestUniqueAbbreviationColumn.setOnEditCommit(event -> {
+            if (viewModel.validateAbbreviationsProperty().get()) {
+                AbbreviationViewModel item = event.getRowValue();
+                String newValue = event.getNewValue();
+                List<ValidationResult> results = viewModel.validateAbbreviation(item.getName(), item.getAbbreviation(), newValue);
+                if (!results.isEmpty()) {
+                    event.consume();
+                    dialogService.showErrorDialogAndWait(Localization.lang("Validation Error"), 
+                        results.stream()
+                            .map(ValidationResult::getMessage)
+                            .collect(Collectors.joining("\n")));
+                }
+            }
+        });
 
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         new ValueTableCellFactory<AbbreviationViewModel, String>()
