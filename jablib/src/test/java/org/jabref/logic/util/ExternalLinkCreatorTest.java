@@ -1,8 +1,6 @@
 package org.jabref.logic.util;
 
 import java.net.MalformedURLException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
