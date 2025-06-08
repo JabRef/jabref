@@ -91,10 +91,10 @@ public class JabKit {
         }
     }
 
-    private static void applyUsageFooters(CommandLine commandLine,
-                                          List<Pair<String, String>> inputFormats,
-                                          List<Pair<String, String>> outputFormats,
-                                          Set<SearchBasedFetcher> fetchers) {
+    static void applyUsageFooters(CommandLine commandLine,
+                                  List<Pair<String, String>> inputFormats,
+                                  List<Pair<String, String>> outputFormats,
+                                  Set<SearchBasedFetcher> fetchers) {
         String inputFooter = "\n"
                 + Localization.lang("Available import formats:") + "\n"
                 + StringUtil.alignStringTable(inputFormats);
