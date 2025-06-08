@@ -151,7 +151,6 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-hugging-face")
 
     implementation("org.apache.velocity:velocity-engine-core")
-    implementation(platform("ai.djl:bom"))
     implementation("ai.djl:api")
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
@@ -172,7 +171,6 @@ dependencies {
     implementation("io.github.adr:e-adr")
 
     implementation("io.zonky.test:embedded-postgres")
-    implementation(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom"))
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
 
