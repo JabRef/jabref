@@ -1,5 +1,9 @@
 package org.jabref.gui.entryeditor.fileannotationtab;
 
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+
 import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 
@@ -14,10 +18,6 @@ import org.jabref.model.entry.field.StandardField;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import org.jabref.model.pdf.FileAnnotation;
-
-import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 
 public class FileAnnotationTab extends EntryEditorTab {
 
