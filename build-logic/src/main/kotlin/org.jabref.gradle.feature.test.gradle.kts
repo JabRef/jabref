@@ -31,3 +31,7 @@ testlogger {
     showCauses = false
     showStackTraces = false
 }
+
+configurations.testCompileOnly {
+    extendsFrom(configurations.compileOnly.get())
+}

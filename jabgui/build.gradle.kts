@@ -33,9 +33,7 @@ dependencies {
     // route all requests to log4j to SLF4J
     implementation("org.apache.logging.log4j:log4j-to-slf4j")
 
-    implementation("org.jabref:afterburner.fx") {
-        exclude( group = "org.openjfx")
-    }
+    implementation("org.jabref:afterburner.fx")
     implementation("org.kordamp.ikonli:ikonli-javafx")
     implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack")
     implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
@@ -49,12 +47,10 @@ dependencies {
         exclude(group = "org.apache.commons.commons-logging")
         exclude(module = "kotlin-stdlib-jdk8")
         exclude(group = "com.squareup.retrofit2")
-        exclude(group = "org.openjfx")
         exclude(group = "org.apache.logging.log4j")
         exclude(group = "tech.units")
     }
     implementation("com.dlsc.pdfviewfx:pdfviewfx") {
-        exclude(group = "org.openjfx")
         exclude(module = "commons-lang3")
     }
 
@@ -66,9 +62,7 @@ dependencies {
     }
 
     implementation("org.controlsfx:controlsfx")
-    implementation("org.jabref:easybind") {
-        exclude(group = "org.openjfx")
-    }
+    implementation("org.jabref:easybind")
 
     implementation("org.apache.lucene:lucene-core")
     implementation("org.apache.lucene:lucene-queryparser")
@@ -116,9 +110,7 @@ dependencies {
     implementation("info.picocli:picocli")
     annotationProcessor("info.picocli:picocli-codegen")
 
-    implementation("de.undercouch:citeproc-java") {
-        exclude(group = "org.antlr")
-    }
+    implementation("de.undercouch:citeproc-java")
 
     testImplementation(project(":test-support"))
 
@@ -126,9 +118,7 @@ dependencies {
     testImplementation("org.testfx:testfx-core")
     testImplementation("org.testfx:testfx-junit5")
 
-    testImplementation("org.mockito:mockito-core") {
-        exclude(group = "net.bytebuddy", module = "byte-buddy")
-    }
+    testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954

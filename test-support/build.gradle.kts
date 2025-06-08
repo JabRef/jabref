@@ -22,9 +22,7 @@ dependencies {
 
     implementation("org.junit.jupiter:junit-jupiter-api")
 
-    implementation("org.mockito:mockito-core") {
-        exclude(group = "net.bytebuddy", module = "byte-buddy") // TODO jjohannes: remove exclude
-    }
+    implementation("org.mockito:mockito-core")
     implementation("net.bytebuddy:byte-buddy")
 
     implementation("org.jspecify:jspecify")

@@ -88,15 +88,10 @@ dependencies {
 
     implementation("com.google.guava:guava")
 
-    implementation("org.jabref:afterburner.fx") {
-        exclude( group = "org.openjfx") // TODO jjohannes: remove exclude
-    }
-
+    implementation("org.jabref:afterburner.fx")
     implementation("net.harawata:appdirs")
 
-    implementation("de.undercouch:citeproc-java") {
-        exclude(group = "org.antlr") // TODO jjohannes: remove exclude
-    }
+    implementation("de.undercouch:citeproc-java")
 
     // endregion
 }

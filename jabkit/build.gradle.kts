@@ -13,9 +13,7 @@ dependencies {
     implementation(project(":jablib"))
 
     // FIXME: Injector needs to be removed, no JavaFX dependencies, etc.
-    implementation("org.jabref:afterburner.fx") {
-        exclude( group = "org.openjfx") // TODO jjohannes: remove exclude
-    }
+    implementation("org.jabref:afterburner.fx")
 
     implementation("org.openjfx:javafx-base")
     implementation("org.openjfx:javafx-controls")
@@ -45,9 +43,7 @@ dependencies {
     // route all requests to log4j to SLF4J
     implementation("org.apache.logging.log4j:log4j-to-slf4j")
 
-    implementation("org.jabref:afterburner.fx") {
-        exclude( group = "org.openjfx") // TODO jjohannes: remove exclude
-    }
+    implementation("org.jabref:afterburner.fx")
 
     implementation("commons-cli:commons-cli")
 
@@ -56,9 +52,7 @@ dependencies {
     implementation("io.github.adr:e-adr")
 
     testImplementation(project(":test-support"))
-    testImplementation("org.mockito:mockito-core") {
-        exclude(group = "net.bytebuddy", module = "byte-buddy") // TODO jjohannes: remove exclude
-    }
+    testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
 }
 

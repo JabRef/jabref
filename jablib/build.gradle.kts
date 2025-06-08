@@ -41,12 +41,8 @@ dependencies {
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
 
-    implementation("org.jabref:afterburner.fx") {
-        exclude( group = "org.openjfx")
-    }
-    implementation("org.jabref:easybind") {
-        exclude(group = "org.openjfx")
-    }
+    implementation("org.jabref:afterburner.fx")
+    implementation("org.jabref:easybind")
 
     implementation ("org.apache.pdfbox:pdfbox") {
         exclude(group = "commons-logging")
@@ -129,9 +125,7 @@ dependencies {
     implementation("org.tinylog:tinylog-api")
     implementation("org.tinylog:tinylog-impl")
 
-    implementation("de.undercouch:citeproc-java") {
-        exclude(group = "org.antlr")
-    }
+    implementation("de.undercouch:citeproc-java")
 
     implementation("com.vladsch.flexmark:flexmark")
     implementation("com.vladsch.flexmark:flexmark-html2md-converter")
@@ -221,9 +215,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("org.mockito:mockito-core") {
-        exclude(group = "net.bytebuddy", module = "byte-buddy")
-    }
+    testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")

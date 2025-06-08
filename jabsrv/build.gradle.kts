@@ -42,22 +42,16 @@ dependencies {
 
     implementation("com.google.guava:guava")
 
-    implementation("org.jabref:afterburner.fx") {
-        exclude( group = "org.openjfx") // TODO jjohannes: remove exclude
-    }
+    implementation("org.jabref:afterburner.fx")
     implementation("org.openjfx:javafx-base")
     implementation("org.openjfx:javafx-controls")
     implementation("org.openjfx:javafx-fxml")
 
     implementation("net.harawata:appdirs")
 
-    implementation("de.undercouch:citeproc-java") {
-        exclude(group = "org.antlr") // TODO jjohannes: remove exclude
-    }
+    implementation("de.undercouch:citeproc-java")
 
-    testImplementation("org.mockito:mockito-core") {
-        exclude(group = "net.bytebuddy", module = "byte-buddy") // TODO jjohannes: remove exclude
-    }
+    testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.tinylog:slf4j-tinylog")
