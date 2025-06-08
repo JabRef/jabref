@@ -23,6 +23,8 @@ dependencies.constraints {
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
 
+    api("com.ibm.icu:icu4j:72.0.1!!")
+
     api("com.dlsc.gemsfx:gemsfx:3.1.1")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")

@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
+
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
@@ -30,6 +32,7 @@ jvmDependencyConflicts.patch {
     }
     module("com.github.tomtung:latex2unicode_2.13") {
         removeDependency("com.lihaoyi:fastparse_2.13")
+        addApiDependency("com.lihaoyi:fastparse:2.3.3")
     }
     module("de.rototor.jeuclid:jeuclid-core") {
         removeDependency("org.apache.xmlgraphics:batik-svg-dom")

@@ -26,8 +26,6 @@ configurations.antlr {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
-
     implementation("org.openjfx:javafx-base")
 
     // Required by afterburner.fx
@@ -88,10 +86,7 @@ dependencies {
 
     implementation("org.postgresql:postgresql")
 
-    antlr("org.antlr:antlr4") {
-        // JabRef ships its own variant of icu4j as binary jar
-        exclude(group = "com.ibm.icu")
-    }
+    antlr("org.antlr:antlr4")
     implementation("org.antlr:antlr4-runtime")
 
     implementation("com.google.guava:guava")
