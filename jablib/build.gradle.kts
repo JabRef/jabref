@@ -44,16 +44,9 @@ dependencies {
     implementation("org.jabref:afterburner.fx")
     implementation("org.jabref:easybind")
 
-    implementation ("org.apache.pdfbox:pdfbox") {
-        exclude(group = "commons-logging")
-    }
-    implementation ("org.apache.pdfbox:fontbox") {
-        exclude(group = "commons-logging")
-    }
-    implementation ("org.apache.pdfbox:xmpbox") {
-        exclude(group = "org.junit.jupiter")
-        exclude(group = "commons-logging")
-    }
+    implementation ("org.apache.pdfbox:pdfbox")
+    implementation ("org.apache.pdfbox:fontbox")
+    implementation ("org.apache.pdfbox:xmpbox")
 
     implementation("org.apache.lucene:lucene-core")
     implementation("org.apache.lucene:lucene-queryparser")
@@ -152,25 +145,10 @@ dependencies {
     // region AI
     implementation("dev.langchain4j:langchain4j")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-        exclude(group = "org.jetbrains.kotlin")
-    }
-    implementation("dev.langchain4j:langchain4j-mistral-ai") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-        exclude(group = "org.jetbrains.kotlin")
-    }
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-    }
-    implementation("dev.langchain4j:langchain4j-hugging-face") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-        exclude(group = "org.jetbrains.kotlin")
-    }
+    implementation("dev.langchain4j:langchain4j-open-ai")
+    implementation("dev.langchain4j:langchain4j-mistral-ai")
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini")
+    implementation("dev.langchain4j:langchain4j-hugging-face")
 
     implementation("org.apache.velocity:velocity-engine-core")
     implementation(platform("ai.djl:bom"))
@@ -179,9 +157,7 @@ dependencies {
     implementation("ai.djl.pytorch:pytorch-model-zoo")
     implementation("io.github.stefanbratanov:jvm-openai")
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
-    implementation("com.squareup.okhttp3:okhttp") {
-        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
-    }
+    implementation("com.squareup.okhttp3:okhttp")
     // GemxFX also (transitively) depends on kotlin
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     // endregion

@@ -42,24 +42,14 @@ dependencies {
     implementation("org.fxmisc.richtext:richtextfx")
     implementation("com.dlsc.gemsfx:gemsfx") {
         exclude(module = "javax.inject") // Split package, use only jakarta.inject
-        exclude(module = "commons-lang3")
-        exclude(group = "org.apache.commons.validator")
-        exclude(group = "org.apache.commons.commons-logging")
-        exclude(module = "kotlin-stdlib-jdk8")
-        exclude(group = "com.squareup.retrofit2")
         exclude(group = "org.apache.logging.log4j")
-        exclude(group = "tech.units")
     }
-    implementation("com.dlsc.pdfviewfx:pdfviewfx") {
-        exclude(module = "commons-lang3")
-    }
+    implementation("com.dlsc.pdfviewfx:pdfviewfx")
 
     // Required by gemsfx
     implementation("tech.units:indriya")
     // Required by gemsfx and langchain4j
-    implementation ("com.squareup.retrofit2:retrofit") {
-        exclude(group = "com.squareup.okhttp3")
-    }
+    implementation ("com.squareup.retrofit2:retrofit")
 
     implementation("org.controlsfx:controlsfx")
     implementation("org.jabref:easybind")
@@ -85,9 +75,7 @@ dependencies {
 
     implementation("commons-io:commons-io")
 
-    implementation ("org.apache.pdfbox:pdfbox") {
-        exclude(group = "commons-logging")
-    }
+    implementation ("org.apache.pdfbox:pdfbox")
 
     // implementation("net.java.dev.jna:jna")
     implementation("net.java.dev.jna:jna-platform")
