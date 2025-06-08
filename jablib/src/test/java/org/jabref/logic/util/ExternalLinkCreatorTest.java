@@ -35,6 +35,7 @@ class ExternalLinkCreatorTest {
                     true, // persistCustomKeys
                     List.of(), // catalogs
                     null, // defaultPlainCitationParser
+                    5, // citationsRelationsStoreTTL
                     Collections.emptyMap() // searchEngineUrlTemplates
             );
         }
@@ -62,9 +63,12 @@ class ExternalLinkCreatorTest {
     @ParameterizedTest
     @MethodSource("specialCharactersProvider")
     void getShortScienceSearchURLEncodesSpecialCharacters(String title) {
+        ImporterPreferences stubPreferences = new StubImporterPreferences();
+        ExternalLinkCreator linkCreator = new ExternalLinkCreator(stubPreferences);
+
         BibEntry entry = new BibEntry();
         entry.setField(StandardField.TITLE, title);
-        Optional<String> url = getShortScienceSearchURL(entry);
+        Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
         assertTrue(url.isPresent());
         assertTrue(urlIsValid(url.get()));
     }
@@ -77,8 +81,11 @@ class ExternalLinkCreatorTest {
         "'JabRef bibliography management', 'https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management'"
     })
     void getShortScienceSearchURLEncodesCharacters(String title, String expectedUrl) {
+        ImporterPreferences stubPreferences = new StubImporterPreferences();
+        ExternalLinkCreator linkCreator = new ExternalLinkCreator(stubPreferences);
+
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, title);
-        Optional<String> url = getShortScienceSearchURL(entry);
+        Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
         assertEquals(Optional.of(expectedUrl), url);
     }
 
@@ -91,15 +98,17 @@ class ExternalLinkCreatorTest {
         assertEquals(Optional.empty(), linkCreator.getShortScienceSearchURL(entry));
     }
 
-    @Test
-    void getShortScienceSearchURLLinksToSearchResults() {
+    @ParameterizedTest
+    @CsvSource({
+            "JabRef bibliography management, https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management",
+            "Machine learning, https://www.shortscience.org/internalsearch?q=Machine%20learning",
+    })
+    void getShortScienceSearchURLLinksToSearchResults(String title, String expectedUrl) {
         ImporterPreferences stubPreferences = new StubImporterPreferences();
         ExternalLinkCreator linkCreator = new ExternalLinkCreator(stubPreferences);
 
-        // Take an arbitrary article name
-        BibEntry entry = new BibEntry().withField(StandardField.TITLE, "JabRef bibliography management");
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, title);
         Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
-        // Expected behaviour is to link to the search results page, /internalsearch
-        assertEquals(Optional.of("https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management"), url);
+        assertEquals(Optional.of(expectedUrl), url);
     }
 }

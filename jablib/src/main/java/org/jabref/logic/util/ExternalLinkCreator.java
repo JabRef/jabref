@@ -37,7 +37,7 @@ public class ExternalLinkCreator {
             if (!baseUrl.contains("{title}")) {
                 try {
                     URIBuilder uriBuilder = new URIBuilder(DEFAULT_SHORTSCIENCE_SEARCH_URL);
-                    uriBuilder.addParameter("q", title);
+                    uriBuilder.addParameter("q", title.trim());
                     author.ifPresent(a -> uriBuilder.addParameter("author", a));
                     return uriBuilder.toString();
                 } catch (URISyntaxException ex) {
@@ -68,7 +68,7 @@ public class ExternalLinkCreator {
             if (!baseUrl.contains("{title}")) {
                 try {
                     URIBuilder uriBuilder = new URIBuilder(DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL);
-                    uriBuilder.addParameter("q", title);
+                    uriBuilder.addParameter("q", title.trim());
                     author.ifPresent(a -> uriBuilder.addParameter("author", a));
                     return uriBuilder.toString();
                 } catch (URISyntaxException ex) {
