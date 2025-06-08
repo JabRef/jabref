@@ -12,6 +12,7 @@ import org.jabref.model.entry.field.StandardField;
 public class ExternalLinkCreator {
     private static final String DEFAULT_SHORTSCIENCE_SEARCH_URL = "https://www.shortscience.org/internalsearch";
     private static final String DEFAULT_GOOGLE_SCHOLAR_SEARCH_URL = "https://scholar.google.com/scholar";
+    private static final String DEFAULT_SEMANTIC_SCHOLAR_SEARCH_URL = "https://www.semanticscholar.org/search";
 
     private final ImporterPreferences importerPreferences;
 
@@ -73,6 +74,37 @@ public class ExternalLinkCreator {
                     return uriBuilder.toString();
                 } catch (URISyntaxException ex) {
                     throw new AssertionError("Default Google Scholar URL is invalid.", ex);
+                }
+            }
+
+            String urlWithTitle = baseUrl.replace("{title}", title);
+            return author.map(a -> urlWithTitle.replace("{author}", a)).orElse(urlWithTitle);
+        });
+    }
+
+    /**
+     * Get a URL to the search results of Semantic Scholar for the BibEntry's title
+     *
+     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
+     * @return The URL if it was successfully created
+     */
+    public Optional<String> getSemanticScholarSearchURL(BibEntry entry) {
+        return entry.getField(StandardField.TITLE).map(title -> {
+            // Use custom URL template if available, otherwise use default
+            String baseUrl = importerPreferences.getSearchEngineUrlTemplates()
+                                                .getOrDefault("Semantic Scholar", DEFAULT_SEMANTIC_SCHOLAR_SEARCH_URL);
+
+            Optional<String> author = entry.getField(StandardField.AUTHOR);
+
+            // If URL doesn't contain {title}, it's invalid, use default
+            if (!baseUrl.contains("{title}")) {
+                try {
+                    URIBuilder uriBuilder = new URIBuilder(DEFAULT_SEMANTIC_SCHOLAR_SEARCH_URL);
+                    uriBuilder.addParameter("q", title);
+                    author.ifPresent(a -> uriBuilder.addParameter("author", a));
+                    return uriBuilder.toString();
+                } catch (URISyntaxException ex) {
+                    throw new AssertionError("Default Semantic Scholar URL is invalid.", ex);
                 }
             }
 

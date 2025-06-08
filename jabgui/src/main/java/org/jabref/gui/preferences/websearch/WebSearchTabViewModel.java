@@ -140,7 +140,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         // Add default search engines
         searchEngines.addAll(
                 new SearchEngineItem("Google Scholar", "https://scholar.google.com/scholar?q={title}"),
-                new SearchEngineItem("Short Science", "https://www.shortscience.org/internalsearch?q={title}")
+                new SearchEngineItem("Short Science", "https://www.shortscience.org/internalsearch?q={title}"),
+                new SearchEngineItem("Semantic Scholar", "https://www.semanticscholar.org/search?q={title}")
         );
     }
 

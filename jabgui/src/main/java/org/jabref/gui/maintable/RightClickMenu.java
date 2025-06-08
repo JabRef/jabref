@@ -229,7 +229,8 @@ public class RightClickMenu {
         Menu searchMenu = factory.createMenu(StandardActions.SEARCH);
         searchMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.SEARCH_SHORTSCIENCE, new SearchShortScienceAction(dialogService, stateManager, preferences, importerPreferences)),
-                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences, importerPreferences))
+                factory.createMenuItem(StandardActions.SEARCH_GOOGLE_SCHOLAR, new SearchGoogleScholarAction(dialogService, stateManager, preferences, importerPreferences)),
+                factory.createMenuItem(StandardActions.SEARCH_SEMANTIC_SCHOLAR, new SearchSemanticScholarAction(dialogService, stateManager, preferences, importerPreferences))
         );
         return searchMenu;
     }
