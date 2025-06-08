@@ -164,13 +164,9 @@ dependencies {
 
     implementation("commons-io:commons-io")
 
-    implementation("com.github.tomtung:latex2unicode_2.13") {
-        exclude(module = "fastparse_2.13")
-    }
+    implementation("com.github.tomtung:latex2unicode_2.13")
 
-    implementation ("de.rototor.snuggletex:snuggletex-jeuclid") {
-        exclude(group = "org.apache.xmlgraphics")
-    }
+    implementation("de.rototor.snuggletex:snuggletex-jeuclid")
 
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr")

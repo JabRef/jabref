@@ -28,6 +28,14 @@ jvmDependencyConflicts.patch {
         removeDependency("org.checkerframework:checker-qual")
         removeDependency("com.google.errorprone:error_prone_annotations")
     }
+    module("com.github.tomtung:latex2unicode_2.13") {
+        removeDependency("com.lihaoyi:fastparse_2.13")
+    }
+    module("de.rototor.jeuclid:jeuclid-core") {
+        removeDependency("org.apache.xmlgraphics:batik-svg-dom")
+        removeDependency("org.apache.xmlgraphics:batik-ext")
+        removeDependency("org.apache.xmlgraphics:xmlgraphics-commons")
+    }
 }
 
 extraJavaModuleInfo {
