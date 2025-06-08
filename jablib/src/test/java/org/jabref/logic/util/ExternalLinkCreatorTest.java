@@ -16,31 +16,11 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import static org.mockito.Mockito.mock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ExternalLinkCreatorTest {
-
-    // Create stub for ImporterPreferences to test
-    private static class StubImporterPreferences extends ImporterPreferences {
-        public StubImporterPreferences() {
-            super(
-                    true, // importerEnabled
-                    true, // generateNewKeyOnImport
-                    null, // importWorkingDirectory
-                    true, // warnAboutDuplicatesOnImport
-                    Collections.emptySet(), // customImporters
-                    Collections.emptySet(), // apiKeys
-                    Collections.emptyMap(), // defaultApiKeys
-                    true, // persistCustomKeys
-                    List.of(), // catalogs
-                    null, // defaultPlainCitationParser
-                    5, // citationsRelationsStoreTTL
-                    Collections.emptyMap() // searchEngineUrlTemplates
-            );
-        }
-    }
-
     /**
      * Validates URL conformance to RFC2396. Does not perform complex checks such as opening connections.
      */
@@ -63,11 +43,10 @@ class ExternalLinkCreatorTest {
     @ParameterizedTest
     @MethodSource("specialCharactersProvider")
     void getShortScienceSearchURLEncodesSpecialCharacters(String title) {
-        ImporterPreferences stubPreferences = new StubImporterPreferences();
-        ExternalLinkCreator linkCreator = new ExternalLinkCreator(stubPreferences);
+        ImporterPreferences mockPreferences = mock(ImporterPreferences.class);
+        ExternalLinkCreator linkCreator = new ExternalLinkCreator(mockPreferences);
 
-        BibEntry entry = new BibEntry();
-        entry.setField(StandardField.TITLE, title);
+        BibEntry entry = new BibEntry().withField(StandardField.TITLE, title);
         Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
         assertTrue(url.isPresent());
         assertTrue(urlIsValid(url.get()));
@@ -81,8 +60,8 @@ class ExternalLinkCreatorTest {
         "'JabRef bibliography management', 'https://www.shortscience.org/internalsearch?q=JabRef%20bibliography%20management'"
     })
     void getShortScienceSearchURLEncodesCharacters(String title, String expectedUrl) {
-        ImporterPreferences stubPreferences = new StubImporterPreferences();
-        ExternalLinkCreator linkCreator = new ExternalLinkCreator(stubPreferences);
+        ImporterPreferences mockPreferences = mock(ImporterPreferences.class);
+        ExternalLinkCreator linkCreator = new ExternalLinkCreator(mockPreferences);
 
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, title);
         Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
@@ -91,8 +70,8 @@ class ExternalLinkCreatorTest {
 
     @Test
     void getShortScienceSearchURLReturnsEmptyOnMissingTitle() {
-        ImporterPreferences stubPreferences = new StubImporterPreferences();
-        ExternalLinkCreator linkCreator = new ExternalLinkCreator(stubPreferences);
+        ImporterPreferences mockPreferences = mock(ImporterPreferences.class);
+        ExternalLinkCreator linkCreator = new ExternalLinkCreator(mockPreferences);
 
         BibEntry entry = new BibEntry();
         assertEquals(Optional.empty(), linkCreator.getShortScienceSearchURL(entry));
@@ -104,8 +83,8 @@ class ExternalLinkCreatorTest {
             "Machine learning, https://www.shortscience.org/internalsearch?q=Machine%20learning",
     })
     void getShortScienceSearchURLLinksToSearchResults(String title, String expectedUrl) {
-        ImporterPreferences stubPreferences = new StubImporterPreferences();
-        ExternalLinkCreator linkCreator = new ExternalLinkCreator(stubPreferences);
+        ImporterPreferences mockPreferences = mock(ImporterPreferences.class);
+        ExternalLinkCreator linkCreator = new ExternalLinkCreator(mockPreferences);
 
         BibEntry entry = new BibEntry().withField(StandardField.TITLE, title);
         Optional<String> url = linkCreator.getShortScienceSearchURL(entry);
