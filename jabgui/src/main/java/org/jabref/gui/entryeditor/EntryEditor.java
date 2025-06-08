@@ -321,7 +321,7 @@ public class EntryEditor extends BorderPane implements PreviewControls, AdaptVis
         }
 
         tabs.add(new MathSciNetTab());
-        tabs.add(new FileAnnotationTab(stateManager));
+        tabs.add(new FileAnnotationTab(stateManager, preferences));
         tabs.add(new SciteTab(preferences, taskExecutor, dialogService));
         tabs.add(new CitationRelationsTab(dialogService, undoManager, stateManager, fileMonitor, preferences, taskExecutor, bibEntryTypesManager));
         tabs.add(new RelatedArticlesTab(buildInfo, preferences, dialogService, stateManager, taskExecutor));
