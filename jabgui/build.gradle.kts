@@ -40,10 +40,7 @@ dependencies {
     implementation("de.saxsys:mvvmfx")
     implementation("org.fxmisc.flowless:flowless")
     implementation("org.fxmisc.richtext:richtextfx")
-    implementation("com.dlsc.gemsfx:gemsfx") {
-        exclude(module = "javax.inject") // Split package, use only jakarta.inject
-        exclude(group = "org.apache.logging.log4j")
-    }
+    implementation("com.dlsc.gemsfx:gemsfx")
     implementation("com.dlsc.pdfviewfx:pdfviewfx")
 
     // Required by gemsfx
