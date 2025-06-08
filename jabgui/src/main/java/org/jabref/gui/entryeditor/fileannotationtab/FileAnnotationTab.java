@@ -43,13 +43,11 @@ public class FileAnnotationTab extends EntryEditorTab {
         }
         if (stateManager.activeTabProperty().get().isPresent()) {
             Map<Path, List<FileAnnotation>> fileAnnotations = stateManager.activeTabProperty().get().get().getAnnotationCache().getFromCache(entry);
-
-             hasAnnotations = fileAnnotations.values().stream()
-                    .anyMatch(list -> !list.isEmpty());
-
+            hasAnnotations = fileAnnotations.values().stream().anyMatch(list -> !list.isEmpty());
         }
         return entry.getField(StandardField.FILE).isPresent() && hasAnnotations;
     }
+
     @Override
     protected void bindToEntry(BibEntry entry) {
         if (stateManager.activeTabProperty().get().isPresent()) {

@@ -258,7 +258,6 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     public static final String SHOW_AI_SUMMARY = "showAiSummary";
     public static final String SHOW_FILE_ANNOTATIONS = "showFileAnnotations";
-
     public static final String SHOW_AI_CHAT = "showAiChat";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
