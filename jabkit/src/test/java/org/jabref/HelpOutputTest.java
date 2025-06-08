@@ -1,5 +1,7 @@
 package org.jabref;
 
+import java.util.Arrays;
+
 import javafx.collections.FXCollections;
 
 import org.jabref.cli.ArgumentProcessor;
@@ -15,8 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import picocli.CommandLine;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,16 +55,25 @@ public class HelpOutputTest {
     }
 
     @Test
-    public void testExportFormatsFooterShownForOutputCommands() {
-        String help = cmd.getSubcommands().get("search").getUsageMessage();
-        assertTrue(help.contains("Available export formats"),
-                "'Available export formats' should appear in 'search' command help");
-    }
+    public void testExportFormatFooterShownOnlyForCommandsWithOutputOption() {
+        cmd.getSubcommands().forEach((name, subCmd) -> {
+            CommandLine.Model.CommandSpec spec = subCmd.getCommandSpec();
+            String helpMessage = subCmd.getUsageMessage();
 
-    @Test
-    public void testExportFormatsFooterNotShownForCommandsWithoutOutput() {
-        String help = cmd.getSubcommands().get("check-consistency").getUsageMessage();
-        assertFalse(help.contains("Available export formats"),
-                "'Available export formats' should NOT appear in 'check-consistency' command help");
+            boolean hasOutputOption = spec.options().stream()
+                                          .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output"));
+
+            if ("fetch".equals(name)) {
+                // special case: expect footer NOT present
+                assertEquals(false, helpMessage.contains("Available export formats"),
+                        "Did not expect 'Available export formats' in help for special case: " + name);
+            } else if (hasOutputOption) {
+                assertEquals(true, helpMessage.contains("Available export formats"),
+                        "Expected 'Available export formats' in help for: " + name);
+            } else {
+                assertEquals(false, helpMessage.contains("Available export formats"),
+                        "Did not expect 'Available export formats' in help for: " + name);
+            }
+        });
     }
 }
