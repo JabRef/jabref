@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -43,6 +44,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
@@ -134,23 +136,52 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     @Override
     public ParserResult importDatabase(Path filePath) throws IOException {
+        Objects.requireNonNull(filePath);
+
+        List<BibEntry> bibItems = new ArrayList<>();
+
         try (BufferedReader reader = getReaderFromZip(filePath)) {
-            Object unmarshalledObject = unmarshallRoot(reader);
+            // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            // required for reading Unicode characters such as &#xf6;
+            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
 
-            if (unmarshalledObject instanceof CitaviExchangeData data) {
-                List<BibEntry> bibEntries = parseDataList(data);
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
 
-                return new ParserResult(bibEntries);
-            } else {
-                return ParserResult.fromErrorMessage("File does not start with xml tag.");
+            if (xmlStreamReader.hasNext()) {
+                xmlStreamReader.next();
+                if (xmlStreamReader.isStartElement()) {
+                    String elementName = xmlStreamReader.getLocalName();
+                    if ("CitaviExchangeData".equals(elementName)) {
+                        parseCitaviData(xmlStreamReader, bibItems, elementName);
+                    }
+                }
             }
-        } catch (JAXBException | XMLStreamException e) {
+        } catch (XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
+        return new ParserResult(bibItems);
     }
 
-    private List<BibEntry> parseDataList(CitaviExchangeData data) {
+    private void parseCitaviData(XMLStreamReader reader, List<BibEntry> bibItems, String startElement) throws XMLStreamException {
+        Map<Field, String> fields = new HashMap<>();
+        // TODO: Persons, Keywords, Publishers, KnowledgeItems, ReferenceAuthors, ReferenceKeywords
+
+        while (reader.hasNext()) {
+            reader.next();
+            if (reader.isStartElement()) {
+                String elementName = reader.getLocalName();
+                switch (elementName) {
+                    case
+
+                }
+
+            }
+        }
+    }
+
+    private List<BibEntry> parseDataList(CitaviExchangeData data) throws XMLStreamException {
         List<BibEntry> bibEntries;
 
         persons = data.getPersons();
