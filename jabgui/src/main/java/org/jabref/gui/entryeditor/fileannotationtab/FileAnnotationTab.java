@@ -15,9 +15,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.pdf.FileAnnotation;
 
 import com.airhacks.afterburner.views.ViewLoader;
-import org.jabref.model.pdf.FileAnnotation;
 
 public class FileAnnotationTab extends EntryEditorTab {
 
