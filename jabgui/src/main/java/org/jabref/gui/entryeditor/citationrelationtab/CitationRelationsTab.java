@@ -403,10 +403,12 @@ public class CitationRelationsTab extends EntryEditorTab {
                 CrossRef doiFetcher = new CrossRef();
                 BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
                               .onRunning(() -> listView.setPlaceholder(new Label("Looking up DOI...")))
-                              .onFinished(() -> listView.setPlaceholder(placeHolder))
-                              .onSuccess(identifier -> {
-                                  if (identifier.isPresent()) {
-                                      System.out.println(identifier.get());
+                              .onSuccess(doiIdentifier -> {
+                                  if (doiIdentifier.isPresent()) {
+                                      System.out.println(doiIdentifier.get());
+                                      entry.setField(StandardField.DOI, doiIdentifier.get().asString());
+                                      searchForRelations(entry, listView, abortButton, refreshButton, searchType, importButton, progress, shouldRefresh);
+//                                      searchForRelations(entry, listView, abortButton, refreshButton, CitationFetcher.SearchType.CITED_BY, importButton, progress, shouldRefresh);
                                   } else {
                                       dialogService.notify("No DOI found");
                                   }
