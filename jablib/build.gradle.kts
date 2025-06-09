@@ -569,6 +569,14 @@ mavenPublishing {
   }
 }
 
+tasks.named("processResources") {
+    dependsOn(
+        taskGenerateJournalListMV,
+        taskGenerateLtwaListMV,
+        taskGenerateCitationStyleCatalog
+    )
+}
+
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
