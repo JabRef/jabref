@@ -1,10 +1,14 @@
 package org.jabref.gui.exporter;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -12,6 +16,7 @@ import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.WriteMetadataToSinglePdfAction;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -178,7 +183,10 @@ public class WriteMetadataToLinkedPdfsAction extends SimpleCommand {
                                         filePreferences,
                                         xmpPreferences);
                                 entriesChanged++;
-                            } catch (Exception e) {
+                            } catch (IOException
+                                     | TransformerException
+                                     | SaveException
+                                     | ParserConfigurationException e) {
                                 LOGGER.error("Error while writing XMP data to pdf '{}'", file, e);
                                 failedWrittenFiles.add(file);
                                 errors++;

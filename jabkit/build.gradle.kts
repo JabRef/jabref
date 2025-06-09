@@ -3,9 +3,6 @@ plugins {
 
     application
 
-    // afterburner.fx
-    id("org.openjfx.javafxplugin") version("0.1.0")
-
     id("org.beryx.jlink") version "3.1.1"
 }
 
@@ -14,6 +11,8 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 
 val luceneVersion = "10.2.1"
 
+val javafxVersion = "24.0.1"
+
 dependencies {
     implementation(project(":jablib"))
 
@@ -21,6 +20,11 @@ dependencies {
     implementation("org.jabref:afterburner.fx:2.0.0") {
         exclude( group = "org.openjfx")
     }
+
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    // implementation("org.openjfx:javafx-graphics:$javafxVersion")
 
     implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.7")
@@ -53,6 +57,8 @@ dependencies {
 
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
+    implementation("io.github.adr:e-adr:2.0.0-SNAPSHOT")
+
     testImplementation(project(":test-support"))
     testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
@@ -60,17 +66,17 @@ dependencies {
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 }
 
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.jabref.testsupport")
+    requires.add("org.mockito")
+}
+
 /*
 jacoco {
     toolVersion = "0.8.13"
 }
 */
-
-javafx {
-    version = "24"
-    // because of afterburner.fx
-    modules = listOf("javafx.base", "javafx.controls", "javafx.fxml")
-}
 
 application {
     mainClass.set("org.jabref.JabKit")
@@ -104,7 +110,8 @@ jlink {
         "zip-6",
         "--no-header-files",
         "--no-man-pages",
-        "--bind-services"
+        "--bind-services",
+        "--add-modules", "jdk.incubator.vector"
     )
 
     launcher {
@@ -113,7 +120,6 @@ jlink {
 
     // TODO: Remove as soon as dependencies are fixed (upstream)
     forceMerge(
-        "controlsfx",
         "bcprov",
         "jaxb",
         "istack",
@@ -121,178 +127,68 @@ jlink {
     )
 
     mergedModule {
-        requires(
-            "com.google.gson"
-        )
-        requires(
-            "com.fasterxml.jackson.annotation"
-        )
-        requires(
-            "com.fasterxml.jackson.databind"
-        )
-        requires(
-            "com.fasterxml.jackson.core"
-        )
-        requires(
-            "com.fasterxml.jackson.datatype.jdk8"
-        )
-        requires(
-            "jakarta.xml.bind"
-        )
-        requires(
-            "java.compiler"
-        )
-        requires(
-            "java.datatransfer"
-        )
-        requires(
-            "java.desktop"
-        )
-        requires(
-            "java.logging"
-        )
-        requires(
-            "java.management"
-        )
-        requires(
-            "java.naming"
-        )
-        requires(
-            "java.net.http"
-        )
-        requires(
-            "java.rmi"
-        )
-        requires(
-            "java.scripting"
-        )
-        requires(
-            "java.security.jgss"
-        )
-        requires(
-            "java.security.sasl"
-        )
-        requires(
-            "java.sql"
-        )
-        requires(
-            "java.sql.rowset"
-        )
-        requires(
-            "java.transaction.xa"
-        )
-        requires(
-            "java.xml"
-        )
-        requires(
-            "javafx.base"
-        )
-        requires(
-            "javafx.controls"
-        )
-        requires(
-            "javafx.fxml"
-        )
-        requires(
-            "javafx.graphics"
-        )
-        requires(
-            "jdk.security.jgss"
-        )
-        requires(
-            "jdk.unsupported"
-        )
-        requires(
-            "jdk.unsupported.desktop"
-        )
-        requires(
-            "jdk.xml.dom"
-        )
-        requires(
-            "org.apache.commons.lang3"
-        )
-        requires(
-            "org.apache.commons.logging"
-        )
-        requires(
-            "org.apache.commons.text"
-        )
-        requires(
-            "org.apache.commons.codec"
-        )
-        requires(
-            "org.apache.commons.io"
-        )
-        requires(
-            "org.apache.commons.compress"
-        )
-        requires(
-            "org.freedesktop.dbus"
-        )
-        requires(
-            "org.jsoup"
-        )
-        requires(
-            "org.slf4j"
-        )
-        requires(
-            "org.tukaani.xz"
-        );
-        uses(
-            "ai.djl.engine.EngineProvider"
-        )
-        uses(
-            "ai.djl.repository.RepositoryFactory"
-        )
-        uses(
-            "ai.djl.repository.zoo.ZooProvider"
-        )
-        uses(
-            "dev.langchain4j.spi.prompt.PromptTemplateFactory"
-        )
-        uses(
-            "kong.unirest.core.json.JsonEngine"
-        )
-        uses(
-            "org.eclipse.jgit.lib.Signer"
-        )
-        uses(
-            "org.eclipse.jgit.transport.SshSessionFactory"
-        )
-        uses(
-            "org.postgresql.shaded.com.ongres.stringprep.Profile"
-        )
-
-        provides(
-            "java.sql.Driver"
-        ).with(
-            "org.postgresql.Driver"
-        )
-        provides(
-            "java.security.Provider"
-        ).with(
+        requires("com.google.gson")
+        requires("com.fasterxml.jackson.annotation")
+        requires("com.fasterxml.jackson.databind")
+        requires("com.fasterxml.jackson.core")
+        requires("com.fasterxml.jackson.datatype.jdk8")
+        requires("jakarta.xml.bind")
+        requires("java.compiler")
+        requires("java.datatransfer")
+        requires("java.desktop")
+        requires("java.logging")
+        requires("java.management")
+        requires("java.naming")
+        requires("java.net.http")
+        requires("java.rmi")
+        requires("java.scripting")
+        requires("java.security.jgss")
+        requires("java.security.sasl")
+        requires("java.sql")
+        requires("java.sql.rowset")
+        requires("java.transaction.xa")
+        requires("java.xml")
+        requires("javafx.base")
+        requires("javafx.controls")
+        requires("javafx.fxml")
+        requires("javafx.graphics")
+        requires("jdk.security.jgss")
+        requires("jdk.unsupported")
+        requires("jdk.unsupported.desktop")
+        requires("jdk.xml.dom")
+        requires("org.apache.commons.lang3")
+        requires("org.apache.commons.logging")
+        requires("org.apache.commons.text")
+        requires("org.apache.commons.codec")
+        requires("org.apache.commons.io")
+        requires("org.apache.commons.compress")
+        requires("org.freedesktop.dbus")
+        requires("org.jsoup")
+        requires("org.slf4j")
+        requires("org.tukaani.xz");
+        uses("ai.djl.engine.EngineProvider")
+        uses("ai.djl.repository.RepositoryFactory")
+        uses("ai.djl.repository.zoo.ZooProvider")
+        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
+        uses("kong.unirest.core.json.JsonEngine")
+        uses("org.eclipse.jgit.lib.Signer")
+        uses("org.eclipse.jgit.transport.SshSessionFactory")
+        uses("org.postgresql.shaded.com.ongres.stringprep.Profile")
+        provides("java.sql.Driver").with(
+            "org.postgresql.Driver")
+        provides("java.security.Provider").with(
             "org.bouncycastle.jce.provider.BouncyCastleProvider",
-            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider"
-        )
-        provides(
-            "kong.unirest.core.json.JsonEngine"
-        ).with(
-            "kong.unirest.modules.gson.GsonEngine"
-        )
-        provides(
-            "ai.djl.repository.zoo.ZooProvider"
-        ).with(
+            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
+        provides("kong.unirest.core.json.JsonEngine").with(
+            "kong.unirest.modules.gson.GsonEngine")
+        provides("ai.djl.repository.zoo.ZooProvider").with(
             "ai.djl.engine.rust.zoo.RsZooProvider",
             "ai.djl.huggingface.zoo.HfZooProvider",
             "ai.djl.pytorch.zoo.PtZooProvider",
-            "ai.djl.repository.zoo.DefaultZooProvider"
-        )
-        provides(
-            "ai.djl.engine.EngineProvider"
-        ).with(
+            "ai.djl.repository.zoo.DefaultZooProvider")
+        provides("ai.djl.engine.EngineProvider").with(
             "ai.djl.engine.rust.RsEngineProvider",
-            "ai.djl.pytorch.engine.PtEngineProvider"
-        )
+            "ai.djl.pytorch.engine.PtEngineProvider")
 
     }
     jpackage {

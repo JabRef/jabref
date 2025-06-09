@@ -3,10 +3,10 @@ import java.nio.file.Path;
 
 ///usr/bin/env jbang "$0" "$@" ; exit $?
 
-//JAVA 24
+//JAVA 21+
 //RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
 
-//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.2.1.202505142326-r
+//DEPS org.eclipse.jgit:org.eclipse.jgit.pgm:7.3.0.202506031305-r
 
 public class CloneJabRef {
     public static void main(String[] args) throws Exception {
@@ -14,7 +14,7 @@ public class CloneJabRef {
         if (args.length == 1) {
             targetDir = Path.of(args[0]).toAbsolutePath();
         } else {
-            targetDir = Path.of(System.getProperty("java.io.tmpdir"), "JabRef");
+            targetDir = Path.of(System.getProperty("java.io.tmpdir"), "jabref");
         }
 
         if (Files.exists(targetDir)) {

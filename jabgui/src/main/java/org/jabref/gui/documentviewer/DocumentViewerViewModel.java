@@ -1,6 +1,5 @@
 package org.jabref.gui.documentviewer;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -15,77 +14,63 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
-import com.tobiasdiez.easybind.EasyBind;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class DocumentViewerViewModel extends AbstractViewModel {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
     private final CliPreferences preferences;
-    private final ObjectProperty<DocumentViewModel> currentDocument = new SimpleObjectProperty<>();
+    private final ObjectProperty<Path> currentDocument = new SimpleObjectProperty<>();
     private final ListProperty<LinkedFile> files = new SimpleListProperty<>();
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
-    private final ObjectProperty<Integer> currentPage = new SimpleObjectProperty<>();
-    private final IntegerProperty maxPages = new SimpleIntegerProperty();
+    private final IntegerProperty currentPage = new SimpleIntegerProperty();
+    private final StringProperty highlightText = new SimpleStringProperty();
 
     public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.preferences = Objects.requireNonNull(preferences);
 
-        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) c -> {
+        this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) _ -> {
             // Switch to currently selected entry in live mode
             if (liveMode.get()) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
             }
         });
 
-        this.liveMode.addListener((observable, oldValue, newValue) -> {
+        this.liveMode.addListener((_, oldValue, newValue) -> {
             // Switch to currently selected entry if mode is changed to live
             if ((oldValue != newValue) && newValue) {
                 setCurrentEntries(this.stateManager.getSelectedEntries());
             }
         });
 
-        // we need to wrap this in run later so that the max pages number is correctly shown
-        UiTaskExecutor.runInJavaFXThread(() -> maxPages.bind(
-                EasyBind.wrapNullable(currentDocument).selectProperty(DocumentViewModel::maxPagesProperty)));
         setCurrentEntries(this.stateManager.getSelectedEntries());
     }
 
-    private int getCurrentPage() {
-        return currentPage.get();
-    }
-
-    public ObjectProperty<Integer> currentPageProperty() {
+    public IntegerProperty currentPageProperty() {
         return currentPage;
     }
 
-    public IntegerProperty maxPagesProperty() {
-        return maxPages;
-    }
-
-    public ObjectProperty<DocumentViewModel> currentDocumentProperty() {
+    public ObjectProperty<Path> currentDocumentProperty() {
         return currentDocument;
     }
 
     public ListProperty<LinkedFile> filesProperty() {
         return files;
+    }
+
+    public StringProperty highlightTextProperty() {
+        return highlightText;
     }
 
     private void setCurrentEntries(List<BibEntry> entries) {
@@ -99,13 +84,8 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     }
 
     private void setCurrentDocument(Path path) {
-        try {
-            if (FileUtil.isPDFFile(path)) {
-                PDDocument document = Loader.loadPDF(path.toFile());
-                currentDocument.set(new PdfDocumentViewModel(document));
-            }
-        } catch (IOException e) {
-            LOGGER.error("Could not set Document Viewer for path {}", path, e);
+        if (FileUtil.isPDFFile(path)) {
+            currentDocument.set(path);
         }
     }
 
@@ -114,31 +94,18 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             stateManager.getActiveDatabase()
                         .flatMap(database -> file.findIn(database, preferences.getFilePreferences()))
                         .ifPresent(this::setCurrentDocument);
-            currentPage.set(1);
         }
     }
 
     public void showPage(int pageNumber) {
-        if (pageNumber >= 1 && pageNumber <= maxPages.get()) {
-            currentPage.set(pageNumber);
-        } else {
-            currentPage.set(1);
-        }
-    }
-
-    public void showNextPage() {
-        if (getCurrentPage() < maxPages.get()) {
-            currentPage.set(getCurrentPage() + 1);
-        }
-    }
-
-    public void showPreviousPage() {
-        if (getCurrentPage() > 1) {
-            currentPage.set(getCurrentPage() - 1);
-        }
+        currentPage.set(pageNumber - 1);
     }
 
     public void setLiveMode(boolean value) {
         this.liveMode.set(value);
+    }
+
+    public void highlightText(String text) {
+        this.highlightText.set(text);
     }
 }
