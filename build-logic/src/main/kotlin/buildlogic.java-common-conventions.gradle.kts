@@ -166,10 +166,13 @@ extraJavaModuleInfo {
         exportAllPackages()
 
         requires("wiremock.slf4j.spi.shim")
+        requires("com.fasterxml.jackson.core")
         requires("com.google.common")
+        requires("commons.fileupload")
         requires("java.xml")
         requires("org.custommonkey.xmlunit")
         requires("org.slf4j")
+        requires("org.xmlunit")
 
         // workaround for https://github.com/wiremock/wiremock/issues/2874
         mergeJar("com.github.jknack:handlebars")
