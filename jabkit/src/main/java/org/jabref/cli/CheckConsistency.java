@@ -66,7 +66,9 @@ class CheckConsistency implements Runnable {
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
         BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries, (count, total) -> {
-            System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
+            if (!sharedOptions.porcelain) {
+                System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
+            }
         });
 
         Writer writer = new OutputStreamWriter(System.out);

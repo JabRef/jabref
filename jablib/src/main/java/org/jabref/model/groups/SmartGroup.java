@@ -24,9 +24,14 @@ public class SmartGroup extends WordKeywordGroup {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ExplicitGroup other)) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
+        // no instanceof check as we don't want to go up the hierarchy
+        if (!super.equals(o)) {
+            return false;
+        }
+        SmartGroup other = (SmartGroup) o;
         return Objects.equals(getName(), other.getName())
                 && Objects.equals(getHierarchicalContext(), other.getHierarchicalContext())
                 && Objects.equals(getIconName(), other.getIconName())

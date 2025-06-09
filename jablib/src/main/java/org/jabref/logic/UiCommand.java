@@ -12,6 +12,8 @@ public sealed interface UiCommand {
 
     record AppendToCurrentLibrary(List<Path> toAppend) implements UiCommand { }
 
+    record Focus() implements UiCommand { }
+
     /// @deprecated used by the browser extension only
     @Deprecated
     record AppendBibTeXToCurrentLibrary(String bibtex) implements UiCommand { }

@@ -10,8 +10,8 @@ import javafx.collections.ObservableList;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileEmbeddingsManager;
 import org.jabref.logic.ai.templates.AiTemplate;
+import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.ai.templates.PaperExcerpt;
-import org.jabref.logic.ai.templates.TemplatesService;
 import org.jabref.logic.ai.util.ErrorMessage;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -45,7 +45,7 @@ public class AiChatLogic {
     private final ChatModel chatLanguageModel;
     private final EmbeddingModel embeddingModel;
     private final EmbeddingStore<TextSegment> embeddingStore;
-    private final TemplatesService templatesService;
+    private final AiTemplatesService aiTemplatesService;
 
     private final ObservableList<ChatMessage> chatHistory;
     private final ObservableList<BibEntry> entries;
@@ -60,7 +60,7 @@ public class AiChatLogic {
                        ChatModel chatLanguageModel,
                        EmbeddingModel embeddingModel,
                        EmbeddingStore<TextSegment> embeddingStore,
-                       TemplatesService templatesService,
+                       AiTemplatesService aiTemplatesService,
                        StringProperty name,
                        ObservableList<ChatMessage> chatHistory,
                        ObservableList<BibEntry> entries,
@@ -70,7 +70,7 @@ public class AiChatLogic {
         this.chatLanguageModel = chatLanguageModel;
         this.embeddingModel = embeddingModel;
         this.embeddingStore = embeddingStore;
-        this.templatesService = templatesService;
+        this.aiTemplatesService = aiTemplatesService;
         this.chatHistory = chatHistory;
         this.entries = entries;
         this.name = name;
@@ -86,7 +86,7 @@ public class AiChatLogic {
         aiPreferences
                 .templateProperty(AiTemplate.CHATTING_SYSTEM_MESSAGE)
                 .addListener(obs ->
-                        setSystemMessage(templatesService.makeChattingSystemMessage(entries)));
+                        setSystemMessage(aiTemplatesService.makeChattingSystemMessage(entries)));
 
         aiPreferences.contextWindowSizeProperty().addListener(obs -> rebuildFull(chatMemory.messages()));
     }
@@ -99,7 +99,7 @@ public class AiChatLogic {
     private void rebuildChatMemory(List<ChatMessage> chatMessages) {
         // Because we can't get a tokenizer for each model, {@link AiChatLogic} assumes that
         // every text is tokenized like it's tokenized for OpenAI's GPT-4o-mini model.
-        // 
+        //
         // Reasons why we can't get tokenizer for each model:
         // - Some tokenizers might not be available in langchain4j.
         // - User may use a custom model, but there is no way to supply a custom tokenizer.
@@ -113,7 +113,7 @@ public class AiChatLogic {
 
         chatMessages.stream().filter(chatMessage -> !(chatMessage instanceof ErrorMessage)).forEach(chatMemory::add);
 
-        setSystemMessage(templatesService.makeChattingSystemMessage(entries));
+        setSystemMessage(aiTemplatesService.makeChattingSystemMessage(entries));
     }
 
     private void rebuildFilter() {
@@ -181,7 +181,7 @@ public class AiChatLogic {
 
         chatMemory.messages().forEach(tempChatMemory::add);
 
-        tempChatMemory.add(new UserMessage(templatesService.makeChattingUserMessage(entries, message.singleText(), excerpts)));
+        tempChatMemory.add(new UserMessage(aiTemplatesService.makeChattingUserMessage(entries, message.singleText(), excerpts)));
         chatMemory.add(message);
 
         AiMessage aiMessage = chatLanguageModel.chat(tempChatMemory.messages()).aiMessage();

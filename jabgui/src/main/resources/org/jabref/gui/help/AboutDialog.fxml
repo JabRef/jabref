@@ -84,7 +84,7 @@
                 </StackPane>
             </AnchorPane>
             <Label styleClass="sub-heading" text="%Maintainers"/>
-            <Label alignment="CENTER" styleClass="info-sections" text="${controller.viewModel.maintainers}" textAlignment="JUSTIFY" wrapText="true"/>
+            <Label alignment="CENTER" styleClass="info-sections" prefHeight="100.0" text="${controller.viewModel.maintainers}" textAlignment="JUSTIFY" wrapText="true"/>
             <Label styleClass="sub-heading" text="%Contributors"/>
             <HBox alignment="CENTER_LEFT">
                 <Hyperlink styleClass="contrib-section" onAction="#openContributors" text="%JabRef would not have been possible without the help of our contributors." wrapText="true"/>

@@ -1,5 +1,6 @@
 package org.jabref.logic.ai.ingestion;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -51,7 +52,7 @@ public class FileToDocument {
             }
 
             return fromString(writer.toString());
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("An error occurred while reading the PDF file: {}", path, e);
             return Optional.empty();
         }
