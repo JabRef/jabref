@@ -220,10 +220,6 @@ jobs:
         run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ needs.conditions.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
       # endregion
 
-      - name: gradle :jablib:jar
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jablib:jar
-      - name: gradle :jabgui:compileJava
-        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:compileJava
       - name: Basic build (assemble)
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" assemble
 
