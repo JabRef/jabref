@@ -441,7 +441,7 @@ tasks.named("compileTestJava") {
 
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
 sourceSets.named("main") {
-    resources.srcDir(layout.buildDirectory.file("generated/resources/journals"))
+    resources.srcDir(layout.buildDirectory.file("generated/resources"))
 }
 
 // Do not process the generated resources in the build/generated/resources directory
