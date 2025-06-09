@@ -139,6 +139,7 @@ dependencies {
 
     testImplementation("org.wiremock:wiremock:3.13.0")
     implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
 }
@@ -442,6 +443,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
     requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 }
 
 tasks.test {

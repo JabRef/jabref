@@ -171,15 +171,10 @@ extraJavaModuleInfo {
         patchRealModule()
         exportAllPackages()
 
-        requires("wiremock.slf4j.shim")
+        requires("wiremock.slf4j.spi.shim")
 
         // Required to provide package "wiremock.org.slf4j.helpers"
         mergeJar("com.github.koppor:wiremock-slf4j-shim")
-    }
-
-    // Required to satisfy the dependency of wiremock to a SLF4J SPI
-    module("com.github.koppor:wiremock-slf4j-shim", "wiremock.slf4j.shim") {
-        patchRealModule()
     }
 }
 

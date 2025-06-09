@@ -240,6 +240,7 @@ dependencies {
     testImplementation("org.wiremock:wiremock:3.13.0")
     // no "test", because of https://github.com/gradlex-org/extra-java-module-info/issues/134#issuecomment-2956556651
     implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
@@ -587,6 +588,8 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 
     // --add-reads
     //reads.add("org.jabref.jablib=io.github.classgraph")
