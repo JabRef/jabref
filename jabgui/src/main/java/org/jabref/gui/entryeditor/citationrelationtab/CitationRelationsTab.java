@@ -449,7 +449,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             hideNodes(abortButton, progress);
             showNodes(refreshButton);
             listView.getItems().clear();
-            Text doiLookUpText = new Text(Localization.lang("The selected entry doesn't have a DOI linked to it. "));
+            Text doiLookUpText = new Text(Localization.lang("The selected entry doesn't have a DOI linked to it."));
             Hyperlink doiLookUpHyperLink = new Hyperlink(Localization.lang("Lookup a DOI and try again."));
             TextFlow doiLookUpTextFlow = new TextFlow(doiLookUpText, doiLookUpHyperLink);
             Label placeHolder = new Label("", doiLookUpTextFlow);
