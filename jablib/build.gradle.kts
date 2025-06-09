@@ -2,6 +2,7 @@ import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import java.net.URI
 import java.util.*
 
 plugins {
@@ -375,9 +376,9 @@ tasks.register<JavaExec>("generateCitationStyleCatalog") {
     dependsOn("processResources")
     mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
-//    onlyIf {
-//        !file("build/resources/main/journals/journal-list.mv").exists()
-//    }
+
+    inputs.dir(layout.projectDirectory.dir("resources/cs-styles"))
+    outputs.file(layout.buildDirectory.file("resources/main/citation-style-catalog.json"))
 }
 
 tasks.named("jar") {
@@ -396,31 +397,31 @@ tasks.register("downloadLtwaFile") {
     val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
     val ltwaCsvFile = ltwaDir.map { it.file("ltwa_20210702.csv") }
 
-    onlyIf {
-        !ltwaCsvFile.get().asFile.exists()
-    }
+    outputs.file(ltwaCsvFile)
+
+    // Ensure that the task really is not run if the file already exists (otherwise, the task could also run if gradle's cache is cleared, ...)
+    onlyIf {!ltwaCsvFile.get().asFile.exists()}
 
     doLast {
         val dir = ltwaDir.get().asFile
         val file = ltwaCsvFile.get().asFile
 
-        if (!file.exists()) {
-            dir.mkdirs()
-            ant.withGroovyBuilder {
-                "get"(
-                    mapOf("src" to ltwaUrl, "dest" to file, "verbose" to true)
-                )
+        dir.mkdirs()
+
+        URI(ltwaUrl).toURL().openStream().use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
             }
-            logger.lifecycle("Downloaded LTWA file to $file")
-        } else {
-            logger.lifecycle("LTWA file already exists at $file")
         }
+
+        logger.lifecycle("Downloaded LTWA file to $file")
     }
 }
 
 tasks.register<JavaExec>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
+    dependsOn("downloadLtwaFile")
 
     classpath = sourceSets["main"].runtimeClasspath
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
@@ -429,12 +430,8 @@ tasks.register<JavaExec>("generateLtwaListMV") {
         languageVersion.set(java.toolchain.languageVersion)
     })
 
-    dependsOn("downloadLtwaFile")
-
-    val outputFile = layout.buildDirectory.file("resources/main/journals/ltwa-list.mv")
-    onlyIf {
-        !outputFile.get().asFile.exists()
-    }
+    inputs.file(layout.buildDirectory.file("resources/main/journals/ltwa_20210702.csv"))
+    outputs.file(layout.buildDirectory.file("resources/main/journals/ltwa-list.mv"))
 }
 
 tasks.named("jar") {
