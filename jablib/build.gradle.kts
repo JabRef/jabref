@@ -238,7 +238,7 @@ dependencies {
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+    testImplementation("org.wiremock:wiremock-standalone:3.13.0")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
