@@ -345,20 +345,19 @@ tasks.named<ProcessResources>("processResources") {
     }
 }
 
+val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
+val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
+
 tasks.register<JavaExec>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
-    classpath = sourceSets["main"].runtimeClasspath
+
+    inputs.dir(abbrvJabRefOrgDir)
+    outputs.file(generatedJournalFile)
+
     mainClass.set("org.jabref.generators.JournalListMvGenerator")
-
-    javaLauncher.convention(javaToolchains.launcherFor {
-        languageVersion.set(java.toolchain.languageVersion)
-    })
-
-    val outputFile = layout.buildDirectory.file("resources/main/journals/journal-list.mv")
-    onlyIf {
-        !outputFile.get().asFile.exists()
-    }
+    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
 tasks.named("jar") {
@@ -372,13 +371,13 @@ tasks.named("compileTestJava") {
 tasks.register<JavaExec>("generateCitationStyleCatalog") {
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
-    classpath = sourceSets["main"].runtimeClasspath
-    dependsOn("processResources")
-    mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
-    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 
-    inputs.dir(layout.projectDirectory.dir("resources/cs-styles"))
-    outputs.file(layout.buildDirectory.file("resources/main/citation-style-catalog.json"))
+    inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
+    outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
+
+    mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
+    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
 tasks.named("jar") {
@@ -389,13 +388,14 @@ tasks.named("compileTestJava") {
     dependsOn("generateCitationStyleCatalog")
 }
 
+var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
+
 tasks.register("downloadLtwaFile") {
     group = "JabRef"
     description = "Downloads the LTWA file for journal abbreviations"
 
     val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
     val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
-    val ltwaCsvFile = ltwaDir.map { it.file("ltwa_20210702.csv") }
 
     outputs.file(ltwaCsvFile)
 
@@ -423,15 +423,12 @@ tasks.register<JavaExec>("generateLtwaListMV") {
     description = "Converts the LTWA CSV file to a H2 MVStore"
     dependsOn("downloadLtwaFile")
 
-    classpath = sourceSets["main"].runtimeClasspath
+    inputs.file(ltwaCsvFile)
+    outputs.file(layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv"))
+
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-
-    javaLauncher.convention(javaToolchains.launcherFor {
-        languageVersion.set(java.toolchain.languageVersion)
-    })
-
-    inputs.file(layout.buildDirectory.file("resources/main/journals/ltwa_20210702.csv"))
-    outputs.file(layout.buildDirectory.file("resources/main/journals/ltwa-list.mv"))
+    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
+    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
 tasks.named("jar") {
@@ -440,6 +437,18 @@ tasks.named("jar") {
 
 tasks.named("compileTestJava") {
     dependsOn("generateLtwaListMV")
+}
+
+// Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
+sourceSets.named("main") {
+    resources.srcDir(layout.buildDirectory.file("generated/resources/journals"))
+}
+
+// Do not process the generated resources in the build/generated/resources directory
+tasks.named<ProcessResources>("processResources") {
+    exclude {
+        it.file.toString().startsWith(layout.buildDirectory.file("generated/resources").get().asFile.toString())
+    }
 }
 
 tasks.withType<JavaCompile>().configureEach {

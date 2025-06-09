@@ -26,7 +26,8 @@ public class JournalListMvGenerator {
             System.out.println("Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist");
             System.exit(0);
         }
-        Path journalListMvFile = Path.of("build", "resources", "main", "journals", "journal-list.mv");
+        // Directory layout aligns to other plugins (e.g., XJF plugin (https://github.com/bjornvester/xjc-gradle-plugin))
+        Path journalListMvFile = Path.of("build", "generated", "resources", "journals", "journal-list.mv");
 
         Set<String> ignoredNames = Set.of(
                 // remove all lists without dot in them:

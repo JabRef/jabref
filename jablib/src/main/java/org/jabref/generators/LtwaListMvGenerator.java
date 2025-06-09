@@ -1,12 +1,8 @@
 package org.jabref.generators;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,43 +23,24 @@ import org.slf4j.LoggerFactory;
 public class LtwaListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaListMvGenerator.class);
-    private static final String LTWA_URL = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv";
 
     public static void main(String[] args) {
         try {
-            Path tempCsvFile = downloadLtwaFile();
+            Path tempCsvFile = Path.of("build", "tmp", "ltwa_20210702.csv");
+            if (!Files.exists(tempCsvFile)) {
+                LOGGER.error("LTWA CSV file not found at {}. Please execute gradle task downloadLtwaFile.", tempCsvFile);
+                return;
+            }
             Path outputDir = Path.of("build", "resources", "main", "journals");
+
             Files.createDirectories(outputDir);
             Path outputFile = outputDir.resolve("ltwa-list.mv");
 
             generateMvStore(tempCsvFile, outputFile);
 
-            // Delete temp file
-            Files.deleteIfExists(tempCsvFile);
-
             LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile);
         } catch (IOException e) {
             LOGGER.error("Error generating LTWA MVStore file.", e);
-        } catch (URISyntaxException e) {
-            LOGGER.error("Invalid URL for LTWA file (this should never happen).", e);
-        }
-    }
-
-    /**
-     * Downloads the LTWA CSV file from the specified URL.
-     *
-     * @return Path to the downloaded file
-     * @throws IOException If an I/O error occurs
-     */
-    private static Path downloadLtwaFile() throws IOException, URISyntaxException {
-        LOGGER.info("Downloading LTWA file from {}.", LtwaListMvGenerator.LTWA_URL);
-        try (InputStream inputStream = new URI(LTWA_URL).toURL().openStream()) {
-            Path path = Files.writeString(
-                    Files.createTempFile("ltwa", ".csv"),
-                    new String(inputStream.readAllBytes()),
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
-            return path;
         }
     }
 
