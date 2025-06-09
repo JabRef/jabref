@@ -18,6 +18,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -241,5 +242,41 @@ public class LibraryResource {
             throw new InternalServerErrorException("Could not parse library", e);
         }
         return parserResult;
+    }
+
+    /// libraries/{id}/entries/{entryId}
+    @GET
+    @Path("entries/{entryId}")
+    @Produces(MediaType.TEXT_HTML)
+    public String getPreview(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
+        ParserResult parserResult = getParserResult(id);
+        List<BibEntry> entriesByCitationKey = parserResult.getDatabase().getEntriesByCitationKey(entryId);
+        if (entriesByCitationKey.isEmpty()) {
+            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+        }
+        if (entriesByCitationKey.size() > 1) {
+            LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
+        }
+        BibEntry theEntry = entriesByCitationKey.getFirst();
+
+        // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
+        // PreviewLayout layout = preferences.getpr previewPreferences.getSelectedPreviewLayout();
+        // return layout.generatePreview(theEntry, parserResult.getDatabaseContext());
+        return theEntry.getAuthorTitleYear();
+    }
+
+    @GET
+    @Path("entries/{entryId}")
+    @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
+    public String getPlainRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
+        ParserResult parserResult = getParserResult(id);
+        List<BibEntry> entriesByCitationKey = parserResult.getDatabase().getEntriesByCitationKey(entryId);
+        if (entriesByCitationKey.isEmpty()) {
+            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+        }
+        if (entriesByCitationKey.size() > 1) {
+            LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
+        }
+        return entriesByCitationKey.getFirst().getAuthorTitleYear();
     }
 }

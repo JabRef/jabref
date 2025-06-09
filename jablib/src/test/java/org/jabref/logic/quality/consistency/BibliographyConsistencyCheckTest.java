@@ -32,7 +32,7 @@ class BibliographyConsistencyCheckTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PUBLISHER, "publisher");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
@@ -49,7 +49,7 @@ class BibliographyConsistencyCheckTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
 
         BibliographyConsistencyCheck.EntryTypeResult entryTypeResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.TITLE, customField), List.of(first));
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
@@ -78,7 +78,7 @@ class BibliographyConsistencyCheckTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth), (_, _) -> { });
 
         BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
         BibliographyConsistencyCheck.EntryTypeResult inProceedingsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION), List.of(fourth, third));
@@ -97,7 +97,7 @@ class BibliographyConsistencyCheckTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
 
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of());
         assertEquals(expected, result);

@@ -87,7 +87,7 @@ public class MrDLibImporter extends Importer {
             while ((line = input.readLine()) != null) {
                 stringBuilder.append(line);
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOGGER.error("", e);
         }
         return stringBuilder.toString();
@@ -104,7 +104,7 @@ public class MrDLibImporter extends Importer {
      *
      * @param input A BufferedReader with a reference to a string with the server's response
      */
-    private void parse(BufferedReader input) throws IOException {
+    private void parse(BufferedReader input) {
         // The Bibdatabase that gets returned in the ParserResult.
         BibDatabase bibDatabase = new BibDatabase();
         // The document to parse

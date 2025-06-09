@@ -61,6 +61,16 @@ Content-Type: application/json
   "name": "demo"
 }
 
+### Get entry preview for "Tokede_2011" of demo library
+
+GET http://localhost:6050/libraries/demo/entries/Tokede_2011
+Accept: text/html
+
+### Get text view for "Tokede_2011" of demo library
+
+GET http://localhost:6050/libraries/demo/entries/Tokede_2011
+Accept: text/plain
+
 ### From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
 
 ### Get BibTeX of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib

@@ -14,12 +14,15 @@ public final class BuildInfo {
        &&&    &&&&&    &&&&&&&&   &&&&&&&&   &&&&&&&&& &&&&&&&&&
        &&&    &&&&&    &&&   &&&  &&&   &&&  &&&       &&&
        &&&   &&& &&&   &&&   &&&  &&&   &&&  &&&       &&&
-       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&& \u001B[97m%s\u001B[35m
+       &&&   &&   &&   &&&&&&&    &&&&&&&&   &&&&&&&&  &&&&&&&
        &&&  &&&&&&&&&  &&&   &&&  &&&   &&&  &&&       &&&
        &&&  &&&   &&&  &&&   &&&  &&&   &&&  &&&       &&&
     &&&&&   &&&   &&&  &&&&&&&&   &&&   &&&  &&&&&&&&& &&&
+
+    \u001B[97mVersion: %s
     \u001B[0m
     Staying on top of your literature since 2003 - https://www.jabref.org/
+
     Please report issues at https://github.com/JabRef/jabref/issues
     """;
 

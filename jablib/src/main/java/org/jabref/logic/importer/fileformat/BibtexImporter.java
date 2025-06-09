@@ -112,8 +112,7 @@ public class BibtexImporter extends Importer {
             encoding = suppliedEncoding.orElse(detectedCharset);
             LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
-        EncodingResult result = new EncodingResult(encoding, encodingExplicitlySupplied);
-        return result;
+        return new EncodingResult(encoding, encodingExplicitlySupplied);
     }
 
     private record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
