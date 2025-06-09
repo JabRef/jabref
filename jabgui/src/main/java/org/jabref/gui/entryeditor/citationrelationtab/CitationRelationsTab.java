@@ -405,10 +405,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                               .onRunning(() -> listView.setPlaceholder(new Label("Looking up DOI...")))
                               .onSuccess(doiIdentifier -> {
                                   if (doiIdentifier.isPresent()) {
-                                      System.out.println(doiIdentifier.get());
                                       entry.setField(StandardField.DOI, doiIdentifier.get().asString());
                                       searchForRelations(entry, listView, abortButton, refreshButton, searchType, importButton, progress, shouldRefresh);
-//                                      searchForRelations(entry, listView, abortButton, refreshButton, CitationFetcher.SearchType.CITED_BY, importButton, progress, shouldRefresh);
                                   } else {
                                       dialogService.notify("No DOI found");
                                   }
