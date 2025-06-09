@@ -251,7 +251,7 @@ jacoco {
 }
  */
 
-tasks.generateGrammarSource {
+var taskGenerateGrammarSource = tasks.generateGrammarSource {
     maxHeapSize = "64m"
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
@@ -348,7 +348,7 @@ tasks.named<ProcessResources>("processResources") {
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
-tasks.register<JavaExec>("generateJournalListMV") {
+var taskGenerateJournalListMV = tasks.register<JavaExec>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
 
@@ -368,7 +368,7 @@ tasks.named("compileTestJava") {
     dependsOn("generateJournalListMV")
 }
 
-tasks.register<JavaExec>("generateCitationStyleCatalog") {
+var taskGenerateCitationStyleCatalog = tasks.register<JavaExec>("generateCitationStyleCatalog") {
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
 
@@ -418,7 +418,7 @@ tasks.register("downloadLtwaFile") {
     }
 }
 
-tasks.register<JavaExec>("generateLtwaListMV") {
+var taskGenerateLtwaListMV = tasks.register<JavaExec>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
     dependsOn("downloadLtwaFile")
@@ -578,7 +578,10 @@ mavenPublishing {
 
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
-        tasks.named("generateGrammarSource"),
+        taskGenerateGrammarSource,
+        taskGenerateJournalListMV,
+        taskGenerateLtwaListMV,
+        taskGenerateCitationStyleCatalog
     )
 }
 
