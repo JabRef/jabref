@@ -3,6 +3,7 @@ package org.jabref.gui.edit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -275,7 +276,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedAuthors = String.join("\n", authors);
+        StringJoiner authorsJoiner = new StringJoiner("\n");
+        for (String author : authors) {
+            authorsJoiner.add(author);
+        }
+        String copiedAuthors = authorsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedAuthors);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
                 Integer.toString(mixedEntries.size() - authors.size()), Integer.toString(mixedEntries.size()), "authors"));
@@ -291,7 +296,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedAuthors = String.join("\n", authors);
+        StringJoiner authorsJoiner = new StringJoiner("\n");
+        for (String author : authors) {
+            authorsJoiner.add(author);
+        }
+        String copiedAuthors = authorsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedAuthors);
         verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
                 JabRefDialogService.shortenDialogMessage(copiedAuthors)));
@@ -327,7 +336,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_JOURNAL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedJournals = String.join("\n", journals);
+        StringJoiner journalsJoiner = new StringJoiner("\n");
+        for (String journal : journals) {
+            journalsJoiner.add(journal);
+        }
+        String copiedJournals = journalsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedJournals);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined journal names.",
                 Integer.toString(mixedEntries.size() - journals.size()), Integer.toString(mixedEntries.size())));
@@ -343,7 +356,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_JOURNAL, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedJournals = String.join("\n", journals);
+        StringJoiner journalsJoiner = new StringJoiner("\n");
+        for (String journal : journals) {
+            journalsJoiner.add(journal);
+        }
+        String copiedJournals = journalsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedJournals);
         verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
                 JabRefDialogService.shortenDialogMessage(copiedJournals)));
@@ -377,7 +394,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_DATE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedDates = String.join("\n", dates);
+        StringJoiner datesJoiner = new StringJoiner("\n");
+        for (String date : dates) {
+            datesJoiner.add(date);
+        }
+        String copiedDates = datesJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedDates);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
                 Integer.toString(mixedEntries.size() - dates.size()), Integer.toString(mixedEntries.size()), "dates"));
@@ -393,7 +414,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_DATE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedDates = String.join("\n", dates);
+        StringJoiner datesJoiner = new StringJoiner("\n");
+        for (String date : dates) {
+            datesJoiner.add(date);
+        }
+        String copiedDates = datesJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedDates);
         verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
                 JabRefDialogService.shortenDialogMessage(copiedDates)));
@@ -427,7 +452,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_KEYWORDS, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedKeywords = String.join("\n", keywords);
+        StringJoiner keywordsJoiner = new StringJoiner("\n");
+        for (String keyword : keywords) {
+            keywordsJoiner.add(keyword);
+        }
+        String copiedKeywords = keywordsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedKeywords);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
                 Integer.toString(mixedEntries.size() - keywords.size()), Integer.toString(mixedEntries.size()), "keywords"));
@@ -443,7 +472,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_KEYWORDS, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedKeywords = String.join("\n", keywords);
+        StringJoiner keywordsJoiner = new StringJoiner("\n");
+        for (String keyword : keywords) {
+            keywordsJoiner.add(keyword);
+        }
+        String copiedKeywords = keywordsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedKeywords);
         verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
                 JabRefDialogService.shortenDialogMessage(copiedKeywords)));
@@ -477,7 +510,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_ABSTRACT, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedAbstracts = String.join("\n", abstracts);
+        StringJoiner abstractsJoiner = new StringJoiner("\n");
+        for (String abstractText : abstracts) {
+            abstractsJoiner.add(abstractText);
+        }
+        String copiedAbstracts = abstractsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedAbstracts);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
                 Integer.toString(mixedEntries.size() - abstracts.size()), Integer.toString(mixedEntries.size()), "abstracts"));
@@ -493,7 +530,11 @@ class CopyMoreActionTest {
         copyMoreAction = new CopyMoreAction(StandardActions.COPY_FIELD_ABSTRACT, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository);
         copyMoreAction.execute();
 
-        String copiedAbstracts = String.join("\n", abstracts);
+        StringJoiner abstractsJoiner = new StringJoiner("\n");
+        for (String abstractText : abstracts) {
+            abstractsJoiner.add(abstractText);
+        }
+        String copiedAbstracts = abstractsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedAbstracts);
         verify(dialogService, times(1)).notify(Localization.lang("Copied '%0' to clipboard.",
                 JabRefDialogService.shortenDialogMessage(copiedAbstracts)));

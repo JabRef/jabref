@@ -213,6 +213,11 @@ public class RightClickMenu {
                                                       GuiPreferences preferences,
                                                       JournalAbbreviationRepository abbreviationRepository) {
         Menu copyFieldContentMenu = factory.createMenu(StandardActions.COPY_FIELD_CONTENT);
+        
+        // Ensure we never return null
+        if (copyFieldContentMenu == null) {
+            throw new IllegalStateException("Failed to create Copy Field Content menu");
+        }
 
         copyFieldContentMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY_FIELD_AUTHOR, new CopyMoreAction(StandardActions.COPY_FIELD_AUTHOR, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),

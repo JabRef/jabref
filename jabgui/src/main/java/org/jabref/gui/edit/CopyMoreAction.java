@@ -73,15 +73,15 @@ public class CopyMoreAction extends SimpleCommand {
             case COPY_DOI, COPY_DOI_URL ->
                     copyDoi();
             case COPY_FIELD_AUTHOR ->
-                    copyField(StandardField.AUTHOR, "authors");
+                    copyField(StandardField.AUTHOR, Localization.lang("authors"));
             case COPY_FIELD_JOURNAL ->
                     copyJournalField();
             case COPY_FIELD_DATE ->
-                    copyField(StandardField.DATE, "dates");
+                    copyField(StandardField.DATE, Localization.lang("dates"));
             case COPY_FIELD_KEYWORDS ->
-                    copyField(StandardField.KEYWORDS, "keywords");
+                    copyField(StandardField.KEYWORDS, Localization.lang("keywords"));
             case COPY_FIELD_ABSTRACT ->
-                    copyField(StandardField.ABSTRACT, "abstracts");
+                    copyField(StandardField.ABSTRACT, Localization.lang("abstracts"));
             default ->
                     LOGGER.info("Unknown copy command.");
         }
