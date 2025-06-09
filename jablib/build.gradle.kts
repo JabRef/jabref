@@ -351,13 +351,12 @@ val generatedJournalFile = layout.buildDirectory.file("generated/resources/journ
 var taskGenerateJournalListMV = tasks.register<JavaExec>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
-    dependsOn(tasks.named("classes"))
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
 
     mainClass.set("org.jabref.generators.JournalListMvGenerator")
-    classpath = configurations.runtimeClasspath.get()
+    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
@@ -377,7 +376,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JavaExec>("generateCitatio
     outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
 
     mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
-    classpath = configurations.runtimeClasspath.get()
+    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
@@ -428,7 +427,7 @@ var taskGenerateLtwaListMV = tasks.register<JavaExec>("generateLtwaListMV") {
     outputs.file(layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv"))
 
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-    classpath = configurations.runtimeClasspath.get()
+    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
