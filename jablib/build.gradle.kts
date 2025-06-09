@@ -360,14 +360,6 @@ var taskGenerateJournalListMV = tasks.register<JavaExec>("generateJournalListMV"
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
-tasks.named("jar") {
-    dependsOn("generateJournalListMV")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateJournalListMV")
-}
-
 var taskGenerateCitationStyleCatalog = tasks.register<JavaExec>("generateCitationStyleCatalog") {
     group = "JabRef"
     description = "Generates a catalog of all available citation styles"
@@ -378,14 +370,6 @@ var taskGenerateCitationStyleCatalog = tasks.register<JavaExec>("generateCitatio
     mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
     classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
-}
-
-tasks.named("jar") {
-    dependsOn("generateCitationStyleCatalog")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateCitationStyleCatalog")
 }
 
 var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
@@ -429,14 +413,6 @@ var taskGenerateLtwaListMV = tasks.register<JavaExec>("generateLtwaListMV") {
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
     classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
-}
-
-tasks.named("jar") {
-    dependsOn("generateLtwaListMV")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateLtwaListMV")
 }
 
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
@@ -572,6 +548,14 @@ mavenPublishing {
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
+        taskGenerateJournalListMV,
+        taskGenerateLtwaListMV,
+        taskGenerateCitationStyleCatalog
+    )
+}
+
+tasks.named("compileTestJava") {
+    dependsOn(
         taskGenerateJournalListMV,
         taskGenerateLtwaListMV,
         taskGenerateCitationStyleCatalog
