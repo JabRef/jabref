@@ -172,6 +172,7 @@ extraJavaModuleInfo {
         exportAllPackages()
 
         requires("wiremock.slf4j.spi.shim")
+        requires("handlebars")
         requires("java.xml")
         requires("org.custommonkey.xmlunit")
         requires("org.slf4j")
