@@ -112,6 +112,10 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2")
 
     testImplementation("org.hamcrest:hamcrest")
 
