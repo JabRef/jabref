@@ -143,8 +143,7 @@ public class ValueTableCellFactory<S, T> implements Callback<TableColumn<S, T>, 
                     setOnMouseEntered(event -> {
                         int rowIndex = getTableRow().getIndex();
                         int totalItems = getTableView().getItems().size();
-                    // The condition ensures that cell is reset to a clean state when it is empty, uninitialized, or detached from a valid table row,
-                    // preventing stale or incorrect data from being displayed in the cell.
+                        // tooltip is != null even for empty lines. Not easy to fix, therefore, there is a check if the current line is a real entry
                         if (tooltip != null && rowIndex < totalItems) {
                             setTooltip(tooltip.apply(rowItem, item));
                         }
