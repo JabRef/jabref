@@ -217,6 +217,10 @@ jobs:
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
       # endregion
 
+      - name: gradle :jablib:jar
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jablib:jar
+      - name: gradle :jabgui:compileJava
+        run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:compileJava
       - name: Basic build (assemble)
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" assemble
 
