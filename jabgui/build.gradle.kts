@@ -138,7 +138,7 @@ dependencies {
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+    testImplementation("org.wiremock:wiremock-standalone:3.13.0")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
 }
