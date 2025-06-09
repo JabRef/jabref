@@ -157,7 +157,7 @@ jobs:
           - os: macos-14
             displayName: macOS (ARM64)
             suffix: '_arm64'
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os == 'ubuntu-22.04-arm' && 'ubuntu-22.04' || matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
