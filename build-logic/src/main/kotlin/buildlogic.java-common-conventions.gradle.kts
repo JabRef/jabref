@@ -80,7 +80,7 @@ javaModulePackaging {
     }
     // The default target is the one determined above
     logger.info("Using target: $osTarget")
-    primaryTarget(target("ubuntu-22.04-arm"))
+    primaryTarget(target(osTarget))
 }
 
 // Tell gradle which jar to use for which platform
