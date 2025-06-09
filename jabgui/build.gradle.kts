@@ -104,7 +104,7 @@ dependencies {
     // implementation("net.java.dev.jna:jna:5.16.0")
     implementation("net.java.dev.jna:jna-platform:5.17.0")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
 
     implementation("com.konghq:unirest-java-core:4.4.7")
 
