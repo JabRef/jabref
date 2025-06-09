@@ -167,6 +167,7 @@ extraJavaModuleInfo {
 
         requires("wiremock.slf4j.spi.shim")
         requires("com.fasterxml.jackson.core")
+        requires("com.fasterxml.jackson.databind")
         requires("com.google.common")
         requires("commons.fileupload")
         requires("java.xml")
