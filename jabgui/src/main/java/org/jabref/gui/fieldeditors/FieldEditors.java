@@ -108,6 +108,8 @@ public class FieldEditors {
             return new PersonsEditor(field, suggestionProvider, fieldCheckers, isMultiLine, undoManager, undoAction, redoAction);
         } else if (StandardField.KEYWORDS == field) {
             return new KeywordsEditor(field, suggestionProvider, fieldCheckers);
+        } else if (StandardField.TAGS == field) {
+            return new KeywordsEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == InternalField.KEY_FIELD) {
             return new CitationKeyEditor(field, suggestionProvider, fieldCheckers, databaseContext, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.MARKDOWN)) {

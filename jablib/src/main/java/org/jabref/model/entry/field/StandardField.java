@@ -114,6 +114,7 @@ public enum StandardField implements Field {
     SORTKEY("sortkey"),
     SORTNAME("sortname", FieldProperty.PERSON_NAMES),
     SUBTITLE("subtitle"),
+    TAGS("tags"),
     TITLE("title"),
     TITLEADDON("titleaddon"),
     TRANSLATOR("translator", FieldProperty.PERSON_NAMES),

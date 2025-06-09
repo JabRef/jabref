@@ -23,7 +23,7 @@ public class BiblatexEntryTypeDefinitions {
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.EDITOR, StandardField.SERIES, StandardField.VOLUME, StandardField.NUMBER,
                     StandardField.EID, StandardField.ISSUE, StandardField.PAGES, StandardField.NOTE, StandardField.ISSN, StandardField.DOI,
-                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
+                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID, StandardField.TAGS)
             .withDetailFields(
                     StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR,
                     StandardField.TITLEADDON, StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
@@ -39,7 +39,7 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.MAINTITLE, StandardField.MAINSUBTITLE,
                     StandardField.MAINTITLEADDON, StandardField.VOLUME, StandardField.EDITION, StandardField.PUBLISHER, StandardField.ISBN,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
-                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID)
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.LANGUAGEID, StandardField.TAGS)
             .withDetailFields(StandardField.EDITORA, StandardField.EDITORB, StandardField.EDITORC,
                     StandardField.TRANSLATOR, StandardField.ANNOTATOR, StandardField.COMMENTATOR, StandardField.INTRODUCTION,
                     StandardField.FOREWORD, StandardField.AFTERWORD,
@@ -179,7 +179,7 @@ public class BiblatexEntryTypeDefinitions {
             .withRequiredFields(new OrFields(StandardField.AUTHOR, StandardField.EDITOR), StandardField.TITLE, StandardField.DATE)
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED, StandardField.LOCATION, StandardField.DOI,
-                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EPRINT, StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.TAGS)
             .withDetailFields(StandardField.LANGUAGE,
                     StandardField.TYPE, StandardField.VERSION, StandardField.NOTE, StandardField.ORGANIZATION,
                     StandardField.ADDENDUM, StandardField.PUBSTATE)
@@ -261,7 +261,7 @@ public class BiblatexEntryTypeDefinitions {
                     StandardField.MAINSUBTITLE, StandardField.MAINTITLEADDON, StandardField.BOOKSUBTITLE,
                     StandardField.BOOKTITLEADDON, StandardField.EVENTTITLE, StandardField.VOLUME, StandardField.PUBLISHER,
                     StandardField.ISBN, StandardField.CHAPTER, StandardField.PAGES, StandardField.DOI, StandardField.EPRINT,
-                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.TAGS)
             .withDetailFields(StandardField.EDITOR,
                     StandardField.EVENTTITLEADDON, StandardField.EVENTDATE, StandardField.VENUE,
                     StandardField.LANGUAGE, StandardField.PART, StandardField.VOLUMES, StandardField.SERIES,
@@ -297,7 +297,7 @@ public class BiblatexEntryTypeDefinitions {
             .withImportantFields(
                     StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.NUMBER, StandardField.ISRN,
                     StandardField.CHAPTER, StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT,
-                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EPRINTCLASS, StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.TAGS)
             .withDetailFields(StandardField.LANGUAGE,
                     StandardField.VERSION, StandardField.NOTE, StandardField.LOCATION,
                     StandardField.ADDENDUM, StandardField.PUBSTATE)
@@ -313,7 +313,7 @@ public class BiblatexEntryTypeDefinitions {
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.TYPE, StandardField.INSTITUTION, StandardField.DATE)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.CHAPTER,
                     StandardField.PAGES, StandardField.PAGETOTAL, StandardField.DOI, StandardField.EPRINT, StandardField.EPRINTCLASS,
-                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.EPRINTTYPE, StandardField.URL, StandardField.URLDATE, StandardField.TAGS)
             .withDetailFields(StandardField.LANGUAGE, StandardField.NOTE,
                     StandardField.LOCATION, StandardField.ISBN,
                     StandardField.ADDENDUM, StandardField.PUBSTATE)
@@ -323,7 +323,7 @@ public class BiblatexEntryTypeDefinitions {
             .withType(StandardEntryType.Unpublished)
             .withRequiredFields(StandardField.AUTHOR, StandardField.TITLE, StandardField.DATE)
             .withImportantFields(StandardField.SUBTITLE, StandardField.TITLEADDON, StandardField.HOWPUBLISHED,
-                    StandardField.PUBSTATE, StandardField.URL, StandardField.URLDATE)
+                    StandardField.PUBSTATE, StandardField.URL, StandardField.URLDATE, StandardField.TAGS)
             .withDetailFields(StandardField.LANGUAGE,
                     StandardField.NOTE, StandardField.LOCATION, StandardField.ADDENDUM, StandardField.EVENTTITLE,
                     StandardField.EVENTDATE, StandardField.VENUE)

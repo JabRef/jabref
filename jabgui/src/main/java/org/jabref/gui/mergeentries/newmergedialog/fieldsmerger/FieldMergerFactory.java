@@ -15,6 +15,7 @@ public class FieldMergerFactory {
         return switch (field) {
             case StandardField.GROUPS -> new GroupMerger(bibEntryPreferences);
             case StandardField.KEYWORDS -> new KeywordMerger(bibEntryPreferences);
+            case StandardField.TAGS -> new KeywordMerger(bibEntryPreferences);
             case StandardField.COMMENT -> new CommentMerger();
             case StandardField.FILE -> new FileMerger();
             case null -> throw new IllegalArgumentException("Field must not be null");
@@ -23,6 +24,6 @@ public class FieldMergerFactory {
     }
 
     public static boolean canMerge(Field field) {
-        return field == StandardField.GROUPS || field == StandardField.KEYWORDS || field == StandardField.COMMENT || field == StandardField.FILE;
+        return field == StandardField.GROUPS || field == StandardField.KEYWORDS || field == StandardField.TAGS || field == StandardField.COMMENT || field == StandardField.FILE;
     }
 }

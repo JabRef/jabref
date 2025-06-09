@@ -32,6 +32,7 @@ class NoBibTexFieldCheckerTest {
                 StandardField.INSTITUTION,
                 StandardField.JOURNAL,
                 StandardField.KEYWORDS,
+                StandardField.TAGS,
                 StandardField.REVIEW
         );
     }
