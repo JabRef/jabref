@@ -75,12 +75,71 @@ public class LibraryResource {
         } else {
             jabMapPath = getJabMapPath(id);
         }
-        if (isDemo && !Files.exists(jabMapPath)) {
-            Files.createFile(jabMapPath);
-            Files.writeString(jabMapPath, "[]");
-        }
         if (!Files.exists(jabMapPath)) {
-            throw new NotFoundException("JabMap file not found");
+            return """
+                    {"map" :
+                        {
+                            "meta": {
+                                "name": "jsMind remote",
+                                "author": "hizzgdev@163.com",
+                                "version": "0.2"
+                            },
+                            "format": "node_tree",
+                            "data": {
+                                "id": "root",
+                                "topic": "jsMind",
+                                "expanded": true,
+                                "children": [
+                                    {
+                                        "id": "easy",
+                                        "topic": "Easy",
+                                        "expanded": true,
+                                        "direction": "left",
+                                        "children": [
+                                            {
+                                                "id": "easy1",
+                                                "topic": "Easy to show",
+                                                "expanded": true
+                                            },
+                                            {
+                                                "id": "easy2",
+                                                "topic": "Easy to edit",
+                                                "expanded": true
+                                            },
+                                            {
+                                                "id": "easy3",
+                                                "topic": "Easy to store",
+                                                "expanded": true
+                                            },
+                                            {
+                                                "id": "easy4",
+                                                "topic": "Easy to embed",
+                                                "expanded": true
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "id": "open",
+                                        "topic": "Open Source",
+                                        "expanded": true,
+                                        "direction": "right",
+                                        "children": [
+                                            {
+                                                "id": "open1",
+                                                "topic": "on GitHub",
+                                                "expanded": true
+                                            },
+                                            {
+                                                "id": "open2",
+                                                "topic": "BSD License",
+                                                "expanded": true
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }""";
         }
         return Files.readString(jabMapPath);
     }
