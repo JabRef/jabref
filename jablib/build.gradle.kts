@@ -444,13 +444,6 @@ sourceSets.named("main") {
     resources.srcDir(layout.buildDirectory.file("generated/resources"))
 }
 
-// Do not process the generated resources in the build/generated/resources directory
-tasks.named<ProcessResources>("processResources") {
-    exclude {
-        it.file.toString().startsWith(layout.buildDirectory.file("generated/resources").get().asFile.toString())
-    }
-}
-
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 
