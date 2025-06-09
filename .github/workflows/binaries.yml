@@ -164,6 +164,9 @@ jobs:
       branchname: ${{ steps.gitversion.outputs.branchName }}
     name: ${{ matrix.displayName }} installer and portable version
     steps:
+      - name: Set $ARCH to arm if arm
+        if: matrix.os == 'ubuntu-22.04-arm'
+        run: echo "ARCH=arm" >> "$GITHUB_ENV"
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:

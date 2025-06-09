@@ -43,8 +43,7 @@ val osTarget = when {
     }
     os.isLinux ->  {
         val arch = System.getProperty("os.arch")
-        println("Using $arch")
-        if (arch.contains("aarch")) "ubuntu-22.04-arm" else "ubuntu-22.04"
+        if (arch.contains("aarch") || System.getenv("ARCH") == "arm") "ubuntu-22.04-arm" else "ubuntu-22.04"
     }
     os.isWindows -> "windows-2022"
     else -> error("Unsupported OS")
