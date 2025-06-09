@@ -351,12 +351,13 @@ val generatedJournalFile = layout.buildDirectory.file("generated/resources/journ
 var taskGenerateJournalListMV = tasks.register<JavaExec>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    dependsOn(tasks.named("classes"))
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
 
     mainClass.set("org.jabref.generators.JournalListMvGenerator")
-    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
+    classpath = configurations.runtimeClasspath.get()
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
@@ -376,7 +377,7 @@ var taskGenerateCitationStyleCatalog = tasks.register<JavaExec>("generateCitatio
     outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
 
     mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
-    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
+    classpath = configurations.runtimeClasspath.get()
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
@@ -427,7 +428,7 @@ var taskGenerateLtwaListMV = tasks.register<JavaExec>("generateLtwaListMV") {
     outputs.file(layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv"))
 
     mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
+    classpath = configurations.runtimeClasspath.get()
     javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
@@ -440,8 +441,8 @@ tasks.named("compileTestJava") {
 }
 
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
-sourceSets.named("main") {
-    resources.srcDir(layout.buildDirectory.file("generated/resources"))
+sourceSets["main"].resources {
+    srcDir(layout.buildDirectory.dir("generated/resources"))
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -567,14 +568,6 @@ mavenPublishing {
         developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
     }
   }
-}
-
-tasks.named("processResources") {
-    dependsOn(
-        taskGenerateJournalListMV,
-        taskGenerateLtwaListMV,
-        taskGenerateCitationStyleCatalog
-    )
 }
 
 tasks.named<Jar>("sourcesJar") {
