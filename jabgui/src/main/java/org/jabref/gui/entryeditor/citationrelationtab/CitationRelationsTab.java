@@ -507,7 +507,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             .executeWith(taskExecutor);
     }
 
-    private void handleIdentifierFetchingError(Exception exception, CrossRef fetcher){
+    private void handleIdentifierFetchingError(Exception exception, CrossRef fetcher) {
         LOGGER.error("Error while fetching identifier", exception);
         if (exception instanceof FetcherClientException) {
             dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("No data was found for the identifier"));
