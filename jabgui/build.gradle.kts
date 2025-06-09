@@ -138,6 +138,7 @@ dependencies {
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     testImplementation("org.wiremock:wiremock:3.13.0")
+    implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
 }
@@ -435,10 +436,12 @@ if (OperatingSystem.current().isWindows) {
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.jabref.testsupport")
+
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
-    requires.add("org.jabref.testsupport")
+    requires.add("wiremock")
 }
 
 tasks.test {
@@ -446,5 +449,6 @@ tasks.test {
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
         "--add-reads", "org.mockito=java.prefs",
         "--add-reads", "org.mockito=javafx.scene",
+        "--add-reads", "org.jabref=wiremock"
     )
 }

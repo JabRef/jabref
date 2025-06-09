@@ -238,6 +238,8 @@ dependencies {
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
     testImplementation("org.wiremock:wiremock:3.13.0")
+    // no "test", because of https://github.com/gradlex-org/extra-java-module-info/issues/134#issuecomment-2956556651
+    implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")

@@ -159,10 +159,27 @@ extraJavaModuleInfo {
         exports("com.sun.javafx.scene.control")
     }
 
-    // workaround for https://github.com/wiremock/wiremock/issues/2149
+    // workaround for https://github.com/wiremock/wiremock/issues/2149 and https://github.com/wiremock/wiremock/issues/2874
     automaticModule("com.github.jknack:handlebars", "handlebars") {
         mergeJar("com.github.jknack:handlebars")
         mergeJar("com.github.jknack:handlebars-helpers")
+    }
+
+    // Workaround for https://github.com/wiremock/wiremock/issues/2149
+    module("org.wiremock:wiremock", "wiremock") {
+        overrideModuleName()
+        patchRealModule()
+        exportAllPackages()
+
+        requires("wiremock.slf4j.shim")
+
+        // Required to provide package "wiremock.org.slf4j.helpers"
+        mergeJar("com.github.koppor:wiremock-slf4j-shim")
+    }
+
+    // Required to satisfy the dependency of wiremock to a SLF4J SPI
+    module("com.github.koppor:wiremock-slf4j-shim", "wiremock.slf4j.shim") {
+        patchRealModule()
     }
 }
 
