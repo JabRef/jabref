@@ -176,6 +176,8 @@ extraJavaModuleInfo {
         requires("org.slf4j")
         requires("org.xmlunit")
 
+        uses("com.github.tomakehurst.wiremock.extension.Extension")
+
         // workaround for https://github.com/wiremock/wiremock/issues/2874
         mergeJar("com.github.jknack:handlebars")
         mergeJar("com.github.jknack:handlebars-helpers")
