@@ -79,6 +79,7 @@ javaModulePackaging {
         packageTypes = listOf("exe")
     }
     // The default target is the one determined above
+    logger.info("Using target: $osTarget")
     primaryTarget(target(osTarget))
 }
 
