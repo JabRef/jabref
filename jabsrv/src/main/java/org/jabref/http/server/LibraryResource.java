@@ -200,8 +200,24 @@ public class LibraryResource {
         }
         BibEntry theEntry = entriesByCitationKey.getFirst();
 
+        // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
         // PreviewLayout layout = preferences.getpr previewPreferences.getSelectedPreviewLayout();
         // return layout.generatePreview(theEntry, parserResult.getDatabaseContext());
-        return null;
+        return theEntry.getAuthorTitleYear();
+    }
+
+    @GET
+    @Path("entries/{entryId}")
+    @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
+    public String getPlainRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
+        ParserResult parserResult = getParserResult(id);
+        List<BibEntry> entriesByCitationKey = parserResult.getDatabase().getEntriesByCitationKey(entryId);
+        if (entriesByCitationKey.isEmpty()) {
+            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+        }
+        if (entriesByCitationKey.size() > 1) {
+            LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
+        }
+        return entriesByCitationKey.getFirst().getAuthorTitleYear();
     }
 }
