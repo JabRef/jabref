@@ -450,7 +450,6 @@ tasks.test {
     jvmArgs = listOf(
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
         "--add-reads", "org.mockito=java.prefs",
-        "--add-reads", "org.mockito=javafx.scene",
         "--add-reads", "org.jabref=wiremock"
     )
 }
