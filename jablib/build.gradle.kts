@@ -238,6 +238,9 @@ dependencies {
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
     testImplementation("org.wiremock:wiremock:3.13.0")
+    // Required by Wiremock - and our patching of Wiremock
+    implementation("com.github.jknack:handlebars:4.3.1")
+    implementation("com.github.jknack:handlebars-helpers:4.3.1")
     // no "test", because of https://github.com/gradlex-org/extra-java-module-info/issues/134#issuecomment-2956556651
     implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
     testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")

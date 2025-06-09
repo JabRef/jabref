@@ -138,6 +138,9 @@ dependencies {
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
     testImplementation("org.wiremock:wiremock:3.13.0")
+    // Required by Wiremock - and our patching of Wiremock
+    implementation("com.github.jknack:handlebars:4.3.1")
+    implementation("com.github.jknack:handlebars-helpers:4.3.1")
     implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
     testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
