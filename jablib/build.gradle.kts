@@ -237,8 +237,18 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
-    // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+    testImplementation("org.wiremock:wiremock:3.13.0")
+    // Required by Wiremock - and our patching of Wiremock
+    implementation("com.github.jknack:handlebars:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+    }
+    implementation("com.github.jknack:handlebars-helpers:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+        exclude(group = "org.apache.commons", module = "commons-lang3")
+    }
+    // no "test", because of https://github.com/gradlex-org/extra-java-module-info/issues/134#issuecomment-2956556651
+    implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
@@ -586,6 +596,8 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 
     // --add-reads
     //reads.add("org.jabref.jablib=io.github.classgraph")
