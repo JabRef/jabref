@@ -317,6 +317,7 @@ jlink {
             "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
+    // This tasks reads resources from src/main/resourcesPackage/$OS
     jpackage {
         outputDir =
             "distribution"
