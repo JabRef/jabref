@@ -251,7 +251,7 @@ jacoco {
 }
  */
 
-var taskGenerateGrammarSource = tasks.generateGrammarSource {
+tasks.generateGrammarSource {
     maxHeapSize = "64m"
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
@@ -578,7 +578,7 @@ mavenPublishing {
 
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
-        taskGenerateGrammarSource,
+        tasks.named("generateGrammarSource"),
         taskGenerateJournalListMV,
         taskGenerateLtwaListMV,
         taskGenerateCitationStyleCatalog
