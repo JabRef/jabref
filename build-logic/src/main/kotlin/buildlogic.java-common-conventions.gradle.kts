@@ -172,6 +172,7 @@ extraJavaModuleInfo {
         exportAllPackages()
 
         requires("wiremock.slf4j.spi.shim")
+        requires("java.xml")
         requires("org.slf4j")
 
         // Required to provide package "wiremock.org.slf4j.helpers"
