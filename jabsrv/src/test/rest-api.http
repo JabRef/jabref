@@ -21,6 +21,10 @@ GET http://localhost:6050
 GET http://localhost:6050/libraries
 Accept: application/json
 
+### Get bibtex
+GET http://localhost:6050/libraries/demo
+Accept: application/x-bibtex
+
 ## demo cases
 
 // JabRef ships with "Chocolate.bib", which is "magically" served when asking for "demo"
@@ -45,7 +49,7 @@ Accept: application/x-bibtex-library-csl+json
 
 ### Read demo JabMap
 
-GET http://localhost:6050/libraries/demo/map
+GET http://localhost:6050/libraries/Mindmaps.bib-7769f2fa/map
 Accept: application/json
 
 ### Save demo JabMap
@@ -57,7 +61,7 @@ Content-Type: application/json
   "name": "demo"
 }
 
-## From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
+### From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
 
 ### Get BibTeX of C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib
 
