@@ -31,7 +31,7 @@ public class LtwaListMvGenerator {
                 LOGGER.error("LTWA CSV file not found at {}. Please execute gradle task downloadLtwaFile.", tempCsvFile);
                 return;
             }
-            Path outputDir = Path.of("build", "resources", "main", "journals");
+            Path outputDir = Path.of("build", "generated", "resources", "journals");
 
             Files.createDirectories(outputDir);
             Path outputFile = outputDir.resolve("ltwa-list.mv");
