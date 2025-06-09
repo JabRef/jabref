@@ -16,22 +16,25 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import com.tobiasdiez.easybind.EasyBind;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// This class is essentially a wrapper around [javafx.concurrent.Task].
-/// We cannot use [javafx.concurrent.Task] directly since it runs certain update notifications on the JavaFX thread,
-/// and so makes testing harder.
-/// We take the opportunity and implement a fluid interface.
 ///
 /// A task created here is to be submitted to `#execute(BackgroundTask)` to submit.
-/// This class is injected at `@Inject TaskExecutor`
+/// BackgroundTask class is mostly injected by `@Inject TaskExecutor` or provided during class initialization.
+///
+/// We take the opportunity and implement a fluid interface.
 ///
 /// Example (for using the fluent interface)
 ///
 ///     BackgroundTask.wrap(() -> ...).showToUser(true).onRunning(() -> ...).onSuccess(() -> ...).onFailure(() -> ...).executeWith(taskExecutor);
 ///
 /// Background: The task executor one takes care to show it in the UI. See `org.jabref.gui.StateManager#addBackgroundTask(BackgroundTask, Task)` for details.
+///
+/// We cannot use [javafx.concurrent.Task] directly since it runs certain update notifications on the JavaFX thread,
+/// and so makes testing harder.
 ///
 /// TODO: Think of migrating to <a href="https://github.com/ReactiveX/RxJava#simple-background-computation">RxJava</a>;
 ///       <a href="https://www.baeldung.com/java-completablefuture">CompletableFuture</a> do not seem to support everything.
@@ -162,6 +165,13 @@ public abstract class BackgroundTask<V> {
     public BackgroundTask<V> onRunning(Runnable onRunning) {
         this.onRunning = onRunning;
         return this;
+    }
+
+    /**
+     * Carry a consumer to a running runnable and invoke it after the task is started.
+     */
+    public @NonNull BackgroundTask<V> consumeOnRunning(@NonNull Consumer<BackgroundTask<V>> onRunningConsumer) {
+        return this.onRunning(() -> onRunningConsumer.accept(this));
     }
 
     /**

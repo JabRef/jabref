@@ -3,6 +3,8 @@
   "extends": [
     "config:base"
   ],
+  "dependencyDashboard": false,
+  "prConcurrentLimit": 1,
   "regexManagers": [
     {
       "managerFilePatterns": ".jbang/*.java",
@@ -12,5 +14,21 @@
       ],
       "datasourceTemplate": "maven"
     }
-  ]
+  ],
+  "packageRules": [
+    {
+      "managers": ["dockerfile", "gradle", "gradle-wrapper", "github-actions"],
+      "enabled": false
+    },
+    {
+      "groupName": "all dependencies",
+      "matchUpdateTypes": ["major", "minor", "patch", "pin", "digest"],
+      "matchDepTypes": ["*"]
+    }
+  ],
+  "maven": {
+    "repositories": [
+      "https://central.sonatype.com/repository/maven-snapshots/"
+    ]
+  }
 }
