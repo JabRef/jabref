@@ -72,6 +72,16 @@ public class CopyMoreAction extends SimpleCommand {
                     copyKeyAndLink();
             case COPY_DOI, COPY_DOI_URL ->
                     copyDoi();
+            case COPY_FIELD_AUTHOR ->
+                    copyField(StandardField.AUTHOR, "authors");
+            case COPY_FIELD_JOURNAL ->
+                    copyJournalField();
+            case COPY_FIELD_DATE ->
+                    copyField(StandardField.DATE, "dates");
+            case COPY_FIELD_KEYWORDS ->
+                    copyField(StandardField.KEYWORDS, "keywords");
+            case COPY_FIELD_ABSTRACT ->
+                    copyField(StandardField.ABSTRACT, "abstracts");
             default ->
                     LOGGER.info("Unknown copy command.");
         }
@@ -262,6 +272,72 @@ public class CopyMoreAction extends SimpleCommand {
         } else {
             dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Long.toString(entries.size() - entriesWithKey.size()), Integer.toString(entries.size())));
+        }
+    }
+
+    private void copyField(StandardField field, String fieldDisplayName) {
+        List<BibEntry> selectedBibEntries = stateManager.getSelectedEntries();
+
+        List<String> fieldValues = selectedBibEntries.stream()
+                                                     .filter(bibEntry -> bibEntry.getField(field).isPresent())
+                                                     .map(bibEntry -> bibEntry.getField(field).orElse(""))
+                                                     .filter(value -> !value.isEmpty())
+                                                     .collect(Collectors.toList());
+
+        if (fieldValues.isEmpty()) {
+            dialogService.notify(Localization.lang("None of the selected entries have %0.", fieldDisplayName));
+            return;
+        }
+
+        final String copiedContent = String.join("\n", fieldValues);
+        clipBoardManager.setContent(copiedContent);
+
+        if (fieldValues.size() == selectedBibEntries.size()) {
+            // All entries had the field.
+            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
+                    JabRefDialogService.shortenDialogMessage(copiedContent)));
+        } else {
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
+                    Integer.toString(selectedBibEntries.size() - fieldValues.size()),
+                    Integer.toString(selectedBibEntries.size()),
+                    fieldDisplayName));
+        }
+    }
+
+    private void copyJournalField() {
+        List<BibEntry> selectedBibEntries = stateManager.getSelectedEntries();
+
+        List<String> journalValues = selectedBibEntries.stream()
+                                                       .filter(bibEntry ->
+                                                               bibEntry.getField(StandardField.JOURNAL).isPresent() ||
+                                                               bibEntry.getField(StandardField.JOURNALTITLE).isPresent())
+                                                       .map(bibEntry -> {
+                                                           // Prefer journal over journaltitle for consistency
+                                                           if (bibEntry.getField(StandardField.JOURNAL).isPresent()) {
+                                                               return bibEntry.getField(StandardField.JOURNAL).orElse("");
+                                                           } else {
+                                                               return bibEntry.getField(StandardField.JOURNALTITLE).orElse("");
+                                                           }
+                                                       })
+                                                       .filter(value -> !value.isEmpty())
+                                                       .collect(Collectors.toList());
+
+        if (journalValues.isEmpty()) {
+            dialogService.notify(Localization.lang("None of the selected entries have journal names."));
+            return;
+        }
+
+        final String copiedContent = String.join("\n", journalValues);
+        clipBoardManager.setContent(copiedContent);
+
+        if (journalValues.size() == selectedBibEntries.size()) {
+            // All entries had journal fields.
+            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
+                    JabRefDialogService.shortenDialogMessage(copiedContent)));
+        } else {
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined journal names.",
+                    Integer.toString(selectedBibEntries.size() - journalValues.size()),
+                    Integer.toString(selectedBibEntries.size())));
         }
     }
 }

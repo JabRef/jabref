@@ -34,6 +34,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for import of a Refer/BibIX file format. [#13069](https://github.com/JabRef/jabref/issues/13069)
 - We added a new `jabkit` command `pseudonymize` to pseudonymize the library. [#13109](https://github.com/JabRef/jabref/issues/13109)
 - We added functionality to focus running instance when trying to start a second instance. [#13129](https://github.com/JabRef/jabref/issues/13129)
+- We added a "Copy Field Content" submenu to the entry context menu, allowing users to quickly copy specific field contents including Author, Journal, Date, Keywords, and Abstract fields from selected entries.
 
 ### Changed
 
