@@ -414,7 +414,7 @@ tasks.register("downloadLtwaFile") {
             }
         }
 
-        logger.lifecycle("Downloaded LTWA file to $file")
+        logger.debug("Downloaded LTWA file to $file")
     }
 }
 
