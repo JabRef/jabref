@@ -158,6 +158,12 @@ extraJavaModuleInfo {
         // PATCH REASON:
         exports("com.sun.javafx.scene.control")
     }
+
+    // workaround for https://github.com/wiremock/wiremock/issues/2149
+    automaticModule("com.github.jknack:handlebars", "handlebars") {
+        mergeJar("com.github.jknack:handlebars")
+        mergeJar("com.github.jknack:handlebars-helpers")
+    }
 }
 
 testing {
