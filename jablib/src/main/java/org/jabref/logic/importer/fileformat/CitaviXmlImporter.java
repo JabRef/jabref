@@ -19,12 +19,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -44,8 +44,6 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -91,6 +89,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     public CitaviXmlImporter() {
         xmlInputFactory = XMLInputFactory.newFactory();
+        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
+        xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        // required for reading Unicode characters such as &#xf6;
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
     }
 
     @Override
@@ -138,14 +140,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     public ParserResult importDatabase(Path filePath) throws IOException {
         Objects.requireNonNull(filePath);
 
-        List<BibEntry> bibItems = new ArrayList<>();
-
         try (BufferedReader reader = getReaderFromZip(filePath)) {
-            // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-            xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-            // required for reading Unicode characters such as &#xf6;
-            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
-
             XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
 
             if (xmlStreamReader.hasNext()) {
@@ -153,7 +148,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 if (xmlStreamReader.isStartElement()) {
                     String elementName = xmlStreamReader.getLocalName();
                     if ("CitaviExchangeData".equals(elementName)) {
-                        parseCitaviData(xmlStreamReader, bibItems, elementName);
+                        parseCitaviData(xmlStreamReader);
                     }
                 }
             }
@@ -161,11 +156,12 @@ public class CitaviXmlImporter extends Importer implements Parser {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
+        List<BibEntry> bibItems = new ArrayList<>();
+
         return new ParserResult(bibItems);
     }
 
-    private void parseCitaviData(XMLStreamReader reader, List<BibEntry> bibItems, String startElement) throws XMLStreamException {
-        Map<Field, String> fields = new HashMap<>();
+    private void parseCitaviData(XMLStreamReader reader) throws XMLStreamException {
         // TODO: Persons, Keywords, Publishers, KnowledgeItems, ReferenceAuthors, ReferenceKeywords
 
         while (reader.hasNext()) {
@@ -173,88 +169,76 @@ public class CitaviXmlImporter extends Importer implements Parser {
             if (reader.isStartElement()) {
                 String elementName = reader.getLocalName();
                 switch (elementName) {
-                    case
-
+                    case "Persons" -> parsePersons(reader);
+                    case "Keywords" -> parseKeywords(reader);
+                    case "Publishers" -> parsePublishers(reader);
+                    case "References" -> parseReferences(reader);
+                    case "KnowledgeItems" -> parseKnowledgeItems(reader);
                 }
-
             }
         }
     }
 
-    private List<BibEntry> parseDataList(CitaviExchangeData data) throws XMLStreamException {
-        List<BibEntry> bibEntries;
-
-        persons = data.getPersons();
-        keywords = data.getKeywords();
-        publishers = data.getPublishers();
-        knowledgeItems = data.getKnowledgeItems();
-
-        refAuthors = data.getReferenceAuthors();
-        refEditors = data.getReferenceEditors();
-        refKeywords = data.getReferenceKeywords();
-        refPublishers = data.getReferencePublishers();
-
-        if (refAuthors != null) {
-            this.refIdWithAuthors = buildPersonList(refAuthors.getOnetoN());
+    private void parsePersons(XMLStreamReader reader) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    if ("Person".equals(reader.getLocalName())) {
+                        parsePerson(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("Persons".equals(reader.getLocalName())) {
+                        return;
+                    }
+                }
+            }
         }
-        if (refEditors != null) {
-            this.refIdWithEditors = buildPersonList(refEditors.getOnetoN());
-        }
-        if (refKeywords != null) {
-            this.refIdWithKeywords = buildKeywordList(refKeywords.getOnetoN());
-        }
-        if (refPublishers != null) {
-            this.refIdWithPublishers = buildPublisherList(refPublishers.getOnetoN());
-        }
-
-        bibEntries = data
-                         .getReferences().getReference()
-                         .stream()
-                         .map(this::parseData)
-                         .collect(Collectors.toList());
-
-        return bibEntries;
     }
 
-    private BibEntry parseData(CitaviExchangeData.References.Reference data) {
-        BibEntry entry = new BibEntry();
+    private void parsePerson(XMLStreamReader reader) throws XMLStreamException {
+        String id = reader.getAttributeValue(null, "id");
+        String firstName = null;
+        String lastName = null;
 
-        entry.setType(getType(data));
-        Optional.ofNullable(data.getTitle())
-                .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
-        Optional.ofNullable(data.getAbstract())
-                .ifPresent(value -> entry.setField(StandardField.ABSTRACT, clean(value)));
-        Optional.ofNullable(data.getYear())
-                .ifPresent(value -> entry.setField(StandardField.YEAR, clean(value)));
-        Optional.ofNullable(data.getDoi())
-                .ifPresent(value -> entry.setField(StandardField.DOI, clean(value)));
-        Optional.ofNullable(data.getIsbn())
-                .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
-
-        String pages = clean(getPages(data));
-        // Cleans also unicode minus signs
-        pages = pagesFormatter.format(pages);
-        entry.setField(StandardField.PAGES, pages);
-
-        Optional.ofNullable(data.getVolume())
-                .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
-        Optional.ofNullable(getAuthorName(data))
-                .ifPresent(value -> entry.setField(StandardField.AUTHOR, clean(value)));
-        Optional.ofNullable(getEditorName(data))
-                .ifPresent(value -> entry.setField(StandardField.EDITOR, clean(value)));
-        Optional.ofNullable(getKeywords(data))
-                .ifPresent(value -> entry.setField(StandardField.KEYWORDS, clean(value)));
-        Optional.ofNullable(getPublisher(data))
-                .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(value)));
-        Optional.ofNullable(getKnowledgeItem(data))
-                .ifPresent(value -> entry.setField(StandardField.COMMENT, StringUtil.unifyLineBreaks(value, "\n")));
-        return entry;
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("FirstName")) {
+                        firstName = reader.getElementText();
+                    } else if (elementName.equals("LastName")) {
+                        lastName = reader.getElementText();
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("Person".equals(reader.getLocalName())) {
+                        Author author = new Author(firstName, null, null, lastName, null);
+                        knownPersons.put(id, author);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
-    private EntryType getType(CitaviExchangeData.References.Reference data) {
-        return Optional.ofNullable(data.getReferenceType())
-                       .map(CitaviXmlImporter::convertRefNameToType)
-                       .orElse(StandardEntryType.Article);
+    private void parseKeywords(XMLStreamReader reader) throws XMLStreamException {
+        // TODO
+    }
+
+    private void parsePublishers(XMLStreamReader reader) throws XMLStreamException {
+        // TODO
+    }
+
+    private void parseReferences(XMLStreamReader reader) throws XMLStreamException {
+        // TODO
+
+    }
+
+    private void parseKnowledgeItems(XMLStreamReader reader) throws XMLStreamException {
+        // TODO
     }
 
     private static EntryType convertRefNameToType(String refName) {
@@ -267,38 +251,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
             // case "journal article" -> StandardEntryType.Article;
             default -> StandardEntryType.Article;
         };
-    }
-
-    private String getPages(CitaviExchangeData.References.Reference data) {
-        String tmpStr = "";
-        if ((data.getPageCount() != null) && (data.getPageRange() == null)) {
-            tmpStr = data.getPageCount();
-        } else if ((data.getPageCount() == null) && (data.getPageRange() != null)) {
-            tmpStr = data.getPageRange();
-        } else if ((data.getPageCount() == null) && (data.getPageRange() == null)) {
-            return tmpStr;
-        }
-        int count = 0;
-        String pages = "";
-        for (int i = tmpStr.length() - 1; i >= 0; i--) {
-            if (count == 2) {
-                pages = tmpStr.substring(i + 2, (tmpStr.length() - 1 - 5) + 1);
-                break;
-            } else {
-                if (tmpStr.charAt(i) == '>') {
-                    count++;
-                }
-            }
-        }
-        return pages;
-    }
-
-    private String getAuthorName(CitaviExchangeData.References.Reference data) {
-        if (refAuthors == null) {
-            return null;
-        }
-
-        return this.refIdWithAuthors.get(data.getId());
     }
 
     private Map<String, String> buildPersonList(List<String> authorsOrEditors) {
@@ -377,27 +329,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
             refToPublishers.put(refId, stringifiedKeywords);
         }
         return refToPublishers;
-    }
-
-    private String getEditorName(CitaviExchangeData.References.Reference data) {
-        if (refEditors == null) {
-            return null;
-        }
-        return this.refIdWithEditors.get(data.getId());
-    }
-
-    private String getKeywords(CitaviExchangeData.References.Reference data) {
-        if (refKeywords == null) {
-            return null;
-        }
-        return this.refIdWithKeywords.get(data.getId());
-    }
-
-    private String getPublisher(CitaviExchangeData.References.Reference data) {
-        if (refPublishers == null) {
-            return null;
-        }
-        return this.refIdWithPublishers.get(data.getId());
     }
 
     private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
