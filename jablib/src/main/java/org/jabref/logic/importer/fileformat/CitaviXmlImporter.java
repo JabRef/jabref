@@ -161,7 +161,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private void parseCitaviData(XMLStreamReader reader) throws XMLStreamException {
         // TODO: Persons, Keywords, Publishers, KnowledgeItems, ReferenceAuthors, ReferenceKeywords
-
         while (reader.hasNext()) {
             int event = reader.next();
             switch (event) {
@@ -250,19 +249,19 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private void parseKeyword(XMLStreamReader reader) throws XMLStreamException {
         String id = reader.getAttributeValue(null, "id");
-        String name = null;
+        String keywordName = null;
         while (reader.hasNext()) {
             int event = reader.next();
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
                     if (elementName.equals("Name")) {
-                        name = reader.getElementText();
+                        keywordName = reader.getElementText();
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
                     if ("Keyword".equals(reader.getLocalName())) {
-                        Keyword keyword = new Keyword(name);
+                        Keyword keyword = new Keyword(keywordName);
                         knownKeywords.put(id, keyword);
                         return;
                     }
@@ -272,7 +271,44 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void parsePublishers(XMLStreamReader reader) throws XMLStreamException {
-        // TODO
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("Publisher")) {
+                        parsePublisher(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("Publishers".equals(reader.getLocalName())) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void parsePublisher(XMLStreamReader reader) throws XMLStreamException {
+        String id = reader.getAttributeValue(null, "id");
+        String publisherName = null;
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("Name")) {
+                        publisherName = reader.getElementText();
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("Publisher".equals(reader.getLocalName())) {
+                        knownPublishers.put(id, publisherName);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     private void parseReferences(XMLStreamReader reader) throws XMLStreamException {
