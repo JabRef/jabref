@@ -361,6 +361,7 @@ jobs:
         shell: bash
         run: |
           cd jabgui/build/distribution
+          ls -l
           ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
           zstd -d < control.tar.zst | xz > control.tar.xz
           zstd -d < data.tar.zst | xz > data.tar.xz
