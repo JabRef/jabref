@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationkeypattern.BracketedPattern;
 import org.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -588,5 +589,35 @@ public class FileUtil {
 
     public static boolean isCharLegal(char c) {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
+    }
+
+    /**
+     * Converts a Cygwin-style file path to a Windows-style path, if the operating system is Windows.
+     *
+     * Supported formats:
+     * - /cygdrive/c/Users/...   → C:\Users\...
+     * - /c/Users/...            → C:\Users\...
+     *
+     * @param filePath the input file path
+     * @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
+     */
+    public static String convertCygwinPathToWindows(String filePath) {
+        if (!OS.WINDOWS || filePath == null) {
+            return filePath;
+        }
+
+        if (filePath.startsWith("/cygdrive/") && filePath.length() > 10) {
+            String driveLetter = filePath.substring(10, 11).toUpperCase();
+            String path = filePath.substring(11).replace("/", "\\\\");
+            return driveLetter + ":" + path;
+        }
+
+        if (filePath.matches("^/[a-zA-Z]/.*")) {
+            String driveLetter = filePath.substring(1, 2).toUpperCase();
+            String path = filePath.substring(2).replace("/", "\\\\");
+            return driveLetter + ":" + path;
+        }
+
+        return filePath;
     }
 }
