@@ -44,6 +44,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -67,6 +68,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private final Map<String, Author> knownPersons = new HashMap<>();
     private final Map<String, Keyword> knownKeywords = new HashMap<>();
     private final Map<String, String> knownPublishers = new HashMap<>();
+    private final Map<String, BibEntry> knownReferences = new HashMap<>();
     private final XMLInputFactory xmlInputFactory;
     private Map<String, String> refIdWithAuthors = new HashMap<>();
     private Map<String, String> refIdWithEditors = new HashMap<>();
@@ -172,6 +174,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                         case "Publishers" -> parsePublishers(reader);
                         case "References" -> parseReferences(reader);
                         case "KnowledgeItems" -> parseKnowledgeItems(reader);
+                        default -> consumeElement(reader);
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
@@ -216,6 +219,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
                         firstName = reader.getElementText();
                     } else if (elementName.equals("LastName")) {
                         lastName = reader.getElementText();
+                    } else {
+                        consumeElement(reader);
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
@@ -257,6 +262,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     String elementName = reader.getLocalName();
                     if (elementName.equals("Name")) {
                         keywordName = reader.getElementText();
+                    } else {
+                        consumeElement(reader);
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
@@ -299,6 +306,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
                     String elementName = reader.getLocalName();
                     if (elementName.equals("Name")) {
                         publisherName = reader.getElementText();
+                    } else {
+                        consumeElement(reader);
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
@@ -312,7 +321,59 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void parseReferences(XMLStreamReader reader) throws XMLStreamException {
-        // TODO
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("Reference")) {
+                        parseReference(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("References".equals(reader.getLocalName())) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseReference(XMLStreamReader reader) throws XMLStreamException {
+        String id = reader.getAttributeValue(null, "id");
+        String pageRange = null;
+        String pageCount = null;
+        BibEntry entry = new BibEntry();
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    switch (elementName) {
+                        case "ReferenceType" -> entry.setType(convertRefNameToType(reader.getElementText()));
+                        case "Title" -> entry.setField(StandardField.TITLE, clean(reader.getElementText()));
+                        case "Abstract" -> entry.setField(StandardField.ABSTRACT, clean(reader.getElementText()));
+                        case "Year" -> entry.setField(StandardField.YEAR, clean(reader.getElementText()));
+                        case "Doi" -> entry.setField(StandardField.DOI, clean(reader.getElementText()));
+                        case "Isbn" -> entry.setField(StandardField.ISBN, clean(reader.getElementText()));
+                        case "Volume" -> entry.setField(StandardField.VOLUME, clean(reader.getElementText()));
+                        case "PageCount" -> pageCount = reader.getElementText();
+                        case "PageRange" -> pageRange = reader.getElementText();
+                        default -> consumeElement(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("Reference".equals(reader.getLocalName())) {
+                        String pages = clean(getPages(pageRange, pageCount));
+                        pages = pagesFormatter.format(pages);
+                        entry.setField(StandardField.PAGES, pages);
+                        knownReferences.put(id, entry);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     private void parseKnowledgeItems(XMLStreamReader reader) throws XMLStreamException {
@@ -462,6 +523,28 @@ public class CitaviXmlImporter extends Importer implements Parser {
             LOGGER.error(e.getLocalizedMessage(), e);
         }
         return List.of();
+    }
+
+    private void consumeElement(XMLStreamReader reader) throws XMLStreamException {
+        int depth = 1;
+        while (reader.hasNext() && depth > 0) {
+            int event = reader.next();
+            if (event == XMLStreamConstants.START_ELEMENT) {
+                depth++;
+            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                depth--;
+            }
+        }
+    }
+
+    private String getPages(String pageRange, String pageCount) {
+        if (pageCount != null && !pageCount.isEmpty()) {
+            return pageCount;
+        }
+        if (pageRange != null && !pageRange.isEmpty()) {
+            return pageRange;
+        }
+        return "";
     }
 
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {
