@@ -38,7 +38,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final IntegerProperty currentPage = new SimpleIntegerProperty();
     private final StringProperty highlightText = new SimpleStringProperty();
-    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -82,15 +82,11 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             files.clear();
             currentDocument.set(null); // Clear current document when no entries
         } else {
-            Set<LinkedFile> linkedFiles = entries.stream()
-                                                 .map(BibEntry::getFiles)
-                                                 .flatMap(List::stream)
-                                                 .collect(Collectors.toSet());
-
-            // Filter to include only PDF files
-            Set<LinkedFile> pdfFiles = linkedFiles.stream()
-                                                  .filter(this::isPdfFile)
-                                                  .collect(Collectors.toSet());
+            Set<LinkedFile> pdfFiles = entries.stream()
+                                              .map(BibEntry::getFiles)
+                                              .flatMap(List::stream)
+                                              .filter(this::isPdfFile)  // 直接在这里过滤
+                                              .collect(Collectors.toSet());
 
             if (pdfFiles.isEmpty()) {
                 // No PDF files found - clear the list and current document
@@ -112,36 +108,15 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         }
     }
 
-    /**
-     * Checks if the given LinkedFile is a PDF file.
-     * Uses multiple strategies: file extension, file type, and FileUtil if available.
-     *
-     * @param file the LinkedFile to check
-     * @return true if the file is a PDF, false otherwise
-     */
     private boolean isPdfFile(LinkedFile file) {
         if (file == null || file.getLink() == null || file.getLink().trim().isEmpty()) {
             return false;
         }
 
-        // Strategy 1: Check file extension
-        String fileName = file.getLink().toLowerCase().trim();
-        if (fileName.endsWith(".pdf")) {
-            return true;
-        }
-
-        // Strategy 2: Check file type property if available
-        String fileType = file.getFileType();
-        if (fileType != null && fileType.equalsIgnoreCase("pdf")) {
-            return true;
-        }
-
-        // Strategy 3: Use existing FileUtil if the file path can be resolved
         try {
             Path filePath = Path.of(file.getLink());
             return FileUtil.isPDFFile(filePath);
         } catch (Exception e) {
-            // If path resolution fails, fall back to extension check
             return false;
         }
     }

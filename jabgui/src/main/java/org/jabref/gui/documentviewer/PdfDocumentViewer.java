@@ -71,7 +71,7 @@ public class PdfDocumentViewer extends StackPane {
                 LOGGER.error("Could not load PDF document {}", document, e);
                 // Show error message
                 pdfView.setVisible(false);
-                placeholderLabel.setText("⚠ Could not load PDF: " + document.getFileName());
+                placeholderLabel.setText("Could not load PDF: " + document.getFileName());
                 placeholderLabel.setVisible(true);
             }
         } else {
