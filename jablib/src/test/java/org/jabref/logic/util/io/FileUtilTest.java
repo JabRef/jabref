@@ -522,7 +522,9 @@ class FileUtilTest {
 
     @EnabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS)
     @ParameterizedTest
-    @ValueSource(strings = {"/c/Users/username/Downloads/test.bib", "/cygdrive/c/Users/username/Downloads/test.bib"})
+    @ValueSource(strings = {"/c/Users/username/Downloads/test.bib",
+            "/cygdrive/c/Users/username/Downloads/test.bib",
+            "/mnt/c/Users/username/Downloads/test.bib"})
     void convertCygwinPathToWindowsShouldConvertToWindowsFormatWhenRunningOnWindows(String filePath) {
         assertEquals("C:\\\\Users\\\\username\\\\Downloads\\\\test.bib", FileUtil.convertCygwinPathToWindows(filePath));
     }
