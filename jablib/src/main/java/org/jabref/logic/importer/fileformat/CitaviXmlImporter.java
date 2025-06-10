@@ -37,6 +37,7 @@ import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.Persons.Person;
+import org.jabref.logic.importer.fileformat.citavi.Reference;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.Author;
@@ -44,7 +45,6 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -68,7 +68,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private final Map<String, Author> knownPersons = new HashMap<>();
     private final Map<String, Keyword> knownKeywords = new HashMap<>();
     private final Map<String, String> knownPublishers = new HashMap<>();
-    private final Map<String, BibEntry> bibEntries = new HashMap<>();
+    private final List<Reference> references = new ArrayList<>();
     private final XMLInputFactory xmlInputFactory;
     private Map<String, String> refIdWithAuthors = new HashMap<>();
     private Map<String, String> refIdWithEditors = new HashMap<>();
@@ -341,9 +341,15 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private void parseReference(XMLStreamReader reader) throws XMLStreamException {
         String id = reader.getAttributeValue(null, "id");
+        String referenceType = null;
+        String title = null;
+        String year = null;
+        String abstractText = null;
         String pageRange = null;
         String pageCount = null;
-        BibEntry entry = new BibEntry();
+        String volume = null;
+        String doi = null;
+        String isbn = null;
 
         while (reader.hasNext()) {
             int event = reader.next();
@@ -351,24 +357,21 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
                     switch (elementName) {
-                        case "ReferenceType" -> entry.setType(convertRefNameToType(reader.getElementText()));
-                        case "Title" -> entry.setField(StandardField.TITLE, clean(reader.getElementText()));
-                        case "Abstract" -> entry.setField(StandardField.ABSTRACT, clean(reader.getElementText()));
-                        case "Year" -> entry.setField(StandardField.YEAR, clean(reader.getElementText()));
-                        case "Doi" -> entry.setField(StandardField.DOI, clean(reader.getElementText()));
-                        case "Isbn" -> entry.setField(StandardField.ISBN, clean(reader.getElementText()));
-                        case "Volume" -> entry.setField(StandardField.VOLUME, clean(reader.getElementText()));
-                        case "PageCount" -> pageCount = reader.getElementText();
+                        case "ReferenceType" -> referenceType = reader.getElementText();
+                        case "Title" -> title = clean(reader.getElementText());
+                        case "Year" -> year = clean(reader.getElementText());
+                        case "Abstract" -> abstractText = clean(reader.getElementText());
                         case "PageRange" -> pageRange = reader.getElementText();
+                        case "PageCount" -> pageCount = reader.getElementText();
+                        case "Volume" -> volume = clean(reader.getElementText());
+                        case "Doi" -> doi = clean(reader.getElementText());
+                        case "Isbn" -> isbn = clean(reader.getElementText());
                         default -> consumeElement(reader);
                     }
                 }
                 case XMLStreamConstants.END_ELEMENT -> {
                     if ("Reference".equals(reader.getLocalName())) {
-                        String pages = clean(getPages(pageRange, pageCount));
-                        pages = pagesFormatter.format(pages);
-                        entry.setField(StandardField.PAGES, pages);
-                        bibEntries.put(id, entry);
+                        references.add(new Reference(id, referenceType, title, year, abstractText, pageRange, pageCount, volume, doi, isbn));
                         return;
                     }
                 }
