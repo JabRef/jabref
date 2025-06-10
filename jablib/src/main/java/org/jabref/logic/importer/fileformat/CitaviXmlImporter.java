@@ -68,7 +68,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private final Map<String, Author> knownPersons = new HashMap<>();
     private final Map<String, Keyword> knownKeywords = new HashMap<>();
     private final Map<String, String> knownPublishers = new HashMap<>();
-    private final Map<String, BibEntry> knownReferences = new HashMap<>();
+    private final Map<String, BibEntry> bibEntries = new HashMap<>();
     private final XMLInputFactory xmlInputFactory;
     private Map<String, String> refIdWithAuthors = new HashMap<>();
     private Map<String, String> refIdWithEditors = new HashMap<>();
@@ -162,7 +162,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void parseCitaviData(XMLStreamReader reader) throws XMLStreamException {
-        // TODO: Persons, Keywords, Publishers, KnowledgeItems, ReferenceAuthors, ReferenceKeywords
+        // TODO: Persons, Keywords, Publishers, KnowledgeItems, ReferenceAuthors, ReferenceKeywords, ReferencePublishers, ReferenceEditors
         while (reader.hasNext()) {
             int event = reader.next();
             switch (event) {
@@ -368,7 +368,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                         String pages = clean(getPages(pageRange, pageCount));
                         pages = pagesFormatter.format(pages);
                         entry.setField(StandardField.PAGES, pages);
-                        knownReferences.put(id, entry);
+                        bibEntries.put(id, entry);
                         return;
                     }
                 }
