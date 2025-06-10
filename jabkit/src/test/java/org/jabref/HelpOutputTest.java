@@ -1,13 +1,17 @@
 package org.jabref;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
+import javafx.util.Pair;
 
 import org.jabref.cli.ArgumentProcessor;
 import org.jabref.logic.exporter.ExportPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -45,34 +49,39 @@ public class HelpOutputTest {
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
         cmd = new CommandLine(argumentProcessor);
-
-        JabKit.applyUsageFooters(
-                cmd,
-                ArgumentProcessor.getAvailableImportFormats(preferences),
-                ArgumentProcessor.getAvailableExportFormats(preferences),
-                WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())
-        );
     }
 
     @Test
     public void testExportFormatFooterShownOnlyForCommandsWithOutputOption() {
+        List<Pair<String, String>> inputFormats = ArgumentProcessor.getAvailableImportFormats(preferences);
+        List<Pair<String, String>> outputFormats = ArgumentProcessor.getAvailableExportFormats(preferences);
+        Set<SearchBasedFetcher> fetchers = WebFetchers.getSearchBasedFetchers(
+                preferences.getImportFormatPreferences(),
+                preferences.getImporterPreferences()
+        );
+
+        JabKit.applyUsageFooters(cmd, inputFormats, outputFormats, fetchers);
+
         cmd.getSubcommands().forEach((name, subCmd) -> {
             CommandLine.Model.CommandSpec spec = subCmd.getCommandSpec();
-            String helpMessage = subCmd.getUsageMessage();
+            String[] footer = subCmd.getCommandSpec().usageMessage().footer();
+            String target = "Available export formats";
 
             boolean hasOutputOption = spec.options().stream()
                                           .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output"));
+            boolean containsExportFormats = Arrays.stream(footer)
+                    .anyMatch(line -> line.contains(target));
 
             if ("fetch".equals(name)) {
                 // special case: expect footer NOT present
-                assertEquals(false, helpMessage.contains("Available export formats"),
-                        "Did not expect 'Available export formats' in help for special case: " + name);
+                assertEquals(false, containsExportFormats,
+                        "Did not expect 'Available export formats' in footer for special case: " + name);
             } else if (hasOutputOption) {
-                assertEquals(true, helpMessage.contains("Available export formats"),
-                        "Expected 'Available export formats' in help for: " + name);
+                assertEquals(true, containsExportFormats,
+                        "Expected 'Available export formats' in footer for: " + name);
             } else {
-                assertEquals(false, helpMessage.contains("Available export formats"),
-                        "Did not expect 'Available export formats' in help for: " + name);
+                assertEquals(false, containsExportFormats,
+                        "Did not expect 'Available export formats' in footer for: " + name);
             }
         });
     }
