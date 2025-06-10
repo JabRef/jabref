@@ -88,7 +88,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
         // This also automatically selects the first file on the initial load
         Stage stage = (Stage) getDialogPane().getScene().getWindow();
         fileChoice.itemsProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.isEmpty()) {
+            if (newValue == null || newValue.isEmpty()) {
                 stage.close();
             } else {
                 fileChoice.getSelectionModel().selectFirst();
@@ -99,9 +99,8 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupViewer() {
         viewModel.currentDocumentProperty().addListener((observable, oldDocument, newDocument) -> {
-            if (newDocument != null) {
-                viewer.show(newDocument);
-            }
+            // Always call show(), even when newDocument is null
+            viewer.show(newDocument);
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
         viewModel.highlightTextProperty().bindBidirectional(viewer.highlightTextProperty());
