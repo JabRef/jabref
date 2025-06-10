@@ -1,4 +1,27 @@
-package org.jabref.generators;
+///usr/bin/env jbang "$0" "$@" ; exit $?
+
+//JAVA 24
+//RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
+
+//DEPS com.h2database:h2:2.2.224
+//DEPS org.antlr:antlr4-runtime:4.13.2
+//DEPS org.apache.commons:commons-csv:1.14.0
+//DEPS info.debatty:java-string-similarity:2.0.0
+//DEPS org.jooq:jool:0.9.14
+//DEPS org.openjfx:javafx-base:24.0.1
+//DEPS org.slf4j:slf4j-api:2.0.13
+//DEPS org.slf4j:slf4j-simple:2.0.13
+
+//SOURCES ../main/java/org/jabref/logic/journals/Abbreviation.java
+//SOURCES ../main/java/org/jabref/logic/journals/AbbreviationFormat.java
+//SOURCES ../main/java/org/jabref/logic/journals/AbbreviationParser.java
+//SOURCES ../main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
+//SOURCES ../main/java/org/jabref/logic/journals/JournalAbbreviationPreferences.java
+//SOURCES ../main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
+//SOURCES ../main/java/org/jabref/logic/journals/ltwa/*.java
+//SOURCES ../main/java/org/jabref/logic/util/strings/StringSimilarity.java
+
+//SOURCES ../../build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,7 +61,7 @@ public class LtwaListMvGenerator {
 
             generateMvStore(tempCsvFile, outputFile);
 
-            LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile);
+            LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile.toAbsolutePath());
         } catch (IOException e) {
             LOGGER.error("Error generating LTWA MVStore file.", e);
         }

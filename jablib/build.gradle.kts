@@ -18,6 +18,9 @@ plugins {
     id("me.champeau.jmh") version "0.7.3"
 
     id("com.vanniktech.maven.publish") version "0.32.0"
+
+    // id("dev.jbang") version "0.2.0"
+    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
 }
 
 val pdfbox = "3.0.5"
@@ -348,16 +351,13 @@ tasks.named<ProcessResources>("processResources") {
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
 
-var taskGenerateJournalListMV = tasks.register<JavaExec>("generateJournalListMV") {
+var taskGenerateJournalListMV = tasks.register<dev.jbang.gradle.tasks.JBangTask>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    script = "src/build-support/LtwaListMvGenerator.java"
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
-
-    mainClass.set("org.jabref.generators.JournalListMvGenerator")
-    classpath = sourceSets["main"].runtimeClasspath.filter { file -> !file.name.endsWith(".mv") }
-    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
 }
 
 var taskGenerateCitationStyleCatalog = tasks.register<JavaExec>("generateCitationStyleCatalog") {
