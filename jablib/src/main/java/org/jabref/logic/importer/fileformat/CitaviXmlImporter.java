@@ -49,8 +49,6 @@ import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -165,15 +163,23 @@ public class CitaviXmlImporter extends Importer implements Parser {
         // TODO: Persons, Keywords, Publishers, KnowledgeItems, ReferenceAuthors, ReferenceKeywords
 
         while (reader.hasNext()) {
-            reader.next();
-            if (reader.isStartElement()) {
-                String elementName = reader.getLocalName();
-                switch (elementName) {
-                    case "Persons" -> parsePersons(reader);
-                    case "Keywords" -> parseKeywords(reader);
-                    case "Publishers" -> parsePublishers(reader);
-                    case "References" -> parseReferences(reader);
-                    case "KnowledgeItems" -> parseKnowledgeItems(reader);
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String startElementName = reader.getLocalName();
+                    switch (startElementName) {
+                        case "Persons" -> parsePersons(reader);
+                        case "Keywords" -> parseKeywords(reader);
+                        case "Publishers" -> parsePublishers(reader);
+                        case "References" -> parseReferences(reader);
+                        case "KnowledgeItems" -> parseKnowledgeItems(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    String endElementName = reader.getLocalName();
+                    if ("CitaviExchangeData".equals(endElementName)) {
+                        return;
+                    }
                 }
             }
         }
@@ -225,7 +231,44 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void parseKeywords(XMLStreamReader reader) throws XMLStreamException {
-        // TODO
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    if ("Keyword".equals(reader.getLocalName())) {
+                        parseKeyword(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("Keywords".equals(reader.getLocalName())) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseKeyword(XMLStreamReader reader) throws XMLStreamException {
+        String id = reader.getAttributeValue(null, "id");
+        String name = null;
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    if (elementName.equals("Name")) {
+                        name = reader.getElementText();
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("Keyword".equals(reader.getLocalName())) {
+                        Keyword keyword = new Keyword(name);
+                        knownKeywords.put(id, keyword);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     private void parsePublishers(XMLStreamReader reader) throws XMLStreamException {
@@ -234,7 +277,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     private void parseReferences(XMLStreamReader reader) throws XMLStreamException {
         // TODO
-
     }
 
     private void parseKnowledgeItems(XMLStreamReader reader) throws XMLStreamException {
@@ -366,27 +408,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private String removeSpacesBeforeLineBreak(String string) {
         return string.replaceAll(" +\r\n", "\r\n")
               .replaceAll(" +\n", "\n");
-    }
-
-    private void initUnmarshaller() throws JAXBException {
-        if (unmarshaller == null) {
-            // Lazy init because this is expensive
-            JAXBContext context = JAXBContext.newInstance("org.jabref.logic.importer.fileformat.citavi");
-            unmarshaller = context.createUnmarshaller();
-        }
-    }
-
-    private Object unmarshallRoot(BufferedReader reader) throws XMLStreamException, JAXBException {
-        initUnmarshaller();
-
-        XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
-
-        // Go to the root element
-        while (!xmlStreamReader.isStartElement()) {
-            xmlStreamReader.next();
-        }
-
-        return unmarshaller.unmarshal(xmlStreamReader);
     }
 
     @Override
