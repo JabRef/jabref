@@ -84,7 +84,7 @@ public class ArgumentProcessor implements Runnable {
         LOGGER.debug("Importing file {}", importArguments);
         String[] data = importArguments.split(",");
 
-        String address = data[0];
+        String address = FileUtil.convertCygwinPathToWindows(data[0]);
         Path file;
         if (address.startsWith("http://") || address.startsWith("https://") || address.startsWith("ftp://")) {
             // Download web resource to temporary file
