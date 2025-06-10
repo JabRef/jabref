@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 
@@ -89,7 +90,7 @@ public class ImportCommand extends SimpleCommand {
                 .addExtensionFilter(FileFilterConverter.importerToExtensionFilter(importers))
                 .withInitialDirectory(preferences.getImporterPreferences().getImportWorkingDirectory())
                 .build();
-        
+
         List<Path> selectedFiles = dialogService.showFileOpenDialogAndGetMultipleFiles(fileDialogConfiguration);
 
         if (selectedFiles.isEmpty()) {
@@ -132,7 +133,7 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            ImportEntriesDialog dialog = new ImportEntriesDialog(tabContainer.getCurrentLibraryTab().getBibDatabaseContext(), task);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }
