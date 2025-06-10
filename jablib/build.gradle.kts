@@ -554,6 +554,15 @@ tasks.named<Jar>("sourcesJar") {
     )
 }
 
+// Task "jar" is executed before things are passed to another project; it is the task directly following "classes"
+tasks.named("jar") {
+    dependsOn(
+        taskGenerateJournalListMV,
+        taskGenerateLtwaListMV,
+        taskGenerateCitationStyleCatalog
+    )
+}
+
 tasks.named("compileTestJava") {
     dependsOn(
         taskGenerateJournalListMV,
