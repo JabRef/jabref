@@ -17,8 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
-import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -34,9 +32,8 @@ import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData;
-import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems;
-import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.KnowledgeItems.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.CitaviExchangeData.Persons.Person;
+import org.jabref.logic.importer.fileformat.citavi.KnowledgeItem;
 import org.jabref.logic.importer.fileformat.citavi.Reference;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -69,6 +66,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private final Map<String, Keyword> knownKeywords = new HashMap<>();
     private final Map<String, String> knownPublishers = new HashMap<>();
     private final List<Reference> references = new ArrayList<>();
+    private final List<KnowledgeItem> knowledgeItems = new ArrayList<>();
     private final XMLInputFactory xmlInputFactory;
     private Map<String, String> refIdWithAuthors = new HashMap<>();
     private Map<String, String> refIdWithEditors = new HashMap<>();
@@ -78,7 +76,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private CitaviExchangeData.Persons persons;
     private CitaviExchangeData.Keywords keywords;
     private CitaviExchangeData.Publishers publishers;
-    private KnowledgeItems knowledgeItems;
 
     private CitaviExchangeData.ReferenceAuthors refAuthors;
     private CitaviExchangeData.ReferenceEditors refEditors;
@@ -380,7 +377,56 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void parseKnowledgeItems(XMLStreamReader reader) throws XMLStreamException {
-        // TODO
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    if ("KnowledgeItem".equals(reader.getLocalName())) {
+                        parseKnowledgeItem(reader);
+                    } else {
+                        consumeElement(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("KnowledgeItems".equals(reader.getLocalName())) {
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseKnowledgeItem(XMLStreamReader reader) throws XMLStreamException {
+        String referenceId = null;
+        String coreStatement = null;
+        String text = null;
+        String pageRangeNumber = null;
+        String quotationType = null;
+        String quotationIndex = null;
+
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    switch (elementName) {
+                        case "ReferenceID" -> referenceId = reader.getElementText();
+                        case "CoreStatement" -> coreStatement = reader.getElementText();
+                        case "Text" -> text = reader.getElementText();
+                        case "PageRangeNumber" -> pageRangeNumber = reader.getElementText();
+                        case "QuotationType" -> quotationType = reader.getElementText();
+                        case "QuotationIndex" -> quotationIndex = reader.getElementText();
+                        default -> consumeElement(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if ("KnowledgeItem".equals(reader.getLocalName())) {
+                        knowledgeItems.add(new KnowledgeItem(referenceId, coreStatement, text, pageRangeNumber, quotationType, quotationIndex));
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     private static EntryType convertRefNameToType(String refName) {
@@ -471,31 +517,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
             refToPublishers.put(refId, stringifiedKeywords);
         }
         return refToPublishers;
-    }
-
-    private String getKnowledgeItem(CitaviExchangeData.References.Reference data) {
-        StringJoiner comment = new StringJoiner("\n\n");
-        List<KnowledgeItem> foundItems = knowledgeItems.getKnowledgeItem().stream().filter(p -> data.getId().equals(p.getReferenceID())).toList();
-        for (KnowledgeItem knowledgeItem : foundItems) {
-            Optional<String> title = Optional.ofNullable(knowledgeItem.getCoreStatement()).filter(Predicate.not(String::isEmpty));
-            title.ifPresent(t -> comment.add("# " + cleanUpText(t)));
-
-            Optional<String> text = Optional.ofNullable(knowledgeItem.getText()).filter(Predicate.not(String::isEmpty));
-            text.ifPresent(t -> comment.add(cleanUpText(t)));
-
-            Optional<Integer> pages = Optional.of(knowledgeItem.getPageRangeNumber()).filter(range -> range != -1);
-            pages.ifPresent(p -> comment.add("page range: " + p));
-
-            Optional<String> quotationTypeDesc = Optional.of(knowledgeItem.getQuotationType()).flatMap(type ->
-                                                                    QUOTATION_TYPES.stream()
-                                                                    .filter(qt -> type == qt.getCitaviIndexType())
-                                                                    .map(QuotationTypeMapping::getName).findFirst());
-            quotationTypeDesc.ifPresent(qt -> comment.add("quotation type: %s".formatted(qt)));
-
-            Optional<Short> quotationIndex = Optional.of(knowledgeItem.getQuotationIndex());
-            quotationIndex.ifPresent(index -> comment.add("quotation index: %d".formatted(index)));
-        }
-        return comment.toString();
     }
 
     String cleanUpText(String text) {
