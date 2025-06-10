@@ -261,7 +261,7 @@ class CopyMoreActionTest {
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "authors"));
+        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Author"));
     }
 
     @Test
@@ -283,7 +283,7 @@ class CopyMoreActionTest {
         String copiedAuthors = authorsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedAuthors);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - authors.size()), Integer.toString(mixedEntries.size()), "authors"));
+                Integer.toString(mixedEntries.size() - authors.size()), Integer.toString(mixedEntries.size()), "Author"));
     }
 
     @Test
@@ -320,7 +320,7 @@ class CopyMoreActionTest {
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have journal names."));
+        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Journal"));
     }
 
     @Test
@@ -342,8 +342,8 @@ class CopyMoreActionTest {
         }
         String copiedJournals = journalsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedJournals);
-        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined journal names.",
-                Integer.toString(mixedEntries.size() - journals.size()), Integer.toString(mixedEntries.size())));
+        verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
+                Integer.toString(mixedEntries.size() - journals.size()), Integer.toString(mixedEntries.size()), "Journal"));
     }
 
     @Test
@@ -370,6 +370,7 @@ class CopyMoreActionTest {
     void executeCopyDateWithNoDate() {
         BibEntry entryWithNoDate = (BibEntry) entry.clone();
         entryWithNoDate.clearField(StandardField.DATE);
+        entryWithNoDate.clearField(StandardField.YEAR);
         ObservableList<BibEntry> entriesWithNoDates = FXCollections.observableArrayList(entryWithNoDate);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoDates));
 
@@ -379,13 +380,14 @@ class CopyMoreActionTest {
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "dates"));
+        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Date"));
     }
 
     @Test
     void executeCopyDateOnPartialSuccess() {
         BibEntry entryWithNoDate = (BibEntry) entry.clone();
         entryWithNoDate.clearField(StandardField.DATE);
+        entryWithNoDate.clearField(StandardField.YEAR);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoDate, entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
 
@@ -401,7 +403,7 @@ class CopyMoreActionTest {
         String copiedDates = datesJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedDates);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - dates.size()), Integer.toString(mixedEntries.size()), "dates"));
+                Integer.toString(mixedEntries.size() - dates.size()), Integer.toString(mixedEntries.size()), "Date"));
     }
 
     @Test
@@ -437,7 +439,7 @@ class CopyMoreActionTest {
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "keywords"));
+        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Keywords"));
     }
 
     @Test
@@ -459,7 +461,7 @@ class CopyMoreActionTest {
         String copiedKeywords = keywordsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedKeywords);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - keywords.size()), Integer.toString(mixedEntries.size()), "keywords"));
+                Integer.toString(mixedEntries.size() - keywords.size()), Integer.toString(mixedEntries.size()), "Keywords"));
     }
 
     @Test
@@ -495,7 +497,7 @@ class CopyMoreActionTest {
         copyMoreAction.execute();
 
         verify(clipBoardManager, times(0)).setContent(any(String.class));
-        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "abstracts"));
+        verify(dialogService, times(1)).notify(Localization.lang("None of the selected entries have %0.", "Abstract"));
     }
 
     @Test
@@ -517,7 +519,7 @@ class CopyMoreActionTest {
         String copiedAbstracts = abstractsJoiner.toString();
         verify(clipBoardManager, times(1)).setContent(copiedAbstracts);
         verify(dialogService, times(1)).notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
-                Integer.toString(mixedEntries.size() - abstracts.size()), Integer.toString(mixedEntries.size()), "abstracts"));
+                Integer.toString(mixedEntries.size() - abstracts.size()), Integer.toString(mixedEntries.size()), "Abstract"));
     }
 
     @Test
