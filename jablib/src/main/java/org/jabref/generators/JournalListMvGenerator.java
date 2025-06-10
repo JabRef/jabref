@@ -15,8 +15,12 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jooq.lambda.Unchecked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JournalListMvGenerator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalListMvGenerator.class);
 
     public static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
@@ -72,5 +76,7 @@ public class JournalListMvGenerator {
                 }
             }));
         }
+
+        LOGGER.info("Generated journal list at {}", journalListMvFile.toAbsolutePath());
     }
 }
