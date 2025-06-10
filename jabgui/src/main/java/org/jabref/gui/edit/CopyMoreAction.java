@@ -73,15 +73,15 @@ public class CopyMoreAction extends SimpleCommand {
             case COPY_DOI, COPY_DOI_URL ->
                     copyDoi();
             case COPY_FIELD_AUTHOR ->
-                    copyField(StandardField.AUTHOR, Localization.lang("authors"));
+                    copyField(StandardField.AUTHOR, Localization.lang("Author"));
             case COPY_FIELD_JOURNAL ->
-                    copyJournalField();
+                    copyField(StandardField.JOURNAL, Localization.lang("Journal"));
             case COPY_FIELD_DATE ->
-                    copyField(StandardField.DATE, Localization.lang("dates"));
+                    copyField(StandardField.DATE, Localization.lang("Date"));
             case COPY_FIELD_KEYWORDS ->
-                    copyField(StandardField.KEYWORDS, Localization.lang("keywords"));
+                    copyField(StandardField.KEYWORDS, Localization.lang("Keywords"));
             case COPY_FIELD_ABSTRACT ->
-                    copyField(StandardField.ABSTRACT, Localization.lang("abstracts"));
+                    copyField(StandardField.ABSTRACT, Localization.lang("Abstract"));
             default ->
                     LOGGER.info("Unknown copy command.");
         }
@@ -279,8 +279,8 @@ public class CopyMoreAction extends SimpleCommand {
         List<BibEntry> selectedBibEntries = stateManager.getSelectedEntries();
 
         List<String> fieldValues = selectedBibEntries.stream()
-                                                     .filter(bibEntry -> bibEntry.getField(field).isPresent())
-                                                     .map(bibEntry -> bibEntry.getField(field).orElse(""))
+                                                     .filter(bibEntry -> bibEntry.getFieldOrAlias(field).isPresent())
+                                                     .map(bibEntry -> bibEntry.getFieldOrAlias(field).orElse(""))
                                                      .filter(value -> !value.isEmpty())
                                                      .collect(Collectors.toList());
 
@@ -289,7 +289,7 @@ public class CopyMoreAction extends SimpleCommand {
             return;
         }
 
-        final String copiedContent = String.join("\n", fieldValues);
+        final String copiedContent = fieldValues.stream().collect(Collectors.joining("\n"));
         clipBoardManager.setContent(copiedContent);
 
         if (fieldValues.size() == selectedBibEntries.size()) {
@@ -301,43 +301,6 @@ public class CopyMoreAction extends SimpleCommand {
                     Integer.toString(selectedBibEntries.size() - fieldValues.size()),
                     Integer.toString(selectedBibEntries.size()),
                     fieldDisplayName));
-        }
-    }
-
-    private void copyJournalField() {
-        List<BibEntry> selectedBibEntries = stateManager.getSelectedEntries();
-
-        List<String> journalValues = selectedBibEntries.stream()
-                                                       .filter(bibEntry ->
-                                                               bibEntry.getField(StandardField.JOURNAL).isPresent() ||
-                                                               bibEntry.getField(StandardField.JOURNALTITLE).isPresent())
-                                                       .map(bibEntry -> {
-                                                           // Prefer journal over journaltitle for consistency
-                                                           if (bibEntry.getField(StandardField.JOURNAL).isPresent()) {
-                                                               return bibEntry.getField(StandardField.JOURNAL).orElse("");
-                                                           } else {
-                                                               return bibEntry.getField(StandardField.JOURNALTITLE).orElse("");
-                                                           }
-                                                       })
-                                                       .filter(value -> !value.isEmpty())
-                                                       .collect(Collectors.toList());
-
-        if (journalValues.isEmpty()) {
-            dialogService.notify(Localization.lang("None of the selected entries have journal names."));
-            return;
-        }
-
-        final String copiedContent = String.join("\n", journalValues);
-        clipBoardManager.setContent(copiedContent);
-
-        if (journalValues.size() == selectedBibEntries.size()) {
-            // All entries had journal fields.
-            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
-                    JabRefDialogService.shortenDialogMessage(copiedContent)));
-        } else {
-            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined journal names.",
-                    Integer.toString(selectedBibEntries.size() - journalValues.size()),
-                    Integer.toString(selectedBibEntries.size())));
         }
     }
 }
