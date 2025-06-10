@@ -591,19 +591,24 @@ public class FileUtil {
         return Arrays.binarySearch(ILLEGAL_CHARS, c) < 0;
     }
 
-    /**
-     * Converts a Cygwin-style file path to a Windows-style path, if the operating system is Windows.
-     *
-     * Supported formats:
-     * - /cygdrive/c/Users/...   → C:\Users\...
-     * - /c/Users/...            → C:\Users\...
-     *
-     * @param filePath the input file path
-     * @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
-     */
+    /// Converts a Cygwin-style file path to a Windows-style path if the operating system is Windows.
+    ///
+    /// Supported formats:
+    /// - /cygdrive/c/Users/... → C:\Users\...
+    /// - /mnt/c/Users/...      → C:\Users\...
+    /// - /c/Users/...          → C:\Users\...
+    ///
+    /// @param filePath the input file path
+    /// @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
     public static String convertCygwinPathToWindows(String filePath) {
         if (!OS.WINDOWS || filePath == null) {
             return filePath;
+        }
+
+        if (filePath.startsWith("/mnt/") && filePath.length() > 5) {
+            String driveLetter = filePath.substring(5, 6).toUpperCase();
+            String path = filePath.substring(6).replace("/", "\\\\");
+            return driveLetter + ":" + path;
         }
 
         if (filePath.startsWith("/cygdrive/") && filePath.length() > 10) {
