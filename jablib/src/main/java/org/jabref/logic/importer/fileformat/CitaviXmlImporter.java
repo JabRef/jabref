@@ -150,7 +150,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private void parseCitaviData(XMLStreamReader reader) throws XMLStreamException {
-        // TODO: Persons, Keywords, Publishers, KnowledgeItems, ReferenceAuthors, ReferenceKeywords, ReferencePublishers, ReferenceEditors
         while (reader.hasNext()) {
             int event = reader.next();
             switch (event) {
