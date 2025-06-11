@@ -1,7 +1,5 @@
 package org.jabref.logic.formatter.bibtexfields;
 
-import org.jabref.model.entry.BibEntryPreferences;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -13,8 +11,6 @@ public class ConvertMSCCodesFormatterTest {
 
     @BeforeEach
     void setup() {
-        BibEntryPreferences preferences = new BibEntryPreferences(',');
-        ConvertMSCCodesFormatter.setPreferences(preferences);
         formatter = new ConvertMSCCodesFormatter();
     }
 
