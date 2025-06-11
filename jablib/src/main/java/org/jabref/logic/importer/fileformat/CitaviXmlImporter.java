@@ -463,8 +463,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
                                                                                     .collect(Collectors.groupingBy(KnowledgeItem::referenceId));
 
         for (Reference reference : references) {
-            // a lot of the fields can be set from the reference itself
-            // the remaining fields must be fetched from the maps
             BibEntry entry = new BibEntry();
             setEntryFieldsFromReference(entry, reference);
 
