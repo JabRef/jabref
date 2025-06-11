@@ -43,6 +43,7 @@ import org.jabref.model.entry.AuthorList;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.IEEETranEntryType;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -154,7 +155,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             LOGGER.debug("could not parse document", e);
             return ParserResult.fromError(e);
         }
-        List<BibEntry> bibItems = new ArrayList<>();
+        List<BibEntry> bibItems = buildBibItems();
 
         return new ParserResult(bibItems);
     }
@@ -461,6 +462,47 @@ public class CitaviXmlImporter extends Importer implements Parser {
         }
     }
 
+    private List<BibEntry> buildBibItems() {
+        List<BibEntry> bibItems = new ArrayList<>();
+
+        for (Reference reference : references) {
+            // a lot of the fields can be set from the reference itself
+            // the remaining fields must be fetched from the maps
+            BibEntry entry = new BibEntry();
+            setEntryFieldsFromReference(entry, reference);
+
+        }
+        return bibItems;
+    }
+
+    private void setEntryFieldsFromReference(BibEntry entry, Reference reference) {
+
+        entry.setType(getType(reference));
+
+        Optional.ofNullable(reference.title())
+                .ifPresent(value -> entry.setField(StandardField.TITLE, clean(value)));
+        Optional.ofNullable(reference.abstractText())
+                .ifPresent(value -> entry.setField(StandardField.ABSTRACT, clean(value)));
+        Optional.ofNullable(reference.year())
+                .ifPresent(value -> entry.setField(StandardField.YEAR, clean(value)));
+        Optional.ofNullable(reference.doi())
+                .ifPresent(value -> entry.setField(StandardField.DOI, clean(value)));
+        Optional.ofNullable(reference.isbn())
+                .ifPresent(value -> entry.setField(StandardField.ISBN, clean(value)));
+        Optional.ofNullable(reference.volume())
+                .ifPresent(value -> entry.setField(StandardField.VOLUME, clean(value)));
+
+        String pages = clean(getPages(reference.pageRange(), reference.pageCount()));
+        pages = pagesFormatter.format(pages);
+        entry.setField(StandardField.PAGES, pages);
+    }
+
+    private EntryType getType(Reference reference) {
+        return Optional.ofNullable(reference.referenceType())
+                       .map(CitaviXmlImporter::convertRefNameToType)
+                       .orElse(StandardEntryType.Article);
+    }
+
     private static EntryType convertRefNameToType(String refName) {
         return switch (refName.toLowerCase().trim()) {
             case "artwork", "generic", "musicalbum", "audioorvideodocument", "movie" -> StandardEntryType.Misc;
@@ -468,7 +510,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
             case "book section" -> StandardEntryType.InBook;
             case "book", "bookedited", "audiobook" -> StandardEntryType.Book;
             case "report" -> StandardEntryType.Report;
-            // case "journal article" -> StandardEntryType.Article;
             default -> StandardEntryType.Article;
         };
     }
