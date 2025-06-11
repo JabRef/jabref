@@ -19,7 +19,7 @@ Go through the checklist below. It is mandatory, even for a draft pull request.
 
 Keep ALL the items. Replace the dots inside [.] and mark them as follows: 
 [x] done 
-[ ] not done 
+[ ] TODO (will be done later while the PR progresses)
 [/] not applicable
 -->
 
