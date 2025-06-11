@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -425,7 +424,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
-                    if ("OneToN".equals(elementName)) {
+                    if ("OnetoN".equals(elementName)) {
                         String rawString = reader.getElementText();
                         if (rawString != null && rawString.length() > UUID_SEMICOLON_OFFSET_INDEX) {
                             String referenceId = rawString.substring(0, UUID_LENGTH);
@@ -455,8 +454,8 @@ public class CitaviXmlImporter extends Importer implements Parser {
         Map<String, String> resolvedKeywordMap = resolveKeywordMap(refIdWithKeywordsIds, knownKeywords);
 
         Map<String, List<KnowledgeItem>> knowledgeItemsByRefId = knowledgeItems.stream()
-                                                                                    .filter(item -> item.referenceId() != null && !item.referenceId().isEmpty())
-                                                                                    .collect(Collectors.groupingBy(KnowledgeItem::referenceId));
+                                                                               .filter(item -> item.referenceId() != null && !item.referenceId().isEmpty())
+                                                                               .collect(Collectors.groupingBy(KnowledgeItem::referenceId));
 
         for (Reference reference : references) {
             BibEntry entry = new BibEntry();
@@ -468,13 +467,13 @@ public class CitaviXmlImporter extends Importer implements Parser {
             String keywords = resolvedKeywordMap.get(reference.id());
 
             Optional.ofNullable(authors)
-                    .ifPresent(value -> entry.setField(StandardField.AUTHOR, clean(authors)));
+                    .ifPresent(value -> entry.setField(StandardField.AUTHOR, clean(value)));
             Optional.ofNullable(editors)
-                    .ifPresent(value -> entry.setField(StandardField.EDITOR, clean(editors)));
+                    .ifPresent(value -> entry.setField(StandardField.EDITOR, clean(value)));
             Optional.ofNullable(publishers)
-                    .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(publishers)));
+                    .ifPresent(value -> entry.setField(StandardField.PUBLISHER, clean(value)));
             Optional.ofNullable(keywords)
-                    .ifPresent(value -> entry.setField(StandardField.KEYWORDS, clean(keywords)));
+                    .ifPresent(value -> entry.setField(StandardField.KEYWORDS, clean(value)));
 
             Optional.ofNullable(getKnowledgeItem(knowledgeItemsByRefId, reference))
                             .ifPresent(value -> entry.setField(StandardField.COMMENT, StringUtil.unifyLineBreaks(value, "\n")));
@@ -676,13 +675,27 @@ public class CitaviXmlImporter extends Importer implements Parser {
     }
 
     private String getPages(String pageRange, String pageCount) {
-        if (pageCount != null && !pageCount.isEmpty()) {
-            return pageCount;
+        String tmpStr = "";
+        if ((pageCount != null) && (pageRange == null)) {
+            tmpStr = pageCount;
+        } else if ((pageCount == null) && (pageRange != null)) {
+            tmpStr = pageRange;
+        } else if (pageCount == null) {
+            return tmpStr;
         }
-        if (pageRange != null && !pageRange.isEmpty()) {
-            return pageRange;
+        int count = 0;
+        String pages = "";
+        for (int i = tmpStr.length() - 1; i >= 0; i--) {
+            if (count == 2) {
+                pages = tmpStr.substring(i + 2, (tmpStr.length() - 1 - 5) + 1);
+                break;
+            } else {
+                if (tmpStr.charAt(i) == '>') {
+                    count++;
+                }
+            }
         }
-        return "";
+        return pages;
     }
 
     private BufferedReader getReaderFromZip(Path filePath) throws IOException {
