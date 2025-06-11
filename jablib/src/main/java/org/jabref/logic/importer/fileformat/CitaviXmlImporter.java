@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -68,10 +69,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
     private final List<Reference> references = new ArrayList<>();
     private final List<KnowledgeItem> knowledgeItems = new ArrayList<>();
     private final XMLInputFactory xmlInputFactory;
-    private Map<String, String> refIdWithAuthors = new HashMap<>();
-    private Map<String, String> refIdWithEditors = new HashMap<>();
-    private Map<String, String> refIdWithKeywords = new HashMap<>();
-    private Map<String, String> refIdWithPublishers = new HashMap<>();
+    private Map<String, List<String>> refIdWithAuthors = new HashMap<>();
+    private Map<String, List<String>> refIdWithEditors = new HashMap<>();
+    private Map<String, List<String>> refIdWithKeywords = new HashMap<>();
+    private Map<String, List<String>> refIdWithPublishers = new HashMap<>();
 
     private CitaviExchangeData.Persons persons;
     private CitaviExchangeData.Keywords keywords;
@@ -171,6 +172,10 @@ public class CitaviXmlImporter extends Importer implements Parser {
                         case "Publishers" -> parsePublishers(reader);
                         case "References" -> parseReferences(reader);
                         case "KnowledgeItems" -> parseKnowledgeItems(reader);
+                        case "ReferenceAuthors" -> parseReferenceIdLink(reader, "ReferenceAuthors", refIdWithAuthors);
+                        case "ReferenceKeywords" -> parseReferenceIdLink(reader, "ReferenceKeywords", refIdWithKeywords);
+                        case "ReferencePublishers" -> parseReferenceIdLink(reader, "ReferencePublishers", refIdWithPublishers);
+                        case "ReferenceEditors" -> parseReferenceIdLink(reader, "ReferenceEditors", refIdWithEditors);
                         default -> consumeElement(reader);
                     }
                 }
@@ -422,6 +427,33 @@ public class CitaviXmlImporter extends Importer implements Parser {
                 case XMLStreamConstants.END_ELEMENT -> {
                     if ("KnowledgeItem".equals(reader.getLocalName())) {
                         knowledgeItems.add(new KnowledgeItem(referenceId, coreStatement, text, pageRangeNumber, quotationType, quotationIndex));
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private void parseReferenceIdLink(XMLStreamReader reader, String startElement, Map<String, List<String>> targetMap) throws XMLStreamException {
+        while (reader.hasNext()) {
+            int event = reader.next();
+            switch (event) {
+                case XMLStreamConstants.START_ELEMENT -> {
+                    String elementName = reader.getLocalName();
+                    if ("OneToN".equals(elementName)) {
+                        String rawString = reader.getElementText();
+                        if (rawString != null && rawString.length() > UUID_SEMICOLON_OFFSET_INDEX) {
+                            String referenceId = rawString.substring(0, UUID_LENGTH);
+                            String attributeIds = rawString.substring(UUID_SEMICOLON_OFFSET_INDEX);
+                            List<String> attributeIdList = Arrays.asList(attributeIds.split(";"));
+                            targetMap.put(referenceId, attributeIdList);
+                        }
+                    } else {
+                        consumeElement(reader);
+                    }
+                }
+                case XMLStreamConstants.END_ELEMENT -> {
+                    if (startElement.equals(reader.getLocalName())) {
                         return;
                     }
                 }
