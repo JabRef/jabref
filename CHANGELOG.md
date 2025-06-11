@@ -11,6 +11,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We introduced a settings parameters to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
+
+### Changed
+
+- We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We added a tooltip to keywords that resemble Math Subject Classification (MSC) codes. [#12944](https://github.com/JabRef/jabref/issues/12944)
 - We added a formatter to convert keywords that resemble MSC codes to their descriptions. [#12944](https://github.com/JabRef/jabref/issues/12944)
 - We introduced a new command line application called `jabkit`. [#13012](https://github.com/JabRef/jabref/pull/13012) [#110](https://github.com/JabRef/jabref/issues/110)
@@ -53,6 +58,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where bibliography entries generated from CSL styles had leading spaces. [#13074](https://github.com/JabRef/jabref/pull/13074)
 - We fixed an issue where the preview area in the "Select Style" dialog of the LibreOffice integration was too small to display full content. [#13051](https://github.com/JabRef/jabref/issues/13051)
 - We fixed an issue where the tab showing the fulltext search results was not displayed. [#12865](https://github.com/JabRef/jabref/issues/12865)
+- We fixed an issue showing an empty tooltip in maintable. [#11681](https://github.com/JabRef/jabref/issues/11681)
 
 ### Removed
 
