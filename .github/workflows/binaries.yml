@@ -191,6 +191,7 @@ jobs:
         with:
           java-version: '24'
           distribution: 'liberica'
+          architecture: ${{ matrix.os == 'ubuntu-22.04-arm' && 'aarch64' || '' }}
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
