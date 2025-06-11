@@ -180,7 +180,7 @@ application {
         "--add-opens=javafx.base/javafx.collections=org.jabref",
         "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
 
-        "--enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
     )
 }
 
@@ -244,7 +244,9 @@ jlink {
             "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
             "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
             // fix for https://github.com/JabRef/jabref/issues/11426
-            "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module"
+            "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
+
+            "--enable-native-access=org.jabref.merged.module"
         )
     }
 
