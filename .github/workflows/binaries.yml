@@ -157,13 +157,16 @@ jobs:
           - os: macos-14
             displayName: macOS (ARM64)
             suffix: '_arm64'
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os == 'ubuntu-22.04-arm' && 'ubuntu-22.04' || matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
       minor: ${{ steps.gitversion.outputs.Minor }}
       branchname: ${{ steps.gitversion.outputs.branchName }}
     name: ${{ matrix.displayName }} installer and portable version
     steps:
+      - name: Set $ARCH to arm if arm
+        if: matrix.os == 'ubuntu-22.04-arm'
+        run: echo "ARCH=aarch64" >> "$GITHUB_ENV"
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
         with:
