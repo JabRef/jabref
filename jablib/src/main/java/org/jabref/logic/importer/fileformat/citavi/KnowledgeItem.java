@@ -8,5 +8,4 @@ public record KnowledgeItem(
         String quotationType,
         String quotationIndex
 ) {
-
 }
