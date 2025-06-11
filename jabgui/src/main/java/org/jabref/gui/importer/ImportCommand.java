@@ -5,13 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 
 import javafx.stage.FileChooser;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -122,7 +122,9 @@ public class ImportCommand extends SimpleCommand {
                     () -> doImport(files, format.orElse(null)));
         }
 
-        if (importMethod == ImportMethod.AS_NEW) {
+        LibraryTab tab = tabContainer.getCurrentLibraryTab();
+
+        if (importMethod == ImportMethod.AS_NEW || tab == null) {
             task.onSuccess(parserResult -> {
                     tabContainer.addTab(parserResult.getDatabaseContext(), true);
                     dialogService.notify(Localization.lang("%0 entry(s) imported", parserResult.getDatabase().getEntries().size()));
@@ -133,7 +135,7 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            ImportEntriesDialog dialog = new ImportEntriesDialog(Objects.requireNonNull(tabContainer.getCurrentLibraryTab()).getBibDatabaseContext(), task);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }
