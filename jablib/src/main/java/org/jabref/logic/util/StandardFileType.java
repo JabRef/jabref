@@ -45,7 +45,7 @@ public enum StandardFileType implements FileType {
     TXT("Plain Text", "txt"),
     XML("XML", "xml"),
     XMP("XMP", "xmp"),
-    YAML("YAML Markup", "yaml"),
+    YAML("YAML Markup", "yml", "yaml"),
     ZIP("Zip Archive", "zip");
 
     private final List<String> extensions;
@@ -67,7 +67,7 @@ public enum StandardFileType implements FileType {
     }
 
     public static FileType fromExtensions(String... extensions) {
-        var exts = Arrays.asList(extensions);
+        List<String> exts = Arrays.asList(extensions);
 
         return OptionalUtil.orElse(Arrays.stream(StandardFileType.values())
                                          .filter(field -> field.getExtensions().stream().anyMatch(exts::contains))

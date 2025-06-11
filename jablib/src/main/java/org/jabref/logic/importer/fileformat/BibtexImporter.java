@@ -112,8 +112,7 @@ public class BibtexImporter extends Importer {
             encoding = suppliedEncoding.orElse(detectedCharset);
             LOGGER.debug("Encoding used to read the file: {}", encoding);
         }
-        EncodingResult result = new EncodingResult(encoding, encodingExplicitlySupplied);
-        return result;
+        return new EncodingResult(encoding, encodingExplicitlySupplied);
     }
 
     private record EncodingResult(Charset encoding, boolean encodingExplicitlySupplied) {
@@ -157,7 +156,7 @@ public class BibtexImporter extends Importer {
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
                 // % = char 37, we might have some bom chars in front that we need to skip, so we use index of
-                var percentPos = line.indexOf('%', 0);
+                int percentPos = line.indexOf('%');
                 // Line does not start with %, so there are no comment lines for us and we can stop parsing
                 if (percentPos == -1) {
                     return Optional.empty();

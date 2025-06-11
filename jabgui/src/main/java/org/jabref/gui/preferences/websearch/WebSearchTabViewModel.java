@@ -6,10 +6,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,6 +23,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.SearchBasedFetcher;
@@ -48,6 +51,11 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
             new SimpleListProperty<>(FXCollections.observableArrayList(PlainCitationParserChoice.values()));
     private final ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParser = new SimpleObjectProperty<>();
 
+    private final IntegerProperty citationsRelationStoreTTL = new SimpleIntegerProperty();
+
+    private final BooleanProperty addImportedEntries = new SimpleBooleanProperty();
+    private final StringProperty addImportedEntriesGroupName = new SimpleStringProperty("");
+
     private final BooleanProperty useCustomDOIProperty = new SimpleBooleanProperty();
     private final StringProperty useCustomDOINameProperty = new SimpleStringProperty("");
 
@@ -67,6 +75,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final ImporterPreferences importerPreferences;
     private final FilePreferences filePreferences;
     private final ImportFormatPreferences importFormatPreferences;
+    private final LibraryPreferences libraryPreferences;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
@@ -78,6 +87,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.doiPreferences = preferences.getDOIPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.importFormatPreferences = preferences.getImportFormatPreferences();
+        this.libraryPreferences = preferences.getLibraryPreferences();
 
         this.refAiEnabled = refAiEnabled;
 
@@ -128,7 +138,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
         shouldkeepDownloadUrl.setValue(filePreferences.shouldKeepDownloadUrl());
+        addImportedEntries.setValue(libraryPreferences.isAddImportedEntriesEnabled());
+        addImportedEntriesGroupName.setValue(libraryPreferences.getAddImportedEntriesGroupName());
         defaultPlainCitationParser.setValue(importerPreferences.getDefaultPlainCitationParser());
+        citationsRelationStoreTTL.setValue(importerPreferences.getCitationsRelationsStoreTTL());
 
         useCustomDOIProperty.setValue(doiPreferences.isUseCustom());
         useCustomDOINameProperty.setValue(doiPreferences.getDefaultBaseURI());
@@ -159,7 +172,15 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
         filePreferences.setKeepDownloadUrl(shouldkeepDownloadUrl.getValue());
+        libraryPreferences.setAddImportedEntries(addImportedEntries.getValue());
+        if (addImportedEntriesGroupName.getValue().isEmpty() || addImportedEntriesGroupName.getValue().startsWith(" ")) {
+            libraryPreferences.setAddImportedEntriesGroupName(Localization.lang("Imported entries"));
+        } else {
+            libraryPreferences.setAddImportedEntriesGroupName(addImportedEntriesGroupName.getValue());
+        }
         importerPreferences.setDefaultPlainCitationParser(defaultPlainCitationParser.getValue());
+        importerPreferences.setCitationsRelationsStoreTTL(citationsRelationStoreTTL.getValue());
+
         grobidPreferences.setGrobidEnabled(grobidEnabledProperty.getValue());
         grobidPreferences.setGrobidUseAsked(grobidPreferences.isGrobidUseAsked());
         grobidPreferences.setGrobidURL(grobidURLProperty.getValue());
@@ -187,6 +208,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParserProperty() {
         return defaultPlainCitationParser;
+    }
+
+    public BooleanProperty getAddImportedEntries() {
+        return addImportedEntries;
+    }
+
+    public StringProperty getAddImportedEntriesGroupName() {
+        return addImportedEntriesGroupName;
     }
 
     public BooleanProperty useCustomDOIProperty() {
@@ -235,6 +264,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty getApikeyPersistProperty() {
         return apikeyPersistProperty;
+    }
+
+    public IntegerProperty citationsRelationsStoreTTLProperty() {
+        return citationsRelationStoreTTL;
     }
 
     public void checkCustomApiKey() {

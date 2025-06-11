@@ -1,6 +1,7 @@
 package org.jabref.gui.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.ListIterator;
@@ -34,7 +35,10 @@ public class FilteredListProxy {
                 initReflection();
             }
             REFILTER_METHOD.invoke(filteredList);
-        } catch (Exception e) {
+        } catch (IllegalAccessException
+                 | InvocationTargetException
+                 | NoSuchMethodException
+                 | NoSuchFieldException e) {
             LOGGER.warn("Could not refilter list", e);
         }
     }

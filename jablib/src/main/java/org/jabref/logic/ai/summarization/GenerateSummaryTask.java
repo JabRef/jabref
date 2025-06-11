@@ -14,7 +14,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.ingestion.FileToDocument;
 import org.jabref.logic.ai.templates.AiTemplate;
-import org.jabref.logic.ai.templates.TemplatesService;
+import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
@@ -27,6 +27,8 @@ import dev.langchain4j.data.document.DefaultDocument;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentSplitter;
 import dev.langchain4j.data.document.splitter.DocumentSplitters;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
@@ -50,7 +52,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
     private final String citationKey;
     private final ChatModel chatLanguageModel;
     private final SummariesStorage summariesStorage;
-    private final TemplatesService templatesService;
+    private final AiTemplatesService aiTemplatesService;
     private final ReadOnlyBooleanProperty shutdownSignal;
     private final AiPreferences aiPreferences;
     private final FilePreferences filePreferences;
@@ -61,7 +63,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
                                BibDatabaseContext bibDatabaseContext,
                                SummariesStorage summariesStorage,
                                ChatModel chatLanguageModel,
-                               TemplatesService templatesService,
+                               AiTemplatesService aiTemplatesService,
                                ReadOnlyBooleanProperty shutdownSignal,
                                AiPreferences aiPreferences,
                                FilePreferences filePreferences
@@ -71,7 +73,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
         this.citationKey = entry.getCitationKey().orElse("<no citation key>");
         this.chatLanguageModel = chatLanguageModel;
         this.summariesStorage = summariesStorage;
-        this.templatesService = templatesService;
+        this.aiTemplatesService = aiTemplatesService;
         this.shutdownSignal = shutdownSignal;
         this.aiPreferences = aiPreferences;
         this.filePreferences = filePreferences;
@@ -195,7 +197,10 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
     public String summarizeOneDocument(String filePath, String document) throws InterruptedException {
         addMoreWork(1); // For the combination of summary chunks.
 
-        DocumentSplitter documentSplitter = DocumentSplitters.recursive(aiPreferences.getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_CHUNK)), MAX_OVERLAP_SIZE_IN_CHARS);
+        DocumentSplitter documentSplitter = DocumentSplitters.recursive(
+                aiPreferences.getContextWindowSize() - MAX_OVERLAP_SIZE_IN_CHARS * 2 - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE)),
+                MAX_OVERLAP_SIZE_IN_CHARS
+        );
 
         List<String> chunkSummaries = documentSplitter.split(new DefaultDocument(document)).stream().map(TextSegment::text).toList();
 
@@ -216,10 +221,14 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
                     throw new InterruptedException();
                 }
 
-                String prompt = templatesService.makeSummarizationChunk(chunkSummary);
+                String systemMessage = aiTemplatesService.makeSummarizationChunkSystemMessage();
+                String userMessage = aiTemplatesService.makeSummarizationChunkUserMessage(chunkSummary);
 
                 LOGGER.debug("Sending request to AI provider to summarize a chunk from file \"{}\" of entry {}", filePath, citationKey);
-                String chunk = chatLanguageModel.chat(prompt);
+                String chunk = chatLanguageModel.chat(List.of(
+                        new SystemMessage(systemMessage),
+                        new UserMessage(userMessage)
+                )).aiMessage().text();
                 LOGGER.debug("Chunk summary for file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
                 list.add(chunk);
@@ -227,7 +236,7 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
             }
 
             chunkSummaries = list;
-        } while (estimateTokenCount(chunkSummaries) > aiPreferences.getContextWindowSize() - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_COMBINE)));
+        } while (estimateTokenCount(chunkSummaries) > aiPreferences.getContextWindowSize() - estimateTokenCount(aiPreferences.getTemplate(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE)));
 
         if (chunkSummaries.size() == 1) {
             doneOneWork(); // No need to call LLM for combination of summary chunks.
@@ -235,14 +244,18 @@ public class GenerateSummaryTask extends BackgroundTask<Summary> {
             return chunkSummaries.getFirst();
         }
 
-        String prompt = templatesService.makeSummarizationCombine(chunkSummaries);
+        String systemMessage = aiTemplatesService.makeSummarizationCombineSystemMessage();
+        String userMessage = aiTemplatesService.makeSummarizationCombineUserMessage(chunkSummaries);
 
         if (shutdownSignal.get()) {
             throw new InterruptedException();
         }
 
         LOGGER.debug("Sending request to AI provider to combine summary chunk(s) for file \"{}\" of entry {}", filePath, citationKey);
-        String result = chatLanguageModel.chat(prompt);
+        String result = chatLanguageModel.chat(List.of(
+                new SystemMessage(systemMessage),
+                new UserMessage(userMessage)
+        )).aiMessage().text();
         LOGGER.debug("Summary of the file \"{}\" of entry {} was generated successfully", filePath, citationKey);
 
         doneOneWork();

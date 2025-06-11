@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 
 class BibliographyConsistencyCheckResultCsvWriterTest {
 
-    private BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
+    private final BibtexImporter importer = new BibtexImporter(mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS), new DummyFileUpdateMonitor());
 
     @Test
     void checkSimpleLibrary(@TempDir Path tempDir) throws IOException {
@@ -36,7 +36,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PUBLISHER, "publisher");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -60,7 +60,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
 
         Path csvFile = tempDir.resolve("checkDifferentOutputSymbols-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -95,7 +95,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth), (_, _) -> { });
 
         Path csvFile = tempDir.resolve("checkSimpleLibrary-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -119,7 +119,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
 
         Path csvFile = tempDir.resolve("checkLibraryWithoutIssues-result.csv");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
@@ -137,7 +137,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
         Path csvFile = file.resolveSibling("biblio-cited.csv");
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext.getEntries());
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext.getEntries(), (_, _) -> { });
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(csvFile));
              BibliographyConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();

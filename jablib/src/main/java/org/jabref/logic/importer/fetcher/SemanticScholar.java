@@ -34,8 +34,10 @@ import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
 import org.apache.hc.core5.net.URIBuilder;
 import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,11 +75,11 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             try {
                 // Retrieve PDF link
                 String source = SOURCE_ID_SEARCH + doi.get().asString();
-                var jsoupRequest = Jsoup.connect(getURLBySource(source))
-                                        .userAgent(URLDownload.USER_AGENT)
-                                        .header("Accept", "text/html; charset=utf-8")
-                                        .referrer("https://www.google.com")
-                                        .ignoreHttpErrors(true);
+                Connection jsoupRequest = Jsoup.connect(getURLBySource(source))
+                                               .userAgent(URLDownload.USER_AGENT)
+                                               .header("Accept", "text/html; charset=utf-8")
+                                               .referrer("https://www.google.com")
+                                               .ignoreHttpErrors(true);
                 importerPreferences.getApiKey(getName()).ifPresent(
                         key -> jsoupRequest.header("x-api-key", key));
                 html = jsoupRequest.get();
@@ -92,7 +94,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
                 arXivString = "arXiv:" + arXivString;
             }
             String source = SOURCE_ID_SEARCH + arXivString;
-            var jsoupRequest = Jsoup.connect(getURLBySource(source))
+            Connection jsoupRequest = Jsoup.connect(getURLBySource(source))
                                     .userAgent(URLDownload.USER_AGENT)
                                     .referrer("https://www.google.com")
                                     .header("Accept", "text/html; charset=utf-8")
@@ -105,7 +107,7 @@ public class SemanticScholar implements FulltextFetcher, PagedSearchBasedParserF
             return Optional.empty();
         }
 
-        var metaTag = html.selectFirst("meta[name=citation_pdf_url]");
+        Element metaTag = html.selectFirst("meta[name=citation_pdf_url]");
         if (metaTag == null) {
             return Optional.empty();
         }

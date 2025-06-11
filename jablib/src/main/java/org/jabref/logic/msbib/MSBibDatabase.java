@@ -57,13 +57,13 @@ public class MSBibDatabase {
      */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         this();
+        List<BibEntry> resolvedEntries;
         if (entries == null) {
-            var resolvedEntries = database.resolveForStrings(database.getEntries(), false);
-            setEntriesForExport(resolvedEntries);
+            resolvedEntries = database.resolveForStrings(database.getEntries(), false);
         } else {
-            var resolvedEntries = database.resolveForStrings(entries, false);
-            setEntriesForExport(resolvedEntries);
+            resolvedEntries = database.resolveForStrings(entries, false);
         }
+        setEntriesForExport(resolvedEntries);
     }
 
     /**

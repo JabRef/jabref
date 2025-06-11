@@ -1,0 +1,41 @@
+% !TeX program = lualatex
+\documentclass{article}
+
+\usepackage{fontspec}
+\usepackage{hyperref}
+
+\usepackage[
+   key=multiple-meta-data,
+   year=2017,
+   publication={Anonymous et al.\ (eds). Proceedings of the International
+       Conference on LaTeX-Hacks, CEUR-WS Vol~42.},
+   startpage={1},
+   doi={10.1039/authorarchive},
+   nocopyright
+ ]{authorarchive}
+
+\hypersetup{
+    pdftitle={title-from-hyperref},
+    pdfauthor={author-from-hyperref},
+    pdfsubject={subject-from-hyperref},
+    pdfkeywords={keywords-from-hyperref, second-keyword}
+}
+
+\title{Title-from-LaTeX}
+\author{Author-from-LaTeX}
+
+\begin{document}
+
+    \begin{verbatim}
+@article{test
+    title     = {title-from-bibtex},
+    author    = {author-from-bibtex},
+    journal   = {journal-from-bibtex},
+    year      = {2023},
+    keywords  = {keywords-from-bibtex, second-keyword},
+}
+    \end{verbatim}
+    \clearpage
+    \maketitle
+    This is a \LaTeX{} document compiled with \texttt{lualatex}.
+\end{document}

@@ -3,6 +3,7 @@ package org.jabref.gui.collab;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
@@ -75,10 +76,10 @@ public class DatabaseChangeMonitor implements FileUpdateListener {
         notificationPane.notify(
                 IconTheme.JabRefIcons.SAVE.getGraphicNode(),
                 Localization.lang("The library has been modified by another program."),
-                List.of(new Action(Localization.lang("Dismiss changes"), event -> notificationPane.hide()),
-                        new Action(Localization.lang("Review changes"), event -> {
+                List.of(new Action(Localization.lang("Dismiss changes"), _ -> notificationPane.hide()),
+                        new Action(Localization.lang("Review changes"), _ -> {
                             DatabaseChangesResolverDialog databaseChangesResolverDialog = new DatabaseChangesResolverDialog(changes, database, Localization.lang("External Changes Resolver"));
-                            var areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
+                            Optional<Boolean> areAllChangesResolved = dialogService.showCustomDialogAndWait(databaseChangesResolverDialog);
                             saveState = stateManager.activeTabProperty().get().get();
                             final NamedCompound ce = new NamedCompound(Localization.lang("Merged external changes"));
                             changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(ce));

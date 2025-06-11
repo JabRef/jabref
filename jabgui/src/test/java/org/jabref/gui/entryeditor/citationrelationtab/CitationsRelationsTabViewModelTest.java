@@ -9,7 +9,6 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.bibtex.FieldPreferences;
@@ -42,9 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class CitationsRelationsTabViewModelTest {
-    private ImportHandler importHandler;
     private BibDatabaseContext bibDatabaseContext;
-    private BibEntry testEntry;
 
     @Mock
     private GuiPreferences preferences;
@@ -110,7 +107,7 @@ class CitationsRelationsTabViewModelTest {
 
     @Test
     void existingEntryCitesOtherPaperWithCitationKeys() {
-        var citationItems = List.of(
+        List<CitationRelationItem> citationItems = List.of(
                 new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
@@ -122,7 +119,7 @@ class CitationsRelationsTabViewModelTest {
 
     @Test
     void importedEntriesWithExistingCitationKeysCiteExistingEntry() {
-        var citationItems = List.of(
+        List<CitationRelationItem> citationItems = List.of(
                 new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 
@@ -140,7 +137,7 @@ class CitationsRelationsTabViewModelTest {
     @Test
     void existingEntryCitesOtherPaperWithCitationKeysAndExistingCiteField() {
         existingEntry.setField(StandardField.CITES, "Asdf1222");
-        var citationItems = List.of(
+        List<CitationRelationItem> citationItems = List.of(
                 new CitationRelationItem(firstEntryToImport, false),
                 new CitationRelationItem(secondEntryToImport, false));
 

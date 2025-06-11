@@ -50,7 +50,7 @@ public class BackupUIManager {
                                                                  FileUpdateMonitor fileUpdateMonitor,
                                                                  UndoManager undoManager,
                                                                  StateManager stateManager) {
-        var actionOpt = showBackupResolverDialog(
+        Optional<ButtonType> actionOpt = showBackupResolverDialog(
                 dialogService,
                 preferences.getExternalApplicationsPreferences(),
                 originalPath,
@@ -100,7 +100,7 @@ public class BackupUIManager {
                         changes,
                         originalDatabase, "Review Backup"
                 );
-                var allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
+                Optional<Boolean> allChangesResolved = dialogService.showCustomDialogAndWait(reviewBackupDialog);
                 LibraryTab saveState = stateManager.activeTabProperty().get().get();
                 final NamedCompound CE = new NamedCompound(Localization.lang("Merged external changes"));
                 changes.stream().filter(DatabaseChange::isAccepted).forEach(change -> change.applyChange(CE));

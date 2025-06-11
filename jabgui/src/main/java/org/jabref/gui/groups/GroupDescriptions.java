@@ -4,6 +4,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.model.groups.ExplicitGroup;
 import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.strings.StringUtil;
 
 public class GroupDescriptions {
@@ -59,6 +60,10 @@ public class GroupDescriptions {
 
     public static String getShortDescriptionAllEntriesGroup() {
         return Localization.lang("<b>All Entries</b> (this group cannot be edited or removed)");
+    }
+
+    public static String getShortDescriptionSmartGroup(SmartGroup smartGroup) {
+        return Localization.lang("<b>Smart Group</b> (Import Entries)");
     }
 
     public static String getShortDescription(SearchGroup searchGroup, boolean showDynamic) {

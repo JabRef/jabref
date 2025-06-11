@@ -141,32 +141,16 @@
   always: true
   message: >
     Note that your PR will not be reviewed/accepted until you have gone through the mandatory checks in the description and marked each of them them exactly in the format of `[x]` (done), `[ ]` (not done yet) or `[/]` (not applicable).
-- jobName: 'Issue number present'
+- jobName: 'Determine issue number'
   always: true
   message: |
-    Your pull request needs to link an issue.
+    Your pull request needs to link an issue correctly.
 
     To ease organizational workflows, please link this pull-request to the issue with syntax as described in <https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue>:
 
     > <h2 id="linking-a-pull-request-to-an-issue-using-a-keyword">Linking a pull request to an issue using a keyword</h2>
     > <p>You can link a pull request to an issue by using a supported keyword
-    > in the pull request's description or in a commit message. The pull
-    > request <strong>must be</strong> on the default branch.</p>
-    > <ul>
-    > <li>close</li>
-    > <li>closes</li>
-    > <li>closed</li>
-    > <li>fix</li>
-    > <li>fixes</li>
-    > <li>fixed</li>
-    > <li>resolve</li>
-    > <li>resolves</li>
-    > <li>resolved</li>
-    > </ul>
-    > <p>If you use a keyword to reference a pull request comment in another
-    > pull request, the pull requests will be linked. Merging the referencing
-    > pull request also closes the referenced pull request.</p>
-    > <p>The syntax for closing keywords depends on whether the issue is in the same repository as the pull request.</p>
+    > in the pull request's description or in a commit message.
 
     ### Examples
 

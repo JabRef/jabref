@@ -60,7 +60,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
                 .install(labelColumn, new DefaultStringConverter());
         labelColumn.setOnEditCommit((TableColumn.CellEditEvent<ConstantsItemModel, String> cellEvent) -> {
 
-            var tableView = cellEvent.getTableView();
+            TableView<ConstantsItemModel> tableView = cellEvent.getTableView();
             ConstantsItemModel cellItem = tableView.getItems()
                                                    .get(cellEvent.getTablePosition().getRow());
 
@@ -77,7 +77,7 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
 
             // Resort the entries based on the keys and set the focus to the newly-created entry
             viewModel.resortStrings();
-            var selectionModel = tableView.getSelectionModel();
+            TableView.TableViewSelectionModel<ConstantsItemModel> selectionModel = tableView.getSelectionModel();
             selectionModel.select(cellItem);
             selectionModel.focus(selectionModel.getSelectedIndex());
             tableView.refresh();
@@ -97,9 +97,9 @@ public class ConstantsPropertiesView extends AbstractPropertiesTabView<Constants
         actionsColumn.setReorderable(false);
         actionsColumn.setCellValueFactory(cellData -> cellData.getValue().labelProperty());
         new ValueTableCellFactory<ConstantsItemModel, String>()
-                .withGraphic(label -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
+                .withGraphic(_ -> IconTheme.JabRefIcons.DELETE_ENTRY.getGraphicNode())
                 .withTooltip(label -> Localization.lang("Remove string %0", label))
-                .withOnMouseClickedEvent(item -> evt ->
+                .withOnMouseClickedEvent(_ -> _ ->
                         viewModel.removeString(stringsList.getFocusModel().getFocusedItem()))
                 .install(actionsColumn);
 
