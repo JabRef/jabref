@@ -851,11 +851,6 @@ public class BibEntry implements Cloneable {
         this.putKeywords(keywords, delimiter);
     }
 
-    /**
-     * Add multiple keywords to entry
-     *
-     * @param keywords Keywords to add
-     */
     public void addKeywords(Collection<String> keywords, Character delimiter) {
         Objects.requireNonNull(keywords);
         keywords.forEach(keyword -> addKeyword(keyword, delimiter));
@@ -969,6 +964,14 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    public BibEntry withField(Field field, Optional<String> value) {
+        value.ifPresent(v -> {
+            setField(field, v);
+            this.setChanged(false);
+        });
+        return this;
+    }
+
     /**
      * A copy is made of the parameter
      */
@@ -1000,6 +1003,12 @@ public class BibEntry implements Cloneable {
     public BibEntry withUserComments(String commentsBeforeEntry) {
         this.commentsBeforeEntry = commentsBeforeEntry;
         this.setChanged(false);
+        return this;
+    }
+
+    public BibEntry withKeywords(Collection<String> keywords, Character delimiter) {
+        Objects.requireNonNull(keywords);
+        keywords.forEach(keyword -> addKeyword(keyword, delimiter));
         return this;
     }
 
@@ -1069,6 +1078,10 @@ public class BibEntry implements Cloneable {
         }
 
         return this.setField(StandardField.FILE, newValue);
+    }
+
+    public BibEntry withFile(LinkedFile files) {
+        return withFiles(List.of(files));
     }
 
     public BibEntry withFiles(List<LinkedFile> files) {

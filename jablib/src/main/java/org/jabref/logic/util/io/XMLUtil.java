@@ -5,6 +5,8 @@ import java.util.AbstractList;
 import java.util.List;
 import java.util.Optional;
 import java.util.RandomAccess;
+import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -12,8 +14,12 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.jabref.architecture.AllowedToUseStandardStreams;
+import org.jabref.model.strings.StringUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,5 +138,25 @@ public class XMLUtil {
         public int size() {
             return list.getLength();
         }
+    }
+
+    public static List<String> getNodesContentByXPath(Node root, XPathExpression xPath) throws XPathExpressionException {
+        NodeList nodes = (NodeList) xPath.evaluate(root, XPathConstants.NODESET);
+
+        if (nodes == null) {
+            return List.of();
+        }
+
+        // This needs to be (somewhat ugly) constructed from {@link IntRange}, as {@link NodeList} is an interface,
+        // and it's very strict (and limited).
+        return IntStream
+                .range(0, nodes.getLength())
+                .mapToObj(i -> nodes.item(i).getTextContent())
+                .filter(Predicate.not(StringUtil::isNullOrEmpty)) // Just in case.
+                .toList();
+    }
+
+    public static Optional<String> getNodeContentByXPath(Node root, XPathExpression xPath) throws XPathExpressionException {
+        return StringUtil.optionalOfEmpty(xPath.evaluate(root));
     }
 }
