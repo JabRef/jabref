@@ -352,7 +352,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                         case "ReferenceType" -> referenceType = reader.getElementText();
                         case "Title" -> title = reader.getElementText();
                         case "Year" -> year = reader.getElementText();
-                        case "Abstract" -> abstractText = (reader.getElementText();
+                        case "Abstract" -> abstractText = reader.getElementText();
                         case "PageRange" -> pageRange = reader.getElementText();
                         case "PageCount" -> pageCount = reader.getElementText();
                         case "Volume" -> volume = reader.getElementText();
