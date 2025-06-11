@@ -77,10 +77,6 @@ public class CitaviXmlImporter extends Importer implements Parser {
 
     public CitaviXmlImporter() {
         xmlInputFactory = XMLInputFactory.newFactory();
-        // prevent xxe (https://rules.sonarsource.com/java/RSPEC-2755)
-        xmlInputFactory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
-        // required for reading Unicode characters such as &#xf6;
-        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING, true);
     }
 
     @Override
