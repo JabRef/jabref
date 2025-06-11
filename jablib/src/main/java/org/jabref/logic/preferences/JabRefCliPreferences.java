@@ -2046,7 +2046,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
                 PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER)),
-                getInt(CITATIONS_RELATIONS_STORE_TTL)
+                getInt(CITATIONS_RELATIONS_STORE_TTL),
+                Map.of()
         );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
