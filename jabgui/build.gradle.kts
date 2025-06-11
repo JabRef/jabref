@@ -169,17 +169,6 @@ application {
         "-XX:+UseZGC", "-XX:+ZUncommit",
         "-XX:+UseStringDeduplication",
 
-        // Fix for https://github.com/JabRef/jabref/issues/11188
-        "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
-        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-
-        // Fix for https://github.com/JabRef/jabref/issues/11198
-        "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
-        "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
-        "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-        // fix for https://github.com/JabRef/jabref/issues/11426
-        "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
-
         // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
         "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
         "--add-exports=javafx.base/com.sun.javafx.event=org.jabref",
@@ -244,8 +233,19 @@ jlink {
     )
 
     launcher {
-        name =
-            "JabRef"
+        name = "JabRef"
+        jvmArgs = listOf(
+            // Fix for https://github.com/JabRef/jabref/issues/11188
+            "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
+            "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+
+            // Fix for https://github.com/JabRef/jabref/issues/11198
+            "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
+            "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
+            "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+            // fix for https://github.com/JabRef/jabref/issues/11426
+            "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module"
+        )
     }
 
     // TODO: Remove as soon as dependencies are fixed (upstream)
