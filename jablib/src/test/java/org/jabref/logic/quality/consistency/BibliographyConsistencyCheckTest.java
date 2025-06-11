@@ -42,7 +42,7 @@ class BibliographyConsistencyCheckTest {
         BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(StandardEntryType.Article, entryTypeResult));
         assertEquals(expected, result);
     }
-qq
+
     @Test
     void checkDifferentOutputSymbols(@TempDir Path tempDir) {
         UnknownField customField = new UnknownField("custom");
