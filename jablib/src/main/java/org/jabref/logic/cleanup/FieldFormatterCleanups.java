@@ -90,13 +90,6 @@ public class FieldFormatterCleanups {
         this.actions = Objects.requireNonNull(actions);
     }
 
-    public FieldFormatterCleanups(boolean enabled, List<FieldFormatterCleanup> actions, BibEntryPreferences preferences) {
-        this.enabled = enabled;
-        this.actions = Objects.requireNonNull(actions);
-
-        ConvertMSCCodesFormatter.setPreferences(preferences);
-    }
-
     /**
      * Note: String parsing is done at {@link FieldFormatterCleanups#parse(String)}
      */

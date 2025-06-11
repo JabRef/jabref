@@ -130,6 +130,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * contents of the defaults HashMap that are defined in this class.
  * There are more default parameters in this map which belong to separate preference classes.
+ * <p>
+ *  This class is injected into formatter using reflection to avoid tight coupling and
+ *  is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
@@ -436,9 +439,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
 
     /**
-     * @implNote The constructor is made protected to enforce this as a singleton class:
+     * @implNote The constructor was made public because dependency injection via constructor
+     * required widespread refactoring, currently we are using reflection in some formatters
+     * to gain access
      */
-    protected JabRefCliPreferences() {
+    public JabRefCliPreferences() {
         try {
             if (Files.exists(Path.of("jabref.xml"))) {
                 importPreferences(Path.of("jabref.xml"));

@@ -8,12 +8,14 @@ import java.util.List;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.shared.exception.MscCodeLoadingException;
 import org.jabref.logic.util.MscCodeUtils;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.eclipse.jgit.annotations.NonNull;
@@ -24,19 +26,6 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
     private static final Logger LOGGER = LoggerFactory.getLogger(ConvertMSCCodesFormatter.class);
     private static final BiMap<String, String> MSCMAP;
     private static boolean conversionPossible;
-    private static BibEntryPreferences preferences;
-
-    public ConvertMSCCodesFormatter() {
-        preferences = new BibEntryPreferences(',');
-    }
-
-    public ConvertMSCCodesFormatter(BibEntryPreferences pref) {
-        preferences = pref;
-    }
-
-    public static void setPreferences(BibEntryPreferences pref) {
-        preferences = pref;
-    }
 
     static {
         MSCMAP = initializeMap();
@@ -74,8 +63,13 @@ public class ConvertMSCCodesFormatter extends Formatter implements LayoutFormatt
             return text;
         }
 
-        // get preferences
-        Character dlim = preferences.getKeywordSeparator();
+        // Using Injector to avoid widespread refactoring for constructor injection.
+        // Class that calls formatters (FieldFormatterCleanups.java) has many usages that would need updates.
+        JabRefCliPreferences cliPreferences = Injector.instantiateModelOrService(JabRefCliPreferences.class);
+
+        // get preferences for BibEntry
+        BibEntryPreferences bibPreferences = cliPreferences.getBibEntryPreferences();
+        Character dlim = bibPreferences.getKeywordSeparator();
         Character hdlim = Keyword.DEFAULT_HIERARCHICAL_DELIMITER;
 
         // create KeywordList to tokenize
