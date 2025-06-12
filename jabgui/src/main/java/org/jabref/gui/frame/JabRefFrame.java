@@ -15,7 +15,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.event.Event;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -374,13 +373,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initBindings() {
-        // Bind global state
-        FilteredList<Tab> filteredTabs = new FilteredList<>(tabbedPane.getTabs());
-        filteredTabs.setPredicate(LibraryTab.class::isInstance);
-
-        // This variable cannot be inlined, since otherwise the list created by EasyBind is being garbage collected
-        openDatabaseList = EasyBind.map(filteredTabs, tab -> ((LibraryTab) tab).getBibDatabaseContext());
-        EasyBind.bindContent(stateManager.getOpenDatabases(), openDatabaseList);
+        BindingsHelper.bindContentFiltered(tabbedPane.getTabs(), stateManager.getOpenDatabases(), LibraryTab.class::isInstance);
 
         // the binding for stateManager.activeDatabaseProperty() is at org.jabref.gui.LibraryTab.onDatabaseLoadingSucceed
 
