@@ -1,10 +1,10 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
+import dev.jbang.gradle.tasks.JBangTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
 import java.util.*
-import dev.jbang.gradle.tasks.JBangTask
 
 plugins {
     id("buildlogic.java-common-conventions")
