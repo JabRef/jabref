@@ -33,15 +33,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Generates a catalog of CSL styles internally supported by JabRef.
- * The catalog contains the list of styles, along with some pre-computed metadata (e.g. numeric nature).
- * This class is intended to be used for the corresponding build-time task.
- */
+/// Generates a catalog of CSL styles internally supported by JabRef.
+/// The catalog contains the list of styles, along with some pre-computed metadata (e.g. numeric nature).
+/// This class is intended to be used for the corresponding build-time task.
+///
+/// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
 @AllowedToUseClassGetResource("Required for loading internal CSL styles")
 public class CitationStyleCatalogGenerator {
-    private static final Path STYLES_ROOT = Path.of("src/main/resources/csl-styles");
-    private static final String CATALOG_PATH = "build/generated/resources/citation-style-catalog.json";
+    private static final Path STYLES_ROOT = Path.of("jablib/src/main/resources/csl-styles");
+    private static final String CATALOG_PATH = "jablib/build/generated/resources/citation-style-catalog.json";
     private static final String DEFAULT_STYLE = "ieee.csl";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CitationStyleCatalogGenerator.class);

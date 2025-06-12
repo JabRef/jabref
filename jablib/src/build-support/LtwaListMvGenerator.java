@@ -40,21 +40,21 @@ import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * CLI tool for downloading the LTWA CSV file and converting it to an MVStore file.
- */
+/// CLI tool for downloading the LTWA CSV file and converting it to an MVStore file.
+///
+/// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
 public class LtwaListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaListMvGenerator.class);
 
     public static void main(String[] args) {
         try {
-            Path tempCsvFile = Path.of("build", "tmp", "ltwa_20210702.csv");
+            Path tempCsvFile = Path.of("jablib", "build", "tmp", "ltwa_20210702.csv");
             if (!Files.exists(tempCsvFile)) {
                 LOGGER.error("LTWA CSV file not found at {}. Please execute gradle task downloadLtwaFile.", tempCsvFile);
                 return;
             }
-            Path outputDir = Path.of("build", "generated", "resources", "journals");
+            Path outputDir = Path.of("jablib", "build", "generated", "resources", "journals");
 
             Files.createDirectories(outputDir);
             Path outputFile = outputDir.resolve("ltwa-list.mv");

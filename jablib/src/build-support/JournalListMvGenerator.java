@@ -44,6 +44,8 @@ import org.jooq.lambda.Unchecked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+/// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
 public class JournalListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JournalListMvGenerator.class);
@@ -51,13 +53,13 @@ public class JournalListMvGenerator {
     public static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
-        Path abbreviationsDirectory = Path.of("src", "main", "abbrv.jabref.org", "journals");
+        Path abbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", "journals");
         if (!Files.exists(abbreviationsDirectory)) {
             System.out.println("Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist");
             System.exit(0);
         }
         // Directory layout aligns to other plugins (e.g., XJF plugin (https://github.com/bjornvester/xjc-gradle-plugin))
-        Path journalListMvFile = Path.of("build", "generated", "resources", "journals", "journal-list.mv");
+        Path journalListMvFile = Path.of("jablib", "build", "generated", "resources", "journals", "journal-list.mv");
 
         Set<String> ignoredNames = Set.of(
                 // remove all lists without dot in them:
