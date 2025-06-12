@@ -185,6 +185,22 @@ jobs:
           distribution: 'liberica'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - name: Debug JBang
+        run: jbangdev/setup-jbang@main
+      - name: Generate JBang cache key
+        id: cache-key
+        run: |
+          week=$(date +%G-%V)  # e.g., 2025-24 for ISO year-week
+          echo "cache_key=jbang-weekly-${week}" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
 
       # region Publish JabLib on Maven Central
       - name: Decode secretKeyRingFile
