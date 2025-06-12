@@ -145,8 +145,7 @@ public class BibEntryWriter {
 
     private void writeEntryType(BibEntry entry, BibWriter out, BibDatabaseMode bibDatabaseMode) throws IOException {
         int start = out.getCurrentPosition();
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, bibDatabaseMode);
-        out.write('@' + typedEntry.getTypeForDisplay());
+        out.write('@' + entry.getType().getDisplayName());
         int end = out.getCurrentPosition();
         fieldPositions.put(InternalField.TYPE_HEADER, new Range(start, end));
         out.write("{");
