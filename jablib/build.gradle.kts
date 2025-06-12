@@ -91,7 +91,7 @@ dependencies {
 
     implementation("com.github.javakeyring:java-keyring:1.0.4")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
@@ -103,7 +103,10 @@ dependencies {
 
     implementation("org.postgresql:postgresql:42.7.5")
 
-    antlr("org.antlr:antlr4:4.13.2")
+    antlr("org.antlr:antlr4:4.13.2") {
+        // JabRef ships its own variant of icu4j as binary jar
+        exclude(group = "com.ibm.icu")
+    }
     implementation("org.antlr:antlr4-runtime:4.13.2")
 
     implementation("com.google.guava:guava:33.4.8-jre")
@@ -115,7 +118,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.20.1")
     implementation("com.konghq:unirest-java-core:4.4.7")
     implementation("com.konghq:unirest-modules-gson:4.4.7")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // endregion
 
@@ -157,14 +160,14 @@ dependencies {
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
 
     // region AI
-    implementation("dev.langchain4j:langchain4j:1.0.0")
+    implementation("dev.langchain4j:langchain4j:1.0.1")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:1.0.0") {
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.1") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
     }
-    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.0-beta5") {
+    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
@@ -173,7 +176,7 @@ dependencies {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
     }
-    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.0-beta5") {
+    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.1-beta6") {
         exclude(group = "com.squareup.okhttp3")
         exclude(group = "com.squareup.retrofit2", module = "retrofit")
         exclude(group = "org.jetbrains.kotlin")
@@ -227,15 +230,25 @@ dependencies {
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    testImplementation("org.xmlunit:xmlunit-core:2.10.1")
+    testImplementation("org.xmlunit:xmlunit-core:2.10.2")
     testImplementation("org.xmlunit:xmlunit-matchers:2.10.2")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
-    // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+    testImplementation("org.wiremock:wiremock:3.13.0")
+    // Required by Wiremock - and our patching of Wiremock
+    implementation("com.github.jknack:handlebars:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+    }
+    implementation("com.github.jknack:handlebars-helpers:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+        exclude(group = "org.apache.commons", module = "commons-lang3")
+    }
+    // no "test", because of https://github.com/gradlex-org/extra-java-module-info/issues/134#issuecomment-2956556651
+    implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
@@ -583,6 +596,8 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
     requires.add("org.mockito")
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 
     // --add-reads
     //reads.add("org.jabref.jablib=io.github.classgraph")

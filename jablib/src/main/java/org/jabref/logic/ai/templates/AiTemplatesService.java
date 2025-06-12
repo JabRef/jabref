@@ -10,12 +10,13 @@ import org.jabref.model.entry.CanonicalBibEntry;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
-public class TemplatesService {
+public class AiTemplatesService {
     private final AiPreferences aiPreferences;
+
     private final VelocityEngine velocityEngine = new VelocityEngine();
     private final VelocityContext baseContext = new VelocityContext();
 
-    public TemplatesService(AiPreferences aiPreferences) {
+    public AiTemplatesService(AiPreferences aiPreferences) {
         this.aiPreferences = aiPreferences;
 
         velocityEngine.init();
@@ -39,18 +40,40 @@ public class TemplatesService {
         return makeTemplate(AiTemplate.CHATTING_USER_MESSAGE, context);
     }
 
-    public String makeSummarizationChunk(String text) {
+    public String makeSummarizationChunkSystemMessage() {
+        VelocityContext context = new VelocityContext(baseContext);
+        return makeTemplate(AiTemplate.SUMMARIZATION_CHUNK_SYSTEM_MESSAGE, context);
+    }
+
+    public String makeSummarizationChunkUserMessage(String text) {
         VelocityContext context = new VelocityContext(baseContext);
         context.put("text", text);
 
-        return makeTemplate(AiTemplate.SUMMARIZATION_CHUNK, context);
+        return makeTemplate(AiTemplate.SUMMARIZATION_CHUNK_USER_MESSAGE, context);
     }
 
-    public String makeSummarizationCombine(List<String> chunks) {
+    public String makeSummarizationCombineSystemMessage() {
+        VelocityContext context = new VelocityContext(baseContext);
+        return makeTemplate(AiTemplate.SUMMARIZATION_COMBINE_SYSTEM_MESSAGE, context);
+    }
+
+    public String makeSummarizationCombineUserMessage(List<String> chunks) {
         VelocityContext context = new VelocityContext(baseContext);
         context.put("chunks", chunks);
 
-        return makeTemplate(AiTemplate.SUMMARIZATION_COMBINE, context);
+        return makeTemplate(AiTemplate.SUMMARIZATION_COMBINE_USER_MESSAGE, context);
+    }
+
+    public String makeCitationParsingSystemMessage() {
+        VelocityContext context = new VelocityContext(baseContext);
+        return makeTemplate(AiTemplate.CITATION_PARSING_SYSTEM_MESSAGE, context);
+    }
+
+    public String makeCitationParsingUserMessage(String citation) {
+        VelocityContext context = new VelocityContext(baseContext);
+        context.put("citation", citation);
+
+        return makeTemplate(AiTemplate.CITATION_PARSING_USER_MESSAGE, context);
     }
 
     private String makeTemplate(AiTemplate template, VelocityContext context) {

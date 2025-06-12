@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.control.ContextMenu;
@@ -21,6 +22,7 @@ import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.documentviewer.DocumentViewerView;
+import org.jabref.gui.entryeditor.EntryEditor;
 import org.jabref.gui.entryeditor.EntryEditorTab;
 import org.jabref.gui.maintable.OpenExternalFileAction;
 import org.jabref.gui.maintable.OpenFolderAction;
@@ -49,19 +51,23 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     private final DialogService dialogService;
     private final ActionFactory actionFactory;
     private final TaskExecutor taskExecutor;
+    private final EntryEditor entryEditor;
     private final TextFlow content;
+
     private BibEntry entry;
     private DocumentViewerView documentViewerView;
 
     public FulltextSearchResultsTab(StateManager stateManager,
                                     GuiPreferences preferences,
                                     DialogService dialogService,
-                                    TaskExecutor taskExecutor) {
+                                    TaskExecutor taskExecutor,
+                                    EntryEditor entryEditor) {
         this.stateManager = stateManager;
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.actionFactory = new ActionFactory();
         this.taskExecutor = taskExecutor;
+        this.entryEditor = entryEditor;
 
         content = new TextFlow();
         ScrollPane scrollPane = new ScrollPane(content);
@@ -91,11 +97,11 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
     }
 
     private void updateSearch() {
-        content.getChildren().clear();
         stateManager.activeSearchQuery(SearchType.NORMAL_SEARCH).get().ifPresent(searchQuery -> {
             SearchResults searchResults = searchQuery.getSearchResults();
             if (searchResults != null && entry != null) {
                 Map<String, List<SearchResult>> searchResultsForEntry = searchResults.getFileSearchResultsForEntry(entry);
+                content.getChildren().clear();
                 if (searchResultsForEntry.isEmpty()) {
                     content.getChildren().add(new Text(Localization.lang("No search matches.")));
                 } else {
@@ -125,6 +131,7 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
                 }
             }
         });
+        Platform.runLater(entryEditor::adaptVisibleTabs);
     }
 
     private Text createFileLink(LinkedFile linkedFile) {

@@ -13,6 +13,7 @@ jobs:
       issues: write
       contents: read
     steps:
+      - uses: actions/checkout@v4
       - name: Check assignees
         id: check_assignee
         run: |
@@ -47,8 +48,6 @@ jobs:
           ignored-columns: ""
           default-column: "Free to take"
           skip-if-not-in-project: true
-      - uses: actions/checkout@v4
-        if: steps.check_assignee.outputs.assigned == 'no'
       - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
         if: steps.check_assignee.outputs.assigned == 'no'
         run: |
