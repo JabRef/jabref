@@ -334,7 +334,7 @@ tasks.register("downloadLtwaFile") {
 var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     group = "JabRef"
     description = "Converts the LTWA CSV file to a H2 MVStore"
-    dependsOn("downloadLtwaFile", "generateGrammarSource")
+    dependsOn("downloadLtwaFile", tasks.named("generateGrammarSource"))
 
     script = project.file("src/build-support/LtwaListMvGenerator.java").toString()
 
