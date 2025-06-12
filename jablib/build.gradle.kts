@@ -286,7 +286,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
     dependsOn(tasks.named("generateGrammarSource"))
 
-    script = project.file("src/build-support/LtwaListMvGenerator.java").toString()
+    script = project.file("src/build-support/JournalListMvGenerator.java").toString()
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
