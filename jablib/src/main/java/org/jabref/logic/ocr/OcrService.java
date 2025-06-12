@@ -1,13 +1,15 @@
 package org.jabref.logic.ocr;
 
-import net.sourceforge.tess4j.Tesseract;
-import net.sourceforge.tess4j.TesseractException;
-import org.jabref.model.strings.StringUtil;  // JabRef utility class
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.nio.file.Path;
+
+import org.jabref.model.strings.StringUtil;
+
+import com.sun.jna.Platform;
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for performing Optical Character Recognition (OCR) on PDF files.
@@ -16,7 +18,7 @@ import java.nio.file.Path;
  */
 public class OcrService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrService.class);
-
+    private static final String JNA_LIBRARY_PATH = "jna.library.path";
     // The OCR engine instance
     private final Tesseract tesseract;
 
@@ -25,6 +27,13 @@ public class OcrService {
      * Currently uses Tesseract with English language support.
      */
     public OcrService() {
+        if (Platform.isMac()) {
+            if (Platform.isARM()) {
+                System.setProperty(JNA_LIBRARY_PATH, JNA_LIBRARY_PATH + File.pathSeparator + "/opt/homebrew/lib/");
+            } else {
+                System.setProperty(JNA_LIBRARY_PATH, JNA_LIBRARY_PATH + File.pathSeparator + "/usr/local/cellar/");
+            }
+        }
         this.tesseract = new Tesseract();
 
         // Configure Tesseract
@@ -66,8 +75,8 @@ public class OcrService {
 
             LOGGER.info("OCR completed successfully. Extracted {} characters", result.length());
             return result;
-
-        } catch (TesseractException e) {
+        } catch (
+                TesseractException e) {
             LOGGER.error("OCR failed for file: {}", pdfFile.getName(), e);
             throw new OcrException(
                     "Failed to perform OCR on file: " + pdfFile.getName() +
