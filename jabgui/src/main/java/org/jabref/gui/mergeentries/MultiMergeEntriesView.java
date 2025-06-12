@@ -35,7 +35,6 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
-import org.jabref.gui.externalfiles.PdfMergeDialog;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
@@ -58,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
+    public static final int MAX_FAILED_SUPPLIERS = 4;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiMergeEntriesView.class);
 
@@ -83,6 +83,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
     private final MultiMergeEntriesViewModel viewModel;
     private final TaskExecutor taskExecutor;
+
 
     private final GuiPreferences preferences;
 
@@ -131,7 +132,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
                     "Could not extract Metadata from: %0",
                     String.join(", ", viewModel.failedSuppliersProperty())));
-             if(viewModel.failedSuppliersProperty().get().size() == 4){
+             if (viewModel.failedSuppliersProperty().get().size() == MAX_FAILED_SUPPLIERS) {
                  close();
              }
         });
