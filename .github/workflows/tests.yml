@@ -55,6 +55,9 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # For debugging tests.yml, we also allow cache refresh on the optimize-build branch
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/optimize-build' }}
       - name: Run processResources
         run: ./gradlew :jablib:processResources
 
