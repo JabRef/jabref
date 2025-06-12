@@ -122,9 +122,12 @@ dependencies {
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     // endregion
 
-    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.slf4j:slf4j-bom:2.0.17")
+    implementation("org.slf4j:slf4j-api")
+    // route all jcl request to sfl4j
+    implementation("org.slf4j:jcl-over-slf4j")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
-    implementation("org.slf4j:jul-to-slf4j:2.0.17")
+    implementation("org.slf4j:jul-to-slf4j")
     // route all requests to log4j to SLF4J
     implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
 
@@ -207,11 +210,12 @@ dependencies {
     }
 
     // region for document importing
-    implementation("org.apache.tika:tika-core:3.2.0") {
-        exclude(group = "commons-logging")
+    implementation(platform("org.apache.tika:tika-bom:3.2.0"))
+    implementation("org.apache.tika:tika-core") {
+        exclude(group = "commons-logging", module = "commons-logging")
     }
-    implementation("org.apache.tika:tika-parsers-standard-package:3.2.0") {
-        exclude(group = "commons-logging")
+    implementation("org.apache.tika:tika-parsers-standard-package") {
+        exclude(group = "commons-logging", module = "commons-logging")
     }
     // endregion
 
