@@ -55,17 +55,28 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          # For debugging tests.yml, we also allow cache refresh on the optimize-build branch
-          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/optimize-build' }}
       - name: Run processResources
         run: ./gradlew :jablib:processResources
+      - name: Upload cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: cache
+          retention-days: 1
+          compression-level: 1
+          include-hidden-files: true
+          path: |
+            .gradle
+            **/build/
 
   checkstyle:
     needs: [cache]
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
+      - name: Download cache
+        uses: actions/download-artifact@v4
+        with:
+          name: cache
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -92,6 +103,10 @@ jobs:
     name: OpenRewrite
     runs-on: ubuntu-latest
     steps:
+      - name: Download cache
+        uses: actions/download-artifact@v4
+        with:
+          name: cache
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -113,6 +128,10 @@ jobs:
     name: Modernizer
     runs-on: ubuntu-latest
     steps:
+      - name: Download cache
+        uses: actions/download-artifact@v4
+        with:
+          name: cache
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -221,6 +240,10 @@ jobs:
     name: JavaDoc
     runs-on: ubuntu-latest
     steps:
+      - name: Download cache
+        uses: actions/download-artifact@v4
+        with:
+          name: cache
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Set up JDK
@@ -240,6 +263,10 @@ jobs:
       matrix:
         module: [jablib, jabkit, jabsrv, jabgui]
     steps:
+      - name: Download cache
+        uses: actions/download-artifact@v4
+        with:
+          name: cache
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -308,6 +335,10 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
+      - name: Download cache
+        uses: actions/download-artifact@v4
+        with:
+          name: cache
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
@@ -379,6 +410,10 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
+      - name: Download cache
+        uses: actions/download-artifact@v4
+        with:
+          name: cache
       - name: Check secrets presence
         id: checksecrets
         if: github.ref == 'refs/heads/main'
