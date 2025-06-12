@@ -206,6 +206,15 @@ dependencies {
         exclude(group = "org.apache.xmlgraphics")
     }
 
+    // region for document importing
+    implementation("org.apache.tika:tika-core:3.2.0") {
+        exclude(group = "commons-logging")
+    }
+    implementation("org.apache.tika:tika-parsers-standard-package:3.2.0") {
+        exclude(group = "commons-logging")
+    }
+    // endregion
+
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
     implementation("io.github.adr:e-adr:2.0.0-SNAPSHOT")
 

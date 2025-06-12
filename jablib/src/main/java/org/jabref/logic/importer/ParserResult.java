@@ -50,6 +50,10 @@ public class ParserResult {
         return parserResult;
     }
 
+    public static ParserResult fromEntry(BibEntry entry) {
+        return new ParserResult(List.of(entry));
+    }
+
     private static String getErrorMessage(Exception exception) {
         String errorMessage = exception.getLocalizedMessage();
         if (exception.getCause() != null) {
