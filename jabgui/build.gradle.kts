@@ -48,7 +48,7 @@ dependencies {
     implementation("de.saxsys:mvvmfx:1.8.0")
     implementation("org.fxmisc.flowless:flowless:0.7.4")
     implementation("org.fxmisc.richtext:richtextfx:0.11.5")
-    implementation("com.dlsc.gemsfx:gemsfx:3.1.1") {
+    implementation("com.dlsc.gemsfx:gemsfx:3.1.3") {
         exclude(module = "javax.inject") // Split package, use only jakarta.inject
         exclude(module = "commons-lang3")
         exclude(group = "org.apache.commons.validator")
@@ -104,7 +104,7 @@ dependencies {
     // implementation("net.java.dev.jna:jna:5.16.0")
     implementation("net.java.dev.jna:jna-platform:5.17.0")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
 
     implementation("com.konghq:unirest-java-core:4.4.7")
 
@@ -137,8 +137,17 @@ dependencies {
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+    testImplementation("org.wiremock:wiremock:3.13.0")
+    // Required by Wiremock - and our patching of Wiremock
+    testImplementation("com.github.jknack:handlebars:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+    }
+    testImplementation("com.github.jknack:handlebars-helpers:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+        exclude(group = "org.apache.commons", module = "commons-lang3")
+    }
+    testImplementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
 }
@@ -160,17 +169,6 @@ application {
         "-XX:+UseZGC", "-XX:+ZUncommit",
         "-XX:+UseStringDeduplication",
 
-        // Fix for https://github.com/JabRef/jabref/issues/11188
-        "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
-        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-
-        // Fix for https://github.com/JabRef/jabref/issues/11198
-        "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
-        "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
-        "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-        // fix for https://github.com/JabRef/jabref/issues/11426
-        "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
-
         // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
         "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
         "--add-exports=javafx.base/com.sun.javafx.event=org.jabref",
@@ -182,7 +180,7 @@ application {
         "--add-opens=javafx.base/javafx.collections=org.jabref",
         "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
 
-        "--enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
     )
 }
 
@@ -235,8 +233,21 @@ jlink {
     )
 
     launcher {
-        name =
-            "JabRef"
+        name = "JabRef"
+        jvmArgs = listOf(
+            // Fix for https://github.com/JabRef/jabref/issues/11188
+            "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
+            "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+
+            // Fix for https://github.com/JabRef/jabref/issues/11198
+            "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
+            "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
+            "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+            // fix for https://github.com/JabRef/jabref/issues/11426
+            "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
+
+            "--enable-native-access=org.jabref.merged.module"
+        )
     }
 
     // TODO: Remove as soon as dependencies are fixed (upstream)
@@ -437,16 +448,19 @@ if (OperatingSystem.current().isWindows) {
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.jabref.testsupport")
+
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
-    requires.add("org.jabref.testsupport")
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
 }
 
 tasks.test {
     jvmArgs = listOf(
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
         "--add-reads", "org.mockito=java.prefs",
-        "--add-reads", "org.mockito=javafx.scene",
+        "--add-reads", "org.jabref=wiremock"
     )
 }
