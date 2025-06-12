@@ -35,6 +35,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 
+import org.jabref.gui.externalfiles.PdfMergeDialog;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
@@ -126,12 +127,14 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         leftScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
 
-        viewModel.failedSuppliersProperty().addListener((obs, oldValue, newValue) ->
-                failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
-                        "Could not extract Metadata from: %0",
-                        String.join(", ", viewModel.failedSuppliersProperty())
-                ))
-        );
+        viewModel.failedSuppliersProperty().addListener((obs, oldValue, newValue) -> {
+            failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
+                    "Could not extract Metadata from: %0",
+                    String.join(", ", viewModel.failedSuppliersProperty())));
+             if(viewModel.failedSuppliersProperty().get().size() == 4){
+                 close();
+             }
+        });
 
         fillDiffModes();
     }

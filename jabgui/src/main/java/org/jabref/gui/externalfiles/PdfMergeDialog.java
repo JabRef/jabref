@@ -54,6 +54,7 @@ public class PdfMergeDialog {
         MultiMergeEntriesView dialog = new MultiMergeEntriesView(preferences, taskExecutor);
         dialog.setTitle(Localization.lang("Merge PDF metadata"));
         return dialog;
+
     }
 
     private static void finishDialog(MultiMergeEntriesView dialog, Path filePath, GuiPreferences preferences) {
@@ -64,6 +65,7 @@ public class PdfMergeDialog {
         }
         dialog.addSource(Localization.lang("XMP metadata"), wrapImporterToSupplier(new PdfXmpImporter(preferences.getXmpPreferences()), filePath));
         dialog.addSource(Localization.lang("Content"), wrapImporterToSupplier(new PdfContentImporter(), filePath));
+
     }
 
     private static Supplier<BibEntry> wrapImporterToSupplier(Importer importer, Path filePath) {
