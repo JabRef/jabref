@@ -124,6 +124,8 @@ dependencies {
 
     implementation("org.slf4j:slf4j-bom:2.0.17")
     implementation("org.slf4j:slf4j-api")
+    // route all jcl request to sfl4j
+    implementation("org.slf4j:jcl-over-slf4j")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
     implementation("org.slf4j:jul-to-slf4j")
     // route all requests to log4j to SLF4J
@@ -211,11 +213,9 @@ dependencies {
     implementation(platform("org.apache.tika:tika-bom:3.2.0"))
     implementation("org.apache.tika:tika-core") {
         exclude(group = "commons-logging", module = "commons-logging")
-        exclude(group = "org.slf4j", module = "jcl-over-slf4j")
     }
     implementation("org.apache.tika:tika-parsers-standard-package") {
         exclude(group = "commons-logging", module = "commons-logging")
-        exclude(group = "org.slf4j", module = "jcl-over-slf4j")
     }
     // endregion
 
