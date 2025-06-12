@@ -135,7 +135,6 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                  close();
              }
         });
-
         fillDiffModes();
     }
 
