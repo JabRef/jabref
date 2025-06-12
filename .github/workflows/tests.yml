@@ -25,7 +25,27 @@ permissions:
   pull-requests: write
 
 jobs:
+  cache:
+    name: Refresh Gradle Cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Run checkstyle using gradle
+        run: ./gradlew :jablib:processResources
+
   checkstyle:
+    needs: [cache]
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
@@ -51,6 +71,7 @@ jobs:
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
   openrewrite:
+    needs: [cache]
     name: OpenRewrite
     runs-on: ubuntu-latest
     steps:
@@ -71,6 +92,7 @@ jobs:
           ./gradlew rewriteDryRun
 
   modernizer:
+    needs: [cache]
     name: Modernizer
     runs-on: ubuntu-latest
     steps:
@@ -167,6 +189,7 @@ jobs:
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
   javadoc:
+    needs: [cache]
     name: JavaDoc
     runs-on: ubuntu-latest
     steps:
@@ -182,6 +205,7 @@ jobs:
       - run: ./gradlew javadoc
 
   tests:
+    needs: [cache]
     name: "Unit tests – ${{ matrix.module }}"
     runs-on: ubuntu-latest
     strategy:
@@ -215,6 +239,7 @@ jobs:
         run: scripts/after-failure.sh
 
   tests-windows:
+    needs: [cache]
     name: "Unit tests (Windows) – ${{ matrix.module }}"
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
@@ -240,6 +265,7 @@ jobs:
           CI: "true"
 
   databasetests:
+    needs: [cache]
     name: Database tests
     runs-on: ubuntu-latest
     services:
@@ -278,24 +304,38 @@ jobs:
     name: JBang
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Install JBang
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          week=$(date +%G-%V)
+          echo "cache_key=jbang-weekly-${week}" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
         uses: jbangdev/setup-jbang@main
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build .jbang/JabKitLauncher.java
       - run: jbang build .jbang/JabSrvLauncher.java
 
   codecoverage:
+    needs: [cache]
     if: false
     name: Code coverage
     runs-on: ubuntu-latest
@@ -357,6 +397,7 @@ jobs:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   requirements_coverage:
+    needs: [cache]
     name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
