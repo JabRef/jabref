@@ -325,7 +325,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                     bibEntry,
                     viewModel,
                     contextCommandFactory,
-                    multiContextCommandFactory
+                    multiContextCommandFactory,
+                    taskExecutor
             );
 
             ContextMenu contextMenu = contextMenuFactory.createForSelection(listView.getSelectionModel().getSelectedItems());

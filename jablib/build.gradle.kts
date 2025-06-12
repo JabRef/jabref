@@ -243,6 +243,9 @@ dependencies {
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+
+    // OCR support
+    implementation("net.sourceforge.tess4j:tess4j:5.15.0")
 }
 /*
 jacoco {
