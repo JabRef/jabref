@@ -57,26 +57,40 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Run processResources
         run: ./gradlew :jablib:processResources
-      - name: Upload cache
+      - name: Upload cache-build
         uses: actions/upload-artifact@v4
         with:
-          name: cache
+          name: cache-build
           retention-days: 1
           compression-level: 1
           include-hidden-files: true
           path: |
-            .gradle
             **/build/
+      - name: Upload cache-gradle-jbang
+        uses: actions/upload-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          retention-days: 1
+          compression-level: 1
+          include-hidden-files: true
+          path: |
+            ~/.jbang
+            ~/.gradle
 
   checkstyle:
     needs: [cache]
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache
+      - name: Download cache-build
         uses: actions/download-artifact@v4
         with:
-          name: cache
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -101,10 +115,15 @@ jobs:
     name: OpenRewrite
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache
+      - name: Download cache-build
         uses: actions/download-artifact@v4
         with:
-          name: cache
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -124,10 +143,15 @@ jobs:
     name: Modernizer
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache
+      - name: Download cache-build
         uses: actions/download-artifact@v4
         with:
-          name: cache
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -234,10 +258,15 @@ jobs:
     name: JavaDoc
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache
+      - name: Download cache-build
         uses: actions/download-artifact@v4
         with:
-          name: cache
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Set up JDK
@@ -255,10 +284,15 @@ jobs:
       matrix:
         module: [jablib, jabkit, jabsrv, jabgui]
     steps:
-      - name: Download cache
+      - name: Download cache-build
         uses: actions/download-artifact@v4
         with:
-          name: cache
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -292,6 +326,15 @@ jobs:
       matrix:
         module: [jablib]
     steps:
+      - name: Download cache-build
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -323,10 +366,15 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Download cache
+      - name: Download cache-build
         uses: actions/download-artifact@v4
         with:
-          name: cache
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
@@ -396,10 +444,15 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Download cache
+      - name: Download cache-build
         uses: actions/download-artifact@v4
         with:
-          name: cache
+          name: cache-build
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - name: Check secrets presence
         id: checksecrets
         if: github.ref == 'refs/heads/main'
@@ -448,6 +501,11 @@ jobs:
     name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
+      - name: Download cache-gradle-jbang
+        uses: actions/download-artifact@v4
+        with:
+          name: cache-gradle-jbang
+          path: ~
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
