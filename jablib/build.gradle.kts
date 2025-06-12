@@ -210,7 +210,7 @@ dependencies {
     implementation("org.apache.tika:tika-core:3.2.0") {
         exclude(group = "commons-logging")
     }
-    implementation("org.apache.tika:tika-parsers-standard-package:3.2.0") {
+    implementation("org.apache.tika:tika-parsers:3.2.0") {
         exclude(group = "commons-logging")
     }
     // endregion
