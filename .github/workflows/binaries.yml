@@ -188,7 +188,7 @@ jobs:
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Debug JBang
-        run: jbang jbangdev/setup-jbang@main
+        run: jbang env@jbangdev JBANG
       - name: Generate JBang cache key
         id: cache-key
         run: |
