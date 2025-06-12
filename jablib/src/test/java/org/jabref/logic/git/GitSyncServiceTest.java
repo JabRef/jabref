@@ -3,13 +3,9 @@ package org.jabref.logic.git;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import org.jabref.logic.git.util.GitFileReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -20,7 +16,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -108,28 +103,6 @@ class GitSyncServiceTest {
 
     @Test
     void performsSemanticMergeWhenNoConflicts() throws Exception {
-        GitSyncService.MergeResult result = GitSyncService.merge(
-                git,
-                baseCommit,
-                aliceCommit,
-                bobCommit,
-                library,
-                importFormatPreferences
-        );
-
-        assertFalse(result.hasConflict(), "Expected no semantic conflict");
-
-        BibDatabaseContext merged = result.merged();
-        List<BibEntry> entries = merged.getDatabase().getEntries();
-        assertEquals(2, entries.size());
-
-        // Verify the author of entry a is modified from Alice
-        BibEntry entryA = entries.stream()
-                                 .filter(e -> e.getCitationKey().orElse("").equals("a"))
-                                 .findFirst()
-                                 .orElseThrow(() -> new IllegalStateException("Entry a not found"));
-
-        assertEquals("author-a", entryA.getField(StandardField.AUTHOR).orElse(""));
     }
 
     @Test

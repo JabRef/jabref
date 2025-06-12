@@ -4,19 +4,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.field.StandardField;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,11 +28,6 @@ import static org.mockito.Mockito.when;
 class SemanticConflictDetectorTest {
     private Git git;
     private Path library;
-    private RevCommit baseCommit;
-    private RevCommit localCommit;
-    private RevCommit remoteCommitNoConflict;
-    private RevCommit remoteCommitConflict;
-
     private final PersonIdent alice = new PersonIdent("Alice", "alice@example.org");
     private final PersonIdent bob = new PersonIdent("Bob", "bob@example.org");
 
@@ -48,96 +44,26 @@ class SemanticConflictDetectorTest {
                  .call();
 
         library = tempDir.resolve("library.bib");
-
-        String base = """
-                    @article{a,
-                       author = {lala},
-                       doi = {xya},
-                     }
-
-                     @article{b,
-                       author = {author-b},
-                       doi = {xyz},
-                     }
-                """;
-
-        String local = """
-                    @article{a,
-                       author = {author-a},
-                       doi = {xya},
-                     }
-
-                     @article{b,
-                       author = {author-b},
-                       doi = {xyz},
-                     }
-                """;
-
-        String remoteNoConflict = """
-                    @article{b,
-                       author = {author-b},
-                       doi = {xyz},
-                     }
-
-                    @article{a,
-                       author = {lala},
-                       doi = {xya},
-                     }
-                """;
-
-        String remoteConflict = """
-            @article{b,
-                       author = {author-b},
-                       doi = {xyz},
-                     }
-
-                    @article{a,
-                       author = {author-c},
-                       doi = {xya},
-                     }
-            """;
-
-        baseCommit = writeAndCommit(base, "base", alice, library, git);
-        localCommit = writeAndCommit(local, "local change article a - author a", alice, library, git);
-
-        // Remote with no conflict
-        git.checkout().setStartPoint(baseCommit).setCreateBranch(true).setName("remote-noconflict").call();
-        remoteCommitNoConflict = writeAndCommit(remoteNoConflict, "remote change article b", bob, library, git);
-
-        // Remote with conflict
-        git.checkout().setStartPoint(baseCommit).setCreateBranch(true).setName("remote-conflict").call();
-        remoteCommitConflict = writeAndCommit(remoteConflict, "remote change article a - author c", bob, library, git);
     }
 
-    @Test
-    void detectsNoConflictWhenChangesAreInDifferentFields() throws Exception {
-        BibDatabaseContext base = parse(baseCommit);
-        BibDatabaseContext local = parse(localCommit);
-        BibDatabaseContext remote = parse(remoteCommitNoConflict);
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("provideConflictCases")
+    void testSemanticConflicts(String description, String base, String local, String remote, boolean expectConflict) throws Exception {
+        RevCommit baseCommit = writeAndCommit(base, "base", alice);
+        RevCommit localCommit = writeAndCommit(local, "local", alice);
+        RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
 
-        List<BibEntryDiff> diffs = SemanticConflictDetector.detectConflicts(base, local, remote);
-        assertTrue(diffs.isEmpty(), "Expected no semantic conflict, but found some");
-    }
+        BibDatabaseContext baseCtx = parse(baseCommit);
+        BibDatabaseContext localCtx = parse(localCommit);
+        BibDatabaseContext remoteCtx = parse(remoteCommit);
 
-    @Test
-    void detectsConflictWhenSameFieldModifiedDifferently() throws Exception {
-        BibDatabaseContext base = parse(baseCommit);
-        BibDatabaseContext local = parse(localCommit);
-        BibDatabaseContext remote = parse(remoteCommitConflict);
+        List<BibEntryDiff> diffs = SemanticConflictDetector.detectConflicts(baseCtx, localCtx, remoteCtx);
 
-        List<BibEntryDiff> diffs = SemanticConflictDetector.detectConflicts(base, local, remote);
-        assertEquals(1, diffs.size(), "Expected one conflicting entry");
-
-        BibEntryDiff diff = diffs.get(0);
-        BibEntry localEntry = diff.originalEntry(); // from local
-        BibEntry remoteEntry = diff.newEntry();     // from remote
-
-        String localAuthor = localEntry.getField(StandardField.AUTHOR).orElse("");
-        String remoteAuthor = remoteEntry.getField(StandardField.AUTHOR).orElse("");
-
-        assertEquals("author-a", localAuthor);
-        assertEquals("author-c", remoteAuthor);
-        assertTrue(!localAuthor.equals(remoteAuthor), "Expected AUTHOR field conflict in entry 'a'");
+        if (expectConflict) {
+            assertEquals(1, diffs.size(), "Expected a conflict but found none");
+        } else {
+            assertTrue(diffs.isEmpty(), "Expected no conflict but found some");
+        }
     }
 
     private BibDatabaseContext parse(RevCommit commit) throws Exception {
@@ -151,10 +77,338 @@ class SemanticConflictDetectorTest {
         return git.commit().setAuthor(author).setMessage(message).call();
     }
 
-    private BibEntry findEntryByCitationKey(BibDatabaseContext ctx, String key) {
-        return ctx.getDatabase().getEntries().stream()
-                  .filter(entry -> entry.getCitationKey().orElse("").equals(key))
-                  .findFirst()
-                  .orElseThrow(() -> new IllegalStateException("Entry with key '" + key + "' not found"));
+    private RevCommit writeAndCommit(String content, String message, PersonIdent author) throws Exception {
+        return writeAndCommit(content, message, author, library, git);
+    }
+
+    static Stream<Arguments> provideConflictCases() {
+        return Stream.of(
+                Arguments.of("T1 - remote changed a field, local unchanged",
+                        """
+                        @article{a,
+                            author = {lala},
+                            doi = {xya},
+                        }
+                        """,
+                        """
+                        @article{a,
+                            author = {lala},
+                            doi = {xya},
+                        }
+                        """,
+                        """
+                        @article{a,
+                            author = {bob},
+                            doi = {xya},
+                        }
+                        """,
+                        false
+                ),
+                Arguments.of("T2 - local changed a field, remote unchanged",
+                        """
+                        @article{a,
+                            author = {lala},
+                            doi = {xya},
+                        }
+                        """,
+                        """
+                        @article{a,
+                            author = {alice},
+                            doi = {xya},
+                        }
+                        """,
+                        """
+                        @article{a,
+                            author = {lala},
+                            doi = {xya},
+                        }
+                        """,
+                        false
+                ),
+                Arguments.of("T3 - both changed to same value",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {bob},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {bob},
+                                doi = {xya},
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T4 - both changed to different values",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {alice},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {bob},
+                                doi = {xya},
+                            }
+                        """,
+                        true
+                ),
+                Arguments.of("T5 - local deleted field, remote changed it",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {bob},
+                                doi = {xya},
+                            }
+                        """,
+                        true
+                ),
+                Arguments.of("T6 - local changed, remote deleted",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {alice},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                            }
+                        """,
+                        true
+                ),
+                Arguments.of("T7 - remote deleted, local unchanged",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T8 - local changed field A, remote changed field B",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {alice},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xyz},
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T9 - field order changed only",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                doi = {xya},
+                                author = {lala},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T10 - local changed entry a, remote changed entry b",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                              }
+
+                            @article{b,
+                                author = {lala},
+                                doi = {xyz},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {author-a},
+                                doi = {xya},
+                            }
+                            @article{b,
+                                author = {lala},
+                                doi = {xyz},
+                            }
+                        """,
+                        """
+                            @article{b,
+                                author = {author-b},
+                                doi = {xyz},
+                            }
+
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T11 - remote added field, local unchanged",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                                year = {2025},
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T12 - both added same field with different values",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                                year = {2023},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                                year = {2025},
+                            }
+                        """,
+                        true
+                ),
+                Arguments.of("T13 - local added field, remote unchanged",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {newfield},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T14 - both added same field with same value",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {value},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {value},
+                            }
+                        """,
+                        false
+                ),
+                Arguments.of("T15 - both added same field with different values",
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {value1},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {lala},
+                                doi = {value2},
+                            }
+                        """,
+                        true
+                )
+        );
     }
 }
