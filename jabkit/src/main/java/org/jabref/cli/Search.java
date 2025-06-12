@@ -8,6 +8,8 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.jabref.cli.converter.PathConverter;
+import org.jabref.cli.converter.StringPathConverter;
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
 import org.jabref.logic.exporter.SaveException;
@@ -46,10 +48,10 @@ class Search implements Runnable {
     @Option(names = {"--query"}, description = "Search query", required = true)
     private String query;
 
-    @Option(names = {"--input"}, description = "Input BibTeX file", required = true)
+    @Option(names = {"--input"}, converter = StringPathConverter.class, description = "Input BibTeX file", required = true)
     private String inputFile;
 
-    @Option(names = {"--output"}, description = "Output file")
+    @Option(names = {"--output"}, converter = PathConverter.class, description = "Output file")
     private Path outputFile;
 
     @Option(names = {"--output-format"}, description = "Output format: bib, txt, etc.")

@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.cli.converter.StringPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pseudonymization.Pseudonymization;
@@ -34,10 +35,10 @@ public class Pseudonymize implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @ADR(45)
-    @Option(names = {"--input"}, description = "BibTeX file to be pseudonymized", required = true)
+    @Option(names = {"--input"}, converter = StringPathConverter.class, description = "BibTeX file to be pseudonymized", required = true)
     private String inputFile;
 
-    @Option(names = {"--output"}, description = "Output pseudo-bib file")
+    @Option(names = {"--output"}, converter = StringPathConverter.class, description = "Output pseudo-bib file")
     private String outputFile;
 
     @Option(names = {"--key"}, description = "Output pseudo-keys file")

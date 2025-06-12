@@ -2,6 +2,7 @@ package org.jabref.cli;
 
 import java.io.File;
 
+import org.jabref.cli.converter.FilePathConverter;
 import org.jabref.logic.l10n.Localization;
 
 import static picocli.CommandLine.Command;
@@ -15,10 +16,10 @@ class CheckIntegrity implements Runnable {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Parameters(index = "0", description = "BibTeX file to check", arity = "0..1")
+    @Parameters(index = "0", converter = FilePathConverter.class, description = "BibTeX file to check", arity = "0..1")
     private File inputFile;
 
-    @Option(names = {"--input"}, description = "Input BibTeX file")
+    @Option(names = {"--input"}, converter = FilePathConverter.class, description = "Input BibTeX file")
     private File inputOption;
 
     @Option(names = {"--output-format"}, description = "Output format: txt or csv")
