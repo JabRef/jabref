@@ -284,7 +284,6 @@ val generatedJournalFile = layout.buildDirectory.file("generated/resources/journ
 var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
     group = "JabRef"
     description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
-    dependsOn(tasks.named("generateGrammarSource"))
 
     script = project.file("src/build-support/JournalListMvGenerator.java").toString()
 
