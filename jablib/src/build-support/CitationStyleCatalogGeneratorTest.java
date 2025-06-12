@@ -1,4 +1,4 @@
-package org.jabref.logic.citationstyle;
+// TODO: Integrate in JBang and tests.yml
 
 import java.io.IOException;
 import java.nio.file.Files;
