@@ -93,8 +93,6 @@ jobs:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
@@ -117,8 +115,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
@@ -142,8 +138,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -251,8 +245,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew javadoc
 
   tests:
@@ -277,8 +269,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -312,8 +302,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Run ${{ matrix.module }} tests
         run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -351,8 +339,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Run tests on PostgreSQL
         run: ./gradlew :jablib:databaseTest --rerun-tasks
         env:
@@ -440,8 +426,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -472,8 +456,6 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements
       - if: always()
         run: cat build/reports/tracing.txt
