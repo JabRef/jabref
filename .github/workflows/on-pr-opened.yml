@@ -1,0 +1,29 @@
+name: Welcome a first-time contributor
+
+on:
+  pull_request_target:
+    types: opened
+
+jobs:
+  welcome-first-time-contributor:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: plbstl/first-contribution@v3
+        with:
+          labels: first contrib
+          pr-opened-msg: |
+            ### Hey @{fc-author}!
+
+            Thank you for taking the time to contribute to JabRef. Your help is truly appreciated :heart:.
+
+            We have automatic checks in place.
+            Futhermore, we use [TragBot](https://usetrag.com/) with custom rules to enable you a more detailed feedback.
+            Sometimes, TragBot does not perform well.
+            In the "Files" tab, you can go through its comments and just click on "Resolve conversation" if the comment absolutely doesn't make sense.
+
+            Please re-check our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) in case of any doubts.
+
+            Don't forget to star :star: the repo.
