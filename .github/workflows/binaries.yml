@@ -191,6 +191,7 @@ jobs:
         run: jbang env@jbangdev JBANG
       - name: Generate JBang cache key
         id: cache-key
+        shell: bash
         run: |
           week=$(date +%G-%V)  # e.g., 2025-24 for ISO year-week
           echo "cache_key=jbang-weekly-${week}" >> $GITHUB_OUTPUT
