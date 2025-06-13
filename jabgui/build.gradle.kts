@@ -262,7 +262,7 @@ jlink {
             imageOptions.addAll(
                 listOf(
                     "--icon",  "$projectDir/src/main/resources/icons/jabref.icns",
-                    "--resource-dir", "$projectDir/buildres/mac"
+                    "--resource-dir", "$projectDir/buildres/macos"
                 )
             )
 
@@ -275,8 +275,8 @@ jlink {
                     "--mac-package-identifier", "JabRef",
                     "--mac-package-name", "JabRef",
                     "--app-version", "$version",
-                    "--file-associations", "$projectDir/buildres/mac/bibtexAssociations.properties",
-                    "--resource-dir", "$projectDir/buildres/mac"
+                    "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
+                    "--resource-dir", "$projectDir/buildres/macos"
                 )
             )
         }
@@ -314,12 +314,68 @@ if (OperatingSystem.current().isWindows) {
     tasks.named("jpackageImage").configure {
         doLast {
             copy {
-                from(file("$projectDir/buildres/mac")) {
+                from(file("$projectDir/buildres/macos")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
                 into(file("${layout.buildDirectory.get()}/distribution/JabRef.app/Contents/Resources"))
             }
         }
+    }
+}
+
+// Below should eventually replace the 'jlink {}' and doLast-copy configurations above
+javaModulePackaging {
+    applicationName = "JabRef"
+    vendor = "JabRef"
+    jpackageResources = layout.projectDirectory.dir("buildres")
+    verbose = true
+    jlinkOptions.addAll(
+        "--ignore-signing-information",
+        "--compress", "zip-6",
+        "--no-header-files",
+        "--no-man-pages",
+        "--bind-services",
+    )
+    addModules.add("jdk.incubator.vector")
+    targetsWithOs("windows") {
+        options.addAll(
+            "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
+            "--win-dir-chooser",
+            "--win-shortcut",
+            "--win-menu",
+            "--win-menu-group", "JabRef",
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+            "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
+            include("jabref-firefox.json")
+            include("jabref-chrome.json")
+            include("JabRefHost.bat")
+            include("JabRefHost.ps1")
+        })
+    }
+    targetsWithOs("linux") {
+        options.addAll(
+            "--linux-menu-group", "Office;",
+            "--linux-rpm-license-type", "MIT",
+            "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
+            "--linux-shortcut",
+            "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/linux").asFileTree.matching {
+            include("native-messaging-host/**")
+            include("jabrefHost.py")
+        })
+    }
+    targetsWithOs("macos") {
+        options.addAll(
+            "--mac-package-identifier", "JabRef",
+            "--mac-package-name", "JabRef",
+            "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
+            include("Resources/**")
+        })
     }
 }
 
