@@ -61,7 +61,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiMergeEntriesView.class);
 
-    public int activecolumns;
+    public int activeColumns;
 
     // LEFT
     @FXML private ScrollPane leftScrollPane;
@@ -133,8 +133,8 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
                     "Could not extract Metadata from: %0",
                     String.join(", ", viewModel.failedSuppliersProperty())));
-            activecolumns = viewModel.entriesProperty().get().size() - viewModel.failedSuppliersProperty().get().size();
-            if (activecolumns < ACTIVE_COLUMNS_MINIMUM) {
+            activeColumns = viewModel.entriesProperty().get().size() - viewModel.failedSuppliersProperty().get().size();
+            if (activeColumns < ACTIVE_COLUMNS_MINIMUM) {
                 close();
             }
         });
