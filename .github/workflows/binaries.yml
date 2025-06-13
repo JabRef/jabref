@@ -140,7 +140,7 @@ jobs:
             displayName: linux
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distribution/jabkit
-            suffix: '_amd64'
+            suffix: ''
           - os: ubuntu-22.04-arm
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/distribution/JabRef

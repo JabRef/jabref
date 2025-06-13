@@ -19,6 +19,17 @@ val pdfbox = "3.0.5"
 
 val javafxVersion = "24.0.1"
 
+tasks.compileJava {
+    options.compilerArgs.add("-verbose")
+    doFirst {
+        println("=== COMPILE CLASSPATH ===")
+        classpath.files.forEach {
+            println(it)
+        }
+        println("=========================")
+    }
+}
+
 dependencies {
     implementation(project(":jablib"))
 
@@ -326,16 +337,6 @@ jlink {
         provides("ai.djl.engine.EngineProvider").with(
             "ai.djl.engine.rust.RsEngineProvider",
             "ai.djl.pytorch.engine.PtEngineProvider")
-    }
-
-    tasks.compileJava {
-        doFirst {
-            println("=== COMPILE CLASSPATH ===")
-            classpath.files.forEach {
-                println(it)
-            }
-            println("=========================")
-        }
     }
 
     jpackage {
