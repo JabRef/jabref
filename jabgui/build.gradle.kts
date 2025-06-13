@@ -328,6 +328,16 @@ jlink {
             "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
+    tasks.compileJava {
+        doFirst {
+            println("=== COMPILE CLASSPATH ===")
+            classpath.files.forEach {
+                println(it)
+            }
+            println("=========================")
+        }
+    }
+
     jpackage {
         outputDir =
             "distribution"
