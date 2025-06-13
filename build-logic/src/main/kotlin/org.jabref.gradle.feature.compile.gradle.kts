@@ -20,3 +20,7 @@ java {
         vendor = JvmVendorSpec.AZUL
     }
 }
+
+tasks.withType<JavaCompile>().configureEach {
+    options.release = 24
+}
