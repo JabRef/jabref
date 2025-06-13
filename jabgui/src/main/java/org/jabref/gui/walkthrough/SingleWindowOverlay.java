@@ -16,7 +16,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
@@ -33,15 +33,15 @@ public class SingleWindowOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleWindowOverlay.class);
     private static final double MARGIN = 10.0;
     private static final double ARROW_OVERLAP = 3.0;
-    private final Stage parentStage;
+    private final Window window;
     private final GridPane overlayPane;
     private final Pane originalRoot;
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
     private final List<Runnable> cleanUpTasks = new ArrayList<>();
 
-    public SingleWindowOverlay(Stage stage) {
-        this.parentStage = stage;
+    public SingleWindowOverlay(Window window) {
+        this.window = window;
         this.renderer = new WalkthroughRenderer();
 
         overlayPane = new GridPane();
@@ -50,7 +50,7 @@ public class SingleWindowOverlay {
         overlayPane.setMaxWidth(Double.MAX_VALUE);
         overlayPane.setMaxHeight(Double.MAX_VALUE);
 
-        Scene scene = stage.getScene();
+        Scene scene = window.getScene();
         assert scene != null;
 
         originalRoot = (Pane) scene.getRoot();
@@ -89,7 +89,7 @@ public class SingleWindowOverlay {
     public void detach() {
         hide();
 
-        Scene scene = parentStage.getScene();
+        Scene scene = window.getScene();
         if (scene != null && originalRoot != null) {
             stackPane.getChildren().remove(originalRoot);
             scene.setRoot(originalRoot);
@@ -194,16 +194,14 @@ public class SingleWindowOverlay {
 
     private Polygon createArrow() {
         Polygon arrow = new Polygon();
-        arrow.getPoints().addAll(new Double[] {
-                0.0, 0.0,
+        arrow.getPoints().addAll(0.0, 0.0,
                 12.0, 15.0,
-                -12.0, 15.0
-        });
+                -12.0, 15.0);
         return arrow;
     }
 
     private void positionTooltipWithArrow(StackPane container, Node tooltip, Node arrow, Node target, TooltipStep step) {
-        Scene scene = parentStage.getScene();
+        Scene scene = window.getScene();
         if (scene == null) {
             return;
         }

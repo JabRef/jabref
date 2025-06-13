@@ -126,7 +126,19 @@ public record TooltipStep(
             if (resolver == null) {
                 throw new IllegalStateException("Node resolver is required for TooltipStep");
             }
-            return new TooltipStep(title, content, resolver, continueButtonText, skipButtonText, backButtonText, navigationPredicate, position, preferredWidth, preferredHeight, highlight, autoFallback, activeWindowResolver);
+            return new TooltipStep(title,
+                    content,
+                    resolver,
+                    continueButtonText,
+                    skipButtonText,
+                    backButtonText,
+                    navigationPredicate,
+                    position,
+                    preferredWidth,
+                    preferredHeight,
+                    highlight,
+                    autoFallback,
+                    activeWindowResolver);
         }
     }
 }

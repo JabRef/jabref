@@ -73,14 +73,12 @@ public class MultiWindowWalkthroughOverlay {
         int currentIndex = walkthrough.currentStepProperty().get();
         for (int i = currentIndex - 1; i >= 0; i--) {
             WalkthroughNode previousStep = getStepAtIndex(i);
-            if (previousStep != null) {
-                Window activeWindow = previousStep.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(mainStage);
-                Scene scene = activeWindow.getScene();
-                if (scene != null && previousStep.resolver().resolve(scene).isPresent()) {
-                    LOGGER.info("Reverting to step {} from step {}", i, currentIndex);
-                    walkthrough.goToStep(i);
-                    return;
-                }
+            Window activeWindow = previousStep.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(mainStage);
+            Scene scene = activeWindow.getScene();
+            if (scene != null && previousStep.resolver().resolve(scene).isPresent()) {
+                LOGGER.info("Reverting to step {} from step {}", i, currentIndex);
+                walkthrough.goToStep(i);
+                return;
             }
         }
 
@@ -120,20 +118,11 @@ public class MultiWindowWalkthroughOverlay {
         }
     }
 
-    private WalkthroughNode getStepAtIndex(int index) {
-        try {
-            return walkthrough.getSteps().get(index);
-        } catch (IndexOutOfBoundsException e) {
-            return null;
-        }
+    private @NonNull WalkthroughNode getStepAtIndex(int index) {
+        return walkthrough.getSteps().get(index);
     }
 
     private SingleWindowOverlay getOrCreateOverlay(Window window) {
-        return overlays.computeIfAbsent(window, w -> {
-            if (w instanceof Stage stage) {
-                return new SingleWindowOverlay(stage);
-            }
-            throw new IllegalArgumentException("Only Stage windows are supported for overlays");
-        });
+        return overlays.computeIfAbsent(window, SingleWindowOverlay::new);
     }
 }

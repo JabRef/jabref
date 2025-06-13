@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
  */
 public abstract class WalkthroughEffect {
     protected final Pane pane;
-    protected final List<Runnable> cleanupTasks = new ArrayList<>();
+    protected final List<Runnable> cleanupTasks = new ArrayList<>(); // needs to be mutable
     protected final InvalidationListener updateListener = _ -> updateLayout();
 
     protected WalkthroughEffect(@NonNull Pane pane) {

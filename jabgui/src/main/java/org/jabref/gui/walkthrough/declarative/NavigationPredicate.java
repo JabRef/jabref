@@ -46,8 +46,6 @@ public interface NavigationPredicate {
                 return () -> targetNode.setOnMouseClicked(onClicked);
             }
 
-            System.out.println("TargetNode is a MenuItem: " + targetNode);
-            System.out.println("MenuItem found: " + item.get().getText());
             EventHandler<ActionEvent> onAction = item.get().getOnAction();
             item.get().setOnAction(ConcurrentNavigationRunner.decorate(onAction, onNavigate));
 

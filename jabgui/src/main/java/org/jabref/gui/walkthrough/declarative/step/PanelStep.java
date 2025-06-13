@@ -28,8 +28,7 @@ public record PanelStep(
         Optional<Double> preferredHeight,
         Optional<MultiWindowHighlight> highlight,
         boolean autoFallback,
-        Optional<WindowResolver> activeWindowResolver
-) implements WalkthroughNode {
+        Optional<WindowResolver> activeWindowResolver) implements WalkthroughNode {
     public static Builder builder(String title) {
         return new Builder(title);
     }
@@ -127,7 +126,19 @@ public record PanelStep(
             if (resolver == null) {
                 throw new IllegalStateException("Node resolver is required for PanelStep");
             }
-            return new PanelStep(title, content, resolver, continueButtonText, skipButtonText, backButtonText, navigationPredicate, position, preferredWidth, preferredHeight, highlight, autoFallback, activeWindowResolver);
+            return new PanelStep(title,
+                    content,
+                    resolver,
+                    continueButtonText,
+                    skipButtonText,
+                    backButtonText,
+                    navigationPredicate,
+                    position,
+                    preferredWidth,
+                    preferredHeight,
+                    highlight,
+                    autoFallback,
+                    activeWindowResolver);
         }
     }
 }

@@ -40,12 +40,12 @@ public class HighlightManager {
         detachAll();
 
         highlightConfig.ifPresentOrElse(
-                c -> {
-                    if (c.windowEffects().isEmpty() && c.fallbackEffect().isPresent()) {
-                        applyEffect(mainScene.getWindow(), c.fallbackEffect().get(), fallbackTarget);
+                config -> {
+                    if (config.windowEffects().isEmpty() && config.fallbackEffect().isPresent()) {
+                        applyEffect(mainScene.getWindow(), config.fallbackEffect().get(), fallbackTarget);
                         return;
                     }
-                    c.windowEffects().forEach(effect -> {
+                    config.windowEffects().forEach(effect -> {
                         Window window = effect.windowResolver().resolve().orElse(mainScene.getWindow());
                         Optional<Node> targetNode = effect.targetNodeResolver()
                                                           .map(resolver ->
