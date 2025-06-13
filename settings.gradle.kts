@@ -1,14 +1,14 @@
 pluginManagement {
     includeBuild("build-logic")
 }
-
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    id("org.jabref.gradle.build")
 }
 
 rootProject.name = "JabRef"
 
-include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support", "versions")
-
-// https://github.com/gradlex-org/java-module-dependencies#plugin-dependency
-includeBuild(".")
+javaModules {
+    directory(".")
+    versions("versions")
+    // include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support", "versions")
+}

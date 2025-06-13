@@ -45,6 +45,7 @@ dependencies.constraints {
     api("com.konghq:unirest-java-core:4.4.7")
     api("com.konghq:unirest-modules-gson:4.4.7")
     api("com.squareup.okhttp3:okhttp:4.12.0")
+    api("com.squareup.okio:okio-jvm:3.12.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
