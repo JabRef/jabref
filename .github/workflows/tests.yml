@@ -25,72 +25,10 @@ permissions:
   pull-requests: write
 
 jobs:
-  cache:
-    name: Refresh Gradle Cache
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-          show-progress: 'false'
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: 24.0.1
-          distribution: 'zulu'
-      - name: Generate JBang cache key
-        id: cache-key
-        shell: bash
-        run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
-      - name: Use cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.jbang
-          key: ${{ steps.cache-key.outputs.cache_key }}
-          restore-keys:
-            jbang-
-      - name: Setup JBang
-        uses: jbangdev/setup-jbang@main
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-      - name: Run processResources
-        run: ./gradlew :jablib:processResources
-      - name: Upload cache-build
-        uses: actions/upload-artifact@v4
-        with:
-          name: cache-build
-          retention-days: 1
-          compression-level: 1
-          include-hidden-files: true
-          path: |
-            **/build/
-      - name: Upload cache-gradle-jbang
-        uses: actions/upload-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          retention-days: 1
-          compression-level: 1
-          include-hidden-files: true
-          path: |
-            ~/.jbang
-            ~/.gradle
-
   checkstyle:
-    needs: [cache]
     name: Checkstyle
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -107,23 +45,15 @@ jobs:
           reporter: github-pr-review
           github_token: ${{ secrets.GITHUB_TOKEN }}
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
   openrewrite:
-    needs: [cache]
     name: OpenRewrite
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -134,24 +64,16 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run OpenRewrite
         run: |
           ./gradlew rewriteDryRun
 
   modernizer:
-    needs: [cache]
     name: Modernizer
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -162,6 +84,8 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -254,19 +178,9 @@ jobs:
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
   javadoc:
-    needs: [cache]
     name: JavaDoc
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Checkout source
         uses: actions/checkout@v4
       - name: Set up JDK
@@ -274,25 +188,17 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew javadoc
 
   tests:
-    needs: [cache]
     name: "Unit tests – ${{ matrix.module }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
         module: [jablib, jabkit, jabsrv, jabgui]
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -303,6 +209,8 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -318,7 +226,6 @@ jobs:
         run: scripts/after-failure.sh
 
   tests-windows:
-    needs: [cache]
     name: "Unit tests (Windows) – ${{ matrix.module }}"
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     runs-on: windows-latest
@@ -326,15 +233,6 @@ jobs:
       matrix:
         module: [jablib]
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Checkout source
         uses: actions/checkout@v4
         with:
@@ -345,13 +243,14 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run ${{ matrix.module }} tests
         run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
 
   databasetests:
-    needs: [cache]
     name: Database tests
     runs-on: ubuntu-latest
     services:
@@ -366,15 +265,6 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
@@ -387,6 +277,8 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Run tests on PostgreSQL
         run: ./gradlew :jablib:databaseTest --rerun-tasks
         env:
@@ -397,6 +289,11 @@ jobs:
     name: JBang
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -428,7 +325,6 @@ jobs:
       - run: jbang build .jbang/JabSrvLauncher.java
 
   codecoverage:
-    needs: [cache]
     if: false
     name: Code coverage
     runs-on: ubuntu-latest
@@ -444,15 +340,6 @@ jobs:
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Download cache-build
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-build
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - name: Check secrets presence
         id: checksecrets
         if: github.ref == 'refs/heads/main'
@@ -479,6 +366,8 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -497,15 +386,9 @@ jobs:
           CODACY_PROJECT_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
 
   requirements_coverage:
-    needs: [cache]
     name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
-      - name: Download cache-gradle-jbang
-        uses: actions/download-artifact@v4
-        with:
-          name: cache-gradle-jbang
-          path: ~/.
       - uses: actions/checkout@v4
         with:
           show-progress: 'false'
@@ -514,6 +397,8 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew traceRequirements
       - if: always()
         run: cat build/reports/tracing.txt
