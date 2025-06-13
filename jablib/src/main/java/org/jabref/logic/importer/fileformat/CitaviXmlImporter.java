@@ -674,6 +674,20 @@ public class CitaviXmlImporter extends Importer implements Parser {
         }
     }
 
+    /**
+     * PageRange and PageCount tags contain text with additional markers that need to be discarded
+     * Example PageCount:
+     * <PageCount>
+     * <c>113</c> <in>true</in> <os>113</os> <ps>113</ps>
+     * </PageCount>
+     * <p>
+     * Example PageRange:
+     * <PageRange>
+     * <![CDATA[ <sp> <n>34165</n> <in>true</in> <os>34165</os> <ps>34165</ps> </sp> <ep> <n>34223</n> <in>true</in> <os>34223</os> <ps>34223</ps> </ep> <os>34165-223</os> ]]>
+     * </PageRange>
+     * Since an additional ">" character is present at the end of the contents of PageRange, code is modified to obtain contents of "os" tag for both PageRange and PageCount
+     */
+
     private String getPages(String pageRange, String pageCount) {
         String tmpStr = "";
         if ((pageCount != null) && (pageRange == null)) {
@@ -687,7 +701,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         String pages = "";
         for (int i = tmpStr.length() - 1; i >= 0; i--) {
             if (count == 2) {
-                pages = tmpStr.substring(i + 2, (tmpStr.length() - 1 - 5) + 1);
+                pages = tmpStr.substring(i + 2, (tmpStr.length() - 5));
                 break;
             } else {
                 if (tmpStr.charAt(i) == '>') {
