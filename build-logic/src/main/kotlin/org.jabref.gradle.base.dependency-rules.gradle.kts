@@ -39,6 +39,10 @@ jvmDependencyConflicts.patch {
         removeDependency("org.apache.xmlgraphics:batik-ext")
         removeDependency("org.apache.xmlgraphics:xmlgraphics-commons")
     }
+    module("org.wiremock:wiremock") {
+        // workaround for https://github.com/wiremock/wiremock/issues/2874
+        addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
+    }
 }
 
 extraJavaModuleInfo {
