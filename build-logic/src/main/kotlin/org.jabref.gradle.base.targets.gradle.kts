@@ -39,7 +39,7 @@ javaModulePackaging {
     target("windows-2022") {
         operatingSystem = OperatingSystemFamily.WINDOWS
         architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("exe")
+        packageTypes = listOf("msi")
     }
     primaryTarget(target(osTarget))
 }
