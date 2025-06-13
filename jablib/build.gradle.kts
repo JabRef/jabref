@@ -265,13 +265,6 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-xjc {
-    xsdDir.set(layout.projectDirectory.dir("src/main/xsd"))
-    xjcVersion.set("4.0.5")
-    defaultPackage.set("org.jabref.logic.importer.fileformat.citavi")
-    options.set(listOf("encoding=UTF-8"))
-}
-
 abstract class JoinNonCommentedLines : DefaultTask() {
 
     @get:InputFile
