@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.accessors.runtime.addDependencyTo
-
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")

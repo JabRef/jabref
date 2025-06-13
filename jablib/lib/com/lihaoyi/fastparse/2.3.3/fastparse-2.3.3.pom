@@ -15,5 +15,9 @@
       <artifactId>geny</artifactId>
       <version>0.6.10</version>
     </dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+    </dependency>
   </dependencies>
 </project>
