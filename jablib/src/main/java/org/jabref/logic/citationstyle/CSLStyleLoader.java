@@ -12,6 +12,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +22,8 @@ import org.slf4j.LoggerFactory;
 public class CSLStyleLoader {
     public static final String DEFAULT_STYLE = "ieee.csl";
 
-    private static final String STYLES_ROOT = "/csl-styles";
-    private static final String CATALOG_PATH = "/citation-style-catalog.json";
+    private static final String STYLES_ROOT = "csl-styles";
+    private static final String CATALOG_PATH = "citation-style-catalog.json";
     private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
     private static final List<CitationStyle> EXTERNAL_STYLES = new ArrayList<>();
 
@@ -30,8 +31,8 @@ public class CSLStyleLoader {
 
     private final OpenOfficePreferences openOfficePreferences;
 
-    public CSLStyleLoader(OpenOfficePreferences openOfficePreferences) {
-        this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
+    public CSLStyleLoader(@NonNull OpenOfficePreferences openOfficePreferences) {
+        this.openOfficePreferences = openOfficePreferences;
         loadExternalStyles();
     }
 
@@ -61,7 +62,7 @@ public class CSLStyleLoader {
     public static void loadInternalStyles() {
         INTERNAL_STYLES.clear();
 
-        try (InputStream is = CSLStyleLoader.class.getResourceAsStream(CATALOG_PATH)) {
+        try (InputStream is = CSLStyleLoader.class.getClassLoader().getResourceAsStream(CATALOG_PATH)) {
             if (is == null) {
                 LOGGER.error("Could not find citation style catalog");
                 return;
@@ -82,7 +83,7 @@ public class CSLStyleLoader {
                     boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
 
                     // We use these metadata and just load the content instead of re-parsing for them
-                    try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
+                    try (InputStream styleStream = CSLStyleLoader.class.getClassLoader().getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
                             CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography, usesHangingIndent, source, true);

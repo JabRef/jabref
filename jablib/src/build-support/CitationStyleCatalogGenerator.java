@@ -83,7 +83,9 @@ public class CitationStyleCatalogGenerator {
         List<Map<String, Object>> styleInfoList = styles.stream()
                                                         .map(style -> {
                                                             Map<String, Object> info = new HashMap<>();
-                                                            info.put("path", style.getFilePath());
+                                                            Path stylePath = Path.of(style.getFilePath());
+                                                            Path relativePath = STYLES_ROOT.toAbsolutePath().relativize(stylePath.toAbsolutePath());
+                                                            info.put("path", relativePath.toString());
                                                             info.put("title", style.getTitle());
                                                             info.put("isNumeric", style.isNumericStyle());
                                                             info.put("hasBibliography", style.hasBibliography());
