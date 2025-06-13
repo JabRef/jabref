@@ -17,13 +17,12 @@ jobs:
           pr-opened-msg: |
             ### Hey @{fc-author}!
 
-            Thank you for taking the time to contribute to JabRef. Your help is truly appreciated :heart:.
+            Thank you for contributing to JabRef! Your help is truly appreciated :heart:.
 
-            We have automatic checks in place.
-            Futhermore, we use [TragBot](https://usetrag.com/) with custom rules to enable you a more detailed feedback.
-            Sometimes, TragBot does not perform well.
-            In the "Files" tab, you can go through its comments and just click on "Resolve conversation" if the comment absolutely doesn't make sense.
+            We have automatic checks in place, based on which you will soon get automated feedback if any of them are failing.
+            We also use [TragBot](https://usetrag.com/) with custom rules that scans your changes and provides some preliminary comments, before a maintainer takes a look.
+            TragBot is still learning, and may not always be accurate.
+            In the "Files changed" tab, you can go through its comments and just click on "Resolve conversation" if you are sure that it is incorrect, or comment on the conversation if you are doubtful.
 
-            Please re-check our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) in case of any doubts.
+            Please re-check our [contribution guide](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md) in case of any other doubts related to our contribution workflow.
 
-            Don't forget to star :star: the repo.
