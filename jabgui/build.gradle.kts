@@ -106,17 +106,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
 
-    testImplementation("org.wiremock:wiremock:3.13.0")
-    // Required by Wiremock - and our patching of Wiremock
-    testImplementation("com.github.jknack:handlebars:4.3.1") {
-        exclude(group = "org.mozilla", module = "rhino")
-    }
-    testImplementation("com.github.jknack:handlebars-helpers:4.3.1") {
-        exclude(group = "org.mozilla", module = "rhino")
-        exclude(group = "org.apache.commons", module = "commons-lang3")
-    }
-    testImplementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
-    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
+    testImplementation("org.wiremock:wiremock")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
 }
