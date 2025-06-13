@@ -133,6 +133,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
             failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
                     "Could not extract Metadata from: %0",
                     String.join(", ", viewModel.failedSuppliersProperty())));
+            // Closes the dialog if the there is only one active column.
             active_columns = viewModel.entriesProperty().get().size() - viewModel.failedSuppliersProperty().get().size();
             if (active_columns < ACTIVE_COLUMNS_MINIMUM) {
                 close();
