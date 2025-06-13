@@ -140,7 +140,7 @@ jobs:
             displayName: linux
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distribution/jabkit
-            suffix: ''
+            suffix: '_amd64'
           - os: ubuntu-22.04-arm
             displayName: linux-arm
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/distribution/JabRef
@@ -361,12 +361,12 @@ jobs:
         shell: bash
         run: |
           cd jabgui/build/distribution
-          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
+          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
           zstd -d < control.tar.zst | xz > control.tar.xz
           zstd -d < data.tar.zst | xz > data.tar.xz
-          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
+          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
+          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
 
       - name: Build JabKit
         shell: bash
