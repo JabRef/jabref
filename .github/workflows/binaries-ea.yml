@@ -176,13 +176,13 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         run: |
           sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
           cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (macOS)
         if: ${{ startsWith(matrix.os, 'macos') }}
         run: |
           sed -i '.bak' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i '.bak' "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i '.bak' "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
           cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
 
       # region setup-JDK
