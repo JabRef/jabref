@@ -24,6 +24,9 @@ if (project.findProperty("tagbuild")?.toString() != "true") {
 configurations.antlr {
     extendsFrom(configurations.internal.get())
 }
+tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach {
+    dependsOn(tasks.withType<AntlrTask>())
+}
 
 dependencies {
     implementation("org.openjfx:javafx-base")

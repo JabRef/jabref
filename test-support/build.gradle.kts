@@ -1,8 +1,7 @@
 plugins {
     id("org.jabref.gradle.module")
+    id("java-library")
 }
-
-val javafxVersion = "24.0.1"
 
 dependencies {
     implementation(project(":jablib"))
