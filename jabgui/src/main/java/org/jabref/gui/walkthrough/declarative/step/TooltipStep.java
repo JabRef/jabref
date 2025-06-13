@@ -108,7 +108,7 @@ public record TooltipStep(
         }
 
         public Builder highlight(@NonNull HighlightEffect effect) {
-            this.highlight = Optional.of(MultiWindowHighlight.single(new WindowEffect(activeWindowResolver.orElse(() -> Optional.empty())::resolve, effect, Optional.empty())));
+            this.highlight = Optional.of(MultiWindowHighlight.single(new WindowEffect(activeWindowResolver.orElse(Optional::empty), effect, Optional.empty())));
             return this;
         }
 

@@ -91,7 +91,7 @@ public interface NavigationPredicate {
     }
 
     static NavigationPredicate auto() {
-        return (targetNode, onNavigate) -> {
+        return (_, onNavigate) -> {
             onNavigate.run();
             return () -> {
             };
