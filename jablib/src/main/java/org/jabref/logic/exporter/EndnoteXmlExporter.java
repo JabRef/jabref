@@ -94,7 +94,7 @@ public class EndnoteXmlExporter extends Exporter {
 
     private final DocumentBuilderFactory documentBuilderFactory;
 
-    private record EndNoteType(String name, Integer number) {
+    private record EndNoteType(String name, int number) {
     }
 
     private final BibEntryPreferences bibEntryPreferences;
@@ -261,7 +261,7 @@ public class EndnoteXmlExporter extends Exporter {
         EndNoteType endNoteType = ENTRY_TYPE_MAPPING.getOrDefault(entryType, DEFAULT_TYPE);
         Element refTypeElement = document.createElement("ref-type");
         refTypeElement.setAttribute("name", endNoteType.name());
-        refTypeElement.setTextContent(endNoteType.number().toString());
+        refTypeElement.setTextContent(String.valueOf(endNoteType.number()));
         recordElement.appendChild(refTypeElement);
     }
 
