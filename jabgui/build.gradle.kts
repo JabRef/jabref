@@ -176,13 +176,9 @@ tasks.register<Delete>("deleteInstallerTemp") {
 }
 
 jlink {
-    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
-    addExtraDependencies(
-        "javafx"
-    )
-
     // We keep debug statements - otherwise "--strip-debug" would be included
     addOptions(
+        "--ignore-signing-information",
         "--compress",
         "zip-6",
         "--no-header-files",
@@ -207,84 +203,6 @@ jlink {
 
             "--enable-native-access=org.jabref.merged.module"
         )
-    }
-
-    // TODO: Remove as soon as dependencies are fixed (upstream)
-    forceMerge(
-        "controlsfx",
-        "bcprov",
-        "jaxb",
-        "istack",
-        "stax"
-    )
-
-    mergedModule {
-        requires("com.google.gson")
-        requires("com.fasterxml.jackson.annotation")
-        requires("com.fasterxml.jackson.databind")
-        requires("com.fasterxml.jackson.core")
-        requires("com.fasterxml.jackson.datatype.jdk8")
-        requires("jakarta.xml.bind")
-        requires("java.compiler")
-        requires("java.datatransfer")
-        requires("java.desktop")
-        requires("java.logging")
-        requires("java.management")
-        requires("java.naming")
-        requires("java.net.http")
-        requires("java.rmi")
-        requires("java.scripting")
-        requires("java.security.jgss")
-        requires("java.security.sasl")
-        requires("java.sql")
-        requires("java.sql.rowset")
-        requires("java.transaction.xa")
-        requires("java.xml")
-        requires("javafx.base")
-        requires("javafx.controls")
-        requires("javafx.fxml")
-        requires("javafx.graphics")
-        requires("javafx.media")
-        requires("javafx.swing")
-        requires("jdk.security.jgss")
-        requires("jdk.unsupported")
-        requires("jdk.unsupported.desktop")
-        requires("jdk.xml.dom")
-        requires("org.apache.commons.lang3")
-        requires("org.apache.commons.logging")
-        requires("org.apache.commons.text")
-        requires("org.apache.commons.codec")
-        requires("org.apache.commons.io")
-        requires("org.apache.commons.compress")
-        requires("org.freedesktop.dbus")
-        requires("org.jsoup")
-        requires("org.slf4j")
-        requires("org.tukaani.xz");
-
-        uses("ai.djl.engine.EngineProvider")
-        uses("ai.djl.repository.RepositoryFactory")
-        uses("ai.djl.repository.zoo.ZooProvider")
-        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
-        uses("kong.unirest.core.json.JsonEngine")
-        uses("org.eclipse.jgit.lib.Signer")
-        uses("org.eclipse.jgit.transport.SshSessionFactory")
-        uses("org.postgresql.shaded.com.ongres.stringprep.Profile")
-
-        provides("java.sql.Driver").with(
-            "org.postgresql.Driver")
-        provides("java.security.Provider").with(
-            "org.bouncycastle.jce.provider.BouncyCastleProvider",
-            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
-        provides("kong.unirest.core.json.JsonEngine").with(
-            "kong.unirest.modules.gson.GsonEngine")
-        provides("ai.djl.repository.zoo.ZooProvider").with(
-            "ai.djl.engine.rust.zoo.RsZooProvider",
-            "ai.djl.huggingface.zoo.HfZooProvider",
-            "ai.djl.pytorch.zoo.PtZooProvider",
-            "ai.djl.repository.zoo.DefaultZooProvider")
-        provides("ai.djl.engine.EngineProvider").with(
-            "ai.djl.engine.rust.RsEngineProvider",
-            "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
     jpackage {
