@@ -43,6 +43,7 @@ public class EntryEditorPreferences {
     private final BooleanProperty shouldShowAiSummaryTab;
     private final BooleanProperty shouldShowAiChatTab;
     private final BooleanProperty shouldShowLatexCitationsTab;
+    private final BooleanProperty shouldShowFileAnnotationsTab;
     private final BooleanProperty showSourceTabByDefault;
     private final BooleanProperty enableValidation;
     private final BooleanProperty allowIntegerEditionBibtex;
@@ -59,6 +60,7 @@ public class EntryEditorPreferences {
                                   boolean shouldShowAiSummaryTab,
                                   boolean shouldShowAiChatTab,
                                   boolean shouldShowLatexCitationsTab,
+                                  boolean shouldShowFileAnnotationsTab,
                                   boolean showSourceTabByDefault,
                                   boolean enableValidation,
                                   boolean allowIntegerEditionBibtex,
@@ -75,6 +77,7 @@ public class EntryEditorPreferences {
         this.shouldShowAiSummaryTab = new SimpleBooleanProperty(shouldShowAiSummaryTab);
         this.shouldShowAiChatTab = new SimpleBooleanProperty(shouldShowAiChatTab);
         this.shouldShowLatexCitationsTab = new SimpleBooleanProperty(shouldShowLatexCitationsTab);
+        this.shouldShowFileAnnotationsTab = new SimpleBooleanProperty(shouldShowFileAnnotationsTab);
         this.showSourceTabByDefault = new SimpleBooleanProperty(showSourceTabByDefault);
         this.enableValidation = new SimpleBooleanProperty(enableValidation);
         this.allowIntegerEditionBibtex = new SimpleBooleanProperty(allowIntegerEditionBibtex);
@@ -159,6 +162,18 @@ public class EntryEditorPreferences {
 
     public void setShouldShowLatexCitationsTab(boolean shouldShowLatexCitationsTab) {
         this.shouldShowLatexCitationsTab.set(shouldShowLatexCitationsTab);
+    }
+
+    public boolean shouldShowFileAnnotationsTab() {
+        return shouldShowFileAnnotationsTab.get();
+    }
+
+    public BooleanProperty shouldShowFileAnnotationsTabProperty() {
+        return shouldShowFileAnnotationsTab;
+    }
+
+    public void setShouldShowFileAnnotationsTab(boolean shouldShowFileAnnotationsTab) {
+        this.shouldShowFileAnnotationsTab.set(shouldShowFileAnnotationsTab);
     }
 
     public boolean showSourceTabByDefault() {

@@ -25,7 +25,7 @@ dependencies.constraints {
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
-    api("com.dlsc.gemsfx:gemsfx:3.1.1")
+    api("com.dlsc.gemsfx:gemsfx:3.1.3")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
@@ -94,7 +94,7 @@ dependencies.constraints {
     api("org.apache.velocity:velocity-engine-core:2.4.1")
     api("org.bouncycastle:bcprov-jdk18on:1.80")
     api("org.controlsfx:controlsfx:11.2.2")
-    api("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
+    api("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
     api("org.fxmisc.richtext:richtextfx:0.11.5")
     api("org.glassfish.grizzly:grizzly-framework:4.0.2")
@@ -133,7 +133,7 @@ dependencies.constraints {
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
     api("org.wiremock:wiremock-standalone:3.12.1")
-    api("org.xmlunit:xmlunit-core:2.10.1")
+    api("org.xmlunit:xmlunit-core:2.10.2")
     api("org.xmlunit:xmlunit-matchers:2.10.2")
     api("org.yaml:snakeyaml:2.4")
     api("tech.units:indriya:2.2.3")
