@@ -3,10 +3,11 @@ package org.jabref.cli;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.cli.converter.StringPathConverter;
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
@@ -34,8 +35,8 @@ class CheckConsistency implements Runnable {
     @Mixin
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
-    @Option(names = {"--input"}, converter = StringPathConverter.class, description = "Input BibTeX file", required = true)
-    private String inputFile;
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "Input BibTeX file", required = true)
+    private Path inputFile;
 
     @Option(names = {"--output-format"}, description = "Output format: txt or csv", defaultValue = "txt")
     private String outputFormat;
