@@ -1,7 +1,6 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -133,7 +132,7 @@ public class AutoSetFileLinksUtil {
         return linkedFiles;
     }
 
-    private List<Path> findByBrokenLinkName(BibEntry entry) {
+    private List<Path> findByBrokenLinkName(BibEntry entry) throws IOException {
         List<Path> matches = new ArrayList<>();
 
         for (LinkedFile brokenLink : entry.getFiles()) {
@@ -149,12 +148,10 @@ public class AutoSetFileLinksUtil {
                         .filter(p -> FileUtil.getBaseName(p).equalsIgnoreCase(wantedBase))
                         .findFirst()
                         .ifPresent(matches::add);
-                } catch (IOException e) {
-                    LOGGER.error("Error during fallback walk", e);
-                    throw new UncheckedIOException(e);
                 }
             }
         }
+
         return matches;
     }
 }
