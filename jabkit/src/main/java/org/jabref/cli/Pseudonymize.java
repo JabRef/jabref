@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.cli.converter.CygWinPathConverter;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pseudonymization.Pseudonymization;
@@ -34,11 +35,11 @@ public class Pseudonymize implements Runnable {
     private ArgumentProcessor.SharedOptions sharedOptions = new ArgumentProcessor.SharedOptions();
 
     @ADR(45)
-    @Option(names = {"--input"}, description = "BibTeX file to be pseudonymized", required = true)
-    private String inputFile;
+    @Option(names = {"--input"}, converter = CygWinPathConverter.class, description = "BibTeX file to be pseudonymized", required = true)
+    private Path inputPath;
 
-    @Option(names = {"--output"}, description = "Output pseudo-bib file")
-    private String outputFile;
+    @Option(names = {"--output"}, converter = CygWinPathConverter.class, description = "Output pseudo-bib file")
+    private Path outputFile;
 
     @Option(names = {"--key"}, description = "Output pseudo-keys file")
     private String keyFile;
@@ -48,24 +49,23 @@ public class Pseudonymize implements Runnable {
 
     @Override
     public void run() {
-        Path inputPath = Path.of(inputFile);
-        String fileName = FileUtil.getBaseName(inputFile);
-        Path pseudoBibPath = resolveOutputPath(outputFile, inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
+        String fileName = FileUtil.getBaseName(inputPath);
+        Path pseudoBibPath = resolveOutputPath(outputFile.toString(), inputPath, fileName + PSEUDO_SUFFIX + BIB_EXTENSION);
         Path pseudoKeyPath = resolveOutputPath(keyFile, inputPath, fileName + PSEUDO_SUFFIX + CSV_EXTENSION);
 
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
-                inputFile,
+                inputPath,
                 "bibtex",
                 argumentProcessor.cliPreferences,
                 sharedOptions.porcelain);
 
         if (parserResult.isEmpty()) {
-            System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
+            System.out.println(Localization.lang("Unable to open file '%0'.", inputPath));
             return;
         }
 
         if (parserResult.get().isInvalid()) {
-            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
+            System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputPath));
             return;
         }
 
