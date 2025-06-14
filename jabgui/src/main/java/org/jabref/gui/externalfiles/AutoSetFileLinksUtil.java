@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.stream.Stream;
 
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
@@ -98,29 +99,29 @@ public class AutoSetFileLinksUtil {
 
         LOGGER.debug("Searching for extensions {} in directories {}", extensions, directories);
 
-        // Run the search operation
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
-        List<Path> result = fileFinder.findAssociatedFiles(entry, directories, extensions);
+        List<Path> result = new ArrayList<>(fileFinder.findAssociatedFiles(entry, directories, extensions));
 
-        // Collect the found files that are not yet linked
+        result.addAll(findByBrokenLinkName(entry));
+
         for (Path foundFile : result) {
             boolean fileAlreadyLinked = entry.getFiles().stream()
                                              .map(file -> file.findIn(directories))
-                                             .anyMatch(file -> {
+                                             .anyMatch(opt -> opt.filter(p -> {
                                                  try {
-                                                     return file.isPresent() && Files.isSameFile(file.get(), foundFile);
+                                                     return Files.isSameFile(p, foundFile);
                                                  } catch (IOException e) {
                                                      LOGGER.error("Problem with isSameFile", e);
+                                                     return false;
                                                  }
-                                                 return false;
-                                             });
+                                             }).isPresent());
 
             if (!fileAlreadyLinked) {
                 Optional<ExternalFileType> type = FileUtil.getFileExtension(foundFile)
                                                             .map(extension -> ExternalFileTypes.getExternalFileTypeByExt(extension, externalApplicationsPreferences))
                                                             .orElse(Optional.of(new UnknownExternalFileType("")));
 
-                String strType = type.isPresent() ? type.get().getName() : "";
+                String strType = type.map(ExternalFileType::getName).orElse("");
                 Path relativeFilePath = FileUtil.relativize(foundFile, directories);
                 LinkedFile linkedFile = new LinkedFile("", relativeFilePath, strType);
                 linkedFiles.add(linkedFile);
@@ -129,5 +130,29 @@ public class AutoSetFileLinksUtil {
         }
 
         return linkedFiles;
+    }
+
+    private List<Path> findByBrokenLinkName(BibEntry entry) {
+        List<Path> matches = new ArrayList<>();
+
+        for (LinkedFile brokenLink : entry.getFiles()) {
+            if (brokenLink.findIn(directories).isPresent()) {
+                continue;
+            }
+
+            String wantedBase = FileUtil.getBaseName(brokenLink.getLink());
+
+            for (Path dir : directories) {
+                try (Stream<Path> walk = Files.walk(dir)) {
+                    walk.filter(p -> !Files.isDirectory(p))
+                        .filter(p -> FileUtil.getBaseName(p).equalsIgnoreCase(wantedBase))
+                        .findFirst()
+                        .ifPresent(matches::add);
+                } catch (IOException e) {
+                    LOGGER.error("Error during fallback walk", e);
+                }
+            }
+        }
+        return matches;
     }
 }
