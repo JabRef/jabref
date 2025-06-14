@@ -2519,3 +2519,83 @@ journalInfo .grid-cell-b {
     -fx-font-size: 1.25em;
     -fx-border-color: transparent;
 }
+
+/* Markdown styles */
+.markdown-textflow {
+    -fx-line-spacing: 2;
+    -fx-text-alignment: left;
+}
+
+.markdown-h1 {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h2 {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h3 {
+    -fx-font-size: 1.25em;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h4 {
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h5 {
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h6 {
+    -fx-font-size: 0.875em;
+    -fx-font-weight: bold;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-bold {
+    -fx-font-weight: bold;
+}
+
+.markdown-italic {
+    -fx-font-style: italic;
+}
+
+.markdown-code {
+    -fx-font-family: monospace;
+    -fx-fill: -jr-theme;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
+}
+
+.markdown-code-block {
+    -fx-font-family: monospace;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-list-bullet {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-list-number {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-blockquote-marker {
+    -fx-fill: transparent;
+}
+
+.markdown-blockquote {
+    -fx-fill: -fx-mid-text-color;
+    -fx-font-style: italic;
+}
