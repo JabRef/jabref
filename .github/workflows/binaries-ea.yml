@@ -184,14 +184,14 @@ jobs:
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
         run: |
-          sed -i'' -e "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i'' -e "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
           cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (macOS)
         if: ${{ startsWith(matrix.os, 'macos') }}
         run: |
-          sed -i '.bak' -e "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i '.bak' -e "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i '.bak' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i '.bak' "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
           cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
 
       # region setup-JDK
@@ -232,7 +232,7 @@ jobs:
           set -e
           shopt -s globstar
           for buildgradle in **/build.gradle.kts; do
-            sed -i'' -e '/val javafxVersion = ".*/val javafxVersion = "${{ env.javafx }}"' $buildgradle
+            sed -i '/val javafxVersion = ".*/val javafxVersion = "${{ env.javafx }}"' $buildgradle
             echo "=========="
             echo $buidgradle
             echo "=========="
@@ -249,7 +249,7 @@ jobs:
             echo "=========="
             cat $buildgradle
           done
-
+   
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
