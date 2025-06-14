@@ -100,10 +100,7 @@ public class BibliographyConsistencyCheck {
 
             List<BibEntry> differingEntries = entryTypeToEntriesMap
                     .get(entryType).stream()
-                    .filter(entry -> {
-                        Set<Field> checkedFields = filterExcludedFields(entry.getFields());
-                        return !checkedFields.equals(commonFields);
-                    })
+                    .filter(entry -> !filterExcludedFields(entry.getFields()).equals(commonFields))
                     .sorted(comparatorStack)
                     .toList();
 
@@ -117,19 +114,17 @@ public class BibliographyConsistencyCheck {
         entries.forEach(entry -> {
                       EntryType entryType = entry.getType();
 
-                      Set<Field> filteredFields = filterExcludedFields(entry.getFields());
+            entryTypeToFieldsInAnyEntryMap
+                    .computeIfAbsent(entryType, k -> new HashSet<>())
+                    .addAll(filterExcludedFields(entry.getFields()));
 
-                      Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap
-                                       .computeIfAbsent(entryType, k -> new HashSet<>());
-                      fieldsInAnyEntry.addAll(filteredFields);
+            entryTypeToFieldsInAllEntriesMap
+                    .computeIfAbsent(entryType, k -> new HashSet<>(filterExcludedFields(entry.getFields())))
+                    .retainAll(filterExcludedFields(entry.getFields()));
 
-                      Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap
-                                        .computeIfAbsent(entryType, k -> new HashSet<>(filteredFields));
-                      fieldsInAllEntries.retainAll(filteredFields);
-
-                      Set<BibEntry> entriesOfType = entryTypeToEntriesMap
-                                        .computeIfAbsent(entryType, k -> new HashSet<>());
-                      entriesOfType.add(entry);
+            entryTypeToEntriesMap
+                    .computeIfAbsent(entryType, k -> new HashSet<>())
+                    .add(entry);
                     });
     }
 }
