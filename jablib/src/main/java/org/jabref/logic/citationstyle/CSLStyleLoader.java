@@ -110,12 +110,8 @@ public class CSLStyleLoader {
 
         List<String> stylePaths = openOfficePreferences.getExternalCslStyles();
         for (String stylePath : stylePaths) {
-            try {
-                Optional<CitationStyle> style = CSLStyleUtils.createCitationStyleFromFile(stylePath);
-                style.ifPresent(EXTERNAL_STYLES::add);
-            } catch (Exception e) {
-                LOGGER.info("Problem reading external style file {}", stylePath, e);
-            }
+            Optional<CitationStyle> style = CSLStyleUtils.createCitationStyleFromFile(stylePath);
+            style.ifPresent(EXTERNAL_STYLES::add);
         }
     }
 

@@ -88,7 +88,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move issue to "Free to take" in "Good First Issues"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -100,7 +100,7 @@ jobs:
           skip-if-not-in-project: true
       - name: Move issue to "Free to take" in "Candidates for University Projects"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"

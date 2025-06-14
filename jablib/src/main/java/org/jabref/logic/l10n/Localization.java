@@ -52,7 +52,7 @@ public class Localization {
             System.err.println("Messages are not initialized before accessing key: " + key);
             setLanguage(Language.ENGLISH);
         }
-        var stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
+        String[] stringParams = Arrays.stream(params).map(Object::toString).toArray(String[]::new);
         return lookup(localizedMessages, key, stringParams);
     }
 

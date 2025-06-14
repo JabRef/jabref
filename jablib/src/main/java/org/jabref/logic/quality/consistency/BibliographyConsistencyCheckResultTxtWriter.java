@@ -5,15 +5,18 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck.EntryTypeResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.types.EntryType;
 
 /**
  * Outputs the findings as plain text.
@@ -79,9 +82,9 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
         int entryTypeWidth = "entry type".length();
         int citationKeyWidth = "citation key".length();
 
-        for (var keysAndValue : result.entryTypeToResultMap().entrySet()) {
+        for (Map.Entry<EntryType, EntryTypeResult> keysAndValue : result.entryTypeToResultMap().entrySet()) {
             entryTypeWidth = Math.max(entryTypeWidth, keysAndValue.getKey().getDisplayName().length());
-            for (var entry : keysAndValue.getValue().sortedEntries()) {
+            for (BibEntry entry : keysAndValue.getValue().sortedEntries()) {
                 citationKeyWidth = Math.max(citationKeyWidth, entry.getCitationKey().orElse("").length());
             }
         }

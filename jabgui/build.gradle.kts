@@ -1,14 +1,9 @@
-
 import org.gradle.internal.os.OperatingSystem
-import org.javamodularity.moduleplugin.extensions.CompileModuleOptions
-import org.javamodularity.moduleplugin.extensions.RunModuleOptions
 
 plugins {
     id("buildlogic.java-common-conventions")
 
     application
-
-    id("org.openjfx.javafxplugin") version("0.1.0")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
@@ -22,8 +17,18 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 val luceneVersion = "10.2.1"
 val pdfbox = "3.0.5"
 
+val javafxVersion = "24.0.1"
+
 dependencies {
     implementation(project(":jablib"))
+
+    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-controls:$javafxVersion")
+    implementation("org.openjfx:javafx-fxml:$javafxVersion")
+    // implementation("org.openjfx:javafx-graphics:24.0.1")
+    implementation("org.openjfx:javafx-graphics:$javafxVersion")
+    implementation("org.openjfx:javafx-swing:$javafxVersion")
+    implementation("org.openjfx:javafx-web:$javafxVersion")
 
     implementation("org.slf4j:slf4j-api:2.0.17")
     implementation("org.tinylog:tinylog-api:2.7.0")
@@ -43,7 +48,7 @@ dependencies {
     implementation("de.saxsys:mvvmfx:1.8.0")
     implementation("org.fxmisc.flowless:flowless:0.7.4")
     implementation("org.fxmisc.richtext:richtextfx:0.11.5")
-    implementation("com.dlsc.gemsfx:gemsfx:2.104.0") {
+    implementation("com.dlsc.gemsfx:gemsfx:3.1.3") {
         exclude(module = "javax.inject") // Split package, use only jakarta.inject
         exclude(module = "commons-lang3")
         exclude(group = "org.apache.commons.validator")
@@ -53,6 +58,10 @@ dependencies {
         exclude(group = "org.openjfx")
         exclude(group = "org.apache.logging.log4j")
         exclude(group = "tech.units")
+    }
+    implementation("com.dlsc.pdfviewfx:pdfviewfx:3.1.1") {
+        exclude(group = "org.openjfx")
+        exclude(module = "commons-lang3")
     }
 
     // Required by gemsfx
@@ -80,7 +89,7 @@ dependencies {
 
     implementation("com.google.guava:guava:33.4.8-jre")
 
-    implementation("dev.langchain4j:langchain4j:1.0.0")
+    implementation("dev.langchain4j:langchain4j:1.0.1")
 
     implementation("io.github.java-diff-utils:java-diff-utils:4.15")
 
@@ -95,11 +104,11 @@ dependencies {
     // implementation("net.java.dev.jna:jna:5.16.0")
     implementation("net.java.dev.jna:jna-platform:5.17.0")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.2.1.202505142326-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
 
     implementation("com.konghq:unirest-java-core:4.4.7")
 
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.4.4")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
 
     implementation("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
 
@@ -123,21 +132,24 @@ dependencies {
     testImplementation("org.testfx:testfx-core:4.0.16-alpha")
     testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
 
-    testImplementation("org.mockito:mockito-core:5.17.0") {
+    testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.5")
 
-    // recommended by https://github.com/wiremock/wiremock/issues/2149#issuecomment-1835775954
-    testImplementation("org.wiremock:wiremock-standalone:3.12.1")
+    testImplementation("org.wiremock:wiremock:3.13.0")
+    // Required by Wiremock - and our patching of Wiremock
+    testImplementation("com.github.jknack:handlebars:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+    }
+    testImplementation("com.github.jknack:handlebars-helpers:4.3.1") {
+        exclude(group = "org.mozilla", module = "rhino")
+        exclude(group = "org.apache.commons", module = "commons-lang3")
+    }
+    testImplementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
-}
-
-javafx {
-    version = "24"
-    // javafx.swing required by com.dlsc.gemsfx
-    modules = listOf("javafx.base", "javafx.graphics", "javafx.fxml", "javafx.web", "javafx.swing")
 }
 
 application {
@@ -147,21 +159,15 @@ application {
     applicationDefaultJvmArgs = listOf(
         // On a change here, also adapt
         //   1. "run > moduleOptions"
-        //   2. "deployment.yml" (macOS part)
-        //   3. "deployment-arm64.yml"
+        //   2. "binaries.yml" (macOS part)
 
         // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
 
-        // Fix for https://github.com/JabRef/jabref/issues/11188
-        "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
-        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+        // Enable JEP 450: Compact Object Headers
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
-        // Fix for https://github.com/JabRef/jabref/issues/11198
-        "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
-        "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
-        "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-        // fix for https://github.com/JabRef/jabref/issues/11426
-        "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
+        "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
 
         // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
         "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
@@ -174,13 +180,9 @@ application {
         "--add-opens=javafx.base/javafx.collections=org.jabref",
         "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
 
-        "--enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
     )
 }
-
-// Workaround for https://github.com/openjfx/javafx-gradle-plugin/issues/89
-// See also https://github.com/java9-modularity/gradle-modules-plugin/issues/165
-modularity.disableEffectiveArgumentsAdjustment()
 
 /*
 jacoco {
@@ -195,65 +197,10 @@ tasks.named<JavaExec>("run") {
     doFirst {
         // Clear the default JVM arguments to avoid warnings
         // application.applicationDefaultJvmArgs = emptyList()
-        application.applicationDefaultJvmArgs = listOf("--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core")
-    }
-
-    extensions.configure<RunModuleOptions>("moduleOptions") {
-        // On a change here, also adapt "application > applicationDefaultJvmArgs"
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal API
-                "javafx.base/com.sun.javafx.event" to "org.jabref.merged.module",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-
-                // ControlsFX compatibility
-                // We need to restate the ControlsFX exports, because we get following error otherwise:
-                //   java.lang.IllegalAccessError:
-                //     class org.controlsfx.control.textfield.AutoCompletionBinding (in module org.controlsfx.controls)
-                //     cannot access class com.sun.javafx.event.EventHandlerManager (in module javafx.base) because
-                //     module javafx.base does not export com.sun.javafx.event to module org.controlsfx.controls
-                // Taken from here: https://github.com/controlsfx/controlsfx/blob/9.0.0/build.gradle#L1
-                "javafx.graphics/com.sun.javafx.scene" to "org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.scene.traversal" to "org.controlsfx.controls",
-                "javafx.graphics/com.sun.javafx.css" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control.behavior" to "org.controlsfx.controls",
-                "javafx.controls/com.sun.javafx.scene.control.inputmap" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.event" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.collections" to "org.controlsfx.controls",
-                "javafx.base/com.sun.javafx.runtime" to "org.controlsfx.controls",
-                "javafx.web/com.sun.webkit" to "org.controlsfx.controls"
+        application.applicationDefaultJvmArgs =
+            listOf(
+                "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
             )
-        )
-
-        addOpens.putAll(
-            mapOf(
-                "javafx.controls/javafx.scene.control" to "org.jabref",
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref",
-                "org.controlsfx.controls/org.controlsfx.control.textfield" to "org.jabref",
-                "javafx.controls/javafx.scene.control.skin" to "org.controlsfx.controls",
-                "javafx.graphics/javafx.scene" to "org.controlsfx.controls",
-                "javafx.base/javafx.collections" to "org.jabref",
-                "javafx.base/javafx.collections.transformation" to "org.jabref"
-            )
-        )
-
-        addModules.add("jdk.incubator.vector")
-
-        createCommandLineArgumentFile = true
-    }
-}
-
-tasks.compileJava {
-    extensions.configure<CompileModuleOptions> {
-        addExports.putAll(
-            mapOf(
-                // TODO: Remove access to internal api
-                "javafx.controls/com.sun.javafx.scene.control" to "org.jabref",
-                "org.controlsfx.controls/impl.org.controlsfx.skin" to "org.jabref"
-            )
-        )
     }
 }
 
@@ -281,12 +228,26 @@ jlink {
         "zip-6",
         "--no-header-files",
         "--no-man-pages",
-        "--bind-services"
+        "--bind-services",
+        "--add-modules", "jdk.incubator.vector"
     )
 
     launcher {
-        name =
-            "JabRef"
+        name = "JabRef"
+        jvmArgs = listOf(
+            // Fix for https://github.com/JabRef/jabref/issues/11188
+            "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
+            "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+
+            // Fix for https://github.com/JabRef/jabref/issues/11198
+            "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
+            "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
+            "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+            // fix for https://github.com/JabRef/jabref/issues/11426
+            "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
+
+            "--enable-native-access=org.jabref.merged.module"
+        )
     }
 
     // TODO: Remove as soon as dependencies are fixed (upstream)
@@ -483,4 +444,22 @@ if (OperatingSystem.current().isWindows) {
             }
         }
     }
+}
+
+javaModuleTesting.whitebox(testing.suites["test"]) {
+    requires.add("org.jabref.testsupport")
+
+    requires.add("org.junit.jupiter.api")
+    requires.add("org.junit.jupiter.params")
+    requires.add("org.mockito")
+    requires.add("wiremock")
+    requires.add("wiremock.slf4j.spi.shim")
+}
+
+tasks.test {
+    jvmArgs = listOf(
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
+        "--add-reads", "org.mockito=java.prefs",
+        "--add-reads", "org.jabref=wiremock"
+    )
 }

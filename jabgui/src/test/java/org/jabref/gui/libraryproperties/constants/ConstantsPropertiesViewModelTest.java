@@ -2,6 +2,7 @@ package org.jabref.gui.libraryproperties.constants;
 
 import java.util.List;
 
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.DialogService;
@@ -17,8 +18,8 @@ import static org.mockito.Mockito.mock;
 
 class ConstantsPropertiesViewModelTest {
 
-    private DialogService service = mock(DialogService.class);
-    private ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+    private final DialogService service = mock(DialogService.class);
+    private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
 
     /**
      * Check that the list of strings is sorted according to their keys
@@ -53,7 +54,7 @@ class ConstantsPropertiesViewModelTest {
         List<String> expected = List.of("ICSE", "TSE");
 
         ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
-        var stringsList = model.stringsListProperty();
+        ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("TSE", "Transactions on Software Engineering"));
         stringsList.add(new ConstantsItemModel("ICSE", "International Conference on Software Engineering"));
 
@@ -74,7 +75,7 @@ class ConstantsPropertiesViewModelTest {
 
         ConstantsPropertiesViewModel model = new ConstantsPropertiesViewModel(context, service, externalApplicationsPreferences);
 
-        var stringsList = model.stringsListProperty();
+        ListProperty<ConstantsItemModel> stringsList = model.stringsListProperty();
         stringsList.add(new ConstantsItemModel("KTH", "Royal Institute of Technology"));
 
         model.storeSettings();

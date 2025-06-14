@@ -379,7 +379,7 @@ public class OpenOfficePanel {
                 }
             };
 
-            taskConnectIfInstalled.setOnSucceeded(evt -> {
+            taskConnectIfInstalled.setOnSucceeded(_ -> {
                 List<Path> installations = new ArrayList<>(taskConnectIfInstalled.getValue());
                 if (installations.isEmpty()) {
                     officeInstallation.selectInstallationPath().ifPresent(installations::add);
@@ -398,7 +398,7 @@ public class OpenOfficePanel {
     }
 
     private void connectManually() {
-        var fileDialogConfiguration = new DirectoryDialogConfiguration.Builder().withInitialDirectory(System.getProperty("user.home")).build();
+        DirectoryDialogConfiguration fileDialogConfiguration = new DirectoryDialogConfiguration.Builder().withInitialDirectory(System.getProperty("user.home")).build();
         Optional<Path> selectedPath = dialogService.showDirectorySelectionDialog(fileDialogConfiguration);
 
         DetectOpenOfficeInstallation officeInstallation = new DetectOpenOfficeInstallation(openOfficePreferences, dialogService);

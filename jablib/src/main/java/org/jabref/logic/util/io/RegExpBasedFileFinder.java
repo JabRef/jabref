@@ -1,6 +1,5 @@
 package org.jabref.logic.util.io;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.FileVisitOption;
@@ -14,7 +13,6 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.jabref.logic.citationkeypattern.BracketedPattern;
@@ -71,7 +69,7 @@ class RegExpBasedFileFinder implements FileFinder {
      * @return a String representation of a regex matching the expanded content and the expanded content cleaned for file name use
      */
     private static String toFileNameRegex(String expandedContent) {
-        var cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
+        String cleanedContent = FileNameCleaner.cleanFileName(expandedContent);
         return expandedContent.equals(cleanedContent) ? Pattern.quote(expandedContent) :
                 "(" + Pattern.quote(expandedContent) + ")|(" + Pattern.quote(cleanedContent) + ")";
     }
@@ -137,12 +135,12 @@ class RegExpBasedFileFinder implements FileFinder {
         List<Path> resultFiles = new ArrayList<>();
 
         String fileName = file;
-        Path actualDirectory;
+        Path currentDirectory;
         if (fileName.startsWith("/")) {
-            actualDirectory = Path.of(".");
+            currentDirectory = Path.of(".");
             fileName = fileName.substring(1);
         } else {
-            actualDirectory = directory;
+            currentDirectory = directory;
         }
 
         // Escape handling...
@@ -163,48 +161,57 @@ class RegExpBasedFileFinder implements FileFinder {
             String dirToProcess = fileParts[index];
 
             if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
-                actualDirectory = Path.of(dirToProcess + '/');
+                currentDirectory = Path.of(dirToProcess + '/');
                 continue;
             }
-            if (".".equals(dirToProcess)) { // Stay in current directory
-                continue;
-            }
-            if ("..".equals(dirToProcess)) {
-                actualDirectory = actualDirectory.getParent();
-                continue;
-            }
-            if ("*".equals(dirToProcess)) { // Do for all direct subdirs
-                File[] subDirs = actualDirectory.toFile().listFiles();
-                if (subDirs != null) {
+            switch (dirToProcess) {
+                case "." -> {
+                    continue;  // Stay in current directory
+                }
+                case ".." -> {
+                    currentDirectory = currentDirectory.getParent();
+                    continue;
+                }
+                case "*" -> { // for all direct subdirs
                     String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
-                    for (File subDir : subDirs) {
-                        if (subDir.isDirectory()) {
-                            resultFiles.addAll(findFile(entry, subDir.toPath(), restOfFileString, extensionRegExp));
+
+                    final Path rootDirectory = currentDirectory;
+                    try (Stream<Path> pathStream = Files.walk(currentDirectory, 1)) {
+                        List<Path> subDirs = pathStream
+                                .filter(path -> isSubDirectory(rootDirectory, path))  // We only want to transverse directories (and not the current one; this is already done below)
+                                .toList();
+
+                        for (Path subDir : subDirs) {
+                            resultFiles.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
                         }
+                    } catch (UncheckedIOException ioe) {
+                        throw ioe.getCause();
                     }
                 }
-            }
-            // Do for all direct and indirect subdirs
-            if ("**".equals(dirToProcess)) {
-                String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
+                case "**" -> { // for all direct and indirect subdirs
+                    String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);
 
-                final Path rootDirectory = actualDirectory;
-                try (Stream<Path> pathStream = Files.walk(actualDirectory)) {
-                    // We only want to transverse directory (and not the current one; this is already done below)
-                    for (Path path : pathStream.filter(element -> isSubDirectory(rootDirectory, element)).collect(Collectors.toList())) {
-                        resultFiles.addAll(findFile(entry, path, restOfFileString, extensionRegExp));
+                    final Path rootDirectory = currentDirectory;
+                    try (Stream<Path> pathStream = Files.walk(currentDirectory)) {
+                        List<Path> subDirs = pathStream
+                                .filter(path -> isSubDirectory(rootDirectory, path))  // We only want to transverse directories (and not the current one; this is already done below)
+                                .toList();
+
+                        for (Path subDir : subDirs) {
+                            resultFiles.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
+                        }
+                    } catch (UncheckedIOException ioe) {
+                        throw ioe.getCause();
                     }
-                } catch (UncheckedIOException ioe) {
-                    throw ioe.getCause();
                 }
             } // End process directory information
         }
 
         // Last step: check if the given file can be found in this directory
         Pattern toMatch = createFileNamePattern(fileParts, extensionRegExp, entry);
-        BiPredicate<Path, BasicFileAttributes> matcher = (path, attributes) -> toMatch.matcher(path.getFileName().toString()).matches();
-        try (Stream<Path> pathStream = Files.find(actualDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
-            resultFiles.addAll(pathStream.collect(Collectors.toList()));
+        BiPredicate<Path, BasicFileAttributes> matcher = (path, _) -> toMatch.matcher(path.getFileName().toString()).matches();
+        try (Stream<Path> pathStream = Files.find(currentDirectory, 1, matcher, FileVisitOption.FOLLOW_LINKS)) {
+            resultFiles.addAll(pathStream.toList());
         } catch (UncheckedIOException uncheckedIOException) {
             // Previously, an empty list were returned here on both IOException and UncheckedIOException
             throw uncheckedIOException.getCause();

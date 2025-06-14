@@ -15,6 +15,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/Pdf.java
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/PdfUpdate.java
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/Preferences.java
+//SOURCES ../jabkit/src/main/java/org/jabref/cli/Pseudonymize.java
 //SOURCES ../jabkit/src/main/java/org/jabref/cli/Search.java
 //SOURCES ../jabkit/src/main/java/org/jabref/JabKit.java
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties

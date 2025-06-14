@@ -46,7 +46,7 @@ jobs:
     outputs:
       upload-to-builds-jabref-org: ${{ steps.binary.outputs.upload-to-builds-jabref-org }}
       secretspresent: ${{ steps.binary.outputs.secretspresent }}
-      # requried to avoid obsolete builds in case of labels != "dev: binary"
+      # requried to avoid obsolete builds in case of labels != "dev: binaries"
       should-build: ${{ steps.binary.outputs.should-build }}
       should-notarize: ${{ steps.binary.outputs.should-notarize }}
     steps:
@@ -66,7 +66,7 @@ jobs:
             exit 0
           fi
 
-          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binary" ]]; then
+          if [[ "$EVENT_NAME" != "labeled" || "$LABEL_NAME" == "automerge"  || "$LABEL_NAME" == "dev: binaries" ]]; then
             echo "📦 build enabled"
             echo "should-build=true" >> "$GITHUB_OUTPUT"
           else
@@ -109,12 +109,12 @@ jobs:
 
           LABELS=$(gh api repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels --jq '.[].name')
 
-          if echo "$LABELS" | grep -q "^dev: binary$"; then
+          if echo "$LABELS" | grep -q "^dev: binaries$"; then
             echo "upload-to-builds-jabref-org=true" >> "$GITHUB_OUTPUT"
-            echo "☁️ Label 'dev: binary' found – will upload"
+            echo "☁️ Label 'dev: binaries' found – will upload"
           else
             echo "upload-to-builds-jabref-org=false" >> "$GITHUB_OUTPUT"
-            echo "🚫 Label 'dev: binary' not found – skipping upload"
+            echo "🚫 Label 'dev: binaries' not found – skipping upload"
           fi
 
   build:
@@ -360,6 +360,10 @@ jobs:
           --resource-dir buildres/mac \
           --file-associations buildres/mac/bibtexAssociations.properties \
           --jlink-options --bind-services \
+          --java-options -XX:+UnlockExperimentalVMOptions \
+          --java-options -XX:+UseCompactObjectHeaders \
+          --java-options -XX:+UseZGC --java-options -XX:+ZUncommit \
+          --java-options -XX:+UseStringDeduplication \
           --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
           --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
           --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \

@@ -39,7 +39,7 @@ public class LatexToUnicodeAdapter {
     public static Optional<String> parse(String inField) {
         Objects.requireNonNull(inField);
         String toFormat = UNDERSCORE_MATCHER.matcher(inField).replaceAll(REPLACEMENT_CHAR);
-        var parsingResult = LaTeX2Unicode.parse(toFormat);
+        Parsed<String> parsingResult = LaTeX2Unicode.parse(toFormat);
         if (parsingResult instanceof Parsed.Success) {
             String text = parsingResult.get().value();
             toFormat = Normalizer.normalize(text, Normalizer.Form.NFC);

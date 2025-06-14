@@ -1,0 +1,20 @@
+name: Sync fork with upstream
+
+on:
+  pull_request:
+    types: [ opened ]
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync-fork:
+    if: ${{ github.repository != 'JabRef/jabref' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
+    steps:
+      - uses: thiagokokada/merge-upstream@v1.0.2
+        with:
+          branch: main
