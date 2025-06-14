@@ -225,6 +225,7 @@ jobs:
 
       # region JavaFX
       - name: Download and extract JavaFX ${{ env.javafx }}
+        if: (matrix.os != 'ubuntu-22.04-arm')
         shell: bash
         run: |
           set -e
