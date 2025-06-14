@@ -93,8 +93,7 @@ class AutoSetFileLinksUtilTest {
         assertEquals(1, matches.size());
         assertEquals(
                 FileUtil.relativize(newPath, List.of(dir)),
-                Path.of(matches.get(0).getLink())
+                Path.of(matches.getFirst().getLink())
         );
     }
-
 }
