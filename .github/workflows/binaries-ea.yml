@@ -161,7 +161,7 @@ jobs:
       - name: Fetch preview of java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: supercharge/docs
+          repository: gradlex-org/java-module-packaging
           path: build-logic/java-module-packaging
           ref: preview
       - name: Install pigz and cache (linux)
