@@ -1,6 +1,7 @@
 package org.jabref.logic.quality.consistency;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,10 +108,6 @@ class BibliographyConsistencyCheckTest {
         assertEquals(expected, result);
     }
 
-    /**
-     * Entries that differ only by automatic, comment, PDF, special or user-specific comment fields
-     * should produce no consistency results.
-     */
     @Test
     void filteredFieldsAreIgnored() {
         // MISC entries differing only in filtered fields:
@@ -123,25 +120,25 @@ class BibliographyConsistencyCheckTest {
                 .withField(StandardField.COMMENT, "another note")
                 .withField(StandardField.PDF, "other.pdf");
 
-        var result = new BibliographyConsistencyCheck().check(List.of(a, b));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
+                .check(List.of(a, b), (ignored1, ignored2) -> { });
 
-        // Since all differences are in filtered fields, there should be no entries reported:
-        assertTrue(result.entryTypeToResultMap().isEmpty(),
+        assertEquals(Collections.emptyMap(), result.entryTypeToResultMap(),
                 "Differences only in filtered fields must be ignored");
     }
 
-    @SuppressWarnings("checkstyle:RegexpMultiline")
     @Test
     void nonFilteredFieldDifferenceIsReported() {
-        // Two MISC entries differing in AUTHOR (not filtered)
         BibEntry withAuthor = new BibEntry(StandardEntryType.Misc, "1")
                 .withField(StandardField.AUTHOR, "Knuth");
         BibEntry withoutAuthor = new BibEntry(StandardEntryType.Misc, "2");
 
-        var result = new BibliographyConsistencyCheck().check(List.of(withAuthor, withoutAuthor));
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
+                .check(List.of(withAuthor, withoutAuthor), (ignored1, ignored2) -> { });
 
-        // AUTHOR should be reported as a unique field
-        var typeResult = result.entryTypeToResultMap().get(StandardEntryType.Misc);
+        BibliographyConsistencyCheck.EntryTypeResult typeResult =
+                result.entryTypeToResultMap().get(StandardEntryType.Misc);
+
         assertNotNull(typeResult);
         assertTrue(typeResult.fields().contains(StandardField.AUTHOR));
     }
