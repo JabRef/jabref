@@ -1,3 +1,4 @@
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
@@ -213,7 +214,32 @@ tasks.named("jlinkZip") {
 }
 
 tasks.register<Delete>("deleteInstallerTemp") {
-    delete(file("$buildDir/installer"))
+    delete(layout.buildDirectory.dir("installer"))
+}
+
+var jpackageResourceDir: String  = ""
+
+if (OperatingSystem.current().isWindows) {
+    jpackageResourceDir = "${layout.buildDirectory.get().asFile}/jpackage-resource-dir"
+
+    tasks.register<Copy>("copyJPackageResourceDir") {
+        from("${projectDir}/buildres/windows") {
+            include("JabRef-post-image.wsf")
+            filter<ReplaceTokens>(mapOf("jabRefRoot" to "$projectDir".replace('\\', '/')))
+        }
+        from("${projectDir}/buildres/windows") {
+            exclude("JabRef-post-image.wsf")
+        }
+        into(jpackageResourceDir)
+    }
+
+    tasks.named("jpackage").configure {
+        dependsOn("copyJPackageResourceDir")
+    }
+} else if (OperatingSystem.current().isLinux) {
+    jpackageResourceDir = "${projectDir}/buildres/linux"
+} else if (OperatingSystem.current().isMacOsX) {
+    jpackageResourceDir = "${projectDir}/buildres/mac"
 }
 
 jlink {
@@ -300,7 +326,7 @@ jlink {
         requires("org.freedesktop.dbus")
         requires("org.jsoup")
         requires("org.slf4j")
-        requires("org.tukaani.xz");
+        requires("org.tukaani.xz")
 
         uses("ai.djl.engine.EngineProvider")
         uses("ai.djl.repository.RepositoryFactory")
@@ -353,7 +379,7 @@ jlink {
                     "--win-menu",
                     "--win-menu-group", "JabRef",
                     "--temp", "${layout.buildDirectory.get()}/installer",
-                    "--resource-dir", "$projectDir/buildres/windows",
+                    "--resource-dir", jpackageResourceDir,
                     "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
                     "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
                 )
@@ -372,7 +398,7 @@ jlink {
                     "--vendor",  "JabRef",
                     "--app-version", "$version",
                     // "--temp", "$buildDir/installer",
-                    "--resource-dir", "$projectDir/buildres/linux",
+                    "--resource-dir", jpackageResourceDir,
                     "--linux-menu-group", "Office;",
                     "--linux-rpm-license-type", "MIT",
                     // "--license-file", "$projectDir/LICENSE.md",
@@ -399,7 +425,7 @@ jlink {
                     "--mac-package-name", "JabRef",
                     "--app-version", "$version",
                     "--file-associations", "$projectDir/buildres/mac/bibtexAssociations.properties",
-                    "--resource-dir", "$projectDir/buildres/mac"
+                    "--resource-dir", jpackageResourceDir
                 )
             )
         }
