@@ -46,6 +46,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved JabRef's internal document viewer. It now allows text section, searching and highlighting of search terms and page rotation [#13193](https://github.com/JabRef/jabref/pull/13193).
 - When importing a PDF, there is no empty entry column shown in the multi merge dialog. [#13132](https://github.com/JabRef/jabref/issues/13132)
 - We added a progress dialog to the "Check consistency" action and progress output to the corresponding cli command. [#12487](https://github.com/JabRef/jabref/issues/12487)
+- We added Enhanced "Citation Relations" feature: "Look up a DOI and try again." is now a clickable hyperlink that triggers a DOI lookup. The link shows result states ("Looking up DOI...", "No DOI found", "List of citations") as appropriate.
 
 ### Fixed
 
