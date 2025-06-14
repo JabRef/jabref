@@ -101,9 +101,11 @@ open module org.jabref.jablib {
     exports org.jabref.model.study;
     exports org.jabref.logic.shared.security;
     exports org.jabref.logic.shared.event;
+    exports org.jabref.logic.citation;
     exports org.jabref.logic.crawler;
     exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
+    exports org.jabref.logic.citation.repository;
 
     requires java.base;
 
