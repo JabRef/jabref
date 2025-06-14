@@ -12,7 +12,7 @@ import org.jabref.logic.util.StandardFileType;
 /**
  * Imports Microsoft Excel 2007-365 files (`.xlsx`).
  */
-public class ExcelImporter extends TikaImporter {
+public class XlsxImporter extends TikaImporter {
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return Constants.isZip(input);

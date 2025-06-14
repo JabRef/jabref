@@ -1,8 +1,10 @@
-package org.jabref.logic.importer.fileformat.docs;
+package org.jabref.logic.importer.fileformat.odf;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
+
+import org.apache.tika.parser.Parser;
 
 /**
  * Importer for OpenDocument Calc (ODS) files.

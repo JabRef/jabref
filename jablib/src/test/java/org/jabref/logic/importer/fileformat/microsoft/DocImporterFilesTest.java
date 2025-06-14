@@ -7,25 +7,24 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.fileformat.ImporterTestEngine;
-import org.jabref.logic.importer.fileformat.odf.OdpImporter;
 import org.jabref.logic.importer.util.Constants;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class WordOldImporterFilesTest {
+public class DocImporterFilesTest {
     private static final String FILE_ENDING = ".doc";
     private static final List<String> EXCLUDE_EXTENSIONS = Constants.OLE_COMPOUND_FILES_EXTENSIONS
             .stream()
             .filter(ext -> !ext.equals(FILE_ENDING))
             .toList();
 
-    private WordOldImporter importer;
+    private DocImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new WordOldImporter();
+        importer = new DocImporter();
     }
 
     private static Stream<String> fileNames() throws IOException {

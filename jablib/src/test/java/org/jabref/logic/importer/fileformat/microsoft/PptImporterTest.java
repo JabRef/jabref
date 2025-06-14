@@ -8,25 +8,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PptImporterTest {
-    private DocImporter importer;
+    private PptImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new DocImporter();
+        importer = new PptImporter();
     }
 
     @Test
     void getFormatName() {
-        assertEquals("Microsoft Word 97-2003", importer.getName());
+        assertEquals("Microsoft PowerPoint 97-2003", importer.getName());
     }
 
     @Test
     void getCLIId() {
-        assertEquals("doc", importer.getId());
+        assertEquals("ppt", importer.getId());
     }
 
     @Test
     void sGetExtensions() {
-        assertEquals(StandardFileType.DOC, importer.getFileType());
+        assertEquals(StandardFileType.PPT, importer.getFileType());
     }
 }

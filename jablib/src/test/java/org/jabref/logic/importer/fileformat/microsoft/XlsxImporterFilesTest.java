@@ -14,26 +14,26 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class XlsxImporterFilesTest {
-    private static final String FILE_ENDING = ".docx";
+    private static final String FILE_ENDING = ".xlsx";
     private static final List<String> EXCLUDE_EXTENSIONS = Constants.ZIP_FILES_EXTENSIONS
             .stream()
             .filter(ext -> !ext.equals(FILE_ENDING))
             .toList();
 
-    private DocxImporter importer;
+    private XlsxImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new DocxImporter();
+        importer = new XlsxImporter();
     }
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("DocxImporterTest") && name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name -> name.startsWith("XlsxImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("DocxImporterTest") && EXCLUDE_EXTENSIONS.stream().noneMatch(name::endsWith);
+        Predicate<String> fileName = name -> !name.startsWith("XlsxImporterTest") && EXCLUDE_EXTENSIONS.stream().noneMatch(name::endsWith);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 

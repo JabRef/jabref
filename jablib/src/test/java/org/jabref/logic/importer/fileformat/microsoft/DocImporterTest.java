@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class WordOldImporterTest {
-    private WordOldImporter importer;
+class DocImporterTest {
+    private DocImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new WordOldImporter();
+        importer = new DocImporter();
     }
 
     @Test

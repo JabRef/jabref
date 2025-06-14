@@ -22,6 +22,8 @@ public enum StandardFileType implements FileType {
     CLASS("Class file", "class"),
     CSS("CSS Styleshet", "css"),
     CSV("CSV", "csv"),
+    DOC("Microsoft Word 97-2003", "doc"),
+    DOCX("Microsoft Word 2007-365", "docx"),
     ENDNOTE("Endnote", "ref", "enw"),
     HTML("HTML", "html", "htm"),
     ISI("Isi", "isi", "txt"),
@@ -36,6 +38,8 @@ public enum StandardFileType implements FileType {
     ODP("OpenOffice Impress", "odp"),
     ODS("OpenOffice Calc", "ods"),
     ODT("OpenOffice Writer", "odt"),
+    PPT("Microsoft PowerPoint 97-2003", "ppt"),
+    PPTX("Microsoft PowerPoint 2007-365", "pptx"),
     PDF("PDF", "pdf"),
     PUBMED("Pubmed", "fcgi"),
     RDF("RDF", "rdf"),
@@ -47,6 +51,8 @@ public enum StandardFileType implements FileType {
     TXT("Plain Text", "txt"),
     XML("XML", "xml"),
     XMP("XMP", "xmp"),
+    XLS("Microsoft Excel 97-2003", "xsl"),
+    XLSX("Microsoft Excel 2007-365", "xlsx"),
     YAML("YAML Markup", "yml", "yaml"),
     ZIP("Zip Archive", "zip");
 

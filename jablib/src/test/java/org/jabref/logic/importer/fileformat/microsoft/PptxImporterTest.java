@@ -8,25 +8,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PptxImporterTest {
-    private XlsxImporter importer;
+    private PptxImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new XlsxImporter();
+        importer = new PptxImporter();
     }
 
     @Test
     void getFormatName() {
-        assertEquals("Microsoft Excel 2007-365", importer.getName());
+        assertEquals("Microsoft PowerPoint 2007-365", importer.getName());
     }
 
     @Test
     void getCLIId() {
-        assertEquals("xlsx", importer.getId());
+        assertEquals("pptx", importer.getId());
     }
 
     @Test
     void sGetExtensions() {
-        assertEquals(StandardFileType.XLSX, importer.getFileType());
+        assertEquals(StandardFileType.PPTX, importer.getFileType());
     }
 }

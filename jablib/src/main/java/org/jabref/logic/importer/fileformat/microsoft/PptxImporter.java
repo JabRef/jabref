@@ -12,7 +12,7 @@ import org.jabref.logic.util.StandardFileType;
 /**
  * Imports Microsoft PowerPoint 2007-365 files (`.pptx`).
  */
-public class PowerpointImporter extends TikaImporter {
+public class PptxImporter extends TikaImporter {
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return Constants.isZip(input);

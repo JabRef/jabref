@@ -8,25 +8,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class XlsImporterTest {
-    private DocImporter importer;
+    private XlsImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new DocImporter();
+        importer = new XlsImporter();
     }
 
     @Test
     void getFormatName() {
-        assertEquals("Microsoft Word 97-2003", importer.getName());
+        assertEquals("Microsoft Excel 97-2003", importer.getName());
     }
 
     @Test
     void getCLIId() {
-        assertEquals("doc", importer.getId());
+        assertEquals("xls", importer.getId());
     }
 
     @Test
     void sGetExtensions() {
-        assertEquals(StandardFileType.DOC, importer.getFileType());
+        assertEquals(StandardFileType.XLS, importer.getFileType());
     }
 }

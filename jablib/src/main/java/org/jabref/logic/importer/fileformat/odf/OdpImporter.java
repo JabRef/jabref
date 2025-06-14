@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat.docs;
+package org.jabref.logic.importer.fileformat.odf;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;

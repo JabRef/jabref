@@ -12,7 +12,7 @@ import org.jabref.logic.util.StandardFileType;
 /**
  * Imports Microsoft Word 2007-365 files (`.docx`).
  */
-public class WordImporter extends TikaImporter {
+public class DocxImporter extends TikaImporter {
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return Constants.isZip(input);

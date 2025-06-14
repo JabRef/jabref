@@ -12,7 +12,7 @@ import org.jabref.logic.util.StandardFileType;
 /**
  * Imports old Microsoft Word 97-2003 files (`.doc`).
  */
-public class WordOldImporter extends TikaImporter {
+public class DocImporter extends TikaImporter {
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return Constants.isOleCompound(input);

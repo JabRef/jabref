@@ -12,7 +12,7 @@ import org.jabref.logic.util.StandardFileType;
 /**
  * Imports old Microsoft PowerPoint 97-2003 files (`.ppt`).
  */
-public class PowerpointOldImporter extends TikaImporter {
+public class PptImporter extends TikaImporter {
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return Constants.isOleCompound(input);

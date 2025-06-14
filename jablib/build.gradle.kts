@@ -213,6 +213,24 @@ dependencies {
     implementation("org.apache.tika:tika-parsers:3.2.0") {
         exclude(group = "commons-logging")
     }
+    implementation("org.apache.tika:tika-parser-xml-module:3.2.0") {
+        exclude(group = "commons-logging")
+    }
+    implementation("org.apache.tika:tika-parser-image-module:3.2.0") {
+        exclude(group = "commons-logging")
+    }
+    implementation("org.apache.tika:tika-parser-microsoft-module:3.2.0") {
+        exclude(group = "commons-logging")
+    }
+    implementation("org.apache.tika:tika-parser-text-module:3.2.0") {
+        exclude(group = "commons-logging")
+    }
+    implementation("org.apache.tika:tika-parser-miscoffice-module:3.2.0") {
+        exclude(group = "commons-logging")
+    }
+    implementation("org.apache.poi:poi:5.4.1")
+    // TODO: Remove this mail dependency.
+    implementation("com.sun.mail:jakarta.mail:2.0.1")
     // endregion
 
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
@@ -483,6 +501,10 @@ tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
     }
+
+    jvmArgs(
+        "--add-exports=org.apache.poi.ooxml/org.apache.poi.xslf.extractor=org.apache.tika.parser.microsoft"
+    )
 }
 
 jmh {

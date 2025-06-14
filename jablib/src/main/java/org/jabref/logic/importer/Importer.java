@@ -49,6 +49,10 @@ public abstract class Importer implements Comparable<Importer> {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     public boolean isRecognizedFormat(Path filePath) throws IOException {
+        if (!Files.exists(filePath) || !Files.isRegularFile(filePath)) {
+            return false;
+        }
+
         try (BufferedReader bufferedReader = getReader(filePath)) {
             return isRecognizedFormat(bufferedReader);
         }

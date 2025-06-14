@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat.docs;
+package org.jabref.logic.importer.fileformat.odf;
 
 import org.jabref.logic.util.StandardFileType;
 
@@ -22,7 +22,7 @@ class OdsImporterTest {
 
     @Test
     void getCLIId() {
-        assertEquals("odc", importer.getId());
+        assertEquals("ods", importer.getId());
     }
 
     @Test

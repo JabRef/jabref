@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat.docs;
+package org.jabref.logic.importer.fileformat.odf;
 
 import java.io.IOException;
 import java.util.List;

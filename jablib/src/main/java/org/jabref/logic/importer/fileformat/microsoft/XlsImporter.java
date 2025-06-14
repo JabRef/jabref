@@ -12,7 +12,7 @@ import org.jabref.logic.util.StandardFileType;
 /**
  * Imports old Microsoft Excel 97-2003 files (`.xls`).
  */
-public class ExcelOldImporter extends TikaImporter {
+public class XlsImporter extends TikaImporter {
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return Constants.isOleCompound(input);
@@ -35,6 +35,6 @@ public class ExcelOldImporter extends TikaImporter {
 
     @Override
     public FileType getFileType() {
-        return StandardFileType.DOC;
+        return StandardFileType.XLS;
     }
 }

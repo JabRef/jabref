@@ -14,26 +14,26 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class DocxImporterFilesTest {
-    private static final String FILE_ENDING = ".doc";
-    private static final List<String> EXCLUDE_EXTENSIONS = Constants.OLE_COMPOUND_FILES_EXTENSIONS
+    private static final String FILE_ENDING = ".docx";
+    private static final List<String> EXCLUDE_EXTENSIONS = Constants.ZIP_FILES_EXTENSIONS
             .stream()
             .filter(ext -> !ext.equals(FILE_ENDING))
             .toList();
 
-    private DocImporter importer;
+    private DocxImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new DocImporter();
+        importer = new DocxImporter();
     }
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("DocImporterTest") && name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name -> name.startsWith("DocxImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("DocImporterTest") && EXCLUDE_EXTENSIONS.stream().noneMatch(name::endsWith);
+        Predicate<String> fileName = name -> !name.startsWith("DocxImporterTest") && EXCLUDE_EXTENSIONS.stream().noneMatch(name::endsWith);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
