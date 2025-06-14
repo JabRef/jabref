@@ -104,7 +104,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                 .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                     List<LinkedFile> filteredFiles = linkedFiles.stream()
                                                                 .filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(fileType))
-                                                                .collect(Collectors.toList());
+                                                                .toList();
 
                     if (event.getButton() == MouseButton.PRIMARY) {
                         if (filteredFiles.size() == 1) {

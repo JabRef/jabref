@@ -194,7 +194,7 @@ public class BstNameFormatter {
                         sb.append(d[j]);
                     }
                 }
-                if (sb.length() > 0) {
+                if (!sb.isEmpty()) {
                     boolean noDisTie = false;
                     if ((sb.charAt(sb.length() - 1) == '~') &&
                             ((BstNameFormatter.numberOfChars(sb.substring(groupStart, sb.length()), 4) >= 4) ||

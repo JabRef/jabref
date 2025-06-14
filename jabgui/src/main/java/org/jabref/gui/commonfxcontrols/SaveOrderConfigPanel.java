@@ -1,7 +1,6 @@
 package org.jabref.gui.commonfxcontrols;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
@@ -136,7 +135,7 @@ public class SaveOrderConfigPanel extends VBox {
     private void clearCriterionRow(int row) {
         List<Node> criterionRow = sortCriterionList.getChildren().stream()
                                                    .filter(item -> GridPane.getRowIndex(item) == row)
-                                                   .collect(Collectors.toList());
+                                                   .toList();
         sortCriterionList.getChildren().removeAll(criterionRow);
 
         sortCriterionList.getChildren().stream()
