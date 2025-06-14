@@ -134,6 +134,13 @@ jobs:
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distribution/jabkit
             suffix: '-ea'
+            archForDebianRepack: "_amd64"
+          - os: ubuntu-22.04-arm
+            displayName: linux-arm
+            archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/distribution/JabRef
+            archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/distribution/jabkit
+            suffix: '-ea_arm64'
+            archForDebianRepack: '_arm64'
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
@@ -145,6 +152,7 @@ jobs:
           - os: macos-14
             displayName: macOS (ARM64)
             suffix: '-ea_arm64'
+            archForDebianRepack: ""
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
@@ -159,7 +167,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-22.04')
+        if: (startsWith(matrix.os, 'ubuntu'))
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pigz
@@ -176,13 +184,13 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         run: |
           sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
           cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (macOS)
         if: ${{ startsWith(matrix.os, 'macos') }}
         run: |
           sed -i '.bak' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i '.bak' "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i '.bak' "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
           cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
 
       # region setup-JDK
@@ -217,7 +225,6 @@ jobs:
 
       # region JavaFX
       - name: Download and extract JavaFX ${{ env.javafx }}
-        if: (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
         shell: bash
         run: |
           set -e
@@ -268,7 +275,7 @@ jobs:
 
           ls -la
       - name: 'Set JavaFX ${{ env.javafx }} (linux, Windows)'
-        if: ${{ !startsWith(matrix.os, 'macos') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm') }}
+        if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: bash
         run: |
           set -e
@@ -291,8 +298,8 @@ jobs:
             cat $buildgradle
           done
       - name: 'Set JavaFX ${{ env.javafx }} (linux-arm)'
-        if: (matrix.os == 'buildjet-8vcpu-ubuntu-2204-arm')
-        # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
+        if: (matrix.os == 'ubuntu-22.04-arm')
+        # No JavaFX EA build for ARM at https://jdk.java.net/javafx25/, therefore using Maven Central artifact
         run: |
           set -e
           curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=10&core=gav" > /tmp/versions.json
@@ -450,16 +457,17 @@ jobs:
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
       - name: Repack deb file for Debian
-        if: (matrix.os == 'ubuntu-22.04')
+        if: (startsWith(matrix.os, 'ubuntu'))
         shell: bash
         run: |
           cd jabgui/build/distribution
-          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
+          ls -l
+          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
           zstd -d < control.tar.zst | xz > control.tar.xz
           zstd -d < data.tar.zst | xz > data.tar.xz
-          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
+          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
+          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
 
       - name: Build JabKit
         shell: bash
