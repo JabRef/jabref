@@ -96,7 +96,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
             if (pdfFiles.isEmpty()) {
                 files.clear();
                 currentDocument.set(null);
-                // Show notification to inform user why no files are available
                 dialogService.notify(Localization.lang("No PDF files available"));
             } else {
                 files.setValue(FXCollections.observableArrayList(pdfFiles));
@@ -130,7 +129,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
                         .ifPresentOrElse(
                                 this::setCurrentDocument,
                                 () -> {
-                                    // File not found or cannot be accessed - clear current document
                                     currentDocument.set(null);
                                     LOGGER.warn("Could not find or access file: {}", file.getLink());
                                 }
