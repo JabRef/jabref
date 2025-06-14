@@ -110,7 +110,6 @@ class BibliographyConsistencyCheckTest {
 
     @Test
     void filteredFieldsAreIgnored() {
-        // MISC entries differing only in filtered fields:
         BibEntry a = new BibEntry(StandardEntryType.Misc, "a")
                 .withField(StandardField.COMMENT, "note")
                 .withField(StandardField.PDF, "file.pdf")
