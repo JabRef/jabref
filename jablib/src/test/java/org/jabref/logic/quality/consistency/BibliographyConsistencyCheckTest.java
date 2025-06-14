@@ -1,7 +1,6 @@
 package org.jabref.logic.quality.consistency;
 
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -122,7 +121,7 @@ class BibliographyConsistencyCheckTest {
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
                 .check(List.of(a, b), (ignored1, ignored2) -> { });
 
-        assertEquals(Collections.emptyMap(), result.entryTypeToResultMap(),
+        assertEquals(Map.of(), result.entryTypeToResultMap(),
                 "Differences only in filtered fields must be ignored");
     }
 
