@@ -110,17 +110,23 @@ public class ImportCommand extends SimpleCommand {
         }
 
         BackgroundTask<ParserResult> task;
+        Optional<Importer> format;
 
-        if (selectedExtensionFilter == null
-                || selectedExtensionFilter == FileFilterConverter.ANY_FILE
-                || "Available import formats".equals(selectedExtensionFilter.getDescription())) {
-            task = BackgroundTask.wrap(
-                    () -> doImport(files, null));
+        boolean isGeneralFilter = selectedExtensionFilter == FileFilterConverter.ANY_FILE
+                || "Available import formats".equals(selectedExtensionFilter.getDescription());
+
+        if (!isGeneralFilter) {
+            // User picked a specific format
+            format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
+        } else if (files.size() == 1) {
+            // Infer if only one file and no specific filter
+            selectedExtensionFilter = FileFilterConverter.determineExtensionFilter(files.getFirst());
+            format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
         } else {
-            Optional<Importer> format = FileFilterConverter.getImporter(selectedExtensionFilter, importers);
-            task = BackgroundTask.wrap(
-                    () -> doImport(files, format.orElse(null)));
+            format = Optional.empty();
         }
+
+        task = BackgroundTask.wrap(() -> doImport(files, format.orElse(null)));
 
         LibraryTab tab = tabContainer.getCurrentLibraryTab();
 
