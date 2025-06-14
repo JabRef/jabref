@@ -130,6 +130,9 @@ public class ImportCommand extends SimpleCommand {
 
         LibraryTab tab = tabContainer.getCurrentLibraryTab();
 
+        // If there is no open library tab, we fall back to importing as new
+        // This prevents a crash in case the user selects "Import into current library"
+        // while no library is currently open.
         if (importMethod == ImportMethod.AS_NEW || tab == null) {
             task.onSuccess(parserResult -> {
                     tabContainer.addTab(parserResult.getDatabaseContext(), true);
