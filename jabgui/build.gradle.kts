@@ -1,9 +1,8 @@
 import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id("buildlogic.java-common-conventions")
-
-    application
+    id("org.jabref.gradle.module")
+    id ("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
@@ -14,142 +13,102 @@ plugins {
 group = "org.jabref"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
-val luceneVersion = "10.2.1"
-val pdfbox = "3.0.5"
-
-val javafxVersion = "24.0.1"
-
 dependencies {
     implementation(project(":jablib"))
 
-    implementation("org.openjfx:javafx-base:$javafxVersion")
-    implementation("org.openjfx:javafx-controls:$javafxVersion")
-    implementation("org.openjfx:javafx-fxml:$javafxVersion")
-    // implementation("org.openjfx:javafx-graphics:24.0.1")
-    implementation("org.openjfx:javafx-graphics:$javafxVersion")
-    implementation("org.openjfx:javafx-swing:$javafxVersion")
-    implementation("org.openjfx:javafx-web:$javafxVersion")
+    implementation("org.openjfx:javafx-base")
+    implementation("org.openjfx:javafx-controls")
+    implementation("org.openjfx:javafx-fxml")
+    // implementation("org.openjfx:javafx-graphics")
+    implementation("org.openjfx:javafx-graphics")
+    implementation("org.openjfx:javafx-swing")
+    implementation("org.openjfx:javafx-web")
 
-    implementation("org.slf4j:slf4j-api:2.0.17")
-    implementation("org.tinylog:tinylog-api:2.7.0")
-    implementation("org.tinylog:slf4j-tinylog:2.7.0")
-    implementation("org.tinylog:tinylog-impl:2.7.0")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.tinylog:tinylog-api")
+    implementation("org.tinylog:slf4j-tinylog")
+    implementation("org.tinylog:tinylog-impl")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation("org.slf4j:jul-to-slf4j:2.0.17")
+    implementation("org.slf4j:jul-to-slf4j")
     // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
+    implementation("org.apache.logging.log4j:log4j-to-slf4j")
 
-    implementation("org.jabref:afterburner.fx:2.0.0") {
-        exclude( group = "org.openjfx")
-    }
-    implementation("org.kordamp.ikonli:ikonli-javafx:12.4.0")
-    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
+    implementation("org.jabref:afterburner.fx")
+    implementation("org.kordamp.ikonli:ikonli-javafx")
+    implementation("org.kordamp.ikonli:ikonli-materialdesign2-pack")
     implementation("com.github.sialcasa.mvvmFX:mvvmfx-validation:f195849ca9") //jitpack
-    implementation("de.saxsys:mvvmfx:1.8.0")
-    implementation("org.fxmisc.flowless:flowless:0.7.4")
-    implementation("org.fxmisc.richtext:richtextfx:0.11.5")
-    implementation("com.dlsc.gemsfx:gemsfx:3.1.3") {
-        exclude(module = "javax.inject") // Split package, use only jakarta.inject
-        exclude(module = "commons-lang3")
-        exclude(group = "org.apache.commons.validator")
-        exclude(group = "org.apache.commons.commons-logging")
-        exclude(module = "kotlin-stdlib-jdk8")
-        exclude(group = "com.squareup.retrofit2")
-        exclude(group = "org.openjfx")
-        exclude(group = "org.apache.logging.log4j")
-        exclude(group = "tech.units")
-    }
-    implementation("com.dlsc.pdfviewfx:pdfviewfx:3.1.1") {
-        exclude(group = "org.openjfx")
-        exclude(module = "commons-lang3")
-    }
+    implementation("de.saxsys:mvvmfx")
+    implementation("org.fxmisc.flowless:flowless")
+    implementation("org.fxmisc.richtext:richtextfx")
+    implementation("com.dlsc.gemsfx:gemsfx")
+    implementation("com.dlsc.pdfviewfx:pdfviewfx")
 
     // Required by gemsfx
-    implementation("tech.units:indriya:2.2.3")
+    implementation("tech.units:indriya")
     // Required by gemsfx and langchain4j
-    implementation ("com.squareup.retrofit2:retrofit:3.0.0") {
-        exclude(group = "com.squareup.okhttp3")
-    }
+    implementation ("com.squareup.retrofit2:retrofit")
 
-    implementation("org.controlsfx:controlsfx:11.2.2")
-    implementation("org.jabref:easybind:2.2.1-SNAPSHOT") {
-        exclude(group = "org.openjfx")
-    }
+    implementation("org.controlsfx:controlsfx")
+    implementation("org.jabref:easybind")
 
-    implementation("org.apache.lucene:lucene-core:${luceneVersion}")
-    implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
-    implementation("org.apache.lucene:lucene-queries:${luceneVersion}")
-    implementation("org.apache.lucene:lucene-analysis-common:${luceneVersion}")
-    implementation("org.apache.lucene:lucene-highlighter:${luceneVersion}")
+    implementation("org.apache.lucene:lucene-core")
+    implementation("org.apache.lucene:lucene-queryparser")
+    implementation("org.apache.lucene:lucene-queries")
+    implementation("org.apache.lucene:lucene-analysis-common")
+    implementation("org.apache.lucene:lucene-highlighter")
 
-    implementation("org.jsoup:jsoup:1.20.1")
+    implementation("org.jsoup:jsoup")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation("org.jspecify:jspecify")
 
-    implementation("com.google.guava:guava:33.4.8-jre")
+    implementation("com.google.guava:guava")
 
-    implementation("dev.langchain4j:langchain4j:1.0.1")
+    implementation("dev.langchain4j:langchain4j")
 
-    implementation("io.github.java-diff-utils:java-diff-utils:4.15")
+    implementation("io.github.java-diff-utils:java-diff-utils")
 
-    implementation("org.jooq:jool:0.9.15")
+    implementation("org.jooq:jool")
 
-    implementation("commons-io:commons-io:2.19.0")
+    implementation("commons-io:commons-io")
 
-    implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
-        exclude(group = "commons-logging")
-    }
+    implementation ("org.apache.pdfbox:pdfbox")
 
-    // implementation("net.java.dev.jna:jna:5.16.0")
-    implementation("net.java.dev.jna:jna-platform:5.17.0")
+    // implementation("net.java.dev.jna:jna")
+    implementation("net.java.dev.jna:jna-platform")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit")
 
-    implementation("com.konghq:unirest-java-core:4.4.7")
+    implementation("com.konghq:unirest-java-core")
 
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
+    implementation("org.apache.httpcomponents.client5:httpclient5")
 
-    implementation("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
+    implementation("com.vladsch.flexmark:flexmark-html2md-converter")
 
-    implementation("io.github.adr:e-adr:2.0.0-SNAPSHOT")
+    implementation("io.github.adr:e-adr")
 
-    implementation("org.libreoffice:unoloader:24.8.4")
-    implementation("org.libreoffice:libreoffice:24.8.4")
+    implementation("org.libreoffice:unoloader")
+    implementation("org.libreoffice:libreoffice")
 
-    implementation("com.github.javakeyring:java-keyring:1.0.4")
+    implementation("com.github.javakeyring:java-keyring")
 
-    implementation("info.picocli:picocli:4.7.7")
-    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
+    implementation("info.picocli:picocli")
+    annotationProcessor("info.picocli:picocli-codegen")
 
-    implementation("de.undercouch:citeproc-java:3.3.0") {
-        exclude(group = "org.antlr")
-    }
+    implementation("de.undercouch:citeproc-java")
 
     testImplementation(project(":test-support"))
 
-    testImplementation("io.github.classgraph:classgraph:4.8.179")
-    testImplementation("org.testfx:testfx-core:4.0.16-alpha")
-    testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+    testImplementation("io.github.classgraph:classgraph")
+    testImplementation("org.testfx:testfx-core")
+    testImplementation("org.testfx:testfx-junit5")
 
-    testImplementation("org.mockito:mockito-core:5.18.0") {
-        exclude(group = "net.bytebuddy", module = "byte-buddy")
-    }
-    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("net.bytebuddy:byte-buddy")
 
-    testImplementation("org.wiremock:wiremock:3.13.0")
-    // Required by Wiremock - and our patching of Wiremock
-    testImplementation("com.github.jknack:handlebars:4.3.1") {
-        exclude(group = "org.mozilla", module = "rhino")
-    }
-    testImplementation("com.github.jknack:handlebars-helpers:4.3.1") {
-        exclude(group = "org.mozilla", module = "rhino")
-        exclude(group = "org.apache.commons", module = "commons-lang3")
-    }
-    testImplementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
-    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
+    testImplementation("org.wiremock:wiremock")
 
-    testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
+    testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
 }
 
 application {
@@ -217,13 +176,9 @@ tasks.register<Delete>("deleteInstallerTemp") {
 }
 
 jlink {
-    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
-    addExtraDependencies(
-        "javafx"
-    )
-
     // We keep debug statements - otherwise "--strip-debug" would be included
     addOptions(
+        "--ignore-signing-information",
         "--compress",
         "zip-6",
         "--no-header-files",
@@ -248,84 +203,6 @@ jlink {
 
             "--enable-native-access=org.jabref.merged.module"
         )
-    }
-
-    // TODO: Remove as soon as dependencies are fixed (upstream)
-    forceMerge(
-        "controlsfx",
-        "bcprov",
-        "jaxb",
-        "istack",
-        "stax"
-    )
-
-    mergedModule {
-        requires("com.google.gson")
-        requires("com.fasterxml.jackson.annotation")
-        requires("com.fasterxml.jackson.databind")
-        requires("com.fasterxml.jackson.core")
-        requires("com.fasterxml.jackson.datatype.jdk8")
-        requires("jakarta.xml.bind")
-        requires("java.compiler")
-        requires("java.datatransfer")
-        requires("java.desktop")
-        requires("java.logging")
-        requires("java.management")
-        requires("java.naming")
-        requires("java.net.http")
-        requires("java.rmi")
-        requires("java.scripting")
-        requires("java.security.jgss")
-        requires("java.security.sasl")
-        requires("java.sql")
-        requires("java.sql.rowset")
-        requires("java.transaction.xa")
-        requires("java.xml")
-        requires("javafx.base")
-        requires("javafx.controls")
-        requires("javafx.fxml")
-        requires("javafx.graphics")
-        requires("javafx.media")
-        requires("javafx.swing")
-        requires("jdk.security.jgss")
-        requires("jdk.unsupported")
-        requires("jdk.unsupported.desktop")
-        requires("jdk.xml.dom")
-        requires("org.apache.commons.lang3")
-        requires("org.apache.commons.logging")
-        requires("org.apache.commons.text")
-        requires("org.apache.commons.codec")
-        requires("org.apache.commons.io")
-        requires("org.apache.commons.compress")
-        requires("org.freedesktop.dbus")
-        requires("org.jsoup")
-        requires("org.slf4j")
-        requires("org.tukaani.xz");
-
-        uses("ai.djl.engine.EngineProvider")
-        uses("ai.djl.repository.RepositoryFactory")
-        uses("ai.djl.repository.zoo.ZooProvider")
-        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
-        uses("kong.unirest.core.json.JsonEngine")
-        uses("org.eclipse.jgit.lib.Signer")
-        uses("org.eclipse.jgit.transport.SshSessionFactory")
-        uses("org.postgresql.shaded.com.ongres.stringprep.Profile")
-
-        provides("java.sql.Driver").with(
-            "org.postgresql.Driver")
-        provides("java.security.Provider").with(
-            "org.bouncycastle.jce.provider.BouncyCastleProvider",
-            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
-        provides("kong.unirest.core.json.JsonEngine").with(
-            "kong.unirest.modules.gson.GsonEngine")
-        provides("ai.djl.repository.zoo.ZooProvider").with(
-            "ai.djl.engine.rust.zoo.RsZooProvider",
-            "ai.djl.huggingface.zoo.HfZooProvider",
-            "ai.djl.pytorch.zoo.PtZooProvider",
-            "ai.djl.repository.zoo.DefaultZooProvider")
-        provides("ai.djl.engine.EngineProvider").with(
-            "ai.djl.engine.rust.RsEngineProvider",
-            "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
     jpackage {
@@ -385,7 +262,7 @@ jlink {
             imageOptions.addAll(
                 listOf(
                     "--icon",  "$projectDir/src/main/resources/icons/jabref.icns",
-                    "--resource-dir", "$projectDir/buildres/mac"
+                    "--resource-dir", "$projectDir/buildres/macos"
                 )
             )
 
@@ -398,8 +275,8 @@ jlink {
                     "--mac-package-identifier", "JabRef",
                     "--mac-package-name", "JabRef",
                     "--app-version", "$version",
-                    "--file-associations", "$projectDir/buildres/mac/bibtexAssociations.properties",
-                    "--resource-dir", "$projectDir/buildres/mac"
+                    "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
+                    "--resource-dir", "$projectDir/buildres/macos"
                 )
             )
         }
@@ -437,12 +314,68 @@ if (OperatingSystem.current().isWindows) {
     tasks.named("jpackageImage").configure {
         doLast {
             copy {
-                from(file("$projectDir/buildres/mac")) {
+                from(file("$projectDir/buildres/macos")) {
                     include("native-messaging-host/**", "jabrefHost.py")
                 }
                 into(file("${layout.buildDirectory.get()}/distribution/JabRef.app/Contents/Resources"))
             }
         }
+    }
+}
+
+// Below should eventually replace the 'jlink {}' and doLast-copy configurations above
+javaModulePackaging {
+    applicationName = "JabRef"
+    vendor = "JabRef"
+    jpackageResources = layout.projectDirectory.dir("buildres")
+    verbose = true
+    jlinkOptions.addAll(
+        "--ignore-signing-information",
+        "--compress", "zip-6",
+        "--no-header-files",
+        "--no-man-pages",
+        "--bind-services",
+    )
+    addModules.add("jdk.incubator.vector")
+    targetsWithOs("windows") {
+        options.addAll(
+            "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
+            "--win-dir-chooser",
+            "--win-shortcut",
+            "--win-menu",
+            "--win-menu-group", "JabRef",
+            "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
+            "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/windows").asFileTree.matching {
+            include("jabref-firefox.json")
+            include("jabref-chrome.json")
+            include("JabRefHost.bat")
+            include("JabRefHost.ps1")
+        })
+    }
+    targetsWithOs("linux") {
+        options.addAll(
+            "--linux-menu-group", "Office;",
+            "--linux-rpm-license-type", "MIT",
+            "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
+            "--linux-shortcut",
+            "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/linux").asFileTree.matching {
+            include("native-messaging-host/**")
+            include("jabrefHost.py")
+        })
+    }
+    targetsWithOs("macos") {
+        options.addAll(
+            "--mac-package-identifier", "JabRef",
+            "--mac-package-name", "JabRef",
+            "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties"
+        )
+        targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
+            include("Resources/**")
+        })
     }
 }
 
