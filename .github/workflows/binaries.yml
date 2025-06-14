@@ -191,7 +191,7 @@ jobs:
         with:
           java-version: '24'
           distribution: 'liberica'
-          java-package: 'jdk+fx'
+          java-package: 'jdk'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
