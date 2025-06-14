@@ -1,6 +1,5 @@
 package org.jabref.gui.documentviewer;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -11,6 +10,8 @@ import javafx.beans.property.StringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+
+import org.jabref.logic.l10n.Localization;
 
 import com.dlsc.pdfviewfx.PDFView;
 import com.tobiasdiez.easybind.EasyBind;
@@ -32,22 +33,18 @@ public class PdfDocumentViewer extends StackPane {
     public PdfDocumentViewer() {
         pdfView = new PDFView();
 
-        // Create placeholder label
-        placeholderLabel = new Label("No PDF available for preview");
-        placeholderLabel.setStyle("-fx-text-fill: #666666; -fx-font-size: 16px;");
+        placeholderLabel = new Label(Localization.lang("No PDF available for preview"));
+        placeholderLabel.getStyleClass().add("message");
         placeholderLabel.setAlignment(Pos.CENTER);
 
         getChildren().addAll(pdfView, placeholderLabel);
 
-        // Initially show placeholder
         pdfView.setVisible(false);
         placeholderLabel.setVisible(true);
 
         EasyBind.subscribe(currentPage, current -> pdfView.setPage(current.intValue()));
-        // We can only set the search query at the moment not the results or mark them in the text
+
         EasyBind.subscribe(highlightText, pdfView::setSearchText);
-        // Initially hide PDFView until a document is loaded
-        pdfView.setVisible(false);
     }
 
     public IntegerProperty currentPageProperty() {
@@ -60,25 +57,27 @@ public class PdfDocumentViewer extends StackPane {
 
     public void show(Path document) {
         if (document != null) {
+            pdfView.setVisible(false);
+            placeholderLabel.setText(Localization.lang("Loading PDF..."));
+            placeholderLabel.setVisible(true);
+
             try {
-                pdfView.load(Files.newInputStream(document));
+                var inputStream = Files.newInputStream(document);
+                pdfView.load(inputStream);
                 pdfView.setPage(currentPage.get());
-                // Show PDF and hide placeholder
                 pdfView.setVisible(true);
                 placeholderLabel.setVisible(false);
                 LOGGER.debug("Successfully loaded PDF document: {}", document);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.error("Could not load PDF document {}", document, e);
-                // Show error message
                 pdfView.setVisible(false);
-                placeholderLabel.setText("Could not load PDF: " + document.getFileName());
+                placeholderLabel.setText(Localization.lang("Could not load PDF: %0", document.getFileName().toString()));
                 placeholderLabel.setVisible(true);
             }
         } else {
             LOGGER.debug("No document provided to viewer, showing placeholder");
-            // Show placeholder and hide PDF
             pdfView.setVisible(false);
-            placeholderLabel.setText("No PDF available for preview");
+            placeholderLabel.setText(Localization.lang("No PDF available for preview"));
             placeholderLabel.setVisible(true);
         }
     }

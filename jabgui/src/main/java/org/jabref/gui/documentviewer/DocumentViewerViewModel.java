@@ -1,5 +1,6 @@
 package org.jabref.gui.documentviewer;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -20,7 +21,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DocumentViewerViewModel extends AbstractViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
     private final CliPreferences preferences;
@@ -38,11 +42,12 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final IntegerProperty currentPage = new SimpleIntegerProperty();
     private final StringProperty highlightText = new SimpleStringProperty();
-    private final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
+    private final DialogService dialogService;
 
-    public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
+    public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences, DialogService dialogService) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.preferences = Objects.requireNonNull(preferences);
+        this.dialogService = Objects.requireNonNull(dialogService);
 
         this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) _ -> {
             // Switch to currently selected entry in live mode
@@ -80,24 +85,21 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private void setCurrentEntries(List<BibEntry> entries) {
         if (entries.isEmpty()) {
             files.clear();
-            currentDocument.set(null); // Clear current document when no entries
+            currentDocument.set(null);
         } else {
             Set<LinkedFile> pdfFiles = entries.stream()
                                               .map(BibEntry::getFiles)
                                               .flatMap(List::stream)
-                                              .filter(this::isPdfFile)  // 直接在这里过滤
+                                              .filter(this::isPdfFile)
                                               .collect(Collectors.toSet());
 
             if (pdfFiles.isEmpty()) {
-                // No PDF files found - clear the list and current document
                 files.clear();
                 currentDocument.set(null);
-                // The UI will automatically close the dialog when files list is empty
-                // This provides better UX than showing technical errors
+                // Show notification to inform user why no files are available
+                dialogService.notify(Localization.lang("No PDF files available"));
             } else {
-                // We have PDF files - display them in the dropdown
                 files.setValue(FXCollections.observableArrayList(pdfFiles));
-                // The first file will be automatically selected by the UI
             }
         }
     }
@@ -116,7 +118,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         try {
             Path filePath = Path.of(file.getLink());
             return FileUtil.isPDFFile(filePath);
-        } catch (Exception e) {
+        } catch (InvalidPathException | SecurityException e) {
             return false;
         }
     }
@@ -134,7 +136,6 @@ public class DocumentViewerViewModel extends AbstractViewModel {
                                 }
                         );
         } else {
-            // File is null - clear current document to ensure UI consistency
             currentDocument.set(null);
         }
     }

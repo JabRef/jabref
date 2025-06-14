@@ -8,8 +8,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ViewModelListCellFactory;
@@ -17,6 +17,7 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.LinkedFile;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
@@ -49,7 +50,8 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new DocumentViewerViewModel(stateManager, preferences);
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        viewModel = new DocumentViewerViewModel(stateManager, preferences, dialogService);
 
         setupViewer();
         setupFileChoice();
@@ -83,15 +85,17 @@ public class DocumentViewerView extends BaseDialog<Void> {
         fileChoice.setButtonCell(cellFactory.call(null));
         fileChoice.setCellFactory(cellFactory);
         fileChoice.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> viewModel.switchToFile(newValue));
-        // We always want that the first item is selected after a change
-        // This also automatically selects the first file on the initial load
-        Stage stage = (Stage) getDialogPane().getScene().getWindow();
+                (observable, oldValue, newValue) -> {
+                    if (newValue != null && !fileChoice.getItems().isEmpty()) {
+                        viewModel.switchToFile(newValue);
+                    }
+                });
+
         fileChoice.itemsProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null || newValue.isEmpty()) {
-                stage.close();
-            } else {
-                fileChoice.getSelectionModel().selectFirst();
+            if (newValue != null && !newValue.isEmpty()) {
+                if (!fileChoice.getItems().isEmpty()) {
+                    fileChoice.getSelectionModel().selectFirst();
+                }
             }
         });
         fileChoice.itemsProperty().bind(viewModel.filesProperty());
@@ -99,7 +103,6 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupViewer() {
         viewModel.currentDocumentProperty().addListener((observable, oldDocument, newDocument) -> {
-            // Always call show(), even when newDocument is null
             viewer.show(newDocument);
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
