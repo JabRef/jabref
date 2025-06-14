@@ -26,6 +26,9 @@ import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DocumentViewerViewModel extends AbstractViewModel {
 
     private final StateManager stateManager;
@@ -35,6 +38,7 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final IntegerProperty currentPage = new SimpleIntegerProperty();
     private final StringProperty highlightText = new SimpleStringProperty();
+    private final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
         this.stateManager = Objects.requireNonNull(stateManager);
@@ -76,10 +80,25 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private void setCurrentEntries(List<BibEntry> entries) {
         if (entries.isEmpty()) {
             files.clear();
+            currentDocument.set(null); // Clear current document when no entries
         } else {
-            Set<LinkedFile> linkedFiles = entries.stream().map(BibEntry::getFiles).flatMap(List::stream).collect(Collectors.toSet());
-            // We don't need to switch to the first file, this is done automatically in the UI part
-            files.setValue(FXCollections.observableArrayList(linkedFiles));
+            Set<LinkedFile> pdfFiles = entries.stream()
+                                              .map(BibEntry::getFiles)
+                                              .flatMap(List::stream)
+                                              .filter(this::isPdfFile)  // 直接在这里过滤
+                                              .collect(Collectors.toSet());
+
+            if (pdfFiles.isEmpty()) {
+                // No PDF files found - clear the list and current document
+                files.clear();
+                currentDocument.set(null);
+                // The UI will automatically close the dialog when files list is empty
+                // This provides better UX than showing technical errors
+            } else {
+                // We have PDF files - display them in the dropdown
+                files.setValue(FXCollections.observableArrayList(pdfFiles));
+                // The first file will be automatically selected by the UI
+            }
         }
     }
 
@@ -89,11 +108,34 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         }
     }
 
+    private boolean isPdfFile(LinkedFile file) {
+        if (file == null || file.getLink() == null || file.getLink().trim().isEmpty()) {
+            return false;
+        }
+
+        try {
+            Path filePath = Path.of(file.getLink());
+            return FileUtil.isPDFFile(filePath);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public void switchToFile(LinkedFile file) {
         if (file != null) {
             stateManager.getActiveDatabase()
                         .flatMap(database -> file.findIn(database, preferences.getFilePreferences()))
-                        .ifPresent(this::setCurrentDocument);
+                        .ifPresentOrElse(
+                                this::setCurrentDocument,
+                                () -> {
+                                    // File not found or cannot be accessed - clear current document
+                                    currentDocument.set(null);
+                                    LOGGER.warn("Could not find or access file: {}", file.getLink());
+                                }
+                        );
+        } else {
+            // File is null - clear current document to ensure UI consistency
+            currentDocument.set(null);
         }
     }
 
