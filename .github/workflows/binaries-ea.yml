@@ -158,6 +158,12 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+      - name: Fetch preview of java-module-packaging
+        uses: actions/checkout@v4
+        with:
+          repository: supercharge/docs
+          path: build-logic/java-module-packaging
+          ref: preview
       - name: Install pigz and cache (linux)
         if: (matrix.os == 'ubuntu-22.04')
         uses: awalsh128/cache-apt-pkgs-action@latest
