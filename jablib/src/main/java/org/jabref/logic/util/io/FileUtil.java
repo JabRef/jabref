@@ -50,6 +50,9 @@ public class FileUtil {
     private static final String ELLIPSIS = "...";
     private static final int ELLIPSIS_LENGTH = ELLIPSIS.length();
     private static final RemoveLatexCommandsFormatter REMOVE_LATEX_COMMANDS_FORMATTER = new RemoveLatexCommandsFormatter();
+    private static final String CYGDRIVE_PREFIX = "/cygdrive/";
+    private static final String MNT_PREFIX = "/mnt/";
+    private static final Pattern ROOT_DRIVE_PATTERN = Pattern.compile("^/[a-zA-Z]/.*");
 
     /**
      * MUST ALWAYS BE A SORTED ARRAY because it is used in a binary search
@@ -600,29 +603,37 @@ public class FileUtil {
     ///
     /// @param filePath the input file path
     /// @return the converted path if running on Windows and path is in Cygwin format; otherwise, returns the original path
-    public static String convertCygwinPathToWindows(String filePath) {
-        if (!OS.WINDOWS || filePath == null) {
-            return filePath;
+    public static Path convertCygwinPathToWindows(String filePath) {
+        if (filePath == null) {
+            return null;
         }
 
-        if (filePath.startsWith("/mnt/") && filePath.length() > 5) {
-            String driveLetter = filePath.substring(5, 6).toUpperCase();
-            String path = filePath.substring(6).replace("/", "\\\\");
-            return driveLetter + ":" + path;
+        if (!OS.WINDOWS) {
+            return Path.of(filePath);
         }
 
-        if (filePath.startsWith("/cygdrive/") && filePath.length() > 10) {
-            String driveLetter = filePath.substring(10, 11).toUpperCase();
-            String path = filePath.substring(11).replace("/", "\\\\");
-            return driveLetter + ":" + path;
+        if (filePath.startsWith(MNT_PREFIX) && filePath.length() > 5) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 5);
         }
 
-        if (filePath.matches("^/[a-zA-Z]/.*")) {
-            String driveLetter = filePath.substring(1, 2).toUpperCase();
-            String path = filePath.substring(2).replace("/", "\\\\");
-            return driveLetter + ":" + path;
+        if (filePath.startsWith(CYGDRIVE_PREFIX) && filePath.length() > 10) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 10);
         }
 
-        return filePath;
+        if (ROOT_DRIVE_PATTERN.matcher(filePath).matches()) {
+            return buildWindowsPathWithDriveLetterIndex(filePath, 1);
+        }
+
+        return Path.of(filePath);
+    }
+
+    /// Builds a Windows-style path from a Cygwin-style path using a known prefix index.
+    /// @param path the input file path
+    /// @param letterIndex the index driver letter, zero-based indexing
+    /// @return a windows-style path
+    private static Path buildWindowsPathWithDriveLetterIndex(String path, int letterIndex) {
+        String driveLetter = path.substring(letterIndex, letterIndex + 1).toUpperCase();
+        String windowsPath = path.substring(letterIndex + 1).replace("/", "\\\\");
+        return Path.of(driveLetter + ":" + windowsPath);
     }
 }
