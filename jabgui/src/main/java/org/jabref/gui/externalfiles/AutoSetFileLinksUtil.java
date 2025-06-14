@@ -1,6 +1,7 @@
 package org.jabref.gui.externalfiles;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -150,6 +151,7 @@ public class AutoSetFileLinksUtil {
                         .ifPresent(matches::add);
                 } catch (IOException e) {
                     LOGGER.error("Error during fallback walk", e);
+                    throw new UncheckedIOException(e);
                 }
             }
         }

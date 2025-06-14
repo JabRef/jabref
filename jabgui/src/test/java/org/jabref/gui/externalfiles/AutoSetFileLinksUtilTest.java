@@ -67,8 +67,8 @@ class AutoSetFileLinksUtilTest {
     }
 
     @Test
-    void relinksMovedFile() throws IOException {
-        Path dir = Files.createTempDirectory("files");
+    void relinksMovedFile(@TempDir Path tempDir) throws IOException {
+        Path dir = tempDir.resolve("files");
         Path oldPath = dir.resolve("old/minimal.pdf");
         Files.createDirectories(oldPath.getParent());
         Files.createFile(oldPath);
@@ -77,7 +77,6 @@ class AutoSetFileLinksUtilTest {
         BibEntry entry = new BibEntry(StandardEntryType.Misc);
         entry.addFile(stale);
 
-        // emulate user move
         Path newPath = dir.resolve("new/minimal.pdf");
         Files.createDirectories(newPath.getParent());
         Files.move(oldPath, newPath);
