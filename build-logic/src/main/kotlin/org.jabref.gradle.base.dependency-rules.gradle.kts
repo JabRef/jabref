@@ -1,75 +1,12 @@
-import org.gradle.internal.os.OperatingSystem
-
 plugins {
-    java
-
-    id("idea")
-
-    // id("jacoco")
-
-    id("project-report")
-
     id("org.gradlex.extra-java-module-info")
-    id("org.gradlex.java-module-testing")
     id("org.gradlex.jvm-dependency-conflict-resolution")
-    id("org.gradlex.java-module-packaging")
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") }
-    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
-    maven { url = uri("https://jitpack.io") }
-    maven { url = uri("https://oss.sonatype.org/content/groups/public") }
-
-    // Required for one.jpro.jproutils:tree-showing
-    maven { url = uri("https://sandec.jfrog.io/artifactory/repo") }
-}
-
-dependencies {
-    constraints {
-        // Define dependency versions as constraints
-        // implementation("org.apache.commons:commons-text:1.12.0")
+jvmDependencyConflicts {
+    consistentResolution {
+        platform(":versions")
     }
-}
-
-val os = OperatingSystem.current()
-
-val osTarget = when {
-    os.isMacOsX -> {
-        val osVersion = System.getProperty("os.version")
-        val arch = System.getProperty("os.arch")
-        if (arch.contains("aarch")) "macos-14" else "macos-13"
-    }
-    os.isLinux -> "ubuntu-22.04"
-    os.isWindows -> "windows-2022"
-    else -> error("Unsupported OS")
-}
-
-// Source: https://github.com/jjohannes/java-module-system/blob/main/gradle/plugins/src/main/kotlin/targets.gradle.kts
-// Configure variants for OS
-javaModulePackaging {
-    target("ubuntu-22.04") {
-        operatingSystem = OperatingSystemFamily.LINUX
-        architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("deb")
-    }
-    target("macos-13") {
-        operatingSystem = OperatingSystemFamily.MACOS
-        architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("dmg")
-    }
-    target("macos-14") {
-        operatingSystem = OperatingSystemFamily.MACOS
-        architecture = MachineArchitecture.ARM64
-        packageTypes = listOf("dmg")
-    }
-    target("windows-2022") {
-        operatingSystem = OperatingSystemFamily.WINDOWS
-        architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("exe")
-    }
-    primaryTarget(target(osTarget))
 }
 
 // Tell gradle which jar to use for which platform
@@ -90,6 +27,19 @@ jvmDependencyConflicts.patch {
         removeDependency("com.google.code.findbugs:jsr305")
         removeDependency("org.checkerframework:checker-qual")
         removeDependency("com.google.errorprone:error_prone_annotations")
+    }
+    module("com.github.tomtung:latex2unicode_2.13") {
+        removeDependency("com.lihaoyi:fastparse_2.13")
+        addApiDependency("com.lihaoyi:fastparse:2.3.3")
+    }
+    module("de.rototor.jeuclid:jeuclid-core") {
+        removeDependency("org.apache.xmlgraphics:batik-svg-dom")
+        removeDependency("org.apache.xmlgraphics:batik-ext")
+        removeDependency("org.apache.xmlgraphics:xmlgraphics-commons")
+    }
+    module("org.wiremock:wiremock") {
+        // workaround for https://github.com/wiremock/wiremock/issues/2874
+        addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
     }
 }
 
@@ -194,53 +144,5 @@ extraJavaModuleInfo {
 
         // Required to provide package "wiremock.org.slf4j.helpers"
         mergeJar("com.github.koppor:wiremock-slf4j-shim")
-    }
-}
-
-testing {
-    suites {
-        val test by getting(JvmTestSuite::class) {
-            useJUnitJupiter()
-        }
-    }
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_24
-    targetCompatibility = JavaVersion.VERSION_24
-    toolchain {
-        // If this is updated, also update
-        // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
-        // - .devcontainer/devcontainer.json#L34 and
-        // - .moderne/moderne.yml
-        // - .github/workflows/binaries*.yml
-        // - .github/workflows/tests*.yml
-        // - .github/workflows/update-gradle-wrapper.yml
-        // - docs/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/intellij-12-build.md
-        // - .sdkmanrc
-        languageVersion = JavaLanguageVersion.of(24)
-        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
-        // See https://docs.gradle.org/current/javadoc/org/gradle/jvm/toolchain/JvmVendorSpec.html for a full list
-        // Temurin does not ship jmods, thus we need to use another JDK -- see https://github.com/actions/setup-java/issues/804
-        vendor = JvmVendorSpec.AZUL
-    }
-}
-
-tasks.javadoc {
-    ( options as StandardJavadocDocletOptions).apply {
-        encoding = "UTF-8"
-        // version = false
-        // author = false
-
-        addMultilineStringsOption("tag").setValue(listOf("apiNote", "implNote"))
-
-        // We cross-link to (non-visible) tests; therefore: no reference check
-        addBooleanOption("Xdoclint:all,-reference", true)
-
-        addMultilineStringsOption("-add-exports").value = listOf(
-            "javafx.controls/com.sun.javafx.scene.control=org.jabref",
-            "org.controlsfx.controls/impl.org.controlsfx.skin=org.jabref"
-        )
-
     }
 }
