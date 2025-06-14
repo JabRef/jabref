@@ -213,7 +213,7 @@ tasks.named("jlinkZip") {
 }
 
 tasks.register<Delete>("deleteInstallerTemp") {
-    delete(file("$buildDir/installer"))
+    delete(file("${layout.buildDirectory.get()}/installer"))
 }
 
 jlink {
