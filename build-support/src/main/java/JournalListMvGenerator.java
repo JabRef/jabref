@@ -1,4 +1,30 @@
-package org.jabref.generators;
+///usr/bin/env jbang "$0" "$@" ; exit $?
+
+//JAVA 24
+//RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
+
+//DEPS com.h2database:h2:2.2.224
+//DEPS org.antlr:antlr4-runtime:4.13.2
+//DEPS org.apache.commons:commons-csv:1.14.0
+//DEPS info.debatty:java-string-similarity:2.0.0
+//DEPS org.jooq:jool:0.9.14
+//DEPS org.openjfx:javafx-base:24.0.1
+//DEPS org.slf4j:slf4j-api:2.0.13
+//DEPS org.slf4j:slf4j-simple:2.0.13
+
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/LtwaEntry.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/LtwaRepository.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/NormalizeUtils.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/PrefixTree.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
+
+//SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -15,18 +41,25 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.h2.mvstore.MVMap;
 import org.h2.mvstore.MVStore;
 import org.jooq.lambda.Unchecked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+/// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
 public class JournalListMvGenerator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JournalListMvGenerator.class);
 
     public static void main(String[] args) throws IOException {
         boolean verbose = (args.length == 1) && ("--verbose".equals(args[0]));
 
-        Path abbreviationsDirectory = Path.of("src", "main", "abbrv.jabref.org", "journals");
+        Path abbreviationsDirectory = Path.of("jablib", "src", "main", "abbrv.jabref.org", "journals");
         if (!Files.exists(abbreviationsDirectory)) {
             System.out.println("Path " + abbreviationsDirectory.toAbsolutePath() + " does not exist");
             System.exit(0);
         }
-        Path journalListMvFile = Path.of("build", "resources", "main", "journals", "journal-list.mv");
+        // Directory layout aligns to other plugins (e.g., XJF plugin (https://github.com/bjornvester/xjc-gradle-plugin))
+        Path journalListMvFile = Path.of("jablib", "build", "generated", "resources", "journals", "journal-list.mv");
 
         Set<String> ignoredNames = Set.of(
                 // remove all lists without dot in them:
@@ -71,5 +104,7 @@ public class JournalListMvGenerator {
                 }
             }));
         }
+
+        LOGGER.info("Generated journal list at {}", journalListMvFile.toAbsolutePath());
     }
 }

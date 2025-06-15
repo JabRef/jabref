@@ -172,7 +172,7 @@ tasks.named("jlinkZip") {
 }
 
 tasks.register<Delete>("deleteInstallerTemp") {
-    delete(file("$buildDir/installer"))
+    delete(file("${layout.buildDirectory.get()}/installer"))
 }
 
 jlink {
@@ -287,6 +287,7 @@ jlink {
             "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
+    // This tasks reads resources from src/main/resourcesPackage/$OS
     jpackage {
         outputDir =
             "distribution"

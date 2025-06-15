@@ -45,8 +45,6 @@ dependencies {
 
     implementation("org.jabref:afterburner.fx")
 
-    implementation("commons-cli:commons-cli")
-
     implementation("org.apache.lucene:lucene-queryparser")
 
     implementation("io.github.adr:e-adr")

@@ -1,4 +1,4 @@
-package org.jabref.logic.citationstyle;
+// TODO: Integrate in JBang and tests.yml
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CitationStyleCatalogGeneratorTest {
 
-    private static final String CATALOG_PATH = "build/resources/main/citation-style-catalog.json";
+    private static final String CATALOG_PATH = "build/generated/resources/citation-style-catalog.json";
 
     @BeforeEach
     void generateCatalog() {
