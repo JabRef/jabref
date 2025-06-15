@@ -58,10 +58,10 @@ public class AutoSetFileLinksUtil {
                                 ExternalApplicationsPreferences externalApplicationsPreferences,
                                 FilePreferences filePreferences,
                                 AutoLinkPreferences autoLinkPreferences) {
-        this(databaseContext.getFileDirectories(filePreferences), externalApplicationsPreferences, filePreferences, autoLinkPreferences);
+        this(databaseContext.getFileDirectories(filePreferences), externalApplicationsPreferences, autoLinkPreferences);
     }
 
-    private AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, FilePreferences filePreferences, AutoLinkPreferences autoLinkPreferences) {
+    private AutoSetFileLinksUtil(List<Path> directories, ExternalApplicationsPreferences externalApplicationsPreferences, AutoLinkPreferences autoLinkPreferences) {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
@@ -97,11 +97,12 @@ public class AutoSetFileLinksUtil {
 
         LOGGER.debug("Searching for extensions {} in directories {}", extensions, directories);
 
+        // Run the search operation
         FileFinder fileFinder = FileFinders.constructFromConfiguration(autoLinkPreferences);
         List<Path> result = new ArrayList<>(fileFinder.findAssociatedFiles(entry, directories, extensions));
-
         result.addAll(findByBrokenLinkName(entry));
 
+        // Collect the found files that are not yet linked
         for (Path foundFile : result) {
             boolean fileAlreadyLinked = entry.getFiles().stream()
                                              .map(file -> file.findIn(directories))
