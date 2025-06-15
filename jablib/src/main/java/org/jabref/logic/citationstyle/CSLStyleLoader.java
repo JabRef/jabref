@@ -23,7 +23,7 @@ public class CSLStyleLoader {
     public static final String DEFAULT_STYLE = "ieee.csl";
 
     private static final String STYLES_ROOT = "/csl-styles";
-    private static final String CATALOG_PATH = "citation-style-catalog.json";
+    private static final String CATALOG_PATH = "/citation-style-catalog.json";
     private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
     private static final List<CitationStyle> EXTERNAL_STYLES = new ArrayList<>();
 
@@ -62,8 +62,7 @@ public class CSLStyleLoader {
     public static void loadInternalStyles() {
         INTERNAL_STYLES.clear();
 
-        // CATALOG_PATH is located inside build/generated/resource; therefore we need to go through the ClassLoader
-        try (InputStream is = CSLStyleLoader.class.getClassLoader().getResourceAsStream(CATALOG_PATH)) {
+        try (InputStream is = CSLStyleLoader.class.getResourceAsStream(CATALOG_PATH)) {
             if (is == null) {
                 LOGGER.error("Could not find citation style catalog");
                 return;
