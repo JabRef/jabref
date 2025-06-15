@@ -178,7 +178,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.MERGE_BIB_FILES_INTO_CURRENT_BIB, new MergeBibFilesIntoCurrentBibAction(frame, dialogService, preferences, stateManager, undoManager, fileUpdateMonitor, aiService, entryTypesManager, clipBoardManager, taskExecutor)),
+                factory.createMenuItem(StandardActions.MERGE_BIBTEX_FILES_INTO_CURRENT_LIBRARY, new MergeBibFilesIntoCurrentBibAction(frame, dialogService, preferences, stateManager, undoManager, fileUpdateMonitor, aiService, entryTypesManager, clipBoardManager, taskExecutor)),
 
                 new SeparatorMenuItem(),
 

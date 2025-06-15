@@ -213,7 +213,6 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(currentContext));
         when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.of(testInnerFolder));
 
-        // Prevents JavaFX UI(from MergeEntriesAction) from being constructed in a non-JavaFX environment
         try (MockedConstruction<MergeEntriesAction> mockedMergeEntriesAction = mockConstruction(MergeEntriesAction.class,
                 (mock, _) -> doNothing().when(mock).execute())) {
             MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
@@ -296,7 +295,6 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(stateManager.getActiveDatabase()).thenReturn(Optional.of(currentContext));
         when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.of(testInnerFolder));
 
-        // Prevents JavaFX UI (from MergeEntriesAction) from being constructed in a non-JavaFX environment
         try (MockedConstruction<MergeEntriesAction> mockedMergeEntriesAction = mockConstruction(MergeEntriesAction.class,
                 (mock, _) -> doNothing().when(mock).execute())) {
             MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
