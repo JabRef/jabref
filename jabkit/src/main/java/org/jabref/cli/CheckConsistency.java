@@ -40,9 +40,6 @@ class CheckConsistency implements Callable<Integer> {
     @Option(names = {"--output-format"}, description = "Output format: txt or csv", defaultValue = "txt")
     private String outputFormat;
 
-    @Option(names = {"--fail-on-error"}, description = "Return a non-zero exit code in case of error")
-    private boolean failOnError;
-
     @Override
     public Integer call() {
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
@@ -52,7 +49,7 @@ class CheckConsistency implements Callable<Integer> {
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return 1;
+            return 2;
         }
 
         if (parserResult.get().isInvalid()) {
@@ -99,11 +96,11 @@ class CheckConsistency implements Callable<Integer> {
             writer.flush();
         } catch (IOException e) {
             LOGGER.error("Error writing results", e);
-            return 3;
+            return 2;
         }
 
-        if (failOnError && !result.entryTypeToResultMap().isEmpty()) {
-            return -1;
+        if (!result.entryTypeToResultMap().isEmpty()) {
+            return 1;
         }
 
         if (!sharedOptions.porcelain) {
