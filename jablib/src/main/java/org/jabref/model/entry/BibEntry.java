@@ -969,6 +969,14 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    public BibEntry withField(Field field, Optional<String> value) {
+        value.ifPresent(v -> {
+            setField(field, v);
+            this.setChanged(false);
+        });
+        return this;
+    }
+
     /**
      * A copy is made of the parameter
      */
