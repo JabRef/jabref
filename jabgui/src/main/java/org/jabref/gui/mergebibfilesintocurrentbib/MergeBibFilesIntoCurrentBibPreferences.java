@@ -12,7 +12,7 @@ public class MergeBibFilesIntoCurrentBibPreferences {
         this.shouldMergeDuplicateEntries.set(shouldMergeDuplicateEntries);
     }
 
-    public boolean getShouldMergeSameKeyEntries() {
+    public boolean shouldMergeSameKeyEntries() {
         return this.shouldMergeSameKeyEntries.get();
     }
 
@@ -24,7 +24,7 @@ public class MergeBibFilesIntoCurrentBibPreferences {
         return this.shouldMergeSameKeyEntries;
     }
 
-    public boolean getShouldMergeDuplicateEntries() {
+    public boolean shouldMergeDuplicateEntries() {
         return this.shouldMergeDuplicateEntries.get();
     }
 

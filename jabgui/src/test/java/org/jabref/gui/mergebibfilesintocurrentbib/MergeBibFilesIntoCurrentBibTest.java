@@ -123,8 +123,8 @@ public class MergeBibFilesIntoCurrentBibTest {
 
         when(stateManager.activeDatabaseProperty()).thenReturn(OptionalObjectProperty.empty());
 
-        when(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeSameKeyEntries()).thenReturn(true);
-        when(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeDuplicateEntries()).thenReturn(true);
+        when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries()).thenReturn(true);
+        when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries()).thenReturn(true);
         when(preferences.getMergeBibFilesIntoCurrentBibPreferences()).thenReturn(mergeBibFilesIntoCurrentBibPreferences);
     }
 
@@ -236,8 +236,8 @@ public class MergeBibFilesIntoCurrentBibTest {
 
     @Test
     public void sameCitationKeyNoMergePreferenceTest() {
-        when(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeSameKeyEntries()).thenReturn(false);
-        when(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeDuplicateEntries()).thenReturn(false);
+        when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries()).thenReturn(false);
+        when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries()).thenReturn(false);
         BibEntry currentEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("test1")
                 .withField(StandardField.AUTHOR, "Different Author")
@@ -287,7 +287,6 @@ public class MergeBibFilesIntoCurrentBibTest {
                 .withField(StandardField.JOURNAL, "International Journal of Something")
                 .withField(StandardField.YEAR, "2023");
 
-        // DuplicateCheck.compareEntriesStrictly allows for different CommentsBeforeEntry
         currentEntry.setCommentsBeforeEntry("%% Very important paper.\n");
 
         BibDatabase currentDatabase = new BibDatabase();
@@ -320,8 +319,8 @@ public class MergeBibFilesIntoCurrentBibTest {
 
     @Test
     public void duplicateNoMergePreferenceTest() {
-        when(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeSameKeyEntries()).thenReturn(false);
-        when(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeDuplicateEntries()).thenReturn(false);
+        when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries()).thenReturn(false);
+        when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries()).thenReturn(false);
         BibEntry currentEntry = new BibEntry(StandardEntryType.Article)
                 .withCitationKey("DIFFERENTCITATIONKEY")
                 .withField(StandardField.AUTHOR, "Foo Bar")
@@ -329,7 +328,6 @@ public class MergeBibFilesIntoCurrentBibTest {
                 .withField(StandardField.JOURNAL, "International Journal of Something")
                 .withField(StandardField.YEAR, "2023");
 
-        // DuplicateCheck.compareEntriesStrictly allows for different CommentsBeforeEntry
         currentEntry.setCommentsBeforeEntry("%% Very important paper.\n");
 
         BibDatabase currentDatabase = new BibDatabase();

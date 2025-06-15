@@ -47,9 +47,6 @@ import org.slf4j.LoggerFactory;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 
-/**
- * Perform a merge libraries (.bib files) in folder into current library action
- */
 public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeBibFilesIntoCurrentBibAction.class);
 
@@ -98,8 +95,8 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
 
         MergeBibFilesIntoCurrentBibPreferences mergeBibFilesIntoCurrentBibPreferences = preferences.getMergeBibFilesIntoCurrentBibPreferences();
 
-        shouldMergeSameKeyEntries = mergeBibFilesIntoCurrentBibPreferences.getShouldMergeSameKeyEntries();
-        shouldMergeDuplicateEntries = mergeBibFilesIntoCurrentBibPreferences.getShouldMergeDuplicateEntries();
+        shouldMergeSameKeyEntries = mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries();
+        shouldMergeDuplicateEntries = mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries();
 
         if (selectedDirectory.isPresent() && context.isPresent()) {
             mergeBibFilesIntoCurrentBib(selectedDirectory.get(), context.get());

@@ -15,13 +15,13 @@ public class MergeBibFilesIntoCurrentBibTabViewModel implements PreferenceTabVie
     private final MergeBibFilesIntoCurrentBibPreferences mergeBibFilesIntoCurrentBibPreferences;
 
     public MergeBibFilesIntoCurrentBibTabViewModel(GuiPreferences preferences) {
-        this.mergeBibFilesIntoCurrentBibPreferences = preferences.getMergeBibFilesIntoCurrentBibPreferences();
+        mergeBibFilesIntoCurrentBibPreferences = preferences.getMergeBibFilesIntoCurrentBibPreferences();
     }
 
     @Override
     public void setValues() {
-        mergeSameKeyEntriesProperty.setValue(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeSameKeyEntries());
-        mergeDuplicateEntriesProperty.setValue(mergeBibFilesIntoCurrentBibPreferences.getShouldMergeDuplicateEntries());
+        mergeSameKeyEntriesProperty.setValue(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries());
+        mergeDuplicateEntriesProperty.setValue(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries());
     }
 
     @Override
