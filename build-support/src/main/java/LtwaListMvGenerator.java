@@ -12,16 +12,16 @@
 //DEPS org.slf4j:slf4j-api:2.0.13
 //DEPS org.slf4j:slf4j-simple:2.0.13
 
-//SOURCES ../main/java/org/jabref/logic/journals/Abbreviation.java
-//SOURCES ../main/java/org/jabref/logic/journals/AbbreviationFormat.java
-//SOURCES ../main/java/org/jabref/logic/journals/AbbreviationParser.java
-//SOURCES ../main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
-//SOURCES ../main/java/org/jabref/logic/journals/JournalAbbreviationPreferences.java
-//SOURCES ../main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
-//SOURCES ../main/java/org/jabref/logic/journals/ltwa/*.java
-//SOURCES ../main/java/org/jabref/logic/util/strings/StringSimilarity.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/*.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
 
-//SOURCES ../../build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
+//SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
 
 import java.io.IOException;
 import java.nio.file.Files;

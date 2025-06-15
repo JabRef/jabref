@@ -7,14 +7,14 @@
 //DEPS org.slf4j:slf4j-api:2.0.13
 //DEPS org.slf4j:slf4j-simple:2.0.13
 
-//SOURCES ../main/java/org/jabref/architecture/AllowedToUseClassGetResource.java
-//SOURCES ../main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
-//SOURCES ../main/java/org/jabref/logic/citationstyle/CitationStyle.java
-//SOURCES ../main/java/org/jabref/logic/openoffice/style/OOStyle.java
-//SOURCES ../main/java/org/jabref/logic/util/FileType.java
-//SOURCES ../main/java/org/jabref/logic/util/StandardFileType.java
-//SOURCES ../main/java/org/jabref/logic/util/UnknownFileType.java
-//SOURCES ../main/java/org/jabref/model/util/OptionalUtil.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/architecture/AllowedToUseClassGetResource.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/citationstyle/CSLStyleUtils.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/citationstyle/CitationStyle.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/openoffice/style/OOStyle.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/FileType.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/StandardFileType.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/UnknownFileType.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/model/util/OptionalUtil.java
 
 import java.io.IOException;
 import java.nio.file.Files;
