@@ -1,39 +1,36 @@
-package org.jabref.logic.importer.fileformat.microsoft;
+package org.jabref.logic.importer.fileformat.misc;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.jabref.logic.importer.TikaImporter;
-import org.jabref.logic.importer.util.Constants;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
 
-public class RtfImporter extends TikaImporter {
-    private static final char[] RTF_MAGIC_NUMBER = new char[]{'{', '\\', 'r', 't', 'f', '1'};
-
+public class TxtImporter extends TikaImporter {
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return Constants.hasMagicNumber(input, RTF_MAGIC_NUMBER);
+        return true;
     }
 
     @Override
     public String getId() {
-        return "rtf";
+        return "txt";
     }
 
     @Override
     public String getName() {
-        return "RTF";
+        return "TXT";
     }
 
     @Override
     public String getDescription() {
-        return Localization.lang("Rich Text File importer");
+        return Localization.lang("Importer for plain text files");
     }
 
     @Override
     public FileType getFileType() {
-        return StandardFileType.RTF;
+        return StandardFileType.TXT;
     }
 }

@@ -12,22 +12,22 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class PngImporterFilesTest {
-    private static final String FILE_ENDING = ".jpg";
+    private static final String FILE_ENDING = ".png";
 
-    private JpgImporter importer;
+    private PngImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new JpgImporter();
+        importer = new PngImporter();
     }
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("JpgImporterTest") && name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name -> name.startsWith("PngImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("JpgImporterTest") && !name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name -> !name.startsWith("PngImporterTest") && !name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 

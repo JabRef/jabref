@@ -14,26 +14,22 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class RtfImporterFilesTest {
-    private static final String FILE_ENDING = ".pptx";
-    private static final List<String> EXCLUDE_EXTENSIONS = Constants.ZIP_FILES_EXTENSIONS
-            .stream()
-            .filter(ext -> !ext.equals(FILE_ENDING))
-            .toList();
+    private static final String FILE_ENDING = ".rtf";
 
-    private PptxImporter importer;
+    private RtfImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new PptxImporter();
+        importer = new RtfImporter();
     }
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("PptxImporterTest") && name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name -> name.startsWith("RtfImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("PptxImporterTest") && EXCLUDE_EXTENSIONS.stream().noneMatch(name::endsWith);
+        Predicate<String> fileName = name -> !name.startsWith("RtfImporterTest") && !name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 

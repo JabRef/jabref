@@ -1,4 +1,4 @@
-package org.jabref.logic.importer.fileformat.img;
+package org.jabref.logic.importer.fileformat.books;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,37 +8,32 @@ import org.jabref.logic.importer.util.Constants;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.entry.types.BiblatexNonStandardTypes;
-import org.jabref.model.entry.types.EntryType;
 
-public class PngImporter extends TikaImporter {
+public class EpubImporter extends TikaImporter {
+    private static final char[] EPUB_HEADER_MAGIC_NUMBER = {0x50, 0x4b, 0x03, 0x04};
+
     @Override
     public boolean isRecognizedFormat(BufferedReader input) throws IOException {
-        return Constants.hasMagicNumber(input, new char[]{0xFFFD, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A});
+        return Constants.hasMagicNumber(input, EPUB_HEADER_MAGIC_NUMBER);
     }
 
     @Override
     public String getId() {
-        return "png";
+        return "epub";
     }
 
     @Override
     public String getName() {
-        return "PNG";
+        return "ePUB";
     }
 
     @Override
     public String getDescription() {
-        return Localization.lang("PNG image importer");
+        return Localization.lang("Import the popular e-book file format ePUB");
     }
 
     @Override
     public FileType getFileType() {
-        return StandardFileType.PNG;
-    }
-
-    @Override
-    protected EntryType getEntryType() {
-       return BiblatexNonStandardTypes.Image;
+        return StandardFileType.EPUB;
     }
 }

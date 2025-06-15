@@ -36,7 +36,7 @@ public class Constants {
         return hasMagicNumber(input, OLE_COMPOUND_MAGIC_NUMBER);
     }
 
-    private static boolean hasMagicNumber(BufferedReader input, char[] magicNumber) throws IOException {
+    public static boolean hasMagicNumber(BufferedReader input, char[] magicNumber) throws IOException {
         char[] header = new char[magicNumber.length];
         int nRead = input.read(header);
         return nRead == magicNumber.length && Arrays.equals(header, magicNumber);

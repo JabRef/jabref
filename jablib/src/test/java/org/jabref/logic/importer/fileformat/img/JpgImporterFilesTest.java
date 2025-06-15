@@ -1,40 +1,33 @@
 package org.jabref.logic.importer.fileformat.img;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.jabref.logic.importer.ImportException;
 import org.jabref.logic.importer.fileformat.ImporterTestEngine;
-import org.jabref.logic.importer.fileformat.microsoft.DocImporter;
-import org.jabref.logic.importer.util.Constants;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class DocImporterFilesTest {
-    private static final String FILE_ENDING = ".doc";
-    private static final List<String> EXCLUDE_EXTENSIONS = Constants.OLE_COMPOUND_FILES_EXTENSIONS
-            .stream()
-            .filter(ext -> !ext.equals(FILE_ENDING))
-            .toList();
+public class JpgImporterFilesTest {
+    private static final String FILE_ENDING = ".jpg";
 
-    private DocImporter importer;
+    private JpgImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new DocImporter();
+        importer = new JpgImporter();
     }
 
     private static Stream<String> fileNames() throws IOException {
-        Predicate<String> fileName = name -> name.startsWith("DocImporterTest") && name.endsWith(FILE_ENDING);
+        Predicate<String> fileName = name -> name.startsWith("JpgImporterTest") && name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 
     private static Stream<String> invalidFileNames() throws IOException {
-        Predicate<String> fileName = name -> !name.startsWith("DocImporterTest") && EXCLUDE_EXTENSIONS.stream().noneMatch(name::endsWith);
+        Predicate<String> fileName = name -> !name.startsWith("JpgImporterTest") && !name.endsWith(FILE_ENDING);
         return ImporterTestEngine.getTestFiles(fileName).stream();
     }
 

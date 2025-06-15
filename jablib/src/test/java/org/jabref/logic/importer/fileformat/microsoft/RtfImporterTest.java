@@ -8,25 +8,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RtfImporterTest {
-    private DocImporter importer;
+    private RtfImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new DocImporter();
+        importer = new RtfImporter();
     }
 
     @Test
     void getFormatName() {
-        assertEquals("Microsoft Word 97-2003", importer.getName());
+        assertEquals("RTF", importer.getName());
     }
 
     @Test
     void getCLIId() {
-        assertEquals("doc", importer.getId());
+        assertEquals("rtf", importer.getId());
     }
 
     @Test
     void sGetExtensions() {
-        assertEquals(StandardFileType.DOC, importer.getFileType());
+        assertEquals(StandardFileType.RTF, importer.getFileType());
     }
 }

@@ -8,25 +8,25 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PngImporterTest {
-    private JpgImporter importer;
+    private PngImporter importer;
 
     @BeforeEach
     void setUp() {
-        importer = new JpgImporter();
+        importer = new PngImporter();
     }
 
     @Test
     void getFormatName() {
-        assertEquals("JPG", importer.getName());
+        assertEquals("PNG", importer.getName());
     }
 
     @Test
     void getCLIId() {
-        assertEquals("jpg", importer.getId());
+        assertEquals("png", importer.getId());
     }
 
     @Test
     void sGetExtensions() {
-        assertEquals(StandardFileType.JPG, importer.getFileType());
+        assertEquals(StandardFileType.PNG, importer.getFileType());
     }
 }
