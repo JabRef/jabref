@@ -29,6 +29,6 @@ public class MergeBibFilesIntoCurrentBibTab extends AbstractPreferenceTabView<Me
 
     @Override
     public String getTabName() {
-        return Localization.lang("Merge bib files");
+        return Localization.lang("Merge BibTeX files into current library");
     }
 }

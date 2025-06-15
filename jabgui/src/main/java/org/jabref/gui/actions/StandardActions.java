@@ -87,7 +87,7 @@ public enum StandardActions implements Action {
     REPLACE_ALL(Localization.lang("Find and replace"), KeyBinding.REPLACE_STRING),
     MANAGE_KEYWORDS(Localization.lang("Manage keywords")),
     MASS_SET_FIELDS(Localization.lang("Manage field names & content")),
-    MERGE_BIBTEX_FILES_INTO_CURRENT_LIBRARY(Localization.lang("Merge other BibTeX files into current library...")),
+    MERGE_BIBTEX_FILES_INTO_CURRENT_LIBRARY(Localization.lang("Merge BibTeX files into current library")),
 
     AUTOMATIC_FIELD_EDITOR(Localization.lang("Automatic field editor")),
     TOGGLE_GROUPS(Localization.lang("Groups"), IconTheme.JabRefIcons.TOGGLE_GROUPS, KeyBinding.TOGGLE_GROUPS_INTERFACE),

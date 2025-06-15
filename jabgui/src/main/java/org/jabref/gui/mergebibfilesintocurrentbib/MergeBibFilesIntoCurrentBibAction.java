@@ -161,7 +161,7 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
                 }
             }
         }
-        NamedCompound ce = new NamedCompound(Localization.lang("Merge bib files into current bib"));
+        NamedCompound ce = new NamedCompound(Localization.lang("Merge BibTeX files into current library"));
         ce.addEdit(new UndoableInsertEntries(database, newEntries));
         ce.end();
 
