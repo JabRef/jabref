@@ -1,5 +1,6 @@
 package org.jabref.gui.documentviewer;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -43,7 +44,6 @@ public class PdfDocumentViewer extends StackPane {
         placeholderLabel.setVisible(true);
 
         EasyBind.subscribe(currentPage, current -> pdfView.setPage(current.intValue()));
-
         EasyBind.subscribe(highlightText, pdfView::setSearchText);
     }
 
@@ -61,14 +61,13 @@ public class PdfDocumentViewer extends StackPane {
             placeholderLabel.setText(Localization.lang("Loading PDF..."));
             placeholderLabel.setVisible(true);
 
-            try {
-                var inputStream = Files.newInputStream(document);
+            try (var inputStream = Files.newInputStream(document)) {
                 pdfView.load(inputStream);
                 pdfView.setPage(currentPage.get());
                 pdfView.setVisible(true);
                 placeholderLabel.setVisible(false);
                 LOGGER.debug("Successfully loaded PDF document: {}", document);
-            } catch (Exception e) {
+            } catch (IOException | PDFView.Document.DocumentProcessingException e) {
                 LOGGER.error("Could not load PDF document {}", document, e);
                 pdfView.setVisible(false);
                 placeholderLabel.setText(Localization.lang("Could not load PDF: %0", document.getFileName().toString()));
