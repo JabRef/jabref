@@ -2,13 +2,8 @@ version: 2
 updates:
   - package-ecosystem: gradle
     directories:
-      - "/build-logic"   # Build-related logic for gradle
-      - "/jabgui"        # JabRef's GUI
-      - "/jabkit"        # JabRef's CLI ("JabKit")
-      - "/jablib"        # Core library
-      - "/jabsrv"        # Server-related module
-      - "/jabsrv-cli"    # CLI for the server
-      - "/test-support"  # Module for test utilities
+      - "/build-logic"   # versions of 3rd party gradle plugins
+      - "/versions"      # versions of 3rd party dependencies of all JabRef modules
     schedule:
       interval: weekly
     labels:

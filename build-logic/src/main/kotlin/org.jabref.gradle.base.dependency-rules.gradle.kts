@@ -1,0 +1,312 @@
+plugins {
+    id("org.gradlex.extra-java-module-info")
+    id("org.gradlex.jvm-dependency-conflict-resolution")
+    id("org.gradlex.java-module-dependencies") // only for mappings at the moment
+}
+
+// TODO remove to translate 'requires' from 'module-info.java' to Gradle dependencies
+//      and remove 'dependencies {}' block from build.gradle files
+javaModuleDependencies { analyseOnly = true }
+
+jvmDependencyConflicts {
+    consistentResolution {
+        platform(":versions")
+    }
+}
+
+// Tell gradle which jar to use for which platform
+// Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
+jvmDependencyConflicts.patch {
+    listOf("base", "controls", "fxml", "graphics", "swing", "web", "media").forEach { jfxModule ->
+        module("org.openjfx:javafx-$jfxModule") {
+            addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
+            addTargetPlatformVariant("linux", OperatingSystemFamily.LINUX, MachineArchitecture.X86_64)
+            addTargetPlatformVariant("linux-aarch64", OperatingSystemFamily.LINUX, MachineArchitecture.ARM64)
+            addTargetPlatformVariant("mac", OperatingSystemFamily.MACOS, MachineArchitecture.X86_64)
+            addTargetPlatformVariant("mac-aarch64", OperatingSystemFamily.MACOS, MachineArchitecture.ARM64)
+            addTargetPlatformVariant("win", OperatingSystemFamily.WINDOWS, MachineArchitecture.X86_64)
+        }
+    }
+    // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L9
+    module("com.google.guava:guava") {
+        removeDependency("com.google.code.findbugs:jsr305")
+        removeDependency("org.checkerframework:checker-qual")
+        removeDependency("com.google.errorprone:error_prone_annotations")
+    }
+    module("org.jetbrains.kotlin:kotlin-stdlib") {
+        removeDependency("org.jetbrains.kotlin:kotlin-stdlib-common") // not needed
+    }
+    module("com.konghq:unirest-modules-gson") {
+        addApiDependency("com.konghq:unirest-java-core")
+    }
+    module("com.github.tomtung:latex2unicode_2.13") {
+        removeDependency("com.lihaoyi:fastparse_2.13")
+        addApiDependency("com.lihaoyi:fastparse:2.3.3")
+    }
+    module("de.rototor.jeuclid:jeuclid-core") {
+        removeDependency("org.apache.xmlgraphics:batik-svg-dom")
+        removeDependency("org.apache.xmlgraphics:batik-ext")
+        removeDependency("org.apache.xmlgraphics:xmlgraphics-commons")
+    }
+    module("org.wiremock:wiremock") {
+        // workaround for https://github.com/wiremock/wiremock/issues/2874
+        addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
+    }
+}
+
+extraJavaModuleInfo {
+    failOnAutomaticModules = true
+
+    knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
+    knownModule("com.github.hypfvieh:dbus-java-transport-native-unixsocket", "org.freedesktop.dbus.transport.jre")
+
+    module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers")
+    module("ai.djl.pytorch:pytorch-engine", "ai.djl.pytorch_engine")
+    module("ai.djl.pytorch:pytorch-model-zoo", "ai.djl.pytorch_model_zoo")
+    module("ai.djl:api", "ai.djl.api")
+    module("at.favre.lib:hkdf", "at.favre.lib.hkdf")
+    module("com.github.javakeyring:java-keyring", "com.github.java.keyring")
+    module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode")
+    module("com.googlecode.plist:dd-plist", "com.googlecode.dd.plist")
+    module("com.h2database:h2-mvstore", "com.h2database.mvstore")
+    module("com.ibm.icu:icu4j", "com.ibm.icu")
+    module("com.knuddels:jtokkit", "com.knuddels.jtokkit")
+    module("com.konghq:unirest-java-core", "com.konghq.unirest.java.core")
+    module("com.konghq:unirest-modules-gson", "com.konghq.unirest.modules.gson")
+    module("com.lihaoyi:fastparse", "com.lihaoyi.fastparse")
+    module("com.lihaoyi:geny", "com.lihaoyi.geny")
+    module("com.lihaoyi:sourcecode", "com.lihaoyi.sourcecode")
+    module("com.squareup.okhttp3:okhttp", "okhttp3")
+    module("com.squareup.okhttp3:okhttp-sse", "okhttp3.sse")
+    module("com.squareup.okio:okio", "okio")
+    module("com.squareup.retrofit2:converter-jackson", "retrofit2.converter.jackson")
+    module("com.squareup.retrofit2:retrofit", "retrofit2")
+    module("com.vladsch.flexmark:flexmark", "com.vladsch.flexmark")
+    module("com.vladsch.flexmark:flexmark-ext-emoji", "com.vladsch.flexmark.ext.emoji")
+    module("com.vladsch.flexmark:flexmark-ext-gfm-strikethrough", "com.vladsch.flexmark.ext.gfm.strikethrough")
+    module("com.vladsch.flexmark:flexmark-ext-ins", "com.vladsch.flexmark.ext.ins")
+    module("com.vladsch.flexmark:flexmark-ext-superscript", "com.vladsch.flexmark.ext.superscript")
+    module("com.vladsch.flexmark:flexmark-ext-tables", "com.vladsch.flexmark.ext.tables")
+    module("com.vladsch.flexmark:flexmark-ext-wikilink", "com.vladsch.flexmark.ext.wikilink")
+    module("com.vladsch.flexmark:flexmark-html2md-converter", "com.vladsch.flexmark.html2md.converter")
+    module("com.vladsch.flexmark:flexmark-jira-converter", "com.vladsch.flexmark.jira.converter")
+    module("com.vladsch.flexmark:flexmark-util", "com.vladsch.flexmark.util")
+    module("com.vladsch.flexmark:flexmark-util-ast", "com.vladsch.flexmark.util.ast")
+    module("com.vladsch.flexmark:flexmark-util-builder", "com.vladsch.flexmark.util.builder")
+    module("com.vladsch.flexmark:flexmark-util-collection", "com.vladsch.flexmark.util.collection")
+    module("com.vladsch.flexmark:flexmark-util-data", "com.vladsch.flexmark.util.data")
+    module("com.vladsch.flexmark:flexmark-util-dependency", "com.vladsch.flexmark.util.dependency")
+    module("com.vladsch.flexmark:flexmark-util-format", "com.vladsch.flexmark.util.format")
+    module("com.vladsch.flexmark:flexmark-util-html", "com.vladsch.flexmark.util.html")
+    module("com.vladsch.flexmark:flexmark-util-misc", "com.vladsch.flexmark.util.misc")
+    module("com.vladsch.flexmark:flexmark-util-options", "com.vladsch.flexmark.util.options")
+    module("com.vladsch.flexmark:flexmark-util-sequence", "com.vladsch.flexmark.util.sequence")
+    module("com.vladsch.flexmark:flexmark-util-visitor", "com.vladsch.flexmark.util.visitor")
+    module("commons-beanutils:commons-beanutils", "commons.beanutils")
+    module("commons-collections:commons-collections", "commons.collections")
+    module("commons-digester:commons-digester", "commons.digester")
+    module("de.rototor.jeuclid:jeuclid-core", "de.rototor.jeuclid.core")
+    module("de.rototor.snuggletex:snuggletex-core", "de.rototor.snuggletex.core")
+    module("de.rototor.snuggletex:snuggletex-jeuclid", "de.rototor.snuggletex.jeuclid")
+    module("de.swiesend:secret-service", "de.swiesend.secret.service")
+    module("de.undercouch:citeproc-java", "de.undercouch.citeproc.java")
+    module("dev.langchain4j:langchain4j", "dev.langchain4j")
+    module("dev.langchain4j:langchain4j-core", "dev.langchain4j.core")
+    module("dev.langchain4j:langchain4j-google-ai-gemini", "dev.langchain4j.google.ai.gemini")
+    module("dev.langchain4j:langchain4j-http-client", "dev.langchain4j.http.client")
+    module("dev.langchain4j:langchain4j-http-client-jdk", "dev.langchain4j.http.client.jdk")
+    module("dev.langchain4j:langchain4j-hugging-face", "dev.langchain4j.hugging.face")
+    module("dev.langchain4j:langchain4j-mistral-ai", "dev.langchain4j.mistral.ai")
+    module("dev.langchain4j:langchain4j-open-ai", "dev.langchain4j.open.ai")
+    module("eu.lestard:doc-annotations", "eu.lestard.doc.annotations")
+    module("info.debatty:java-string-similarity", "info.debatty.java.string.similarity")
+    module("io.github.adr:e-adr", "io.github.adr")
+    module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
+    module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "io.zonky.test.postgres.embedded.postgres.binaries.darwin.amd64")
+    module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8", "io.zonky.test.postgres.embedded.postgres.binaries.darwin.arm64v8")
+    module("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64", "io.zonky.test.postgres.embedded.postgres.binaries.linux.amd64")
+    module("io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64-alpine", "io.zonky.test.postgres.embedded.postgres.binaries.linux.amd64.alpine")
+    module("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8", "io.zonky.test.postgres.embedded.postgres.binaries.linux.arm64v8")
+    module("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64", "io.zonky.test.postgres.embedded.postgres.binaries.windows.amd64")
+    module("net.harawata:appdirs", "net.harawata.appdirs")
+    module("net.java.dev.jna:jna", "com.sun.jna")
+    module("net.java.dev.jna:jna-platform", "com.sun.jna.platform")
+    module("net.jcip:jcip-annotations", "net.jcip.annotations")
+    module("net.jodah:typetools", "net.jodah.typetools")
+    module("org.abego.treelayout:org.abego.treelayout.core", "org.abego.treelayout.core")
+    module("org.antlr:antlr4-runtime", "org.antlr.antlr4.runtime")
+    module("org.apache.httpcomponents.client5:httpclient5", "org.apache.httpcomponents.client5.httpclient5")
+    module("org.apache.httpcomponents.core5:httpcore5", "org.apache.httpcomponents.core5.httpcore5")
+    module("org.apache.httpcomponents.core5:httpcore5-h2", "org.apache.httpcomponents.core5.httpcore5.h2")
+    module("org.apache.httpcomponents:httpclient", "org.apache.httpcomponents.httpclient")
+    module("org.apache.opennlp:opennlp-tools", "org.apache.opennlp.tools")
+    module("org.apache.pdfbox:fontbox", "org.apache.fontbox")
+    module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
+    module("org.apache.velocity:velocity-engine-core", "org.apache.velocity.engine.core")
+    module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
+    module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
+    module("org.fxmisc.wellbehaved:wellbehavedfx", "org.fxmisc.wellbehaved")
+    module("org.jbibtex:jbibtex", "org.jbibtex.jbibtex")
+    module("org.scala-lang:scala-library", "scala.library")
+    module("pt.davidafsilva.apple:jkeychain", "pt.davidafsilva.apple.jkeychain")
+
+    module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("org.controlsfx.controls")
+    }
+    module("de.saxsys:mvvmfx", "de.saxsys.mvvmfx") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+    }
+    module("de.saxsys:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+    }
+    module("org.reactfx:reactfx", "org.reactfx") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+    }
+    module("org.fxmisc.flowless:flowless", "org.fxmisc.flowless") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.controls")
+        requiresTransitive("javafx.graphics")
+    }
+    module("org.fxmisc.richtext:richtextfx", "org.fxmisc.richtext") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.graphics")
+    }
+    module("io.github.stefanbratanov:jvm-openai", "io.github.stefanbratanov.jvm.openai") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.net.http")
+    }
+    module("io.zonky.test:embedded-postgres", "io.zonky.test.embedded.postgres") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.sql")
+    }
+    module("org.postgresql:postgresql", "org.postgresql.jdbc") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.sql")
+    }
+    module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.desktop")
+    }
+    module("org.apache.pdfbox:xmpbox", "org.apache.xmpbox") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.xml")
+    }
+    module("com.squareup.okio:okio-jvm", "okio"){
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
+    module("org.openjfx:javafx-base", "javafx.base") {
+        patchRealModule()
+        // jabgui requires at least "javafx.collections"
+        exportAllPackages()
+    }
+
+    // required for testing of jablib
+    module("org.openjfx:javafx-fxml", "javafx.fxml") {
+        patchRealModule()
+        exportAllPackages()
+
+        requiresTransitive("javafx.base")
+        requiresTransitive("javafx.graphics")
+        requiresTransitive("java.desktop")
+    }
+
+    // required for testing
+    module("org.openjfx:javafx-graphics", "javafx.graphics") {
+        patchRealModule()
+        exportAllPackages()
+
+        requiresTransitive("javafx.base")
+        requiresTransitive("java.desktop")
+        requiresTransitive("jdk.unsupported")
+    }
+
+    module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
+        patchRealModule()
+
+        exports("impl.org.controlsfx.skin")
+        exports("org.controlsfx.control")
+        exports("org.controlsfx.control.action")
+        exports("org.controlsfx.control.decoration")
+        exports("org.controlsfx.control.table")
+        exports("org.controlsfx.control.textfield")
+        exports("org.controlsfx.dialog")
+        exports("org.controlsfx.validation")
+        exports("org.controlsfx.validation.decoration")
+
+        requires("javafx.base")
+        requires("javafx.controls")
+        requires("javafx.graphics")
+    }
+
+    module("org.openjfx:javafx-controls", "javafx.controls") {
+        patchRealModule()
+
+        requiresTransitive("javafx.base");
+        requiresTransitive("javafx.graphics");
+
+        exports("javafx.scene.chart")
+        exports("javafx.scene.control")
+        exports("javafx.scene.control.cell")
+        exports("javafx.scene.control.skin")
+
+        // PATCH REASON:
+        exports("com.sun.javafx.scene.control")
+    }
+
+    // Workaround for https://github.com/wiremock/wiremock/issues/2149
+    module("org.wiremock:wiremock", "wiremock") {
+        patchRealModule()
+        exportAllPackages()
+
+        requires("wiremock.slf4j.spi.shim")
+        requires("com.fasterxml.jackson.core")
+        requires("com.fasterxml.jackson.databind")
+        requires("com.fasterxml.jackson.datatype.jsr310")
+        requires("com.google.common")
+        requires("commons.fileupload")
+        requires("org.eclipse.jetty.server")
+        requires("org.eclipse.jetty.servlet")
+        requires("org.eclipse.jetty.servlets")
+        requires("org.eclipse.jetty.webapp")
+        requires("org.eclipse.jetty.proxy")
+        requires("org.eclipse.jetty.http2.server")
+        requires("org.eclipse.jetty.alpn.server")
+        requires("org.eclipse.jetty.alpn.java.server")
+        requires("org.eclipse.jetty.alpn.java.client")
+        requires("org.eclipse.jetty.alpn.client")
+        requires("java.xml")
+        requires("org.custommonkey.xmlunit")
+        requires("org.slf4j")
+        requires("org.xmlunit")
+
+        uses("com.github.tomakehurst.wiremock.extension.Extension")
+
+        // workaround for https://github.com/wiremock/wiremock/issues/2874
+        mergeJar("com.github.jknack:handlebars")
+        mergeJar("com.github.jknack:handlebars-helpers")
+
+        // Required to provide package "wiremock.org.slf4j.helpers"
+        mergeJar("com.github.koppor:wiremock-slf4j-shim")
+    }
+}
