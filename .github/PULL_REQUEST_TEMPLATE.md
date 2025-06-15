@@ -1,4 +1,5 @@
 Closes _____
+<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD. Example: Closes https://github.com/JabRef/jabref/issues/13109 OR Closes #13109 -->
 
 <!-- In about one to three sentences, describe the changes you have made: what, where, why, ... (REPLACE THIS LINE) -->
 
@@ -11,7 +12,6 @@ Closes _____
 <!-- (REPLACE THIS PARAGRAPH) -->
 
 <!-- YOU HAVE TO MODIFY THE ABOVE TEXT FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
-<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD. Example: Closes https://github.com/JabRef/jabref/issues/13109 OR Closes #13109 -->
 
 ### Mandatory checks
 
