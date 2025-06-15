@@ -26,6 +26,6 @@ Thereby, existing, up-to-date code, from JabRef should be used
 
 Chosen option: "JBang", because
 
-- All "scripts" have a total length of 300 lines of code
-- JBang is a well-enough supported tool
-- Using gradle would lead to introduce another "jablib" project: "jablib-journals-csl", which depends on the jablib. This is much effort to implement and get project dependencies right.
+* All "scripts" have a total length of 300 lines of code
+* JBang is a well-enough supported tool
+* Using gradle would lead to introduce another "jablib" project: "jablib-journals-csl", which depends on the jablib. This is much effort to implement and get project dependencies right.
