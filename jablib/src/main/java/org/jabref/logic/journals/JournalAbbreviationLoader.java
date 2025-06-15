@@ -40,7 +40,7 @@ public class JournalAbbreviationLoader {
         // Initialize with built-in list
         try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
             if (resourceAsStream == null) {
-                LOGGER.warn("There is no journal-list.mv. We use a default journal list");
+                LOGGER.warn("There is no journal-list.mv. We use a default journal list.");
                 repository = new JournalAbbreviationRepository();
             } else {
                 Path tempDir = Files.createTempDirectory("jabref-journal");
@@ -49,6 +49,7 @@ public class JournalAbbreviationLoader {
                 repository = new JournalAbbreviationRepository(tempJournalList, loadLtwaRepository());
                 tempDir.toFile().deleteOnExit();
                 tempJournalList.toFile().deleteOnExit();
+                LOGGER.info("Loaded journal abbreviations from {}", tempJournalList.toAbsolutePath());
             }
         } catch (IOException e) {
             LOGGER.error("Error while loading journal abbreviation repository", e);
