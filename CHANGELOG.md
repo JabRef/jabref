@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We introduced a settings parameters to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
+- We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
 
 ### Changed
 
@@ -34,6 +35,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for import of a Refer/BibIX file format. [#13069](https://github.com/JabRef/jabref/issues/13069)
 - We added a new `jabkit` command `pseudonymize` to pseudonymize the library. [#13109](https://github.com/JabRef/jabref/issues/13109)
 - We added functionality to focus running instance when trying to start a second instance. [#13129](https://github.com/JabRef/jabref/issues/13129)
+- We added a new setting in the 'Entry Editor' preferences to hide the 'File Annotations' tab when no annotations are available. [#13143](https://github.com/JabRef/jabref/issues/13143)
 
 ### Changed
 
@@ -45,6 +47,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We improved JabRef's internal document viewer. It now allows text section, searching and highlighting of search terms and page rotation [#13193](https://github.com/JabRef/jabref/pull/13193).
 - When importing a PDF, there is no empty entry column shown in the multi merge dialog. [#13132](https://github.com/JabRef/jabref/issues/13132)
 - We added a progress dialog to the "Check consistency" action and progress output to the corresponding cli command. [#12487](https://github.com/JabRef/jabref/issues/12487)
+- We made the `check-consistency` command of the toolkit always return an exit code; 0 means no issues found, a non-zero exit code reflects any issues, which allows CI to fail in these cases [#13328](https://github.com/JabRef/jabref/issues/13328).
 
 ### Fixed
 

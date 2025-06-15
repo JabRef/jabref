@@ -139,14 +139,14 @@ dependencies {
 
     testImplementation("org.wiremock:wiremock:3.13.0")
     // Required by Wiremock - and our patching of Wiremock
-    implementation("com.github.jknack:handlebars:4.3.1") {
+    testImplementation("com.github.jknack:handlebars:4.3.1") {
         exclude(group = "org.mozilla", module = "rhino")
     }
-    implementation("com.github.jknack:handlebars-helpers:4.3.1") {
+    testImplementation("com.github.jknack:handlebars-helpers:4.3.1") {
         exclude(group = "org.mozilla", module = "rhino")
         exclude(group = "org.apache.commons", module = "commons-lang3")
     }
-    implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
+    testImplementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
     testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
@@ -169,17 +169,6 @@ application {
         "-XX:+UseZGC", "-XX:+ZUncommit",
         "-XX:+UseStringDeduplication",
 
-        // Fix for https://github.com/JabRef/jabref/issues/11188
-        "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
-        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-
-        // Fix for https://github.com/JabRef/jabref/issues/11198
-        "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
-        "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
-        "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-        // fix for https://github.com/JabRef/jabref/issues/11426
-        "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
-
         // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
         "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
         "--add-exports=javafx.base/com.sun.javafx.event=org.jabref",
@@ -191,7 +180,7 @@ application {
         "--add-opens=javafx.base/javafx.collections=org.jabref",
         "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
 
-        "--enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
+        "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
     )
 }
 
@@ -244,8 +233,21 @@ jlink {
     )
 
     launcher {
-        name =
-            "JabRef"
+        name = "JabRef"
+        jvmArgs = listOf(
+            // Fix for https://github.com/JabRef/jabref/issues/11188
+            "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
+            "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+
+            // Fix for https://github.com/JabRef/jabref/issues/11198
+            "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
+            "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
+            "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
+            // fix for https://github.com/JabRef/jabref/issues/11426
+            "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
+
+            "--enable-native-access=org.jabref.merged.module"
+        )
     }
 
     // TODO: Remove as soon as dependencies are fixed (upstream)
@@ -326,6 +328,7 @@ jlink {
             "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
+    // This tasks reads resources from src/main/resourcesPackage/$OS
     jpackage {
         outputDir =
             "distribution"
