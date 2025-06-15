@@ -105,6 +105,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.crawler;
     exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
+    exports org.jabref.logic.ocr;
     exports org.jabref.logic.citation.repository;
 
     requires java.base;
@@ -252,5 +253,6 @@ open module org.jabref.jablib {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
+    requires tess4j;
     // endregion
 }
