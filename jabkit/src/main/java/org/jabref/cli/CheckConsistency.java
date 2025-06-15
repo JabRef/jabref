@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
@@ -24,7 +25,7 @@ import static picocli.CommandLine.Option;
 import static picocli.CommandLine.ParentCommand;
 
 @Command(name = "check-consistency", description = "Check consistency of the library.")
-class CheckConsistency implements Runnable {
+class CheckConsistency implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(CheckConsistency.class);
 
     @ParentCommand
@@ -39,8 +40,11 @@ class CheckConsistency implements Runnable {
     @Option(names = {"--output-format"}, description = "Output format: txt or csv", defaultValue = "txt")
     private String outputFormat;
 
+    @Option(names = {"--fail-on-error"}, description = "Return a non-zero exit code in case of error")
+    private boolean failOnError;
+
     @Override
-    public void run() {
+    public Integer call() {
         Optional<ParserResult> parserResult = ArgumentProcessor.importFile(
                 inputFile,
                 "bibtex",
@@ -48,12 +52,12 @@ class CheckConsistency implements Runnable {
                 sharedOptions.porcelain);
         if (parserResult.isEmpty()) {
             System.out.println(Localization.lang("Unable to open file '%0'.", inputFile));
-            return;
+            return 1;
         }
 
         if (parserResult.get().isInvalid()) {
             System.out.println(Localization.lang("Input file '%0' is invalid and could not be parsed.", inputFile));
-            return;
+            return 2;
         }
 
         if (!sharedOptions.porcelain) {
@@ -95,11 +99,16 @@ class CheckConsistency implements Runnable {
             writer.flush();
         } catch (IOException e) {
             LOGGER.error("Error writing results", e);
-            return;
+            return 3;
+        }
+
+        if (failOnError && !result.entryTypeToResultMap().isEmpty()) {
+            return -1;
         }
 
         if (!sharedOptions.porcelain) {
             System.out.println(Localization.lang("Consistency check completed"));
         }
+        return 0;
     }
 }
