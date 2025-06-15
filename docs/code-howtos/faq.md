@@ -118,11 +118,14 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 
-For `csl-styles`:
-
+For `csl-styles`,`csl-locales` and `abbrev.jabref.org`  
 ```bash
 git merge origin/main
 git checkout main -- jablib/src/main/resources/csl-styles
+git checkout main -- jablib/src/main/resources/csl-locales
+git checkout main -- jablib/src/main/abbrev.jabref.org
+
+
 ... git commit ... 
 git push
 ```
