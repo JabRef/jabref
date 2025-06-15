@@ -1,12 +1,31 @@
-package org.jabref.generators;
+///usr/bin/env jbang "$0" "$@" ; exit $?
+
+//JAVA 24
+//RUNTIME_OPTIONS --enable-native-access=ALL-UNNAMED
+
+//DEPS com.h2database:h2:2.2.224
+//DEPS org.antlr:antlr4-runtime:4.13.2
+//DEPS org.apache.commons:commons-csv:1.14.0
+//DEPS info.debatty:java-string-similarity:2.0.0
+//DEPS org.jooq:jool:0.9.14
+//DEPS org.openjfx:javafx-base:24.0.1
+//DEPS org.slf4j:slf4j-api:2.0.13
+//DEPS org.slf4j:slf4j-simple:2.0.13
+
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/Abbreviation.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationFormat.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/AbbreviationParser.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationLoader.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationPreferences.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/JournalAbbreviationRepository.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/journals/ltwa/*.java
+//SOURCES ../../../../jablib/src/main/java/org/jabref/logic/util/strings/StringSimilarity.java
+
+//SOURCES ../../../../jablib/build/generated-src/antlr/main/org/jabref/logic/journals/ltwa/*.java
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,49 +40,30 @@ import org.h2.mvstore.MVStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * CLI tool for downloading the LTWA CSV file and converting it to an MVStore file.
- */
+/// CLI tool for downloading the LTWA CSV file and converting it to an MVStore file.
+///
+/// Has to be started in the root of the repository due to <https://github.com/jbangdev/jbang-gradle-plugin/issues/11>
 public class LtwaListMvGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LtwaListMvGenerator.class);
-    private static final String LTWA_URL = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv";
 
     public static void main(String[] args) {
         try {
-            Path tempCsvFile = downloadLtwaFile();
-            Path outputDir = Path.of("build", "resources", "main", "journals");
+            Path tempCsvFile = Path.of("jablib", "build", "tmp", "ltwa_20210702.csv");
+            if (!Files.exists(tempCsvFile)) {
+                LOGGER.error("LTWA CSV file not found at {}. Please execute gradle task downloadLtwaFile.", tempCsvFile);
+                return;
+            }
+            Path outputDir = Path.of("jablib", "build", "generated", "resources", "journals");
+
             Files.createDirectories(outputDir);
             Path outputFile = outputDir.resolve("ltwa-list.mv");
 
             generateMvStore(tempCsvFile, outputFile);
 
-            // Delete temp file
-            Files.deleteIfExists(tempCsvFile);
-
-            LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile);
+            LOGGER.info("LTWA MVStore file generated successfully at {}.", outputFile.toAbsolutePath());
         } catch (IOException e) {
             LOGGER.error("Error generating LTWA MVStore file.", e);
-        } catch (URISyntaxException e) {
-            LOGGER.error("Invalid URL for LTWA file (this should never happen).", e);
-        }
-    }
-
-    /**
-     * Downloads the LTWA CSV file from the specified URL.
-     *
-     * @return Path to the downloaded file
-     * @throws IOException If an I/O error occurs
-     */
-    private static Path downloadLtwaFile() throws IOException, URISyntaxException {
-        LOGGER.info("Downloading LTWA file from {}.", LtwaListMvGenerator.LTWA_URL);
-        try (InputStream inputStream = new URI(LTWA_URL).toURL().openStream()) {
-            Path path = Files.writeString(
-                    Files.createTempFile("ltwa", ".csv"),
-                    new String(inputStream.readAllBytes()),
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING);
-            return path;
         }
     }
 
