@@ -107,7 +107,7 @@ You probably chose the wrong gradle task:
 
 ### The problem
 
-Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org` or `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
+Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org`, `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
 
 ![Changed submodules](../images/submodules.png)
 
@@ -118,19 +118,16 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 
-For `csl-styles`,`csl-locales` and `abbrev.jabref.org`  
+For `csl-styles`, `csl-locales`, and `abbrev.jabref.org`:
+
 ```bash
 git merge origin/main
 git checkout main -- jablib/src/main/resources/csl-styles
 git checkout main -- jablib/src/main/resources/csl-locales
 git checkout main -- jablib/src/main/abbrev.jabref.org
-
-
-... git commit ... 
+git commit -m "Fix submodules"
 git push
 ```
-
-And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 #### Alternative method (if the above doesn't work)
 
