@@ -53,8 +53,6 @@ dependencies {
         exclude( group = "org.openjfx")
     }
 
-    implementation("commons-cli:commons-cli:1.9.0")
-
     implementation("org.apache.lucene:lucene-queryparser:${luceneVersion}")
 
     implementation("io.github.adr:e-adr:2.0.0-SNAPSHOT")
