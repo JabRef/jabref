@@ -68,8 +68,8 @@ class AutoSetFileLinksUtilTest {
 
     @Test
     void relinksMovedFile(@TempDir Path tempDir) throws IOException {
-        Path dir = tempDir.resolve("files");
-        Path oldPath = dir.resolve("old/minimal.pdf");
+        Path directory = tempDir.resolve("files");
+        Path oldPath = directory.resolve("old/minimal.pdf");
         Files.createDirectories(oldPath.getParent());
         Files.createFile(oldPath);
 
@@ -77,21 +77,24 @@ class AutoSetFileLinksUtilTest {
         BibEntry entry = new BibEntry(StandardEntryType.Misc);
         entry.addFile(stale);
 
-        Path newPath = dir.resolve("new/minimal.pdf");
+        Path newPath = directory.resolve("new/minimal.pdf");
         Files.createDirectories(newPath.getParent());
         Files.move(oldPath, newPath);
 
         BibDatabaseContext context = mock(BibDatabaseContext.class);
-        when(context.getFileDirectories(filePreferences)).thenReturn(List.of(dir));
+        when(context.getFileDirectories(filePreferences)).thenReturn(List.of(directory));
 
-        AutoSetFileLinksUtil util =
-                new AutoSetFileLinksUtil(context, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                context,
+                externalApplicationsPreferences,
+                filePreferences,
+                autoLinkPrefs);
 
         List<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
 
         assertEquals(1, matches.size());
         assertEquals(
-                FileUtil.relativize(newPath, List.of(dir)),
+                FileUtil.relativize(newPath, List.of(directory)),
                 Path.of(matches.getFirst().getLink())
         );
     }

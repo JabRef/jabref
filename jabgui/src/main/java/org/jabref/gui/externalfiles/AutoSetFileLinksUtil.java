@@ -53,7 +53,6 @@ public class AutoSetFileLinksUtil {
     private final List<Path> directories;
     private final AutoLinkPreferences autoLinkPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
-    private final FilePreferences filePreferences;
 
     public AutoSetFileLinksUtil(BibDatabaseContext databaseContext,
                                 ExternalApplicationsPreferences externalApplicationsPreferences,
@@ -66,7 +65,6 @@ public class AutoSetFileLinksUtil {
         this.directories = directories;
         this.autoLinkPreferences = autoLinkPreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
-        this.filePreferences = filePreferences;
     }
 
     public LinkFilesResult linkAssociatedFiles(List<BibEntry> entries, BiConsumer<LinkedFile, BibEntry> onAddLinkedFile) {
@@ -107,11 +105,11 @@ public class AutoSetFileLinksUtil {
         for (Path foundFile : result) {
             boolean fileAlreadyLinked = entry.getFiles().stream()
                                              .map(file -> file.findIn(directories))
-                                             .anyMatch(opt -> opt.filter(p -> {
+                                             .anyMatch(linked -> linked.filter(path -> {
                                                  try {
-                                                     return Files.isSameFile(p, foundFile);
+                                                     return Files.isSameFile(path, foundFile);
                                                  } catch (IOException e) {
-                                                     LOGGER.error("Problem with isSameFile", e);
+                                                     LOGGER.debug("Unable to check file identity, assuming no identity", e);
                                                      return false;
                                                  }
                                              }).isPresent());
@@ -142,10 +140,10 @@ public class AutoSetFileLinksUtil {
 
             String wantedBase = FileUtil.getBaseName(brokenLink.getLink());
 
-            for (Path dir : directories) {
-                try (Stream<Path> walk = Files.walk(dir)) {
-                    walk.filter(p -> !Files.isDirectory(p))
-                        .filter(p -> FileUtil.getBaseName(p).equalsIgnoreCase(wantedBase))
+            for (Path directory : directories) {
+                try (Stream<Path> walk = Files.walk(directory)) {
+                    walk.filter(path -> !Files.isDirectory(path))
+                        .filter(path -> FileUtil.getBaseName(path).equalsIgnoreCase(wantedBase))
                         .findFirst()
                         .ifPresent(matches::add);
                 }
