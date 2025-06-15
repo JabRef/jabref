@@ -106,20 +106,20 @@ public class BibliographyConsistencyCheck {
     }
 
     private static void collectEntriesIntoMaps(List<BibEntry> entries, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
-        entries.forEach(entry -> {
-                      EntryType entryType = entry.getType();
+        for (BibEntry entry : entries) {
+            EntryType entryType = entry.getType();
 
             entryTypeToFieldsInAnyEntryMap
-                    .computeIfAbsent(entryType, k -> new HashSet<>())
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
                     .addAll(filterExcludedFields(entry.getFields()));
 
             entryTypeToFieldsInAllEntriesMap
-                    .computeIfAbsent(entryType, k -> new HashSet<>(filterExcludedFields(entry.getFields())))
+                    .computeIfAbsent(entryType, _ -> new HashSet<>(filterExcludedFields(entry.getFields())))
                     .retainAll(filterExcludedFields(entry.getFields()));
 
             entryTypeToEntriesMap
-                    .computeIfAbsent(entryType, k -> new HashSet<>())
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
                     .add(entry);
-                    });
+        }
     }
 }
