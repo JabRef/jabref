@@ -60,19 +60,19 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     private void setupModeButtons() {
         // make sure that always one toggle is selected
-        toggleGroupMode.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
+        toggleGroupMode.selectedToggleProperty().addListener((_, oldToggle, newToggle) -> {
             if (newToggle == null) {
                 oldToggle.setSelected(true);
             }
         });
 
-        modeLive.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        modeLive.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
                 viewModel.setLiveMode(true);
             }
         });
 
-        modeLock.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        modeLock.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
                 viewModel.setLiveMode(false);
             }
@@ -85,13 +85,13 @@ public class DocumentViewerView extends BaseDialog<Void> {
         fileChoice.setButtonCell(cellFactory.call(null));
         fileChoice.setCellFactory(cellFactory);
         fileChoice.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> {
+                (_, _, newValue) -> {
                     if (newValue != null && !fileChoice.getItems().isEmpty()) {
                         viewModel.switchToFile(newValue);
                     }
                 });
 
-        fileChoice.itemsProperty().addListener((observable, oldValue, newValue) -> {
+        fileChoice.itemsProperty().addListener((_, _, newValue) -> {
             if (newValue != null && !newValue.isEmpty()) {
                 if (!fileChoice.getItems().isEmpty()) {
                     fileChoice.getSelectionModel().selectFirst();
@@ -102,7 +102,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
     }
 
     private void setupViewer() {
-        viewModel.currentDocumentProperty().addListener((observable, oldDocument, newDocument) -> {
+        viewModel.currentDocumentProperty().addListener((_, _, newDocument) -> {
                 viewer.show(newDocument);
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
