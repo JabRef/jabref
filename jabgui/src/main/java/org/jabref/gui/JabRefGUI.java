@@ -78,7 +78,6 @@ public class JabRefGUI extends Application {
     private static ClipBoardManager clipBoardManager;
     private static DialogService dialogService;
     private static JabRefFrame mainFrame;
-
     private static RemoteListenerServerManager remoteListenerServerManager;
 
     private Stage mainStage;
@@ -202,7 +201,7 @@ public class JabRefGUI extends Application {
 
     private void setupProxy() {
         if (!preferences.getProxyPreferences().shouldUseProxy()
-                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
+            || !preferences.getProxyPreferences().shouldUseAuthentication()) {
             return;
         }
 
