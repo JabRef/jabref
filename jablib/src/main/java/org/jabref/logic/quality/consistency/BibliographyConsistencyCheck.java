@@ -9,15 +9,41 @@ import java.util.Map;
 import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.SpecialField;
+import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
+
+    private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
+                            StandardField.COMMENT,
+                            StandardField.CROSSREF,
+                            StandardField.GROUPS,
+                            StandardField.CITES,
+                            StandardField.PDF,
+                            StandardField.REVIEW,
+                            StandardField.SORTKEY,
+                            StandardField.SORTNAME,
+                            StandardField.TYPE,
+                            StandardField.XREF
+                    );
+
+    private static Set<Field> filterExcludedFields(Collection<Field> fields) {
+        return fields.stream()
+                     .filter(field -> !EXPLICITLY_EXCLUDED_FIELDS.contains(field))
+                     .filter(field -> !StandardField.AUTOMATIC_FIELDS.contains(field))
+                     .filter(field -> !(field instanceof SpecialField))
+                     .filter(field -> !(field instanceof UserSpecificCommentField))
+                     .collect(Collectors.toSet());
+    }
 
     public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
     }
@@ -69,7 +95,7 @@ public class BibliographyConsistencyCheck {
 
             List<BibEntry> differingEntries = entryTypeToEntriesMap
                     .get(entryType).stream()
-                    .filter(entry -> !entry.getFields().equals(commonFields))
+                    .filter(entry -> !filterExcludedFields(entry.getFields()).equals(commonFields))
                     .sorted(comparatorStack)
                     .toList();
 
@@ -83,14 +109,17 @@ public class BibliographyConsistencyCheck {
         for (BibEntry entry : entries) {
             EntryType entryType = entry.getType();
 
-            Set<Field> fieldsInAnyEntry = entryTypeToFieldsInAnyEntryMap.computeIfAbsent(entryType, _ -> new HashSet<>());
-            fieldsInAnyEntry.addAll(entry.getFields());
+            entryTypeToFieldsInAnyEntryMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .addAll(filterExcludedFields(entry.getFields()));
 
-            Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.computeIfAbsent(entryType, _ -> new HashSet<>(entry.getFields()));
-            fieldsInAllEntries.retainAll(entry.getFields());
+            entryTypeToFieldsInAllEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>(filterExcludedFields(entry.getFields())))
+                    .retainAll(filterExcludedFields(entry.getFields()));
 
-            Set<BibEntry> entriesOfType = entryTypeToEntriesMap.computeIfAbsent(entryType, _ -> new HashSet<>());
-            entriesOfType.add(entry);
+            entryTypeToEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .add(entry);
         }
     }
 }
