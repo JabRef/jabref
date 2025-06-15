@@ -10,7 +10,6 @@ import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
@@ -24,27 +23,23 @@ import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
 
-    private static final Set<Field> FILTERED_FIELDS = Stream
-            .concat(
-                    StandardField.AUTOMATIC_FIELDS.stream(),
-                    Stream.of(
+    private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
                             StandardField.COMMENT,
                             StandardField.CROSSREF,
+                            StandardField.GROUPS,
                             StandardField.CITES,
                             StandardField.PDF,
                             StandardField.REVIEW,
                             StandardField.SORTKEY,
                             StandardField.SORTNAME,
                             StandardField.TYPE,
-                            StandardField.XREF,
-                            StandardField.GROUPS
-                    )
-            )
-            .collect(Collectors.toSet());
+                            StandardField.XREF
+                    );
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
         return fields.stream()
-                     .filter(field -> !FILTERED_FIELDS.contains(field))
+                     .filter(field -> !EXPLICITLY_EXCLUDED_FIELDS.contains(field))
+                     .filter(field -> !StandardField.AUTOMATIC_FIELDS.contains(field))
                      .filter(field -> !(field instanceof SpecialField))
                      .filter(field -> !(field instanceof UserSpecificCommentField))
                      .collect(Collectors.toSet());
