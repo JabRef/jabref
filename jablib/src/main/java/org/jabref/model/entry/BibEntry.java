@@ -646,6 +646,17 @@ public class BibEntry implements Cloneable {
     }
 
     /**
+     * Set a field and notify listeners about the change if the value is present. Otherwise, do nothing.
+     */
+    public Optional<FieldChange> setField(Field field, Optional<String> value) {
+        if (value.isPresent()) {
+            return setField(field, value.get());
+        }
+
+        return Optional.empty();
+    }
+
+    /**
      * Remove the mapping for the field name, and notify listeners about the change.
      *
      * @param field The field to clear.
@@ -963,16 +974,22 @@ public class BibEntry implements Cloneable {
         }
     }
 
+    public BibEntry withType(EntryType type) {
+        setType(type);
+        this.setChanged(true);
+        return this;
+    }
+
     public BibEntry withField(Field field, String value) {
         setField(field, value);
-        this.setChanged(false);
+        this.setChanged(true);
         return this;
     }
 
     public BibEntry withField(Field field, Optional<String> value) {
         value.ifPresent(v -> {
             setField(field, v);
-            this.setChanged(false);
+            this.setChanged(true);
         });
         return this;
     }

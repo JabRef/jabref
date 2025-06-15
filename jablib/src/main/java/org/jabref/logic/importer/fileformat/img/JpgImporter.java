@@ -5,9 +5,11 @@ import java.io.IOException;
 
 import org.jabref.logic.importer.TikaImporter;
 import org.jabref.logic.importer.util.Constants;
+import org.jabref.logic.importer.util.TikaMetadataParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.FileType;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.types.BiblatexNonStandardTypes;
 import org.jabref.model.entry.types.EntryType;
 
@@ -38,7 +40,7 @@ public class JpgImporter extends TikaImporter {
     }
 
     @Override
-    protected EntryType getEntryType() {
-        return BiblatexNonStandardTypes.Image;
+    protected void extractAdditionalMetadata(BibEntry entry, TikaMetadataParser metadataParser) {
+        entry.setType(BiblatexNonStandardTypes.Image);
     }
 }
