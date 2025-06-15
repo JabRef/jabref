@@ -20,8 +20,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class BibliographyConsistencyCheckTest {
@@ -137,7 +135,6 @@ class BibliographyConsistencyCheckTest {
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Misc);
 
-        assertNotNull(typeResult);
-        assertTrue(typeResult.fields().contains(StandardField.AUTHOR));
+        assertEquals(Set.of(StandardField.AUTHOR), typeResult.fields());
     }
 }
