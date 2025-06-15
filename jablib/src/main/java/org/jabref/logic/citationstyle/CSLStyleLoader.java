@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class CSLStyleLoader {
     public static final String DEFAULT_STYLE = "ieee.csl";
 
-    private static final String STYLES_ROOT = "csl-styles";
+    private static final String STYLES_ROOT = "/csl-styles";
     private static final String CATALOG_PATH = "citation-style-catalog.json";
     private static final List<CitationStyle> INTERNAL_STYLES = new ArrayList<>();
     private static final List<CitationStyle> EXTERNAL_STYLES = new ArrayList<>();
@@ -62,6 +62,7 @@ public class CSLStyleLoader {
     public static void loadInternalStyles() {
         INTERNAL_STYLES.clear();
 
+        // CATALOG_PATH is located inside build/generated/resource; therefore we need to go through the ClassLoader
         try (InputStream is = CSLStyleLoader.class.getClassLoader().getResourceAsStream(CATALOG_PATH)) {
             if (is == null) {
                 LOGGER.error("Could not find citation style catalog");
@@ -83,7 +84,8 @@ public class CSLStyleLoader {
                     boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
 
                     // We use these metadata and just load the content instead of re-parsing for them
-                    try (InputStream styleStream = CSLStyleLoader.class.getClassLoader().getResourceAsStream(STYLES_ROOT + "/" + path)) {
+                    // These are located in the resources directly; therefore it is enough to use the class itself for loading
+                    try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
                             CitationStyle style = new CitationStyle(path, title, isNumeric, hasBibliography, usesHangingIndent, source, true);

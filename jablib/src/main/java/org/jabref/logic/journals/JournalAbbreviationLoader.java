@@ -38,7 +38,8 @@ public class JournalAbbreviationLoader {
         JournalAbbreviationRepository repository;
 
         // Initialize with built-in list
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/journal-list.mv")) {
+        // journal-list.mv is located inside build/generated/resource; therefore we need to go through the ClassLoader
+        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getClassLoader().getResourceAsStream("/journals/journal-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no journal-list.mv. We use a default journal list");
                 repository = new JournalAbbreviationRepository();
@@ -74,7 +75,8 @@ public class JournalAbbreviationLoader {
     }
 
     private static LtwaRepository loadLtwaRepository() throws IOException {
-        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getResourceAsStream("/journals/ltwa-list.mv")) {
+        // ltwa-list.mve is located inside build/generated/resource; therefore we need to go through the ClassLoader
+        try (InputStream resourceAsStream = JournalAbbreviationRepository.class.getClassLoader().getResourceAsStream("/journals/ltwa-list.mv")) {
             if (resourceAsStream == null) {
                 LOGGER.warn("There is no ltwa-list.mv. We cannot load the LTWA repository.");
                 throw new IOException("LTWA repository not found");
