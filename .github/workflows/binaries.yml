@@ -462,15 +462,6 @@ jobs:
             jabgui/build/distribution
             jabkit/build/distribution
           compression-level: 0 # no compression
-      - name: Upload to GitHub workflow artifacts store
-        if: ${{ (needs.conditions.outputs.upload-to-builds-jabref-org == 'false') }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: JabRef-${{ matrix.os }}
-          path: |
-            jabgui/build/distribution
-            jabkit/build/distribution
-          compression-level: 0 # no compression
       # endregion
 
   comment-on-pr:

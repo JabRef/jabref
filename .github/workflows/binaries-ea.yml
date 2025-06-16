@@ -4,8 +4,6 @@
 name: Binaries (JDK and JavaFX early access builds)
 
 on:
-  schedule:
-    - cron: "0 18 * * *"
   pull_request:
     types:
       - opened
