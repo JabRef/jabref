@@ -1,9 +1,9 @@
-
 package org.jabref.gui.preview;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
+import java.net.MalformedURLException;
 import java.util.Objects;
 
 import javafx.application.Platform;
@@ -40,12 +40,14 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.html.HTMLAnchorElement;
 
+/**
+ * Displays an BibEntry using the given layout format.
+ */
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
@@ -111,7 +113,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         themeManager.installCss(previewView.getEngine());
 
         previewView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (newState != Worker.State.SUCCEEDED) return;
+            if (newState != Worker.State.SUCCEEDED) {
+                return;
+            }
 
             NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
             for (int i = 0; i < anchorList.getLength(); i++) {
@@ -123,7 +127,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                     if (href != null) {
                         try {
                             NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
-                        } catch (Exception e) {
+                        } catch (IOException e) {
                             LOGGER.error("Could not open URL: {}", href, e);
                         }
                     }
@@ -134,36 +138,46 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setLayout(PreviewLayout newLayout) {
-        if (newLayout == null || newLayout.equals(layout)) return;
+        if ((newLayout == null) || newLayout.equals(layout)) {
+            return;
+        }
         this.layout = newLayout;
         update();
     }
 
     public void setEntry(@Nullable BibEntry newEntry) {
-        if (Objects.equals(entry, newEntry)) return;
+        if (Objects.equals(entry, newEntry)) {
+            return;
+        }
         if (entry != null) {
-            for (Observable obs : entry.getObservables()) obs.removeListener(this);
+            for (Observable obs : entry.getObservables()) {
+                obs.removeListener(this);
+            }
         }
         this.entry = newEntry;
         if (entry != null) {
-            for (Observable obs : entry.getObservables()) obs.addListener(this);
+            for (Observable obs : entry.getObservables()) {
+                obs.addListener(this);
+            }
         }
         update();
     }
 
     public void setDatabaseContext(BibDatabaseContext newDatabaseContext) {
-        if (Objects.equals(databaseContext, newDatabaseContext)) return;
+        if (Objects.equals(databaseContext, newDatabaseContext)) {
+            return;
+        }
         setEntry(null);
         this.databaseContext = newDatabaseContext;
         update();
     }
 
     private void update() {
-        if (databaseContext == null || entry == null || layout == null) {
+        if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
-                    databaseContext == null ? "null" : "OK",
-                    entry == null ? "null" : "OK",
-                    layout == null ? "null" : "OK");
+                    (databaseContext == null) ? "null" : "OK",
+                    (entry == null) ? "null" : "OK",
+                    (layout == null) ? "null" : "OK");
             setPreviewText("");
             return;
         }
@@ -189,14 +203,16 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void setPreviewText(String text) {
         layoutText = """
-            <html><body id=\"previewBody\"><div id=\"content\"> %s </div></body></html>
-        """.formatted(text);
+                <html><body id=\"previewBody\"><div id=\"content\"> %s </div></body></html>
+                """.formatted(text);
         highlightLayoutText();
         setHvalue(0);
     }
 
     private void highlightLayoutText() {
-        if (layoutText == null) return;
+        if (layoutText == null) {
+            return;
+        }
 
         String query = searchQueryProperty.get();
         if (StringUtil.isNotBlank(query)) {
@@ -210,7 +226,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void print() {
         PrinterJob job = PrinterJob.createPrinterJob();
-        if (!dialogService.showPrintDialog(job) || entry == null) return;
+        if (!dialogService.showPrintDialog(job) || (entry == null)) {
+            return;
+        }
 
         BackgroundTask.wrap(() -> {
                           job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
@@ -220,20 +238,36 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                       .executeWith(taskExecutor);
     }
 
+    /**
+     * New implementation based on CopyCitationAction to maintain HTML formatting when copying preview
+     */
     public void copyPreviewHtmlToClipBoard() {
-        Document doc = previewView.getEngine().getDocument();
-        ClipboardContent content = ClipboardContentGenerator.processHtml(Arrays.asList(doc.getElementById("content").getTextContent()));
-        clipBoardManager.setContent(content);
+        if ((entry == null) || (layout == null) || (databaseContext == null)) {
+            LOGGER.warn("Cannot copy preview citation: Missing entry, layout, or database context.");
+            return;
+        }
+
+        try {
+            String citationHtml = layout.generatePreview(entry, databaseContext);
+            ClipboardContent content = ClipboardContentGenerator.processHtml(java.util.List.of(citationHtml));
+            clipBoardManager.setContent(content);
+        } catch (Exception e) {
+            LOGGER.error("Failed to generate or copy citation HTML", e);
+            dialogService.showErrorDialogAndWait(Localization.lang("Could not copy citation"), e);
+        }
     }
 
+
+
+    /**
+     * Deprecated: Use {@link #copyPreviewHtmlToClipBoard()} instead.
+     */
     public void copyPreviewTextToClipBoard() {
-        Document doc = previewView.getEngine().getDocument();
-        ClipboardContent content = ClipboardContentGenerator.processText(Arrays.asList(doc.getElementById("content").getTextContent()));
-        clipBoardManager.setContent(content);
+        // Deprecated in favor of copyPreviewHtmlToClipBoard using CopyCitationAction
     }
 
     public void copySelectionToClipBoard() {
-        ClipboardContent content = new ClipboardContent();
+        var content = new javafx.scene.input.ClipboardContent();
         content.putString(getSelectionTextContent());
         content.putHtml(getSelectionHtmlContent());
         clipBoardManager.setContent(content);
