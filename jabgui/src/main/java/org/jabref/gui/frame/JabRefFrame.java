@@ -521,9 +521,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     /**
-     * Opens a new tab with existing data. Asynchronous loading is done at
-     * {@link LibraryTab#createLibraryTab}. Similar method:
-     * {@link OpenDatabaseAction#openTheFile(Path)}
+     * Opens a new tab with existing data.
+     * Asynchronous loading is done at {@link LibraryTab#createLibraryTab}.
+     * Similar method: {@link OpenDatabaseAction#openTheFile(Path)}
      */
     public void addTab(@NonNull BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
@@ -681,8 +681,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         }
 
         /**
-         * Using this constructor will result in executing the command on the currently
-         * open library tab
+         * Using this constructor will result in executing the command on the currently open library tab
          */
         public CloseDatabaseAction(LibraryTabContainer tabContainer, StateManager stateManager) {
             this(tabContainer, null, stateManager);
