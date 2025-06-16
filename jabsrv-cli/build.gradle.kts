@@ -13,10 +13,10 @@ application{
 
     applicationDefaultJvmArgs = listOf(
         // Enable JEP 450: Compact Object Headers
-        "-XXUnlockExperimentalVMOptions", "-XXUseCompactObjectHeaders",
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
-        "-XXUseZGC", "-XXZUncommit",
-        "-XXUseStringDeduplication",
+        "-XX:+UseZGC", "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication",
 
         "--enable-native-access=com.sun.jna,org.apache.lucene.core"
     )

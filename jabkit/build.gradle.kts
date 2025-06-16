@@ -73,11 +73,11 @@ application {
     // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
     applicationDefaultJvmArgs = listOf(
         // Enable JEP 450: Compact Object Headers
-        "-XXUnlockExperimentalVMOptions", "-XXUseCompactObjectHeaders",
+        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
 
         // Default garbage collector is sufficient for CLI APP
-        // "-XXUseZGC", "-XXZUncommit",
-        // "-XXUseStringDeduplication",
+        // "-XX:+UseZGC", "-XX:+ZUncommit",
+        // "-XX:+UseStringDeduplication",
 
         "--enable-native-access=com.sun.jna,javafx.graphics,org.apache.lucene.core"
     )
