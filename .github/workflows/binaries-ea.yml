@@ -119,8 +119,8 @@ jobs:
     needs: [conditions]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
     env:
-      jdk_version: '25'
-      jdk: 'openjdk-25.0.0-ea+27'
+      jdk_version: '24'
+      jdk_distribution: 'openjdk-25.0.0-ea+27'
     strategy:
       fail-fast: false
       matrix:
@@ -201,12 +201,14 @@ jobs:
 
       # region setup-JDK
       - name: Setup JDK ${{ env.jdk_version }} (${{ env.jdk }}) for "java toolchain" of Gradle
+        if: false
         uses: jdx/mise-action@v2
         with:
           mise_toml: |
             [tools]
-            java = { version = "${{ env.jdk }}", release_type = "ea" }
+            java = { version = "${{ env.jdk_distribution }}", release_type = "ea" }
       - name: Debug
+        if: false
         shell: bash
         run: |
           set -x
@@ -214,12 +216,12 @@ jobs:
           echo $JAVA_HOME
           java --version
       - name: Make JDK known to gradle (Linux, macOS)
-        if: (matrix.os != 'windows-latest')
+        if: false && (matrix.os != 'windows-latest')
         shell: bash
         # Hint by https://github.com/gradle/gradle/issues/29355#issuecomment-2598556970
         run: ln -s ~/.local/share/mise ~/.asdf
       - name: Make JDK known to gradle (Windows)
-        if: (matrix.os == 'windows-latest')
+        if: false && (matrix.os == 'windows-latest')
         shell: bash
         run: mv ~/AppData/Local/mise ~/.asdf
       - name: Setup JDK for gradle itself
