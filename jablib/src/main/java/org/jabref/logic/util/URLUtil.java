@@ -110,7 +110,7 @@ public class URLUtil {
             }
             return parsedUri.toURL();
         } catch (URISyntaxException e) {
-            throw new MalformedURLException("Invalid URI syntax: " + url + " | Error: " + e.getMessage());
+            throw new MalformedURLException("Invalid  URI syntax: " + url + " | Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new MalformedURLException("Illegal argument in URI construction: " + url + " | Error: " + e.getMessage());
         } catch (NullPointerException e) {
