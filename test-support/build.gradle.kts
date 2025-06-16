@@ -26,7 +26,7 @@ dependencies {
     implementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
-    implementation("net.bytebuddy:byte-buddy:1.17.5")
+    implementation("net.bytebuddy:byte-buddy:1.17.6")
 
     implementation("org.jspecify:jspecify:1.0.0")
 }
