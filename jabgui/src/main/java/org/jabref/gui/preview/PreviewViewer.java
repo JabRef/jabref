@@ -1,3 +1,4 @@
+
 package org.jabref.gui.preview;
 
 import java.io.PrintWriter;
