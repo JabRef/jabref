@@ -97,10 +97,10 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
+        if (url == null || url.trim().isEmpty()) {
+            throw new MalformedURLException("Provided URL is null or empty.");
+        }
         try {
-            if (url == null || url.trim().isEmpty()) {
-                throw new MalformedURLException("Provided URL is null or empty.");
-            }
             URI parsedUri = new URI(url.trim());
             if (!parsedUri.isAbsolute()) {
                 throw new MalformedURLException("URI is not absolute: " + url);
