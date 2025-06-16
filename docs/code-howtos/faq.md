@@ -124,7 +124,7 @@ For `csl-styles`, `csl-locales`, and `abbrev.jabref.org`:
 git merge origin/main
 git checkout main -- jablib/src/main/resources/csl-styles
 git checkout main -- jablib/src/main/resources/csl-locales
-git checkout main -- jablib/src/main/abbrev.jabref.org
+git checkout main -- jablib/src/main/abbrv.jabref.org
 git commit -m "Fix submodules"
 git push
 ```

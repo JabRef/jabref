@@ -227,7 +227,7 @@ jobs:
 
   tests-windows:
     name: "Unit tests (Windows) – ${{ matrix.module }}"
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
     runs-on: windows-latest
     strategy:
       matrix:
@@ -251,6 +251,7 @@ jobs:
           CI: "true"
 
   databasetests:
+    if: (github.repository_owner == 'JabRef')
     name: Database tests
     runs-on: ubuntu-latest
     services:
