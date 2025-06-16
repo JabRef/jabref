@@ -97,7 +97,27 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        return createUri(url).toURL();
+        try {
+            if (url == null || url.trim().isEmpty()) {
+                throw new MalformedURLException("Provided URL is null or empty.");
+            }
+            URI parsedUri = new URI(url.trim());
+            if (!parsedUri.isAbsolute()) {
+                throw new MalformedURLException("URI is not absolute: " + url);
+            }
+            if (parsedUri.getScheme() == null || parsedUri.getHost() == null) {
+                throw new MalformedURLException("URI must include both scheme and host: " + url);
+            }
+            return parsedUri.toURL();
+        } catch (URISyntaxException e) {
+            throw new MalformedURLException("Invalid URI syntax: " + url + " | Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new MalformedURLException("Illegal argument in URI construction: " + url + " | Error: " + e.getMessage());
+        } catch (NullPointerException e) {
+            throw new MalformedURLException("Null value encountered during URI parsing: " + url);
+        } catch (Exception e) {
+            throw new MalformedURLException("Unexpected error while parsing URI: " + url + " | Error: " + e.getMessage());
+        }
     }
 
     /**
