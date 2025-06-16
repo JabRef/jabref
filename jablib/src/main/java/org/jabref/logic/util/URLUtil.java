@@ -115,8 +115,6 @@ public class URLUtil {
             throw new MalformedURLException("Illegal argument in URI construction: " + url + " | Error: " + e.getMessage());
         } catch (NullPointerException e) {
             throw new MalformedURLException("Null value encountered during URI parsing: " + url);
-        } catch (Exception e) {
-            throw new MalformedURLException("Unexpected error while parsing URI: " + url + " | Error: " + e.getMessage());
         }
     }
 

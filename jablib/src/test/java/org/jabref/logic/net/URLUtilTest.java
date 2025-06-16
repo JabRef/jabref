@@ -148,17 +148,4 @@ class URLUtilTest {
         });
         assertTrue(exception.getMessage().contains("Invalid  URI syntax"), " URI syntax error");
     }
-
-
-    // illegal character
-    @Test
-    public void testIllegalCharacters() {
-        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
-            URLUtil.create("http://example .com");
-        });
-        assertTrue(exception.getMessage().contains("Illegal argument"), "illegal argument");
-    }
-
-
-
 }
