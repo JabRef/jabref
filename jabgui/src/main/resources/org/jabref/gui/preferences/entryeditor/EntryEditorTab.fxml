@@ -38,7 +38,7 @@
     </CheckBox>
     <CheckBox fx:id="defaultSource" text="%Show BibTeX source by default"/>
     <CheckBox fx:id="enableLatexCitationsTab" text="%Show tab 'LaTeX citations'"/>
-    <CheckBox fx:id="enableFileAnnotationsTab" text="%Show tab 'File annotations' only if it contains highlights or comments"/>
+    <CheckBox fx:id="smartFileAnnotationsTab" text="%Show tab 'File annotations' only if it contains highlights or comments"/>
     <CheckBox fx:id="enableAiSummaryTab" text="%Show tab 'AI Summary'"/>
     <CheckBox fx:id="enableAiChatTab" text="%Show tab 'AI Chat'"/>
 
