@@ -22,23 +22,23 @@ import org.slf4j.LoggerFactory;
 /**
  * Manages walkthrough overlays and highlights across multiple windows.
  */
-public class MultiWindowWalkthroughOverlay {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MultiWindowWalkthroughOverlay.class);
+public class WalkthroughOverlay {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
 
-    private final Map<Window, SingleWindowOverlay> overlays = new HashMap<>();
+    private final Map<Window, SingleWindowWalkthroughOverlay> overlays = new HashMap<>();
     private final Stage mainStage;
-    private final HighlightManager highlightManager;
+    private final WalkthroughHighlighter walkthroughHighlighter;
     private final Walkthrough walkthrough;
     private Timeline nodePollingTimeline;
 
-    public MultiWindowWalkthroughOverlay(Stage mainStage, Walkthrough walkthrough) {
+    public WalkthroughOverlay(Stage mainStage, Walkthrough walkthrough) {
         this.mainStage = mainStage;
         this.walkthrough = walkthrough;
-        this.highlightManager = new HighlightManager();
+        this.walkthroughHighlighter = new WalkthroughHighlighter();
     }
 
     public void displayStep(@NonNull WalkthroughNode step) {
-        overlays.values().forEach(SingleWindowOverlay::hide);
+        overlays.values().forEach(SingleWindowWalkthroughOverlay::hide);
         Window activeWindow = step.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(mainStage);
         Scene scene = activeWindow.getScene();
 
@@ -53,17 +53,17 @@ public class MultiWindowWalkthroughOverlay {
         }
 
         if (step.highlight().isPresent()) {
-            highlightManager.applyHighlight(scene, step.highlight(), targetNode);
+            walkthroughHighlighter.applyHighlight(scene, step.highlight(), targetNode);
         }
 
-        SingleWindowOverlay overlay = getOrCreateOverlay(activeWindow);
+        SingleWindowWalkthroughOverlay overlay = getOrCreateOverlay(activeWindow);
         overlay.displayStep(step, targetNode.get(), walkthrough);
     }
 
     public void detachAll() {
         stopNodePolling();
-        highlightManager.detachAll();
-        overlays.values().forEach(SingleWindowOverlay::detach);
+        walkthroughHighlighter.detachAll();
+        overlays.values().forEach(SingleWindowWalkthroughOverlay::detach);
         overlays.clear();
     }
 
@@ -98,10 +98,10 @@ public class MultiWindowWalkthroughOverlay {
                     stopNodePolling();
 
                     if (step.highlight().isPresent()) {
-                        highlightManager.applyHighlight(scene, step.highlight(), targetNode);
+                        walkthroughHighlighter.applyHighlight(scene, step.highlight(), targetNode);
                     }
 
-                    SingleWindowOverlay overlay = getOrCreateOverlay(activeWindow);
+                    SingleWindowWalkthroughOverlay overlay = getOrCreateOverlay(activeWindow);
                     overlay.displayStep(step, targetNode.get(), walkthrough);
                 }
             }
@@ -122,7 +122,7 @@ public class MultiWindowWalkthroughOverlay {
         return walkthrough.getSteps().get(index);
     }
 
-    private SingleWindowOverlay getOrCreateOverlay(Window window) {
-        return overlays.computeIfAbsent(window, SingleWindowOverlay::new);
+    private SingleWindowWalkthroughOverlay getOrCreateOverlay(Window window) {
+        return overlays.computeIfAbsent(window, SingleWindowWalkthroughOverlay::new);
     }
 }

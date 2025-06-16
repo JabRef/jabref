@@ -22,7 +22,7 @@ public class Walkthrough {
     private final BooleanProperty active;
 
     private final List<WalkthroughNode> steps;
-    private Optional<MultiWindowWalkthroughOverlay> overlayManager = Optional.empty();
+    private Optional<WalkthroughOverlay> overlayManager = Optional.empty();
     private Stage currentStage;
 
     /**
@@ -64,9 +64,9 @@ public class Walkthrough {
      */
     public void start(Stage stage) {
         if (currentStage != stage) {
-            overlayManager.ifPresent(MultiWindowWalkthroughOverlay::detachAll);
+            overlayManager.ifPresent(WalkthroughOverlay::detachAll);
             currentStage = stage;
-            overlayManager = Optional.of(new MultiWindowWalkthroughOverlay(stage, this));
+            overlayManager = Optional.of(new WalkthroughOverlay(stage, this));
         }
 
         currentStep.set(0);
@@ -106,7 +106,7 @@ public class Walkthrough {
     }
 
     private void stop() {
-        overlayManager.ifPresent(MultiWindowWalkthroughOverlay::detachAll);
+        overlayManager.ifPresent(WalkthroughOverlay::detachAll);
         active.set(false);
     }
 

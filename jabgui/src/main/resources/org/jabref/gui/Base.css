@@ -2521,6 +2521,30 @@ journalInfo .grid-cell-b {
 }
 
 /* Walkthrough Styles */
+.walkthrough-overlay {
+    -fx-background-color: transparent;
+}
+
+/* Tooltip Content */
+.walkthrough-tooltip-content-container {
+    -fx-spacing: 0.75em;
+    -fx-padding: 1em;
+}
+
+.walkthrough-tooltip-title {
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.4em;
+    -fx-font-weight: bold;
+}
+
+.walkthrough-tooltip-content {
+    -fx-spacing: 0.5em;
+}
+
+.walkthrough-tooltip-actions {
+    -fx-spacing: 0;
+}
+
 .walkthrough-panel {
     -fx-background-color: -jr-white;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
@@ -2554,6 +2578,10 @@ journalInfo .grid-cell-b {
     -fx-pref-height: 18em;
     -fx-max-height: 18em;
     -fx-min-height: 18em;
+}
+
+.walkthrough-content {
+    -fx-spacing: 0.8em;
 }
 
 .walkthrough-step-counter {
@@ -2592,11 +2620,20 @@ journalInfo .grid-cell-b {
     -fx-alignment: center-left;
 }
 
+.walkthrough-actions {
+    -fx-spacing: 0;
+}
+
+.walkthrough-right-actions {
+    -fx-spacing: 4;
+}
+
 .walkthrough-continue-button {
     -fx-background-color: -jr-theme;
     -fx-text-fill: -jr-white;
     -fx-font-size: 1.1em;
     -fx-border-radius: 4;
+    -fx-background-radius: 4;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2607,6 +2644,7 @@ journalInfo .grid-cell-b {
     -fx-border-color: -jr-theme;
     -fx-border-width: 0.5;
     -fx-border-radius: 4;
+    -fx-background-radius: 4;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2615,6 +2653,7 @@ journalInfo .grid-cell-b {
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.1em;
     -fx-border-radius: 4;
+    -fx-background-radius: 4;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2624,23 +2663,3 @@ journalInfo .grid-cell-b {
     -fx-max-width: 48em;
     -fx-fill-width: true;
 }
-
-.walkthrough-tooltip {
-    -fx-background-color: -jr-white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
-    -fx-background-radius: 8;
-    -fx-padding: 1em;
-    -fx-spacing: 0.75em;
-    -fx-border-radius: 8;
-}
-
-.walkthrough-tooltip-title {
-    -fx-text-fill: -jr-theme;
-    -fx-font-size: 1.4em;
-    -fx-font-weight: bold;
-}
-
-.walkthrough-tooltip-content {
-    -fx-spacing: 0.5em;
-}
-

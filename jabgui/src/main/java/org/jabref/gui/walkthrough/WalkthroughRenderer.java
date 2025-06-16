@@ -30,10 +30,10 @@ public class WalkthroughRenderer {
      *
      * @param step        The tooltip step to render
      * @param walkthrough The walkthrough context for navigation
-     * @return The rendered tooltip Node
+     * @return The rendered tooltip content Node
      */
     public Node render(@NonNull TooltipStep step, @NonNull Walkthrough walkthrough) {
-        return createTooltip(step, walkthrough);
+        return createTooltipContent(step, walkthrough);
     }
 
     /**
@@ -79,17 +79,9 @@ public class WalkthroughRenderer {
         return panel;
     }
 
-    private Node createTooltip(@NonNull TooltipStep step, @NonNull Walkthrough walkthrough) {
-        VBox tooltip = new VBox(6);
-        tooltip.getStyleClass().add("walkthrough-tooltip");
-
-        double prefWidth = step.preferredWidth().orElse(300.0);
-        double prefHeight = step.preferredHeight().orElse(200.0);
-
-        tooltip.setPrefWidth(prefWidth);
-        tooltip.setPrefHeight(prefHeight);
-        tooltip.setMaxWidth(prefWidth);
-        tooltip.setMaxHeight(prefHeight);
+    private Node createTooltipContent(@NonNull TooltipStep step, @NonNull Walkthrough walkthrough) {
+        VBox tooltip = new VBox();
+        tooltip.getStyleClass().add("walkthrough-tooltip-content-container");
 
         Label titleLabel = new Label(Localization.lang(step.title()));
         titleLabel.getStyleClass().add("walkthrough-tooltip-title");
@@ -99,6 +91,7 @@ public class WalkthroughRenderer {
         VBox.setVgrow(contentContainer, Priority.ALWAYS);
 
         HBox actionsContainer = makeActions(step, walkthrough);
+        actionsContainer.getStyleClass().add("walkthrough-tooltip-actions");
 
         tooltip.getChildren().addAll(titleLabel, contentContainer, actionsContainer);
 
@@ -136,7 +129,7 @@ public class WalkthroughRenderer {
     private HBox makeActions(@NonNull WalkthroughNode step, @NonNull Walkthrough walkthrough) {
         HBox actions = new HBox();
         actions.setAlignment(Pos.CENTER_LEFT);
-        actions.setSpacing(0);
+        actions.getStyleClass().add("walkthrough-actions");
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -146,7 +139,7 @@ public class WalkthroughRenderer {
         }
         HBox rightActions = new HBox();
         rightActions.setAlignment(Pos.CENTER_RIGHT);
-        rightActions.setSpacing(4);
+        rightActions.getStyleClass().add("walkthrough-right-actions");
         if (step.skipButtonText().isPresent()) {
             rightActions.getChildren().add(makeSkipButton(step, walkthrough));
         }
@@ -160,7 +153,8 @@ public class WalkthroughRenderer {
     }
 
     private VBox makeContent(@NonNull WalkthroughNode step, @NonNull Walkthrough walkthrough) {
-        VBox contentBox = new VBox(8);
+        VBox contentBox = new VBox();
+        contentBox.getStyleClass().add("walkthrough-content");
         contentBox.getChildren().addAll(step.content().stream().map(block ->
                 switch (block) {
                     case TextBlock textBlock -> render(textBlock);
