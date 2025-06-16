@@ -150,14 +150,14 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
         if (entry != null) {
-            for (Observable obs : entry.getObservables()) {
-                obs.removeListener(this);
+            for (Observable observable : entry.getObservables()) {
+                observable.removeListener(this);
             }
         }
         this.entry = newEntry;
         if (entry != null) {
-            for (Observable obs : entry.getObservables()) {
-                obs.addListener(this);
+            for (Observable observable : entry.getObservables()) {
+                observable.addListener(this);
             }
         }
         update();
@@ -238,9 +238,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                       .executeWith(taskExecutor);
     }
 
-    /**
-     * New implementation based on CopyCitationAction to maintain HTML formatting when copying preview
-     */
     public void copyPreviewHtmlToClipBoard() {
         if ((entry == null) || (layout == null) || (databaseContext == null)) {
             LOGGER.warn("Cannot copy preview citation: Missing entry, layout, or database context.");
@@ -257,13 +254,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         }
     }
 
-
-
     /**
-     * Deprecated: Use {@link #copyPreviewHtmlToClipBoard()} instead.
+     * Plain-text citation copy functionality. Not deprecated.
      */
     public void copyPreviewTextToClipBoard() {
-        // Deprecated in favor of copyPreviewHtmlToClipBoard using CopyCitationAction
+        copySelectionToClipBoard();
     }
 
     public void copySelectionToClipBoard() {
