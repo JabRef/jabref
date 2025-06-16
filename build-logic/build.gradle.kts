@@ -17,20 +17,3 @@ dependencies {
     implementation("org.gradlex:java-module-testing:1.7")
     implementation("org.gradlex:jvm-dependency-conflict-resolution:2.4")
 }
-
-// TODO jjohannes: is this still needed and where should it go?
-configurations
-    .named { it.contains("downloadSources") }
-    .configureEach {
-        attributes {
-            attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_RUNTIME))
-            attribute(
-                OperatingSystemFamily.OPERATING_SYSTEM_ATTRIBUTE,
-                objects.named(OperatingSystemFamily::class.java, DefaultNativePlatform.getCurrentOperatingSystem().name)
-            )
-            attribute(
-                MachineArchitecture.ARCHITECTURE_ATTRIBUTE,
-                objects.named(MachineArchitecture::class.java, DefaultNativePlatform.getCurrentArchitecture().name)
-            )
-        }
-    }
