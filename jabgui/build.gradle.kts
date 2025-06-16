@@ -149,7 +149,7 @@ dependencies {
     testImplementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
     testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
-    testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
+    testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
 }
 
 application {
