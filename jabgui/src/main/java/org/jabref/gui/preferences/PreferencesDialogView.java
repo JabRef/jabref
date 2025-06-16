@@ -1,4 +1,4 @@
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                 package org.jabref.gui.preferences;
+package org.jabref.gui.preferences;
 
 import java.util.Locale;
 import java.util.Optional;
