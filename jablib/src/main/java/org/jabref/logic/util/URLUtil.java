@@ -98,16 +98,13 @@ public class URLUtil {
      */
     public static URL create(String url) throws MalformedURLException {
         try {
-
             URI parsedUri = new URI(url.trim());
-
             //  Validate that the URI
             if (parsedUri.isAbsolute() && parsedUri.getScheme() != null && parsedUri.getHost() != null) {
                 return parsedUri.toURL();
             } else {
                 throw new MalformedURLException("Provided URI is not absolute or lacks scheme/host: " + url);
             }
-
         } catch (URISyntaxException e) {
             throw new MalformedURLException("Malformed URI syntax: " + url + " | Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
@@ -115,7 +112,6 @@ public class URLUtil {
         } catch (Exception e) {
             throw new MalformedURLException("Unexpected error while parsing URI: " + url + " | Error: " + e.getMessage());
         }
-
     }
 
     /**
