@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We introduced a settings parameters to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
+- We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
 
 ### Changed
 
@@ -60,8 +61,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added "Hanging Indent" as the default selected bibliography body format for CSL styles that specify it (e.g. APA). [#13074](https://github.com/JabRef/jabref/pull/13074)
 - We fixed an issue where bibliography entries generated from CSL styles had leading spaces. [#13074](https://github.com/JabRef/jabref/pull/13074)
 - We fixed an issue where the preview area in the "Select Style" dialog of the LibreOffice integration was too small to display full content. [#13051](https://github.com/JabRef/jabref/issues/13051)
+- We excluded specific fields (e.g., `comment`, `pdf`, `sortkey`) from the consistency check to reduce false positives [#13131](https://github.com/JabRef/jabref/issues/13131)
+- We fixed an issue where moved or renamed linked files in the file directory were not automatically relinked by the “search for unlinked files” feature. [#13264](https://github.com/JabRef/jabref/issues/13264)
 - We fixed an issue where the tab showing the fulltext search results was not displayed. [#12865](https://github.com/JabRef/jabref/issues/12865)
 - We fixed an issue showing an empty tooltip in maintable. [#11681](https://github.com/JabRef/jabref/issues/11681)
+- We fixed an issue where Document Viewer showed technical exceptions when opening entries with non-PDF files. [#13198](https://github.com/JabRef/jabref/issues/13198)
 
 ### Removed
 

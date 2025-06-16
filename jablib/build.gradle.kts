@@ -1,7 +1,9 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
+import dev.jbang.gradle.tasks.JBangTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import java.net.URI
 import java.util.*
 
 plugins {
@@ -17,6 +19,10 @@ plugins {
     id("me.champeau.jmh") version "0.7.3"
 
     id("com.vanniktech.maven.publish") version "0.32.0"
+
+    // id("dev.jbang") version "0.2.0"
+    // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
+    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
 }
 
 val pdfbox = "3.0.5"
@@ -272,6 +278,79 @@ xjc {
     options.set(listOf("encoding=UTF-8"))
 }
 
+val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
+val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
+
+var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
+    group = "JabRef"
+    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    dependsOn(tasks.named("generateGrammarSource"))
+
+    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath
+
+    inputs.dir(abbrvJabRefOrgDir)
+    outputs.file(generatedJournalFile)
+}
+
+var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
+    group = "JabRef"
+    description = "Generates a catalog of all available citation styles"
+
+    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath
+
+
+    inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
+    outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
+}
+
+var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
+
+tasks.register("downloadLtwaFile") {
+    group = "JabRef"
+    description = "Downloads the LTWA file for journal abbreviations"
+
+    val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
+    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
+
+    outputs.file(ltwaCsvFile)
+
+    // Ensure that the task really is not run if the file already exists (otherwise, the task could also run if gradle's cache is cleared, ...)
+    onlyIf {!ltwaCsvFile.get().asFile.exists()}
+
+    doLast {
+        val dir = ltwaDir.get().asFile
+        val file = ltwaCsvFile.get().asFile
+
+        dir.mkdirs()
+
+        URI(ltwaUrl).toURL().openStream().use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        logger.debug("Downloaded LTWA file to $file")
+    }
+}
+
+var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
+    group = "JabRef"
+    description = "Converts the LTWA CSV file to a H2 MVStore"
+    dependsOn("downloadLtwaFile", tasks.named("generateGrammarSource"))
+
+    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
+
+    inputs.file(ltwaCsvFile)
+    outputs.file(layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv"))
+}
+
+// Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
+sourceSets["main"].resources {
+    srcDir(layout.buildDirectory.dir("generated/resources"))
+}
+
+
+// region processResources
 abstract class JoinNonCommentedLines : DefaultTask() {
 
     @get:InputFile
@@ -313,7 +392,10 @@ val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeri
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
-    dependsOn("extractMaintainers")
+    dependsOn(extractMaintainers)
+    dependsOn(taskGenerateJournalListMV)
+    dependsOn(taskGenerateCitationStyleCatalog)
+    dependsOn(taskGenerateLtwaListMV)
     filteringCharset = "UTF-8"
 
     inputs.property("version", versionProvider)
@@ -353,107 +435,8 @@ tasks.named<ProcessResources>("processResources") {
         expand(mapOf("version" to inputs.properties["version"]))
     }
 }
+// endregion
 
-tasks.register<JavaExec>("generateJournalListMV") {
-    group = "JabRef"
-    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("org.jabref.generators.JournalListMvGenerator")
-
-    javaLauncher.convention(javaToolchains.launcherFor {
-        languageVersion.set(java.toolchain.languageVersion)
-    })
-
-    val outputFile = layout.buildDirectory.file("resources/main/journals/journal-list.mv")
-    onlyIf {
-        !outputFile.get().asFile.exists()
-    }
-}
-
-tasks.named("jar") {
-    dependsOn("generateJournalListMV")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateJournalListMV")
-}
-
-tasks.register<JavaExec>("generateCitationStyleCatalog") {
-    group = "JabRef"
-    description = "Generates a catalog of all available citation styles"
-    classpath = sourceSets["main"].runtimeClasspath
-    dependsOn("processResources")
-    mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
-    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
-//    onlyIf {
-//        !file("build/resources/main/journals/journal-list.mv").exists()
-//    }
-}
-
-tasks.named("jar") {
-    dependsOn("generateCitationStyleCatalog")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateCitationStyleCatalog")
-}
-
-tasks.register("downloadLtwaFile") {
-    group = "JabRef"
-    description = "Downloads the LTWA file for journal abbreviations"
-
-    val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
-    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
-    val ltwaCsvFile = ltwaDir.map { it.file("ltwa_20210702.csv") }
-
-    onlyIf {
-        !ltwaCsvFile.get().asFile.exists()
-    }
-
-    doLast {
-        val dir = ltwaDir.get().asFile
-        val file = ltwaCsvFile.get().asFile
-
-        if (!file.exists()) {
-            dir.mkdirs()
-            ant.withGroovyBuilder {
-                "get"(
-                    mapOf("src" to ltwaUrl, "dest" to file, "verbose" to true)
-                )
-            }
-            logger.lifecycle("Downloaded LTWA file to $file")
-        } else {
-            logger.lifecycle("LTWA file already exists at $file")
-        }
-    }
-}
-
-tasks.register<JavaExec>("generateLtwaListMV") {
-    group = "JabRef"
-    description = "Converts the LTWA CSV file to a H2 MVStore"
-
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-
-    javaLauncher.convention(javaToolchains.launcherFor {
-        languageVersion.set(java.toolchain.languageVersion)
-    })
-
-    dependsOn("downloadLtwaFile")
-
-    val outputFile = layout.buildDirectory.file("resources/main/journals/ltwa-list.mv")
-    onlyIf {
-        !outputFile.get().asFile.exists()
-    }
-}
-
-tasks.named("jar") {
-    dependsOn("generateLtwaListMV")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateLtwaListMV")
-}
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
@@ -583,6 +566,11 @@ mavenPublishing {
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
+
+        // We have generated/resources on the sources path, which needs to be populated
+        taskGenerateJournalListMV,
+        taskGenerateLtwaListMV,
+        taskGenerateCitationStyleCatalog
     )
 }
 

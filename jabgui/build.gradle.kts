@@ -135,21 +135,21 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
-    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
+    testImplementation("net.bytebuddy:byte-buddy:1.17.6")
 
     testImplementation("org.wiremock:wiremock:3.13.0")
     // Required by Wiremock - and our patching of Wiremock
-    testImplementation("com.github.jknack:handlebars:4.3.1") {
+    testImplementation("com.github.jknack:handlebars:4.4.0") {
         exclude(group = "org.mozilla", module = "rhino")
     }
-    testImplementation("com.github.jknack:handlebars-helpers:4.3.1") {
+    testImplementation("com.github.jknack:handlebars-helpers:4.4.0") {
         exclude(group = "org.mozilla", module = "rhino")
         exclude(group = "org.apache.commons", module = "commons-lang3")
     }
     testImplementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
     testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
-    testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
+    testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
 }
 
 application {
@@ -213,7 +213,7 @@ tasks.named("jlinkZip") {
 }
 
 tasks.register<Delete>("deleteInstallerTemp") {
-    delete(file("$buildDir/installer"))
+    delete(file("${layout.buildDirectory.get()}/installer"))
 }
 
 jlink {
@@ -328,6 +328,7 @@ jlink {
             "ai.djl.pytorch.engine.PtEngineProvider")
     }
 
+    // This tasks reads resources from src/main/resourcesPackage/$OS
     jpackage {
         outputDir =
             "distribution"
