@@ -3,6 +3,7 @@ package org.jabref.logic.net;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
@@ -88,27 +89,76 @@ class URLUtilTest {
         assertEquals("http://example.com/test%7Cfile", uri.toString());
     }
 
+    // valid absolute URL
     @Test
-    void createTestForAbsoluteURL() throws MalformedURLException {
+    public void testValidUrl() {
         String input = "http://example.com";
+
         try {
-            URI parsedUri = new URI(input.trim());
-            if (!parsedUri.isAbsolute()) {
-                throw new MalformedURLException("URI is not absolute: " + input);
-            }
-            if (parsedUri.getScheme() == null || parsedUri.getHost() == null) {
-                throw new MalformedURLException("URI must include both scheme and host: " + input);
-            }
-            assertNotNull(input);
-            assertEquals(input, parsedUri.toString());
-        } catch (URISyntaxException e) {
-            throw new MalformedURLException("Invalid  URI syntax: " + input + " | Error: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new MalformedURLException("Illegal argument in URI construction: " + input + " | Error: " + e.getMessage());
-        } catch (NullPointerException e) {
-            throw new MalformedURLException("Null value encountered during URI parsing: " + input);
-        } catch (Exception e) {
-            throw new MalformedURLException("Unexpected error while parsing URI: " + input + " | Error: " + e.getMessage());
+            URL result = URLUtil.create(input);
+            assertNotNull(result, "URL should not be null");
+            assertEquals(input, result.toString(), "Returned URL should match input");
+        } catch (MalformedURLException e) {
+            fail("Exception " + e.getMessage());
         }
     }
+
+
+    // null input
+    @Test
+    public void testNullUrl() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
+            URLUtil.create(null);
+        });
+        assertTrue(exception.getMessage().contains("null or empty"), "Error message should indicate null or empty input");
+    }
+
+    //empty string input
+    @Test
+    public void testEmptyUrl() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
+            URLUtil.create("   ");
+        });
+        assertTrue(exception.getMessage().contains("null or empty"), "Error message ");
+    }
+
+    // URI without scheme
+    @Test
+    public void testUriMissingScheme() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
+            URLUtil.create("www.example.com");
+        });
+        assertTrue(exception.getMessage().contains("not absolute"), "URI is not absolute");
+    }
+
+    // URI with scheme but missing host
+    @Test
+    public void testUriMissingHost() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
+            URLUtil.create("mailto:someone@example.com");
+        });
+        assertTrue(exception.getMessage().contains("must include both scheme and host"), "Error message should mention scheme and host");
+    }
+
+    // malformed syntax
+    @Test
+    public void testMalformedSyntax() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
+            URLUtil.create("http://[invalid-url]");
+        });
+        assertTrue(exception.getMessage().contains("Invalid  URI syntax"), " URI syntax error");
+    }
+
+
+    // illegal character
+    @Test
+    public void testIllegalCharacters() {
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
+            URLUtil.create("http://example .com");
+        });
+        assertTrue(exception.getMessage().contains("Illegal argument"), "illegal argument");
+    }
+
+
+
 }
