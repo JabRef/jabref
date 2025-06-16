@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("org.jabref.gradle.module")
-    id ("application")
+    id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
