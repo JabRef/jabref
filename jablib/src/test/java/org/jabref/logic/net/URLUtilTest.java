@@ -1,14 +1,14 @@
 package org.jabref.logic.net;
 
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.jabref.logic.util.URLUtil;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class URLUtilTest {
 
@@ -86,5 +86,32 @@ class URLUtilTest {
         String input = "http://example.com/test|file";
         URI uri = URLUtil.createUri(input);
         assertEquals("http://example.com/test%7Cfile", uri.toString());
+    }
+
+    @Test
+    void createTestForAbsoluteURL() {
+        String input = "http://example.com";
+        try {
+            if (url == null || url.trim().isEmpty()) {
+                throw new MalformedURLException("Provided URL is null or empty.");
+            }
+            URI parsedUri = new URI(url.trim());
+            if (!parsedUri.isAbsolute()) {
+                throw new MalformedURLException("URI is not absolute: " + url);
+            }
+            if (parsedUri.getScheme() == null || parsedUri.getHost() == null) {
+                throw new MalformedURLException("URI must include both scheme and host: " + url);
+            }
+            assertNotNull(input);
+            assertEquals(input, parsedUri.toString());
+        } catch (URISyntaxException e) {
+            throw new MalformedURLException("Invalid  URI syntax: " + url + " | Error: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            throw new MalformedURLException("Illegal argument in URI construction: " + url + " | Error: " + e.getMessage());
+        } catch (NullPointerException e) {
+            throw new MalformedURLException("Null value encountered during URI parsing: " + url);
+        } catch (Exception e) {
+            throw new MalformedURLException("Unexpected error while parsing URI: " + url + " | Error: " + e.getMessage());
+        }
     }
 }
