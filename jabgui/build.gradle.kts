@@ -135,7 +135,7 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.18.0") {
         exclude(group = "net.bytebuddy", module = "byte-buddy")
     }
-    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
+    testImplementation("net.bytebuddy:byte-buddy:1.17.6")
 
     testImplementation("org.wiremock:wiremock:3.13.0")
     // Required by Wiremock - and our patching of Wiremock
