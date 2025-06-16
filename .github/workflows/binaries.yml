@@ -192,7 +192,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '24'
-          distribution: 'amazon'
+          distribution: 'corretto'
           java-package: 'jdk'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
