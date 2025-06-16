@@ -100,7 +100,7 @@ public class URLUtil {
         try {
             URI parsedUri = new URI(url.trim());
 
-            // Validate that the URI
+            //  Validate that the URI
             if (parsedUri.isAbsolute() && parsedUri.getScheme() != null && parsedUri.getHost() != null) {
                 return parsedUri.toURL();
             } else {
