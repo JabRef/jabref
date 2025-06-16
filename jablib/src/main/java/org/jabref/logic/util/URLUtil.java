@@ -98,6 +98,7 @@ public class URLUtil {
      */
     public static URL create(String url) throws MalformedURLException {
         try {
+
             URI parsedUri = new URI(url.trim());
 
             //  Validate that the URI
