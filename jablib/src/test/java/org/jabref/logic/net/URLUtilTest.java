@@ -89,29 +89,26 @@ class URLUtilTest {
     }
 
     @Test
-    void createTestForAbsoluteURL() {
+    void createTestForAbsoluteURL() throws MalformedURLException {
         String input = "http://example.com";
         try {
-            if (url == null || url.trim().isEmpty()) {
-                throw new MalformedURLException("Provided URL is null or empty.");
-            }
-            URI parsedUri = new URI(url.trim());
+            URI parsedUri = new URI(input.trim());
             if (!parsedUri.isAbsolute()) {
-                throw new MalformedURLException("URI is not absolute: " + url);
+                throw new MalformedURLException("URI is not absolute: " + input);
             }
             if (parsedUri.getScheme() == null || parsedUri.getHost() == null) {
-                throw new MalformedURLException("URI must include both scheme and host: " + url);
+                throw new MalformedURLException("URI must include both scheme and host: " + input);
             }
             assertNotNull(input);
             assertEquals(input, parsedUri.toString());
         } catch (URISyntaxException e) {
-            throw new MalformedURLException("Invalid  URI syntax: " + url + " | Error: " + e.getMessage());
+            throw new MalformedURLException("Invalid  URI syntax: " + input + " | Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
-            throw new MalformedURLException("Illegal argument in URI construction: " + url + " | Error: " + e.getMessage());
+            throw new MalformedURLException("Illegal argument in URI construction: " + input + " | Error: " + e.getMessage());
         } catch (NullPointerException e) {
-            throw new MalformedURLException("Null value encountered during URI parsing: " + url);
+            throw new MalformedURLException("Null value encountered during URI parsing: " + input);
         } catch (Exception e) {
-            throw new MalformedURLException("Unexpected error while parsing URI: " + url + " | Error: " + e.getMessage());
+            throw new MalformedURLException("Unexpected error while parsing URI: " + input + " | Error: " + e.getMessage());
         }
     }
 }
