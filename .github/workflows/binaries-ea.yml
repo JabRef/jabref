@@ -247,12 +247,12 @@ jobs:
         shell: bash
         run: |
           set -e
-          sed -i '/val javafx = ".*/val javafx = "${{ steps.javafx.outputs.version }}"' versions/build.gradle.kts
+          sed -i 's/val javafx = ".*/val javafx = "${{ steps.javafx.outputs.version }}"/' versions/build.gradle.kts
       - name: 'Set JavaFX ${{ steps.javafx.output.version }} (macOS)'
         if: startsWith(matrix.os, 'macos')
         run: |
           set -e
-          sed -i '.bak' '/val javafx = ".*/val javafx = "${{ steps.javafx.outputs.version }}"' versions/build.gradle.kts
+          sed -i '.bak' 's/val javafx = ".*/val javafx = "${{ steps.javafx.outputs.version }}"/' versions/build.gradle.kts
       # endregion
 
       - name: Setup Gradle
