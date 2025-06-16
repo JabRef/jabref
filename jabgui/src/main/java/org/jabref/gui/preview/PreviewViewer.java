@@ -1,10 +1,8 @@
 package org.jabref.gui.preview;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Objects;
 
 import javafx.application.Platform;
@@ -47,201 +45,163 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.html.HTMLAnchorElement;
 
-/**
- * Displays an BibEntry using the given layout format.
- */
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
-    // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT = """
-                                                                   function getSelectionHtml() {
-                                                                   let html = "";
-                                                                   if (typeof window.getSelection != "undefined") {
-                                                                       let sel = window.getSelection();
-                                                                       if (sel.rangeCount) {
-                                                                           let container = document.createElement("div");
-                                                                           for (let i = 0, len = sel.rangeCount; i < len; ++i) {
-                                                                               container.appendChild(sel.getRangeAt(i).cloneContents());
-                                                                           }
-                                                                           html = container.innerHTML;
-                                                                       }
-                                                                   } else if (typeof document.selection != "undefined") {
-                                                                       if (document.selection.type == "Text") {
-                                                                           html = document.selection.createRange().htmlText;
-                                                                       }
-                                                                   }
-                                                                   return html;
-                                                                   }
-                                                               getSelectionHtml();
-                                                               """;
+        function getSelectionHtml() {
+            var html = "";
+            if (typeof window.getSelection != "undefined") {
+                var sel = window.getSelection();
+                if (sel.rangeCount) {
+                    var container = document.createElement("div");
+                    for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                        container.appendChild(sel.getRangeAt(i).cloneContents());
+                    }
+                    html = container.innerHTML;
+                }
+            } else if (typeof document.selection != "undefined") {
+                if (document.selection.type == "Text") {
+                    html = document.selection.createRange().htmlText;
+                }
+            }
+            return html;
+        }
+        getSelectionHtml();
+        """;
+
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final WebView previewView;
-    private final StringProperty searchQueryProperty;
     private final GuiPreferences preferences;
+    private final StringProperty searchQueryProperty;
+    private final WebView previewView;
 
-    // Used for resolving strings and pdf directories for links.
     private @Nullable BibDatabaseContext databaseContext;
-
     private @Nullable BibEntry entry;
-
     private PreviewLayout layout;
-
     private String layoutText;
 
-    public PreviewViewer(DialogService dialogService,
-                         GuiPreferences preferences,
-                         ThemeManager themeManager,
-                         TaskExecutor taskExecutor) {
+    public PreviewViewer(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
         this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());
     }
 
-    public PreviewViewer(DialogService dialogService,
-                         GuiPreferences preferences,
-                         ThemeManager themeManager,
-                         TaskExecutor taskExecutor,
-                         StringProperty searchQueryProperty) {
+    public PreviewViewer(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor, StringProperty searchQueryProperty) {
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
-        this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
         setFitToHeight(true);
         setFitToWidth(true);
-        previewView = WebViewStore.get();
+
+        this.previewView = WebViewStore.get();
         setContent(previewView);
+
+        configurePreviewView(themeManager);
+        this.searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightLayoutText());
+    }
+
+    private void configurePreviewView(ThemeManager themeManager) {
         previewView.setContextMenuEnabled(false);
         previewView.getEngine().setJavaScriptEnabled(true);
+        themeManager.installCss(previewView.getEngine());
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
-            if (newValue != Worker.State.SUCCEEDED) {
-                return;
-            }
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState != Worker.State.SUCCEEDED) return;
 
-            // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
             NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
             for (int i = 0; i < anchorList.getLength(); i++) {
                 Node node = anchorList.item(i);
                 EventTarget eventTarget = (EventTarget) node;
                 eventTarget.addEventListener("click", evt -> {
-                    EventTarget target = evt.getCurrentTarget();
-                    HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
-                    String href = anchorElement.getHref();
+                    HTMLAnchorElement anchor = (HTMLAnchorElement) evt.getCurrentTarget();
+                    String href = anchor.getHref();
                     if (href != null) {
                         try {
                             NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
-                        } catch (MalformedURLException exception) {
-                            LOGGER.error("Invalid URL", exception);
-                        } catch (IOException exception) {
-                            LOGGER.error("Invalid URL Input", exception);
+                        } catch (Exception e) {
+                            LOGGER.error("Could not open URL: {}", href, e);
                         }
                     }
                     evt.preventDefault();
                 }, false);
             }
         });
-
-        themeManager.installCss(previewView.getEngine());
     }
 
     public void setLayout(PreviewLayout newLayout) {
-        // Change listeners might set the layout to null while the update method is executing, therefore we need to prevent this here
-        if ((newLayout == null) || newLayout.equals(layout)) {
-            return;
-        }
-        layout = newLayout;
+        if (newLayout == null || newLayout.equals(layout)) return;
+        this.layout = newLayout;
         update();
     }
 
     public void setEntry(@Nullable BibEntry newEntry) {
-        if (Objects.equals(entry, newEntry)) {
-            return;
-        }
-
-        // Remove update listener for old entry
+        if (Objects.equals(entry, newEntry)) return;
         if (entry != null) {
-            for (Observable observable : entry.getObservables()) {
-                observable.removeListener(this);
-            }
+            for (Observable obs : entry.getObservables()) obs.removeListener(this);
         }
-
-        entry = newEntry;
-
+        this.entry = newEntry;
         if (entry != null) {
-            // Register for changes
-            for (Observable observable : newEntry.getObservables()) {
-                observable.addListener(this);
-            }
+            for (Observable obs : entry.getObservables()) obs.addListener(this);
         }
         update();
     }
 
     public void setDatabaseContext(BibDatabaseContext newDatabaseContext) {
-        if (Objects.equals(databaseContext, newDatabaseContext)) {
-            return;
-        }
-
+        if (Objects.equals(databaseContext, newDatabaseContext)) return;
         setEntry(null);
-
-        databaseContext = newDatabaseContext;
+        this.databaseContext = newDatabaseContext;
         update();
     }
 
     private void update() {
-        if ((databaseContext == null) || (entry == null) || (layout == null)) {
-            LOGGER.debug("databaseContext null {}, entry null {}, or layout null {}", databaseContext == null, entry == null, layout == null);
-            // Make sure that the preview panel is not completely white, especially with dark theme on
+        if (databaseContext == null || entry == null || layout == null) {
+            LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
+                    databaseContext == null ? "null" : "OK",
+                    entry == null ? "null" : "OK",
+                    layout == null ? "null" : "OK");
             setPreviewText("");
             return;
         }
 
-        Number.serialExportNumber = 1; // Set entry number in case that is included in the preview layout.
+        Number.serialExportNumber = 1;
+        BibEntry currentEntry = entry;
 
-        final BibEntry theEntry = entry;
-        BackgroundTask
-                .wrap(() -> layout.generatePreview(theEntry, databaseContext))
-                .onSuccess(this::setPreviewText)
-                .onFailure(exception -> {
-                    LOGGER.error("Error while generating citation style", exception);
+        BackgroundTask.wrap(() -> layout.generatePreview(currentEntry, databaseContext))
+                      .onSuccess(this::setPreviewText)
+                      .onFailure(e -> setPreviewText(formatError(currentEntry, e)))
+                      .executeWith(taskExecutor);
+    }
 
-                    // Convert stack trace to a string
-                    StringWriter stringWriter = new StringWriter();
-                    PrintWriter printWriter = new PrintWriter(stringWriter);
-                    exception.printStackTrace(printWriter);
-                    String stackTraceString = stringWriter.toString();
-
-                    // Set the preview text with the localized error message and the stack trace
-                    setPreviewText(Localization.lang("Error while generating citation style") + "\n\n" + exception.getLocalizedMessage() + "\n\nBibTeX (internal):\n" + theEntry + "\n\nStack Trace:\n" + stackTraceString);
-                })
-                .executeWith(taskExecutor);
+    private String formatError(BibEntry entry, Throwable exception) {
+        StringWriter sw = new StringWriter();
+        exception.printStackTrace(new PrintWriter(sw));
+        return String.format("%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s",
+                Localization.lang("Error while generating citation style"),
+                exception.getLocalizedMessage(),
+                entry,
+                sw.toString());
     }
 
     private void setPreviewText(String text) {
         layoutText = """
-                <html>
-                    <body id="previewBody">
-                        <div id="content"> %s </div>
-                    </body>
-                </html>
-                """.formatted(text);
+            <html><body id=\"previewBody\"><div id=\"content\"> %s </div></body></html>
+        """.formatted(text);
         highlightLayoutText();
-        this.setHvalue(0);
+        setHvalue(0);
     }
 
     private void highlightLayoutText() {
-        if (layoutText == null) {
-            return;
-        }
+        if (layoutText == null) return;
 
-        if (StringUtil.isNotBlank(searchQueryProperty.get())) {
-            SearchQuery searchQuery = new SearchQuery(searchQueryProperty.get());
-            String highlightedHtml = Highlighter.highlightHtml(layoutText, searchQuery);
-            Platform.runLater(() -> previewView.getEngine().loadContent(highlightedHtml));
+        String query = searchQueryProperty.get();
+        if (StringUtil.isNotBlank(query)) {
+            SearchQuery searchQuery = new SearchQuery(query);
+            String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
+            Platform.runLater(() -> previewView.getEngine().loadContent(highlighted));
         } else {
             Platform.runLater(() -> previewView.getEngine().loadContent(layoutText));
         }
@@ -249,30 +209,25 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     public void print() {
         PrinterJob job = PrinterJob.createPrinterJob();
-        boolean proceed = dialogService.showPrintDialog(job);
-        if (!proceed && (entry != null)) {
-            return;
-        }
+        if (!dialogService.showPrintDialog(job) || entry == null) return;
 
-        BackgroundTask
-                .wrap(() -> {
-                    job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
-                    previewView.getEngine().print(job);
-                    job.endJob();
-                })
-                .onFailure(exception -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), exception))
-                .executeWith(taskExecutor);
+        BackgroundTask.wrap(() -> {
+                          job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
+                          previewView.getEngine().print(job);
+                          job.endJob();
+                      }).onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e))
+                      .executeWith(taskExecutor);
     }
 
     public void copyPreviewHtmlToClipBoard() {
-        Document document = previewView.getEngine().getDocument();
-        ClipboardContent content = ClipboardContentGenerator.processHtml(List.of(document.getElementById("content").getTextContent()));
+        Document doc = previewView.getEngine().getDocument();
+        ClipboardContent content = ClipboardContentGenerator.processHtml(Arrays.asList(doc.getElementById("content").getTextContent()));
         clipBoardManager.setContent(content);
     }
 
     public void copyPreviewTextToClipBoard() {
-        Document document = previewView.getEngine().getDocument();
-        ClipboardContent content = ClipboardContentGenerator.processText(List.of(document.getElementById("content").getTextContent()));
+        Document doc = previewView.getEngine().getDocument();
+        ClipboardContent content = ClipboardContentGenerator.processText(Arrays.asList(doc.getElementById("content").getTextContent()));
         clipBoardManager.setContent(content);
     }
 
@@ -280,13 +235,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         ClipboardContent content = new ClipboardContent();
         content.putString(getSelectionTextContent());
         content.putHtml(getSelectionHtmlContent());
-
         clipBoardManager.setContent(content);
     }
 
     public void exportToClipBoard(StateManager stateManager) {
-        ExportToClipboardAction exportToClipboardAction = new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences);
-        exportToClipboardAction.execute();
+        new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences).execute();
     }
 
     @Override
