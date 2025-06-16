@@ -183,14 +183,22 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         # TODO UPDATE THIS!
         run: |
-          sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          # Update JavaLanguageVersion
+          sed -i "s/JavaLanguageVersion.of..../JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+
+          # Update options.release
+          sed -i "s/options\.release = ../options.release = ${{ env.jdk_version }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+
+          # Use default vendor
+          sed -i "s#vendor = JvmVendorSpec\..*##" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+
           cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (macOS)
         if: ${{ startsWith(matrix.os, 'macos') }}
         run: |
-          sed -i '.bak' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
-          sed -i '.bak' "s#vendor = JvmVendorSpec.AMAZON##" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i '.bak' "s/JavaLanguageVersion.of..../JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i '.bak' "s/options\.release = ../options.release = ${{ env.jdk_version }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i '.bak' "s#vendor = JvmVendorSpec\..*##" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
           cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
 
       # region setup-JDK
