@@ -26,7 +26,7 @@ plugins {
 
 rootProject.name = "JabRef"
 
-include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support")
+include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support", "versions")
 
 // https://github.com/gradlex-org/java-module-dependencies#plugin-dependency
 includeBuild(".")
