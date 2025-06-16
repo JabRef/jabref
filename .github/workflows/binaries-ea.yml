@@ -179,7 +179,6 @@ jobs:
 
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
-        # TODO UPDATE THIS!
         run: |
           # Update JavaLanguageVersion
           sed -i "s/JavaLanguageVersion.of..../JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
