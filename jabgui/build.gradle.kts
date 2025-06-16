@@ -137,7 +137,7 @@ dependencies {
     }
     testImplementation("net.bytebuddy:byte-buddy:1.17.6")
 
-    testImplementation("org.wiremock:wiremock:3.13.0")
+    testImplementation("org.wiremock:wiremock:3.13.1")
     // Required by Wiremock - and our patching of Wiremock
     testImplementation("com.github.jknack:handlebars:4.4.0") {
         exclude(group = "org.mozilla", module = "rhino")
