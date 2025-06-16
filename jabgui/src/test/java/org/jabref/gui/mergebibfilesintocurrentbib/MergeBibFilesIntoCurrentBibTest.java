@@ -1,7 +1,6 @@
 package org.jabref.gui.mergebibfilesintocurrentbib;
 
 import java.io.IOException;
-import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -29,11 +28,10 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import com.google.common.jimfs.Configuration;
-import com.google.common.jimfs.Jimfs;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockedConstruction;
@@ -49,6 +47,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(ApplicationExtension.class)
 public class MergeBibFilesIntoCurrentBibTest {
+    @TempDir Path tempDir;
+
     private Path testFolder;
     private Path testInnerFolder;
     private Path currentDbFile;
@@ -81,13 +81,11 @@ public class MergeBibFilesIntoCurrentBibTest {
     void setUp() throws IOException {
         MockitoAnnotations.openMocks(this);
 
-        FileSystem fs = Jimfs.newFileSystem(Configuration.unix());
-
-        testFolder = fs.getPath("/test");
+        testFolder = tempDir.resolve("test");
         Files.createDirectory(testFolder);
-        testInnerFolder = fs.getPath("/test/inner");
+        testInnerFolder = testFolder.resolve("inner");
         Files.createDirectory(testInnerFolder);
-        Path backupDirectory = fs.getPath("/backups");
+        Path backupDirectory = tempDir.resolve("backups");
         Files.createDirectory(backupDirectory);
 
         Path bibFile1 = testInnerFolder.resolve("library1.bib");

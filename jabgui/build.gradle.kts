@@ -150,12 +150,6 @@ dependencies {
     testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
-
-    testImplementation("com.google.jimfs:jimfs:1.2") {
-        exclude(group = "com.google.auto.service")
-        exclude(group = "com.google.code.findbugs")
-        exclude(group = "org.checkerframework")
-    }
 }
 
 application {
