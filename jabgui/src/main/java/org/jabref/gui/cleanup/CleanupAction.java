@@ -114,8 +114,7 @@ public class CleanupAction extends SimpleCommand {
         CleanupWorker cleaner = new CleanupWorker(
                 databaseContext,
                 preferences.getFilePreferences(),
-                preferences.getTimestampPreferences(),
-                preferences.getBibEntryPreferences()
+                preferences.getTimestampPreferences()
         );
 
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
