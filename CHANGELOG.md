@@ -1500,7 +1500,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where a window which is on an external screen gets unreachable when external screen is removed. [#5037](https://github.com/JabRef/jabref/issues/5037)
 - We fixed a bug where the selection of groups was lost after drag and drop. [#2868](https://github.com/JabRef/jabref/issues/2868)
 - We fixed an issue where the custom entry types didn't show the correct display name [#5651](https://github.com/JabRef/jabref/issues/5651)
-- We fixed Non-absolute URIs are now properly rejected with a meaningful error message. [#12186](https://github.com/JabRef/jabref/issues/12186)
+
 
 ### Removed
 
