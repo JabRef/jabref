@@ -113,8 +113,6 @@ public class URLUtil {
             throw new MalformedURLException("Invalid  URI syntax: " + url + " | Error: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             throw new MalformedURLException("Illegal argument in URI construction: " + url + " | Error: " + e.getMessage());
-        } catch (NullPointerException e) {
-            throw new MalformedURLException("Null value encountered during URI parsing: " + url);
         }
     }
 
