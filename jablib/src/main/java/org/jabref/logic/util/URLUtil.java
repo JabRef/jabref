@@ -98,7 +98,6 @@ public class URLUtil {
      */
     public static URL create(String url) throws MalformedURLException {
         try {
-             input string into a URI
             URI parsedUri = new URI(url.trim());
 
             // Validate that the URI
@@ -107,8 +106,6 @@ public class URLUtil {
             } else {
                 throw new MalformedURLException("Provided URI is not absolute or lacks scheme/host: " + url);
             }
-
-            //validation
 
         } catch (URISyntaxException e) {
             throw new MalformedURLException("Malformed URI syntax: " + url + " | Error: " + e.getMessage());
