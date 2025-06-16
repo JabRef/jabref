@@ -89,7 +89,6 @@ class URLUtilTest {
         assertEquals("http://example.com/test%7Cfile", uri.toString());
     }
 
-    // valid absolute URL
     @Test
     public void testValidUrl() {
         String input = "http://example.com";
@@ -104,7 +103,6 @@ class URLUtilTest {
     }
 
 
-    // null input
     @Test
     public void testNullUrl() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
@@ -113,7 +111,6 @@ class URLUtilTest {
         assertTrue(exception.getMessage().contains("null or empty"), "Error message should indicate null or empty input");
     }
 
-    //empty string input
     @Test
     public void testEmptyUrl() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
@@ -122,7 +119,6 @@ class URLUtilTest {
         assertTrue(exception.getMessage().contains("null or empty"), "Error message ");
     }
 
-    // URI without scheme
     @Test
     public void testUriMissingScheme() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
@@ -131,7 +127,6 @@ class URLUtilTest {
         assertTrue(exception.getMessage().contains("not absolute"), "URI is not absolute");
     }
 
-    // URI with scheme but missing host
     @Test
     public void testUriMissingHost() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
@@ -140,7 +135,6 @@ class URLUtilTest {
         assertTrue(exception.getMessage().contains("must include both scheme and host"), "Error message should mention scheme and host");
     }
 
-    // malformed syntax
     @Test
     public void testMalformedSyntax() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
