@@ -226,13 +226,14 @@ jobs:
         uses: jbangdev/setup-jbang@main
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Debug
-        shell: bash
-        run: find . -name "*.mv"
       - name: Run ${{ matrix.module }} tests
         run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -i -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
+      - name: Debug
+        if: failure()
+        shell: bash
+        run: find . -name "*.mv"
       - name: Prepare format failed test results
         if: failure()
         uses: awalsh128/cache-apt-pkgs-action@latest
