@@ -243,7 +243,7 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest-library:3.0")
 
-    testImplementation("org.wiremock:wiremock:3.13.0")
+    testImplementation("org.wiremock:wiremock:3.13.1")
     // Required by Wiremock - and our patching of Wiremock
     implementation("com.github.jknack:handlebars:4.3.1") {
         exclude(group = "org.mozilla", module = "rhino")
