@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
 /**
  * Manages highlight effects across multiple windows for walkthrough steps.
  */
-public class HighlightManager {
+public class WalkthroughHighlighter {
     private final Map<Window, BackdropHighlight> backdropHighlights = new HashMap<>();
     private final Map<Window, PulseAnimateIndicator> pulseIndicators = new HashMap<>();
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
