@@ -139,10 +139,10 @@ dependencies {
 
     testImplementation("org.wiremock:wiremock:3.13.0")
     // Required by Wiremock - and our patching of Wiremock
-    testImplementation("com.github.jknack:handlebars:4.3.1") {
+    testImplementation("com.github.jknack:handlebars:4.4.0") {
         exclude(group = "org.mozilla", module = "rhino")
     }
-    testImplementation("com.github.jknack:handlebars-helpers:4.3.1") {
+    testImplementation("com.github.jknack:handlebars-helpers:4.4.0") {
         exclude(group = "org.mozilla", module = "rhino")
         exclude(group = "org.apache.commons", module = "commons-lang3")
     }
