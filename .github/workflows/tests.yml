@@ -227,13 +227,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run ${{ matrix.module }} tests
-        run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -i -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        run: xvfb-run --auto-servernum ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
           CI: "true"
-      - name: Debug
-        if: failure()
-        shell: bash
-        run: find . -name "*.mv"
       - name: Prepare format failed test results
         if: failure()
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -339,10 +335,10 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
-      - run: jbang build --verbose .jbang/CheckoutPR.java
-      - run: jbang build --verbose .jbang/CloneJabRef.java
-      - run: jbang build --verbose .jbang/JabKitLauncher.java
-      - run: jbang build --verbose .jbang/JabSrvLauncher.java
+      - run: jbang build .jbang/CheckoutPR.java
+      - run: jbang build .jbang/CloneJabRef.java
+      - run: jbang build .jbang/JabKitLauncher.java
+      - run: jbang build .jbang/JabSrvLauncher.java
 
   codecoverage:
     if: false
