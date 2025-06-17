@@ -52,6 +52,20 @@ jvmDependencyConflicts.patch {
         // workaround for https://github.com/wiremock/wiremock/issues/2874
         addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
     }
+    module("org.apache.logging.log4j:log4j-to-slf4j") {
+        // remove non-module annotation libraries only used at compile time
+        removeDependency("com.github.spotbugs:spotbugs-annotations")
+        removeDependency("org.osgi:org.osgi.annotation.versioning")
+        removeDependency("org.osgi:org.osgi.annotation.bundle")
+        removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
+    }
+    module("org.apache.logging.log4j:log4j-api") {
+        // remove non-module annotation libraries only used at compile time
+        removeDependency("com.github.spotbugs:spotbugs-annotations")
+        removeDependency("org.osgi:org.osgi.annotation.versioning")
+        removeDependency("org.osgi:org.osgi.annotation.bundle")
+        removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
+    }
 }
 
 extraJavaModuleInfo {
