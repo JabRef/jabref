@@ -146,9 +146,58 @@ extraJavaModuleInfo {
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "org.fxmisc.wellbehaved")
-    module("org.jbibtex:jbibtex", "org.jbibtex.jbibtex")
+    module("org.javassist:javassist", "org.javassist")
+    module("org.jbibtex:jbibtex", "org.jbibtex")
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "pt.davidafsilva.apple.jkeychain")
+
+    module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
+    module("org.glassfish.jersey.core:jersey-server", "org.glassfish.jersey.server") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
+    module("org.glassfish.jersey.inject:jersey-hk2", "org.glassfish.jersey.hk2") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
+    module("org.glassfish.jersey.core:jersey-client", "org.glassfish.jersey.client") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
+    module("org.glassfish.jersey.core:jersey-common", "org.glassfish.jersey.common") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
+    module("org.glassfish.jersey.containers:jersey-container-grizzly2-http", "org.glassfish.jersey.grizzly2.http") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+        requires("org.glassfish.grizzly")
+    }
+    module("org.glassfish.hk2:hk2-locator", "org.glassfish.hk2.locator") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
+    module("org.glassfish.hk2:hk2-api", "org.glassfish.hk2.api") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        uses("org.glassfish.hk2.extension.ServiceLocatorGenerator")
+    }
+    module("org.glassfish.hk2:hk2-utils", "org.glassfish.hk2.utilities") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
+    module("org.glassfish.hk2:osgi-resource-locator", "org.glassfish.hk2.osgi.resource.locator") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
 
     module("com.github.sialcasa.mvvmFX:mvvmfx-validation", "de.saxsys.mvvmfx.validation") {
         exportAllPackages()
@@ -213,7 +262,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.xml")
     }
-    module("com.squareup.okio:okio-jvm", "okio"){
+    module("com.squareup.okio:okio-jvm", "okio") {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.logging")

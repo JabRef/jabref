@@ -183,7 +183,7 @@ open module org.jabref.jablib {
     requires scala.library;
     // endregion
 
-    requires org.jbibtex.jbibtex;
+    requires org.jbibtex;
     requires de.undercouch.citeproc.java;
 
     requires de.rototor.snuggletex.core;
