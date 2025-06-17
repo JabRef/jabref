@@ -12,6 +12,7 @@ import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -120,6 +121,7 @@ class CrossRefTest {
         assertEquals(Optional.of(barrosEntry), fetcher.performSearch(entry).stream().findFirst());
     }
 
+    @Disabled("As of June 2025, has a title")
     @Test
     void performSearchByIdFindsPaperWithoutTitle() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
