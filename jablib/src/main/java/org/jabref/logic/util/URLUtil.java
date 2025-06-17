@@ -98,7 +98,7 @@ public class URLUtil {
      */
     public static URL create(String url) throws MalformedURLException {
         if (url == null || url.trim().isEmpty()) {
-            throw new MalformedURLException("Provided URL is null or empty.");
+            throw new IllegalArgumentException("URL must not be null or empty.");
         }
         try {
             URI parsedUri = new URI(url.trim());
@@ -109,10 +109,8 @@ public class URLUtil {
                 throw new MalformedURLException("URI must include both scheme and host: " + url);
             }
             return parsedUri.toURL();
-        } catch (URISyntaxException e) {
-            throw new MalformedURLException("Invalid  URI syntax: " + url + " | Error: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            throw new MalformedURLException("Illegal argument in URI construction: " + url + " | Error: " + e.getMessage());
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            throw new MalformedURLException("Invalid URI: " + url + " | " + e.getMessage());
         }
     }
 
