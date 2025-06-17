@@ -389,7 +389,7 @@ jobs:
       - name: Remove duplicate for arm64
         if: ${{ matrix.os == 'ubuntu-22.04-arm' }}
         shell: bash
-        run:
+        run: |
           cd jabgui/build/distribution
           rm jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
       - name: Build JabKit
