@@ -22,15 +22,13 @@ application{
     )
 }
 
-val javafxVersion = "24.0.1"
-
 dependencies {
     implementation(project(":jablib"))
     implementation(project(":jabsrv"))
 
-    implementation("org.openjfx:javafx-controls:${javafxVersion}")
-    implementation("org.openjfx:javafx-fxml:${javafxVersion}")
-    implementation ("org.openjfx:javafx-graphics:${javafxVersion}")
+    implementation("org.openjfx:javafx-controls")
+    implementation("org.openjfx:javafx-fxml")
+    implementation ("org.openjfx:javafx-graphics")
 
     implementation("org.slf4j:slf4j-api")
     implementation("org.tinylog:slf4j-tinylog")
