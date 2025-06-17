@@ -20,6 +20,7 @@ import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
@@ -277,6 +278,27 @@ public class LibraryResource {
         if (entriesByCitationKey.size() > 1) {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
         }
-        return entriesByCitationKey.getFirst().getAuthorTitleYear();
+
+        // build the preview
+        BibEntry entry = entriesByCitationKey.getFirst();
+
+        String author = entry.getField(StandardField.AUTHOR).orElse("(N/A)");
+        String title = entry.getField(StandardField.TITLE).orElse("(N/A)");
+        String journal = entry.getField(StandardField.JOURNAL).orElse("(N/A)");
+        String volume = entry.getField(StandardField.VOLUME).orElse("(N/A)");
+        String number = entry.getField(StandardField.NUMBER).orElse("(N/A)");
+        String pages = entry.getField(StandardField.PAGES).orElse("(N/A)");
+        String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
+
+        String preview =
+                    "Author: " + author
+                + "\nTitle: " + title
+                + "\nJournal: " + journal
+                + "\nVolume: " + volume
+                + "\nNumber: " + number
+                + "\nPages: " + pages
+                + "\nReleased on: " + releaseDate;
+
+        return preview;
     }
 }
