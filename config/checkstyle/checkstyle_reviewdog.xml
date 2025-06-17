@@ -163,7 +163,7 @@
         <!-- force a space after // for comments -->
         <module name="TodoComment">
             <property name="id" value="commentStartWithSpace"/>
-            <property name="format" value="^([^\s\/*])"/>
+            <property name="format" value="^(DEPS|JAVA|SOURCES|FILES|RUNTIME_OPTIONS|[^\s/*])"/>
             <message key="todo.match" value="Comment text should start with space."/>
         </module>
 

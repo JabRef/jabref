@@ -20,7 +20,8 @@ rewrite {
     activeRecipe("org.jabref.config.rewrite.cleanup")
     exclusion(
         "settings.gradle",
-        "**/generated-sources/**",
+        "**/generated/sources/**",
+        "**/generated-src/**",
         "**/src/main/resources/**",
         "**/src/test/resources/**",
         "**/module-info.java",

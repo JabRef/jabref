@@ -2,7 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 plugins {
     id("org.jabref.gradle.module")
-    id ("application")
+    id("application")
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
@@ -172,7 +172,7 @@ tasks.named("jlinkZip") {
 }
 
 tasks.register<Delete>("deleteInstallerTemp") {
-    delete(file("$buildDir/installer"))
+    delete(file("${layout.buildDirectory.get()}/installer"))
 }
 
 jlink {
@@ -205,6 +205,7 @@ jlink {
         )
     }
 
+    // This tasks reads resources from src/main/resourcesPackage/$OS
     jpackage {
         outputDir =
             "distribution"

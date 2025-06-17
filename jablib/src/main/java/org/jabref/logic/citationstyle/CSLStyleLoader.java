@@ -12,6 +12,7 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,8 @@ public class CSLStyleLoader {
 
     private final OpenOfficePreferences openOfficePreferences;
 
-    public CSLStyleLoader(OpenOfficePreferences openOfficePreferences) {
-        this.openOfficePreferences = Objects.requireNonNull(openOfficePreferences);
+    public CSLStyleLoader(@NonNull OpenOfficePreferences openOfficePreferences) {
+        this.openOfficePreferences = openOfficePreferences;
         loadExternalStyles();
     }
 
@@ -82,6 +83,7 @@ public class CSLStyleLoader {
                     boolean usesHangingIndent = (boolean) info.get("usesHangingIndent");
 
                     // We use these metadata and just load the content instead of re-parsing for them
+                    // These are located in the resources directly; therefore it is enough to use the class itself for loading
                     try (InputStream styleStream = CSLStyleLoader.class.getResourceAsStream(STYLES_ROOT + "/" + path)) {
                         if (styleStream != null) {
                             String source = new String(styleStream.readAllBytes());
