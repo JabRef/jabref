@@ -120,8 +120,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getEngine().setJavaScriptEnabled(true);
         themeManager.installCss(previewView.getEngine());
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
-            if (newState != Worker.State.SUCCEEDED) {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newValue) -> {
+            if (newValue != Worker.State.SUCCEEDED) {
                 return;
             }
 
@@ -132,8 +132,8 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 EventTarget eventTarget = (EventTarget) node;
                 eventTarget.addEventListener("click", evt -> {
                     EventTarget target = evt.getCurrentTarget();
-                    HTMLAnchorElement anchor = (HTMLAnchorElement) target;
-                    String href = anchor.getHref();
+                    HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
+                    String href = anchorElement.getHref();
                     if (href != null) {
                         try {
                             NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
@@ -221,7 +221,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private void setPreviewText(String text) {
         layoutText = """
-                <html><body id=\"previewBody\"><div id=\"content\"> %s </div></body></html>
+                <html>
+                    <body id="previewBody">
+                        <div id="content"> %s </div>
+                    </body>
+                </html>
                 """.formatted(text);
         highlightLayoutText();
         setHvalue(0);
@@ -293,7 +297,13 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void exportToClipBoard(StateManager stateManager) {
-        new ExportToClipboardAction(dialogService, stateManager, clipBoardManager, taskExecutor, preferences).execute();
+        ExportToClipboardAction exportToClipboardAction = new ExportToClipboardAction(
+                dialogService,
+                stateManager,
+                clipBoardManager,
+                taskExecutor,
+                preferences);
+        exportToClipboardAction.execute();
     }
 
     @Override
