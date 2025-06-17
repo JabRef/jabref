@@ -94,7 +94,7 @@ class URLUtilTest {
     }
 
     @Test
-    public void validUrl() throws MalformedURLException {
+    void validUrl() throws MalformedURLException {
         String input = "http://example.com";
 
         URL result = URLUtil.create(input);
@@ -104,35 +104,35 @@ class URLUtilTest {
     }
 
     @Test
-    public void nullUrl() {
+    void nullUrl() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 URLUtil.create(null));
         assertTrue(exception.getMessage().contains("null or empty"));
     }
 
     @Test
-    public void emptyUrl() {
+    void emptyUrl() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 URLUtil.create("   "));
         assertTrue(exception.getMessage().contains("null or empty"));
     }
 
     @Test
-    public void uriMissingScheme() {
+    void uriMissingScheme() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
                 URLUtil.create("www.example.com"));
         assertTrue(exception.getMessage().contains("not absolute"));
     }
 
     @Test
-    public void uriMissingHost() {
+    void uriMissingHost() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
                 URLUtil.create("mailto:someone@example.com"));
         assertTrue(exception.getMessage().contains("must include both scheme and host"));
     }
 
     @Test
-    public void malformedSyntax() {
+    void malformedSyntax() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
                 URLUtil.create("http://[invalid-url]"));
         assertTrue(exception.getMessage().contains("Invalid URI"));
