@@ -28,10 +28,10 @@ dependencies.constraints {
     api("com.dlsc.gemsfx:gemsfx:3.1.3")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
-    api("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
+    api("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
     api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.jknack:handlebars:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
@@ -122,7 +122,7 @@ dependencies.constraints {
     api("org.junit.jupiter:junit-jupiter-api:5.12.2")
     api("org.junit.jupiter:junit-jupiter-params:5.12.2")
     api("org.junit.jupiter:junit-jupiter:5.12.2")
-    api("org.junit.platform:junit-platform-launcher:1.12.2")
+    api("org.junit.platform:junit-platform-launcher:1.13.1")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
