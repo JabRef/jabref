@@ -104,44 +104,38 @@ class URLUtilTest {
         });
     }
 
-
     @Test
     public void nullUrl() {
-        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
-            URLUtil.create(null);
-        });
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create(null));
         assertTrue(exception.getMessage().contains("null or empty"), "Error message should indicate null or empty input");
     }
 
     @Test
     public void emptyUrl() {
-        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
-            URLUtil.create("   ");
-        });
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create("   "));
         assertTrue(exception.getMessage().contains("null or empty"), "Error message ");
     }
 
     @Test
     public void uriMissingScheme() {
-        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
-            URLUtil.create("www.example.com");
-        });
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create("www.example.com"));
         assertTrue(exception.getMessage().contains("not absolute"), "URI is not absolute");
     }
 
     @Test
     public void uriMissingHost() {
-        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
-            URLUtil.create("mailto:someone@example.com");
-        });
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create("mailto:someone@example.com"));
         assertTrue(exception.getMessage().contains("must include both scheme and host"), "Error message should mention scheme and host");
     }
 
     @Test
     public void malformedSyntax() {
-        MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
-            URLUtil.create("http://[invalid-url]");
-        });
+        MalformedURLException exception = assertThrows(MalformedURLException.class, () ->
+                URLUtil.create("http://[invalid-url]"));
         assertTrue(exception.getMessage().contains("Invalid  URI syntax"), " URI syntax error");
     }
 }
