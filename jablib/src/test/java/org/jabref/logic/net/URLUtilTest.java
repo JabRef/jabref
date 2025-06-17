@@ -99,7 +99,7 @@ class URLUtilTest {
 
         URL result = URLUtil.create(input);
         assertNotNull(result);
-        assertNotEquals("", result.trim());
+        assertNotEquals("", result.toString().trim());
         assertEquals(input, result.toString());
     }
 
