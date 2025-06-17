@@ -115,53 +115,14 @@ application {
     mainClass.set("org.jabref.Launcher")
     mainModule.set("org.jabref")
 
-    applicationDefaultJvmArgs = listOf(
-        // On a change here, also adapt
-        //   1. "run > moduleOptions"
-        //   2. "binaries.yml" (macOS part)
-
-        // Note that the arguments are cleared for the "run" task to avoid messages like "WARNING: Unknown module: org.jabref.merged.module specified to --add-exports"
-
-        // Enable JEP 450: Compact Object Headers
-        "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
-
-        "-XX:+UseZGC", "-XX:+ZUncommit",
-        "-XX:+UseStringDeduplication",
-
-        // Fix for https://github.com/JabRef/jabref/issues/11225 on linux
-        "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
-        "--add-exports=javafx.base/com.sun.javafx.event=org.jabref",
-        "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref",
-        "--add-opens=javafx.graphics/javafx.scene=org.jabref",
-        "--add-opens=javafx.controls/javafx.scene.control=org.jabref",
-        "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref",
-
-        "--add-opens=javafx.base/javafx.collections=org.jabref",
-        "--add-opens=javafx.base/javafx.collections.transformation=org.jabref",
-
+    application.applicationDefaultJvmArgs = listOf(
         "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
     )
 }
 
-/*
-jacoco {
-    toolVersion = "0.8.13"
-}
-*/
-
 tasks.named<JavaExec>("run") {
     // "assert" statements in the code should activated when running using gradle
     enableAssertions = true
-
-    doFirst {
-        // Clear the default JVM arguments to avoid warnings
-        // application.applicationDefaultJvmArgs = emptyList()
-        application.applicationDefaultJvmArgs =
-            listOf(
-                "--enable-native-access=ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,org.apache.lucene.core"
-            )
-    }
-}
 
 tasks.named("jpackage") {
     dependsOn("deleteInstallerTemp")

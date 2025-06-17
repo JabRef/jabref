@@ -60,12 +60,6 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.mockito")
 }
 
-/*
-jacoco {
-    toolVersion = "0.8.13"
-}
-*/
-
 application {
     mainClass.set("org.jabref.JabKit")
     mainModule.set("org.jabref.jabkit")
