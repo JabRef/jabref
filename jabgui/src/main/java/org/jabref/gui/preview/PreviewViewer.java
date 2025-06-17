@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
+import java.util.List;
 import java.util.Objects;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -25,6 +25,7 @@ import org.jabref.gui.exporter.ExportToClipboardAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.Highlighter;
 import org.jabref.gui.theme.ThemeManager;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.format.Number;
@@ -52,6 +53,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
 
+    // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT = """
         function getSelectionHtml() {
             var html = "";
@@ -77,34 +79,40 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private final ClipBoardManager clipBoardManager;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
-    private final GuiPreferences preferences;
-    private final StringProperty searchQueryProperty;
     private final WebView previewView;
+    private final StringProperty searchQueryProperty;
+    private final GuiPreferences preferences;
 
     private @Nullable BibDatabaseContext databaseContext;
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
     private String layoutText;
 
-    public PreviewViewer(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor) {
+    public PreviewViewer(DialogService dialogService,
+                         GuiPreferences preferences,
+                         ThemeManager themeManager,
+                         TaskExecutor taskExecutor) {
         this(dialogService, preferences, themeManager, taskExecutor, new SimpleStringProperty());
     }
 
-    public PreviewViewer(DialogService dialogService, GuiPreferences preferences, ThemeManager themeManager, TaskExecutor taskExecutor, StringProperty searchQueryProperty) {
+    public PreviewViewer(DialogService dialogService,
+                         GuiPreferences preferences,
+                         ThemeManager themeManager,
+                         TaskExecutor taskExecutor,
+                         StringProperty searchQueryProperty) {
         this.dialogService = dialogService;
         this.clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         this.taskExecutor = taskExecutor;
         this.preferences = preferences;
         this.searchQueryProperty = searchQueryProperty;
+        this.searchQueryProperty.addListener((_, _, _) -> highlightLayoutText());
 
         setFitToHeight(true);
         setFitToWidth(true);
-
-        this.previewView = WebViewStore.get();
+        previewView = WebViewStore.get();
         setContent(previewView);
 
         configurePreviewView(themeManager);
-        this.searchQueryProperty.addListener((observable, oldValue, newValue) -> highlightLayoutText());
     }
 
     private void configurePreviewView(ThemeManager themeManager) {
@@ -112,21 +120,25 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         previewView.getEngine().setJavaScriptEnabled(true);
         themeManager.installCss(previewView.getEngine());
 
-        previewView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+        previewView.getEngine().getLoadWorker().stateProperty().addListener((_, _, newState) -> {
             if (newState != Worker.State.SUCCEEDED) {
                 return;
             }
 
+            // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
             NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
             for (int i = 0; i < anchorList.getLength(); i++) {
                 Node node = anchorList.item(i);
                 EventTarget eventTarget = (EventTarget) node;
                 eventTarget.addEventListener("click", evt -> {
-                    HTMLAnchorElement anchor = (HTMLAnchorElement) evt.getCurrentTarget();
+                    EventTarget target = evt.getCurrentTarget();
+                    HTMLAnchorElement anchor = (HTMLAnchorElement) target;
                     String href = anchor.getHref();
                     if (href != null) {
                         try {
                             NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
+                        } catch (MalformedURLException exception) {
+                            LOGGER.error("Invalid URL Input", exception);
                         } catch (IOException e) {
                             LOGGER.error("Could not open URL: {}", href, e);
                         }
@@ -138,10 +150,11 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     }
 
     public void setLayout(PreviewLayout newLayout) {
+        // Change listeners might set the layout to null while the update method is executing, therefore, we need to prevent this here
         if ((newLayout == null) || newLayout.equals(layout)) {
             return;
         }
-        this.layout = newLayout;
+        layout = newLayout;
         update();
     }
 
@@ -149,12 +162,17 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         if (Objects.equals(entry, newEntry)) {
             return;
         }
+
+        // Remove update listener for old entry
         if (entry != null) {
             for (Observable observable : entry.getObservables()) {
                 observable.removeListener(this);
             }
         }
-        this.entry = newEntry;
+
+        entry = newEntry;
+
+        // Register listeners for new entry
         if (entry != null) {
             for (Observable observable : entry.getObservables()) {
                 observable.addListener(this);
@@ -175,9 +193,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void update() {
         if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
-                    (databaseContext == null) ? "null" : "OK",
-                    (entry == null) ? "null" : "OK",
-                    (layout == null) ? "null" : "OK");
+                    (databaseContext == null) ? "null" : databaseContext,
+                    (entry == null) ? "null" : entry,
+                    (layout == null) ? "null" : layout);
             setPreviewText("");
             return;
         }
@@ -198,7 +216,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 Localization.lang("Error while generating citation style"),
                 exception.getLocalizedMessage(),
                 entry,
-                sw.toString());
+                sw);
     }
 
     private void setPreviewText(String text) {
@@ -214,19 +232,19 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
             return;
         }
 
-        String query = searchQueryProperty.get();
-        if (StringUtil.isNotBlank(query)) {
-            SearchQuery searchQuery = new SearchQuery(query);
+        String queryText = searchQueryProperty.get();
+        if (StringUtil.isNotBlank(queryText)) {
+            SearchQuery searchQuery = new SearchQuery(queryText);
             String highlighted = Highlighter.highlightHtml(layoutText, searchQuery);
-            Platform.runLater(() -> previewView.getEngine().loadContent(highlighted));
+            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(highlighted));
         } else {
-            Platform.runLater(() -> previewView.getEngine().loadContent(layoutText));
+            UiTaskExecutor.runInJavaFXThread(() -> previewView.getEngine().loadContent(layoutText));
         }
     }
 
     public void print() {
         PrinterJob job = PrinterJob.createPrinterJob();
-        if (!dialogService.showPrintDialog(job) || (entry == null)) {
+        if ((entry == null) || !dialogService.showPrintDialog(job)) {
             return;
         }
 
@@ -234,36 +252,42 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                           job.getJobSettings().setJobName(entry.getCitationKey().orElse("NO CITATION KEY"));
                           previewView.getEngine().print(job);
                           job.endJob();
-                      }).onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e))
+                      })
+                      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Could not print preview"), e))
                       .executeWith(taskExecutor);
     }
 
-    public void copyPreviewHtmlToClipBoard() {
+    public void copyPreviewAsHtmlToClipBoard() {
         if ((entry == null) || (layout == null) || (databaseContext == null)) {
             LOGGER.warn("Cannot copy preview citation: Missing entry, layout, or database context.");
             return;
         }
 
-        try {
-            String citationHtml = layout.generatePreview(entry, databaseContext);
-            ClipboardContent content = ClipboardContentGenerator.processHtml(java.util.List.of(citationHtml));
-            clipBoardManager.setContent(content);
-        } catch (Exception e) {
-            LOGGER.error("Failed to generate or copy citation HTML", e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Could not copy citation"), e);
-        }
+        String citationHtml = layout.generatePreview(entry, databaseContext);
+        ClipboardContent content = ClipboardContentGenerator.processHtml(List.of(citationHtml));
+        clipBoardManager.setContent(content);
     }
 
-    /**
-     * Plain-text citation copy functionality. Not deprecated.
-     */
-    public void copyPreviewTextToClipBoard() {
-        copySelectionToClipBoard();
+    public void copyPreviewAsPlainTextToClipBoard() {
+        if ((entry == null) || (layout == null) || (databaseContext == null)) {
+            LOGGER.warn("Cannot copy preview citation: Missing entry, layout, or database context.");
+            return;
+        }
+
+        String plainText = (String) previewView.getEngine().executeScript("document.body.innerText");
+        ClipboardContent content = new ClipboardContent();
+        content.putString(plainText);
+        clipBoardManager.setContent(content);
     }
 
     public void copySelectionToClipBoard() {
-        var content = new javafx.scene.input.ClipboardContent();
-        content.putString(getSelectionTextContent());
+        if ((entry == null) || (layout == null) || (databaseContext == null)) {
+            LOGGER.warn("Cannot copy preview citation: Missing entry, layout, or database context.");
+            return;
+        }
+
+        ClipboardContent content = new ClipboardContent();
+        content.putString((String) previewView.getEngine().executeScript("window.getSelection().toString()"));
         content.putHtml(getSelectionHtmlContent());
         clipBoardManager.setContent(content);
     }
@@ -275,10 +299,6 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     @Override
     public void invalidated(Observable observable) {
         update();
-    }
-
-    public String getSelectionTextContent() {
-        return (String) previewView.getEngine().executeScript("window.getSelection().toString()");
     }
 
     public String getSelectionHtmlContent() {
