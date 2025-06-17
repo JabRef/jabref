@@ -6,7 +6,6 @@ import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
