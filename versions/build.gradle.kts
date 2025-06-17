@@ -31,7 +31,7 @@ dependencies.constraints {
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1")
     api("com.fasterxml:aalto-xml:1.3.3")
     api("com.github.javakeyring:java-keyring:1.0.4")
-    api("com.github.javaparser:javaparser-symbol-solver-core:3.26.4")
+    api("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
     api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.jknack:handlebars:4.3.1") // Required by Wiremock - and our patching of Wiremock
     api("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
