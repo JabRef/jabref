@@ -130,6 +130,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * contents of the defaults HashMap that are defined in this class.
  * There are more default parameters in this map which belong to separate preference classes.
+ * <p>
+ *  This class is injected into formatter using reflection to avoid tight coupling and
+ *  is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
@@ -438,9 +441,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
 
     /**
-     * @implNote The constructor is made protected to enforce this as a singleton class:
+     * @implNote The constructor was made public because dependency injection via constructor
+     * required widespread refactoring, currently we are using reflection in some formatters
+     * to gain access
      */
-    protected JabRefCliPreferences() {
+    public JabRefCliPreferences() {
         try {
             if (Files.exists(Path.of("jabref.xml"))) {
                 importPreferences(Path.of("jabref.xml"));
@@ -1742,7 +1747,8 @@ public class JabRefCliPreferences implements CliPreferences {
                                                           .map(CleanupPreferences.CleanupStep::valueOf)
                                                           .collect(Collectors.toSet())),
                 new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))));
+                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
+                ));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
                 putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
@@ -1761,7 +1767,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultCleanupJobs(),
                 new FieldFormatterCleanups(
                         (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))));
+                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
+                ));
     }
 
     private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {

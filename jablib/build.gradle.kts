@@ -1,15 +1,14 @@
 import com.vanniktech.maven.publish.JavaLibrary
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
+import dev.jbang.gradle.tasks.JBangTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import java.net.URI
 import java.util.*
 
 plugins {
-    id("buildlogic.java-common-conventions")
-
-    `java-library`
-
-    id("idea")
+    id("org.jabref.gradle.module")
+    id("java-library")
 
     id("antlr")
     id("com.github.bjornvester.xjc") version "1.8.1"
@@ -17,27 +16,41 @@ plugins {
     id("me.champeau.jmh") version "0.7.3"
 
     id("com.vanniktech.maven.publish") version "0.32.0"
-}
 
-val pdfbox = "3.0.5"
-val luceneVersion = "10.2.1"
+    // id("dev.jbang") version "0.2.0"
+    // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
+    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
+}
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
 if (project.findProperty("tagbuild")?.toString() != "true") {
     version += "-SNAPSHOT"
 }
 
-val javafxVersion = "24.0.1"
+configurations.antlr {
+    extendsFrom(configurations.internal.get())
+}
+
+configurations {
+    // Treat the ANTLR compiler as a separate tool that should not end up on the compile/runtime
+    // classpath of our runtime.
+    // https://github.com/gradle/gradle/issues/820
+    api { setExtendsFrom(extendsFrom.filterNot { it == antlr.get() }) }
+    // Get ANTLR version from 'hiero-dependency-versions'
+    antlr { extendsFrom(configurations["internal"]) }
+}
+tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach {
+    dependsOn(tasks.withType<AntlrTask>())
+}
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to("lib"), "includes" to listOf("*.jar"))))
-
-    implementation("org.openjfx:javafx-base:$javafxVersion")
+    implementation("org.openjfx:javafx-base")
 
     // Required by afterburner.fx
-    implementation("org.openjfx:javafx-controls:$javafxVersion")
-    implementation("org.openjfx:javafx-fxml:$javafxVersion")
-    implementation("org.openjfx:javafx-graphics:$javafxVersion")
+    implementation("org.openjfx:javafx-controls")
+    implementation("org.openjfx:javafx-fxml")
+    implementation("org.openjfx:javafx-graphics")
+    implementation("com.ibm.icu:icu4j")
 
     // Fix "error: module not found: javafx.controls" during compilation
     // implementation("org.openjfx:javafx-controls:$javafxVersion")
@@ -45,166 +58,128 @@ dependencies {
     // We do not use [Version Catalogs](https://docs.gradle.org/current/userguide/version_catalogs.html#sec:dependency-bundles), because
     // exclusions are not supported
 
-    implementation("org.jabref:afterburner.fx:2.0.0") {
-        exclude( group = "org.openjfx")
-    }
-    implementation("org.jabref:easybind:2.2.1-SNAPSHOT") {
-        exclude(group = "org.openjfx")
-    }
+    implementation("org.jabref:afterburner.fx")
+    implementation("org.jabref:easybind")
 
-    implementation ("org.apache.pdfbox:pdfbox:$pdfbox") {
-        exclude(group = "commons-logging")
-    }
-    implementation ("org.apache.pdfbox:fontbox:$pdfbox") {
-        exclude(group = "commons-logging")
-    }
-    implementation ("org.apache.pdfbox:xmpbox:$pdfbox") {
-        exclude(group = "org.junit.jupiter")
-        exclude(group = "commons-logging")
-    }
+    implementation ("org.apache.pdfbox:pdfbox")
+    implementation ("org.apache.pdfbox:fontbox")
+    implementation ("org.apache.pdfbox:xmpbox")
 
-    implementation("org.apache.lucene:lucene-core:$luceneVersion")
-    implementation("org.apache.lucene:lucene-queryparser:$luceneVersion")
-    implementation("org.apache.lucene:lucene-queries:$luceneVersion")
-    implementation("org.apache.lucene:lucene-analysis-common:$luceneVersion")
-    implementation("org.apache.lucene:lucene-highlighter:$luceneVersion")
+    implementation("org.apache.lucene:lucene-core")
+    implementation("org.apache.lucene:lucene-queryparser")
+    implementation("org.apache.lucene:lucene-queries")
+    implementation("org.apache.lucene:lucene-analysis-common")
+    implementation("org.apache.lucene:lucene-highlighter")
 
-    implementation("org.apache.commons:commons-csv:1.14.0")
-    implementation("org.apache.commons:commons-lang3:3.17.0")
-    implementation("org.apache.commons:commons-text:1.13.1")
-    implementation("commons-logging:commons-logging:1.3.5")
+    implementation("org.apache.commons:commons-csv")
+    implementation("org.apache.commons:commons-lang3")
+    implementation("org.apache.commons:commons-text")
+    implementation("commons-logging:commons-logging")
 
-    implementation("com.h2database:h2-mvstore:2.3.232")
+    implementation("com.h2database:h2-mvstore")
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
+    implementation("org.bouncycastle:bcprov-jdk18on")
 
     // region: LibreOffice
-    implementation("org.libreoffice:unoloader:24.8.4")
-    implementation("org.libreoffice:libreoffice:24.8.4")
+    implementation("org.libreoffice:unoloader")
+    implementation("org.libreoffice:libreoffice")
     // Required for ID generation
-    implementation("io.github.thibaultmeyer:cuid:2.0.3")
+    implementation("io.github.thibaultmeyer:cuid")
     // endregion
 
-    implementation("io.github.java-diff-utils:java-diff-utils:4.15")
-    implementation("info.debatty:java-string-similarity:2.0.0")
+    implementation("io.github.java-diff-utils:java-diff-utils")
+    implementation("info.debatty:java-string-similarity")
 
-    implementation("com.github.javakeyring:java-keyring:1.0.4")
+    implementation("com.github.javakeyring:java-keyring")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
+    implementation("org.eclipse.jgit:org.eclipse.jgit")
 
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // required by XJC
-    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api")
 
-    implementation("com.fasterxml:aalto-xml:1.3.3")
+    implementation("com.fasterxml:aalto-xml")
 
-    implementation("org.postgresql:postgresql:42.7.5")
+    implementation("org.postgresql:postgresql")
 
-    antlr("org.antlr:antlr4:4.13.2") {
-        // JabRef ships its own variant of icu4j as binary jar
-        exclude(group = "com.ibm.icu")
-    }
-    implementation("org.antlr:antlr4-runtime:4.13.2")
+    antlr("org.antlr:antlr4")
+    implementation("org.antlr:antlr4-runtime")
 
-    implementation("com.google.guava:guava:33.4.8-jre")
+    implementation("com.google.guava:guava")
 
-    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
-    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    implementation("jakarta.inject:jakarta.inject-api")
 
     // region HTTP clients
-    implementation("org.jsoup:jsoup:1.20.1")
-    implementation("com.konghq:unirest-java-core:4.4.7")
-    implementation("com.konghq:unirest-modules-gson:4.4.7")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.5")
-    implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
+    implementation("org.jsoup:jsoup")
+    implementation("com.konghq:unirest-java-core")
+    implementation("com.konghq:unirest-modules-gson")
+    implementation("org.apache.httpcomponents.client5:httpclient5")
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api")
     // endregion
 
-    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.slf4j:slf4j-api")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog in the CLI and GUI)
-    implementation("org.slf4j:jul-to-slf4j:2.0.17")
+    implementation("org.slf4j:jul-to-slf4j")
     // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
+    implementation("org.apache.logging.log4j:log4j-to-slf4j")
 
     // required by org.jabref.generators (only)
-    implementation("org.tinylog:slf4j-tinylog:2.7.0")
-    implementation("org.tinylog:tinylog-api:2.7.0")
-    implementation("org.tinylog:tinylog-impl:2.7.0")
+    implementation("org.tinylog:slf4j-tinylog")
+    implementation("org.tinylog:tinylog-api")
+    implementation("org.tinylog:tinylog-impl")
 
-    implementation("de.undercouch:citeproc-java:3.3.0") {
-        exclude(group = "org.antlr")
-    }
+    implementation("de.undercouch:citeproc-java")
 
-    implementation("com.vladsch.flexmark:flexmark:0.64.8")
-    implementation("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
+    implementation("com.vladsch.flexmark:flexmark")
+    implementation("com.vladsch.flexmark:flexmark-html2md-converter")
 
-    implementation("net.harawata:appdirs:1.4.0")
+    implementation("net.harawata:appdirs")
 
-    implementation("org.jooq:jool:0.9.15")
+    implementation("org.jooq:jool")
 
     // Because of GraalVM quirks, we need to ship that. See https://github.com/jspecify/jspecify/issues/389#issuecomment-1661130973 for details
-    implementation("org.jspecify:jspecify:1.0.0")
+    implementation("org.jspecify:jspecify")
 
     // parse plist files
-    implementation("com.googlecode.plist:dd-plist:1.28")
+    implementation("com.googlecode.plist:dd-plist")
 
     // Parse lnk files
-    implementation("com.github.vatbub:mslinks:1.0.6.2")
+    implementation("com.github.vatbub:mslinks")
 
     // YAML reading and writing
-    implementation("org.yaml:snakeyaml:2.4")
+    implementation("org.yaml:snakeyaml")
 
     // XJC related
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.5")
+    implementation("org.glassfish.jaxb:jaxb-runtime")
 
     // region AI
-    implementation("dev.langchain4j:langchain4j:1.0.1")
+    implementation("dev.langchain4j:langchain4j")
     // Even though we use jvm-openai for LLM connection, we still need this package for tokenization.
-    implementation("dev.langchain4j:langchain4j-open-ai:1.0.1") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-        exclude(group = "org.jetbrains.kotlin")
-    }
-    implementation("dev.langchain4j:langchain4j-mistral-ai:1.0.1-beta6") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-        exclude(group = "org.jetbrains.kotlin")
-    }
-    implementation("dev.langchain4j:langchain4j-google-ai-gemini:1.0.1-beta6") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-    }
-    implementation("dev.langchain4j:langchain4j-hugging-face:1.0.1-beta6") {
-        exclude(group = "com.squareup.okhttp3")
-        exclude(group = "com.squareup.retrofit2", module = "retrofit")
-        exclude(group = "org.jetbrains.kotlin")
-    }
+    implementation("dev.langchain4j:langchain4j-open-ai")
+    implementation("dev.langchain4j:langchain4j-mistral-ai")
+    implementation("dev.langchain4j:langchain4j-google-ai-gemini")
+    implementation("dev.langchain4j:langchain4j-hugging-face")
 
-    implementation("org.apache.velocity:velocity-engine-core:2.4.1")
-    implementation(platform("ai.djl:bom:0.33.0"))
+    implementation("org.apache.velocity:velocity-engine-core")
     implementation("ai.djl:api")
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
-    implementation("io.github.stefanbratanov:jvm-openai:0.11.0")
+    implementation("io.github.stefanbratanov:jvm-openai")
     // openai depends on okhttp, which needs kotlin - see https://github.com/square/okhttp/issues/5299 for details
-    implementation("com.squareup.okhttp3:okhttp:4.12.0") {
-        exclude(group = "org.jetbrains.kotlin", module = "kotlin-stdlib-jdk8")
-    }
+    implementation("com.squareup.okhttp3:okhttp")
     // GemxFX also (transitively) depends on kotlin
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     // endregion
 
-    implementation("commons-io:commons-io:2.19.0")
+    implementation("commons-io:commons-io")
 
-    implementation("com.github.tomtung:latex2unicode_2.13:0.3.2") {
-        exclude(module = "fastparse_2.13")
-    }
+    implementation("com.github.tomtung:latex2unicode_2.13")
 
-    implementation ("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0") {
-        exclude(group = "org.apache.xmlgraphics")
-    }
+    implementation("de.rototor.snuggletex:snuggletex-jeuclid")
 
     // region for document importing
     implementation("org.apache.tika:tika-core:3.2.0") {
@@ -234,10 +209,9 @@ dependencies {
     // endregion
 
     // Even if("compileOnly") is used, IntelliJ always adds to module-info.java. To avoid issues during committing, we use("implementation") instead of("compileOnly")
-    implementation("io.github.adr:e-adr:2.0.0-SNAPSHOT")
+    implementation("io.github.adr:e-adr")
 
-    implementation("io.zonky.test:embedded-postgres:2.1.0")
-    implementation(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.4.0"))
+    implementation("io.zonky.test:embedded-postgres")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     implementation("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
 
@@ -246,40 +220,27 @@ dependencies {
     // loading of .fxml files in localization tests requires JabRef's GUI classes
     testImplementation(project(":jabgui"))
 
-    testImplementation("io.github.classgraph:classgraph:4.8.179")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.12.2")
-    testImplementation("org.junit.platform:junit-platform-launcher:1.12.2")
+    testImplementation("io.github.classgraph:classgraph")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
+    testImplementation("org.junit.platform:junit-platform-launcher")
 
-    testImplementation("org.mockito:mockito-core:5.18.0") {
-        exclude(group = "net.bytebuddy", module = "byte-buddy")
-    }
-    testImplementation("net.bytebuddy:byte-buddy:1.17.5")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("net.bytebuddy:byte-buddy")
 
-    testImplementation("org.xmlunit:xmlunit-core:2.10.2")
-    testImplementation("org.xmlunit:xmlunit-matchers:2.10.2")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
-    testImplementation("com.tngtech.archunit:archunit-junit5-api:1.4.1")
+    testImplementation("org.xmlunit:xmlunit-core")
+    testImplementation("org.xmlunit:xmlunit-matchers")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
+    testImplementation("com.tngtech.archunit:archunit-junit5-api")
 
-    testImplementation("org.hamcrest:hamcrest-library:3.0")
+    testImplementation("org.hamcrest:hamcrest-library")
 
-    testImplementation("org.wiremock:wiremock:3.13.0")
-    // Required by Wiremock - and our patching of Wiremock
-    implementation("com.github.jknack:handlebars:4.3.1") {
-        exclude(group = "org.mozilla", module = "rhino")
-    }
-    implementation("com.github.jknack:handlebars-helpers:4.3.1") {
-        exclude(group = "org.mozilla", module = "rhino")
-        exclude(group = "org.apache.commons", module = "commons-lang3")
-    }
-    // no "test", because of https://github.com/gradlex-org/extra-java-module-info/issues/134#issuecomment-2956556651
-    implementation("com.github.koppor:wiremock-slf4j-shim:main-SNAPSHOT")
-    testImplementation("com.github.koppor:wiremock-slf4j-spi-shim:main-SNAPSHOT")
+    testImplementation("org.wiremock:wiremock")
 
     // Required for LocalizationConsistencyTest
-    testImplementation("org.testfx:testfx-core:4.0.16-alpha")
-    testImplementation("org.testfx:testfx-junit5:4.0.16-alpha")
+    testImplementation("org.testfx:testfx-core")
+    testImplementation("org.testfx:testfx-junit5")
 }
 /*
 jacoco {
@@ -299,6 +260,79 @@ xjc {
     options.set(listOf("encoding=UTF-8"))
 }
 
+val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
+val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
+
+var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV") {
+    group = "JabRef"
+    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
+    dependsOn(tasks.named("generateGrammarSource"))
+
+    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/JournalListMvGenerator.java").asFile.absolutePath
+
+    inputs.dir(abbrvJabRefOrgDir)
+    outputs.file(generatedJournalFile)
+}
+
+var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
+    group = "JabRef"
+    description = "Generates a catalog of all available citation styles"
+
+    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath
+
+
+    inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
+    outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
+}
+
+var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
+
+tasks.register("downloadLtwaFile") {
+    group = "JabRef"
+    description = "Downloads the LTWA file for journal abbreviations"
+
+    val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
+    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
+
+    outputs.file(ltwaCsvFile)
+
+    // Ensure that the task really is not run if the file already exists (otherwise, the task could also run if gradle's cache is cleared, ...)
+    onlyIf {!ltwaCsvFile.get().asFile.exists()}
+
+    doLast {
+        val dir = ltwaDir.get().asFile
+        val file = ltwaCsvFile.get().asFile
+
+        dir.mkdirs()
+
+        URI(ltwaUrl).toURL().openStream().use { input ->
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+
+        logger.debug("Downloaded LTWA file to $file")
+    }
+}
+
+var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
+    group = "JabRef"
+    description = "Converts the LTWA CSV file to a H2 MVStore"
+    dependsOn("downloadLtwaFile", tasks.named("generateGrammarSource"))
+
+    script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
+
+    inputs.file(ltwaCsvFile)
+    outputs.file(layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv"))
+}
+
+// Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
+sourceSets["main"].resources {
+    srcDir(layout.buildDirectory.dir("generated/resources"))
+}
+
+
+// region processResources
 abstract class JoinNonCommentedLines : DefaultTask() {
 
     @get:InputFile
@@ -340,7 +374,10 @@ val biodiversityHeritageApiKey = providers.environmentVariable("BiodiversityHeri
 val semanticScholarApiKey = providers.environmentVariable("SemanticScholarApiKey").orElse("")
 
 tasks.named<ProcessResources>("processResources") {
-    dependsOn("extractMaintainers")
+    dependsOn(extractMaintainers)
+    dependsOn(taskGenerateJournalListMV)
+    dependsOn(taskGenerateCitationStyleCatalog)
+    dependsOn(taskGenerateLtwaListMV)
     filteringCharset = "UTF-8"
 
     inputs.property("version", versionProvider)
@@ -380,107 +417,8 @@ tasks.named<ProcessResources>("processResources") {
         expand(mapOf("version" to inputs.properties["version"]))
     }
 }
+// endregion
 
-tasks.register<JavaExec>("generateJournalListMV") {
-    group = "JabRef"
-    description = "Converts the comma-separated journal abbreviation file to a H2 MVStore"
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("org.jabref.generators.JournalListMvGenerator")
-
-    javaLauncher.convention(javaToolchains.launcherFor {
-        languageVersion.set(java.toolchain.languageVersion)
-    })
-
-    val outputFile = layout.buildDirectory.file("resources/main/journals/journal-list.mv")
-    onlyIf {
-        !outputFile.get().asFile.exists()
-    }
-}
-
-tasks.named("jar") {
-    dependsOn("generateJournalListMV")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateJournalListMV")
-}
-
-tasks.register<JavaExec>("generateCitationStyleCatalog") {
-    group = "JabRef"
-    description = "Generates a catalog of all available citation styles"
-    classpath = sourceSets["main"].runtimeClasspath
-    dependsOn("processResources")
-    mainClass.set("org.jabref.generators.CitationStyleCatalogGenerator")
-    javaLauncher.set(javaToolchains.launcherFor { languageVersion.set(java.toolchain.languageVersion) })
-//    onlyIf {
-//        !file("build/resources/main/journals/journal-list.mv").exists()
-//    }
-}
-
-tasks.named("jar") {
-    dependsOn("generateCitationStyleCatalog")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateCitationStyleCatalog")
-}
-
-tasks.register("downloadLtwaFile") {
-    group = "JabRef"
-    description = "Downloads the LTWA file for journal abbreviations"
-
-    val ltwaUrl = "https://www.issn.org/wp-content/uploads/2021/07/ltwa_20210702.csv"
-    val ltwaDir = layout.buildDirectory.dir("resources/main/journals")
-    val ltwaCsvFile = ltwaDir.map { it.file("ltwa_20210702.csv") }
-
-    onlyIf {
-        !ltwaCsvFile.get().asFile.exists()
-    }
-
-    doLast {
-        val dir = ltwaDir.get().asFile
-        val file = ltwaCsvFile.get().asFile
-
-        if (!file.exists()) {
-            dir.mkdirs()
-            ant.withGroovyBuilder {
-                "get"(
-                    mapOf("src" to ltwaUrl, "dest" to file, "verbose" to true)
-                )
-            }
-            logger.lifecycle("Downloaded LTWA file to $file")
-        } else {
-            logger.lifecycle("LTWA file already exists at $file")
-        }
-    }
-}
-
-tasks.register<JavaExec>("generateLtwaListMV") {
-    group = "JabRef"
-    description = "Converts the LTWA CSV file to a H2 MVStore"
-
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("org.jabref.generators.LtwaListMvGenerator")
-
-    javaLauncher.convention(javaToolchains.launcherFor {
-        languageVersion.set(java.toolchain.languageVersion)
-    })
-
-    dependsOn("downloadLtwaFile")
-
-    val outputFile = layout.buildDirectory.file("resources/main/journals/ltwa-list.mv")
-    onlyIf {
-        !outputFile.get().asFile.exists()
-    }
-}
-
-tasks.named("jar") {
-    dependsOn("generateLtwaListMV")
-}
-
-tasks.named("compileTestJava") {
-    dependsOn("generateLtwaListMV")
-}
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
@@ -614,6 +552,11 @@ mavenPublishing {
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
+
+        // We have generated/resources on the sources path, which needs to be populated
+        taskGenerateJournalListMV,
+        taskGenerateLtwaListMV,
+        taskGenerateCitationStyleCatalog
     )
 }
 
