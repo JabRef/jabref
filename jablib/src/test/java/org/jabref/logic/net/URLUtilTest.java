@@ -97,11 +97,10 @@ class URLUtilTest {
     public void validUrl() {
         String input = "http://example.com";
 
-        Assertions.assertDoesNotThrow(() -> {
-            URL result = URLUtil.create(input);
-            assertNotNull(result, "URL should not be null");
-            assertEquals(input, result.toString());
-        });
+        URL result = URLUtil.create(input);
+        assertNotNull(result);
+        assertNotEquals("", result.trim());
+        assertEquals(input, result.toString());
     }
 
     @Test
