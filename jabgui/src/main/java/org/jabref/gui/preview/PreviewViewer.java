@@ -138,7 +138,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                         try {
                             NativeDesktop.openBrowser(href, preferences.getExternalApplicationsPreferences());
                         } catch (MalformedURLException exception) {
-                            LOGGER.error("Invalid URL Input", exception);
+                            LOGGER.error("Invalid URL", exception);
                         } catch (IOException e) {
                             LOGGER.error("Could not open URL: {}", href, e);
                         }
