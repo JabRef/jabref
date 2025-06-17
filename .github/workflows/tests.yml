@@ -34,6 +34,12 @@ jobs:
         with:
           submodules: 'true'
           show-progress: 'false'
+      - name: Checkout java-module-packaging
+        uses: actions/checkout@v4
+        with:
+          repository: gradlex-org/java-module-packaging
+          path: build-logic/java-module-packaging
+          ref: preview
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
