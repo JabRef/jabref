@@ -18,7 +18,7 @@ public class GuiCommandLine {
 
     /// @deprecated used by the browser extension
     @Deprecated
-    @Option(names = {"--importBibTex"}, description = "Import bibtex string")
+    @Option(names = {"--importBibtex"}, description = "Import bibtex string")
     public String importBibtex;
 
     /// @deprecated used by the browser extension

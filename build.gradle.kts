@@ -1,14 +1,8 @@
 plugins {
-    id("buildlogic.java-common-conventions")
-
-    id("checkstyle")
-
-    id("com.github.andygoossens.modernizer") version "1.11.0"
+    id("org.jabref.gradle.base.repositories")
+    id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.openrewrite.rewrite") version "7.6.1"
-
     id("org.itsallcode.openfasttrace") version "3.0.1"
-
-    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 // OpenRewrite should rewrite all sources
@@ -26,7 +20,8 @@ rewrite {
     activeRecipe("org.jabref.config.rewrite.cleanup")
     exclusion(
         "settings.gradle",
-        "**/generated-sources/**",
+        "**/generated/sources/**",
+        "**/generated-src/**",
         "**/src/main/resources/**",
         "**/src/test/resources/**",
         "**/module-info.java",
@@ -48,65 +43,6 @@ requirementTracing {
         )
     )
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
-}
-
-
-subprojects {
-    plugins.apply("checkstyle")
-
-    plugins.apply("com.github.andygoossens.modernizer")
-
-    // Hint from https://stackoverflow.com/a/46533151/873282
-    plugins.apply("com.adarshr.test-logger")
-
-    checkstyle {
-        toolVersion = "10.23.0"
-        configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-    }
-
-    tasks.withType<Checkstyle>().configureEach {
-        reports {
-            xml.required.set(false)
-            html.required.set(true)
-        }
-        source = fileTree("src") { include("**/*.java") }
-    }
-
-    configurations.named("checkstyle") {
-        resolutionStrategy.capabilitiesResolution.withCapability("com.google.collections:google-collections") {
-            select("com.google.guava:guava:0")
-        }
-    }
-
-    modernizer {
-        failOnViolations = true
-        includeTestClasses = true
-        exclusions = setOf(
-            "java/util/Optional.get:()Ljava/lang/Object;"
-        )
-    }
-
-    testlogger {
-        // See https://github.com/radarsh/gradle-test-logger-plugin#configuration for configuration options
-
-        theme = com.adarshr.gradle.testlogger.theme.ThemeType.STANDARD
-
-        showPassed = false
-        showSkipped = false
-
-        showCauses = false
-        showStackTraces = false
-    }
-
-    tasks.withType<Test>().configureEach {
-        reports.html.outputLocation.set(file("${reporting.baseDirectory}/${name}"))
-
-        // Enable parallel tests (on desktop).
-        // See https://docs.gradle.org/8.1/userguide/performance.html#execute_tests_in_parallel for details.
-        if (!providers.environmentVariable("CI").isPresent) {
-            maxParallelForks = maxOf(Runtime.getRuntime().availableProcessors() - 1, 1)
-        }
-    }
 }
 
 // TODO: "run" should run the GUI, not all modules

@@ -1,16 +1,17 @@
-Closes #_____
+Closes _____
+<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD. Example: Closes https://github.com/JabRef/jabref/issues/13109 OR Closes #13109 -->
 
-In about one to three sentences, describe the changes you have made: what, where, why, ...
+<!-- In about one to three sentences, describe the changes you have made: what, where, why, ... (REPLACE THIS LINE) -->
 
 <!-- NOTE: If your work is not yet complete, please open a draft pull request. In that case, outline your intended next steps. Do you need feedback? Will you continue in parallel? ... -->
 
 ### Steps to test
 
-Describe how reviewers can test this fix/feature. Ideally, think of how you would guide a beginner user of Jabef to try out your change.
-You can add screenshots or videos (using [Loom](https://www.loom.com/) or by just adding .mp4 files).
+<!-- Describe how reviewers can test this fix/feature. Ideally, think of how you would guide a beginner user of Jabef to try out your change. -->
+<!-- You can add screenshots or videos (using Loom - https://www.loom.com or by just adding .mp4 files). -->
+<!-- (REPLACE THIS PARAGRAPH) -->
 
 <!-- YOU HAVE TO MODIFY THE ABOVE TEXT FIT YOUR PR. OTHERWISE, YOUR PR WILL BE CLOSED WITHOUT FURTHER COMMENT. -->
-<!-- LINK THE ISSUE WITH THE "Closes" KEYWORD. Example: Closes (link) OR Closes #12345 -->
 
 ### Mandatory checks
 
@@ -19,7 +20,7 @@ Go through the checklist below. It is mandatory, even for a draft pull request.
 
 Keep ALL the items. Replace the dots inside [.] and mark them as follows: 
 [x] done 
-[ ] not done 
+[ ] TODO (yet to be done)
 [/] not applicable
 -->
 
