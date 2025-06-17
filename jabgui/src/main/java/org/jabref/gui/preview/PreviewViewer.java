@@ -261,7 +261,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                       .executeWith(taskExecutor);
     }
 
-    public void copyPreviewAsHtmlToClipBoard() {
+    public void copyPreviewHtmlToClipBoard() {
         if ((entry == null) || (layout == null) || (databaseContext == null)) {
             LOGGER.warn("Cannot copy preview citation: Missing entry, layout, or database context.");
             return;
@@ -272,7 +272,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
         clipBoardManager.setContent(content);
     }
 
-    public void copyPreviewAsPlainTextToClipBoard() {
+    public void copyPreviewPlainTextToClipBoard() {
         if ((entry == null) || (layout == null) || (databaseContext == null)) {
             LOGGER.warn("Cannot copy preview citation: Missing entry, layout, or database context.");
             return;

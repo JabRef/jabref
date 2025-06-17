@@ -111,7 +111,7 @@ public class PreviewPanel extends VBox implements PreviewControls {
             Optional<KeyBinding> keyBinding = keyBindingRepository.mapToKeyBinding(event);
             if (keyBinding.isPresent()) {
                 if (keyBinding.get() == KeyBinding.COPY_PREVIEW) {
-                    previewView.copyPreviewAsHtmlToClipBoard();
+                    previewView.copyPreviewHtmlToClipBoard();
                     event.consume();
                 }
             }
@@ -121,9 +121,9 @@ public class PreviewPanel extends VBox implements PreviewControls {
     private ContextMenu createPopupMenu() {
         MenuItem copyCitationHtml = new MenuItem(Localization.lang("Copy citation (html)"), IconTheme.JabRefIcons.COPY.getGraphicNode());
         keyBindingRepository.getKeyCombination(KeyBinding.COPY_PREVIEW).ifPresent(copyCitationHtml::setAccelerator);
-        copyCitationHtml.setOnAction(_ -> previewView.copyPreviewAsHtmlToClipBoard());
+        copyCitationHtml.setOnAction(_ -> previewView.copyPreviewHtmlToClipBoard());
         MenuItem copyCitationText = new MenuItem(Localization.lang("Copy citation (text)"));
-        copyCitationText.setOnAction(_ -> previewView.copyPreviewAsPlainTextToClipBoard());
+        copyCitationText.setOnAction(_ -> previewView.copyPreviewPlainTextToClipBoard());
         MenuItem exportToClipboard = new MenuItem(Localization.lang("Export to clipboard"));
         exportToClipboard.setOnAction(_ -> previewView.exportToClipBoard(stateManager));
         MenuItem copySelection = new MenuItem(Localization.lang("Copy selection"));
