@@ -235,7 +235,7 @@ jobs:
           md5sum ${{ steps.secring.outputs.filePath }}
       - name: publishAllPublicationsToMavenCentralRepository
         if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (matrix.os == 'ubuntu-22.04')
-        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ needs.conditions.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
+        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ needs.conditions.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository || true
       # endregion
 
       - name: Basic build (assemble)
