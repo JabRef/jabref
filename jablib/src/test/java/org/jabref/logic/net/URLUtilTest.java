@@ -95,7 +95,7 @@ class URLUtilTest {
     }
 
     @Test
-    public void validUrl() {
+    public void validUrl() throws MalformedURLException {
         String input = "http://example.com";
 
         URL result = URLUtil.create(input);
