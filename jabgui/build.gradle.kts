@@ -6,8 +6,6 @@ plugins {
 
     // Do not activate; causes issues with the modularity plugin (no tests found etc)
     // id("com.redock.classpathtofile") version "0.1.0"
-
-    id("org.beryx.jlink") version "3.1.1"
 }
 
 group = "org.jabref"
@@ -123,181 +121,13 @@ application {
 tasks.named<JavaExec>("run") {
     // "assert" statements in the code should activated when running using gradle
     enableAssertions = true
-
-tasks.named("jpackage") {
-    dependsOn("deleteInstallerTemp")
-}
-
-tasks.named("jlinkZip") {
-    dependsOn("jpackage")
-}
-
-tasks.register<Delete>("deleteInstallerTemp") {
-    delete(file("${layout.buildDirectory.get()}/installer"))
-}
-
-jlink {
-    // We keep debug statements - otherwise "--strip-debug" would be included
-    addOptions(
-        "--ignore-signing-information",
-        "--compress",
-        "zip-6",
-        "--no-header-files",
-        "--no-man-pages",
-        "--bind-services",
-        "--add-modules", "jdk.incubator.vector"
-    )
-
-    launcher {
-        name = "JabRef"
-        jvmArgs = listOf(
-            // Fix for https://github.com/JabRef/jabref/issues/11188
-            "--add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module",
-            "--add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-
-            // Fix for https://github.com/JabRef/jabref/issues/11198
-            "--add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module",
-            "--add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module",
-            "--add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module",
-            // fix for https://github.com/JabRef/jabref/issues/11426
-            "--add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module",
-
-            "--enable-native-access=org.jabref.merged.module"
-        )
-    }
-
-    // This tasks reads resources from src/main/resourcesPackage/$OS
-    jpackage {
-        outputDir =
-            "distribution"
-
-        if (OperatingSystem.current().isWindows) {
-            // This requires WiX to be installed: https://github.com/wixtoolset/wix3/releases
-            installerType =  "msi"
-
-            imageOptions.addAll(
-                listOf(
-                    "--icon", "${projectDir}/src/main/resources/icons/jabref.ico"
-                )
-            )
-
-            installerOptions.addAll(
-                listOf(
-                    "--vendor", "JabRef",
-                    "--app-version", "$version",
-                    "--verbose",
-                    "--win-upgrade-uuid", "d636b4ee-6f10-451e-bf57-c89656780e36",
-                    "--win-dir-chooser",
-                    "--win-shortcut",
-                    "--win-menu",
-                    "--win-menu-group", "JabRef",
-                    "--temp", "${layout.buildDirectory.get()}/installer",
-                    "--resource-dir", "$projectDir/buildres/windows",
-                    "--license-file", "$projectDir/buildres/LICENSE_with_Privacy.md",
-                    "--file-associations", "$projectDir/buildres/windows/bibtexAssociations.properties"
-                )
-            )
-        } else if (OperatingSystem.current().isLinux) {
-            imageOptions.addAll(
-                listOf(
-                    "--icon", "$projectDir/src/main/resources/icons/JabRef-linux-icon-64.png",
-                    "--app-version", "$version"
-                )
-            )
-
-            installerOptions.addAll(
-                listOf(
-                    "--verbose",
-                    "--vendor",  "JabRef",
-                    "--app-version", "$version",
-                    // "--temp", "$buildDir/installer",
-                    "--resource-dir", "$projectDir/buildres/linux",
-                    "--linux-menu-group", "Office;",
-                    "--linux-rpm-license-type", "MIT",
-                    // "--license-file", "$projectDir/LICENSE.md",
-                    "--description", "JabRef is an open source bibliography reference manager. Simplifies reference management and literature organization for academic researchers by leveraging BibTeX, native file format for LaTeX.",
-                    "--linux-shortcut",
-                    "--file-associations", "$projectDir/buildres/linux/bibtexAssociations.properties"
-                )
-            )
-        } else if (OperatingSystem.current().isMacOsX) {
-            imageOptions.addAll(
-                listOf(
-                    "--icon",  "$projectDir/src/main/resources/icons/jabref.icns",
-                    "--resource-dir", "$projectDir/buildres/macos"
-                )
-            )
-
-            skipInstaller = true
-
-            installerOptions.addAll(
-                listOf(
-                    "--verbose",
-                    "--vendor", "JabRef",
-                    "--mac-package-identifier", "JabRef",
-                    "--mac-package-name", "JabRef",
-                    "--app-version", "$version",
-                    "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
-                    "--resource-dir", "$projectDir/buildres/macos"
-                )
-            )
-        }
-    }
-}
-
-if (OperatingSystem.current().isWindows) {
-    tasks.named("jpackageImage").configure {
-        doLast {
-            copy {
-                from(file("$projectDir/buildres/windows")) {
-                    include(
-                        "jabref-firefox.json",
-                        "jabref-chrome.json",
-                        "JabRefHost.bat",
-                        "JabRefHost.ps1"
-                    )
-                }
-                into(file("${layout.buildDirectory.get()}/distribution/JabRef"))
-            }
-        }
-    }
-} else if (OperatingSystem.current().isLinux) {
-    tasks.named("jpackageImage").configure {
-        doLast {
-            copy {
-                from(file("$projectDir/buildres/linux")) {
-                    include("native-messaging-host/**", "jabrefHost.py")
-                }
-                into(file("${layout.buildDirectory.get()}/distribution/JabRef/lib"))
-            }
-        }
-    }
-} else if (OperatingSystem.current().isMacOsX) {
-    tasks.named("jpackageImage").configure {
-        doLast {
-            copy {
-                from(file("$projectDir/buildres/macos")) {
-                    include("native-messaging-host/**", "jabrefHost.py")
-                }
-                into(file("${layout.buildDirectory.get()}/distribution/JabRef.app/Contents/Resources"))
-            }
-        }
-    }
 }
 
 // Below should eventually replace the 'jlink {}' and doLast-copy configurations above
 javaModulePackaging {
     applicationName = "JabRef"
-    vendor = "JabRef"
     jpackageResources = layout.projectDirectory.dir("buildres")
     verbose = true
-    jlinkOptions.addAll(
-        "--ignore-signing-information",
-        "--compress", "zip-6",
-        "--no-header-files",
-        "--no-man-pages",
-        "--bind-services",
-    )
     addModules.add("jdk.incubator.vector")
     targetsWithOs("windows") {
         options.addAll(

@@ -25,6 +25,16 @@ val osTarget = when {
 // Source: https://github.com/jjohannes/java-module-system/blob/main/gradle/plugins/src/main/kotlin/targets.gradle.kts
 // Configure variants for OS. Target name can be any string, but should match the name used in GitHub actions.
 javaModulePackaging {
+    // Configuration shared by all targets and applications
+    vendor = "JabRef"
+    jlinkOptions.addAll(
+        "--ignore-signing-information",
+        "--compress", "zip-6",
+        "--no-header-files",
+        "--no-man-pages",
+        "--bind-services",
+    )
+
     target("ubuntu-22.04") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.X86_64
