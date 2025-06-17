@@ -193,9 +193,9 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private void update() {
         if ((databaseContext == null) || (entry == null) || (layout == null)) {
             LOGGER.debug("Missing components - Database: {}, Entry: {}, Layout: {}",
-                    (databaseContext == null) ? "null" : databaseContext,
-                    (entry == null) ? "null" : entry,
-                    (layout == null) ? "null" : layout);
+                    databaseContext == null ? "null" : databaseContext,
+                    entry == null ? "null" : entry,
+                    layout == null ? "null" : layout);
             setPreviewText("");
             return;
         }
@@ -212,7 +212,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private String formatError(BibEntry entry, Throwable exception) {
         StringWriter sw = new StringWriter();
         exception.printStackTrace(new PrintWriter(sw));
-        return String.format("%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s",
+        return "%s\n\n%s\n\nBibTeX (internal):\n%s\n\nStack Trace:\n%s".formatted(
                 Localization.lang("Error while generating citation style"),
                 exception.getLocalizedMessage(),
                 entry,
