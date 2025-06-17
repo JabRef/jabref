@@ -6,6 +6,7 @@ import java.net.URL;
 
 import org.jabref.logic.util.URLUtil;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 class URLUtilTest {
 
@@ -94,21 +94,19 @@ class URLUtilTest {
     }
 
     @Test
-    public void testValidUrl() {
+    public void validUrl() {
         String input = "http://example.com";
 
-        try {
+        Assertions.assertDoesNotThrow(() -> {
             URL result = URLUtil.create(input);
             assertNotNull(result, "URL should not be null");
             assertEquals(input, result.toString(), "Returned URL should match input");
-        } catch (MalformedURLException e) {
-            fail("Exception " + e.getMessage());
-        }
+        });
     }
 
 
     @Test
-    public void testNullUrl() {
+    public void nullUrl() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
             URLUtil.create(null);
         });
@@ -116,7 +114,7 @@ class URLUtilTest {
     }
 
     @Test
-    public void testEmptyUrl() {
+    public void emptyUrl() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
             URLUtil.create("   ");
         });
@@ -124,7 +122,7 @@ class URLUtilTest {
     }
 
     @Test
-    public void testUriMissingScheme() {
+    public void uriMissingScheme() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
             URLUtil.create("www.example.com");
         });
@@ -132,7 +130,7 @@ class URLUtilTest {
     }
 
     @Test
-    public void testUriMissingHost() {
+    public void uriMissingHost() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
             URLUtil.create("mailto:someone@example.com");
         });
@@ -140,7 +138,7 @@ class URLUtilTest {
     }
 
     @Test
-    public void testMalformedSyntax() {
+    public void malformedSyntax() {
         MalformedURLException exception = assertThrows(MalformedURLException.class, () -> {
             URLUtil.create("http://[invalid-url]");
         });
