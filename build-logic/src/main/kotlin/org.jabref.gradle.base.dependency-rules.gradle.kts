@@ -171,6 +171,7 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requiresTransitive("javafx.base")
+        requiresTransitive("javafx.graphics")
     }
     module("org.fxmisc.flowless:flowless", "org.fxmisc.flowless") {
         exportAllPackages()
@@ -198,6 +199,8 @@ extraJavaModuleInfo {
     module("org.postgresql:postgresql", "org.postgresql.jdbc") {
         exportAllPackages()
         requireAllDefinedDependencies()
+        requires("java.management")
+        requires("java.naming")
         requires("java.sql")
     }
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
