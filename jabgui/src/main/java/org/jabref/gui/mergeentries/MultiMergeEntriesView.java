@@ -133,6 +133,7 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
                     String.join(", ", viewModel.failedSuppliersProperty())));
             int activeColumns = viewModel.entriesProperty().get().size() - viewModel.failedSuppliersProperty().get().size();
             if (activeColumns < ACTIVE_COLUMNS_MINIMUM) {
+                // [impl->req~ux.auto-close.merge-entries~1]
                 close();
             }
         });
