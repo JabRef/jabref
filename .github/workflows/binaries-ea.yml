@@ -283,9 +283,9 @@ jobs:
           cd jabgui
 
           # see https://github.com/jdx/mise/discussions/4973
-          eval $(mise hook-env -f | grep 'export JAVA_HOME')
-          eval $(mise hook-env -f | grep 'export PATH')
-          echo $JAVA_HOME
+          # eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          # eval $(mise hook-env -f | grep 'export PATH')
+          # echo $JAVA_HOME
 
           jpackage \
           --module org.jabref/org.jabref.Launcher \
@@ -335,9 +335,9 @@ jobs:
           cd jabgui
 
           # see https://github.com/jdx/mise/discussions/4973
-          eval $(mise hook-env -f | grep 'export JAVA_HOME')
-          eval $(mise hook-env -f | grep 'export PATH')
-          echo $JAVA_HOME
+          # eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          # eval $(mise hook-env -f | grep 'export PATH')
+          # echo $JAVA_HOME
 
           jpackage \
           --module org.jabref/org.jabref.Launcher \
