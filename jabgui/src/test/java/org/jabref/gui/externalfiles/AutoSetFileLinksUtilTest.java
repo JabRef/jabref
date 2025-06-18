@@ -12,6 +12,7 @@ import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -63,5 +64,38 @@ class AutoSetFileLinksUtilTest {
         AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(databaseContext, externalApplicationsPreferences, filePreferences, autoLinkPrefs);
         List<LinkedFile> actual = util.findAssociatedNotLinkedFiles(entry);
         assertEquals(List.of(), actual);
+    }
+
+    @Test
+    void relinksMovedFile(@TempDir Path tempDir) throws IOException {
+        Path directory = tempDir.resolve("files");
+        Path oldPath = directory.resolve("old/minimal.pdf");
+        Files.createDirectories(oldPath.getParent());
+        Files.createFile(oldPath);
+
+        LinkedFile stale = new LinkedFile("", oldPath.toString(), "PDF");
+        BibEntry entry = new BibEntry(StandardEntryType.Misc);
+        entry.addFile(stale);
+
+        Path newPath = directory.resolve("new/minimal.pdf");
+        Files.createDirectories(newPath.getParent());
+        Files.move(oldPath, newPath);
+
+        BibDatabaseContext context = mock(BibDatabaseContext.class);
+        when(context.getFileDirectories(filePreferences)).thenReturn(List.of(directory));
+
+        AutoSetFileLinksUtil util = new AutoSetFileLinksUtil(
+                context,
+                externalApplicationsPreferences,
+                filePreferences,
+                autoLinkPrefs);
+
+        List<LinkedFile> matches = util.findAssociatedNotLinkedFiles(entry);
+
+        assertEquals(1, matches.size());
+        assertEquals(
+                FileUtil.relativize(newPath, List.of(directory)),
+                Path.of(matches.getFirst().getLink())
+        );
     }
 }

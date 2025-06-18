@@ -30,6 +30,18 @@ public class StringUtil {
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
+
+    /**
+     * Pattern for normalizing whitespace and punctuation using named capture groups
+     */
+    private static final Pattern NORMALIZE_PATTERN = Pattern.compile(
+            "(?<whitespace>\\s+)|" +                   // multiple whitespace
+                    "(?<hyphen>\\s*-+\\s*)|" +         // hyphens with surrounding spaces
+                    "(?<comma>\\s*,\\s*)|" +           // commas with surrounding spaces
+                    "(?<semicolon>\\s*;\\s*)|" +       // semicolons with surrounding spaces
+                    "(?<colon>\\s*:\\s*)"              // colons with surrounding spaces
+    );
+
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
     private static final String STRING_TABLE_DELIMITER = " : ";
