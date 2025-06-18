@@ -226,12 +226,6 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-xjc {
-    xsdDir.set(layout.projectDirectory.dir("src/main/xsd"))
-    xjcVersion.set("4.0.5")
-    defaultPackage.set("org.jabref.logic.importer.fileformat.citavi")
-    options.set(listOf("encoding=UTF-8"))
-}
 
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
