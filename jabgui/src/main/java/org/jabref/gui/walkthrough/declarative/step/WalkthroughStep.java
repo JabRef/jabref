@@ -2,6 +2,7 @@ package org.jabref.gui.walkthrough.declarative.step;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
@@ -9,13 +10,12 @@ import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 
-public sealed interface WalkthroughNode permits PanelStep, TooltipStep {
+public sealed interface WalkthroughStep permits PanelStep, TooltipStep {
     String title();
 
     List<WalkthroughRichTextBlock> content();
 
-    // FIXME: Refactor to make this optional
-    NodeResolver resolver();
+    Optional<NodeResolver> resolver();
 
     Optional<String> continueButtonText();
 
@@ -25,9 +25,9 @@ public sealed interface WalkthroughNode permits PanelStep, TooltipStep {
 
     Optional<NavigationPredicate> navigationPredicate();
 
-    Optional<Double> preferredWidth();
+    OptionalDouble preferredWidth();
 
-    Optional<Double> preferredHeight();
+    OptionalDouble preferredHeight();
 
     boolean autoFallback();
 

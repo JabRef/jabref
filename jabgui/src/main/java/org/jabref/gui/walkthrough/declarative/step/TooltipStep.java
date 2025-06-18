@@ -2,6 +2,7 @@ package org.jabref.gui.walkthrough.declarative.step;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 
 import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
@@ -13,22 +14,69 @@ import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public record TooltipStep(
         String title,
         List<WalkthroughRichTextBlock> content,
-        NodeResolver resolver,
-        Optional<String> continueButtonText,
-        Optional<String> skipButtonText,
-        Optional<String> backButtonText,
-        Optional<NavigationPredicate> navigationPredicate,
+        @Nullable NodeResolver resolverValue,
+        @Nullable String continueButtonTextValue,
+        @Nullable String skipButtonTextValue,
+        @Nullable String backButtonTextValue,
+        @Nullable NavigationPredicate navigationPredicateValue,
         TooltipPosition position,
-        Optional<Double> preferredWidth,
-        Optional<Double> preferredHeight,
-        Optional<MultiWindowHighlight> highlight,
+        @Nullable Double preferredWidthValue,
+        @Nullable Double preferredHeightValue,
+        @Nullable MultiWindowHighlight highlightValue,
         boolean autoFallback,
-        Optional<WindowResolver> activeWindowResolver
-) implements WalkthroughNode {
+        @Nullable WindowResolver activeWindowResolverValue
+) implements WalkthroughStep {
+
+    @Override
+    public Optional<NodeResolver> resolver() {
+        return Optional.ofNullable(resolverValue);
+    }
+
+    @Override
+    public Optional<String> continueButtonText() {
+        return Optional.ofNullable(continueButtonTextValue);
+    }
+
+    @Override
+    public Optional<String> skipButtonText() {
+        return Optional.ofNullable(skipButtonTextValue);
+    }
+
+    @Override
+    public Optional<String> backButtonText() {
+        return Optional.ofNullable(backButtonTextValue);
+    }
+
+    @Override
+    public Optional<NavigationPredicate> navigationPredicate() {
+        return Optional.ofNullable(navigationPredicateValue);
+    }
+
+    @Override
+    public OptionalDouble preferredWidth() {
+        return preferredWidthValue != null ? OptionalDouble.of(preferredWidthValue) : OptionalDouble.empty();
+    }
+
+    @Override
+    public OptionalDouble preferredHeight() {
+        return preferredHeightValue != null ? OptionalDouble.of(preferredHeightValue) : OptionalDouble.empty();
+    }
+
+    @Override
+    public Optional<MultiWindowHighlight> highlight() {
+        return Optional.ofNullable(highlightValue);
+    }
+
+    @Override
+    public Optional<WindowResolver> activeWindowResolver() {
+        return Optional.ofNullable(activeWindowResolverValue);
+    }
+
     public static Builder builder(String key, Object... params) {
         return new Builder(Localization.lang(key, params));
     }
@@ -36,28 +84,28 @@ public record TooltipStep(
     public static class Builder {
         private final String title;
         private List<WalkthroughRichTextBlock> content = List.of();
-        private NodeResolver resolver;
-        private Optional<String> continueButtonText = Optional.empty();
-        private Optional<String> skipButtonText = Optional.empty();
-        private Optional<String> backButtonText = Optional.empty();
-        private Optional<NavigationPredicate> navigationPredicate = Optional.empty();
+        private @Nullable NodeResolver resolver;
+        private @Nullable String continueButtonText;
+        private @Nullable String skipButtonText;
+        private @Nullable String backButtonText;
+        private @Nullable NavigationPredicate navigationPredicate;
         private TooltipPosition position = TooltipPosition.AUTO;
-        private Optional<Double> preferredWidth = Optional.empty();
-        private Optional<Double> preferredHeight = Optional.empty();
-        private Optional<MultiWindowHighlight> highlight = Optional.empty();
+        private @Nullable Double preferredWidth;
+        private @Nullable Double preferredHeight;
+        private @Nullable MultiWindowHighlight highlight;
         private boolean autoFallback = true;
-        private Optional<WindowResolver> activeWindowResolver = Optional.empty();
+        private @Nullable WindowResolver activeWindowResolver;
 
-        private Builder(String title) {
+        private Builder(@NonNull String title) {
             this.title = title;
         }
 
-        public Builder content(WalkthroughRichTextBlock... blocks) {
+        public Builder content(@NonNull WalkthroughRichTextBlock... blocks) {
             this.content = List.of(blocks);
             return this;
         }
 
-        public Builder content(List<WalkthroughRichTextBlock> content) {
+        public Builder content(@NonNull List<WalkthroughRichTextBlock> content) {
             this.content = content;
             return this;
         }
@@ -68,22 +116,22 @@ public record TooltipStep(
         }
 
         public Builder continueButton(@NonNull String text) {
-            this.continueButtonText = Optional.of(text);
+            this.continueButtonText = text;
             return this;
         }
 
         public Builder skipButton(@NonNull String text) {
-            this.skipButtonText = Optional.of(text);
+            this.skipButtonText = text;
             return this;
         }
 
         public Builder backButton(@NonNull String text) {
-            this.backButtonText = Optional.of(text);
+            this.backButtonText = text;
             return this;
         }
 
         public Builder navigation(@NonNull NavigationPredicate navigationPredicate) {
-            this.navigationPredicate = Optional.of(navigationPredicate);
+            this.navigationPredicate = navigationPredicate;
             return this;
         }
 
@@ -93,22 +141,22 @@ public record TooltipStep(
         }
 
         public Builder preferredWidth(double width) {
-            this.preferredWidth = Optional.of(width);
+            this.preferredWidth = width;
             return this;
         }
 
         public Builder preferredHeight(double height) {
-            this.preferredHeight = Optional.of(height);
+            this.preferredHeight = height;
             return this;
         }
 
         public Builder highlight(@NonNull MultiWindowHighlight highlight) {
-            this.highlight = Optional.of(highlight);
+            this.highlight = highlight;
             return this;
         }
 
         public Builder highlight(@NonNull HighlightEffect effect) {
-            this.highlight = Optional.of(MultiWindowHighlight.single(new WindowEffect(activeWindowResolver.orElse(Optional::empty), effect, Optional.empty())));
+            this.highlight = MultiWindowHighlight.single(new WindowEffect(activeWindowResolver, effect));
             return this;
         }
 
@@ -118,7 +166,7 @@ public record TooltipStep(
         }
 
         public Builder activeWindow(@NonNull WindowResolver activeWindowResolver) {
-            this.activeWindowResolver = Optional.of(activeWindowResolver);
+            this.activeWindowResolver = activeWindowResolver;
             return this;
         }
 
@@ -142,4 +190,3 @@ public record TooltipStep(
         }
     }
 }
-

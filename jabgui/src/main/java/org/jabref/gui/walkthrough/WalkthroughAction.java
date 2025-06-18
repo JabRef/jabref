@@ -1,11 +1,9 @@
 package org.jabref.gui.walkthrough;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javafx.geometry.Pos;
 import javafx.scene.control.ContextMenu;
 import javafx.stage.Window;
 
@@ -17,10 +15,11 @@ import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
+import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.WalkthroughNode;
+import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 import org.jabref.logic.l10n.Localization;
 
 public class WalkthroughAction extends SimpleCommand {
@@ -43,7 +42,7 @@ public class WalkthroughAction extends SimpleCommand {
         Map<String, Walkthrough> registry = new HashMap<>();
 
         // FIXME: Not internationalized.
-        WalkthroughNode step1 = TooltipStep
+        WalkthroughStep step1 = TooltipStep
                 .builder("Hover over \"File\" menu")
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
                 .navigation(NavigationPredicate.onClick())
@@ -51,7 +50,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
                 .build();
 
-        WalkthroughNode step2 = TooltipStep
+        WalkthroughStep step2 = TooltipStep
                 .builder("Select \"Preferences\"")
                 .resolver(NodeResolver.menuItem("Preferences"))
                 .navigation(NavigationPredicate.onClick())
@@ -68,7 +67,7 @@ public class WalkthroughAction extends SimpleCommand {
                 ))
                 .build();
 
-        WalkthroughNode step3 = TooltipStep
+        WalkthroughStep step3 = TooltipStep
                 .builder("Select \"Linked files\" tab")
                 .resolver(NodeResolver.predicate(node ->
                         node.getStyleClass().contains("list-cell") &&
@@ -83,7 +82,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .activeWindow(WindowResolver.title("JabRef preferences"))
                 .build();
 
-        WalkthroughNode step4 = TooltipStep
+        WalkthroughStep step4 = TooltipStep
                 .builder("Choose to use main file directory")
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))
                 .navigation(NavigationPredicate.onClick())
@@ -95,11 +94,11 @@ public class WalkthroughAction extends SimpleCommand {
                 .activeWindow(WindowResolver.title("JabRef preferences"))
                 .build();
 
-        WalkthroughNode step5 = PanelStep
+        WalkthroughStep step5 = PanelStep
                 .builder("Click \"OK\" to save changes")
                 .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
                 .navigation(NavigationPredicate.onClick())
-                .position(Pos.TOP_CENTER)
+                .position(PanelPosition.TOP)
                 .highlight(MultiWindowHighlight.multiple(
                         new WindowEffect(Optional::empty, HighlightEffect.BACKDROP_HIGHLIGHT),
                         new WindowEffect(WindowResolver.title("JabRef"), HighlightEffect.FULL_SCREEN_DARKEN)
@@ -107,11 +106,8 @@ public class WalkthroughAction extends SimpleCommand {
                 .activeWindow(WindowResolver.title("JabRef preferences"))
                 .build();
 
-        Walkthrough mainFileDirectory = new Walkthrough(List.of(step1, step2, step3, step4, step5));
+        Walkthrough mainFileDirectory = new Walkthrough(step1, step2, step3, step4, step5);
         registry.put("mainFileDirectory", mainFileDirectory);
-
-        Walkthrough editEntry = new Walkthrough(List.of());
-        registry.put("editEntry", editEntry);
         return registry;
     }
 }

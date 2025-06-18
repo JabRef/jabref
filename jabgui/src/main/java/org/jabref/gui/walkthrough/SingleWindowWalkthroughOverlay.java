@@ -17,12 +17,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
 
+import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.WalkthroughNode;
+import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
 import org.controlsfx.control.PopOver;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +67,7 @@ public class SingleWindowWalkthroughOverlay {
     /**
      * Displays a walkthrough step with the specified target node.
      */
-    public void displayStep(WalkthroughNode step, Node targetNode, Walkthrough walkthrough) {
+    public void displayStep(WalkthroughStep step, @Nullable Node targetNode, Walkthrough walkthrough) {
         hide();
         displayStepContent(step, targetNode, walkthrough);
         overlayPane.toFront();
@@ -102,7 +104,7 @@ public class SingleWindowWalkthroughOverlay {
         }
     }
 
-    private void displayStepContent(WalkthroughNode step, Node targetNode, Walkthrough walkthrough) {
+    private void displayStepContent(WalkthroughStep step, Node targetNode, Walkthrough walkthrough) {
         switch (step) {
             case TooltipStep tooltipStep -> {
                 displayTooltipStep(tooltipStep, targetNode, walkthrough);
@@ -164,22 +166,22 @@ public class SingleWindowWalkthroughOverlay {
         GridPane.setVgrow(content, Priority.NEVER);
 
         switch (step.position()) {
-            case CENTER_LEFT -> {
+            case LEFT -> {
                 overlayPane.setAlignment(Pos.CENTER_LEFT);
                 GridPane.setVgrow(content, Priority.ALWAYS);
                 GridPane.setFillHeight(content, true);
             }
-            case CENTER_RIGHT -> {
+            case RIGHT -> {
                 overlayPane.setAlignment(Pos.CENTER_RIGHT);
                 GridPane.setVgrow(content, Priority.ALWAYS);
                 GridPane.setFillHeight(content, true);
             }
-            case TOP_CENTER -> {
+            case TOP -> {
                 overlayPane.setAlignment(Pos.TOP_CENTER);
                 GridPane.setHgrow(content, Priority.ALWAYS);
                 GridPane.setFillWidth(content, true);
             }
-            case BOTTOM_CENTER -> {
+            case BOTTOM -> {
                 overlayPane.setAlignment(Pos.BOTTOM_CENTER);
                 GridPane.setHgrow(content, Priority.ALWAYS);
                 GridPane.setFillWidth(content, true);
@@ -191,18 +193,18 @@ public class SingleWindowWalkthroughOverlay {
         }
     }
 
-    private void configurePanelLayout(Pos position) {
+    private void configurePanelLayout(PanelPosition position) {
         RowConstraints rowConstraints = new RowConstraints();
         ColumnConstraints columnConstraints = new ColumnConstraints();
 
         switch (position) {
-            case CENTER_LEFT,
-                 CENTER_RIGHT -> {
+            case LEFT,
+                 RIGHT -> {
                 rowConstraints.setVgrow(Priority.ALWAYS);
                 columnConstraints.setHgrow(Priority.NEVER);
             }
-            case TOP_CENTER,
-                 BOTTOM_CENTER -> {
+            case TOP,
+                 BOTTOM -> {
                 columnConstraints.setHgrow(Priority.ALWAYS);
                 rowConstraints.setVgrow(Priority.NEVER);
             }
@@ -219,13 +221,13 @@ public class SingleWindowWalkthroughOverlay {
     private PopOver.ArrowLocation mapToArrowLocation(TooltipPosition position) {
         return switch (position) {
             case TOP ->
-                    PopOver.ArrowLocation.TOP_CENTER;
-            case BOTTOM ->
                     PopOver.ArrowLocation.BOTTOM_CENTER;
+            case BOTTOM ->
+                    PopOver.ArrowLocation.TOP_CENTER;
             case LEFT ->
-                    PopOver.ArrowLocation.LEFT_CENTER;
-            case RIGHT ->
                     PopOver.ArrowLocation.RIGHT_CENTER;
+            case RIGHT ->
+                    PopOver.ArrowLocation.LEFT_CENTER;
             case AUTO ->
                     null;
         };

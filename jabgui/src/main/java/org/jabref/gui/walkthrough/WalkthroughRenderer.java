@@ -14,9 +14,10 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.walkthrough.declarative.richtext.ArbitraryJFXBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
+import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.WalkthroughNode;
+import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
@@ -46,7 +47,7 @@ public class WalkthroughRenderer {
     public Node render(@NonNull PanelStep step, @NonNull Walkthrough walkthrough) {
         VBox panel = makePanel();
 
-        if (step.position() == Pos.CENTER_LEFT || step.position() == Pos.CENTER_RIGHT) {
+        if (step.position() == PanelPosition.LEFT || step.position() == PanelPosition.RIGHT) {
             panel.getStyleClass().add("walkthrough-side-panel-vertical");
             VBox.setVgrow(panel, Priority.ALWAYS);
             panel.setMaxHeight(Double.MAX_VALUE);
@@ -56,7 +57,7 @@ public class WalkthroughRenderer {
                 panel.setMaxWidth(width);
                 panel.setMinWidth(width);
             });
-        } else if (step.position() == Pos.TOP_CENTER || step.position() == Pos.BOTTOM_CENTER) {
+        } else if (step.position() == PanelPosition.TOP || step.position() == PanelPosition.BOTTOM) {
             panel.getStyleClass().add("walkthrough-side-panel-horizontal");
             HBox.setHgrow(panel, Priority.ALWAYS);
             panel.setMaxWidth(Double.MAX_VALUE);
@@ -126,7 +127,7 @@ public class WalkthroughRenderer {
         return container;
     }
 
-    private HBox makeActions(@NonNull WalkthroughNode step, @NonNull Walkthrough walkthrough) {
+    private HBox makeActions(@NonNull WalkthroughStep step, @NonNull Walkthrough walkthrough) {
         HBox actions = new HBox();
         actions.setAlignment(Pos.CENTER_LEFT);
         actions.getStyleClass().add("walkthrough-actions");
@@ -152,7 +153,7 @@ public class WalkthroughRenderer {
         return actions;
     }
 
-    private VBox makeContent(@NonNull WalkthroughNode step, @NonNull Walkthrough walkthrough) {
+    private VBox makeContent(@NonNull WalkthroughStep step, @NonNull Walkthrough walkthrough) {
         VBox contentBox = new VBox();
         contentBox.getStyleClass().add("walkthrough-content");
         contentBox.getChildren().addAll(step.content().stream().map(block ->
@@ -165,7 +166,7 @@ public class WalkthroughRenderer {
         return contentBox;
     }
 
-    private Button makeContinueButton(@NonNull WalkthroughNode step, @NonNull Walkthrough walkthrough) {
+    private Button makeContinueButton(@NonNull WalkthroughStep step, @NonNull Walkthrough walkthrough) {
         String buttonText = step.continueButtonText()
                                 .orElse("Walkthrough continue button");
 
@@ -175,7 +176,7 @@ public class WalkthroughRenderer {
         return continueButton;
     }
 
-    private Button makeSkipButton(@NonNull WalkthroughNode step, @NonNull Walkthrough walkthrough) {
+    private Button makeSkipButton(@NonNull WalkthroughStep step, @NonNull Walkthrough walkthrough) {
         String buttonText = step.skipButtonText()
                                 .orElse("Walkthrough skip to finish");
 
@@ -185,7 +186,7 @@ public class WalkthroughRenderer {
         return skipButton;
     }
 
-    private Button makeBackButton(@NonNull WalkthroughNode step, @NonNull Walkthrough walkthrough) {
+    private Button makeBackButton(@NonNull WalkthroughStep step, @NonNull Walkthrough walkthrough) {
         String buttonText = step.backButtonText()
                                 .orElse("Walkthrough back button");
 
