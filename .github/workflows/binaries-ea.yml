@@ -224,10 +224,17 @@ jobs:
         shell: bash
         run: mv ~/AppData/Local/mise ~/.asdf
       - name: Setup JDK for gradle itself
+        if: false
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Setup JDK ${{ env.jdk_version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '${{ env.jdk_version }}'
+          distribution: 'corretto'
+          java-package: 'jdk'
       # endregion
 
       # region JavaFX
