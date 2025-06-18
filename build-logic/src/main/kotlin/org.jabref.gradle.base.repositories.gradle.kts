@@ -8,5 +8,5 @@ repositories {
     // Required for one.jpro.jproutils:tree-showing
     maven { url = uri("https://sandec.jfrog.io/artifactory/repo") }
 
-    maven { url = uri("file:${rootDir.absolutePath}/jablib/lib")}
+    maven { url = rootDir.resolve("jablib/lib").toURI() }
 }
