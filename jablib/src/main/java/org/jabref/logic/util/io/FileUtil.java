@@ -284,7 +284,7 @@ public class FileUtil {
         List<Path> fileDirectories = databaseContext.getFileDirectories(filePreferences);
 
         return entries.stream()
-                      .map(entry -> {
+                      .peek(entry -> {
                           if (entry.hasField(StandardField.FILE)) {
                               List<LinkedFile> updatedLinkedFiles = entry.getFiles().stream().map(linkedFile -> {
                                   if (!linkedFile.isOnlineLink()) {
@@ -295,7 +295,6 @@ public class FileUtil {
                               }).toList();
                               entry.setFiles(updatedLinkedFiles);
                           }
-                          return entry;
                       }).toList();
     }
 
