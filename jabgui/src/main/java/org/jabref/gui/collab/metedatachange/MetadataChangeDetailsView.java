@@ -80,18 +80,15 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
      * @return Configured SplitPane showing groups differences
      */
     private SplitPane createGroupDiffSplitPane(MetadataChange metadataChange) {
-        // Create text areas for both sides
         StyleClassedTextArea jabrefTextArea = createConfiguredTextArea();
         StyleClassedTextArea diskTextArea = createConfiguredTextArea();
 
-        // Populate content from both versions
         String jabRefContent = getMetadataGroupsContent(metadataChange.getMetaDataDiff().getOriginalMetaData());
         String diskContent = getMetadataGroupsContent(metadataChange.getMetaDataDiff().getNewMetaData());
 
         jabrefTextArea.replaceText(jabRefContent);
         diskTextArea.replaceText(diskContent);
 
-        // Highlight differences between the two versions
         SplitDiffHighlighter highlighter = new SplitDiffHighlighter(
                 jabrefTextArea,
                 diskTextArea,
@@ -110,12 +107,11 @@ public final class MetadataChangeDetailsView extends DatabaseChangeDetailsView {
         VBox leftContainer = new VBox(5, inJabRef, leftScrollPane);
         VBox rightContainer = new VBox(5, onDisk, rightScrollPane);
 
-        // Create and configure split pane
         SplitPane splitPane = new SplitPane(leftContainer, rightContainer);
         splitPane.setOrientation(Orientation.HORIZONTAL);
         splitPane.setDividerPositions(0.5);
 
-        Label legendLabel = new Label(Localization.lang("Red: Removed   Blue: Changed   Green: Added"));
+        Label legendLabel = new Label(Localization.lang("Red: Removed, Blue: Changed, Green: Added"));
         legendLabel.getStyleClass().add("lib-change-legend");
 
         VBox resultContainer = new VBox(splitPane, legendLabel);
