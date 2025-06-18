@@ -21,6 +21,7 @@ permissions:
 
 jobs:
   build:
+    if: ${{ github.repository_owner == 'JabRef' }}
     strategy:
       matrix:
         component: [jabkit, jabsrv]
@@ -39,7 +40,7 @@ jobs:
             type=ref,event=pr
       - name: Login to GitHub Container Registry
         if: >
-          (github.event_name == 'push' && github.repository == 'JabRef/jabref') || 
+          (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
           (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref')
         uses: docker/login-action@v3
         with:
@@ -54,8 +55,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: >
-            ${{ 
-              (github.event_name == 'push' && github.repository == 'JabRef/jabref') || 
+            ${{
+              (github.event_name == 'push' && github.repository == 'JabRef/jabref') ||
               (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'JabRef/jabref')
             }}
           platforms: linux/amd64
