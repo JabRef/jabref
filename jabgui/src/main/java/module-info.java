@@ -76,7 +76,6 @@ open module org.jabref {
     // endregion
 
     // region: data mapping
-    // requires jakarta.xml.bind;
     requires jdk.xml.dom;
     // requires com.google.gson;
     // requires com.fasterxml.jackson.databind;
