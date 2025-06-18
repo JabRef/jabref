@@ -73,26 +73,6 @@ class CheckConsistency implements Callable<Integer> {
         });
 
         Writer writer = new OutputStreamWriter(System.out);
-        BibliographyConsistencyCheckResultWriter checkResultWriter = getBibliographyConsistencyCheckResultWriter(result, writer, databaseContext);
-
-        // System.out should not be closed, therefore no try-with-resources
-        try {
-            checkResultWriter.writeFindings();
-            writer.flush();
-        } catch (IOException e) {
-            LOGGER.error("Error writing results", e);
-            return;
-        }
-
-        if (!sharedOptions.porcelain) {
-            System.out.println(Localization.lang("Consistency check completed"));
-        }
-    }
-
-    private BibliographyConsistencyCheckResultWriter getBibliographyConsistencyCheckResultWriter(
-            BibliographyConsistencyCheck.Result result,
-            Writer writer,
-            BibDatabaseContext databaseContext) {
         BibliographyConsistencyCheckResultWriter checkResultWriter;
         if ("txt".equalsIgnoreCase(outputFormat)) {
             checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
