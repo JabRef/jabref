@@ -17,15 +17,17 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.treewalk.TreeWalk;
 
 public class GitFileReader {
-    public static String readFileFromCommit(Git git, RevCommit commit, Path filePath) throws JabRefException {
+    // Unit test is in the GitSyncServiceTest
+    public static String readFileFromCommit(Git git, RevCommit commit, Path relativePath) throws JabRefException {
+        // ref: https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/api/ReadFileFromCommit.java
         // 1. get commit-pointing tree
         Repository repository = git.getRepository();
         RevTree commitTree = commit.getTree();
 
         // 2. setup TreeWalk + to the target file
-        try (TreeWalk treeWalk = TreeWalk.forPath(repository, String.valueOf(filePath), commitTree)) {
+        try (TreeWalk treeWalk = TreeWalk.forPath(repository, String.valueOf(relativePath), commitTree)) {
             if (treeWalk == null) {
-                throw new JabRefException("File '" + filePath + "' not found in commit " + commit.getName());
+                throw new JabRefException("File '" + relativePath + "' not found in commit " + commit.getName());
             }
             // 3. load blob object
             ObjectId objectId = treeWalk.getObjectId(0);
@@ -33,9 +35,9 @@ public class GitFileReader {
             return new String(loader.getBytes(), StandardCharsets.UTF_8);
         } catch (MissingObjectException |
                  IncorrectObjectTypeException e) {
-            throw new JabRefException("Git object missing or incorrect when reading file: " + filePath, e);
+            throw new JabRefException("Git object missing or incorrect when reading file: " + relativePath, e);
         } catch (IOException e) {
-            throw new JabRefException("I/O error while reading file from commit: " + filePath, e);
+            throw new JabRefException("I/O error while reading file from commit: " + relativePath, e);
         }
     }
 }

@@ -3,19 +3,23 @@ package org.jabref.logic.git;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.jabref.logic.git.util.GitFileReader;
+import org.jabref.logic.git.util.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.RefSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -33,12 +37,12 @@ class GitSyncServiceTest {
     private final PersonIdent bob = new PersonIdent("Bob", "bob@example.org");
     private final String initialContent = """
             @article{a,
-              author = {don't know the author}
+              author = {don't know the author},
               doi = {xya},
             }
 
             @article{b,
-              author = {author-b}
+              author = {don't know the author},
               doi = {xyz},
             }
         """;
@@ -46,12 +50,12 @@ class GitSyncServiceTest {
     // Alice modifies a
     private final String aliceUpdatedContent = """
             @article{a,
-              author = {author-a}
+              author = {author-a},
               doi = {xya},
             }
 
             @article{b,
-              author = {author-b}
+              author = {don't know the author},
               doi = {xyz},
             }
         """;
@@ -59,12 +63,12 @@ class GitSyncServiceTest {
     // Bob reorders a and b
     private final String bobUpdatedContent = """
             @article{b,
-              author = {author-b}
+              author = {author-b},
               doi = {xyz},
             }
 
             @article{a,
-              author = {lala}
+              author = {don't know the author},
               doi = {xya},
             }
             """;
@@ -72,27 +76,48 @@ class GitSyncServiceTest {
 
     /**
      * Creates a commit graph with a base commit, one modification by Alice and one modification by Bob
+     * 1. Alice commit initial → push to remote
+     * 2. Bob clone remote -> update `b` → push
+     * 3. Alice update `a` → pull
      */
     @BeforeEach
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 
-        // Create empty repository
-        git = Git.init()
-                 .setDirectory(tempDir.toFile())
-                 .setInitialBranch("main")
-                 .call();
+        // create fake remote repo
+        Path remoteDir = tempDir.resolve("remote.git");
+        Git remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
 
-        library = tempDir.resolve("library.bib");
+        // Alice clone remote -> local repository
+        Path aliceDir = tempDir.resolve("alice");
+        Git aliceGit = Git.cloneRepository()
+                          .setURI(remoteDir.toUri().toString())
+                          .setDirectory(aliceDir.toFile())
+                          .setBranch("main")
+                          .call();
+        this.git = aliceGit;
+        this.library = aliceDir.resolve("library.bib");
 
-        baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, git);
+        // Alice: initial commit
+        baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
+        git.push().setRemote("origin").setRefSpecs(new RefSpec("main")).call();
 
-        aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, git);
+        // Bob clone remote
+        Path bobDir = tempDir.resolve("bob");
+        Git bobGit = Git.cloneRepository()
+                        .setURI(remoteDir.toUri().toString())
+                        .setDirectory(bobDir.toFile())
+                        .setBranchesToClone(List.of("refs/heads/main"))
+                        .setBranch("refs/heads/main")
+                        .call();
+        Path bobLibrary = bobDir.resolve("library.bib");
+        bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
+        bobGit.push().setRemote("origin").setRefSpecs(new RefSpec("main")).call();
 
-        git.checkout().setStartPoint(baseCommit).setCreateBranch(true).setName("bob-branch").call();
-
-        bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, library, git);
+        // back to Alice's branch, fetch remote
+        aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);
+        git.fetch().setRemote("origin").call();
 
         // ToDo: Replace by call to GitSyncService crafting a merge commit
 //      git.merge().include(aliceCommit).include(bobCommit).call(); // Will throw exception bc of merge conflict
@@ -102,7 +127,27 @@ class GitSyncServiceTest {
     }
 
     @Test
-    void performsSemanticMergeWhenNoConflicts() throws Exception {
+    void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
+        GitHandler gitHandler = mock(GitHandler.class);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler);
+        MergeResult result = syncService.pullAndMerge(library);
+
+        assertTrue(result.successful());
+        String merged = Files.readString(library);
+
+        String expected = """
+        @article{a,
+          author = {author-a},
+          doi = {xya},
+        }
+
+        @article{b,
+          author = {author-b},
+          doi = {xyz},
+        }
+        """;
+
+        assertEquals(normalize(expected), normalize(merged));
     }
 
     @Test
@@ -118,7 +163,18 @@ class GitSyncServiceTest {
 
     private RevCommit writeAndCommit(String content, String message, PersonIdent author, Path library, Git git) throws Exception {
         Files.writeString(library, content, StandardCharsets.UTF_8);
-        git.add().addFilepattern(library.getFileName().toString()).call();
-        return git.commit().setAuthor(author).setMessage(message).call();
+        String relativePath = git.getRepository().getWorkTree().toPath().relativize(library).toString();
+        git.add().addFilepattern(relativePath).call();
+        return git.commit()
+                  .setAuthor(author)
+                  .setMessage(message)
+                  .call();
+    }
+
+    private String normalize(String s) {
+        return s.trim()
+                .replaceAll("@[aA]rticle", "@article")
+                .replaceAll("\\s+", "")
+                .toLowerCase();
     }
 }

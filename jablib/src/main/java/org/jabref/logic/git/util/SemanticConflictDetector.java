@@ -3,6 +3,8 @@ package org.jabref.logic.git.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,20 +58,15 @@ public class SemanticConflictDetector {
         return conflicts;
     }
 
-    private static Map<String, BibEntryDiff> toDiffMap(List<BibEntryDiff> diffs) {
-        return diffs.stream()
-                    .filter(diff -> diff.newEntry().getCitationKey().isPresent())
-                    .collect(Collectors.toMap(
-                            diff -> diff.newEntry().getCitationKey().get(),
-                            Function.identity()));
-    }
-
-    public static Map<String, BibEntry> toEntryMap(BibDatabaseContext ctx) {
-        return ctx.getDatabase().getEntries().stream()
-                  .filter(entry -> entry.getCitationKey().isPresent())
-                  .collect(Collectors.toMap(
-                          entry -> entry.getCitationKey().get(),
-                          Function.identity()));
+    public static Map<String, BibEntry> toEntryMap(BibDatabaseContext context) {
+        return context.getDatabase().getEntries().stream()
+                      .filter(e -> e.getCitationKey().isPresent())
+                      .collect(Collectors.toMap(
+                              e -> e.getCitationKey().get(),
+                              Function.identity(),
+                              (a, b) -> b,
+                              LinkedHashMap::new
+                      ));
     }
 
     private static boolean hasConflictingFields(BibEntry base, BibEntry local, BibEntry remote) {
@@ -93,5 +90,53 @@ public class SemanticConflictDetector {
         }
 
         return false;
+    }
+
+    public static MergePlan extractMergePlan(BibDatabaseContext base, BibDatabaseContext remote) {
+        Map<String, BibEntry> baseMap = toEntryMap(base);
+        Map<String, BibEntry> remoteMap = toEntryMap(remote);
+
+        Map<String, Map<Field, String>> fieldPatches = new LinkedHashMap<>();
+        List<BibEntry> newEntries = new ArrayList<>();
+
+        for (Map.Entry<String, BibEntry> remoteEntryPair : remoteMap.entrySet()) {
+            String key = remoteEntryPair.getKey();
+            BibEntry remoteEntry = remoteEntryPair.getValue();
+            BibEntry baseEntry = baseMap.get(key);
+
+            if (baseEntry == null) {
+                // New entry (not in base)
+                newEntries.add(remoteEntry);
+            } else {
+                Map<Field, String> patch = computeFieldPatch(baseEntry, remoteEntry);
+                if (!patch.isEmpty()) {
+                    fieldPatches.put(key, patch);
+                }
+            }
+        }
+
+        return new MergePlan(fieldPatches, newEntries);
+    }
+
+    /**
+     * Compares base and remote and constructs a patch at the field level. null == the field is deleted.
+     */
+    private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry remote) {
+        Map<Field, String> patch = new LinkedHashMap<>();
+
+        Set<Field> allFields = new LinkedHashSet<>();
+        allFields.addAll(base.getFields());
+        allFields.addAll(remote.getFields());
+
+        for (Field field : allFields) {
+            String baseValue = base.getField(field).orElse(null);
+            String remoteValue = remote.getField(field).orElse(null);
+
+            if (!Objects.equals(baseValue, remoteValue)) {
+                patch.put(field, remoteValue);
+            }
+        }
+
+        return patch;
     }
 }

@@ -106,6 +106,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
+    exports org.jabref.logic.git.util;
 
     requires java.base;
 

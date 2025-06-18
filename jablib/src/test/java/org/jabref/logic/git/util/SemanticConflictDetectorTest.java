@@ -4,16 +4,20 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.StandardField;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -410,5 +414,70 @@ class SemanticConflictDetectorTest {
                         true
                 )
         );
+    }
+
+    @Test
+    void testExtractMergePlan_T10_onlyRemoteChangedEntryB() throws Exception {
+        String base = """
+            @article{a,
+                author = {lala},
+                doi = {xya},
+            }
+            @article{b,
+                author = {lala},
+                doi = {xyz},
+            }
+        """;
+        String remote = """
+            @article{b,
+                author = {author-b},
+                doi = {xyz},
+            }
+            @article{a,
+                author = {lala},
+                doi = {xya},
+            }
+        """;
+
+        RevCommit baseCommit = writeAndCommit(base, "base", alice);
+        RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
+        BibDatabaseContext baseCtx = parse(baseCommit);
+        BibDatabaseContext remoteCtx = parse(remoteCommit);
+
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseCtx, remoteCtx);
+
+        assertEquals(1, plan.fieldPatches().size());
+        assertTrue(plan.fieldPatches().containsKey("b"));
+
+        Map<Field, String> patch = plan.fieldPatches().get("b");
+        assertEquals("author-b", patch.get(StandardField.AUTHOR));
+    }
+
+    @Test
+    void testExtractMergePlan_T11_remoteAddsField() throws Exception {
+        String base = """
+            @article{a,
+                author = {lala},
+                doi = {xya},
+            }
+        """;
+        String remote = """
+            @article{a,
+                author = {lala},
+                doi = {xya},
+                year = {2025},
+            }
+        """;
+
+        RevCommit baseCommit = writeAndCommit(base, "base", alice);
+        RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
+        BibDatabaseContext baseCtx = parse(baseCommit);
+        BibDatabaseContext remoteCtx = parse(remoteCommit);
+
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseCtx, remoteCtx);
+
+        assertEquals(1, plan.fieldPatches().size());
+        Map<Field, String> patch = plan.fieldPatches().get("a");
+        assertEquals("2025", patch.get(StandardField.YEAR));
     }
 }
