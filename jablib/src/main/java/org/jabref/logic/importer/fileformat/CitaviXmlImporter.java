@@ -202,9 +202,9 @@ public class CitaviXmlImporter extends Importer implements Parser {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
-                    if (elementName.equals("FirstName")) {
+                    if ("FirstName".equals(elementName)) {
                         firstName = reader.getElementText();
-                    } else if (elementName.equals("LastName")) {
+                    } else if ("LastName".equals(elementName)) {
                         lastName = reader.getElementText();
                     } else {
                         consumeElement(reader);
@@ -247,7 +247,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
-                    if (elementName.equals("Name")) {
+                    if ("Name".equals(elementName)) {
                         keywordName = reader.getElementText();
                     } else {
                         consumeElement(reader);
@@ -270,7 +270,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
-                    if (elementName.equals("Publisher")) {
+                    if ("Publisher".equals(elementName)) {
                         parsePublisher(reader);
                     }
                 }
@@ -291,7 +291,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
-                    if (elementName.equals("Name")) {
+                    if ("Name".equals(elementName)) {
                         publisherName = reader.getElementText();
                     } else {
                         consumeElement(reader);
@@ -313,7 +313,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             switch (event) {
                 case XMLStreamConstants.START_ELEMENT -> {
                     String elementName = reader.getLocalName();
-                    if (elementName.equals("Reference")) {
+                    if ("Reference".equals(elementName)) {
                         parseReference(reader);
                     }
                 }
@@ -599,7 +599,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
                                                                                              .filter(qt -> type == qt.getCitaviIndexType())
                                                                                              .map(QuotationTypeMapping::getName)
                                                                                              .findFirst());
-                quotationTypeDesc.ifPresent(qt -> comment.add(String.format("quotation type: %s", qt)));
+                quotationTypeDesc.ifPresent(qt -> comment.add("quotation type: %s".formatted(qt)));
             } catch (NumberFormatException e) {
                 // If the string is not a number, we replicate behaviour by leaving the optional empty
             }
@@ -607,7 +607,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
             try {
                 Optional<Short> quotationIndex = Optional.ofNullable(knowledgeItem.quotationIndex())
                                                          .map(Short::parseShort);
-                quotationIndex.ifPresent(index -> comment.add(String.format("quotation index: %d", index)));
+                quotationIndex.ifPresent(index -> comment.add("quotation index: %d".formatted(index)));
             } catch (NumberFormatException e) {
                 // If the string is not a number, we replicate behaviour by leaving the optional empty
             }
@@ -705,7 +705,7 @@ public class CitaviXmlImporter extends Importer implements Parser {
         String pages = "";
         for (int i = tmpStr.length() - 1; i >= 0; i--) {
             if (count == 2) {
-                pages = tmpStr.substring(i + 2, (tmpStr.length() - END_TAG_CHARACTER_COUNT)); // extract tag content, skipping first 2 chars ("s>") and trimming closing tag
+                pages = tmpStr.substring(i + 2, tmpStr.length() - END_TAG_CHARACTER_COUNT); // extract tag content, skipping first 2 chars ("s>") and trimming closing tag
                 break;
             } else {
                 if (tmpStr.charAt(i) == '>') {
