@@ -213,8 +213,6 @@ jlink {
     forceMerge(
         "controlsfx",
         "bcprov",
-        "jaxb",
-        "istack",
         "stax"
     )
 

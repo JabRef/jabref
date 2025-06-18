@@ -109,8 +109,6 @@ jlink {
     // TODO: Remove as soon as dependencies are fixed (upstream)
     forceMerge(
         "bcprov",
-        "jaxb",
-        "istack",
         "stax"
     )
 
