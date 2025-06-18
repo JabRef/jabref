@@ -105,7 +105,6 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-api:3.1.1")
     api("org.glassfish.hk2:hk2-locator:3.1.1")
     api("org.glassfish.hk2:hk2-utils:3.1.1")
-    api("org.glassfish.jaxb:jaxb-runtime:4.0.5")
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
     api("org.glassfish.jersey.core:jersey-server:3.1.10")
     api("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
