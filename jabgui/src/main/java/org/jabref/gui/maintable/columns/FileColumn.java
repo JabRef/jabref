@@ -120,7 +120,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                         entry.getEntry(), database, taskExecutor, dialogService, preferences);
                                 MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                                         linkedFileViewModel.getTypeIcon().getGraphicNode());
-                                menuItem.setOnAction(e -> linkedFileViewModel.open());
+                                menuItem.setOnAction(_ -> linkedFileViewModel.open());
                                 contextMenu.getItems().add(menuItem);
                             }
                             contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());
