@@ -77,7 +77,7 @@ class CompositeSearchBasedFetcherTest {
             "Fetchers: {arguments}")
     @MethodSource("performSearchParameters")
     void performSearchOnNonEmptyQuery(Set<SearchBasedFetcher> fetchers) throws FetcherException {
-        List fetcherNames = fetchers.stream().map(WebFetcher::getName).toList();
+        List<String> fetcherNames = fetchers.stream().map(WebFetcher::getName).toList();
         ObservableList<String> observableList = FXCollections.observableArrayList(fetcherNames);
         when(importerPreferences.getCatalogs()).thenReturn(observableList);
         CompositeSearchBasedFetcher compositeFetcher = new CompositeSearchBasedFetcher(fetchers, importerPreferences, Integer.MAX_VALUE);
