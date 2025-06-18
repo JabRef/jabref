@@ -140,14 +140,11 @@ open module org.jabref.jablib {
     // endregion
 
     // region: data mapping
-    requires jakarta.xml.bind;
     requires jdk.xml.dom;
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime, related to XJC
-    requires org.glassfish.jaxb.runtime;
     // endregion
 
     // region HTTP clients
