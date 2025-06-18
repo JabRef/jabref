@@ -117,7 +117,7 @@ public class CitationKeyPatternSuggestionCell extends TextFieldTableCell<Citatio
 
                 menuItems.add(item);
 
-                item.setOnAction(actionEvent -> {
+                item.setOnAction(_ -> {
                     setText(result);
                     positionCaret(result.length());
                     suggestionsList.hide();

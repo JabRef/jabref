@@ -135,7 +135,7 @@ public class SaveOrderConfigPanel extends VBox {
     private void clearCriterionRow(int row) {
         List<Node> criterionRow = sortCriterionList.getChildren().stream()
                                                    .filter(item -> GridPane.getRowIndex(item) == row)
-                                                   .toList();
+                                                   .collect(Collectors.toList());
         sortCriterionList.getChildren().removeAll(criterionRow);
 
         sortCriterionList.getChildren().stream()
