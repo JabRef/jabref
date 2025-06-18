@@ -82,8 +82,6 @@ open module org.jabref {
     // requires com.fasterxml.jackson.databind;
     // requires com.fasterxml.jackson.dataformat.yaml;
     // requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime
-    // requires org.glassfish.jaxb.runtime;
     // endregion
 
     // dependency injection using HK2

@@ -11,7 +11,6 @@ plugins {
     id("java-library")
 
     id("antlr")
-    id("com.github.bjornvester.xjc") version "1.8.1"
 
     id("me.champeau.jmh") version "0.7.3"
 
@@ -98,9 +97,6 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-    // required by XJC
-    implementation("jakarta.xml.bind:jakarta.xml.bind-api")
-
     implementation("com.fasterxml:aalto-xml")
 
     implementation("org.postgresql:postgresql")
@@ -152,9 +148,6 @@ dependencies {
 
     // YAML reading and writing
     implementation("org.yaml:snakeyaml")
-
-    // XJC related
-    implementation("org.glassfish.jaxb:jaxb-runtime")
 
     // region AI
     implementation("dev.langchain4j:langchain4j")
