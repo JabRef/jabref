@@ -9,17 +9,13 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.FilePreferences;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -55,8 +51,6 @@ public class MergeBibFilesIntoCurrentBibTest {
     private BibEntry expectedEntry1;
 
     @Mock
-    private LibraryTabContainer libraryTabContainer;
-    @Mock
     private DialogService dialogService;
     @Mock
     private GuiPreferences preferences;
@@ -67,13 +61,7 @@ public class MergeBibFilesIntoCurrentBibTest {
     @Mock
     private FileUpdateMonitor fileUpdateMonitor;
     @Mock
-    private AiService aiService;
-    @Mock
     private BibEntryTypesManager bibEntryTypesManager;
-    @Mock
-    private ClipBoardManager clipboardManager;
-    @Mock
-    private TaskExecutor taskExecutor;
     @Mock
     private MergeBibFilesIntoCurrentBibPreferences mergeBibFilesIntoCurrentBibPreferences;
 
@@ -135,16 +123,12 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.of(testInnerFolder));
 
         MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
-                libraryTabContainer,
                 dialogService,
                 preferences,
                 stateManager,
                 undoManager,
                 fileUpdateMonitor,
-                aiService,
-                bibEntryTypesManager,
-                clipboardManager,
-                taskExecutor
+                bibEntryTypesManager
         );
 
         action.execute();
@@ -170,16 +154,12 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.of(testInnerFolder));
 
         MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
-                libraryTabContainer,
                 dialogService,
                 preferences,
                 stateManager,
                 undoManager,
                 fileUpdateMonitor,
-                aiService,
-                bibEntryTypesManager,
-                clipboardManager,
-                taskExecutor
+                bibEntryTypesManager
         );
 
         action.execute();
@@ -214,16 +194,12 @@ public class MergeBibFilesIntoCurrentBibTest {
         try (MockedConstruction<MergeEntriesAction> mockedMergeEntriesAction = mockConstruction(MergeEntriesAction.class,
                 (mock, _) -> doNothing().when(mock).execute())) {
             MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
-                    libraryTabContainer,
                     dialogService,
                     preferences,
                     stateManager,
                     undoManager,
                     fileUpdateMonitor,
-                    aiService,
-                    bibEntryTypesManager,
-                    clipboardManager,
-                    taskExecutor
+                    bibEntryTypesManager
             );
 
             action.execute();
@@ -250,16 +226,12 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.of(testInnerFolder));
 
         MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
-                libraryTabContainer,
                 dialogService,
                 preferences,
                 stateManager,
                 undoManager,
                 fileUpdateMonitor,
-                aiService,
-                bibEntryTypesManager,
-                clipboardManager,
-                taskExecutor
+                bibEntryTypesManager
         );
 
         action.execute();
@@ -296,16 +268,12 @@ public class MergeBibFilesIntoCurrentBibTest {
         try (MockedConstruction<MergeEntriesAction> mockedMergeEntriesAction = mockConstruction(MergeEntriesAction.class,
                 (mock, _) -> doNothing().when(mock).execute())) {
             MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
-                    libraryTabContainer,
                     dialogService,
                     preferences,
                     stateManager,
                     undoManager,
                     fileUpdateMonitor,
-                    aiService,
-                    bibEntryTypesManager,
-                    clipboardManager,
-                    taskExecutor
+                    bibEntryTypesManager
             );
 
             action.execute();
@@ -334,16 +302,12 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.of(testInnerFolder));
 
         MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
-                libraryTabContainer,
                 dialogService,
                 preferences,
                 stateManager,
                 undoManager,
                 fileUpdateMonitor,
-                aiService,
-                bibEntryTypesManager,
-                clipboardManager,
-                taskExecutor
+                bibEntryTypesManager
         );
 
         action.execute();
@@ -404,16 +368,12 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(dialogService.showDirectorySelectionDialog(any())).thenReturn(Optional.of(testFolder));
 
         MergeBibFilesIntoCurrentBibAction action = new MergeBibFilesIntoCurrentBibAction(
-                libraryTabContainer,
                 dialogService,
                 preferences,
                 stateManager,
                 undoManager,
                 fileUpdateMonitor,
-                aiService,
-                bibEntryTypesManager,
-                clipboardManager,
-                taskExecutor
+                bibEntryTypesManager
         );
 
         action.execute();

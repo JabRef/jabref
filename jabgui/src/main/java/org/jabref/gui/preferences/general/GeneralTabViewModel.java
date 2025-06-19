@@ -23,6 +23,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.UiMessageHandler;
+import org.jabref.gui.mergebibfilesintocurrentbib.MergeBibFilesIntoCurrentBibPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -93,6 +94,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final LibraryPreferences libraryPreferences;
     private final FilePreferences filePreferences;
     private final RemotePreferences remotePreferences;
+    private final MergeBibFilesIntoCurrentBibPreferences mergeBibFilesIntoCurrentBibPreferences;
 
     private final Validator fontSizeValidator;
     private final Validator customPathToThemeValidator;
@@ -104,6 +106,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final FileUpdateMonitor fileUpdateMonitor;
     private final TrustStoreManager trustStoreManager;
 
+    private final BooleanProperty mergeSameKeyEntriesProperty = new SimpleBooleanProperty();
+    private final BooleanProperty mergeDuplicateEntriesProperty = new SimpleBooleanProperty();
+
     public GeneralTabViewModel(DialogService dialogService, GuiPreferences preferences, FileUpdateMonitor fileUpdateMonitor) {
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -111,6 +116,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         this.libraryPreferences = preferences.getLibraryPreferences();
         this.filePreferences = preferences.getFilePreferences();
         this.remotePreferences = preferences.getRemotePreferences();
+        this.mergeBibFilesIntoCurrentBibPreferences = preferences.getMergeBibFilesIntoCurrentBibPreferences();
         this.fileUpdateMonitor = fileUpdateMonitor;
 
         fontSizeValidator = new FunctionBasedValidator<>(
@@ -189,6 +195,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         bibliographyModeListProperty.setValue(FXCollections.observableArrayList(BibDatabaseMode.values()));
         selectedBiblatexModeProperty.setValue(libraryPreferences.getDefaultBibDatabaseMode());
 
+        mergeSameKeyEntriesProperty.setValue(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries());
+        mergeDuplicateEntriesProperty.setValue(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries());
+
         alwaysReformatBibProperty.setValue(libraryPreferences.shouldAlwaysReformatOnSave());
         autosaveLocalLibraries.setValue(libraryPreferences.shouldAutoSave());
 
@@ -230,6 +239,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         workspacePreferences.setHideTabBar(confirmHideTabBarProperty().getValue());
 
         libraryPreferences.setDefaultBibDatabaseMode(selectedBiblatexModeProperty.getValue());
+
+        mergeBibFilesIntoCurrentBibPreferences.setShouldMergeSameKeyEntries(mergeSameKeyEntriesProperty.getValue());
+        mergeBibFilesIntoCurrentBibPreferences.setShouldMergeDuplicateEntries(mergeDuplicateEntriesProperty.getValue());
 
         libraryPreferences.setAlwaysReformatOnSave(alwaysReformatBibProperty.getValue());
         libraryPreferences.setAutoSave(autosaveLocalLibraries.getValue());
@@ -388,6 +400,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ObjectProperty<BibDatabaseMode> selectedBiblatexModeProperty() {
         return this.selectedBiblatexModeProperty;
+    }
+
+    public BooleanProperty mergeSameKeyEntriesProperty() {
+        return this.mergeSameKeyEntriesProperty;
+    }
+
+    public BooleanProperty mergeDuplicateEntriesProperty() {
+        return this.mergeDuplicateEntriesProperty;
     }
 
     public BooleanProperty alwaysReformatBibProperty() {

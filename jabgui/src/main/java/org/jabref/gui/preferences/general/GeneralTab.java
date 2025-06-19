@@ -50,6 +50,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox shouldAskForIncludingCrossReferences;
     @FXML private CheckBox confirmHideTabBar;
     @FXML private ComboBox<BibDatabaseMode> biblatexMode;
+    @FXML private CheckBox mergeSameKeyEntries;
+    @FXML private CheckBox mergeDuplicateEntries;
     @FXML private CheckBox alwaysReformatBib;
     @FXML private CheckBox autosaveLocalLibraries;
     @FXML private Button autosaveLocalLibrariesHelp;
@@ -129,6 +131,9 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
                 .install(biblatexMode);
         biblatexMode.itemsProperty().bind(viewModel.biblatexModeListProperty());
         biblatexMode.valueProperty().bindBidirectional(viewModel.selectedBiblatexModeProperty());
+
+        mergeSameKeyEntries.selectedProperty().bindBidirectional(viewModel.mergeSameKeyEntriesProperty());
+        mergeDuplicateEntries.selectedProperty().bindBidirectional(viewModel.mergeDuplicateEntriesProperty());
 
         alwaysReformatBib.selectedProperty().bindBidirectional(viewModel.alwaysReformatBibProperty());
         autosaveLocalLibraries.selectedProperty().bindBidirectional(viewModel.autosaveLocalLibrariesProperty());

@@ -28,7 +28,6 @@ import org.jabref.gui.preferences.groups.GroupsTab;
 import org.jabref.gui.preferences.journals.JournalAbbreviationsTab;
 import org.jabref.gui.preferences.keybindings.KeyBindingsTab;
 import org.jabref.gui.preferences.linkedfiles.LinkedFilesTab;
-import org.jabref.gui.preferences.mergebibfilesintocurrentbib.MergeBibFilesIntoCurrentBibTab;
 import org.jabref.gui.preferences.nameformatter.NameFormatterTab;
 import org.jabref.gui.preferences.network.NetworkTab;
 import org.jabref.gui.preferences.preview.PreviewTab;
@@ -86,8 +85,7 @@ public class PreferencesDialogViewModel extends AbstractViewModel {
                 new XmpPrivacyTab(),
                 new CustomImporterTab(),
                 new CustomExporterTab(),
-                new NetworkTab(),
-                new MergeBibFilesIntoCurrentBibTab()
+                new NetworkTab()
         );
     }
 

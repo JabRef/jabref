@@ -3,7 +3,6 @@ package org.jabref.gui.mergebibfilesintocurrentbib;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,29 +11,18 @@ import java.util.stream.Stream;
 
 import javax.swing.undo.UndoManager;
 
-import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
-import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
-import org.jabref.gui.autosaveandbackup.BackupManager;
-import org.jabref.gui.dialogs.BackupUIManager;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.shared.SharedDatabaseUIManager;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableInsertEntries;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.logic.ai.AiService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.shared.DatabaseNotSupportedException;
-import org.jabref.logic.shared.exception.InvalidDBMSConnectionPropertiesException;
-import org.jabref.logic.shared.exception.NotASharedDatabaseException;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
@@ -50,40 +38,32 @@ import static org.jabref.gui.actions.ActionHelper.needsDatabase;
 public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeBibFilesIntoCurrentBibAction.class);
 
-    private final LibraryTabContainer tabContainer;
     private final DialogService dialogService;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final UndoManager undoManager;
     private final FileUpdateMonitor fileUpdateMonitor;
-    private final AiService aiService;
     private final BibEntryTypesManager entryTypesManager;
-    private final ClipBoardManager clipBoardManager;
-    private final TaskExecutor taskExecutor;
 
     private boolean shouldMergeSameKeyEntries;
     private boolean shouldMergeDuplicateEntries;
 
-    public MergeBibFilesIntoCurrentBibAction(LibraryTabContainer tabContainer,
-                                             DialogService dialogService,
+    private final List<BibEntry> entriesToMerge = new ArrayList<>();
+    private final List<List<BibEntry>> duplicatePairsToMerge = new ArrayList<>();
+    private final List<List<BibEntry>> sameKeyPairsToMerge = new ArrayList<>();
+
+    public MergeBibFilesIntoCurrentBibAction(DialogService dialogService,
                                              GuiPreferences preferences,
                                              StateManager stateManager,
                                              UndoManager undoManager,
                                              FileUpdateMonitor fileUpdateMonitor,
-                                             AiService aiService,
-                                             BibEntryTypesManager entryTypesManager,
-                                             ClipBoardManager clipBoardManager,
-                                             TaskExecutor taskExecutor) {
-        this.tabContainer = tabContainer;
+                                             BibEntryTypesManager entryTypesManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
-        this.aiService = aiService;
         this.entryTypesManager = entryTypesManager;
-        this.clipBoardManager = clipBoardManager;
-        this.taskExecutor = taskExecutor;
 
         this.executable.bind(needsDatabase(this.stateManager));
     }
@@ -103,7 +83,7 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
         }
     }
 
-    public Optional<Path> getDirectoryToMerge() {
+    private Optional<Path> getDirectoryToMerge() {
         DirectoryDialogConfiguration config = new DirectoryDialogConfiguration.Builder()
                 .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
@@ -112,63 +92,73 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
     }
 
     public void mergeBibFilesIntoCurrentBib(Path directory, BibDatabaseContext context) {
-        List<BibEntry> newEntries = new ArrayList<>();
-        List<BibEntry> selectedEntries;
-
         BibDatabase database = context.getDatabase();
         Optional<Path> databasePath = context.getDatabasePath();
+        DuplicateCheck duplicateCheck = new DuplicateCheck(entryTypesManager);
 
-        BibEntryTypesManager entryTypesManager = new BibEntryTypesManager();
-        DuplicateCheck dupCheck = new DuplicateCheck(entryTypesManager);
+        entriesToMerge.clear();
+        sameKeyPairsToMerge.clear();
+        duplicatePairsToMerge.clear();
 
-        for (Path p : getAllBibFiles(directory, databasePath.orElseGet(() -> Path.of("")))) {
-            ParserResult result = loadDatabase(p);
-
+        for (Path path : getAllBibFiles(directory, databasePath.orElseGet(() -> Path.of("")))) {
+            ParserResult result;
+            try {
+                result = OpenDatabase.loadDatabase(path, preferences.getImportFormatPreferences(), fileUpdateMonitor);
+            } catch (IOException e) {
+                LOGGER.error("Could not load file '{}': {}", path, e.getMessage());
+                continue;
+            }
             for (BibEntry toMergeEntry : result.getDatabase().getEntries()) {
-                boolean validNewEntry = true;
-                for (BibEntry e : database.getEntries()) {
-                    if (toMergeEntry.equals(e)) {
-                        validNewEntry = false;
-                        break;
-                    } else if (toMergeEntry.getCitationKey().equals(e.getCitationKey())) {
-                        validNewEntry = false;
-
-                        if (shouldMergeSameKeyEntries) {
-                            selectedEntries = new ArrayList<>();
-                            selectedEntries.add(toMergeEntry);
-                            selectedEntries.add(e);
-                            stateManager.setSelectedEntries(selectedEntries);
-                            new MergeEntriesAction(dialogService, stateManager, undoManager, preferences).execute();
-                        }
-                        break;
-                    } else if (dupCheck.isDuplicate(toMergeEntry, e, BibDatabaseMode.BIBTEX)) {
-                        validNewEntry = false;
-
-                        if (shouldMergeDuplicateEntries) {
-                            selectedEntries = new ArrayList<>();
-                            selectedEntries.add(toMergeEntry);
-                            selectedEntries.add(e);
-                            stateManager.setSelectedEntries(selectedEntries);
-                            new MergeEntriesAction(dialogService, stateManager, undoManager, preferences).execute();
-                        }
-                        break;
-                    }
-                }
-
-                if (validNewEntry) {
-                    newEntries.add(toMergeEntry);
-                    database.insertEntry(toMergeEntry);
-                }
+                processEntry(toMergeEntry, database, duplicateCheck);
             }
         }
-        NamedCompound ce = new NamedCompound(Localization.lang("Merge BibTeX files into current library"));
-        ce.addEdit(new UndoableInsertEntries(database, newEntries));
-        ce.end();
 
-        undoManager.addEdit(ce);
+        database.insertEntries(entriesToMerge);
+        performMerges();
+
+        NamedCompound compound = new NamedCompound(Localization.lang("Merge BibTeX files into current library"));
+        compound.addEdit(new UndoableInsertEntries(database, entriesToMerge));
+        compound.end();
+        undoManager.addEdit(compound);
     }
 
-    public List<Path> getAllBibFiles(Path directory, Path databasePath) {
+    private void processEntry(BibEntry entry, BibDatabase database, DuplicateCheck duplicateCheck) {
+        for (BibEntry existingEntry : database.getEntries()) {
+            if (entry.equals(existingEntry)) {
+                return;
+            } else if (entry.getCitationKey().equals(existingEntry.getCitationKey())) {
+                if (shouldMergeSameKeyEntries) {
+                    sameKeyPairsToMerge.add(List.of(entry, existingEntry));
+                }
+                return;
+            } else if (duplicateCheck.isDuplicate(entry, existingEntry, BibDatabaseMode.BIBTEX)) {
+                if (shouldMergeDuplicateEntries) {
+                    duplicatePairsToMerge.add(List.of(entry, existingEntry));
+                }
+                return;
+            }
+        }
+        entriesToMerge.add(entry);
+    }
+
+    private void performMerges() {
+        for (List<BibEntry> pair : sameKeyPairsToMerge) {
+            mergeEntries(pair);
+        }
+        for (List<BibEntry> pair : duplicatePairsToMerge) {
+            mergeEntries(pair);
+        }
+    }
+
+    private void mergeEntries(List<BibEntry> entries) {
+        stateManager.setSelectedEntries(entries);
+        new MergeEntriesAction(dialogService, stateManager, undoManager, preferences).execute();
+    }
+
+    private List<Path> getAllBibFiles(Path directory, Path databasePath) {
+        if (!checkPathValidity(directory)) {
+            return List.of();
+        }
         try (Stream<Path> stream = Files.find(
                 directory,
                 Integer.MAX_VALUE,
@@ -177,55 +167,24 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
         )) {
             return stream.collect(Collectors.toList());
         } catch (IOException e) {
-            LOGGER.error("Error finding .bib files in '{}'", directory.getFileName(), e);
+            LOGGER.error("Error finding .bib files in '{}': {}", directory.getFileName(), e.getMessage());
         }
         return List.of();
     }
 
-    public ParserResult loadDatabase(Path file) {
-        Path fileToLoad = file.toAbsolutePath();
-
-        preferences.getFilePreferences().setWorkingDirectory(fileToLoad.getParent());
-        Path backupDir = preferences.getFilePreferences().getBackupDirectory();
-
-        ParserResult parserResult = null;
-        if (BackupManager.backupFileDiffers(fileToLoad, backupDir)) {
-            parserResult = BackupUIManager.showRestoreBackupDialog(dialogService, fileToLoad, preferences, fileUpdateMonitor, undoManager, stateManager)
-                                          .orElse(null);
+    private boolean checkPathValidity(Path directory) {
+        if (!Files.exists(directory)) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Chosen folder does not exist:") + " " + directory);
+            return false;
         }
-
-        try {
-            if (parserResult == null) {
-                parserResult = OpenDatabase.loadDatabase(fileToLoad,
-                        preferences.getImportFormatPreferences(),
-                        fileUpdateMonitor);
-            }
-
-            if (parserResult.hasWarnings()) {
-                String content = Localization.lang("Please check your library file for wrong syntax.")
-                        + "\n\n" + parserResult.getErrorMessage();
-                UiTaskExecutor.runInJavaFXThread(() ->
-                        dialogService.showWarningDialogAndWait(Localization.lang("Open library error"), content));
-            }
-        } catch (IOException e) {
-            parserResult = ParserResult.fromError(e);
-            LOGGER.error("Error opening file '{}'", fileToLoad, e);
+        if (!Files.isDirectory(directory)) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Chosen path is not a folder:") + " " + directory);
+            return false;
         }
-
-        if (parserResult.getDatabase().isShared()) {
-            try {
-                new SharedDatabaseUIManager(tabContainer, dialogService, preferences, aiService, stateManager, entryTypesManager,
-                        fileUpdateMonitor, undoManager, clipBoardManager, taskExecutor)
-                        .openSharedDatabaseFromParserResult(parserResult);
-            } catch (SQLException |
-                     DatabaseNotSupportedException |
-                     InvalidDBMSConnectionPropertiesException |
-                     NotASharedDatabaseException e) {
-                parserResult.getDatabaseContext().clearDatabasePath();
-                parserResult.getDatabase().clearSharedDatabaseID();
-                LOGGER.error("Connection error", e);
-            }
+        if (!Files.isReadable(directory)) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Chosen folder is not readable:") + " " + directory);
+            return false;
         }
-        return parserResult;
+        return true;
     }
 }
