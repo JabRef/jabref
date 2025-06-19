@@ -1481,7 +1481,8 @@ public class JabRefCliPreferences implements CliPreferences {
         return internalPreferences;
     }
 
-    private UserAndHost getUserAndHost() {
+    @Override
+    public UserAndHost getUserAndHost() {
         if (userAndHost != null) {
             return userAndHost;
         }
