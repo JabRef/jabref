@@ -67,6 +67,7 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
+        upgradeResolveBibTeXStringsFields(preferences);
     }
 
     /**
@@ -253,6 +254,12 @@ public class PreferencesMigrations {
                 }
             }
         }
+    }
+
+    static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
+        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS));
+        keys.add("monthfiled");
+        prefs.putStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, new ArrayList<>(keys));
     }
 
     static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs, Preferences mainPrefsNode) {

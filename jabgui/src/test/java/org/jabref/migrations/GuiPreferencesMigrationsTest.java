@@ -220,4 +220,12 @@ class GuiPreferencesMigrationsTest {
             verify(preferences).deleteKey(V5_9_FETCHER_CUSTOM_KEYS);
         }
     }
+
+    @Test
+    void resolveBibTexStringsFields() {
+        when(preferences.getStringList(JabRefGuiPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(List.of("author"));
+
+        PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
+        verify(preferences).putStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, List.of("author", "monthfiled"));
+    }
 }
