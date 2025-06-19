@@ -5,4 +5,3 @@ plugins {
 
 // https://github.com/gradlex-org/java-module-dependencies#plugin-dependency
 includeBuild(".")
-
