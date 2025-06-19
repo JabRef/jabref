@@ -165,6 +165,21 @@ extraJavaModuleInfo {
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "pt.davidafsilva.apple.jkeychain")
 
+    module("org.testfx:testfx-core", "org.testfx")
+    module("org.testfx:testfx-junit5", "org.testfx.junit5")
+    module("org.hamcrest:hamcrest", "org.hamcrest")
+    knownModule("org.hamcrest:hamcrest-core", "org.hamcrest.core")
+    module("commons-fileupload:commons-fileupload", "commons.fileupload")
+    module("org.xmlunit:xmlunit-core", "org.xmlunit")
+    module("org.xmlunit:xmlunit-legacy", "org.custommonkey.xmlunit")
+    module("org.xmlunit:xmlunit-placeholders", "org.xmlunit.placeholder")
+    module("net.javacrumbs.json-unit:json-unit-core", "net.javacrumbs.jsonunit.core")
+    module("com.jayway.jsonpath:json-path", "json.path")
+    module("com.github.javaparser:javaparser-core", "com.github.javaparser.core")
+    module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
+    module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
+    module("net.minidev:json-smart", "net.minidev.jsonsmart")
+
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
     module("org.glassfish.jersey.core:jersey-server", "org.glassfish.jersey.server") {
         exportAllPackages()
