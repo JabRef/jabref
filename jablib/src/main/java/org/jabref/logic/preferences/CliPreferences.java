@@ -42,7 +42,7 @@ public interface CliPreferences {
     void exportPreferences(Path file) throws JabRefException;
     void importPreferences(Path file) throws JabRefException;
 
-    /** Returns a small POJO holding the OS username and hostname. */
+
     UserAndHost getUserAndHost();
 
     /** Shortcut for getUserAndHost().getUser() */

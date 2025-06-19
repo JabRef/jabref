@@ -1,12 +1,14 @@
 package org.jabref.logic.util;
 
+import java.util.Objects;
+
 public class UserAndHost {
     private final String user;
     private final String host;
 
     public UserAndHost(String user, String host) {
-        this.user = user;
-        this.host = host;
+        this.user = Objects.requireNonNull(user, "user must not be null");
+        this.host = Objects.requireNonNull(host, "host must not be null");
     }
 
     public String getUser() {
