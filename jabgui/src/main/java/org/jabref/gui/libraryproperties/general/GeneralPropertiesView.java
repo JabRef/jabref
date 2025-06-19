@@ -111,17 +111,16 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         });
 
         String userHost = preferences.getUsername() + "@" + preferences.getHostname();
-        String userDir = viewModel.userSpecificFileDirectoryProperty().get();
-        if (userDir.isEmpty()) {
-            userSpecificFileDirectoryTooltip.setText(Localization.lang("User-specific file directory: (not set)"));
-        } else {
-            userSpecificFileDirectoryTooltip.setText(Localization.lang("User-specific file directory: %0", userHost));
-        }
+        userSpecificFileDirectoryTooltip.setText(userHost);
         laTexFileDirectoryTooltip.textProperty().bind(
-                viewModel.laTexFileDirectoryProperty().map(path ->
-                        Localization.lang(path.isEmpty() ? "Directory for LaTeX files: (not set)" : "Directory for LaTeX files: %0", path)
-                )
-        );
+                viewModel.laTexFileDirectoryProperty().map(path -> {
+                    if (path.isEmpty()) {
+                        return Localization.lang("Directory for LaTeX files: (not set)");
+                    } else {
+                        return Localization.lang("Directory for LaTeX files: %0", path);
+                    }
+                })
+                );
 
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
