@@ -174,9 +174,11 @@ javaModulePackaging {
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.jabref.testsupport")
 
+    requires.add("com.github.javaparser.core")
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
+    requires.add("org.testfx.junit5")
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
 }

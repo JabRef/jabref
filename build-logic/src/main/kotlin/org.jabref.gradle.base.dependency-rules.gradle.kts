@@ -166,7 +166,10 @@ extraJavaModuleInfo {
     module("pt.davidafsilva.apple:jkeychain", "pt.davidafsilva.apple.jkeychain")
 
     module("org.testfx:testfx-core", "org.testfx")
-    module("org.testfx:testfx-junit5", "org.testfx.junit5")
+    module("org.testfx:testfx-junit5", "org.testfx.junit5") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
     module("org.hamcrest:hamcrest", "org.hamcrest")
     knownModule("org.hamcrest:hamcrest-core", "org.hamcrest.core")
     module("commons-fileupload:commons-fileupload", "commons.fileupload")
