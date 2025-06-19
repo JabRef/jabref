@@ -254,7 +254,7 @@ public class PreferencesMigrations {
     }
 
     static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
-        String oldPrefsValue =  "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
         String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS);
 
         if (oldPrefsValue.equals(currentPrefs)) {
@@ -305,7 +305,6 @@ public class PreferencesMigrations {
         // LinkedHashSet because we want to retain the order and add new fields to the end
         String oldPrefs = "author;editor;title;journal;publisher;keywords";
         String newFieldsToAdd = "crossref;related;entryset";
-
         String currentPrefs = prefs.get(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS);
 
         if (oldPrefs.equals(currentPrefs)) {
