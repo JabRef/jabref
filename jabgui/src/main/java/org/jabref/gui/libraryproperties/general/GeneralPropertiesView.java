@@ -111,10 +111,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
 
-        String userString = preferences.getFilePreferences().getUserAndHost().replace("-" + OS.getHostName(), "");
-        userSpecificFileDirectoryTooltip.setText("User: " + userString + ", Host: " + OS.getHostName());
-
-        userSpecificFileDirectoryTooltip.setText(Localization.lang(preferences.getFilePreferences().getUserAndHost()));
+        String userHost = preferences.getUsername() + "@" + preferences.getHostname();
+        userSpecificFileDirectoryTooltip.setText(userHost);
         laTexFileDirectoryTooltip.textProperty().bind(
                 viewModel.laTexFileDirectoryProperty().map(path ->
                         Localization.lang(path.isEmpty() ? "Directory for LaTeX files: (not set)" : "Directory for LaTeX files: %0", path)
