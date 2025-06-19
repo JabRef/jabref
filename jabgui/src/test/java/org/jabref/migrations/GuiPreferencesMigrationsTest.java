@@ -223,8 +223,8 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void resolveBibTexStringsFields() {
-        String oldPrefsValue =  "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
-        String expectedValue =  "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
+        String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String expectedValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
         when(preferences.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(oldPrefsValue);
 
         PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
