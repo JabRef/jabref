@@ -223,9 +223,11 @@ class GuiPreferencesMigrationsTest {
 
     @Test
     void resolveBibTexStringsFields() {
-        when(preferences.getStringList(JabRefGuiPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(List.of("author"));
+        String oldPrefsValue =  "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String expectedValue =  "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon;monthfiled";
+        when(preferences.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS)).thenReturn(oldPrefsValue);
 
         PreferencesMigrations.upgradeResolveBibTeXStringsFields(preferences);
-        verify(preferences).putStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, List.of("author", "monthfiled"));
+        verify(preferences).put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, expectedValue);
     }
 }

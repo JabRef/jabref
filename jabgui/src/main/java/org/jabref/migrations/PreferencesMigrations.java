@@ -257,12 +257,13 @@ public class PreferencesMigrations {
     }
 
     static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
-        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS));
-        if (keys.contains("monthfiled")) {
-            return;
+        String oldPrefsValue =  "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS);
+
+        if (oldPrefsValue.equals(currentPrefs)) {
+            currentPrefs += ";monthfiled";
+            prefs.put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, currentPrefs);
         }
-        keys.add("monthfiled");
-        prefs.putStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, new ArrayList<>(keys));
     }
 
     static void upgradeImportFileAndDirePatterns(JabRefCliPreferences prefs, Preferences mainPrefsNode) {
