@@ -356,6 +356,12 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
+                factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
+                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction("mainFileDirectory", frame))
+                ),
+
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.ERROR_CONSOLE, new ErrorConsoleAction()),
 
                 new SeparatorMenuItem(),
@@ -374,10 +380,6 @@ public class MainMenu extends MenuBar {
 
                         factory.createMenuItem(StandardActions.OPEN_DEV_VERSION_LINK, new OpenBrowserAction(URLs.DEV_VERSION_LINK_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction(URLs.CHANGELOG_URL, dialogService, preferences.getExternalApplicationsPreferences()))
-                ),
-                factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
-                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction("mainFileDirectory", frame)),
-                        factory.createMenuItem(StandardActions.EDIT_ENTRY_WALKTHROUGH, new WalkthroughAction("editEntry", frame))
                 ),
 
                 factory.createMenuItem(StandardActions.OPEN_WELCOME_TAB, new SimpleCommand() {

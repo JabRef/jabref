@@ -2,10 +2,8 @@ package org.jabref.gui.walkthrough;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import javafx.scene.control.ContextMenu;
-import javafx.stage.Window;
 
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.frame.JabRefFrame;
@@ -55,15 +53,13 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.menuItem("Preferences"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.RIGHT)
-                .highlight(MultiWindowHighlight.multiple(
-                        new WindowEffect(Optional::empty, HighlightEffect.FULL_SCREEN_DARKEN),
+                .highlight(new MultiWindowHighlight(
                         new WindowEffect(
-                                () -> Window.getWindows().stream()
-                                            .filter(w -> w instanceof ContextMenu cm && cm.isShowing())
-                                            .findFirst(),
+                                WindowResolver.clazz(ContextMenu.class),
                                 HighlightEffect.ANIMATED_PULSE,
                                 NodeResolver.menuItem("Preferences")
-                        )
+                        ),
+                        new WindowEffect(HighlightEffect.FULL_SCREEN_DARKEN)
                 ))
                 .build();
 
@@ -74,12 +70,12 @@ public class WalkthroughAction extends SimpleCommand {
                                 node.toString().contains("Linked files")))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.AUTO)
-                .highlight(MultiWindowHighlight.multiple(
-                        new WindowEffect(Optional::empty, HighlightEffect.BACKDROP_HIGHLIGHT),
-                        new WindowEffect(WindowResolver.title("JabRef"), HighlightEffect.FULL_SCREEN_DARKEN)
-                ))
                 .autoFallback(false)
                 .activeWindow(WindowResolver.title("JabRef preferences"))
+                .highlight(new MultiWindowHighlight(
+                        new WindowEffect(HighlightEffect.BACKDROP_HIGHLIGHT),
+                        new WindowEffect(WindowResolver.title("JabRef"), HighlightEffect.FULL_SCREEN_DARKEN)
+                ))
                 .build();
 
         WalkthroughStep step4 = TooltipStep
@@ -87,8 +83,8 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.AUTO)
-                .highlight(MultiWindowHighlight.multiple(
-                        new WindowEffect(Optional::empty, HighlightEffect.BACKDROP_HIGHLIGHT),
+                .highlight(new MultiWindowHighlight(
+                        new WindowEffect(HighlightEffect.BACKDROP_HIGHLIGHT),
                         new WindowEffect(WindowResolver.title("JabRef"), HighlightEffect.FULL_SCREEN_DARKEN)
                 ))
                 .activeWindow(WindowResolver.title("JabRef preferences"))
@@ -99,8 +95,8 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
                 .navigation(NavigationPredicate.onClick())
                 .position(PanelPosition.TOP)
-                .highlight(MultiWindowHighlight.multiple(
-                        new WindowEffect(Optional::empty, HighlightEffect.BACKDROP_HIGHLIGHT),
+                .highlight(new MultiWindowHighlight(
+                        new WindowEffect(HighlightEffect.BACKDROP_HIGHLIGHT),
                         new WindowEffect(WindowResolver.title("JabRef"), HighlightEffect.FULL_SCREEN_DARKEN)
                 ))
                 .activeWindow(WindowResolver.title("JabRef preferences"))

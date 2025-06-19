@@ -13,6 +13,10 @@ public record WindowEffect(
         HighlightEffect effect,
         Optional<NodeResolver> targetNodeResolver
 ) {
+    public WindowEffect(HighlightEffect effect) {
+        this(Optional.empty(), effect, Optional.empty());
+    }
+
     public WindowEffect(WindowResolver windowResolver, HighlightEffect effect) {
         this(Optional.of(windowResolver), effect, Optional.empty());
     }

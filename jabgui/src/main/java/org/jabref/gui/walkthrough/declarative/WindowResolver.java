@@ -29,10 +29,24 @@ public interface WindowResolver {
      */
     static WindowResolver title(@NonNull String key) {
         return () -> Window.getWindows().stream()
+                           .filter(Window::isShowing)
                            .filter(Stage.class::isInstance)
                            .map(Stage.class::cast)
                            .filter(stage -> stage.getTitle().contains(Localization.lang(key)))
                            .map(Window.class::cast)
+                           .findFirst();
+    }
+
+    /**
+     * Create a resolver that finds a window by its class.
+     *
+     * @param clazz the class of the window
+     * @return a resolver that finds the window by class
+     */
+    static WindowResolver clazz(@NonNull Class<? extends Window> clazz) {
+        return () -> Window.getWindows().stream()
+                           .filter(clazz::isInstance)
+                           .filter(Window::isShowing)
                            .findFirst();
     }
 }

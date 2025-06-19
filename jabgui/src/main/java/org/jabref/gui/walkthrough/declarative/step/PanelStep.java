@@ -153,9 +153,12 @@ public record PanelStep(
             return this;
         }
 
+        public Builder highlight(@NonNull WindowEffect effect) {
+            return highlight(new MultiWindowHighlight(effect));
+        }
+
         public Builder highlight(@NonNull HighlightEffect effect) {
-            this.highlight = MultiWindowHighlight.single(new WindowEffect(activeWindowResolver, effect));
-            return this;
+            return highlight(new WindowEffect(effect));
         }
 
         public Builder autoFallback(boolean autoFallback) {

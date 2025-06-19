@@ -10,19 +10,23 @@ public record MultiWindowHighlight(
         List<WindowEffect> windowEffects,
         Optional<HighlightEffect> fallbackEffect
 ) {
-    public static MultiWindowHighlight single(WindowEffect windowEffect) {
-        return single(windowEffect, HighlightEffect.FULL_SCREEN_DARKEN);
+    public MultiWindowHighlight(HighlightEffect effect) {
+        this(new WindowEffect(effect));
     }
 
-    public static MultiWindowHighlight single(WindowEffect windowEffect, HighlightEffect fallback) {
-        return new MultiWindowHighlight(List.of(windowEffect), Optional.of(fallback));
+    public MultiWindowHighlight(WindowEffect windowEffect) {
+        this(windowEffect, HighlightEffect.FULL_SCREEN_DARKEN);
     }
 
-    public static MultiWindowHighlight multiple(WindowEffect... windowEffects) {
-        return multiple(HighlightEffect.FULL_SCREEN_DARKEN, windowEffects);
+    public MultiWindowHighlight(WindowEffect windowEffect, HighlightEffect fallback) {
+        this(List.of(windowEffect), Optional.of(fallback));
     }
 
-    public static MultiWindowHighlight multiple(HighlightEffect fallback, WindowEffect... windowEffects) {
-        return new MultiWindowHighlight(List.of(windowEffects), Optional.of(fallback));
+    public MultiWindowHighlight(WindowEffect... windowEffects) {
+        this(HighlightEffect.FULL_SCREEN_DARKEN, windowEffects);
+    }
+
+    public MultiWindowHighlight(HighlightEffect fallback, WindowEffect... windowEffects) {
+        this(List.of(windowEffects), Optional.of(fallback));
     }
 }
