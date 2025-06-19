@@ -28,38 +28,41 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.util.UserAndHost;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public interface CliPreferences {
+
     void clear() throws BackingStoreException;
-
     void deleteKey(String key) throws IllegalArgumentException;
-
     void flush();
-
     void exportPreferences(Path file) throws JabRefException;
-
     void importPreferences(Path file) throws JabRefException;
 
+    /** Returns a small POJO holding the OS username and hostname. */
+    UserAndHost getUserAndHost();
+
+    /** Shortcut for getUserAndHost().getUser() */
+    default String getUsername() {
+        return getUserAndHost().getUser();
+    }
+
+    /** Shortcut for getUserAndHost().getHost() */
+    default String getHostname() {
+        return getUserAndHost().getHost();
+    }
+
     InternalPreferences getInternalPreferences();
-
     BibEntryPreferences getBibEntryPreferences();
-
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
-
     FilePreferences getFilePreferences();
-
     FieldPreferences getFieldPreferences();
-
     Map<String, Object> getPreferences();
-
     Map<String, Object> getDefaults();
-
     LayoutFormatterPreferences getLayoutFormatterPreferences();
-
     ImportFormatPreferences getImportFormatPreferences();
 
     /**
@@ -68,50 +71,27 @@ public interface CliPreferences {
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
-
     void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
-
     CleanupPreferences getCleanupPreferences();
-
     CleanupPreferences getDefaultCleanupPreset();
-
     LibraryPreferences getLibraryPreferences();
-
     DOIPreferences getDOIPreferences();
-
     OwnerPreferences getOwnerPreferences();
-
     TimestampPreferences getTimestampPreferences();
-
     RemotePreferences getRemotePreferences();
-
     ProxyPreferences getProxyPreferences();
-
     SSLPreferences getSSLPreferences();
-
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
-
     AutoLinkPreferences getAutoLinkPreferences();
-
     ExportPreferences getExportPreferences();
-
     ImporterPreferences getImporterPreferences();
-
     GrobidPreferences getGrobidPreferences();
-
     XmpPreferences getXmpPreferences();
-
     NameFormatterPreferences getNameFormatterPreferences();
-
     SearchPreferences getSearchPreferences();
-
     MrDlibPreferences getMrDlibPreferences();
-
     ProtectedTermsPreferences getProtectedTermsPreferences();
-
     AiPreferences getAiPreferences();
-
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
-
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
 }
