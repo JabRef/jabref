@@ -50,12 +50,12 @@ public interface CliPreferences {
 
     /** Shortcut for getUserAndHost().getUser() */
     default String getUsername() {
-        return getUserAndHost().getUser();
+        return getUserAndHost().user();
     }
 
     /** Shortcut for getUserAndHost().getHost() */
     default String getHostname() {
-        return getUserAndHost().getHost();
+        return getUserAndHost().host();
     }
 
     InternalPreferences getInternalPreferences();
