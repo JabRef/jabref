@@ -93,7 +93,7 @@
                GridPane.columnIndex="0" GridPane.rowIndex="3"
                tooltip="$laTexFileDirectoryTooltip"/>
         <TextField fx:id="laTexFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="3" tooltip="$laTexFileDirectoryTooltip"/>/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="3" tooltip="$laTexFileDirectoryTooltip"/>
         <Button fx:id="laTexSpecificFileDirSwitchId" onAction="#browseLatexFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="3">
