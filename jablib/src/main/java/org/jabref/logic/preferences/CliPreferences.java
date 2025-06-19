@@ -37,11 +37,14 @@ import org.jabref.model.entry.BibEntryTypesManager;
 public interface CliPreferences {
 
     void clear() throws BackingStoreException;
-    void deleteKey(String key) throws IllegalArgumentException;
-    void flush();
-    void exportPreferences(Path file) throws JabRefException;
-    void importPreferences(Path file) throws JabRefException;
 
+    void deleteKey(String key) throws IllegalArgumentException;
+
+    void flush();
+
+    void exportPreferences(Path file) throws JabRefException;
+
+    void importPreferences(Path file) throws JabRefException;
 
     UserAndHost getUserAndHost();
 
@@ -56,13 +59,21 @@ public interface CliPreferences {
     }
 
     InternalPreferences getInternalPreferences();
+
     BibEntryPreferences getBibEntryPreferences();
+
     JournalAbbreviationPreferences getJournalAbbreviationPreferences();
+
     FilePreferences getFilePreferences();
+
     FieldPreferences getFieldPreferences();
+
     Map<String, Object> getPreferences();
+
     Map<String, Object> getDefaults();
+
     LayoutFormatterPreferences getLayoutFormatterPreferences();
+
     ImportFormatPreferences getImportFormatPreferences();
 
     /**
@@ -71,27 +82,50 @@ public interface CliPreferences {
     SelfContainedSaveConfiguration getSelfContainedExportConfiguration();
 
     BibEntryTypesManager getCustomEntryTypesRepository();
+
     void storeCustomEntryTypesRepository(BibEntryTypesManager entryTypesManager);
+
     CleanupPreferences getCleanupPreferences();
+
     CleanupPreferences getDefaultCleanupPreset();
+
     LibraryPreferences getLibraryPreferences();
+
     DOIPreferences getDOIPreferences();
+
     OwnerPreferences getOwnerPreferences();
+
     TimestampPreferences getTimestampPreferences();
+
     RemotePreferences getRemotePreferences();
+
     ProxyPreferences getProxyPreferences();
+
     SSLPreferences getSSLPreferences();
+
     CitationKeyPatternPreferences getCitationKeyPatternPreferences();
+
     AutoLinkPreferences getAutoLinkPreferences();
+
     ExportPreferences getExportPreferences();
+
     ImporterPreferences getImporterPreferences();
+
     GrobidPreferences getGrobidPreferences();
+
     XmpPreferences getXmpPreferences();
+
     NameFormatterPreferences getNameFormatterPreferences();
+
     SearchPreferences getSearchPreferences();
+
     MrDlibPreferences getMrDlibPreferences();
+
     ProtectedTermsPreferences getProtectedTermsPreferences();
+
     AiPreferences getAiPreferences();
+
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
+
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
 }
