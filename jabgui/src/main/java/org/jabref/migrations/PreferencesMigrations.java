@@ -258,6 +258,9 @@ public class PreferencesMigrations {
 
     static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
         Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS));
+        if (keys.contains("monthfiled")) {
+            return;
+        }
         keys.add("monthfiled");
         prefs.putStringList(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, new ArrayList<>(keys));
     }
