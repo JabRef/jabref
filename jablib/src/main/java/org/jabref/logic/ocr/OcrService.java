@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 public class OcrService {
     private static final Logger LOGGER = LoggerFactory.getLogger(OcrService.class);
     private static final String JNA_LIBRARY_PATH = "jna.library.path";
+    private static final String TESSDATA_PREFIX = "TESSDATA_PREFIX";
+
     // The OCR engine instance
     private final Tesseract tesseract;
 
@@ -26,24 +28,78 @@ public class OcrService {
      * Constructs a new OcrService with default settings.
      * Currently uses Tesseract with English language support.
      */
-    public OcrService() {
+    public OcrService() throws OcrException {
+        configureLibraryPath();
+
+        try {
+            this.tesseract = new Tesseract();
+            tesseract.setLanguage("eng");
+            configureTessdata();
+            LOGGER.debug("Initialized OcrService with Tesseract");
+        } catch (Exception e) {
+            throw new OcrException("Failed to initialize OCR engine", e);
+        }
+    }
+
+    private void configureLibraryPath() {
         if (Platform.isMac()) {
+            String originalPath = System.getProperty(JNA_LIBRARY_PATH, "");
             if (Platform.isARM()) {
-                System.setProperty(JNA_LIBRARY_PATH, JNA_LIBRARY_PATH + File.pathSeparator + "/opt/homebrew/lib/");
+                System.setProperty(JNA_LIBRARY_PATH,
+                        originalPath + File.pathSeparator + "/opt/homebrew/lib/");
             } else {
-                System.setProperty(JNA_LIBRARY_PATH, JNA_LIBRARY_PATH + File.pathSeparator + "/usr/local/cellar/");
+                System.setProperty(JNA_LIBRARY_PATH,
+                        originalPath + File.pathSeparator + "/usr/local/cellar/");
             }
         }
-        this.tesseract = new Tesseract();
+    }
 
-        // Configure Tesseract
-        tesseract.setLanguage("eng");
+    private void configureTessdata() throws OcrException {
+        // First, check environment variable
+        String tessdataPath = System.getenv(TESSDATA_PREFIX);
 
-        // TODO: This path needs to be configurable and bundled properly
-        // For now, we'll use a relative path that works during development
-        tesseract.setDatapath("tessdata");
+        if (tessdataPath != null && !tessdataPath.isEmpty()) {
+            File tessdataDir = new File(tessdataPath);
+            if (tessdataDir.exists() && tessdataDir.isDirectory()) {
+                // Tesseract expects the parent directory of tessdata
+                if (tessdataDir.getName().equals("tessdata")) {
+                    tesseract.setDatapath(tessdataDir.getParent());
+                } else {
+                    tesseract.setDatapath(tessdataPath);
+                }
+                LOGGER.info("Using tessdata from environment variable: {}", tessdataPath);
+                return;
+            } else {
+                LOGGER.warn("TESSDATA_PREFIX points to non-existent directory: {}", tessdataPath);
+            }
+        }
 
-        LOGGER.debug("Initialized OcrService with Tesseract");
+        // Fall back to system locations
+        String systemPath = findSystemTessdata();
+        if (systemPath != null) {
+            tesseract.setDatapath(systemPath);
+            LOGGER.info("Using system tessdata at: {}", systemPath);
+        } else {
+            throw new OcrException("Could not find tessdata directory. Please set TESSDATA_PREFIX environment variable.");
+        }
+    }
+
+    private String findSystemTessdata() {
+        String[] possiblePaths = {
+                "/usr/local/share",  // Homebrew Intel
+                "/opt/homebrew/share",  // Homebrew ARM
+                "/usr/share"  // System
+        };
+
+        for (String path : possiblePaths) {
+            File tessdata = new File(path, "tessdata");
+            File engData = new File(tessdata, "eng.traineddata");
+            if (tessdata.exists() && engData.exists()) {
+                return path;  // Return parent of tessdata
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -53,35 +109,35 @@ public class OcrService {
      * @return The extracted text, or empty string if no text found
      * @throws OcrException if OCR processing fails
      */
-    public String performOcr(Path pdfPath) throws OcrException {
-        // Validate input
+    public OcrResult performOcr(Path pdfPath) {
+        // User error - not an exception
         if (pdfPath == null) {
-            throw new OcrException("PDF path cannot be null");
+            LOGGER.warn("PDF path is null");
+            return OcrResult.failure("No file path provided");
         }
 
         File pdfFile = pdfPath.toFile();
+
+        // User error - not an exception
         if (!pdfFile.exists()) {
-            throw new OcrException("PDF file does not exist: " + pdfPath);
+            LOGGER.warn("PDF file does not exist: {}", pdfPath);
+            return OcrResult.failure("File does not exist: " + pdfPath.getFileName());
         }
 
         try {
             LOGGER.info("Starting OCR for file: {}", pdfFile.getName());
 
-            // Perform OCR
             String result = tesseract.doOCR(pdfFile);
-
-            // Clean up the result (remove extra whitespace, etc.)
             result = StringUtil.isBlank(result) ? "" : result.trim();
 
             LOGGER.info("OCR completed successfully. Extracted {} characters", result.length());
-            return result;
-        } catch (
-                TesseractException e) {
-            LOGGER.error("OCR failed for file: {}", pdfFile.getName(), e);
-            throw new OcrException(
-                    "Failed to perform OCR on file: " + pdfFile.getName() +
-                            ". Error: " + e.getMessage(), e
-            );
+            return OcrResult.success(result);
+
+        } catch (TesseractException e) {
+            // This could be either a user error (corrupt PDF) or our bug
+            // Log it as error but return as failure, not exception
+            LOGGER.error("OCR processing failed for file: {}", pdfFile.getName(), e);
+            return OcrResult.failure("Failed to extract text from PDF: " + e.getMessage());
         }
     }
 }
