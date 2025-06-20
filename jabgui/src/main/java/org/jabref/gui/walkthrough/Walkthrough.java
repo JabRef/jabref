@@ -28,9 +28,6 @@ public class Walkthrough {
     private @Nullable WalkthroughOverlay overlay;
     private Stage currentStage;
 
-    /**
-     * Creates a new walkthrough with steps
-     */
     public Walkthrough(List<WalkthroughStep> steps) {
         this.currentStep = new SimpleIntegerProperty(0);
         this.active = new SimpleBooleanProperty(false);

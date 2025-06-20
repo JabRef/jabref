@@ -42,7 +42,7 @@ public class SingleWindowWalkthroughOverlay {
     private final Pane originalRoot;
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
-    private final List<Runnable> cleanUpTasks = new ArrayList<>();
+    private final List<Runnable> cleanUpTasks = new ArrayList<>(); // needs to be mutable
 
     public SingleWindowWalkthroughOverlay(Window window) {
         this.window = window;
