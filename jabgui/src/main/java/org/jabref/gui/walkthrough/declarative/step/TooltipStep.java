@@ -76,8 +76,8 @@ public record TooltipStep(
         return Optional.ofNullable(activeWindowResolverValue);
     }
 
-    public static Builder builder(String key, Object... params) {
-        return new Builder(Localization.lang(key, params));
+    public static Builder builder(String title) {
+        return new Builder(title);
     }
 
     public static class Builder {

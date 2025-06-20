@@ -11,6 +11,7 @@ import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
+import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -74,8 +75,8 @@ public record PanelStep(
         return Optional.ofNullable(activeWindowResolverValue);
     }
 
-    public static Builder builder(String title) {
-        return new Builder(title);
+    public static Builder builder(String key) {
+        return new Builder(key);
     }
 
     public static class Builder {

@@ -41,7 +41,7 @@ public class WalkthroughAction extends SimpleCommand {
 
     private static Map<String, Walkthrough> buildRegistry() {
         WalkthroughStep step1 = TooltipStep
-                .builder("Click on \"File\" menu")
+                .builder(Localization.lang("Click on \"File\" menu"))
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.BOTTOM)
@@ -49,7 +49,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step2 = TooltipStep
-                .builder("Click on \"Preferences\"")
+                .builder(Localization.lang("Click on \"Preferences\""))
                 .resolver(NodeResolver.menuItem("Preferences"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.RIGHT)
@@ -61,7 +61,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step3 = TooltipStep
-                .builder("Select the \"Linked files\" tab")
+                .builder(Localization.lang("Select the \"Linked files\" tab"))
                 .content(new TextBlock(Localization.lang("This section manages how JabRef handles your PDF files and other documents.")))
                 .width(400)
                 .resolver(NodeResolver.predicate(node ->
@@ -77,10 +77,8 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step4 = TooltipStep
-                .builder("Enable \"Main file directory\" option")
-                .content(new TextBlock("""
-                        Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step.
-                        """))
+                .builder(Localization.lang("Enable \"Main file directory\" option"))
+                .content(new TextBlock(Localization.lang("Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step.")))
                 .width(400)
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))
                 .navigation(NavigationPredicate.onClick())
@@ -93,10 +91,10 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step5 = PanelStep
-                .builder("Click \"Save\" to save changes")
+                .builder(Localization.lang("Click \"Save\" to save changes"))
                 .content(
-                        new TextBlock("Congratulations! Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents."),
-                        new InfoBlock("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks")
+                        new TextBlock(Localization.lang("Congratulations! Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
+                        new InfoBlock(Localization.lang("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks"))
                 )
                 .height(180)
                 .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
