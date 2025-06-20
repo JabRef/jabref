@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 public record TooltipStep(
         String title,
         List<WalkthroughRichTextBlock> content,
-        @Nullable NodeResolver resolverValue,
+        NodeResolver resolverValue,
         @Nullable String continueButtonTextValue,
         @Nullable String skipButtonTextValue,
         @Nullable String backButtonTextValue,

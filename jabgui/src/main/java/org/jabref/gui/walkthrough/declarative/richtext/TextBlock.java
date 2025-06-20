@@ -1,4 +1,7 @@
 package org.jabref.gui.walkthrough.declarative.richtext;
 
-public record TextBlock(String text) implements WalkthroughRichTextBlock {
+import org.jspecify.annotations.NonNull;
+
+public record TextBlock(
+        @NonNull String text) implements WalkthroughRichTextBlock {
 }

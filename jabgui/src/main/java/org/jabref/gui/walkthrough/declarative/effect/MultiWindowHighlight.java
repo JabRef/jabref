@@ -3,11 +3,10 @@ package org.jabref.gui.walkthrough.declarative.effect;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Highlighting effects across multiple windows.
- */
+import org.jspecify.annotations.NonNull;
+
 public record MultiWindowHighlight(
-        List<WindowEffect> windowEffects,
+        @NonNull List<WindowEffect> windowEffects,
         Optional<HighlightEffect> fallbackEffect
 ) {
     public MultiWindowHighlight(WindowEffect windowEffect) {

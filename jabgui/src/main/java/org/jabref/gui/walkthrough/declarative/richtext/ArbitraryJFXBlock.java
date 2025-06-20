@@ -6,7 +6,9 @@ import javafx.scene.Node;
 
 import org.jabref.gui.walkthrough.Walkthrough;
 
+import org.jspecify.annotations.NonNull;
+
 public record ArbitraryJFXBlock(
-        BiFunction<Walkthrough, Runnable, Node> componentFactory)
+        @NonNull BiFunction<Walkthrough, Runnable, Node> componentFactory)
         implements WalkthroughRichTextBlock {
 }
