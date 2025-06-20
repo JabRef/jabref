@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -38,7 +37,6 @@ public class SingleWindowWalkthroughOverlay {
 
     private final Window window;
     private final GridPane overlayPane;
-    private final PopOver popover;
     private final Pane originalRoot;
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
@@ -53,8 +51,6 @@ public class SingleWindowWalkthroughOverlay {
         overlayPane.setPickOnBounds(false);
         overlayPane.setMaxWidth(Double.MAX_VALUE);
         overlayPane.setMaxHeight(Double.MAX_VALUE);
-
-        popover = new PopOver();
 
         Scene scene = window.getScene();
         // This basically never happens, so only a development time check is needed
@@ -74,7 +70,6 @@ public class SingleWindowWalkthroughOverlay {
      */
     public void displayStep(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate, Walkthrough walkthrough) {
         hide();
-        // race condition with PopOver showing
         displayStepContent(step, targetNode, beforeNavigate, walkthrough);
     }
 
@@ -82,8 +77,6 @@ public class SingleWindowWalkthroughOverlay {
      * Hide the overlay and clean up any resources.
      */
     public void hide() {
-        popover.hide();
-
         overlayPane.getChildren().clear();
         overlayPane.setClip(null);
         overlayPane.setVisible(true);
@@ -121,45 +114,30 @@ public class SingleWindowWalkthroughOverlay {
             }
         }
 
-        step.navigationPredicate().ifPresent(predicate -> {
-            if (targetNode == null) {
-                return;
-            }
-            cleanUpTasks.add(predicate.attachListeners(targetNode, beforeNavigate, walkthrough::nextStep));
-        });
+        if (targetNode == null) {
+            return;
+        }
+
+        step.navigationPredicate().ifPresent(predicate -> cleanUpTasks.add(predicate.attachListeners(targetNode, beforeNavigate, walkthrough::nextStep)));
     }
 
     private void displayTooltipStep(Node content, @Nullable Node targetNode, TooltipStep step) {
+        PopOver popover = new PopOver();
         popover.setContentNode(content);
         popover.setDetachable(false);
         popover.setCloseButtonEnabled(false);
         popover.setHeaderAlwaysVisible(false);
+        mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
         popover.setAutoFix(true);
         popover.setAutoHide(false);
-        mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
 
-        Platform.runLater(() -> {
-            if (targetNode != null) {
-                if (isNodeReady(targetNode)) {
-                    popover.show(targetNode);
-                } else {
-                    ChangeListener<Bounds> boundsListener = new ChangeListener<>() {
-                        @Override
-                        public void changed(javafx.beans.value.ObservableValue<? extends Bounds> observable,
-                                             Bounds oldValue, Bounds newValue) {
-                            if (newValue.getWidth() > 0 && newValue.getHeight() > 0) {
-                                Platform.runLater(() -> popover.show(targetNode));
-                                targetNode.boundsInParentProperty().removeListener(this);
-                            }
-                        }
-                    };
-                    targetNode.boundsInParentProperty().addListener(boundsListener);
-                    cleanUpTasks.add(() -> targetNode.boundsInParentProperty().removeListener(boundsListener));
-                }
-            } else {
-                popover.show(window);
-            }
-        });
+        if (targetNode != null) {
+            popover.show(targetNode);
+        } else {
+            popover.show(window);
+        }
+
+        cleanUpTasks.add(popover::hide);
     }
 
     private void displayPanelStep(Node content, PanelStep step) {
@@ -266,10 +244,5 @@ public class SingleWindowWalkthroughOverlay {
 
         cleanUpTasks.add(() -> node.boundsInParentProperty().removeListener(listener));
         cleanUpTasks.add(() -> overlayPane.setClip(null));
-    }
-
-    private boolean isNodeReady(Node node) {
-        Bounds bounds = node.getBoundsInParent();
-        return bounds.getWidth() > 0 && bounds.getHeight() > 0;
     }
 }
