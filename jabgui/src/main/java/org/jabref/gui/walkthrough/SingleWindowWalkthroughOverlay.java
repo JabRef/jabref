@@ -64,12 +64,28 @@ public class SingleWindowWalkthroughOverlay {
     }
 
     /**
-     * Displays a walkthrough step with the specified target node.
+     * Displays a walkthrough step with a target node.
      */
-    public void displayStep(WalkthroughStep step,
-                            @Nullable Node targetNode,
-                            Runnable beforeNavigate,
-                            Walkthrough walkthrough) {
+    public void displayStepWithTarget(WalkthroughStep step,
+                                      Node targetNode,
+                                      Runnable beforeNavigate,
+                                      Walkthrough walkthrough) {
+        displayStep(step, targetNode, beforeNavigate, walkthrough);
+    }
+
+    /**
+     * Displays a walkthrough step without a target node.
+     */
+    public void displayStepWithoutTarget(WalkthroughStep step,
+                                         Runnable beforeNavigate,
+                                         Walkthrough walkthrough) {
+        displayStep(step, null, beforeNavigate, walkthrough);
+    }
+
+    private void displayStep(WalkthroughStep step,
+                             @Nullable Node targetNode,
+                             Runnable beforeNavigate,
+                             Walkthrough walkthrough) {
         hide();
 
         switch (step) {

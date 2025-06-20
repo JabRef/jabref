@@ -81,7 +81,12 @@ public class WalkthroughOverlay {
     }
 
     private void displayStep(WalkthroughStep step, Window window, @Nullable Node node) {
-        getOrCreateOverlay(window).displayStep(step, node, this::stopNodePolling, walkthrough);
+        SingleWindowWalkthroughOverlay overlay = getOrCreateOverlay(window);
+        if (node != null) {
+            overlay.displayStepWithTarget(step, node, this::stopNodePolling, walkthrough);
+        } else {
+            overlay.displayStepWithoutTarget(step, this::stopNodePolling, walkthrough);
+        }
     }
 
     private void startNodePolling(WalkthroughStep step, Window window, @Nullable Node node) {
