@@ -25,9 +25,6 @@ module org.jabref.jabsrv {
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.http.JabRefResourceLocator;
 
-    // needs to be loaded here as it's otherwise not found at runtime; XJC related maybe
-    // requires org.glassfish.jaxb.runtime;
-
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;
     requires org.glassfish.grizzly.http.server;

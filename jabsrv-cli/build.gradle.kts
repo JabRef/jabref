@@ -1,13 +1,10 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 
 plugins {
-    id("buildlogic.java-common-conventions")
-
-    application
+    id("org.jabref.gradle.module")
+    id("application")
 
     id("org.beryx.jlink") version "3.1.1"
-
-    id("org.kordamp.gradle.jdeps") version "0.20.0"
 }
 
 application{
@@ -35,72 +32,66 @@ dependencies {
     implementation("org.openjfx:javafx-fxml:${javafxVersion}")
     implementation ("org.openjfx:javafx-graphics:${javafxVersion}")
 
-    implementation("org.slf4j:slf4j-api:2.0.17")
-    implementation("org.tinylog:slf4j-tinylog:2.7.0")
-    implementation("org.tinylog:tinylog-impl:2.7.0")
+    implementation("org.slf4j:slf4j-api")
+    implementation("org.tinylog:slf4j-tinylog")
+    implementation("org.tinylog:tinylog-impl")
     // route all requests to java.util.logging to SLF4J (which in turn routes to tinylog)
-    implementation("org.slf4j:jul-to-slf4j:2.0.17")
+    implementation("org.slf4j:jul-to-slf4j")
     // route all requests to log4j to SLF4J
-    implementation("org.apache.logging.log4j:log4j-to-slf4j:2.24.3")
-    implementation("info.picocli:picocli:4.7.7")
-    annotationProcessor("info.picocli:picocli-codegen:4.7.7")
+    implementation("org.apache.logging.log4j:log4j-to-slf4j")
+    implementation("info.picocli:picocli")
+    annotationProcessor("info.picocli:picocli-codegen")
 
     // required because of "service implementation must be defined in the same module as the provides directive"
-    implementation("org.postgresql:postgresql:42.7.5")
-    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
-    implementation("com.konghq:unirest-modules-gson:4.4.7")
-    implementation(platform("ai.djl:bom:0.33.0"))
+    implementation("org.postgresql:postgresql")
+    implementation("org.bouncycastle:bcprov-jdk18on")
+    implementation("com.konghq:unirest-modules-gson")
     implementation("ai.djl:api")
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
 
     // Prevents errors at "createMergedModule"
-    // implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.20")
+    // implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     // region copied from jabsrv
 
     // API
-    implementation("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
+    implementation("jakarta.ws.rs:jakarta.ws.rs-api")
 
     // Implementation of the API
-    implementation("org.glassfish.jersey.core:jersey-server:3.1.10")
+    implementation("org.glassfish.jersey.core:jersey-server")
 
     // Injection framework
-    // implementation("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
-    // implementation("org.glassfish.hk2:hk2-api:3.1.1")
-    // implementation("org.glassfish.hk2:hk2-utils:3.1.1")
+    // implementation("org.glassfish.jersey.inject:jersey-hk2")
+    // implementation("org.glassfish.hk2:hk2-api")
+    // implementation("org.glassfish.hk2:hk2-utils")
     // Just to avoid the compiler error " org.glassfish.hk2.extension.ServiceLocatorGenerator: module jabsrv.merged.module does not declare `uses`"
-    // implementation("org.glassfish.hk2:hk2-locator:3.1.1")
+    // implementation("org.glassfish.hk2:hk2-locator")
 
-    // testImplementation("org.glassfish.hk2:hk2-testing:3.0.4")
-    // implementation("org.glassfish.hk2:hk2-testing-jersey:3.0.4")
-    // testImplementation("org.glassfish.hk2:hk2-junitrunner:3.0.4")
+    // testImplementation("org.glassfish.hk2:hk2-testing")
+    // implementation("org.glassfish.hk2:hk2-testing-jersey")
+    // testImplementation("org.glassfish.hk2:hk2-junitrunner")
 
     // HTTP server
-    // implementation("org.glassfish.jersey.containers:jersey-container-netty-http:3.1.1")
-    implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
-    implementation("org.glassfish.grizzly:grizzly-http-server:4.0.2")
-    implementation("org.glassfish.grizzly:grizzly-framework:4.0.2")
-    testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
-    implementation("jakarta.validation:jakarta.validation-api:3.1.1")
-    implementation("org.hibernate.validator:hibernate-validator:9.0.0.Final")
+    // implementation("org.glassfish.jersey.containers:jersey-container-netty-http")
+    implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
+    implementation("org.glassfish.grizzly:grizzly-http-server")
+    implementation("org.glassfish.grizzly:grizzly-framework")
+    testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
+    implementation("jakarta.validation:jakarta.validation-api")
+    implementation("org.hibernate.validator:hibernate-validator")
 
-    implementation("com.konghq:unirest-modules-gson:4.4.7")
+    implementation("com.konghq:unirest-modules-gson")
 
     // Allow objects "magically" to be mapped to JSON using GSON
-    // implementation("org.glassfish.jersey.media:jersey-media-json-gson:3.1.1")
+    // implementation("org.glassfish.jersey.media:jersey-media-json-gson")
 
-    implementation("com.google.guava:guava:33.4.8-jre")
+    implementation("com.google.guava:guava")
 
-    implementation("org.jabref:afterburner.fx:2.0.0") {
-        exclude( group = "org.openjfx")
-    }
+    implementation("org.jabref:afterburner.fx")
+    implementation("net.harawata:appdirs")
 
-    implementation("net.harawata:appdirs:1.4.0")
-
-    implementation("de.undercouch:citeproc-java:3.3.0") {
-        exclude(group = "org.antlr")
-    }
+    implementation("de.undercouch:citeproc-java")
 
     // endregion
 }
@@ -148,8 +139,6 @@ jlink {
     // TODO: Remove as soon as dependencies are fixed (upstream)
     forceMerge(
         "bcprov",
-        "jaxb",
-        "istack",
         "stax"
     )
 

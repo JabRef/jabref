@@ -25,16 +25,17 @@
 
 //DEPS org.jabref:jablib:6.+
 //DEPS info.picocli:picocli:4.7.7
+//DEPS org.jspecify:jspecify:1.0.0
 
 // from jabsrv
 //DEPS org.slf4j:slf4j-api:2.0.17
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.24.3
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.0
 //DEPS info.picocli:picocli:4.7.7
-//DEPS org.postgresql:postgresql:42.7.5
-//DEPS org.bouncycastle:bcprov-jdk18on:1.80
+//DEPS org.postgresql:postgresql:42.7.7
+//DEPS org.bouncycastle:bcprov-jdk18on:1.81
 //DEPS com.konghq:unirest-modules-gson:4.4.7
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:3.1.10
@@ -46,7 +47,7 @@
 //DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
-//DEPS org.hibernate.validator:hibernate-validator:8.0.2.Final
+//DEPS org.hibernate.validator:hibernate-validator:9.0.1.Final
 //DEPS com.konghq:unirest-modules-gson:4.4.7
 //DEPS com.google.guava:guava:33.4.8-jre
 //DEPS org.jabref:afterburner.fx:2.0.0

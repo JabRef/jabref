@@ -10,6 +10,17 @@ Following is a list of common errors encountered by developers which lead to fai
 * Sync your fork with the JabRef repository: [General howto by GitHub](https://help.github.com/articles/syncing-a-fork/)
 * Branches and pull requests (🇩🇪): [https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md](https://github.com/unibas-marcelluethi/software-engineering/blob/master/docs/week2/exercises/practical-exercises.md)
 
+## Failing GitHub workflow "Sync fork with upstream"
+
+To ease development, a GitHub workflow automatically updates your `main` branch daily.
+However, it is not allowed to update your files if the GitHub workflows are updated by the JabRef team.
+Therefore, GitHub notifies you now and then that "Sync fork with upstream failed for main branch".
+
+To solve this issue, open your GitHub repository in your browser.
+Then, click "Sync fork" to get your fork up-to-date and get the workflow passing again.
+
+![Sync fork](https://github.com/user-attachments/assets/5c1b0a17-0fde-4ce8-ac46-d9477a65c345)
+
 ## Failing tests
 
 ### Failing <b>Checkstyle</b> tests
@@ -96,7 +107,7 @@ You probably chose the wrong gradle task:
 
 ### The problem
 
-Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org` or `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
+Sometimes, when contributing to JabRef, you may see `abbrv.jabref.org`, `csl-styles` or `csl-locales` among the changed files in your pull request. This means that you have accidentally committed your local submodules into the branch.
 
 ![Changed submodules](../images/submodules.png)
 
@@ -107,16 +118,16 @@ What's strange (mostly an IntelliJ bug): Regardless of CLI or GUI, These changes
   
 ### Fix
 
-For `csl-styles`:
+For `csl-styles`, `csl-locales`, and `abbrev.jabref.org`:
 
 ```bash
 git merge origin/main
 git checkout main -- jablib/src/main/resources/csl-styles
-... git commit ... 
+git checkout main -- jablib/src/main/resources/csl-locales
+git checkout main -- jablib/src/main/abbrv.jabref.org
+git commit -m "Fix submodules"
 git push
 ```
-
-And similarly for `csl-locales` or `abbrv.jabref.org`.
 
 #### Alternative method (if the above doesn't work)
 

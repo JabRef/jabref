@@ -38,6 +38,7 @@ public enum StandardActions implements Action {
     OPEN_URL(Localization.lang("Open URL or DOI"), IconTheme.JabRefIcons.WWW, KeyBinding.OPEN_URL_OR_DOI),
     SEARCH_SHORTSCIENCE(Localization.lang("Search ShortScience")),
     MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0", "DOI/ISBN/..."), KeyBinding.MERGE_WITH_FETCHED_ENTRY),
+    BATCH_MERGE_WITH_FETCHED_ENTRY(Localization.lang("Get bibliographic data from %0 (fully automated)", "DOI/ISBN/...")),
     ATTACH_FILE(Localization.lang("Attach file"), IconTheme.JabRefIcons.ATTACH_FILE),
     ATTACH_FILE_FROM_URL(Localization.lang("Attach file from URL"), IconTheme.JabRefIcons.DOWNLOAD_FILE),
     PRIORITY(Localization.lang("Priority"), IconTheme.JabRefIcons.PRIORITY),
@@ -135,10 +136,10 @@ public enum StandardActions implements Action {
     EXPAND_ALL(Localization.lang("Expand all")),
     COLLAPSE_ALL(Localization.lang("Collapse all")),
 
-    CREATE_ENTRY_IMMEDIATE(Localization.lang("Add entry"), IconTheme.JabRefIcons.CREATE_ENTRY_IMMEDIATE),
-    CREATE_ENTRY(Localization.lang("Create new entry..."), IconTheme.JabRefIcons.CREATE_ENTRY, KeyBinding.CREATE_ENTRY),
-    CREATE_ENTRY_IDENTIFIER(Localization.lang("Enter identifier..."), IconTheme.JabRefIcons.CREATE_ENTRY_IDENTIFIER, KeyBinding.CREATE_ENTRY_IDENTIFIER),
-    CREATE_ENTRY_PLAINTEXT(Localization.lang("Interpret citations..."), IconTheme.JabRefIcons.CREATE_ENTRY_PLAINTEXT, KeyBinding.CREATE_ENTRY_PLAINTEXT),
+    ADD_ENTRY_IMMEDIATE(Localization.lang("Add entry"), IconTheme.JabRefIcons.ADD_ENTRY_IMMEDIATE),
+    ADD_ENTRY(Localization.lang("Add entry using..."), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.ADD_ENTRY),
+    ADD_ENTRY_IDENTIFIER(Localization.lang("Enter identifier..."), IconTheme.JabRefIcons.ADD_ENTRY_IDENTIFIER, KeyBinding.ADD_ENTRY_IDENTIFIER),
+    ADD_ENTRY_PLAINTEXT(Localization.lang("Interpret citations..."), IconTheme.JabRefIcons.ADD_ENTRY_PLAINTEXT, KeyBinding.ADD_ENTRY_PLAINTEXT),
 
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
     FIND_DUPLICATES(Localization.lang("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES),

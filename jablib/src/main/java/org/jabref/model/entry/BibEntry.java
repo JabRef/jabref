@@ -706,14 +706,20 @@ public class BibEntry implements Cloneable {
         return clone;
     }
 
-    /// This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
-    /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
-    /// used, it is output as "field = {#value#}", which may cause headaches in debugging. We nevertheless do it this way
-    /// to a) enable debugging the internal representation and b) save time at this method.
-    ///
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
+    /// We do it this way to
+    ///   a) enable debugging the internal representation and
+    ///   b) save time at this method.
+    ///
+    ///
+    /// This returns canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
+    /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
+    /// used, it is output as "field = {#value#}", which may cause headaches in debugging.
+    ///
     /// Alternative for some more readable output: [#getAuthorTitleYear(int)]
+    ///
+    /// @return A user-readable string NOT A VALID BibTeX string
     @Override
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
