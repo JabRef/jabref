@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
@@ -28,7 +29,6 @@ import org.controlsfx.control.PopOver;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javafx.application.Platform;
 
 /**
  * Manages the overlay for displaying walkthrough steps in a single window.

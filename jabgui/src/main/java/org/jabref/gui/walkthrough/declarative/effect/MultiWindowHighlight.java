@@ -10,10 +10,6 @@ public record MultiWindowHighlight(
         List<WindowEffect> windowEffects,
         Optional<HighlightEffect> fallbackEffect
 ) {
-    public MultiWindowHighlight(HighlightEffect effect) {
-        this(new WindowEffect(effect));
-    }
-
     public MultiWindowHighlight(WindowEffect windowEffect) {
         this(windowEffect, HighlightEffect.FULL_SCREEN_DARKEN);
     }

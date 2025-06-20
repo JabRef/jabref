@@ -1,14 +1,12 @@
 package org.jabref.gui.walkthrough;
 
 import java.util.List;
-import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
@@ -119,13 +117,6 @@ public class Walkthrough {
 
         WalkthroughStep step = getCurrentStep();
         overlay.displayStep(step);
-    }
-
-    /**
-     * Get scene of the current stage.
-     */
-    public Optional<Scene> getScene() {
-        return Optional.ofNullable(currentStage).map(Stage::getScene);
     }
 
     private void stop() {
