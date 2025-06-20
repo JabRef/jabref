@@ -105,7 +105,7 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
             try {
                 result = OpenDatabase.loadDatabase(path, preferences.getImportFormatPreferences(), fileUpdateMonitor);
             } catch (IOException e) {
-                LOGGER.error("Could not load file '{}': {}", path, e.getMessage());
+                LOGGER.error("Could not load file '{}': {}", path, e.getMessage(), e);
                 continue;
             }
             for (BibEntry toMergeEntry : result.getDatabase().getEntries()) {
@@ -167,7 +167,7 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
         )) {
             return stream.collect(Collectors.toList());
         } catch (IOException e) {
-            LOGGER.error("Error finding .bib files in '{}': {}", directory.getFileName(), e.getMessage());
+            LOGGER.error("Error finding .bib files in '{}': {}", directory.getFileName(), e.getMessage(), e);
         }
         return List.of();
     }

@@ -203,7 +203,7 @@ public class MergeBibFilesIntoCurrentBibTest {
             );
 
             action.execute();
-            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "MergeEntriesAction was not created as expected");
+            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "Expected 1 MergeEntriesAction instance but found");
         }
     }
 
@@ -250,13 +250,11 @@ public class MergeBibFilesIntoCurrentBibTest {
     @Test
     public void duplicateMergeTest() {
         BibEntry currentEntry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("DIFFERENTCITATIONKEY")
+                .withCitationKey("DIFFERENT CITATION KEY")
                 .withField(StandardField.AUTHOR, "Foo Bar")
                 .withField(StandardField.TITLE, "First Article")
                 .withField(StandardField.JOURNAL, "International Journal of Something")
                 .withField(StandardField.YEAR, "2023");
-
-        currentEntry.setCommentsBeforeEntry("%% Very important paper.\n");
 
         BibDatabase currentDatabase = new BibDatabase();
         currentDatabase.insertEntry(currentEntry);
@@ -277,7 +275,7 @@ public class MergeBibFilesIntoCurrentBibTest {
             );
 
             action.execute();
-            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "MergeEntriesAction was not created as expected");
+            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "Expected 1 MergeEntriesAction instance but found");
         }
     }
 
@@ -286,13 +284,11 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries()).thenReturn(false);
         when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries()).thenReturn(false);
         BibEntry currentEntry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("DIFFERENTCITATIONKEY")
+                .withCitationKey("DIFFERENT CITATION KEY")
                 .withField(StandardField.AUTHOR, "Foo Bar")
                 .withField(StandardField.TITLE, "First Article")
                 .withField(StandardField.JOURNAL, "International Journal of Something")
                 .withField(StandardField.YEAR, "2023");
-
-        currentEntry.setCommentsBeforeEntry("%% Very important paper.\n");
 
         BibDatabase currentDatabase = new BibDatabase();
         currentDatabase.insertEntry(currentEntry);
@@ -316,7 +312,7 @@ public class MergeBibFilesIntoCurrentBibTest {
         assertEquals(1, entries.size(), "Should still have one entry");
 
         BibEntry entry1 = entries.stream()
-                                 .filter(e -> "DIFFERENTCITATIONKEY".equals(e.getCitationKey().orElse("")))
+                                 .filter(e -> "DIFFERENT CITATION KEY".equals(e.getCitationKey().orElse("")))
                                  .findFirst()
                                  .orElseThrow(() -> new AssertionError("Entry 'test1' not found"));
 
