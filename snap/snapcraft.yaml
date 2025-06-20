@@ -13,7 +13,7 @@ confinement: strict
 base: core22
 compression: lzo
 architectures:
- - build-on: [arm64, arm64]
+ - build-on: [amd64, arm64]
 
 plugs:
   home:
