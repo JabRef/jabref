@@ -16,8 +16,8 @@ public class BackdropHighlight extends WalkthroughEffect {
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
 
     private @Nullable Node node;
-    private final @NonNull Rectangle backdrop = new Rectangle();
-    private final @NonNull Rectangle hole = new Rectangle();
+    private Rectangle backdrop;
+    private Rectangle hole;
     private @Nullable Shape overlayShape;
 
     public BackdropHighlight(@NonNull Pane pane) {
@@ -47,6 +47,8 @@ public class BackdropHighlight extends WalkthroughEffect {
 
     @Override
     protected void initializeEffect() {
+        this.backdrop = new Rectangle();
+        this.hole = new Rectangle();
         this.overlayShape = Shape.subtract(backdrop, hole);
         this.overlayShape.setFill(OVERLAY_COLOR);
         this.overlayShape.setVisible(false);
