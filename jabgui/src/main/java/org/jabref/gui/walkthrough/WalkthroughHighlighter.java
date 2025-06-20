@@ -8,12 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 
-import org.jabref.gui.walkthrough.components.BackdropHighlight;
-import org.jabref.gui.walkthrough.components.FullScreenDarken;
-import org.jabref.gui.walkthrough.components.PulseAnimateIndicator;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
+import org.jabref.gui.walkthrough.effects.BackdropHighlight;
+import org.jabref.gui.walkthrough.effects.FullScreenDarken;
+import org.jabref.gui.walkthrough.effects.PulseAnimateIndicator;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;

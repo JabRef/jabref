@@ -1,4 +1,4 @@
-package org.jabref.gui.walkthrough.components;
+package org.jabref.gui.walkthrough.effects;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -29,9 +29,6 @@ public class FullScreenDarken extends WalkthroughEffect {
         this.pane.getChildren().add(overlay);
     }
 
-    /**
-     * Attaches the effect to the pane
-     */
     public void attach() {
         updater.cleanup();
         if (overlay == null) {

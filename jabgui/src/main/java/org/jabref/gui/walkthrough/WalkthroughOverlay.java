@@ -21,9 +21,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Manages walkthrough overlays and highlights across multiple windows.
- */
 public class WalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
 
@@ -57,9 +54,6 @@ public class WalkthroughOverlay {
         }
     }
 
-    /**
-     * Detaches all overlays
-     */
     public void detachAll() {
         stopNodePolling();
         walkthroughHighlighter.detachAll();

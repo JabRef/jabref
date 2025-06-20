@@ -1,4 +1,4 @@
-package org.jabref.gui.walkthrough.components;
+package org.jabref.gui.walkthrough.effects;
 
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
@@ -10,17 +10,15 @@ import javafx.scene.shape.Shape;
 import org.jabref.gui.walkthrough.WalkthroughUpdater;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
-/**
- * A backdrop highlight effect that dims the background and highlights a specific node.
- */
 public class BackdropHighlight extends WalkthroughEffect {
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
 
-    private Node node;
-    private Rectangle backdrop;
-    private Rectangle hole;
-    private Shape overlayShape;
+    private @Nullable Node node;
+    private final @NonNull Rectangle backdrop = new Rectangle();
+    private final @NonNull Rectangle hole = new Rectangle();
+    private @Nullable Shape overlayShape;
 
     public BackdropHighlight(@NonNull Pane pane) {
         super(pane);
@@ -49,8 +47,6 @@ public class BackdropHighlight extends WalkthroughEffect {
 
     @Override
     protected void initializeEffect() {
-        this.backdrop = new Rectangle();
-        this.hole = new Rectangle();
         this.overlayShape = Shape.subtract(backdrop, hole);
         this.overlayShape.setFill(OVERLAY_COLOR);
         this.overlayShape.setVisible(false);
@@ -64,15 +60,9 @@ public class BackdropHighlight extends WalkthroughEffect {
             return;
         }
 
-        Bounds nodeBoundsInScene;
-        try {
-            nodeBoundsInScene = node.localToScene(node.getBoundsInLocal());
-        } catch (IllegalStateException e) {
-            hideEffect();
-            return;
-        }
+        Bounds bounds = node.localToScene(node.getBoundsInLocal());
 
-        if (nodeBoundsInScene == null || nodeBoundsInScene.getWidth() <= 0 || nodeBoundsInScene.getHeight() <= 0) {
+        if (bounds == null || bounds.getWidth() <= 0 || bounds.getHeight() <= 0) {
             hideEffect();
             return;
         }
@@ -82,7 +72,7 @@ public class BackdropHighlight extends WalkthroughEffect {
         backdrop.setWidth(pane.getWidth());
         backdrop.setHeight(pane.getHeight());
 
-        Bounds nodeBoundsInRootPane = pane.sceneToLocal(nodeBoundsInScene);
+        Bounds nodeBoundsInRootPane = pane.sceneToLocal(bounds);
         hole.setX(nodeBoundsInRootPane.getMinX());
         hole.setY(nodeBoundsInRootPane.getMinY());
         hole.setWidth(nodeBoundsInRootPane.getWidth());
@@ -103,6 +93,7 @@ public class BackdropHighlight extends WalkthroughEffect {
 
     @Override
     protected void hideEffect() {
+        assert overlayShape != null : "Overlay shape should be initialized before hiding effect";
         overlayShape.setVisible(false);
     }
 }

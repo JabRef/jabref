@@ -1,6 +1,5 @@
 package org.jabref.gui.walkthrough;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -41,8 +40,6 @@ public class WalkthroughAction extends SimpleCommand {
     }
 
     private static Map<String, Walkthrough> buildRegistry() {
-        Map<String, Walkthrough> registry = new HashMap<>();
-
         WalkthroughStep step1 = TooltipStep
                 .builder("Click on \"File\" menu")
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
@@ -96,7 +93,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step5 = PanelStep
-                .builder("Click \"OK\" to save changes")
+                .builder("Click \"Save\" to save changes")
                 .content(
                         new TextBlock("Congratulations! Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents."),
                         new InfoBlock("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks")
@@ -113,7 +110,6 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         Walkthrough mainFileDirectory = new Walkthrough(step1, step2, step3, step4, step5);
-        registry.put("mainFileDirectory", mainFileDirectory);
-        return registry;
+        return Map.of("mainFileDirectory", mainFileDirectory);
     }
 }

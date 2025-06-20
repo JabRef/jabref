@@ -1,4 +1,4 @@
-package org.jabref.gui.walkthrough.components;
+package org.jabref.gui.walkthrough.effects;
 
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
@@ -8,12 +8,17 @@ import org.jabref.gui.walkthrough.WalkthroughUpdater;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Base class for walkthrough effects with common listener management and positioning.
+ * Base class for walkthrough effects BackdropHighlight, TooltipHighlight, FullScreenDarken, etc.
  */
 public abstract class WalkthroughEffect {
     protected final Pane pane;
     protected final WalkthroughUpdater updater = new WalkthroughUpdater();
 
+    /**
+     * Constructor for WalkthroughEffect.
+     *
+     * @param pane The pane where the effect will be applied. Usually obtained from window.getScene().getRoot().
+     */
     protected WalkthroughEffect(@NonNull Pane pane) {
         this.pane = pane;
         initializeEffect();
@@ -23,8 +28,16 @@ public abstract class WalkthroughEffect {
 
     protected abstract void updateLayout();
 
+    /**
+     * Hide the effect, e.g., by making it invisible. The effect should not be removed from the pane,
+     * and the scene graph is not modified.
+     */
     protected abstract void hideEffect();
 
+    /**
+     * Detach the effect, cleaning up any resources and listeners. The effect is no longer active
+     * and reattaching will require scene graph modifications.
+     */
     public void detach() {
         updater.cleanup();
         hideEffect();

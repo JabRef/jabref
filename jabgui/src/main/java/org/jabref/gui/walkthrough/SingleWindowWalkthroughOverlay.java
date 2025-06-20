@@ -66,10 +66,32 @@ public class SingleWindowWalkthroughOverlay {
     /**
      * Displays a walkthrough step with the specified target node.
      */
-    public void displayStep(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate,
+    public void displayStep(WalkthroughStep step,
+                            @Nullable Node targetNode,
+                            Runnable beforeNavigate,
                             Walkthrough walkthrough) {
         hide();
-        displayStepContent(step, targetNode, beforeNavigate, walkthrough);
+
+        switch (step) {
+            case TooltipStep tooltipStep -> {
+                Node content = renderer.render(tooltipStep, walkthrough, beforeNavigate);
+                displayTooltipStep(content, targetNode, tooltipStep);
+                hideOverlayPane();
+            }
+            case PanelStep panelStep -> {
+                Node content = renderer.render(panelStep, walkthrough, beforeNavigate);
+                displayPanelStep(content, panelStep);
+                setupClipping(content);
+                overlayPane.toFront();
+            }
+        }
+
+        if (targetNode == null) {
+            return;
+        }
+
+        step.navigationPredicate().ifPresent(predicate -> updater
+                .addCleanupTask(predicate.attachListeners(targetNode, beforeNavigate, walkthrough::nextStep)));
     }
 
     /**
@@ -94,32 +116,6 @@ public class SingleWindowWalkthroughOverlay {
             scene.setRoot(originalRoot);
             LOGGER.debug("Restored original scene root: {}", originalRoot.getClass().getName());
         }
-    }
-
-    private void displayStepContent(WalkthroughStep step,
-                                    @Nullable Node targetNode,
-                                    Runnable beforeNavigate,
-                                    Walkthrough walkthrough) {
-        switch (step) {
-            case TooltipStep tooltipStep -> {
-                Node content = renderer.render(tooltipStep, walkthrough, beforeNavigate);
-                displayTooltipStep(content, targetNode, tooltipStep);
-                hideOverlayPane();
-            }
-            case PanelStep panelStep -> {
-                Node content = renderer.render(panelStep, walkthrough, beforeNavigate);
-                displayPanelStep(content, panelStep);
-                setupClipping(content);
-                overlayPane.toFront();
-            }
-        }
-
-        if (targetNode == null) {
-            return;
-        }
-
-        step.navigationPredicate().ifPresent(predicate -> updater
-                .addCleanupTask(predicate.attachListeners(targetNode, beforeNavigate, walkthrough::nextStep)));
     }
 
     private void displayTooltipStep(Node content, @Nullable Node targetNode, TooltipStep step) {

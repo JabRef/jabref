@@ -34,9 +34,6 @@ public class Walkthrough {
         this.steps = steps;
     }
 
-    /**
-     * Creates a new walkthrough with steps
-     */
     public Walkthrough(WalkthroughStep... steps) {
         this(List.of(steps));
     }

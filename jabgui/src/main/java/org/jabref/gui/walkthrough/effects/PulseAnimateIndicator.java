@@ -1,4 +1,4 @@
-package org.jabref.gui.walkthrough.components;
+package org.jabref.gui.walkthrough.effects;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -14,9 +14,6 @@ import org.jabref.gui.walkthrough.WalkthroughUpdater;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * A pulsing circular indicator that can be attached to a target node.
- */
 public class PulseAnimateIndicator extends WalkthroughEffect {
     public static final int INDICATOR_OFFSET = 5;
     private Circle pulseIndicator;
