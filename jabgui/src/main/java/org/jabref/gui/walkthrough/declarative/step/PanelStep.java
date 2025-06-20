@@ -27,7 +27,6 @@ public record PanelStep(
         @Nullable Double widthValue,
         @Nullable Double heightValue,
         @Nullable MultiWindowHighlight highlightValue,
-        boolean autoFallback,
         @Nullable WindowResolver activeWindowResolverValue) implements WalkthroughStep {
 
     @Override
@@ -91,7 +90,6 @@ public record PanelStep(
         private @Nullable Double width;
         private @Nullable Double height;
         private @Nullable MultiWindowHighlight highlight;
-        private boolean autoFallback = true;
         private @Nullable WindowResolver activeWindowResolver;
 
         private Builder(@NonNull String title) {
@@ -161,11 +159,6 @@ public record PanelStep(
             return highlight(new WindowEffect(effect));
         }
 
-        public Builder autoFallback(boolean autoFallback) {
-            this.autoFallback = autoFallback;
-            return this;
-        }
-
         public Builder activeWindow(@NonNull WindowResolver activeWindowResolver) {
             this.activeWindowResolver = activeWindowResolver;
             return this;
@@ -189,7 +182,6 @@ public record PanelStep(
                     width,
                     height,
                     highlight,
-                    autoFallback,
                     activeWindowResolver);
         }
     }

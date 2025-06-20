@@ -72,7 +72,6 @@ public class WalkthroughAction extends SimpleCommand {
                                 node.toString().contains("Linked files")))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.AUTO)
-                .autoFallback(false)
                 .activeWindow(WindowResolver.title("JabRef preferences"))
                 .highlight(new MultiWindowHighlight(
                         new WindowEffect(HighlightEffect.BACKDROP_HIGHLIGHT),

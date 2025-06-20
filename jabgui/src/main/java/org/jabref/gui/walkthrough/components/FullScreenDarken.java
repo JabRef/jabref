@@ -33,10 +33,10 @@ public class FullScreenDarken extends WalkthroughEffect {
      * Attaches the effect to the pane
      */
     public void attach() {
+        updater.cleanup();
         if (overlay == null) {
             initializeEffect();
         }
-        cleanUp();
         setupPaneListeners();
         updateLayout();
     }

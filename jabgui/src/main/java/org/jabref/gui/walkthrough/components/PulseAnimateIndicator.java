@@ -10,6 +10,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
+import org.jabref.gui.walkthrough.WalkthroughUpdater;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -26,7 +28,7 @@ public class PulseAnimateIndicator extends WalkthroughEffect {
     }
 
     public void attach(@NonNull Node node) {
-        cleanUp();
+        updater.cleanup();
         if (pulseIndicator == null) {
             initializeEffect();
         }
@@ -74,7 +76,7 @@ public class PulseAnimateIndicator extends WalkthroughEffect {
 
     @Override
     protected void updateLayout() {
-        if (cannotPositionNode(node)) {
+        if (WalkthroughUpdater.cannotPositionNode(node)) {
             hideEffect();
             return;
         }

@@ -1,7 +1,5 @@
 package org.jabref.gui.walkthrough;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.value.ChangeListener;
@@ -40,7 +38,7 @@ public class SingleWindowWalkthroughOverlay {
     private final Pane originalRoot;
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
-    private final List<Runnable> cleanUpTasks = new ArrayList<>(); // needs to be mutable
+    private final WalkthroughUpdater updater = new WalkthroughUpdater();
 
     public SingleWindowWalkthroughOverlay(Window window) {
         this.window = window;
@@ -68,7 +66,8 @@ public class SingleWindowWalkthroughOverlay {
     /**
      * Displays a walkthrough step with the specified target node.
      */
-    public void displayStep(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate, Walkthrough walkthrough) {
+    public void displayStep(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate,
+                            Walkthrough walkthrough) {
         hide();
         displayStepContent(step, targetNode, beforeNavigate, walkthrough);
     }
@@ -80,9 +79,7 @@ public class SingleWindowWalkthroughOverlay {
         overlayPane.getChildren().clear();
         overlayPane.setClip(null);
         overlayPane.setVisible(true);
-
-        cleanUpTasks.forEach(Runnable::run);
-        cleanUpTasks.clear();
+        updater.cleanup();
     }
 
     /**
@@ -99,7 +96,10 @@ public class SingleWindowWalkthroughOverlay {
         }
     }
 
-    private void displayStepContent(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate, Walkthrough walkthrough) {
+    private void displayStepContent(WalkthroughStep step,
+                                    @Nullable Node targetNode,
+                                    Runnable beforeNavigate,
+                                    Walkthrough walkthrough) {
         switch (step) {
             case TooltipStep tooltipStep -> {
                 Node content = renderer.render(tooltipStep, walkthrough, beforeNavigate);
@@ -118,7 +118,8 @@ public class SingleWindowWalkthroughOverlay {
             return;
         }
 
-        step.navigationPredicate().ifPresent(predicate -> cleanUpTasks.add(predicate.attachListeners(targetNode, beforeNavigate, walkthrough::nextStep)));
+        step.navigationPredicate().ifPresent(predicate -> updater
+                .addCleanupTask(predicate.attachListeners(targetNode, beforeNavigate, walkthrough::nextStep)));
     }
 
     private void displayTooltipStep(Node content, @Nullable Node targetNode, TooltipStep step) {
@@ -128,16 +129,23 @@ public class SingleWindowWalkthroughOverlay {
         popover.setCloseButtonEnabled(false);
         popover.setHeaderAlwaysVisible(false);
         mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
-        popover.setAutoFix(true);
         popover.setAutoHide(false);
+        popover.setAutoFix(true);
 
-        if (targetNode != null) {
-            popover.show(targetNode);
-        } else {
+        if (targetNode == null) {
             popover.show(window);
+            return;
         }
 
-        cleanUpTasks.add(popover::hide);
+        popover.show(targetNode);
+        updater.addCleanupTask(popover::hide);
+        Runnable showPopover = () -> {
+            if (WalkthroughUpdater.cannotPositionNode(targetNode)) {
+                return;
+            }
+            popover.show(targetNode);
+        };
+        updater.setupScrollContainerListeners(targetNode, showPopover);
     }
 
     private void displayPanelStep(Node content, PanelStep step) {
@@ -221,7 +229,7 @@ public class SingleWindowWalkthroughOverlay {
 
     private void hideOverlayPane() {
         overlayPane.setVisible(false);
-        cleanUpTasks.add(() -> overlayPane.setVisible(true));
+        updater.addCleanupTask(() -> overlayPane.setVisible(true));
     }
 
     private void setupClipping(Node node) {
@@ -232,17 +240,7 @@ public class SingleWindowWalkthroughOverlay {
                 overlayPane.setClip(clip);
             }
         };
-
-        node.boundsInParentProperty().addListener(listener);
-
-        Bounds initialBounds = node.getBoundsInParent();
-        if (initialBounds.getWidth() > 0 && initialBounds.getHeight() > 0) {
-            Rectangle clip = new Rectangle(initialBounds.getMinX(), initialBounds.getMinY(),
-                    initialBounds.getWidth(), initialBounds.getHeight());
-            overlayPane.setClip(clip);
-        }
-
-        cleanUpTasks.add(() -> node.boundsInParentProperty().removeListener(listener));
-        cleanUpTasks.add(() -> overlayPane.setClip(null));
+        updater.listen(node.boundsInLocalProperty(), listener);
+        listener.changed(null, null, node.getBoundsInParent());
     }
 }

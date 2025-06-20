@@ -122,16 +122,9 @@ public class WalkthroughOverlay {
                             return;
                         }
 
-                        if (step.autoFallback()) {
-                            LOGGER.info("Node disappeared for step: {}, auto-falling back", step.title());
-                            stopNodePolling();
-                            tryRevertToPreviousResolvableStep();
-                        } else {
-                            LOGGER.info("Node disappeared for step: {}, showing step without node", step.title());
-                            walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), scene, null);
-                            displayStep(step, window, null);
-                            nodeEverResolved.set(false);
-                        }
+                        LOGGER.info("Node disappeared for step: {}, auto-falling back", step.title());
+                        stopNodePolling();
+                        tryRevertToPreviousResolvableStep();
                     }
             );
         }));

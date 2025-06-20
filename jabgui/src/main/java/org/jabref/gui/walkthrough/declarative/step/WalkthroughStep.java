@@ -29,8 +29,6 @@ public sealed interface WalkthroughStep permits PanelStep, TooltipStep {
 
     OptionalDouble height();
 
-    boolean autoFallback();
-
     Optional<MultiWindowHighlight> highlight();
 
     Optional<WindowResolver> activeWindowResolver();

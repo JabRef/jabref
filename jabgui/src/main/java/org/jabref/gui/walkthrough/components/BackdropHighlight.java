@@ -7,6 +7,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
+import org.jabref.gui.walkthrough.WalkthroughUpdater;
+
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -57,7 +59,7 @@ public class BackdropHighlight extends WalkthroughEffect {
 
     @Override
     protected void updateLayout() {
-        if (cannotPositionNode(node)) {
+        if (WalkthroughUpdater.cannotPositionNode(node)) {
             hideEffect();
             return;
         }
