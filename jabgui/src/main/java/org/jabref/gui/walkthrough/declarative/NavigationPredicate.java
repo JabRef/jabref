@@ -13,6 +13,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.MouseEvent;
@@ -21,6 +22,7 @@ import javafx.stage.Window;
 import org.jabref.gui.frame.MainMenu;
 
 import com.sun.javafx.scene.control.ContextMenuContent;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Defines a predicate for when navigation should occur on a target node.
@@ -30,36 +32,56 @@ public interface NavigationPredicate {
     /**
      * Attaches the navigation listeners to the target node.
      *
-     * @param targetNode the node to attach the listeners to
-     * @param onNavigate the runnable to execute when navigation occurs
+     * @param targetNode     the node to attach the listeners to
+     * @param beforeNavigate the runnable to execute before navigation
+     * @param onNavigate     the runnable to execute when navigation occurs
      * @return a runnable to clean up the listeners
      */
-    Runnable attachListeners(Node targetNode, Runnable onNavigate);
+    Runnable attachListeners(@NonNull Node targetNode, Runnable beforeNavigate, Runnable onNavigate);
 
     static NavigationPredicate onClick() {
-        return (targetNode, onNavigate) -> {
+        return (targetNode, beforeNavigate, onNavigate) -> {
             EventHandler<? super MouseEvent> onClicked = targetNode.getOnMouseClicked();
-            targetNode.setOnMouseClicked(ConcurrentNavigationRunner.decorate(onClicked, onNavigate));
+            targetNode.setOnMouseClicked(ConcurrentNavigationRunner.decorate(beforeNavigate, onClicked, onNavigate));
 
             Optional<MenuItem> item = resolveMenuItem(targetNode);
-            if (item.isEmpty()) {
-                return () -> targetNode.setOnMouseClicked(onClicked);
+            if (item.isPresent()) {
+                MenuItem menuItem = item.get();
+                // Note MenuItem doesn't extend Node, so the duplication between MenuItem and ButtonBase cannot be removed
+                EventHandler<ActionEvent> onAction = menuItem.getOnAction();
+                EventHandler<ActionEvent> decoratedAction = ConcurrentNavigationRunner.decorate(beforeNavigate, onAction, onNavigate);
+                menuItem.setOnAction(decoratedAction);
+                menuItem.addEventFilter(ActionEvent.ACTION, decoratedAction);
+
+                return () -> {
+                    targetNode.setOnMouseClicked(onClicked);
+                    menuItem.setOnAction(onAction);
+                    menuItem.removeEventFilter(ActionEvent.ACTION, decoratedAction);
+                };
             }
 
-            EventHandler<ActionEvent> onAction = item.get().getOnAction();
-            item.get().setOnAction(ConcurrentNavigationRunner.decorate(onAction, onNavigate));
+            if (targetNode instanceof ButtonBase button) {
+                EventHandler<ActionEvent> onAction = button.getOnAction();
+                EventHandler<ActionEvent> decoratedAction = ConcurrentNavigationRunner.decorate(beforeNavigate, onAction, onNavigate);
 
-            return () -> {
-                targetNode.setOnMouseClicked(onClicked);
-                item.get().setOnAction(onAction);
-            };
+                button.setOnAction(decoratedAction);
+                button.addEventFilter(ActionEvent.ACTION, decoratedAction);
+
+                return () -> {
+                    targetNode.setOnMouseClicked(onClicked);
+                    button.setOnAction(onAction);
+                    button.removeEventFilter(ActionEvent.ACTION, decoratedAction);
+                };
+            }
+
+            return () -> targetNode.setOnMouseClicked(onClicked);
         };
     }
 
     static NavigationPredicate onHover() {
-        return (targetNode, onNavigate) -> {
+        return (targetNode, beforeNavigate, onNavigate) -> {
             EventHandler<? super MouseEvent> onEnter = targetNode.getOnMouseEntered();
-            targetNode.setOnMouseEntered(ConcurrentNavigationRunner.decorate(onEnter, onNavigate));
+            targetNode.setOnMouseEntered(ConcurrentNavigationRunner.decorate(beforeNavigate, onEnter, onNavigate));
 
             Optional<MenuItem> item = resolveMenuItem(targetNode);
             if (item.isPresent()) {
@@ -71,10 +93,11 @@ public interface NavigationPredicate {
     }
 
     static NavigationPredicate onTextInput() {
-        return (targetNode, onNavigate) -> {
+        return (targetNode, beforeNavigate, onNavigate) -> {
             if (targetNode instanceof TextInputControl textInput) {
                 ChangeListener<String> listener = (_, _, newText) -> {
                     if (!newText.trim().isEmpty()) {
+                        beforeNavigate.run();
                         onNavigate.run();
                     }
                 };
@@ -86,12 +109,12 @@ public interface NavigationPredicate {
     }
 
     static NavigationPredicate manual() {
-        return (_, _) -> () -> {
+        return (_, _, _) -> () -> {
         };
     }
 
     static NavigationPredicate auto() {
-        return (_, onNavigate) -> {
+        return (_, _, onNavigate) -> {
             onNavigate.run();
             return () -> {
             };
@@ -99,8 +122,9 @@ public interface NavigationPredicate {
     }
 
     private static Optional<MenuItem> resolveMenuItem(Node node) {
-        if (!(node instanceof ContextMenuContent) && Stream.iterate(node.getParent(), Objects::nonNull, Parent::getParent)
-                                                           .noneMatch(ContextMenuContent.class::isInstance)) {
+        if (!(node instanceof ContextMenuContent)
+                && Stream.iterate(node.getParent(), Objects::nonNull, Parent::getParent)
+                         .noneMatch(ContextMenuContent.class::isInstance)) {
             return Optional.empty();
         }
 
@@ -113,8 +137,9 @@ public interface NavigationPredicate {
                      .flatMap(menu -> menu.getMenus().stream())
                      .flatMap(topLevelMenu -> topLevelMenu.getItems().stream())
                      .filter(menuItem -> Optional.ofNullable(menuItem.getGraphic())
-                                                 .map(graphic -> graphic.equals(node) || Stream.iterate(graphic, Objects::nonNull, Node::getParent)
-                                                                                               .anyMatch(cm -> cm.equals(node)))
+                                                 .map(graphic -> graphic.equals(node)
+                                                         || Stream.iterate(graphic, Objects::nonNull, Node::getParent)
+                                                                  .anyMatch(cm -> cm.equals(node)))
                                                  .orElse(false))
                      .findFirst();
     }
@@ -123,17 +148,20 @@ public interface NavigationPredicate {
         private static final long HANDLER_TIMEOUT_MS = 1000;
 
         static <T extends Event> EventHandler<T> decorate(
+                Runnable beforeNavigate,
                 EventHandler<? super T> originalHandler,
                 Runnable onNavigate) {
-            return event -> navigate(originalHandler, event, onNavigate);
+            return event -> navigate(beforeNavigate, originalHandler, event, onNavigate);
         }
 
         static <T extends Event> void navigate(
+                Runnable beforeNavigate,
                 EventHandler<? super T> originalHandler,
                 T event,
                 Runnable onNavigate) {
 
-            System.out.println("Navigation started for event: " + event);
+            event.consume();
+            beforeNavigate.run();
 
             CompletableFuture<Void> handlerFuture = new CompletableFuture<>();
 
@@ -174,7 +202,6 @@ public interface NavigationPredicate {
                 }
             });
 
-            // FIXME: The onNavigate function is ran without any of those futures being completed?
             CompletableFuture.anyOf(handlerFuture, windowFuture, timeoutFuture)
                              .whenComplete((_, _) -> {
                                  Platform.runLater(onNavigate);

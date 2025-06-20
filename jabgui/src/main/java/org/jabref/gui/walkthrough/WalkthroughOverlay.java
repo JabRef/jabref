@@ -3,6 +3,7 @@ package org.jabref.gui.walkthrough;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -16,6 +17,7 @@ import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,37 +28,38 @@ public class WalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
 
     private final Map<Window, SingleWindowWalkthroughOverlay> overlays = new HashMap<>();
-    private final Stage mainStage;
+    private final Stage stage;
     private final WalkthroughHighlighter walkthroughHighlighter;
     private final Walkthrough walkthrough;
-    private Timeline nodePollingTimeline;
+    private @Nullable Timeline nodePollingTimeline;
 
-    public WalkthroughOverlay(Stage mainStage, Walkthrough walkthrough) {
-        this.mainStage = mainStage;
+    public WalkthroughOverlay(Stage stage, Walkthrough walkthrough) {
+        this.stage = stage;
         this.walkthrough = walkthrough;
         this.walkthroughHighlighter = new WalkthroughHighlighter();
     }
 
+    /**
+     * Displays the specified walkthrough step in the appropriate window.
+     */
     public void displayStep(@NonNull WalkthroughStep step) {
         overlays.values().forEach(SingleWindowWalkthroughOverlay::hide);
-        Window activeWindow = step.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(mainStage);
-        Scene scene = activeWindow.getScene();
+        Window window = step.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(stage);
+        Scene scene = window.getScene();
 
         Optional<Node> targetNode = step.resolver().flatMap(resolver -> resolver.resolve(scene));
-        if (step.resolver().isPresent() && targetNode.isEmpty()) {
-            if (step.autoFallback()) {
-                tryRevertToPreviousResolvableStep();
-            } else {
-                startNodePolling(step, activeWindow);
-            }
-            return;
-        }
 
-        walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), targetNode.orElse(null));
-        SingleWindowWalkthroughOverlay overlay = getOrCreateOverlay(activeWindow);
-        overlay.displayStep(step, targetNode.orElse(null), walkthrough);
+        if (step.resolver().isPresent()) {
+            startNodePolling(step, window, targetNode.orElse(null));
+        } else {
+            walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), null);
+            displayStep(step, window, null);
+        }
     }
 
+    /**
+     * Detaches all overlays
+     */
     public void detachAll() {
         stopNodePolling();
         walkthroughHighlighter.detachAll();
@@ -68,9 +71,10 @@ public class WalkthroughOverlay {
         LOGGER.info("Attempting to revert to previous resolvable step");
 
         int currentIndex = walkthrough.currentStepProperty().get();
+
         for (int i = currentIndex - 1; i >= 0; i--) {
             WalkthroughStep previousStep = getStepAtIndex(i);
-            Window activeWindow = previousStep.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(mainStage);
+            Window activeWindow = previousStep.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(stage);
             Scene scene = activeWindow.getScene();
             if (scene != null && (previousStep.resolver().isEmpty() || previousStep.resolver().get().resolve(scene).isPresent())) {
                 LOGGER.info("Reverting to step {} from step {}", i, currentIndex);
@@ -82,26 +86,54 @@ public class WalkthroughOverlay {
         LOGGER.warn("No previous resolvable step found, staying at current step");
     }
 
-    private void startNodePolling(WalkthroughStep step, Window activeWindow) {
-        LOGGER.info("Auto-fallback disabled for step: {}, starting node polling", step.title());
+    private void displayStep(WalkthroughStep step, Window window, @Nullable Node node) {
+        getOrCreateOverlay(window).displayStep(step, node, this::stopNodePolling, walkthrough);
+    }
+
+    private void startNodePolling(WalkthroughStep step, Window window, @Nullable Node node) {
         stopNodePolling();
 
-        nodePollingTimeline = new Timeline(new KeyFrame(Duration.millis(100), _ -> {
-            Scene scene = activeWindow.getScene();
+        AtomicBoolean nodeEverResolved = new AtomicBoolean(node != null);
+
+        Scene initialScene = window.getScene();
+
+        walkthroughHighlighter.applyHighlight(initialScene, step.highlight().orElse(null), node);
+        displayStep(step, window, node);
+
+        LOGGER.info("Starting continuous node polling for step: {}", step.title());
+
+        nodePollingTimeline = new Timeline(new KeyFrame(Duration.millis(500), _ -> {
+            Scene scene = window.getScene();
             if (scene == null) {
                 return;
             }
-            Optional<Node> targetNode = step.resolver().flatMap(resolver -> resolver.resolve(scene));
-            if (targetNode.isEmpty()) {
-                return;
-            }
 
-            LOGGER.info("Target node found for step: {}, displaying step", step.title());
-            stopNodePolling();
+            step.resolver().flatMap(resolver -> resolver.resolve(scene)).ifPresentOrElse(
+                    (currentNode) -> {
+                        if (!nodeEverResolved.get()) {
+                            LOGGER.info("Target node found for step: {}, updating display", step.title());
+                            walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), currentNode);
+                            displayStep(step, window, currentNode);
+                            nodeEverResolved.set(true);
+                        }
+                    },
+                    () -> {
+                        if (!nodeEverResolved.get()) {
+                            return;
+                        }
 
-            walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), targetNode.orElse(null));
-            SingleWindowWalkthroughOverlay overlay = getOrCreateOverlay(activeWindow);
-            overlay.displayStep(step, targetNode.get(), walkthrough);
+                        if (step.autoFallback()) {
+                            LOGGER.info("Node disappeared for step: {}, auto-falling back", step.title());
+                            stopNodePolling();
+                            tryRevertToPreviousResolvableStep();
+                        } else {
+                            LOGGER.info("Node disappeared for step: {}, showing step without node", step.title());
+                            walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), null);
+                            displayStep(step, window, null);
+                            nodeEverResolved.set(false);
+                        }
+                    }
+            );
         }));
 
         nodePollingTimeline.setCycleCount(Timeline.INDEFINITE);
@@ -109,10 +141,12 @@ public class WalkthroughOverlay {
     }
 
     private void stopNodePolling() {
-        if (nodePollingTimeline != null) {
-            nodePollingTimeline.stop();
-            nodePollingTimeline = null;
+        LOGGER.info("Stopping node polling for step.");
+        if (nodePollingTimeline == null) {
+            return;
         }
+        nodePollingTimeline.stop();
+        nodePollingTimeline = null;
     }
 
     private @NonNull WalkthroughStep getStepAtIndex(int index) {

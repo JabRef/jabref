@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
-import javafx.stage.Window;
 
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.l10n.Localization;
@@ -78,21 +77,26 @@ public interface NodeResolver {
      * @return a resolver that finds the menu item by language key
      */
     static NodeResolver menuItem(@NonNull String key) {
-        return scene -> Window.getWindows().stream().flatMap(window -> {
-            if (window instanceof ContextMenu menu && menu.isShowing()) {
-                return menu.getItems().stream()
-                           .filter(item -> Optional.ofNullable(item.getText())
-                                                   .map(str -> str.contains(Localization.lang(key)))
-                                                   .orElse(false))
-                           .map(item -> Stream.iterate(item.getGraphic(), Objects::nonNull, Node::getParent)
-                                              .filter(node -> node.getStyleClass().contains("menu-item"))
-                                              .findFirst()
-                                              .orElse(null));
+        return scene -> {
+            if (!(scene.getWindow() instanceof ContextMenu menu)) {
+                return Optional.empty();
             }
-            return window.getScene().getRoot().lookupAll(".menu-item").stream()
-                         .filter(node -> node.getStyleClass().contains("menu-item") &&
-                                 node.toString().contains(Localization.lang(key)));
-        }).findFirst();
+
+            if (!menu.isShowing()) {
+                return Optional.empty();
+            }
+
+            return menu.getItems().stream()
+                       .filter(item -> Optional
+                               .ofNullable(item.getText())
+                               .map(str -> str.contains(Localization.lang(key)))
+                               .orElse(false))
+                       .flatMap(item -> Stream
+                               .iterate(item.getGraphic(), Objects::nonNull, Node::getParent)
+                               .filter(node -> node.getStyleClass().contains("menu-item"))
+                               .findFirst().stream()
+                       ).findFirst();
+        };
     }
 
     @Nullable

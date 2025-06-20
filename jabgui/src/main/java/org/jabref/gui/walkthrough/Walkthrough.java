@@ -64,6 +64,7 @@ public class Walkthrough {
         if (currentStage != stage) {
             if (overlay != null) {
                 overlay.detachAll();
+                overlay = null;
             }
             currentStage = stage;
             overlay = new WalkthroughOverlay(stage, this);

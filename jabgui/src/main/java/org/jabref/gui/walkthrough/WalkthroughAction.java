@@ -53,13 +53,10 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.menuItem("Preferences"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.RIGHT)
+                .activeWindow(WindowResolver.clazz(ContextMenu.class))
                 .highlight(new MultiWindowHighlight(
-                        new WindowEffect(
-                                WindowResolver.clazz(ContextMenu.class),
-                                HighlightEffect.ANIMATED_PULSE,
-                                NodeResolver.menuItem("Preferences")
-                        ),
-                        new WindowEffect(HighlightEffect.FULL_SCREEN_DARKEN)
+                        new WindowEffect(HighlightEffect.ANIMATED_PULSE),
+                        new WindowEffect(WindowResolver.title("JabRef"), HighlightEffect.FULL_SCREEN_DARKEN)
                 ))
                 .build();
 
