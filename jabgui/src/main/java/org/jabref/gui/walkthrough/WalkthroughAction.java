@@ -41,7 +41,6 @@ public class WalkthroughAction extends SimpleCommand {
     private static Map<String, Walkthrough> buildRegistry() {
         Map<String, Walkthrough> registry = new HashMap<>();
 
-        // FIXME: Not internationalized.
         WalkthroughStep step1 = TooltipStep
                 .builder("Click on \"File\" menu")
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
@@ -63,8 +62,8 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step3 = TooltipStep
-                .builder("Select the 'Linked files' tab")
-                .content(new TextBlock("This section manages how JabRef handles your PDF files and other documents."))
+                .builder("Select the \"Linked files\" tab")
+                .content(new TextBlock(Localization.lang("This section manages how JabRef handles your PDF files and other documents.")))
                 .width(400)
                 .resolver(NodeResolver.predicate(node ->
                         node.getStyleClass().contains("list-cell") &&
@@ -80,7 +79,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step4 = TooltipStep
-                .builder("Enable 'Main file directory' option")
+                .builder("Enable \"Main file directory\" option")
                 .content(new TextBlock("Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step."))
                 .width(400)
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))

@@ -138,7 +138,22 @@ public class SingleWindowWalkthroughOverlay {
 
         Platform.runLater(() -> {
             if (targetNode != null) {
-                popover.show(targetNode);
+                if (isNodeReady(targetNode)) {
+                    popover.show(targetNode);
+                } else {
+                    ChangeListener<Bounds> boundsListener = new ChangeListener<>() {
+                        @Override
+                        public void changed(javafx.beans.value.ObservableValue<? extends Bounds> observable,
+                                             Bounds oldValue, Bounds newValue) {
+                            if (newValue.getWidth() > 0 && newValue.getHeight() > 0) {
+                                Platform.runLater(() -> popover.show(targetNode));
+                                targetNode.boundsInParentProperty().removeListener(this);
+                            }
+                        }
+                    };
+                    targetNode.boundsInParentProperty().addListener(boundsListener);
+                    cleanUpTasks.add(() -> targetNode.boundsInParentProperty().removeListener(boundsListener));
+                }
             } else {
                 popover.show(window);
             }
@@ -249,5 +264,10 @@ public class SingleWindowWalkthroughOverlay {
 
         cleanUpTasks.add(() -> node.boundsInParentProperty().removeListener(listener));
         cleanUpTasks.add(() -> overlayPane.setClip(null));
+    }
+
+    private boolean isNodeReady(Node node) {
+        Bounds bounds = node.getBoundsInParent();
+        return bounds.getWidth() > 0 && bounds.getHeight() > 0;
     }
 }
