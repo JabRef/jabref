@@ -90,18 +90,18 @@ public class WalkthroughHighlighter {
             case FULL_SCREEN_DARKEN ->
                     applyFullScreenDarken(window);
             case NONE -> {
-                if (backdropHighlights.containsKey(window)) {
-                    backdropHighlights.get(window).detach();
-                    backdropHighlights.remove(window);
-                }
-                if (pulseIndicators.containsKey(window)) {
-                    pulseIndicators.get(window).detach();
-                    pulseIndicators.remove(window);
-                }
-                if (fullScreenDarkens.containsKey(window)) {
-                    fullScreenDarkens.get(window).detach();
-                    fullScreenDarkens.remove(window);
-                }
+                backdropHighlights.computeIfPresent(window, (_, highlight) -> {
+                    highlight.detach();
+                    return null;
+                });
+                pulseIndicators.computeIfPresent(window, (_, indicator) -> {
+                    indicator.detach();
+                    return null;
+                });
+                fullScreenDarkens.computeIfPresent(window, (_, darken) -> {
+                    darken.detach();
+                    return null;
+                });
             }
         }
     }

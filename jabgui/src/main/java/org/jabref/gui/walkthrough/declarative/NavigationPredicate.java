@@ -29,6 +29,8 @@ import org.jspecify.annotations.NonNull;
  */
 @FunctionalInterface
 public interface NavigationPredicate {
+    long HANDLER_TIMEOUT_MS = 1000;
+
     /**
      * Attaches the navigation listeners to the target node.
      *
@@ -42,14 +44,14 @@ public interface NavigationPredicate {
     static NavigationPredicate onClick() {
         return (targetNode, beforeNavigate, onNavigate) -> {
             EventHandler<? super MouseEvent> onClicked = targetNode.getOnMouseClicked();
-            targetNode.setOnMouseClicked(ConcurrentNavigationRunner.decorate(beforeNavigate, onClicked, onNavigate));
+            targetNode.setOnMouseClicked(decorate(beforeNavigate, onClicked, onNavigate));
 
             Optional<MenuItem> item = resolveMenuItem(targetNode);
             if (item.isPresent()) {
                 MenuItem menuItem = item.get();
                 // Note MenuItem doesn't extend Node, so the duplication between MenuItem and ButtonBase cannot be removed
                 EventHandler<ActionEvent> onAction = menuItem.getOnAction();
-                EventHandler<ActionEvent> decoratedAction = ConcurrentNavigationRunner.decorate(beforeNavigate, onAction, onNavigate);
+                EventHandler<ActionEvent> decoratedAction = decorate(beforeNavigate, onAction, onNavigate);
                 menuItem.setOnAction(decoratedAction);
                 menuItem.addEventFilter(ActionEvent.ACTION, decoratedAction);
 
@@ -62,7 +64,7 @@ public interface NavigationPredicate {
 
             if (targetNode instanceof ButtonBase button) {
                 EventHandler<ActionEvent> onAction = button.getOnAction();
-                EventHandler<ActionEvent> decoratedAction = ConcurrentNavigationRunner.decorate(beforeNavigate, onAction, onNavigate);
+                EventHandler<ActionEvent> decoratedAction = decorate(beforeNavigate, onAction, onNavigate);
 
                 button.setOnAction(decoratedAction);
                 button.addEventFilter(ActionEvent.ACTION, decoratedAction);
@@ -81,7 +83,7 @@ public interface NavigationPredicate {
     static NavigationPredicate onHover() {
         return (targetNode, beforeNavigate, onNavigate) -> {
             EventHandler<? super MouseEvent> onEnter = targetNode.getOnMouseEntered();
-            targetNode.setOnMouseEntered(ConcurrentNavigationRunner.decorate(beforeNavigate, onEnter, onNavigate));
+            targetNode.setOnMouseEntered(decorate(beforeNavigate, onEnter, onNavigate));
 
             Optional<MenuItem> item = resolveMenuItem(targetNode);
             if (item.isPresent()) {
@@ -144,71 +146,67 @@ public interface NavigationPredicate {
                      .findFirst();
     }
 
-    class ConcurrentNavigationRunner {
-        private static final long HANDLER_TIMEOUT_MS = 1000;
+    static <T extends Event> EventHandler<T> decorate(
+            Runnable beforeNavigate,
+            EventHandler<? super T> originalHandler,
+            Runnable onNavigate) {
+        return event -> navigate(beforeNavigate, originalHandler, event, onNavigate);
+    }
 
-        static <T extends Event> EventHandler<T> decorate(
-                Runnable beforeNavigate,
-                EventHandler<? super T> originalHandler,
-                Runnable onNavigate) {
-            return event -> navigate(beforeNavigate, originalHandler, event, onNavigate);
-        }
+    static <T extends Event> void navigate(
+            Runnable beforeNavigate,
+            EventHandler<? super T> originalHandler,
+            T event,
+            Runnable onNavigate) {
 
-        static <T extends Event> void navigate(
-                Runnable beforeNavigate,
-                EventHandler<? super T> originalHandler,
-                T event,
-                Runnable onNavigate) {
+        event.consume();
+        beforeNavigate.run();
 
-            event.consume();
-            beforeNavigate.run();
+        CompletableFuture<Void> handlerFuture = new CompletableFuture<>();
 
-            CompletableFuture<Void> handlerFuture = new CompletableFuture<>();
-
-            if (originalHandler != null) {
-                Platform.runLater(() -> {
-                    try {
-                        originalHandler.handle(event);
-                    } finally {
-                        handlerFuture.complete(null);
-                    }
-                });
-            } else {
-                handlerFuture.complete(null);
-            }
-
-            CompletableFuture<Void> windowFuture = new CompletableFuture<>();
-
-            ListChangeListener<Window> listener = new ListChangeListener<>() {
-                @Override
-                public void onChanged(Change<? extends Window> change) {
-                    while (change.next()) {
-                        if (change.wasAdded()) {
-                            Window.getWindows().removeListener(this);
-                            windowFuture.complete(null);
-                            return;
-                        }
-                    }
-                }
-            };
-
-            Platform.runLater(() -> Window.getWindows().addListener(listener));
-
-            CompletableFuture<Void> timeoutFuture = CompletableFuture.runAsync(() -> {
+        if (originalHandler != null) {
+            Platform.runLater(() -> {
                 try {
-                    Thread.sleep(HANDLER_TIMEOUT_MS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+                    originalHandler.handle(event);
+                } finally {
+                    handlerFuture.complete(null);
                 }
             });
-
-            CompletableFuture.anyOf(handlerFuture, windowFuture, timeoutFuture)
-                             .whenComplete((_, _) -> {
-                                 Platform.runLater(onNavigate);
-                                 timeoutFuture.cancel(true);
-                                 Platform.runLater(() -> Window.getWindows().removeListener(listener));
-                                 windowFuture.cancel(true);
-                             });
+        } else {
+            handlerFuture.complete(null);
         }
+
+        CompletableFuture<Void> windowFuture = new CompletableFuture<>();
+
+        ListChangeListener<Window> listener = new ListChangeListener<>() {
+            @Override
+            public void onChanged(Change<? extends Window> change) {
+                while (change.next()) {
+                    if (change.wasAdded()) {
+                        Window.getWindows().removeListener(this);
+                        windowFuture.complete(null);
+                        return;
+                    }
+                }
+            }
+        };
+
+        Platform.runLater(() -> Window.getWindows().addListener(listener));
+
+        CompletableFuture<Void> timeoutFuture = CompletableFuture.runAsync(() -> {
+            try {
+                Thread.sleep(HANDLER_TIMEOUT_MS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture.anyOf(handlerFuture, windowFuture, timeoutFuture)
+                         .whenComplete((_, _) -> {
+                             Platform.runLater(onNavigate);
+                             timeoutFuture.cancel(true);
+                             Platform.runLater(() -> Window.getWindows().removeListener(listener));
+                             windowFuture.cancel(true);
+                         });
     }
 }

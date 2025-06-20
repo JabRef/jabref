@@ -2,6 +2,7 @@ package org.jabref.gui.walkthrough;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javafx.scene.control.ContextMenu;
 
@@ -30,6 +31,7 @@ public class WalkthroughAction extends SimpleCommand {
 
     public WalkthroughAction(String name, JabRefFrame frame) {
         this.walkthrough = WALKTHROUGH_REGISTRY.get(name);
+        Objects.requireNonNull(this.walkthrough);
         this.frame = frame;
     }
 
@@ -80,7 +82,9 @@ public class WalkthroughAction extends SimpleCommand {
 
         WalkthroughStep step4 = TooltipStep
                 .builder("Enable \"Main file directory\" option")
-                .content(new TextBlock("Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step."))
+                .content(new TextBlock("""
+                        Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step.
+                        """))
                 .width(400)
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))
                 .navigation(NavigationPredicate.onClick())

@@ -57,6 +57,7 @@ public class SingleWindowWalkthroughOverlay {
         popover = new PopOver();
 
         Scene scene = window.getScene();
+        // This basically never happens, so only a development time check is needed
         assert scene != null;
 
         originalRoot = (Pane) scene.getRoot();
@@ -73,6 +74,7 @@ public class SingleWindowWalkthroughOverlay {
      */
     public void displayStep(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate, Walkthrough walkthrough) {
         hide();
+        // race condition with PopOver showing
         displayStepContent(step, targetNode, beforeNavigate, walkthrough);
     }
 
@@ -104,7 +106,7 @@ public class SingleWindowWalkthroughOverlay {
         }
     }
 
-    private void displayStepContent(WalkthroughStep step, Node targetNode, Runnable beforeNavigate, Walkthrough walkthrough) {
+    private void displayStepContent(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate, Walkthrough walkthrough) {
         switch (step) {
             case TooltipStep tooltipStep -> {
                 Node content = renderer.render(tooltipStep, walkthrough, beforeNavigate);

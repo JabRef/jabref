@@ -10,7 +10,7 @@ import javafx.scene.shape.Shape;
 import org.jspecify.annotations.NonNull;
 
 /**
- * Creates a backdrop highlight effect.
+ * A backdrop highlight effect that dims the background and highlights a specific node.
  */
 public class BackdropHighlight extends WalkthroughEffect {
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
@@ -24,11 +24,6 @@ public class BackdropHighlight extends WalkthroughEffect {
         super(pane);
     }
 
-    /**
-     * Attaches the backdrop highlight to the specified node.
-     *
-     * @param node The node to attach the backdrop highlight to.
-     */
     public void attach(@NonNull Node node) {
         detach();
         if (overlayShape == null) {

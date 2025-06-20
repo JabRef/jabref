@@ -16,6 +16,7 @@ import org.jspecify.annotations.NonNull;
  * A pulsing circular indicator that can be attached to a target node.
  */
 public class PulseAnimateIndicator extends WalkthroughEffect {
+    public static final int INDICATOR_OFFSET = 5;
     private Circle pulseIndicator;
     private Timeline pulseAnimation;
     private Node node;
@@ -24,11 +25,6 @@ public class PulseAnimateIndicator extends WalkthroughEffect {
         super(pane);
     }
 
-    /**
-     * Attaches the pulse indicator to the specified node.
-     *
-     * @param node The node to attach the pulse indicator to.
-     */
     public void attach(@NonNull Node node) {
         cleanUp();
         if (pulseIndicator == null) {
@@ -92,8 +88,8 @@ public class PulseAnimateIndicator extends WalkthroughEffect {
 
         pulseIndicator.setVisible(true);
 
-        double indicatorX = targetBounds.getMaxX() - 5;
-        double indicatorY = targetBounds.getMinY() + 5;
+        double indicatorX = targetBounds.getMaxX() - INDICATOR_OFFSET;
+        double indicatorY = targetBounds.getMinY() + INDICATOR_OFFSET;
 
         pulseIndicator.setLayoutX(indicatorX);
         pulseIndicator.setLayoutY(indicatorY);

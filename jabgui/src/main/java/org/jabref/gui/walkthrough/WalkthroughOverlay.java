@@ -73,7 +73,7 @@ public class WalkthroughOverlay {
         int currentIndex = walkthrough.currentStepProperty().get();
 
         for (int i = currentIndex - 1; i >= 0; i--) {
-            WalkthroughStep previousStep = getStepAtIndex(i);
+            WalkthroughStep previousStep = walkthrough.getStepAtIndex(i);
             Window activeWindow = previousStep.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(stage);
             Scene scene = activeWindow.getScene();
             if (scene != null && (previousStep.resolver().isEmpty() || previousStep.resolver().get().resolve(scene).isPresent())) {
@@ -147,10 +147,6 @@ public class WalkthroughOverlay {
         }
         nodePollingTimeline.stop();
         nodePollingTimeline = null;
-    }
-
-    private @NonNull WalkthroughStep getStepAtIndex(int index) {
-        return walkthrough.getSteps().get(index);
     }
 
     private SingleWindowWalkthroughOverlay getOrCreateOverlay(Window window) {

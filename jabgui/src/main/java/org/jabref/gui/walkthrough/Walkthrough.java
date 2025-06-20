@@ -142,8 +142,8 @@ public class Walkthrough {
         overlay.displayStep(step);
     }
 
-    public List<WalkthroughStep> getSteps() {
-        return steps;
+    public WalkthroughStep getStepAtIndex(int index) {
+        return steps.get(index);
     }
 
     public void skip() {
