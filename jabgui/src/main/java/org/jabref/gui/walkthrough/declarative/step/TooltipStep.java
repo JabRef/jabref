@@ -25,8 +25,8 @@ public record TooltipStep(
         @Nullable String backButtonTextValue,
         @Nullable NavigationPredicate navigationPredicateValue,
         TooltipPosition position,
-        @Nullable Double preferredWidthValue,
-        @Nullable Double preferredHeightValue,
+        @Nullable Double widthValue,
+        @Nullable Double heightValue,
         @Nullable MultiWindowHighlight highlightValue,
         boolean autoFallback,
         @Nullable WindowResolver activeWindowResolverValue
@@ -58,13 +58,13 @@ public record TooltipStep(
     }
 
     @Override
-    public OptionalDouble preferredWidth() {
-        return preferredWidthValue != null ? OptionalDouble.of(preferredWidthValue) : OptionalDouble.empty();
+    public OptionalDouble width() {
+        return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.empty();
     }
 
     @Override
-    public OptionalDouble preferredHeight() {
-        return preferredHeightValue != null ? OptionalDouble.of(preferredHeightValue) : OptionalDouble.empty();
+    public OptionalDouble height() {
+        return heightValue != null ? OptionalDouble.of(heightValue) : OptionalDouble.empty();
     }
 
     @Override
@@ -90,8 +90,8 @@ public record TooltipStep(
         private @Nullable String backButtonText;
         private @Nullable NavigationPredicate navigationPredicate;
         private TooltipPosition position = TooltipPosition.AUTO;
-        private @Nullable Double preferredWidth;
-        private @Nullable Double preferredHeight;
+        private @Nullable Double width;
+        private @Nullable Double height;
         private @Nullable MultiWindowHighlight highlight;
         private boolean autoFallback = true;
         private @Nullable WindowResolver activeWindowResolver;
@@ -140,13 +140,13 @@ public record TooltipStep(
             return this;
         }
 
-        public Builder preferredWidth(double width) {
-            this.preferredWidth = width;
+        public Builder width(double width) {
+            this.width = width;
             return this;
         }
 
-        public Builder preferredHeight(double height) {
-            this.preferredHeight = height;
+        public Builder height(double height) {
+            this.height = height;
             return this;
         }
 
@@ -185,8 +185,8 @@ public record TooltipStep(
                     backButtonText,
                     navigationPredicate,
                     position,
-                    preferredWidth,
-                    preferredHeight,
+                    width,
+                    height,
                     highlight,
                     autoFallback,
                     activeWindowResolver);

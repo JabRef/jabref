@@ -25,9 +25,9 @@ public sealed interface WalkthroughStep permits PanelStep, TooltipStep {
 
     Optional<NavigationPredicate> navigationPredicate();
 
-    OptionalDouble preferredWidth();
+    OptionalDouble width();
 
-    OptionalDouble preferredHeight();
+    OptionalDouble height();
 
     boolean autoFallback();
 

@@ -52,7 +52,7 @@ public class WalkthroughOverlay {
         if (step.resolver().isPresent()) {
             startNodePolling(step, window, targetNode.orElse(null));
         } else {
-            walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), null);
+            walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), scene, null);
             displayStep(step, window, null);
         }
     }
@@ -97,7 +97,7 @@ public class WalkthroughOverlay {
 
         Scene initialScene = window.getScene();
 
-        walkthroughHighlighter.applyHighlight(initialScene, step.highlight().orElse(null), node);
+        walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), initialScene, node);
         displayStep(step, window, node);
 
         LOGGER.info("Starting continuous node polling for step: {}", step.title());
@@ -112,7 +112,7 @@ public class WalkthroughOverlay {
                     (currentNode) -> {
                         if (!nodeEverResolved.get()) {
                             LOGGER.info("Target node found for step: {}, updating display", step.title());
-                            walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), currentNode);
+                            walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), scene, currentNode);
                             displayStep(step, window, currentNode);
                             nodeEverResolved.set(true);
                         }
@@ -128,7 +128,7 @@ public class WalkthroughOverlay {
                             tryRevertToPreviousResolvableStep();
                         } else {
                             LOGGER.info("Node disappeared for step: {}, showing step without node", step.title());
-                            walkthroughHighlighter.applyHighlight(scene, step.highlight().orElse(null), null);
+                            walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), scene, null);
                             displayStep(step, window, null);
                             nodeEverResolved.set(false);
                         }

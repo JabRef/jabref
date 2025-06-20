@@ -46,6 +46,17 @@ public class WalkthroughRenderer {
         HBox actionsContainer = makeActions(step, walkthrough, beforeNavigate);
         actionsContainer.getStyleClass().add("walkthrough-tooltip-actions");
 
+        step.height().ifPresent(height -> {
+            tooltip.setPrefHeight(height);
+            tooltip.setMaxHeight(height);
+            tooltip.setMinHeight(height);
+        });
+        step.width().ifPresent(width -> {
+            tooltip.setPrefWidth(width);
+            tooltip.setMaxWidth(width);
+            tooltip.setMinWidth(width);
+        });
+
         tooltip.getChildren().addAll(titleLabel, contentContainer, actionsContainer);
         return tooltip;
     }
@@ -79,7 +90,7 @@ public class WalkthroughRenderer {
             panel.getStyleClass().add("walkthrough-side-panel-vertical");
             VBox.setVgrow(panel, Priority.ALWAYS);
             panel.setMaxHeight(Double.MAX_VALUE);
-            step.preferredWidth().ifPresent(width -> {
+            step.width().ifPresent(width -> {
                 panel.setPrefWidth(width);
                 panel.setMaxWidth(width);
                 panel.setMinWidth(width);
@@ -88,7 +99,7 @@ public class WalkthroughRenderer {
             panel.getStyleClass().add("walkthrough-side-panel-horizontal");
             HBox.setHgrow(panel, Priority.ALWAYS);
             panel.setMaxWidth(Double.MAX_VALUE);
-            step.preferredHeight().ifPresent(height -> {
+            step.height().ifPresent(height -> {
                 panel.setPrefHeight(height);
                 panel.setMaxHeight(height);
                 panel.setMinHeight(height);

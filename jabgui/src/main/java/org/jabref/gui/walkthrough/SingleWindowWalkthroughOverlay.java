@@ -43,7 +43,6 @@ public class SingleWindowWalkthroughOverlay {
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
     private final List<Runnable> cleanUpTasks = new ArrayList<>();
-    private @Nullable Node node;
 
     public SingleWindowWalkthroughOverlay(Window window) {
         this.window = window;
@@ -75,7 +74,6 @@ public class SingleWindowWalkthroughOverlay {
     public void displayStep(WalkthroughStep step, @Nullable Node targetNode, Runnable beforeNavigate, Walkthrough walkthrough) {
         hide();
         displayStepContent(step, targetNode, beforeNavigate, walkthrough);
-        node = targetNode;
     }
 
     /**
@@ -138,19 +136,6 @@ public class SingleWindowWalkthroughOverlay {
         popover.setAutoHide(false);
         mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
 
-        step.preferredWidth().ifPresent(width -> {
-            popover.setPrefWidth(width);
-            popover.setMinWidth(width);
-        });
-        step.preferredHeight().ifPresent(height -> {
-            popover.setPrefHeight(height);
-            popover.setMinHeight(height);
-        });
-
-        // Defer showing the popover until the next pulse to ensure the
-        // target node (or window) has been fully laid out. This prevents
-        // situations where the pop-over fails to appear because the node
-        // is not yet ready (for example directly after a scene change).
         Platform.runLater(() -> {
             if (targetNode != null) {
                 popover.show(targetNode);
@@ -158,23 +143,6 @@ public class SingleWindowWalkthroughOverlay {
                 popover.show(window);
             }
         });
-
-        ChangeListener<Boolean> listener = (_, _, focused) -> {
-            if (focused && !popover.isShowing()) {
-                LOGGER.debug("Window gained focus, ensuring tooltip is visible");
-                if (node != null) {
-                    popover.show(node);
-                } else {
-                    popover.show(window);
-                }
-            }
-        };
-
-        window.focusedProperty().addListener(listener);
-        cleanUpTasks.add(() -> window.focusedProperty().removeListener(listener));
-        popover.showingProperty().addListener(listener);
-        cleanUpTasks.add(() -> popover.showingProperty().removeListener(listener));
-        cleanUpTasks.add(popover::hide);
     }
 
     private void displayPanelStep(Node content, PanelStep step) {

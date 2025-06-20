@@ -13,6 +13,8 @@ import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
+import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
+import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
 import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
@@ -41,7 +43,7 @@ public class WalkthroughAction extends SimpleCommand {
 
         // FIXME: Not internationalized.
         WalkthroughStep step1 = TooltipStep
-                .builder("Hover over \"File\" menu")
+                .builder("Click on \"File\" menu")
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.BOTTOM)
@@ -49,7 +51,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step2 = TooltipStep
-                .builder("Select \"Preferences\"")
+                .builder("Click on \"Preferences\"")
                 .resolver(NodeResolver.menuItem("Preferences"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.RIGHT)
@@ -61,7 +63,9 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step3 = TooltipStep
-                .builder("Select \"Linked files\" tab")
+                .builder("Select the 'Linked files' tab")
+                .content(new TextBlock("This section manages how JabRef handles your PDF files and other documents."))
+                .width(400)
                 .resolver(NodeResolver.predicate(node ->
                         node.getStyleClass().contains("list-cell") &&
                                 node.toString().contains("Linked files")))
@@ -76,7 +80,9 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step4 = TooltipStep
-                .builder("Choose to use main file directory")
+                .builder("Enable 'Main file directory' option")
+                .content(new TextBlock("Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step."))
+                .width(400)
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.AUTO)
@@ -89,6 +95,11 @@ public class WalkthroughAction extends SimpleCommand {
 
         WalkthroughStep step5 = PanelStep
                 .builder("Click \"OK\" to save changes")
+                .content(
+                        new TextBlock("Congratulations! Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents."),
+                        new InfoBlock("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks")
+                )
+                .height(180)
                 .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
                 .navigation(NavigationPredicate.onClick())
                 .position(PanelPosition.TOP)

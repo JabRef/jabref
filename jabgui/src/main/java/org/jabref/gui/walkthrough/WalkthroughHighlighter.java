@@ -29,35 +29,36 @@ public class WalkthroughHighlighter {
     /**
      * Applies the specified highlight configuration.
      *
-     * @param mainScene       The primary scene to apply the highlight to.
-     * @param highlightConfig The highlight configuration to apply. Default to
-     *                        BackdropHighlight on the primary windows if null.
-     * @param fallbackTarget  The fallback target node to use if no highlight
-     *                        configuration is provided.
+     * @param config         The highlight configuration to apply. Default to
+     *                       BackdropHighlight on the primary windows if null.
+     * @param fallbackWindow The primary scene to apply the highlight to.
+     * @param fallbackTarget The fallback target node to use if no highlight
+     *                       configuration is provided.
      */
-    public void applyHighlight(@NonNull Scene mainScene,
-                               @Nullable MultiWindowHighlight highlightConfig,
+    public void applyHighlight(@Nullable MultiWindowHighlight config, @NonNull Scene fallbackWindow,
                                @Nullable Node fallbackTarget) {
         detachAll();
 
-        if (highlightConfig != null) {
-            if (highlightConfig.windowEffects().isEmpty() && highlightConfig.fallbackEffect().isPresent()) {
-                applyEffect(mainScene.getWindow(), highlightConfig.fallbackEffect().get(), fallbackTarget);
-                return;
-            }
-            highlightConfig.windowEffects().forEach(effect -> {
-                Window window = effect.windowResolver().flatMap(WindowResolver::resolve).orElse(mainScene.getWindow());
-                Node targetNode = effect
-                        .targetNodeResolver()
-                        .flatMap(resolver -> resolver.resolve(window.getScene() != null ? window.getScene() : mainScene))
-                        .orElse(fallbackTarget);
-                applyEffect(window, effect.effect(), targetNode);
-            });
-        } else {
+        if (config == null) {
             if (fallbackTarget != null) {
-                applyBackdropHighlight(mainScene.getWindow(), fallbackTarget);
+                applyBackdropHighlight(fallbackWindow.getWindow(), fallbackTarget);
             }
+            return;
         }
+
+        if (config.windowEffects().isEmpty() && config.fallbackEffect().isPresent()) {
+            applyEffect(fallbackWindow.getWindow(), config.fallbackEffect().get(), fallbackTarget);
+            return;
+        }
+
+        config.windowEffects().forEach(effect -> {
+            Window window = effect.windowResolver().flatMap(WindowResolver::resolve).orElse(fallbackWindow.getWindow());
+            Node targetNode = effect
+                    .targetNodeResolver()
+                    .flatMap(resolver -> resolver.resolve(window.getScene() != null ? window.getScene() : fallbackWindow))
+                    .orElse(fallbackTarget);
+            applyEffect(window, effect.effect(), targetNode);
+        });
     }
 
     /**

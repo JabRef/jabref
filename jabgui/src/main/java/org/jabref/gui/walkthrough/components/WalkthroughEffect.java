@@ -8,9 +8,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 
@@ -63,8 +60,9 @@ public abstract class WalkthroughEffect {
     protected void setupNodeListeners(@NonNull Node node) {
         addListener(node.boundsInLocalProperty());
         addListener(node.localToSceneTransformProperty());
+        addListener(node.boundsInParentProperty());
+        addListener(node.layoutBoundsProperty());
         addListener(node.visibleProperty());
-        setupScrollListeners(node);
 
         ChangeListener<Scene> sceneListener = (_, oldScene, newScene) -> {
             if (oldScene != null) {
@@ -105,23 +103,6 @@ public abstract class WalkthroughEffect {
                 addListener(newScene.getWindow().heightProperty());
             }
         });
-    }
-
-    protected void setupScrollListeners(@NonNull Node node) {
-        Node current = node.getParent();
-        while (current != null) {
-            if (current instanceof ScrollPane scrollPane) {
-                addListener(scrollPane.hvalueProperty());
-                addListener(scrollPane.vvalueProperty());
-            }
-            if (current instanceof ListView<?> listView) {
-                // ref: https://stackoverflow.com/questions/49425888/javafx-listview-on-scroll-show
-                listView.lookupAll(".scroll-bar")
-                        .stream().filter(ScrollBar.class::isInstance)
-                        .forEach(bar -> addListener(bar.visibleProperty()));
-            }
-            current = current.getParent();
-        }
     }
 
     protected boolean isNodeVisible(@Nullable Node node) {
