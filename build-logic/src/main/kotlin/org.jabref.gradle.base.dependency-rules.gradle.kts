@@ -143,7 +143,11 @@ extraJavaModuleInfo {
     module("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8", "io.zonky.test.postgres.embedded.postgres.binaries.linux.arm64v8")
     module("io.zonky.test.postgres:embedded-postgres-binaries-windows-amd64", "io.zonky.test.postgres.embedded.postgres.binaries.windows.amd64")
     module("net.harawata:appdirs", "net.harawata.appdirs")
-    module("net.java.dev.jna:jna", "com.sun.jna")
+    module("net.java.dev.jna:jna", "com.sun.jna") {
+        patchRealModule()
+        exportAllPackages()
+        requires("java.logging")
+    }
     module("net.java.dev.jna:jna-platform", "com.sun.jna.platform")
     module("net.jcip:jcip-annotations", "net.jcip.annotations")
     module("net.jodah:typetools", "net.jodah.typetools")
