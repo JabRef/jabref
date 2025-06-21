@@ -204,6 +204,7 @@ dependencies {
     testImplementation("org.hamcrest:hamcrest")
 
     testImplementation("org.wiremock:wiremock") {
+        exclude(group = "com.jayway.jsonpath", module = "json-path")
         exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
         exclude(group = "org.xmlunit", module = "xmlunit-legacy")
     }
