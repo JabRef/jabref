@@ -294,6 +294,15 @@ extraJavaModuleInfo {
         requires("java.logging")
         requires("org.glassfish.grizzly")
     }
+    module("org.glassfish.jersey.test-framework:jersey-test-framework-core", "org.glassfish.jersey.test.framework.core") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet", "org.glassfish.jersey.container.grizzly2.servlet")
+    module("org.glassfish.jersey.containers:jersey-container-servlet", "org.glassfish.jersey.container.servlet")
+    module("org.glassfish.jersey.containers:jersey-container-servlet-core", "org.glassfish.jersey.container.servlet.core")
+    module("org.glassfish.jersey.media:jersey-media-jaxb", "org.glassfish.jersey.media.jaxb")
+    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "org.glassfish.jersey.test.provider.grizzly2")
     module("org.glassfish.hk2:hk2-locator", "org.glassfish.hk2.locator") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -438,6 +447,11 @@ extraJavaModuleInfo {
 
     module("org.hamcrest:hamcrest", "org.hamcrest") {
         exportAllPackages()
+    }
+
+    module("org.mockito:mockito-core", "org.mockito") {
+        preserveExisting()
+        requires("java.prefs")
     }
 
     // Workaround for https://github.com/wiremock/wiremock/issues/2149
