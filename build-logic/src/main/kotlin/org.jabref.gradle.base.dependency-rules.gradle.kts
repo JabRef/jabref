@@ -182,6 +182,8 @@ extraJavaModuleInfo {
         exportAllPackages()
         requires("org.assertj")
         requires("org.hamcrest")
+        requires("org.junit.jupiter.api")
+        requires("org.testfx")
     }
 
     module("commons-fileupload:commons-fileupload", "commons.fileupload")
@@ -203,7 +205,10 @@ extraJavaModuleInfo {
     module("net.minidev:json-smart", "net.minidev.jsonsmart")
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
+    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
+    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi")
     module("com.tngtech.archunit:archunit", "com.tngtech.archunit")
+    module("net.minidev:accessors-smart", "net.minidev.accessorssmart")
 
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
     module("org.glassfish.jersey.core:jersey-server", "org.glassfish.jersey.server") {
