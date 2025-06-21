@@ -77,6 +77,7 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
@@ -366,6 +367,12 @@ public class MainMenu extends MenuBar {
         help.getItems().addAll(
                 factory.createMenuItem(StandardActions.HELP, new HelpAction(HelpFile.CONTENTS, dialogService, preferences.getExternalApplicationsPreferences())),
                 factory.createMenuItem(StandardActions.OPEN_FORUM, new OpenBrowserAction(URLs.DONATE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+
+                new SeparatorMenuItem(),
+
+                factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
+                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction("mainFileDirectory", frame))
+                ),
 
                 new SeparatorMenuItem(),
 

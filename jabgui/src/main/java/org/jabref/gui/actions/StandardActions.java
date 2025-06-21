@@ -185,6 +185,8 @@ public enum StandardActions implements Action {
     OPEN_DEV_VERSION_LINK(Localization.lang("Development version"), Localization.lang("Opens a link where the current development version can be downloaded")),
     OPEN_CHANGELOG(Localization.lang("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
     OPEN_GITHUB("GitHub", Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
+    WALKTHROUGH_MENU(Localization.lang("Walkthroughs"), IconTheme.JabRefIcons.BOOK),
+    MAIN_FILE_DIRECTORY_WALKTHROUGH(Localization.lang("Configure main file directory"), IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY),
     DONATE(Localization.lang("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
     OPEN_FORUM(Localization.lang("Community forum"), Localization.lang("Community forum"), IconTheme.JabRefIcons.FORUM),
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),
