@@ -390,17 +390,15 @@ extraJavaModuleInfo {
         requiresTransitive("java.desktop")
     }
 
-    // maybe required for testing; maybe not
-    /*
+    // Required for fxml loading (for localization test)
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         patchRealModule()
-        exportAllPackages()
+        exportAllPackages() // required for testfx
 
         requiresTransitive("javafx.base")
         requiresTransitive("java.desktop")
         requiresTransitive("jdk.unsupported")
     }
-    */
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()
