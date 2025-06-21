@@ -371,12 +371,13 @@ extraJavaModuleInfo {
         patchRealModule()
         exportAllPackages()
 
-        requires("wiremock.slf4j.spi.shim")
         requires("com.fasterxml.jackson.core")
         requires("com.fasterxml.jackson.databind")
         requires("com.fasterxml.jackson.datatype.jsr310")
         requires("com.google.common")
         requires("commons.fileupload")
+        requires("java.xml")
+        requires("org.custommonkey.xmlunit")
         requires("org.eclipse.jetty.server")
         requires("org.eclipse.jetty.servlet")
         requires("org.eclipse.jetty.servlets")
@@ -387,10 +388,9 @@ extraJavaModuleInfo {
         requires("org.eclipse.jetty.alpn.java.server")
         requires("org.eclipse.jetty.alpn.java.client")
         requires("org.eclipse.jetty.alpn.client")
-        requires("java.xml")
-        requires("org.custommonkey.xmlunit")
         requires("org.slf4j")
         requires("org.xmlunit")
+        requires("wiremock.slf4j.spi.shim")
 
         uses("com.github.tomakehurst.wiremock.extension.Extension")
 
@@ -401,9 +401,12 @@ extraJavaModuleInfo {
         // Required to provide package "wiremock.org.slf4j.helpers"
         mergeJar("com.github.koppor:wiremock-slf4j-shim")
     }
-    module("com.github.koppor:wiremock-slf4j-spi-shim", "wiremock.org.slf4j.spi.shim") {
+    module("com.github.koppor:wiremock-slf4j-shim", "wiremock.slf4j.shim") {
         patchRealModule()
         exportAllPackages()
-        requires("org.slf4j")
+    }
+    module("com.github.koppor:wiremock-slf4j-spi-shim", "wiremock.slf4j.spi.shim") {
+        patchRealModule()
+        exportAllPackages()
     }
 }
