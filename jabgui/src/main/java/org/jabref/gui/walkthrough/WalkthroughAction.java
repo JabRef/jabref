@@ -93,7 +93,7 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step5 = PanelStep
                 .builder(Localization.lang("Click \"Save\" to save changes"))
                 .content(
-                        new TextBlock(Localization.lang("Congratulations! Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
+                        new TextBlock(Localization.lang("Congratulations. Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
                         new InfoBlock(Localization.lang("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks"))
                 )
                 .height(180)

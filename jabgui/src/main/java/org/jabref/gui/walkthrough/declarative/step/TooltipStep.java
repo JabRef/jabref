@@ -11,20 +11,19 @@ import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
-import org.jabref.logic.l10n.Localization;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public record TooltipStep(
-        String title,
-        List<WalkthroughRichTextBlock> content,
-        NodeResolver resolverValue,
+        @NonNull String title,
+        @NonNull List<WalkthroughRichTextBlock> content,
+        @NonNull NodeResolver resolverValue,
         @Nullable String continueButtonTextValue,
         @Nullable String skipButtonTextValue,
         @Nullable String backButtonTextValue,
         @Nullable NavigationPredicate navigationPredicateValue,
-        TooltipPosition position,
+        @NonNull TooltipPosition position,
         @Nullable Double widthValue,
         @Nullable Double heightValue,
         @Nullable MultiWindowHighlight highlightValue,
@@ -33,7 +32,7 @@ public record TooltipStep(
 
     @Override
     public Optional<NodeResolver> resolver() {
-        return Optional.ofNullable(resolverValue);
+        return Optional.of(resolverValue);
     }
 
     @Override
@@ -76,7 +75,7 @@ public record TooltipStep(
         return Optional.ofNullable(activeWindowResolverValue);
     }
 
-    public static Builder builder(String title) {
+    public static Builder builder(@NonNull String title) {
         return new Builder(title);
     }
 
