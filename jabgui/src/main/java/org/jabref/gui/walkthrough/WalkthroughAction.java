@@ -66,7 +66,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .width(400)
                 .resolver(NodeResolver.predicate(node ->
                         node.getStyleClass().contains("list-cell") &&
-                                node.toString().contains("Linked files")))
+                                node.toString().contains(Localization.lang("Linked files"))))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.AUTO)
                 .activeWindow(WindowResolver.title("JabRef preferences"))
