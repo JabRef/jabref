@@ -77,6 +77,10 @@ jvmDependencyConflicts.patch {
         removeDependency("net.sf.jopt-simple:jopt-simple")
         removeDependency("org.xmlunit:xmlunit-legacy")
     }
+
+    module("org.testfx:testfx-core") {
+        removeDependency("org.osgi:org.osgi.core")
+    }
 }
 
 extraJavaModuleInfo {
@@ -84,15 +88,6 @@ extraJavaModuleInfo {
 
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
     knownModule("com.github.hypfvieh:dbus-java-transport-native-unixsocket", "org.freedesktop.dbus.transport.jre")
-
-    /*
-    module("java.base", "java.base") {
-        patchRealModule()
-        // org.apache.pdfbox.io requires jdk.internal.ref.Cleaner (via java.nio.DirectByteBuffer.cleaner())
-        // jabgui requires at least "javafx.collections"
-        exportAllPackages()
-    }
-   */
 
     module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers") {
         exportAllPackages()
