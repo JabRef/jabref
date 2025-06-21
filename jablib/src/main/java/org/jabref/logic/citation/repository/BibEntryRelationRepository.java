@@ -23,4 +23,10 @@ public interface BibEntryRelationRepository {
     }
 
     void close();
+
+    /// Close the file and the store, without writing anything (if supported by the implementation).
+    /// This will stop the background thread. This method ignores all errors.
+    default void closeImmediately() {
+        close();
+    }
 }
