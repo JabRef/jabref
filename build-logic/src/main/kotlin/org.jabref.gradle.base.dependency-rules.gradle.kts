@@ -161,7 +161,12 @@ extraJavaModuleInfo {
     module("de.rototor.snuggletex:snuggletex-jeuclid", "de.rototor.snuggletex.jeuclid")
     module("de.swiesend:secret-service", "de.swiesend.secret.service")
     module("de.undercouch:citeproc-java", "de.undercouch.citeproc.java") {
-        requires("javax.xml")
+        exportAllPackages()
+        requires("org.antlr.antlr4.runtime")
+        requires("org.apache.commons.lang3")
+        requires("org.apache.commons.text")
+        requires("java.xml")
+        requires("org.jbibtex")
     }
     module("dev.langchain4j:langchain4j", "dev.langchain4j")
     module("dev.langchain4j:langchain4j-core", "dev.langchain4j.core")
@@ -197,14 +202,20 @@ extraJavaModuleInfo {
     module("org.apache.httpcomponents.core5:httpcore5-h2", "org.apache.httpcomponents.core5.httpcore5.h2")
     module("org.apache.httpcomponents:httpclient", "org.apache.httpcomponents.httpclient")
     module("org.apache.opennlp:opennlp-tools", "org.apache.opennlp.tools")
-    module("org.apache.pdfbox:fontbox", "org.apache.fontbox")
+    module("org.apache.pdfbox:fontbox", "org.apache.fontbox") {
+        requires("java.desktop")
+        requires("org.apache.pdfbox.io")
+        requires("org.apache.commons.logging")
+    }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
     module("org.apache.velocity:velocity-engine-core", "org.apache.velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "org.fxmisc.wellbehaved")
     module("org.javassist:javassist", "org.javassist")
-    module("org.jbibtex:jbibtex", "org.jbibtex")
+    module("org.jbibtex:jbibtex", "org.jbibtex") {
+        exportAllPackages()
+    }
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "pt.davidafsilva.apple.jkeychain")
 
@@ -225,9 +236,13 @@ extraJavaModuleInfo {
 
     module("commons-fileupload:commons-fileupload", "commons.fileupload")
 
-    module("org.xmlunit:xmlunit-core", "org.xmlunit")
+    module("org.xmlunit:xmlunit-core", "org.xmlunit") {
+        exportAllPackages()
+        requires("java.xml")
+    }
     module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers") {
         exportAllPackages()
+        requires("java.logging")
         requires("org.xmlunit")
         requires("org.hamcrest")
     }

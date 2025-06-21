@@ -203,7 +203,10 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 tasks.test {
     jvmArgs = listOf(
         // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
-        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx"
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
+
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
 
         // "--add-reads", "org.mockito=java.prefs",
         // "--add-reads", "org.jabref=wiremock"

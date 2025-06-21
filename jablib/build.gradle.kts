@@ -97,6 +97,8 @@ dependencies {
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
+    // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
 
     implementation("com.fasterxml:aalto-xml")
 
@@ -415,7 +417,11 @@ tasks.test {
         excludeTags("DatabaseTest", "FetcherTest")
     }
     // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
-    jvmArgs = listOf("-javaagent:${mockitoAgent.asPath}")
+    jvmArgs = listOf(
+        "-javaagent:${mockitoAgent.asPath}",
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
+    )
 }
 
 jmh {
