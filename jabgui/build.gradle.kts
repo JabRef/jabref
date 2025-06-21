@@ -11,6 +11,9 @@ plugins {
 group = "org.jabref"
 version = project.findProperty("projVersion") ?: "100.0.0"
 
+// See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+val mockitoAgent = configurations.create("mockitoAgent")
+
 dependencies {
     implementation(project(":jablib"))
     // Following already provided by jablib
@@ -102,6 +105,7 @@ dependencies {
     testImplementation("org.testfx:testfx-junit5")
 
     testImplementation("org.mockito:mockito-core")
+    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.hamcrest:hamcrest")
@@ -202,6 +206,8 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
 tasks.test {
     jvmArgs = listOf(
+        "-javaagent:${mockitoAgent.asPath}",
+
         // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
 
