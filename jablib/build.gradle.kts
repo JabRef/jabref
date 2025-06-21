@@ -203,7 +203,9 @@ dependencies {
 
     testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock")
+    testImplementation("org.wiremock:wiremock") {
+        exclude(group = "org.xmlunit", module = "xmlunit-legacy")
+    }
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")

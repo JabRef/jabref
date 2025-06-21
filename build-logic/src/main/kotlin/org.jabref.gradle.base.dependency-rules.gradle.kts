@@ -51,6 +51,10 @@ jvmDependencyConflicts.patch {
     module("org.wiremock:wiremock") {
         // workaround for https://github.com/wiremock/wiremock/issues/2874
         addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
+
+        // We don't use XMLUnit 1.x APIs (hopefully)
+        removeDependency("org.xmlunit:xmlunit-legacy")
+        removeDependency("org.custommonkey.xmlunit")
     }
     module("org.apache.logging.log4j:log4j-to-slf4j") {
         // remove non-module annotation libraries only used at compile time
@@ -169,17 +173,28 @@ extraJavaModuleInfo {
     module("org.scala-lang:scala-library", "scala.library")
     module("pt.davidafsilva.apple:jkeychain", "pt.davidafsilva.apple.jkeychain")
 
-    module("org.testfx:testfx-core", "org.testfx")
+    module("org.testfx:testfx-core", "org.testfx") {
+        exportAllPackages()
+        requires("org.assertj")
+        requires("org.hamcrest")
+    }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
         exportAllPackages()
-        requireAllDefinedDependencies()
+        requires("org.assertj")
+        requires("org.hamcrest")
     }
-    module("org.hamcrest:hamcrest", "org.hamcrest")
-    knownModule("org.hamcrest:hamcrest-core", "org.hamcrest.core")
+
     module("commons-fileupload:commons-fileupload", "commons.fileupload")
+
     module("org.xmlunit:xmlunit-core", "org.xmlunit")
-    module("org.xmlunit:xmlunit-legacy", "org.custommonkey.xmlunit")
+    // module("org.xmlunit:xmlunit-legacy", "org.custommonkey.xmlunit")
+    module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers") {
+        exportAllPackages()
+        requires("org.xmlunit")
+        requires("org.hamcrest")
+    }
     module("org.xmlunit:xmlunit-placeholders", "org.xmlunit.placeholder")
+
     module("net.javacrumbs.json-unit:json-unit-core", "net.javacrumbs.jsonunit.core")
     module("com.jayway.jsonpath:json-path", "json.path")
     module("com.github.javaparser:javaparser-core", "com.github.javaparser.core")
@@ -189,7 +204,6 @@ extraJavaModuleInfo {
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
     module("com.tngtech.archunit:archunit", "com.tngtech.archunit")
-    module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers")
 
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
     module("org.glassfish.jersey.core:jersey-server", "org.glassfish.jersey.server") {
@@ -366,6 +380,10 @@ extraJavaModuleInfo {
         exports("com.sun.javafx.scene.control")
     }
 
+    module("org.hamcrest:hamcrest", "org.hamcrest") {
+        exportAllPackages()
+    }
+
     // Workaround for https://github.com/wiremock/wiremock/issues/2149
     module("org.wiremock:wiremock", "wiremock") {
         patchRealModule()
@@ -377,7 +395,7 @@ extraJavaModuleInfo {
         requires("com.google.common")
         requires("commons.fileupload")
         requires("java.xml")
-        requires("org.custommonkey.xmlunit")
+        // requires("org.custommonkey.xmlunit")
         requires("org.eclipse.jetty.server")
         requires("org.eclipse.jetty.servlet")
         requires("org.eclipse.jetty.servlets")
