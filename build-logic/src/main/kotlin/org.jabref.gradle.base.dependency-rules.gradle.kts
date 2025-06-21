@@ -88,7 +88,11 @@ extraJavaModuleInfo {
     module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers")
     module("ai.djl.pytorch:pytorch-engine", "ai.djl.pytorch_engine")
     module("ai.djl.pytorch:pytorch-model-zoo", "ai.djl.pytorch_model_zoo")
-    module("ai.djl:api", "ai.djl.api")
+    module("ai.djl:api", "ai.djl.api") {
+        exportAllPackages()
+        requires("org.slf4j")
+        uses("ai.djl.repository.zoo.ZooProvider")
+    }
     module("at.favre.lib:hkdf", "at.favre.lib.hkdf")
     module("com.github.javakeyring:java-keyring", "com.github.java.keyring")
     module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode")
@@ -96,7 +100,10 @@ extraJavaModuleInfo {
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
     module("com.knuddels:jtokkit", "com.knuddels.jtokkit")
-    module("com.konghq:unirest-java-core", "com.konghq.unirest.java.core")
+    module("com.konghq:unirest-java-core", "com.konghq.unirest.java.core") {
+        exportAllPackages()
+        requires("java.net.http")
+    }
     module("com.konghq:unirest-modules-gson", "com.konghq.unirest.modules.gson")
     module("com.lihaoyi:fastparse", "com.lihaoyi.fastparse")
     module("com.lihaoyi:geny", "com.lihaoyi.geny")
