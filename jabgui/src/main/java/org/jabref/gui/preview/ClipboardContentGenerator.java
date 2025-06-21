@@ -45,6 +45,7 @@ public class ClipboardContentGenerator {
             return switch (outputFormat) {
                 case HTML -> processHtml(citations);
                 case TEXT -> processText(citations);
+                case MARKDOWN -> processMarkdown(citations);
             };
         } else {
             // if it is not a citation style take care of the preview
@@ -117,6 +118,13 @@ public class ClipboardContentGenerator {
         ClipboardContent content = new ClipboardContent();
         content.putString(result);
         content.putHtml(result);
+        return content;
+    }
+
+    static ClipboardContent processMarkdown(List<String> citations) {
+        String result = String.join(CitationStyleOutputFormat.MARKDOWN.getLineSeparator(), citations);
+        ClipboardContent content = new ClipboardContent();
+        content.putString(result);
         return content;
     }
 
