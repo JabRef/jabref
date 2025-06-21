@@ -213,8 +213,7 @@ extraJavaModuleInfo {
 
     module("org.testfx:testfx-core", "org.testfx") {
         exportAllPackages()
-        requires("javax.controls")
-        requiresTransitive("javax.graphics")
+        requiresTransitive("javax.controls")
         requires("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
@@ -375,7 +374,8 @@ extraJavaModuleInfo {
         requiresTransitive("java.desktop")
     }
 
-    // required for testing
+    // maybe required for testing; maybe not
+    /*
     module("org.openjfx:javafx-graphics", "javafx.graphics") {
         patchRealModule()
         exportAllPackages()
@@ -384,6 +384,7 @@ extraJavaModuleInfo {
         requiresTransitive("java.desktop")
         requiresTransitive("jdk.unsupported")
     }
+    */
 
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()
