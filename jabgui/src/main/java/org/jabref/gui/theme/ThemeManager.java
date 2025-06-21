@@ -55,12 +55,12 @@ public class ThemeManager {
     );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
-    private static final ThemeWindowManager THEME_WINDOW_MANAGER = ThemeWindowManagerFactory.create();
     private static final boolean SUPPORTS_DARK_MODE = OS.WINDOWS || OS.OS_X;
 
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
+    private final ThemeWindowManager themeWindowManager;
 
     private final StyleSheet baseStyleSheet;
     private Theme theme;
@@ -75,6 +75,7 @@ public class ThemeManager {
         this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
+        this.themeWindowManager = ThemeWindowManagerFactory.create();
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
         this.theme = workspacePreferences.getTheme();
@@ -134,7 +135,7 @@ public class ThemeManager {
             return;
         }
 
-        THEME_WINDOW_MANAGER.setDarkModeForWindowFrame(stage, darkMode);
+        themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
         LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
     }
 
