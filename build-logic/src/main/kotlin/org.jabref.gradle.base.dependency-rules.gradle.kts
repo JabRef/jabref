@@ -71,7 +71,6 @@ jvmDependencyConflicts.patch {
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
     module("org.wiremock:wiremock") {
-        removeDependency("com.jayway.jsonpath:json-path")
         removeDependency("net.minidev:json-smart")
         removeDependency("net.minidev:accessors-smart")
         removeDependency("net.sf.jopt-simple:jopt-simple")
@@ -413,6 +412,8 @@ extraJavaModuleInfo {
         requiresTransitive("jdk.unsupported")
     }
 
+    module("org.openjfx:jdk-jsobject", "jdk.jsobjectEmpty")
+
     module("org.controlsfx:controlsfx", "org.controlsfx.controls") {
         patchRealModule()
 
@@ -495,11 +496,11 @@ extraJavaModuleInfo {
         patchRealModule()
         exportAllPackages()
     }
-
     module("org.objenesis:objenesis", "org.objenesis") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
+    module("com.jayway.jsonpath:json-path", "json.path")
 
     module("org.openjdk.jmh:jmh-core", "jmh.core")
     module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")
