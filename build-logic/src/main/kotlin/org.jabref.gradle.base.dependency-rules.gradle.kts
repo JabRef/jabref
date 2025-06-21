@@ -210,7 +210,7 @@ extraJavaModuleInfo {
         exportAllPackages()
         // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
         requires("java.desktop")
-        requiresTransitive("javax.controls")
+        requiresTransitive("javafx.controls")
         requiresTransitive("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
