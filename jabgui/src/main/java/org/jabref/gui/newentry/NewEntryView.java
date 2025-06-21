@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -94,7 +95,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     private final ControlsFxVisualizer visualizer;
     private BibEntry duplicateEntry;
-    private final HashMap<String, BibEntry> doiCache = new HashMap<String, BibEntry>();
+    private final Map<String, BibEntry> doiCache = new HashMap<>();
     private boolean isCacheInitialized = false;
 
     @FXML private ButtonType generateButtonType;
@@ -326,7 +327,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
-            // since the clipboard automatically pastes the DOI in the textfield, a check here is also required !
             checkDOI(ClipBoardManager.getContents().trim());
 
             Identifier id = validClipboardId.get();
