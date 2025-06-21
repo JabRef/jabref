@@ -42,6 +42,8 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
     dependsOn(tasks.withType<AntlrTask>())
 }
 
+val mockitoAgent = configurations.create("mockitoAgent")
+
 dependencies {
     implementation("org.openjfx:javafx-base")
 
@@ -192,6 +194,9 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-launcher")
 
     testImplementation("org.mockito:mockito-core")
+    // TODO: Use versions of versions/build.gradle.kts
+    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
+
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")
@@ -409,6 +414,8 @@ tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
     }
+    // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+    jvmArgs = listOf("-javaagent:${mockitoAgent.asPath}")
 }
 
 jmh {
