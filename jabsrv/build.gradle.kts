@@ -32,6 +32,7 @@ dependencies {
     implementation("org.glassfish.grizzly:grizzly-http-server")
     implementation("org.glassfish.grizzly:grizzly-framework")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
+    // implementation("org.glassfish.jersey.containers:jersey-container-servlet:3.1.10")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.hibernate.validator:hibernate-validator")
 
