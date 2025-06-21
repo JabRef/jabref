@@ -123,6 +123,10 @@ public class MetaDataDiff {
         return newMetaData;
     }
 
+    public MetaData getOriginalMetaData() {
+        return originalMetaData;
+    }
+
     /**
      * Currently, the groups diff is contained here - and as entry in {@link #getDifferences(GlobalCitationKeyPatterns)}
      */
