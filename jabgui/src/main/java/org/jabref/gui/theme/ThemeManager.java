@@ -18,12 +18,11 @@ import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
 
 import org.jabref.gui.WorkspacePreferences;
-import org.jabref.gui.desktop.os.WindowTitleBarUtil;
+import org.jabref.gui.desktop.os.ThemeListener;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -72,6 +71,8 @@ public class ThemeManager {
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
         this.theme = workspacePreferences.getTheme();
 
+        ThemeListener.initialize(this.theme.getName().equals(Theme.EMBEDDED_DARK_CSS));
+
         // Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
         // file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css)
         addStylesheetToWatchlist(this.baseStyleSheet, this::baseCssLiveUpdate);
@@ -105,11 +106,7 @@ public class ThemeManager {
         this.theme = newTheme;
         LOGGER.info("Theme set to {} with base css {}", newTheme, baseStyleSheet);
 
-        if (OS.WINDOWS) {
-            boolean isDarkTheme = newTheme.getType() == Theme.Type.EMBEDDED &&
-                    newTheme.getName().equals(Theme.EMBEDDED_DARK_CSS);
-            WindowTitleBarUtil.setDarkMode(isDarkTheme);
-        }
+        ThemeListener.setDarkMode(newTheme.getName().equals(Theme.EMBEDDED_DARK_CSS));
 
         this.theme.getAdditionalStylesheet().ifPresent(
                 styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));
