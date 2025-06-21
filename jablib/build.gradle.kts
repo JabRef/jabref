@@ -45,10 +45,6 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
 dependencies {
     implementation("org.openjfx:javafx-base")
 
-    // Required by afterburner.fx
-    implementation("org.openjfx:javafx-controls")
-    implementation("org.openjfx:javafx-fxml")
-    implementation("org.openjfx:javafx-graphics")
     implementation("com.ibm.icu:icu4j")
 
     // Fix "error: module not found: javafx.controls" during compilation
@@ -58,6 +54,9 @@ dependencies {
     // exclusions are not supported
 
     implementation("org.jabref:afterburner.fx")
+    // Required by afterburner.fx
+    implementation("org.openjfx:javafx-fxml")
+
     implementation("org.jabref:easybind")
 
     implementation ("org.apache.pdfbox:pdfbox")
