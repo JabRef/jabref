@@ -182,9 +182,8 @@ extraJavaModuleInfo {
 
     module("org.testfx:testfx-core", "org.testfx") {
         exportAllPackages()
-        requires("javax.base")
         requires("javax.controls")
-        requires("javax.graphics")
+        requiresTransitive("javax.graphics")
         requires("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
@@ -285,20 +284,17 @@ extraJavaModuleInfo {
     module("org.reactfx:reactfx", "org.reactfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
-        requiresTransitive("javafx.base")
         requiresTransitive("javafx.graphics")
     }
     module("org.fxmisc.flowless:flowless", "org.fxmisc.flowless") {
         exportAllPackages()
         requireAllDefinedDependencies()
-        requiresTransitive("javafx.base")
         requiresTransitive("javafx.controls")
         requiresTransitive("javafx.graphics")
     }
     module("org.fxmisc.richtext:richtextfx", "org.fxmisc.richtext") {
         exportAllPackages()
         requireAllDefinedDependencies()
-        requiresTransitive("javafx.base")
         requiresTransitive("javafx.graphics")
     }
     module("io.github.stefanbratanov:jvm-openai", "io.github.stefanbratanov.jvm.openai") {
@@ -344,7 +340,6 @@ extraJavaModuleInfo {
         patchRealModule()
         exportAllPackages()
 
-        requiresTransitive("javafx.base")
         requiresTransitive("javafx.graphics")
         requiresTransitive("java.desktop")
     }
@@ -372,9 +367,8 @@ extraJavaModuleInfo {
         exports("org.controlsfx.validation")
         exports("org.controlsfx.validation.decoration")
 
-        requires("javafx.base")
         requires("javafx.controls")
-        requires("javafx.graphics")
+        requiresTransitive("javafx.graphics")
     }
 
     module("org.openjfx:javafx-controls", "javafx.controls") {

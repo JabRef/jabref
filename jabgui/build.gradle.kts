@@ -13,11 +13,12 @@ version = project.findProperty("projVersion") ?: "100.0.0"
 
 dependencies {
     implementation(project(":jablib"))
+    // Following already provided by jablib
+    // implementation("org.openjfx:javafx-base")
+    // implementation("org.openjfx:javafx-controls")
+    // implementation("org.openjfx:javafx-fxml")
+    // implementation("org.openjfx:javafx-graphics")
 
-    implementation("org.openjfx:javafx-base")
-    implementation("org.openjfx:javafx-controls")
-    implementation("org.openjfx:javafx-fxml")
-    implementation("org.openjfx:javafx-graphics")
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
 
