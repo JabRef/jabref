@@ -162,10 +162,10 @@ extraJavaModuleInfo {
     module("de.swiesend:secret-service", "de.swiesend.secret.service")
     module("de.undercouch:citeproc-java", "de.undercouch.citeproc.java") {
         exportAllPackages()
+        requires("java.xml")
         requires("org.antlr.antlr4.runtime")
         requires("org.apache.commons.lang3")
         requires("org.apache.commons.text")
-        requires("java.xml")
         requires("org.jbibtex")
     }
     module("dev.langchain4j:langchain4j", "dev.langchain4j")
@@ -330,13 +330,12 @@ extraJavaModuleInfo {
     module("org.reactfx:reactfx", "org.reactfx") {
         exportAllPackages()
         requireAllDefinedDependencies()
-        requiresTransitive("javafx.graphics")
+        requiresTransitive("javafx.controls")
     }
     module("org.fxmisc.flowless:flowless", "org.fxmisc.flowless") {
         exportAllPackages()
         requireAllDefinedDependencies()
         requiresTransitive("javafx.controls")
-        requiresTransitive("javafx.graphics")
     }
     module("org.fxmisc.richtext:richtextfx", "org.fxmisc.richtext") {
         exportAllPackages()
