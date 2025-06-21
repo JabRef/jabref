@@ -10,7 +10,7 @@ on:
       - 'src/test/**'
       - 'README.md'
     tags:
-       - '*'
+      - '*'
   pull_request:
     types:
       - opened
@@ -211,32 +211,6 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-
-      # region Publish JabLib on Maven Central
-      - name: Decode secretKeyRingFile
-        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
-        id: secring
-        uses: timheuer/base64-to-file@v1
-        with:
-          fileName: 'secring.gpg'
-          encodedString: ${{ secrets.KOPPOR_SIGNING_SECRETKEYRINGFILE_BASE64 }}
-      - name: store secrets
-        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (startsWith(matrix.os, 'ubuntu'))
-        run: |
-          cat >> gradle.properties <<EOF
-          signing.keyId=${{ secrets.KOPPOR_SIGNING_KEYID }}
-          signing.password=${{ secrets.KOPPOR_SIGNING_PASSWORD }}
-          signing.secretKeyRingFile=${{ steps.secring.outputs.filePath }}
-          mavenCentralUsername=${{ secrets.KOPPOR_MAVENCENTRALUSERNAME }}
-          mavenCentralPassword=${{ secrets.KOPPOR_MAVENCENTRALPASSWORD }}
-          EOF
-          grep secretKeyRingFile gradle.properties
-          file ${{ steps.secring.outputs.filePath }}
-          md5sum ${{ steps.secring.outputs.filePath }}
-      - name: publishAllPublicationsToMavenCentralRepository
-        if: (needs.conditions.outputs.upload-to-builds-jabref-org == 'true') && (matrix.os == 'ubuntu-22.04')
-        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ needs.conditions.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
-      # endregion
 
       - name: Basic build (assemble)
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" assemble
