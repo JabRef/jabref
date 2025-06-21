@@ -70,6 +70,13 @@ jvmDependencyConflicts.patch {
         removeDependency("org.osgi:org.osgi.annotation.bundle")
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
+    module("org.wiremock:wiremock") {
+        removeDependency("com.jayway.jsonpath:json-path")
+        removeDependency("net.minidev:json-smart")
+        removeDependency("net.minidev:accessors-smart")
+        removeDependency("net.sf.jopt-simple:jopt-simple")
+        removeDependency("org.xmlunit:xmlunit-legacy")
+    }
 }
 
 extraJavaModuleInfo {
@@ -185,6 +192,7 @@ extraJavaModuleInfo {
         requires("org.junit.jupiter.api")
         requires("org.testfx")
     }
+    module("org.assertj:assertj-core", "org.assertj")
 
     module("commons-fileupload:commons-fileupload", "commons.fileupload")
 
@@ -198,17 +206,21 @@ extraJavaModuleInfo {
     module("org.xmlunit:xmlunit-placeholders", "org.xmlunit.placeholder")
 
     module("net.javacrumbs.json-unit:json-unit-core", "net.javacrumbs.jsonunit.core")
-    module("com.jayway.jsonpath:json-path", "json.path")
+    // module("com.jayway.jsonpath:json-path", "json.path")
     module("com.github.javaparser:javaparser-core", "com.github.javaparser.core")
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
-    module("net.minidev:json-smart", "net.minidev.jsonsmart")
+    /*module("net.yminidev:json-smart", "net.minidev.jsonsmart") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+     */
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
     module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
     module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi")
     module("com.tngtech.archunit:archunit", "com.tngtech.archunit")
-    module("net.minidev:accessors-smart", "net.minidev.accessorssmart")
+    // module("net.minidev:accessors-smart", "net.minidev.accessorssmart")
 
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
     module("org.glassfish.jersey.core:jersey-server", "org.glassfish.jersey.server") {
@@ -391,7 +403,7 @@ extraJavaModuleInfo {
 
     // Workaround for https://github.com/wiremock/wiremock/issues/2149
     module("org.wiremock:wiremock", "wiremock") {
-        patchRealModule()
+        // patchRealModule()
         exportAllPackages()
 
         requires("com.fasterxml.jackson.core")

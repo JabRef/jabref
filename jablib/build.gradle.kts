@@ -205,6 +205,8 @@ dependencies {
 
     testImplementation("org.wiremock:wiremock") {
         exclude(group = "com.jayway.jsonpath", module = "json-path")
+        exclude(group = "net.minidev", module = "json-smart")
+        exclude(group = "net.minidev", module = "accessors-smart")
         exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
         exclude(group = "org.xmlunit", module = "xmlunit-legacy")
     }
@@ -539,6 +541,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     // Required for LocalizationConsistencyTest
     requires.add("org.testfx.junit5")
+    requires.add("org.assertj")
 
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
