@@ -183,6 +183,10 @@ extraJavaModuleInfo {
     module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
     module("net.minidev:json-smart", "net.minidev.jsonsmart")
 
+    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
+    module("com.tngtech.archunit:archunit", "com.tngtech.archunit")
+    module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers")
+
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
     module("org.glassfish.jersey.core:jersey-server", "org.glassfish.jersey.server") {
         exportAllPackages()

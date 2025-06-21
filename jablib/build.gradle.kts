@@ -525,7 +525,14 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
+    requires.add("org.hamcrest")
     requires.add("org.mockito")
+
+    // Required for LocalizationConsistencyTest
+    requires.add("org.testfx.junit5")
+
+    requires.add("org.xmlunit")
+    requires.add("org.xmlunit.matchers")
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
 
