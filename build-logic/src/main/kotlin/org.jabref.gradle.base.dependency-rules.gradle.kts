@@ -216,8 +216,11 @@ extraJavaModuleInfo {
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
     module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
     module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi")
-    module("com.tngtech.archunit:archunit", "com.tngtech.archunit")
-    // module("net.minidev:accessors-smart", "net.minidev.accessorssmart")
+    module("com.tngtech.archunit:archunit", "com.tngtech.archunit") {
+        exportAllPackages()
+        requires("java.logging")
+        requires("org.slf4j")
+    }
 
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
     module("org.glassfish.jersey.core:jersey-server", "org.glassfish.jersey.server") {
