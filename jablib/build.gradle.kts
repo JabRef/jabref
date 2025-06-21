@@ -547,8 +547,4 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.xmlunit.matchers")
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
-
-    // --add-reads
-    //reads.add("org.jabref.jablib=io.github.classgraph")
-    //reads.add("org.jabref.jablib=org.jabref.testsupport")
 }
