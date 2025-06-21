@@ -17,7 +17,6 @@ dependencies {
     implementation("org.openjfx:javafx-base")
     implementation("org.openjfx:javafx-controls")
     implementation("org.openjfx:javafx-fxml")
-    // implementation("org.openjfx:javafx-graphics")
     implementation("org.openjfx:javafx-graphics")
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
@@ -104,7 +103,15 @@ dependencies {
     testImplementation("org.mockito:mockito-core")
     testImplementation("net.bytebuddy:byte-buddy")
 
-    testImplementation("org.wiremock:wiremock")
+    testImplementation("org.hamcrest:hamcrest")
+
+    testImplementation("org.wiremock:wiremock") {
+        exclude(group = "com.jayway.jsonpath", module = "json-path")
+        exclude(group = "net.minidev", module = "json-smart")
+        exclude(group = "net.minidev", module = "accessors-smart")
+        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
+        exclude(group = "org.xmlunit", module = "xmlunit-legacy")
+    }
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
 }
@@ -174,16 +181,23 @@ javaModulePackaging {
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.jabref.testsupport")
 
+    // Not sure why there is no dependency for jabgui normal running for this dependency
+    // requires.add("javafx.graphics")
+
     requires.add("com.github.javaparser.core")
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
+
     requires.add("org.testfx")
     requires.add("org.testfx.junit5")
+    requires.add("org.hamcrest")
+
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
 }
 
+/*
 tasks.test {
     jvmArgs = listOf(
         "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
@@ -191,3 +205,4 @@ tasks.test {
         "--add-reads", "org.jabref=wiremock"
     )
 }
+ */

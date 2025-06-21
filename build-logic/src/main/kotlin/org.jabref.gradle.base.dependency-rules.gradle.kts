@@ -182,6 +182,10 @@ extraJavaModuleInfo {
 
     module("org.testfx:testfx-core", "org.testfx") {
         exportAllPackages()
+        requires("javax.base")
+        requires("javax.controls")
+        requires("javax.graphics")
+        requires("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
         exportAllPackages()
