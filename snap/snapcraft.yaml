@@ -13,8 +13,10 @@ confinement: strict
 base: core22
 compression: lzo
 architectures:
- - build-on: [amd64, arm64]
-   build-for: [amd64]
+  - build-on: [amd64]
+    build-for: [amd64]
+  - build-on: [arm64]
+    build-for: [arm64]
 
 plugs:
   home:
@@ -58,7 +60,9 @@ environment:
 parts:
   jabref:
     plugin: dump
-    source: https://builds.jabref.org/main/JabRef-6.0-portable_linux.tar.gz
+    source:
+      - on amd64 to amd64: https://builds.jabref.org/main/JabRef-6.0-portable_linux.tar.gz
+      - on arm64 to arm64: https://builds.jabref.org/main/JabRef-6.0_arm64-portable_linux_arm64.tar.gz
     stage-packages:
       - x11-utils
     override-build: |

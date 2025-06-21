@@ -60,7 +60,7 @@ import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.MrDlibPreferences;
 import org.jabref.logic.importer.fetcher.ScienceDirect;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarFetcher;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.importer.fileformat.CustomImporter;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.util.GrobidPreferences;
@@ -130,6 +130,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * contents of the defaults HashMap that are defined in this class.
  * There are more default parameters in this map which belong to separate preference classes.
+ * <p>
+ *  This class is injected into formatter using reflection to avoid tight coupling and
+ *  is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
@@ -220,6 +223,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SEARCH_WINDOW_DIVIDER_POS = "searchWindowDividerPos";
     public static final String SEARCH_CATALOGS = "searchCatalogs";
     public static final String DEFAULT_PLAIN_CITATION_PARSER = "defaultPlainCitationParser";
+    public static final String CITATIONS_RELATIONS_STORE_TTL = "citationsRelationsStoreTTL";
     public static final String IMPORTERS_ENABLED = "importersEnabled";
     public static final String GENERATE_KEY_ON_IMPORT = "generateKeyOnImport";
     public static final String GROBID_ENABLED = "grobidEnabled";
@@ -257,6 +261,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     public static final String SHOW_AI_SUMMARY = "showAiSummary";
+    public static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
     public static final String SHOW_AI_CHAT = "showAiChat";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
@@ -436,9 +441,11 @@ public class JabRefCliPreferences implements CliPreferences {
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
 
     /**
-     * @implNote The constructor is made protected to enforce this as a singleton class:
+     * @implNote The constructor was made public because dependency injection via constructor
+     * required widespread refactoring, currently we are using reflection in some formatters
+     * to gain access
      */
-    protected JabRefCliPreferences() {
+    public JabRefCliPreferences() {
         try {
             if (Files.exists(Path.of("jabref.xml"))) {
                 importPreferences(Path.of("jabref.xml"));
@@ -473,6 +480,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(DEFAULT_PLAIN_CITATION_PARSER, PlainCitationParserChoice.RULE_BASED.name());
         defaults.put(IMPORTERS_ENABLED, Boolean.TRUE);
         defaults.put(GENERATE_KEY_ON_IMPORT, Boolean.TRUE);
+        defaults.put(CITATIONS_RELATIONS_STORE_TTL, 30);
 
         defaults.put(ADD_IMPORTED_ENTRIES, Boolean.FALSE);
         defaults.put(ADD_IMPORTED_ENTRIES_GROUP_NAME, Localization.lang("Imported entries"));
@@ -550,6 +558,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(SHOW_AI_CHAT, Boolean.TRUE);
         defaults.put(SHOW_AI_SUMMARY, Boolean.TRUE);
+        defaults.put(SMART_FILE_ANNOTATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
@@ -601,7 +610,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
-        defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
+        defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon");
         defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
@@ -1738,7 +1747,8 @@ public class JabRefCliPreferences implements CliPreferences {
                                                           .map(CleanupPreferences.CleanupStep::valueOf)
                                                           .collect(Collectors.toSet())),
                 new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))));
+                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
+                ));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
                 putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
@@ -1757,7 +1767,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultCleanupJobs(),
                 new FieldFormatterCleanups(
                         (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))));
+                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
+                ));
     }
 
     private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
@@ -2043,7 +2054,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultFetcherKeys(),
                 getBoolean(FETCHER_CUSTOM_KEY_PERSIST),
                 getStringList(SEARCH_CATALOGS),
-                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER))
+                PlainCitationParserChoice.valueOf(get(DEFAULT_PLAIN_CITATION_PARSER)),
+                getInt(CITATIONS_RELATIONS_STORE_TTL)
         );
 
         EasyBind.listen(importerPreferences.importerEnabledProperty(), (_, _, newValue) -> putBoolean(IMPORTERS_ENABLED, newValue));
@@ -2055,6 +2067,7 @@ public class JabRefCliPreferences implements CliPreferences {
         importerPreferences.getCustomImporters().addListener((InvalidationListener) _ -> storeCustomImportFormats(importerPreferences.getCustomImporters()));
         importerPreferences.getCatalogs().addListener((InvalidationListener) _ -> putStringList(SEARCH_CATALOGS, importerPreferences.getCatalogs()));
         EasyBind.listen(importerPreferences.defaultPlainCitationParserProperty(), (_, _, newValue) -> put(DEFAULT_PLAIN_CITATION_PARSER, newValue.name()));
+        EasyBind.listen(importerPreferences.citationsRelationsStoreTTLProperty(), (_, _, newValue) -> put(CITATIONS_RELATIONS_STORE_TTL, newValue.toString()));
 
         return importerPreferences;
     }
@@ -2138,7 +2151,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         Map<String, String> keys = new HashMap<>();
-        keys.put(SemanticScholarFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
+        keys.put(SemanticScholarCitationFetcher.FETCHER_NAME, buildInfo.semanticScholarApiKey);
         keys.put(AstrophysicsDataSystem.FETCHER_NAME, buildInfo.astrophysicsDataSystemAPIKey);
         keys.put(BiodiversityLibrary.FETCHER_NAME, buildInfo.biodiversityHeritageApiKey);
         keys.put(ScienceDirect.FETCHER_NAME, buildInfo.scienceDirectApiKey);

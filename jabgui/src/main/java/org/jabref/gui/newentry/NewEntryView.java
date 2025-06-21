@@ -101,7 +101,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private Button generateButton;
 
     @FXML private TabPane tabs;
-    @FXML private Tab tabCreateEntry;
+    @FXML private Tab tabAddEntry;
     @FXML private Tab tabLookupIdentifier;
     @FXML private Tab tabInterpretCitations;
     @FXML private Tab tabSpecifyBibtex;
@@ -181,8 +181,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         switch (approach) {
             case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
-                tabs.getSelectionModel().select(tabCreateEntry);
-                switchCreateEntry();
+                tabs.getSelectionModel().select(tabAddEntry);
+                switchAddEntry();
                 break;
             case NewEntryDialogTab.ENTER_IDENTIFIER:
                 tabs.getSelectionModel().select(tabLookupIdentifier);
@@ -198,7 +198,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 break;
         }
 
-        tabCreateEntry.setOnSelectionChanged(_ -> switchCreateEntry());
+        tabAddEntry.setOnSelectionChanged(_ -> switchAddEntry());
         tabLookupIdentifier.setOnSelectionChanged(_ -> switchLookupIdentifier());
         tabInterpretCitations.setOnSelectionChanged(_ -> switchInterpretCitations());
         tabSpecifyBibtex.setOnSelectionChanged(_ -> switchSpecifyBibtex());
@@ -218,7 +218,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 }
             });
 
-        initializeCreateEntry();
+        initializeAddEntry();
         initializeLookupIdentifier();
         initializeInterpretCitations();
         initializeSpecifyBibTeX();
@@ -258,7 +258,49 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         }
     }
 
-    private void initializeCreateEntry() {
+     private void initializeCreateEntry() {
+        entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
+        entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
+        entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());
+
+        entryOtherTitle.managedProperty().bind(entryOtherTitle.visibleProperty());
+        entryOtherTitle.expandedProperty().bindBidirectional(preferences.typesOtherExpandedProperty());
+        entryOther.managedProperty().bind(entryOther.visibleProperty());
+
+        entryCustomTitle.managedProperty().bind(entryCustomTitle.visibleProperty());
+        entryCustomTitle.expandedProperty().bindBidirectional(preferences.typesCustomExpandedProperty());
+        entryCustom.managedProperty().bind(entryCustom.visibleProperty());
+
+        final boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
+
+        List<BibEntryType> recommendedEntries;
+        List<BibEntryType> otherEntries;
+        if (isBiblatexMode) {
+            recommendedEntries = BiblatexEntryTypeDefinitions.RECOMMENDED;
+            otherEntries = new ArrayList<>(BiblatexEntryTypeDefinitions.ALL);
+            otherEntries.removeAll(recommendedEntries);
+            otherEntries.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
+            otherEntries.addAll(BiblatexAPAEntryTypeDefinitions.ALL);
+        } else {
+            recommendedEntries = BibtexEntryTypeDefinitions.RECOMMENDED;
+            otherEntries = new ArrayList<>(BiblatexEntryTypeDefinitions.ALL);
+            otherEntries.removeAll(recommendedEntries);
+            otherEntries.addAll(IEEETranEntryTypeDefinitions.ALL);
+        }
+        addEntriesToPane(entryRecommended, recommendedEntries);
+        addEntriesToPane(entryOther, otherEntries);
+
+        final BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
+        final BibDatabaseMode customTypesDatabaseMode = isBiblatexMode ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX;
+        final List<BibEntryType> customEntries = entryTypesManager.getAllCustomTypes(customTypesDatabaseMode);
+        if (customEntries.isEmpty()) {
+            entryCustomTitle.setVisible(false);
+        } else {
+            addEntriesToPane(entryCustom, customEntries);
+        }
+    }
+  
+    private void initializeAddEntry() {
         entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
         entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
         entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());
@@ -398,8 +440,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     @FXML
-    private void switchCreateEntry() {
-        if (!tabCreateEntry.isSelected()) {
+    private void switchAddEntry() {
+        if (!tabAddEntry.isSelected()) {
             return;
         }
 

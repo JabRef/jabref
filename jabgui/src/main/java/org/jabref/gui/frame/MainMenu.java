@@ -53,7 +53,9 @@ import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
+import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
 import org.jabref.gui.mergeentries.MergeEntriesAction;
+import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
 import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
@@ -239,10 +241,10 @@ public class MainMenu extends MenuBar {
         });
 
         library.getItems().addAll(
-                factory.createMenuItem(StandardActions.CREATE_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.CREATE_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.CREATE_ENTRY_IDENTIFIER, new NewEntryAction(NewEntryDialogTab.ENTER_IDENTIFIER, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
-                factory.createMenuItem(StandardActions.CREATE_ENTRY_PLAINTEXT, new NewEntryAction(NewEntryDialogTab.INTERPRET_CITATIONS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.ADD_ENTRY_IMMEDIATE, new NewEntryAction(true, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.ADD_ENTRY, new NewEntryAction(false, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.ADD_ENTRY_IDENTIFIER, new NewEntryAction(NewEntryDialogTab.ENTER_IDENTIFIER, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
+                factory.createMenuItem(StandardActions.ADD_ENTRY_PLAINTEXT, new NewEntryAction(NewEntryDialogTab.INTERPRET_CITATIONS, frame::getCurrentLibraryTab, dialogService, preferences, stateManager)),
                 factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, frame::getCurrentLibraryTab, stateManager, undoManager)),
 
                 new SeparatorMenuItem(),
@@ -284,12 +286,24 @@ public class MainMenu extends MenuBar {
         }
 
         lookup.getItems().addAll(
+                // region identifier-related
                 lookupIdentifiers,
-                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
+
+                factory.createMenuItem(
+                        StandardActions.MERGE_WITH_FETCHED_ENTRY,
+                        new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager)),
+
+                factory.createMenuItem(
+                        StandardActions.BATCH_MERGE_WITH_FETCHED_ENTRY,
+                        new BatchEntryMergeWithFetchedDataAction(stateManager, undoManager, preferences, dialogService, taskExecutor)),
+                // endregion
 
                 new SeparatorMenuItem(),
 
+                // region file-related
+                factory.createMenuItem(StandardActions.DOWNLOAD_FULL_TEXT, new DownloadFullTextAction(dialogService, stateManager, preferences, (UiTaskExecutor) taskExecutor)),
                 factory.createMenuItem(StandardActions.FIND_UNLINKED_FILES, new FindUnlinkedFilesAction(dialogService, stateManager))
+                // endregion
         );
 
         final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
