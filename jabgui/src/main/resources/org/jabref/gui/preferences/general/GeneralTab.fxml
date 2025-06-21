@@ -93,6 +93,12 @@
         <ComboBox fx:id="biblatexMode" prefWidth="200.0" GridPane.columnIndex="1"/>
     </GridPane>
 
+    <Label styleClass="sectionHeader" text="%Merge libraries"/>
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <CheckBox fx:id="mergeSameKeyEntries" text="%Merge entries with same citation key"/>
+        <CheckBox fx:id="mergeDuplicateEntries" text="%Merge duplicate entries"/>
+    </HBox>
+
     <Label styleClass="sectionHeader" text="%Saving"/>
     <CheckBox fx:id="alwaysReformatBib" text="%Always reformat library on save and export"/>
     <HBox alignment="CENTER_LEFT" spacing="4.0">

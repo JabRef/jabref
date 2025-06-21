@@ -13,6 +13,7 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTablePreferences;
 import org.jabref.gui.maintable.NameDisplayPreferences;
+import org.jabref.gui.mergebibfilesintocurrentbib.MergeBibFilesIntoCurrentBibPreferences;
 import org.jabref.gui.mergeentries.MergeDialogPreferences;
 import org.jabref.gui.newentry.NewEntryPreferences;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -58,4 +59,6 @@ public interface GuiPreferences extends CliPreferences {
     KeyBindingRepository getKeyBindingRepository();
 
     NewEntryPreferences getNewEntryPreferences();
+
+    MergeBibFilesIntoCurrentBibPreferences getMergeBibFilesIntoCurrentBibPreferences();
 }
