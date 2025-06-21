@@ -182,17 +182,16 @@ extraJavaModuleInfo {
 
     module("org.testfx:testfx-core", "org.testfx") {
         exportAllPackages()
-        requires("org.assertj")
+        requires("org.assertj.core")
         requires("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
         exportAllPackages()
-        requires("org.assertj")
+        requires("org.assertj.core")
         requires("org.hamcrest")
         requires("org.junit.jupiter.api")
         requires("org.testfx")
     }
-    module("org.assertj:assertj-core", "org.assertj")
 
     module("commons-fileupload:commons-fileupload", "commons.fileupload")
 
