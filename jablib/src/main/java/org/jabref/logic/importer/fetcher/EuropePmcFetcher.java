@@ -135,7 +135,6 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
                 }
             }
 
-
             return entry;
         } catch (JSONException e) {
             throw new ParseException("Error parsing EuropePMC response", e);
