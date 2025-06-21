@@ -237,6 +237,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
+    onlyIf {!generatedJournalFile.get().asFile.exists()}
 }
 
 var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
@@ -245,9 +246,10 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
 
     script = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath
 
-
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
-    outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
+    val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
+    outputs.file(cslCatalogJson)
+    onlyIf {!cslCatalogJson.get().asFile.exists()}
 }
 
 var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
@@ -288,7 +290,9 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
 
     inputs.file(ltwaCsvFile)
-    outputs.file(layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv"))
+    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv");
+    outputs.file(ltwaListMv)
+    onlyIf {!ltwaListMv.get().asFile.exists()}
 }
 
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
