@@ -185,8 +185,6 @@ extraJavaModuleInfo {
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
         exportAllPackages()
-        // requires("org.assertj.core")
-        // requires("org.hamcrest")
         requires("org.junit.jupiter.api")
         requires("org.testfx")
     }
@@ -194,7 +192,6 @@ extraJavaModuleInfo {
     module("commons-fileupload:commons-fileupload", "commons.fileupload")
 
     module("org.xmlunit:xmlunit-core", "org.xmlunit")
-    // module("org.xmlunit:xmlunit-legacy", "org.custommonkey.xmlunit")
     module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers") {
         exportAllPackages()
         requires("org.xmlunit")
@@ -203,15 +200,9 @@ extraJavaModuleInfo {
     module("org.xmlunit:xmlunit-placeholders", "org.xmlunit.placeholder")
 
     module("net.javacrumbs.json-unit:json-unit-core", "net.javacrumbs.jsonunit.core")
-    // module("com.jayway.jsonpath:json-path", "json.path")
     module("com.github.javaparser:javaparser-core", "com.github.javaparser.core")
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
-    /*module("net.yminidev:json-smart", "net.minidev.jsonsmart") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-    }
-     */
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
     module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
@@ -403,7 +394,6 @@ extraJavaModuleInfo {
 
     // Workaround for https://github.com/wiremock/wiremock/issues/2149
     module("org.wiremock:wiremock", "wiremock") {
-        // patchRealModule()
         exportAllPackages()
 
         requires("com.fasterxml.jackson.core")
@@ -412,7 +402,6 @@ extraJavaModuleInfo {
         requires("com.google.common")
         requires("commons.fileupload")
         requires("java.xml")
-        // requires("org.custommonkey.xmlunit")
         requires("org.eclipse.jetty.server")
         requires("org.eclipse.jetty.servlet")
         requires("org.eclipse.jetty.servlets")
