@@ -203,7 +203,7 @@ public class MergeBibFilesIntoCurrentBibTest {
             );
 
             action.execute();
-            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "Expected 1 MergeEntriesAction instance but found");
+            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "Expected MergeEntriesAction instance not found");
         }
     }
 
@@ -250,7 +250,7 @@ public class MergeBibFilesIntoCurrentBibTest {
     @Test
     public void duplicateMergeTest() {
         BibEntry currentEntry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("DIFFERENT CITATION KEY")
+                .withCitationKey("DIFFERENTCITATIONKEY")
                 .withField(StandardField.AUTHOR, "Foo Bar")
                 .withField(StandardField.TITLE, "First Article")
                 .withField(StandardField.JOURNAL, "International Journal of Something")
@@ -275,7 +275,7 @@ public class MergeBibFilesIntoCurrentBibTest {
             );
 
             action.execute();
-            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "Expected 1 MergeEntriesAction instance but found");
+            assertEquals(1, mockedMergeEntriesAction.constructed().size(), "Expected MergeEntriesAction instance not found");
         }
     }
 
@@ -284,7 +284,7 @@ public class MergeBibFilesIntoCurrentBibTest {
         when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntries()).thenReturn(false);
         when(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntries()).thenReturn(false);
         BibEntry currentEntry = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("DIFFERENT CITATION KEY")
+                .withCitationKey("DIFFERENTCITATIONKEY")
                 .withField(StandardField.AUTHOR, "Foo Bar")
                 .withField(StandardField.TITLE, "First Article")
                 .withField(StandardField.JOURNAL, "International Journal of Something")
@@ -312,7 +312,7 @@ public class MergeBibFilesIntoCurrentBibTest {
         assertEquals(1, entries.size(), "Should still have one entry");
 
         BibEntry entry1 = entries.stream()
-                                 .filter(e -> "DIFFERENT CITATION KEY".equals(e.getCitationKey().orElse("")))
+                                 .filter(e -> "DIFFERENTCITATIONKEY".equals(e.getCitationKey().orElse("")))
                                  .findFirst()
                                  .orElseThrow(() -> new AssertionError("Entry 'test1' not found"));
 
