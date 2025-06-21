@@ -2,6 +2,7 @@ package org.jabref.gui.newentry;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -19,6 +21,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -43,11 +46,15 @@ import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.layout.format.DOIStrip;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
@@ -86,6 +93,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private final ControlsFxVisualizer visualizer;
+    private BibEntry duplicateEntry;
+    private final HashMap<String, BibEntry> doiCache = new HashMap<String, BibEntry>();
+    private boolean isCacheInitialized = false;
 
     @FXML private ButtonType generateButtonType;
     private Button generateButton;
@@ -115,6 +125,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
     @FXML private TextArea bibtexText;
 
+    @FXML private HBox duplicateWarningBox;
+    @FXML private Hyperlink duplicateSelectLink;
     private BibEntry result;
 
     public NewEntryView(NewEntryDialogTab initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {
@@ -212,6 +224,40 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         initializeSpecifyBibTeX();
     }
 
+    private void checkDOI(String doiInput) {
+        if (doiInput == null || doiInput.isBlank()) {
+            viewModel.isDuplicateEntryProperty().set(false);
+            duplicateEntry = null;
+            return;
+        }
+
+        LayoutFormatter doiStrip = new DOIStrip();
+        String normalizedInput = doiStrip.format(doiInput);
+
+        if (!isCacheInitialized) {
+            doiCache.clear();
+            BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("no active library found !"));
+
+            for (BibEntry entry : databaseContext.getEntries()) {
+                entry.getField(StandardField.DOI)
+                     .map(doiStrip::format)
+                     .ifPresent(strippedDoi -> doiCache.put(strippedDoi.toLowerCase(), entry));
+            }
+
+            isCacheInitialized = true;
+        }
+
+        BibEntry matchedEntry = doiCache.get(normalizedInput.toLowerCase());
+
+        if (matchedEntry != null) {
+            duplicateEntry = matchedEntry;
+            viewModel.isDuplicateEntryProperty().set(true);
+        } else {
+            duplicateEntry = null;
+            viewModel.isDuplicateEntryProperty().set(false);
+        }
+    }
+
     private void initializeCreateEntry() {
         entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
         entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
@@ -260,7 +306,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         //       method (each automatically independently, or all through the same fetcher).
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
-        final String clipboardText = ClipBoardManager.getContents().trim();
+
+        duplicateWarningBox.visibleProperty().bind(viewModel.isDuplicateEntryProperty());
+        duplicateWarningBox.managedProperty().bind(viewModel.isDuplicateEntryProperty());
 
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
@@ -277,6 +325,9 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         if (validClipboardId.isPresent()) {
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
+
+            // since the clipboard automatically pastes the DOI in the textfield, a check here is also required !
+            checkDOI(ClipBoardManager.getContents().trim());
 
             Identifier id = validClipboardId.get();
             Platform.runLater(() -> {
@@ -303,6 +354,16 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idText.textProperty().addListener((_, _, newText) -> {
+            checkDOI(newText);
+        });
+
+        duplicateSelectLink.setOnAction(_ -> {
+            if (duplicateEntry != null) {
+                libraryTab.showAndEdit(duplicateEntry);
+            }
+        });
     }
 
     private void initializeInterpretCitations() {

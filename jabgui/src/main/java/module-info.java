@@ -191,5 +191,6 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires com.dlsc.pdfviewfx;
+    requires jbibtex;
     // endregion
 }

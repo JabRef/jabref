@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ButtonType?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.Tab?>
@@ -63,6 +64,10 @@
                                 <Tooltip text="%Specify the source identifier to look up."/>
                             </tooltip>
                         </TextField>
+                    </HBox>
+                    <HBox fx:id="duplicateWarningBox" alignment="CENTER_LEFT" spacing="5.0">
+                        <Label fx:id="duplicateSelectLabel" text="Entry already existing in library."/>
+                        <Hyperlink fx:id="duplicateSelectLink" text="%Select entry"/>
                     </HBox>
                     <VBox spacing="5.0">
                         <RadioButton fx:id="idLookupGuess" text="%Automatically determine identifier type">

@@ -62,6 +62,7 @@ public class NewEntryViewModel {
 
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
+    private final BooleanProperty isDuplicateEntry = new SimpleBooleanProperty(false);
 
     private final StringProperty idText;
     private final Validator idTextValidator;
@@ -128,6 +129,10 @@ public class NewEntryViewModel {
             StringUtil::isNotBlank,
             ValidationMessage.error(Localization.lang("You must specify a Bib(La)TeX source.")));
         bibtexWorker = null;
+    }
+
+    public BooleanProperty isDuplicateEntryProperty() {
+        return isDuplicateEntry;
     }
 
     public ReadOnlyBooleanProperty executingProperty() {
