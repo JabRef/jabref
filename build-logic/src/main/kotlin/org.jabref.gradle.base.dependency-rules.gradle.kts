@@ -432,4 +432,9 @@ extraJavaModuleInfo {
         patchRealModule()
         exportAllPackages()
     }
+
+    module("org.objenesis:objenesis", "org.objenesis") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
 }
