@@ -540,7 +540,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     // Required for LocalizationConsistencyTest
     requires.add("org.testfx.junit5")
-    requires.add("org.assertj.core")
+    // requires.add("org.assertj.core")
 
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")

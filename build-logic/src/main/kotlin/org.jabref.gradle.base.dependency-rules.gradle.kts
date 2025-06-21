@@ -466,4 +466,10 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
+
+    module("org.openjdk.jmh:jmh-core", "jmh.core")
+    module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")
+    module("org.openjdk.jmh:jmh-generator-bytecode", "jmh.generator.bytecode")
+    module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
+    module("org.apache.commons:commons-math3", "org.apache.commons.math3")
 }
