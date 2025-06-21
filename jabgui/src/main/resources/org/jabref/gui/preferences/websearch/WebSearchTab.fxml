@@ -29,6 +29,10 @@
         <Label text="%Default plain citation parser"/>
         <ComboBox fx:id="defaultPlainCitationParser" HBox.hgrow="ALWAYS"/>
     </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="%Citations relations local storage time-to-live (in days)"/>
+        <TextField fx:id="citationsRelationStoreTTL" prefWidth="60"/>
+    </HBox>
 
     <Label styleClass="sectionHeader" text="%Custom DOI URI"/>
     <HBox alignment="CENTER_LEFT" spacing="10.0">

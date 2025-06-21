@@ -143,11 +143,12 @@ class ArgumentProcessorTest {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent, true));
 
-        commandLine.execute(args.toArray(String[]::new));
+        int executionResult = commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"));
         assertTrue(output.contains("Consistency check completed"));
+        assertEquals(0, executionResult);
 
         System.setOut(System.out);
     }
@@ -163,10 +164,11 @@ class ArgumentProcessorTest {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 
-        commandLine.execute(args.toArray(String[]::new));
+        int executionResult = commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
         assertEquals("", output);
+        assertEquals(0, executionResult);
 
         System.setOut(System.out);
     }

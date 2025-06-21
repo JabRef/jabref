@@ -3,6 +3,9 @@ name: Update Gradle Wrapper
 on:
   schedule:
     - cron: "0 5 * * 1"
+  pull_request:
+    paths:
+      - .github/workflows/update-gradle-wrapper.yml
   workflow_dispatch:
 
 jobs:
