@@ -213,7 +213,10 @@ extraJavaModuleInfo {
     module("org.apache.velocity:velocity-engine-core", "org.apache.velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
-    module("org.fxmisc.wellbehaved:wellbehavedfx", "org.fxmisc.wellbehaved")
+    module("org.fxmisc.wellbehaved:wellbehavedfx", "org.fxmisc.wellbehaved") {
+        exportAllPackages()
+        requires("javafx.graphics")
+    }
     module("org.javassist:javassist", "org.javassist")
     module("org.jbibtex:jbibtex", "org.jbibtex") {
         exportAllPackages()
