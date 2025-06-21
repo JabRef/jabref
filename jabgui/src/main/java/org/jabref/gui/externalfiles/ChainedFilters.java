@@ -17,6 +17,7 @@ public class ChainedFilters implements DirectoryStream.Filter<Path> {
 
     private DirectoryStream.Filter<Path>[] filters;
 
+    @SafeVarargs
     public ChainedFilters(DirectoryStream.Filter<Path>... filters) {
         this.filters = filters;
     }

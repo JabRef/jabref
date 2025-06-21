@@ -123,7 +123,7 @@ public class FileFieldParser {
             }
             escaped = false;
         }
-        if (charactersOfCurrentElement.length() > 0) {
+        if (!charactersOfCurrentElement.isEmpty()) {
             linkedFileData.add(charactersOfCurrentElement.toString());
         }
         if (!linkedFileData.isEmpty()) {
