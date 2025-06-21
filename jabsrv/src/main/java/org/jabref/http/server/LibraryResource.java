@@ -246,7 +246,7 @@ public class LibraryResource {
     }
 
     /// libraries/{id}/entries/{entryId}
-    @GET
+    /*@GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML)
     public String getPreview(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
@@ -264,7 +264,7 @@ public class LibraryResource {
         // PreviewLayout layout = preferences.getpr previewPreferences.getSelectedPreviewLayout();
         // return layout.generatePreview(theEntry, parserResult.getDatabaseContext());
         return theEntry.getAuthorTitleYear();
-    }
+    }*/
 
     @GET
     @Path("entries/{entryId}")
@@ -298,6 +298,42 @@ public class LibraryResource {
                 + "\nNumber: " + number
                 + "\nPages: " + pages
                 + "\nReleased on: " + releaseDate;
+
+        return preview;
+    }
+
+    @GET
+    @Path("entries/{entryId}")
+    @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")
+    public String getHTMLRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
+        ParserResult parserResult = getParserResult(id);
+        List<BibEntry> entriesByCitationKey = parserResult.getDatabase().getEntriesByCitationKey(entryId);
+        if (entriesByCitationKey.isEmpty()) {
+            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
+        }
+        if (entriesByCitationKey.size() > 1) {
+            LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
+        }
+
+        // build the preview
+        BibEntry entry = entriesByCitationKey.getFirst();
+
+        String author = entry.getField(StandardField.AUTHOR).orElse("(N/A)");
+        String title = entry.getField(StandardField.TITLE).orElse("(N/A)");
+        String journal = entry.getField(StandardField.JOURNAL).orElse("(N/A)");
+        String volume = entry.getField(StandardField.VOLUME).orElse("(N/A)");
+        String number = entry.getField(StandardField.NUMBER).orElse("(N/A)");
+        String pages = entry.getField(StandardField.PAGES).orElse("(N/A)");
+        String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
+
+        String preview =
+                "<strong>Author:</strong> " + author + "<br>" +
+                        "<strong>Title:</strong> " + title + "<br>" +
+                        "<strong>Journal:</strong> " + journal + "<br>" +
+                        "<strong>Volume:</strong> " + volume + "<br>" +
+                        "<strong>Number:</strong> " + number + "<br>" +
+                        "<strong>Pages:</strong> " + pages + "<br>" +
+                        "<strong>Released on:</strong> " + releaseDate;
 
         return preview;
     }
