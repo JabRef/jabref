@@ -194,9 +194,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.params")
     requires.add("org.mockito")
 
-    requires.add("org.testfx")
     requires.add("org.testfx.junit5")
-    requires.add("org.hamcrest")
 
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
