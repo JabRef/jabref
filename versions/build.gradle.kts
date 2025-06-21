@@ -110,7 +110,7 @@ dependencies.constraints {
     api("org.glassfish.jersey.core:jersey-server:3.1.10")
     api("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
-    api("org.hamcrest:hamcrest-library:3.0")
+    api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.0.Final")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.2.1-SNAPSHOT")

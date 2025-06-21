@@ -200,7 +200,7 @@ dependencies {
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
 
-    testImplementation("org.hamcrest:hamcrest-library")
+    testImplementation("org.hamcrest:hamcrest")
 
     testImplementation("org.wiremock:wiremock")
 
