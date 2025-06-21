@@ -122,7 +122,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
             if (result.has("journalInfo")) {
                 JSONObject journalInfo = result.getJSONObject("journalInfo");
                 Optional.ofNullable(journalInfo.optString("issue")).ifPresent(issue -> entry.setField(StandardField.ISSUE, issue));
-                Optional.ofNullable(journalInfo.optString("volume")).ifPresent(volumne -> entry.setField(StandardField.VOLUME, volumne));
+                Optional.ofNullable(journalInfo.optString("volume")).ifPresent(volume -> entry.setField(StandardField.VOLUME, volume));
                 Optional.of(journalInfo.optInt("yearOfPublication")).ifPresent(year -> entry.setField(StandardField.YEAR, year.toString()));
                 Optional.of(journalInfo.optInt("monthOfPublication"))
                         .flatMap(month -> Month.parse(month.toString()))

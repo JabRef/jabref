@@ -40,7 +40,6 @@ class EuropePmcFetcherTest {
                 .withField(StandardField.VOLUME, "23")
                 .withField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/27670948/")
                 .withField(StandardField.YEAR, "2017");
-
     }
 
     @Test
