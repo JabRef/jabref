@@ -207,14 +207,16 @@ extraJavaModuleInfo {
     module("pt.davidafsilva.apple:jkeychain", "pt.davidafsilva.apple.jkeychain")
 
     module("org.testfx:testfx-core", "org.testfx") {
+        // Content based on https://github.com/TestFX/TestFX/commit/bf4a08aa82c008fdd3c296aaafee1d222f3824cb
         exportAllPackages()
+        requires("java.desktop")
         requiresTransitive("javax.controls")
         requires("org.hamcrest")
     }
     module("org.testfx:testfx-junit5", "org.testfx.junit5") {
         exportAllPackages()
         requires("org.junit.jupiter.api")
-        requires("org.testfx")
+        requiresTransitive("org.testfx")
     }
 
     module("commons-fileupload:commons-fileupload", "commons.fileupload")

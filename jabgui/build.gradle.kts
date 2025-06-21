@@ -202,12 +202,12 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("wiremock.slf4j.spi.shim")
 }
 
-/*
 tasks.test {
     jvmArgs = listOf(
-        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx",
-        "--add-reads", "org.mockito=java.prefs",
-        "--add-reads", "org.jabref=wiremock"
+        // Source: https://github.com/TestFX/TestFX/issues/638#issuecomment-433744765
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=org.testfx"
+
+        // "--add-reads", "org.mockito=java.prefs",
+        // "--add-reads", "org.jabref=wiremock"
     )
 }
- */
