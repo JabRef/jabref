@@ -136,8 +136,8 @@ dependencies.constraints {
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
     api("org.wiremock:wiremock:3.13.0")
-    api("org.xmlunit:xmlunit-core:2.10.2")
-    api("org.xmlunit:xmlunit-matchers:2.10.2")
+    api("org.xmlunit:xmlunit-core:2.10.3")
+    api("org.xmlunit:xmlunit-matchers:2.10.3")
     api("org.yaml:snakeyaml:2.4")
     api("tech.units:indriya:2.2.3")
 }
