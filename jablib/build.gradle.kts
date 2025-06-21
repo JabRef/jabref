@@ -197,12 +197,19 @@ dependencies {
 
     testImplementation("org.xmlunit:xmlunit-core")
     testImplementation("org.xmlunit:xmlunit-matchers")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
 
-    testImplementation("org.hamcrest:hamcrest-library")
+    testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock")
+    testImplementation("org.wiremock:wiremock") {
+        exclude(group = "com.jayway.jsonpath", module = "json-path")
+        exclude(group = "net.minidev", module = "json-smart")
+        exclude(group = "net.minidev", module = "accessors-smart")
+        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
+        exclude(group = "org.xmlunit", module = "xmlunit-legacy")
+    }
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")
@@ -529,11 +536,15 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
+    requires.add("org.hamcrest")
     requires.add("org.mockito")
+
+    // Required for LocalizationConsistencyTest
+    requires.add("org.testfx.junit5")
+    requires.add("org.assertj.core")
+
+    requires.add("org.xmlunit")
+    requires.add("org.xmlunit.matchers")
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
-
-    // --add-reads
-    //reads.add("org.jabref.jablib=io.github.classgraph")
-    //reads.add("org.jabref.jablib=org.jabref.testsupport")
 }
