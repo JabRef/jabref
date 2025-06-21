@@ -85,13 +85,37 @@ extraJavaModuleInfo {
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
     knownModule("com.github.hypfvieh:dbus-java-transport-native-unixsocket", "org.freedesktop.dbus.transport.jre")
 
-    module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers")
-    module("ai.djl.pytorch:pytorch-engine", "ai.djl.pytorch_engine")
-    module("ai.djl.pytorch:pytorch-model-zoo", "ai.djl.pytorch_model_zoo")
+    /*
+    module("java.base", "java.base") {
+        patchRealModule()
+        // org.apache.pdfbox.io requires jdk.internal.ref.Cleaner (via java.nio.DirectByteBuffer.cleaner())
+        // jabgui requires at least "javafx.collections"
+        exportAllPackages()
+    }
+   */
+
+    module("ai.djl.huggingface:tokenizers", "ai.djl.tokenizers") {
+        exportAllPackages()
+        requires("ai.djl.api")
+        requires("org.slf4j")
+    }
+    module("ai.djl.pytorch:pytorch-engine", "ai.djl.pytorch_engine") {
+        exportAllPackages()
+        requires("ai.djl.api")
+        requires("org.slf4j")
+    }
+    module("ai.djl.pytorch:pytorch-model-zoo", "ai.djl.pytorch_model_zoo") {
+        exportAllPackages()
+        requires("ai.djl.api")
+        requires("org.slf4j")
+    }
     module("ai.djl:api", "ai.djl.api") {
         exportAllPackages()
+        requires("com.google.gson")
         requires("org.slf4j")
+        uses("ai.djl.engine.EngineProvider")
         uses("ai.djl.repository.zoo.ZooProvider")
+        uses("ai.djl.repository.RepositoryFactory")
     }
     module("at.favre.lib:hkdf", "at.favre.lib.hkdf")
     module("com.github.javakeyring:java-keyring", "com.github.java.keyring")
