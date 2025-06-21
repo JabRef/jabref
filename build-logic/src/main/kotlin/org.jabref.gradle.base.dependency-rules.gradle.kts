@@ -167,6 +167,8 @@ extraJavaModuleInfo {
         requires("org.apache.commons.lang3")
         requires("org.apache.commons.text")
         requires("org.jbibtex")
+        // Compile time only
+        // requires("jackson.annotations")
     }
     module("dev.langchain4j:langchain4j", "dev.langchain4j")
     module("dev.langchain4j:langchain4j-core", "dev.langchain4j.core")
