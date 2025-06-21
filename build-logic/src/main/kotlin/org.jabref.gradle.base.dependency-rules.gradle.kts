@@ -397,4 +397,9 @@ extraJavaModuleInfo {
         // Required to provide package "wiremock.org.slf4j.helpers"
         mergeJar("com.github.koppor:wiremock-slf4j-shim")
     }
+    module("com.github.koppor:wiremock-slf4j-spi-shim", "wiremock.org.slf4j.spi.shim") {
+        patchRealModule()
+        exportAllPackages()
+        requires("org.slf4j")
+    }
 }
