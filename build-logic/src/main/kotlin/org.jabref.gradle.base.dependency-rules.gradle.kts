@@ -121,6 +121,7 @@ extraJavaModuleInfo {
     module("com.konghq:unirest-java-core", "com.konghq.unirest.java.core") {
         exportAllPackages()
         requires("java.net.http")
+        uses("kong.unirest.core.json.JsonEngine")
     }
     module("com.konghq:unirest-modules-gson", "com.konghq.unirest.modules.gson")
     module("com.lihaoyi:fastparse", "com.lihaoyi.fastparse")
@@ -159,7 +160,9 @@ extraJavaModuleInfo {
     module("de.rototor.snuggletex:snuggletex-core", "de.rototor.snuggletex.core")
     module("de.rototor.snuggletex:snuggletex-jeuclid", "de.rototor.snuggletex.jeuclid")
     module("de.swiesend:secret-service", "de.swiesend.secret.service")
-    module("de.undercouch:citeproc-java", "de.undercouch.citeproc.java")
+    module("de.undercouch:citeproc-java", "de.undercouch.citeproc.java") {
+        requires("javax.xml")
+    }
     module("dev.langchain4j:langchain4j", "dev.langchain4j")
     module("dev.langchain4j:langchain4j-core", "dev.langchain4j.core")
     module("dev.langchain4j:langchain4j-google-ai-gemini", "dev.langchain4j.google.ai.gemini")
