@@ -122,6 +122,7 @@ dependencies {
     }
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
+    testImplementation("org.ow2.asm:asm")
 }
 
 application {
