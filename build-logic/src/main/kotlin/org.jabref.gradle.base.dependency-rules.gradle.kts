@@ -293,6 +293,7 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.logging")
+        requires("java.xml")
     }
     module("org.glassfish.jersey.containers:jersey-container-grizzly2-http", "org.glassfish.jersey.grizzly2.http") {
         exportAllPackages()
