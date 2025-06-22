@@ -210,12 +210,10 @@ dependencies {
     testImplementation("org.hamcrest:hamcrest")
 
     testImplementation("org.wiremock:wiremock") {
-        exclude(group = "com.jayway.jsonpath", module = "json-path")
-        exclude(group = "net.minidev", module = "json-smart")
-        exclude(group = "net.minidev", module = "accessors-smart")
         exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
         exclude(group = "org.xmlunit", module = "xmlunit-legacy")
     }
+    testImplementation("org.ow2.asm:asm:9.6")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")

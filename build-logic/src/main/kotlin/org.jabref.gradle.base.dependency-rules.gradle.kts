@@ -71,8 +71,6 @@ jvmDependencyConflicts.patch {
         removeDependency("biz.aQute.bnd:biz.aQute.bnd.annotation")
     }
     module("org.wiremock:wiremock") {
-        removeDependency("net.minidev:json-smart")
-        removeDependency("net.minidev:accessors-smart")
         removeDependency("net.sf.jopt-simple:jopt-simple")
         removeDependency("org.xmlunit:xmlunit-legacy")
     }
@@ -533,6 +531,8 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
     }
     module("com.jayway.jsonpath:json-path", "json.path")
+    module("net.minidev:json-smart", "json.smart")
+    module("net.minidev:accessors-smart", "accessors.smart")
 
     module("org.openjdk.jmh:jmh-core", "jmh.core")
     module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")
