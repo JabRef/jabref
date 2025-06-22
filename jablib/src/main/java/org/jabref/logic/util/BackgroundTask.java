@@ -215,7 +215,7 @@ public abstract class BackgroundTask<V> {
     }
 
     /**
-     * Sets the {@link Runnable} that is invoked after the task is finished, irrespectively if it was successful or
+     * Sets the {@link Runnable} that is invoked after the task is finished, irrespectively if it was isSuccessful or
      * failed with an error.
      */
     public BackgroundTask<V> onFinished(Runnable onFinished) {

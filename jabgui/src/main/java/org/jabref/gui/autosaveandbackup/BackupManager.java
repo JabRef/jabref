@@ -275,7 +275,7 @@ public class BackupManager {
         BibDatabaseContext bibDatabaseContextClone = new BibDatabaseContext(bibDatabaseClone, bibDatabaseContext.getMetaData());
 
         Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
-        // We want to have successful backups only
+        // We want to have isSuccessful backups only
         // Thus, we do not use a plain "FileWriter", but the "AtomicFileWriter"
         // Example: What happens if one hard powers off the machine (or kills the jabref process) during writing of the backup?
         //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?

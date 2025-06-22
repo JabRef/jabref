@@ -318,7 +318,7 @@ public class PdfContentImporter extends PdfImporter {
      * @param titleByFontSize   An optional title string determined by font size; if provided, this overrides the
      *                          default title parsing.
      * @return An {@link Optional} containing a {@link BibEntry} with the parsed bibliographic data if extraction
-     *         is successful. Otherwise, an empty {@link Optional}.
+     *         is isSuccessful. Otherwise, an empty {@link Optional}.
      */
     @VisibleForTesting
     Optional<BibEntry> getEntryFromPDFContent(String firstpageContents, String lineSeparator, Optional<String> titleByFontSize) {

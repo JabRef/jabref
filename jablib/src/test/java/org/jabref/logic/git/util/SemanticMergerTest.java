@@ -29,14 +29,14 @@ public class SemanticMergerTest {
     @ParameterizedTest(name = "Database patch: {0}")
     @MethodSource("provideDatabasePatchCases")
     void testPatchDatabase(String description, String base, String local, String remote, String expectedAuthor) throws Exception {
-        BibDatabaseContext baseCtx = GitBibParser.parseBibFromGit(base, importFormatPreferences);
-        BibDatabaseContext localCtx = GitBibParser.parseBibFromGit(local, importFormatPreferences);
-        BibDatabaseContext remoteCtx = GitBibParser.parseBibFromGit(remote, importFormatPreferences);
+        BibDatabaseContext baseDatabaseContext = GitBibParser.parseBibFromGit(base, importFormatPreferences);
+        BibDatabaseContext localDatabaseContext = GitBibParser.parseBibFromGit(local, importFormatPreferences);
+        BibDatabaseContext remoteDatabaseContext = GitBibParser.parseBibFromGit(remote, importFormatPreferences);
 
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseCtx, remoteCtx);
-        SemanticMerger.applyMergePlan(localCtx, plan);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
+        SemanticMerger.applyMergePlan(localDatabaseContext, plan);
 
-        BibEntry patched = localCtx.getDatabase().getEntryByCitationKey("a").orElseThrow();
+        BibEntry patched = localDatabaseContext.getDatabase().getEntryByCitationKey("a").orElseThrow();
         assertEquals(expectedAuthor, patched.getField(StandardField.AUTHOR).orElse(null));
     }
 

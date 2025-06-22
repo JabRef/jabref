@@ -14,13 +14,13 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public class GitFileWriter {
-    public static void write(Path file, BibDatabaseContext ctx, ImportFormatPreferences importPrefs) throws IOException {
+    public static void write(Path file, BibDatabaseContext bibDatabaseContext, ImportFormatPreferences importPrefs) throws IOException {
         SelfContainedSaveConfiguration saveConfiguration = new SelfContainedSaveConfiguration();
-        Charset encoding = ctx.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
+        Charset encoding = bibDatabaseContext.getMetaData().getEncoding().orElse(StandardCharsets.UTF_8);
 
-        synchronized (ctx) {
+        synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
-                BibWriter bibWriter = new BibWriter(fileWriter, ctx.getDatabase().getNewLineSeparator());
+                BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
                 BibtexDatabaseWriter writer = new BibtexDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
@@ -28,7 +28,7 @@ public class GitFileWriter {
                         importPrefs.citationKeyPatternPreferences(),
                         new BibEntryTypesManager()
                 );
-                writer.saveDatabase(ctx);
+                writer.saveDatabase(bibDatabaseContext);
 
                 if (fileWriter.hasEncodingProblems()) {
                     throw new IOException("Encoding problem detected when saving .bib file: "

@@ -130,9 +130,9 @@ class GitSyncServiceTest {
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
         GitHandler gitHandler = mock(GitHandler.class);
         GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler);
-        MergeResult result = syncService.pullAndMerge(library);
+        MergeResult result = syncService.fetchAndMerge(library);
 
-        assertTrue(result.successful());
+        assertTrue(result.isSuccessful());
         String merged = Files.readString(library);
 
         String expected = """

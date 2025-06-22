@@ -154,7 +154,7 @@ public class FieldComparator implements Comparator<BibEntry> {
             }
 
             if (i1present && i2present) {
-                // Ok, parsing was successful. Update f1 and f2:
+                // Ok, parsing was isSuccessful. Update f1 and f2:
                 return Integer.compare(i1, i2) * multiplier;
             } else if (i1present) {
                 // The first one was parsable, but not the second one.

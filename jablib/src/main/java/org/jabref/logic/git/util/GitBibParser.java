@@ -13,12 +13,12 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 public class GitBibParser {
     public static BibDatabaseContext parseBibFromGit(String bibContent, ImportFormatPreferences importFormatPreferences) throws JabRefException {
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
-        ParserResult result = null;
+        ParserResult result;
         try {
             result = parser.parse(new StringReader(bibContent));
+            return result.getDatabaseContext();
         } catch (IOException e) {
             throw new JabRefException("Failed to parse BibTeX content from Git", e);
         }
-        return result.getDatabaseContext();
     }
 }

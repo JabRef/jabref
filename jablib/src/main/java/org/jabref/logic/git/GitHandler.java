@@ -202,4 +202,14 @@ public class GitHandler {
             return git.getRepository().getBranch();
         }
     }
+
+    public void fetchOnCurrentBranch() throws IOException {
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            git.fetch()
+               .setCredentialsProvider(credentialsProvider)
+               .call();
+        } catch (GitAPIException e) {
+            LOGGER.info("Failed to fetch from remote", e);
+        }
+    }
 }

@@ -86,7 +86,7 @@ public class EntryComparator implements Comparator<BibEntry> {
             try {
                 int i1 = Integer.parseInt((String) f1);
                 int i2 = Integer.parseInt((String) f2);
-                // Ok, parsing was successful. Update f1 and f2:
+                // Ok, parsing was isSuccessful. Update f1 and f2:
                 f1 = i1;
                 f2 = i2;
             } catch (NumberFormatException ex) {

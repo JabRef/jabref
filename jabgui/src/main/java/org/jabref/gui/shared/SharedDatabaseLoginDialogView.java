@@ -34,7 +34,7 @@ import jakarta.inject.Inject;
 
 /**
  * This offers the user to connect to a remove SQL database.
- * Moreover, it directly opens the shared database after successful connection.
+ * Moreover, it directly opens the shared database after isSuccessful connection.
  */
 public class SharedDatabaseLoginDialogView extends BaseDialog<Void> {
     @FXML private ComboBox<DBMSType> databaseType;

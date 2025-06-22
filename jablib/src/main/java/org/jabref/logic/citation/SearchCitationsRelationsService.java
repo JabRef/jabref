@@ -66,7 +66,7 @@ public class SearchCitationsRelationsService {
 
     /**
      * If the store was empty and nothing was fetch in any case (empty fetch, or error) then yes => empty list
-     * If the store was not empty and nothing was fetched after a successful fetch => the store will be erased and the returned collection will be empty
+     * If the store was not empty and nothing was fetched after a isSuccessful fetch => the store will be erased and the returned collection will be empty
      * If the store was not empty and an error occurs while fetching => will return the content of the store
      */
     public List<BibEntry> searchCitations(BibEntry cited) {

@@ -27,7 +27,7 @@ class GitFileWriterTest {
 
     @Test
     void testWriteThenReadBack() throws Exception {
-        BibDatabaseContext inputCtx = GitBibParser.parseBibFromGit(
+        BibDatabaseContext inputDatabaseContext = GitBibParser.parseBibFromGit(
         """
                     @article{a,
                         author = {Alice},
@@ -37,15 +37,15 @@ class GitFileWriterTest {
 
         Path tempFile = Files.createTempFile("tempgitwriter", ".bib");
 
-        GitFileWriter.write(tempFile, inputCtx, importFormatPreferences);
+        GitFileWriter.write(tempFile, inputDatabaseContext, importFormatPreferences);
 
         BibDatabaseContext outputCtx = GitBibParser.parseBibFromGit(Files.readString(tempFile), importFormatPreferences);
 
-        List<BibEntry> inputEntries = inputCtx.getDatabase().getEntries();
+        List<BibEntry> inputEntries = inputDatabaseContext.getDatabase().getEntries();
         List<BibEntry> outputEntries = outputCtx.getDatabase().getEntries();
 
         assertEquals(inputEntries.size(), outputEntries.size());
-        assertEquals(inputEntries.get(0).getCitationKey(), outputEntries.get(0).getCitationKey());
-        assertEquals(inputEntries.get(0).getField(StandardField.AUTHOR), outputEntries.get(0).getField(StandardField.AUTHOR));
+        assertEquals(inputEntries.getFirst().getCitationKey(), outputEntries.getFirst().getCitationKey());
+        assertEquals(inputEntries.getFirst().getField(StandardField.AUTHOR), outputEntries.getFirst().getField(StandardField.AUTHOR));
     }
 }

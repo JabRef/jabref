@@ -14,7 +14,7 @@ public class ExternalLinkCreator {
     /**
      * Get a URL to the search results of ShortScience for the BibEntry's title
      *
-     * @param entry The entry to search for. Expects the BibEntry's title to be set for successful return.
+     * @param entry The entry to search for. Expects the BibEntry's title to be set for isSuccessful return.
      * @return The URL if it was successfully created
      */
     public static Optional<String> getShortScienceSearchURL(BibEntry entry) {

@@ -57,11 +57,11 @@ class SemanticConflictDetectorTest {
         RevCommit localCommit = writeAndCommit(local, "local", alice);
         RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
 
-        BibDatabaseContext baseCtx = parse(baseCommit);
-        BibDatabaseContext localCtx = parse(localCommit);
-        BibDatabaseContext remoteCtx = parse(remoteCommit);
+        BibDatabaseContext baseDatabaseContext = parse(baseCommit);
+        BibDatabaseContext localDatabaseContext = parse(localCommit);
+        BibDatabaseContext remoteDatabaseContext = parse(remoteCommit);
 
-        List<BibEntryDiff> diffs = SemanticConflictDetector.detectConflicts(baseCtx, localCtx, remoteCtx);
+        List<BibEntryDiff> diffs = SemanticConflictDetector.detectConflicts(baseDatabaseContext, localDatabaseContext, remoteDatabaseContext);
 
         if (expectConflict) {
             assertEquals(1, diffs.size(), "Expected a conflict but found none");
@@ -441,10 +441,10 @@ class SemanticConflictDetectorTest {
 
         RevCommit baseCommit = writeAndCommit(base, "base", alice);
         RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
-        BibDatabaseContext baseCtx = parse(baseCommit);
-        BibDatabaseContext remoteCtx = parse(remoteCommit);
+        BibDatabaseContext baseDatabaseContext = parse(baseCommit);
+        BibDatabaseContext remoteDatabaseContext = parse(remoteCommit);
 
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseCtx, remoteCtx);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
 
         assertEquals(1, plan.fieldPatches().size());
         assertTrue(plan.fieldPatches().containsKey("b"));
@@ -471,10 +471,10 @@ class SemanticConflictDetectorTest {
 
         RevCommit baseCommit = writeAndCommit(base, "base", alice);
         RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
-        BibDatabaseContext baseCtx = parse(baseCommit);
-        BibDatabaseContext remoteCtx = parse(remoteCommit);
+        BibDatabaseContext baseDatabaseContext = parse(baseCommit);
+        BibDatabaseContext remoteDatabaseContext = parse(remoteCommit);
 
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseCtx, remoteCtx);
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
 
         assertEquals(1, plan.fieldPatches().size());
         Map<Field, String> patch = plan.fieldPatches().get("a");

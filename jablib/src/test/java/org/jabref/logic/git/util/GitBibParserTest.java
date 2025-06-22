@@ -62,7 +62,7 @@ class GitBibParserTest {
         List<BibEntry> entries = context.getEntries();
         assertEquals(1, entries.size());
 
-        BibEntry entry = entries.get(0);
+        BibEntry entry = entries.getFirst();
         assertEquals(Optional.of("Alice"), entry.getField(FieldFactory.parseField("author")));
         assertEquals(Optional.of("Test Title"), entry.getField(FieldFactory.parseField("title")));
         assertEquals(Optional.of("2025"), entry.getField(FieldFactory.parseField("year")));

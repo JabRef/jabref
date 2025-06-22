@@ -1,6 +1,11 @@
 package org.jabref.logic.git.util;
 
+import java.io.IOException;
+
+import org.jabref.logic.JabRefException;
+
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -12,12 +17,15 @@ import org.eclipse.jgit.revwalk.RevWalk;
  * remote = origin/main
  */
 public class GitRevisionLocator {
-    public RevisionTriple locateMergeCommits(Git git) throws Exception {
+    private static final String HEAD = "HEAD";
+    private static final String REMOTE = "refs/remotes/origin/main";
+
+    public RevisionTriple locateMergeCommits(Git git) throws GitAPIException, IOException, JabRefException {
         // assumes the remote branch is 'origin/main'
-        ObjectId headId = git.getRepository().resolve("HEAD");
+        ObjectId headId = git.getRepository().resolve(HEAD);
         // and uses the default remote tracking reference
         // does not support multiple remotes or custom remote branch names so far
-        ObjectId remoteId = git.getRepository().resolve("refs/remotes/origin/main");
+        ObjectId remoteId = git.getRepository().resolve(REMOTE);
         if (remoteId == null) {
             throw new IllegalStateException("Remote branch missing origin/main.");
         }

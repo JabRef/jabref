@@ -11,5 +11,4 @@ import org.eclipse.jgit.revwalk.RevCommit;
  * @param local the current local branch tip
  * @param remote the tip of the remote tracking branch (typically origin/main)
  */
-public record RevisionTriple(
-        RevCommit base, RevCommit local, RevCommit remote) { }
+public record RevisionTriple(RevCommit base, RevCommit local, RevCommit remote) { }

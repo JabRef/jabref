@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  * when closing a database or quitting the applications.
  * <p>
  * The save operation is loaded off of the GUI thread using {@link BackgroundTask}. Callers can query whether the
- * operation was canceled, or whether it was successful.
+ * operation was canceled, or whether it was isSuccessful.
  */
 public class SaveDatabaseAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveDatabaseAction.class);
@@ -134,8 +134,8 @@ public class SaveDatabaseAction {
 
     /**
      * @param file the new file name to save the database to. This is stored in the database context of the panel upon
-     *             successful save.
-     * @return true on successful save
+     *             isSuccessful save.
+     * @return true on isSuccessful save
      */
     boolean saveAs(Path file, SaveDatabaseMode mode) {
         BibDatabaseContext context = libraryTab.getBibDatabaseContext();

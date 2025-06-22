@@ -1,7 +1,6 @@
 package org.jabref.logic.git.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -28,7 +27,7 @@ public class SemanticConflictDetector {
         // 1. get diffs between base and remote
         List<BibEntryDiff> remoteDiffs = BibDatabaseDiff.compare(base, remote).getEntryDifferences();
         if (remoteDiffs == null) {
-            return Collections.emptyList();
+            return List.of();
         }
         // 2. map citation key to entry for local/remote diffs
         Map<String, BibEntry> baseEntries = toEntryMap(base);
@@ -60,11 +59,11 @@ public class SemanticConflictDetector {
 
     public static Map<String, BibEntry> toEntryMap(BibDatabaseContext context) {
         return context.getDatabase().getEntries().stream()
-                      .filter(e -> e.getCitationKey().isPresent())
+                      .filter(entry -> entry.getCitationKey().isPresent())
                       .collect(Collectors.toMap(
-                              e -> e.getCitationKey().get(),
+                              entry -> entry.getCitationKey().get(),
                               Function.identity(),
-                              (a, b) -> b,
+                              (existing, replacement) -> replacement,
                               LinkedHashMap::new
                       ));
     }
@@ -88,10 +87,18 @@ public class SemanticConflictDetector {
                 return true;
             }
         }
-
         return false;
     }
 
+    /**
+     * Compares base and remote, finds all semantic-level changes (new entries, updated fields), and builds a patch plan.
+     * This plan is meant to be applied to local during merge:
+     * result = local + (remote − base)
+     *
+     * @param base The base version of the database.
+     * @param remote The remote version to be merged.
+     * @return A {@link MergePlan} describing how to update the local copy with remote changes.
+     */
     public static MergePlan extractMergePlan(BibDatabaseContext base, BibDatabaseContext remote) {
         Map<String, BibEntry> baseMap = toEntryMap(base);
         Map<String, BibEntry> remoteMap = toEntryMap(remote);
