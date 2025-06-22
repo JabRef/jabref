@@ -6,6 +6,7 @@ on:
 
 jobs:
   welcome-first-time-contributor:
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     permissions:
       issues: write

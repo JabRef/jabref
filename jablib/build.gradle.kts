@@ -11,7 +11,6 @@ plugins {
     id("java-library")
 
     id("antlr")
-    id("com.github.bjornvester.xjc") version "1.8.1"
 
     id("me.champeau.jmh") version "0.7.3"
 
@@ -98,9 +97,6 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
-    // required by XJC
-    implementation("jakarta.xml.bind:jakarta.xml.bind-api")
-
     implementation("com.fasterxml:aalto-xml")
 
     implementation("org.postgresql:postgresql")
@@ -152,9 +148,6 @@ dependencies {
 
     // YAML reading and writing
     implementation("org.yaml:snakeyaml")
-
-    // XJC related
-    implementation("org.glassfish.jaxb:jaxb-runtime")
 
     // region AI
     implementation("dev.langchain4j:langchain4j")
@@ -226,12 +219,6 @@ tasks.generateGrammarSource {
     arguments = arguments + listOf("-visitor", "-long-messages")
 }
 
-xjc {
-    xsdDir.set(layout.projectDirectory.dir("src/main/xsd"))
-    xjcVersion.set("4.0.5")
-    defaultPackage.set("org.jabref.logic.importer.fileformat.citavi")
-    options.set(listOf("encoding=UTF-8"))
-}
 
 val abbrvJabRefOrgDir = layout.projectDirectory.dir("src/main/abbrv.jabref.org")
 val generatedJournalFile = layout.buildDirectory.file("generated/resources/journals/journal-list.mv")
@@ -245,6 +232,7 @@ var taskGenerateJournalListMV = tasks.register<JBangTask>("generateJournalListMV
 
     inputs.dir(abbrvJabRefOrgDir)
     outputs.file(generatedJournalFile)
+    onlyIf {!generatedJournalFile.get().asFile.exists()}
 }
 
 var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitationStyleCatalog") {
@@ -253,9 +241,10 @@ var taskGenerateCitationStyleCatalog = tasks.register<JBangTask>("generateCitati
 
     script = rootProject.layout.projectDirectory.file("build-support/src/main/java/CitationStyleCatalogGenerator.java").asFile.absolutePath
 
-
     inputs.dir(layout.projectDirectory.dir("src/main/resources/csl-styles"))
-    outputs.file(layout.buildDirectory.file("generated/resources/citation-style-catalog.json"))
+    val cslCatalogJson = layout.buildDirectory.file("generated/resources/citation-style-catalog.json")
+    outputs.file(cslCatalogJson)
+    onlyIf {!cslCatalogJson.get().asFile.exists()}
 }
 
 var ltwaCsvFile = layout.buildDirectory.file("tmp/ltwa_20210702.csv")
@@ -296,7 +285,9 @@ var taskGenerateLtwaListMV = tasks.register<JBangTask>("generateLtwaListMV") {
     script = rootProject.layout.projectDirectory.file("build-support/src/main/java/LtwaListMvGenerator.java").asFile.absolutePath
 
     inputs.file(ltwaCsvFile)
-    outputs.file(layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv"))
+    val ltwaListMv = layout.buildDirectory.file("generated/resources/journals/ltwa-list.mv");
+    outputs.file(ltwaListMv)
+    onlyIf {!ltwaListMv.get().asFile.exists()}
 }
 
 // Adds ltwa, journal-list.mv, and citation-style-catalog.json to the resources directory
