@@ -498,6 +498,7 @@ extraJavaModuleInfo {
         requires("com.google.common")
         requires("commons.fileupload")
         requires("java.xml")
+        requires("json.path")
         requires("org.custommonkey.xmlunit")
         requires("org.eclipse.jetty.server")
         requires("org.eclipse.jetty.servlet")
