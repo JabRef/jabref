@@ -79,7 +79,7 @@ public class ThemeManager {
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
         this.theme = workspacePreferences.getTheme();
-        this.isDarkMode = this.theme.getName().equals(Theme.EMBEDDED_DARK_CSS);
+        this.isDarkMode = Theme.EMBEDDED_DARK_CSS.equals(this.theme.getName());
 
         initializeWindowThemeUpdater(this.isDarkMode);
 
@@ -168,7 +168,7 @@ public class ThemeManager {
         this.theme = newTheme;
         LOGGER.info("Theme set to {} with base css {}", newTheme, baseStyleSheet);
 
-        boolean isDarkTheme = newTheme.getName().equals(Theme.EMBEDDED_DARK_CSS);
+        boolean isDarkTheme = Theme.EMBEDDED_DARK_CSS.equals(newTheme.getName());
         if (this.isDarkMode != isDarkTheme) {
             this.isDarkMode = isDarkTheme;
             applyDarkModeToAllWindows(isDarkTheme);
