@@ -110,14 +110,16 @@ public class MainTableDataModel {
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
     }
 
-//  We need to call this when the database is switched during a fulltext search since
-//  the listener on the searchQueryProperty will not fire if the query doesn't change
-//  (this causes searchResults in FullTextResultsTab to be empty)
-//  https://github.com/JabRef/jabref/issues/13241
+    /// Refresh the current search
+    ///
+    /// We need to call this when the database is switched during a fulltext search since
+    /// the listener on the searchQueryProperty will not fire if the query doesn't change
+    /// (this causes searchResults in FullTextResultsTab to be empty)
+    /// [issue 13241](https://github.com/JabRef/jabref/issues/13241)
     public void refreshSearchMatches() {
         searchQueryProperty.getValue().ifPresent(searchQuery -> {
             searchQuery.getSearchFlags().remove(SearchFlags.FULLTEXT);
-            //  There is no need to re-add the flag since the UI is unchanged and the flag will be automatically re-added.
+            // There is no need to re-add the flag since the UI is unchanged and the flag will be automatically re-added.
         });
     }
 
