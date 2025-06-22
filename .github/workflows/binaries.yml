@@ -221,8 +221,6 @@ jobs:
       - name: Basic build (assemble)
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" assemble
 
-      - run: ls -la build/app/packages/*/*
-
       - name: Setup macOS key chain
         if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
         uses: slidoapp/import-codesign-certs@1923310662e8682dd05b76b612b53301f431cd5d
