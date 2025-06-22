@@ -400,6 +400,7 @@ jobs:
         shell: bash
         run: |
           set -e
+          ls -la jabgui/build/distributions
           ${{ matrix.archivePortable }}
       - name: Rename files
         if: ${{ !startsWith(matrix.os, 'macos') }}
