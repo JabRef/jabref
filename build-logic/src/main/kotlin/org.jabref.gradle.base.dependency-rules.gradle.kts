@@ -80,12 +80,8 @@ jvmDependencyConflicts.patch {
         removeDependency("org.osgi:org.osgi.core")
     }
     module("org.glassfish.jersey.containers:jersey-container-servlet") {
-        // removeDependency("jakarta.servlet:jakarta.servlet-api")
-        // TODO: Fix this: java.lang.module.ResolutionException: Module org.glassfish.jersey.container.servlet does not read a module that exports org.glassfish.jersey.servlet.spi
-        removeDependency("jakarta.servlet:jakarta.servlet-api")
     }
     module("org.glassfish.jersey.containers:jersey-container-servlet-core") {
-        removeDependency("jakarta.servlet:jakarta.servlet-api")
     }
 }
 
@@ -279,6 +275,7 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.logging")
+        requires("jakarta.xml.bind")
     }
     // module("org.glassfish.jersey.containers:jersey-container-servlet", "org.glassfish.jersey.servlet")
     module("org.glassfish.jersey.inject:jersey-hk2", "org.glassfish.jersey.hk2") {
@@ -305,6 +302,7 @@ extraJavaModuleInfo {
     module("org.glassfish.jersey.test-framework:jersey-test-framework-core", "org.glassfish.jersey.test.framework.core") {
         exportAllPackages()
         requireAllDefinedDependencies()
+        requires("java.logging")
     }
     module("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet", "org.glassfish.jersey.container.grizzly2.servlet") {
         // requires("org.glassfish.jersey.servlet")
@@ -312,13 +310,27 @@ extraJavaModuleInfo {
     module("org.glassfish.jersey.containers:jersey-container-servlet", "org.glassfish.jersey.container.servlet") {
         exportAllPackages()
         // requireAllDefinedDependencies()
-        // requires("jakarta.servlet.api")
+        requires("org.glassfish.jersey.container.servlet.core")
+        requires("jakarta.servlet.api")
+    }
+    module("jakarta.servlet:jakarta.servlet-api", "jakarta.servlet.api") {
+        patchRealModule()
+        exportAllPackages()
     }
     module("org.glassfish.jersey.containers:jersey-container-servlet-core", "org.glassfish.jersey.container.servlet.core") {
         exportAllPackages()
+        requires("jakarta.servlet.api")
     }
-    module("org.glassfish.jersey.media:jersey-media-jaxb", "org.glassfish.jersey.media.jaxb")
-    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "org.glassfish.jersey.test.provider.grizzly2")
+    module("org.glassfish.jersey.media:jersey-media-jaxb", "org.glassfish.jersey.media.jaxb") {
+        requireAllDefinedDependencies()
+        requires("java.logging")
+        requires("java.xml")
+        requires("jakarta.xml.bind")
+    }
+    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "org.glassfish.jersey.test.provider.grizzly2") {
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
     module("org.glassfish.hk2:hk2-locator", "org.glassfish.hk2.locator") {
         exportAllPackages()
         requireAllDefinedDependencies()
