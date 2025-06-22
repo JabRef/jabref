@@ -213,7 +213,7 @@ dependencies {
         exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
         exclude(group = "org.xmlunit", module = "xmlunit-legacy")
     }
-    testImplementation("org.ow2.asm:asm:9.6")
+    testImplementation("org.ow2.asm:asm")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")
