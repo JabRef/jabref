@@ -51,10 +51,6 @@ jvmDependencyConflicts.patch {
     module("org.wiremock:wiremock") {
         // workaround for https://github.com/wiremock/wiremock/issues/2874
         addApiDependency("com.github.koppor:wiremock-slf4j-spi-shim")
-
-        // We don't use XMLUnit 1.x APIs (hopefully)
-        removeDependency("org.xmlunit:xmlunit-legacy")
-        removeDependency("org.custommonkey.xmlunit")
     }
     module("org.apache.logging.log4j:log4j-to-slf4j") {
         // remove non-module annotation libraries only used at compile time
@@ -72,7 +68,6 @@ jvmDependencyConflicts.patch {
     }
     module("org.wiremock:wiremock") {
         removeDependency("net.sf.jopt-simple:jopt-simple")
-        removeDependency("org.xmlunit:xmlunit-legacy")
     }
     module("org.testfx:testfx-core") {
         removeDependency("org.osgi:org.osgi.core")
@@ -80,6 +75,9 @@ jvmDependencyConflicts.patch {
     module("org.glassfish.jersey.containers:jersey-container-servlet") {
     }
     module("org.glassfish.jersey.containers:jersey-container-servlet-core") {
+    }
+    module("org.xmlunit:xmlunit-legacy") {
+        removeDependency("junit:junit")
     }
 }
 
@@ -246,6 +244,11 @@ extraJavaModuleInfo {
         exportAllPackages()
         requires("java.xml")
     }
+    module("org.xmlunit:xmlunit-legacy", "org.custommonkey.xmlunit") {
+        exportAllPackages()
+        requires("java.xml")
+    }
+
     module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers") {
         exportAllPackages()
         requires("java.logging")
@@ -495,6 +498,7 @@ extraJavaModuleInfo {
         requires("com.google.common")
         requires("commons.fileupload")
         requires("java.xml")
+        requires("org.custommonkey.xmlunit")
         requires("org.eclipse.jetty.server")
         requires("org.eclipse.jetty.servlet")
         requires("org.eclipse.jetty.servlets")

@@ -211,7 +211,6 @@ dependencies {
 
     testImplementation("org.wiremock:wiremock") {
         exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
-        exclude(group = "org.xmlunit", module = "xmlunit-legacy")
     }
     testImplementation("org.ow2.asm:asm")
 
