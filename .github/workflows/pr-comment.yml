@@ -76,7 +76,7 @@ jobs:
             echo "workflow_run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
           fi
 
-      - name:Check if PR has 'dev: no-bot-comments' label
+      - name: Check if PR has 'dev: no-bot-comments' label
         if: ${{ github.event_name == 'workflow_dispatch' || (steps.read-pr_number.outputs.pr_number != '' && steps.isCrossRepository.outputs.isCrossRepository == 'true') }}
         id: check-label
         run: |
