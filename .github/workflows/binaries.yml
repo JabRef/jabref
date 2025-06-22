@@ -344,7 +344,8 @@ jobs:
         run: |
           set -e
           ls -la jabgui/build/distributions
-          ${{ matrix.archivePortable }}
+          # TODO: portable version is currently very different
+          # ${{ matrix.archivePortable }}
       - name: Rename files
         if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: pwsh
@@ -376,7 +377,8 @@ jobs:
         shell: bash
         run: |
           set -e
-          ${{ matrix.archivePortableJabKit }}
+          # TODO: portable version is currently very different
+          # ${{ matrix.archivePortableJabKit }}
 
       # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
