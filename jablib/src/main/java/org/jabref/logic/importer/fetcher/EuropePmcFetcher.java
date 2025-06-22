@@ -71,7 +71,6 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
             entry.setField(StandardField.VOLUME, result.optString("journalVolume"));
             entry.setField(StandardField.ISSUE, result.optString("journalIssue"));
 
-            // Format pages with double dash
             String pages = result.optString("pageInfo");
             entry.setField(StandardField.PAGES, pages);
 
