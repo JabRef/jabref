@@ -356,7 +356,7 @@ jobs:
         if: (startsWith(matrix.os, 'ubuntu'))
         shell: bash
         run: |
-          cd jabgui/build/distributions
+          cd jabgui/build/packages
           ls -l
           ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
           rm jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
