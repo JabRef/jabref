@@ -79,9 +79,10 @@ javaModulePackaging {
     applicationName = "jabkit"
     addModules.add("jdk.incubator.vector")
     targetsWithOs("windows") {
-        options.addAll(
-            "--win-console"
-        )
+        // Error: Option [--win-console] is not valid with type [msi]
+        // options.addAll(
+        //    "--win-console"
+        // )
     }
     targetsWithOs("linux") {
         options.addAll(
