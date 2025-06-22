@@ -533,6 +533,9 @@ extraJavaModuleInfo {
     module("com.jayway.jsonpath:json-path", "json.path")
     module("net.minidev:json-smart", "json.smart")
     module("net.minidev:accessors-smart", "accessors.smart")
+    module("org.ow2.asm:asm", "org.objectweb.asm") {
+        preserveExisting()
+    }
 
     module("org.openjdk.jmh:jmh-core", "jmh.core")
     module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")
