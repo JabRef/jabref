@@ -492,6 +492,7 @@ extraJavaModuleInfo {
     module("org.wiremock:wiremock", "wiremock") {
         exportAllPackages()
 
+        requires("org.apache.httpcomponents.client5.httpclient5")
         requires("com.fasterxml.jackson.core")
         requires("com.fasterxml.jackson.databind")
         requires("com.fasterxml.jackson.datatype.jsr310")
@@ -535,7 +536,11 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
-    module("com.jayway.jsonpath:json-path", "json.path")
+    module("com.jayway.jsonpath:json-path", "json.path") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("com.fasterxml.jackson.databind")
+    }
     module("net.minidev:json-smart", "json.smart")
     module("net.minidev:accessors-smart", "accessors.smart")
     module("org.ow2.asm:asm", "org.objectweb.asm") {
