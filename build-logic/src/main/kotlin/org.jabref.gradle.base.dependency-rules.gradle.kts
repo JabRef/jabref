@@ -299,6 +299,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
         requires("org.glassfish.grizzly")
+        requires("org.glassfish.grizzly.http")
     }
     module("org.glassfish.jersey.test-framework:jersey-test-framework-core", "org.glassfish.jersey.test.framework.core") {
         exportAllPackages()
