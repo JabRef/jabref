@@ -372,10 +372,11 @@ jobs:
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
 
       - name: Build JabKit
+        if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
       - name: Remove JabKit app build (macOS)
-        if: ${{ startsWith(matrix.os, 'macos') }}
+        if: ${{ false && startsWith(matrix.os, 'macos') }}
         run: rm -rf jabkit/build/distributions/jabkit.app
       - name: Package JabKit application image (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') && (needs.conditions.outputs.secretspresent == 'true') }}
