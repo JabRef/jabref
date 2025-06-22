@@ -355,15 +355,14 @@ jobs:
           # get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
           # get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
           ls jabgui/build/packages
-          get-childitem -Path jabgui/build/packages/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
-          get-childitem -Path jabgui/build/packages/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
+          ls jabgui/build/packages/${{ matrix. os}}
+          get-childitem -Path jabgui/build/packages/${{ matrix. os}}/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
+          get-childitem -Path jabgui/build/packages/${{ matrix. os}}/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
       - name: Repack deb file for Debian
         if: (startsWith(matrix.os, 'ubuntu'))
         shell: bash
         run: |
-          cd jabgui/build/packages
-          ls -l
-          cd ${{ matrix. os}}
+          cd jabgui/build/packages/${{ matrix. os}}
           ls -l
           ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
           rm jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
