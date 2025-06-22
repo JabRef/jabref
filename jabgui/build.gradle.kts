@@ -25,6 +25,9 @@ dependencies {
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
 
+    // From JavaFX25 onwards
+    implementation("org.openjfx:jdk-jsobject:25-ea+21")
+
     implementation("org.slf4j:slf4j-api")
     implementation("org.tinylog:tinylog-api")
     implementation("org.tinylog:slf4j-tinylog")
