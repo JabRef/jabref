@@ -332,6 +332,7 @@ jobs:
         shell: bash
         run: |
           cd jabgui
+          ls build/distributions
           mv build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.dmg
           mv build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.pkg
       - name: Build runtime image and installer (linux, Windows)
@@ -350,8 +351,10 @@ jobs:
         if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: pwsh
         run: |
-          get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
-          get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
+          ls jabgui/build/distributions
+          # get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
+          # get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
+          ls jabgui/build/packages
           get-childitem -Path jabgui/build/packages/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
           get-childitem -Path jabgui/build/packages/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
       - name: Repack deb file for Debian
