@@ -136,6 +136,7 @@ public class SingleWindowWalkthroughOverlay {
 
     private void displayTooltipStep(Node content, @Nullable Node targetNode, TooltipStep step) {
         PopOver popover = new PopOver();
+        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets());
         popover.setContentNode(content);
         popover.setDetachable(false);
         popover.setCloseButtonEnabled(false);

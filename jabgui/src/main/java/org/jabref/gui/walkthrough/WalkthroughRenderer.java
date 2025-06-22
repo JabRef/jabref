@@ -34,7 +34,7 @@ public class WalkthroughRenderer {
      */
     public Node render(TooltipStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
         VBox tooltip = new VBox();
-        tooltip.getStyleClass().add("walkthrough-tooltip-content-container");
+        tooltip.getStyleClass().addAll("root", "walkthrough-tooltip-content-container");
 
         Label titleLabel = new Label(Localization.lang(step.title()));
         titleLabel.getStyleClass().add("walkthrough-tooltip-title");
