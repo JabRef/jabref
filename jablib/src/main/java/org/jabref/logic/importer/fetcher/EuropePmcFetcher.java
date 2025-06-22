@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.cleanup.FieldFormatterCleanup;
+import org.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import org.jabref.logic.importer.IdBasedParserFetcher;
 import org.jabref.logic.importer.ParseException;
 import org.jabref.logic.importer.Parser;
@@ -71,10 +73,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
 
             // Format pages with double dash
             String pages = result.optString("pageInfo");
-            if (pages != null && !pages.isEmpty()) {
-                pages = pages.replace("-", "--");
-                entry.setField(StandardField.PAGES, pages);
-            }
+            entry.setField(StandardField.PAGES, pages);
 
             entry.setField(StandardField.DOI, result.optString("doi"));
             entry.setField(StandardField.PMID, result.optString("pmid"));
@@ -139,6 +138,11 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
         } catch (JSONException e) {
             throw new ParseException("Error parsing EuropePMC response", e);
         }
+    }
+
+    @Override
+    public void doPostCleanup(BibEntry entry) {
+        new FieldFormatterCleanup(StandardField.PAGES, new NormalizePagesFormatter()).cleanup(entry);
     }
 
     @Override
