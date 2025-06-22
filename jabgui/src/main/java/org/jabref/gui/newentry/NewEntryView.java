@@ -2,9 +2,7 @@ package org.jabref.gui.newentry;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -22,7 +20,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.TilePane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -47,15 +44,11 @@ import org.jabref.logic.importer.fetcher.RfcFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.LayoutFormatter;
-import org.jabref.logic.layout.format.DOIStrip;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.ArXivIdentifier;
 import org.jabref.model.entry.identifier.DOI;
 import org.jabref.model.entry.identifier.ISBN;
@@ -94,9 +87,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @Inject private FileUpdateMonitor fileUpdateMonitor;
 
     private final ControlsFxVisualizer visualizer;
-    private BibEntry duplicateEntry;
-    private final Map<String, BibEntry> doiCache = new HashMap<>();
-    private boolean isCacheInitialized = false;
 
     @FXML private ButtonType generateButtonType;
     private Button generateButton;
@@ -120,14 +110,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
     @FXML private Label idErrorInvalidText;
     @FXML private Label idErrorInvalidFetcher;
+    @FXML private Label duplicateSelectLabel;
+    @FXML private Hyperlink duplicateSelectLink;
 
     @FXML private TextArea interpretText;
     @FXML private ComboBox<PlainCitationParserChoice> interpretParser;
 
     @FXML private TextArea bibtexText;
 
-    @FXML private HBox duplicateWarningBox;
-    @FXML private Hyperlink duplicateSelectLink;
     private BibEntry result;
 
     public NewEntryView(NewEntryDialogTab initialApproach, GuiPreferences preferences, LibraryTab libraryTab, DialogService dialogService) {
@@ -225,82 +215,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         initializeSpecifyBibTeX();
     }
 
-    private void checkDOI(String doiInput) {
-        if (doiInput == null || doiInput.isBlank()) {
-            viewModel.isDuplicateEntryProperty().set(false);
-            duplicateEntry = null;
-            return;
-        }
-
-        LayoutFormatter doiStrip = new DOIStrip();
-        String normalizedInput = doiStrip.format(doiInput);
-
-        if (!isCacheInitialized) {
-            doiCache.clear();
-            BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("no active library found !"));
-
-            for (BibEntry entry : databaseContext.getEntries()) {
-                entry.getField(StandardField.DOI)
-                     .map(doiStrip::format)
-                     .ifPresent(strippedDoi -> doiCache.put(strippedDoi.toLowerCase(), entry));
-            }
-
-            isCacheInitialized = true;
-        }
-
-        BibEntry matchedEntry = doiCache.get(normalizedInput.toLowerCase());
-
-        if (matchedEntry != null) {
-            duplicateEntry = matchedEntry;
-            viewModel.isDuplicateEntryProperty().set(true);
-        } else {
-            duplicateEntry = null;
-            viewModel.isDuplicateEntryProperty().set(false);
-        }
-    }
-
-     private void initializeCreateEntry() {
-        entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
-        entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
-        entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());
-
-        entryOtherTitle.managedProperty().bind(entryOtherTitle.visibleProperty());
-        entryOtherTitle.expandedProperty().bindBidirectional(preferences.typesOtherExpandedProperty());
-        entryOther.managedProperty().bind(entryOther.visibleProperty());
-
-        entryCustomTitle.managedProperty().bind(entryCustomTitle.visibleProperty());
-        entryCustomTitle.expandedProperty().bindBidirectional(preferences.typesCustomExpandedProperty());
-        entryCustom.managedProperty().bind(entryCustom.visibleProperty());
-
-        final boolean isBiblatexMode = libraryTab.getBibDatabaseContext().isBiblatexMode();
-
-        List<BibEntryType> recommendedEntries;
-        List<BibEntryType> otherEntries;
-        if (isBiblatexMode) {
-            recommendedEntries = BiblatexEntryTypeDefinitions.RECOMMENDED;
-            otherEntries = new ArrayList<>(BiblatexEntryTypeDefinitions.ALL);
-            otherEntries.removeAll(recommendedEntries);
-            otherEntries.addAll(BiblatexSoftwareEntryTypeDefinitions.ALL);
-            otherEntries.addAll(BiblatexAPAEntryTypeDefinitions.ALL);
-        } else {
-            recommendedEntries = BibtexEntryTypeDefinitions.RECOMMENDED;
-            otherEntries = new ArrayList<>(BiblatexEntryTypeDefinitions.ALL);
-            otherEntries.removeAll(recommendedEntries);
-            otherEntries.addAll(IEEETranEntryTypeDefinitions.ALL);
-        }
-        addEntriesToPane(entryRecommended, recommendedEntries);
-        addEntriesToPane(entryOther, otherEntries);
-
-        final BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-        final BibDatabaseMode customTypesDatabaseMode = isBiblatexMode ? BibDatabaseMode.BIBLATEX : BibDatabaseMode.BIBTEX;
-        final List<BibEntryType> customEntries = entryTypesManager.getAllCustomTypes(customTypesDatabaseMode);
-        if (customEntries.isEmpty()) {
-            entryCustomTitle.setVisible(false);
-        } else {
-            addEntriesToPane(entryCustom, customEntries);
-        }
-    }
-  
     private void initializeAddEntry() {
         entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
         entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
@@ -350,9 +264,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
 
-        duplicateWarningBox.visibleProperty().bind(viewModel.isDuplicateEntryProperty());
-        duplicateWarningBox.managedProperty().bind(viewModel.isDuplicateEntryProperty());
-
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
         idLookupSpecify.setToggleGroup(toggleGroup);
@@ -363,13 +274,13 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             idLookupSpecify.selectedProperty().set(true);
         }
 
+        viewModel.populateDOICache();
+
         // [impl->req~newentry.clipboard.autofocus~1]
         Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
         if (validClipboardId.isPresent()) {
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
-
-            checkDOI(ClipBoardManager.getContents().trim());
 
             Identifier id = validClipboardId.get();
             Platform.runLater(() -> {
@@ -395,15 +306,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
+        idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
+        duplicateSelectLabel.visibleProperty().bind(viewModel.duplicateDoiValidatorProperty());
+        duplicateSelectLink.visibleProperty().bind(viewModel.duplicateDoiValidatorProperty());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
 
-        idText.textProperty().addListener((_, _, newText) -> {
-            checkDOI(newText);
-        });
-
         duplicateSelectLink.setOnAction(_ -> {
-            if (duplicateEntry != null) {
-                libraryTab.showAndEdit(duplicateEntry);
+            if (viewModel.duplicateDoiValidatorProperty() != null) {
+                libraryTab.showAndEdit(viewModel.getDuplicateEntry());
             }
         });
     }

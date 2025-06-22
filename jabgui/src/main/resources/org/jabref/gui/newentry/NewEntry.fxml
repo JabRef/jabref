@@ -65,10 +65,6 @@
                             </tooltip>
                         </TextField>
                     </HBox>
-                    <HBox fx:id="duplicateWarningBox" alignment="CENTER_LEFT" spacing="5.0">
-                        <Label fx:id="duplicateSelectLabel" text="Entry already existing in library."/>
-                        <Hyperlink fx:id="duplicateSelectLink" text="%Select entry"/>
-                    </HBox>
                     <VBox spacing="5.0">
                         <RadioButton fx:id="idLookupGuess" text="%Automatically determine identifier type">
                             <tooltip>
@@ -93,6 +89,14 @@
                         <Label fx:id="idErrorInvalidText" text="%You must provide an identifier.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>
+                        <HBox>
+                            <Label fx:id="duplicateSelectLabel" text="Entry already exists in library.">
+                                <font><Font name="System Italic" size="13.0"/></font>
+                            </Label>
+                            <Hyperlink fx:id="duplicateSelectLink" text=" Jump to entry.">
+                                <font><Font name="System Italic" size="13.0"/></font>
+                            </Hyperlink>
+                        </HBox>
                         <Label fx:id="idErrorInvalidFetcher" text="%You must select an identifier type.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>

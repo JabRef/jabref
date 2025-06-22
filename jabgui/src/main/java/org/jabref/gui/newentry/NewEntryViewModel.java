@@ -1,6 +1,8 @@
 package org.jabref.gui.newentry;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -38,7 +40,10 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.layout.format.DOIStrip;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -62,10 +67,10 @@ public class NewEntryViewModel {
 
     private final BooleanProperty executing;
     private final BooleanProperty executedSuccessfully;
-    private final BooleanProperty isDuplicateEntry = new SimpleBooleanProperty(false);
 
     private final StringProperty idText;
     private final Validator idTextValidator;
+    private final Validator duplicateDoiValidator;
     private final ListProperty<IdBasedFetcher> idFetchers;
     private final ObjectProperty<IdBasedFetcher> idFetcher;
     private final Validator idFetcherValidator;
@@ -80,6 +85,8 @@ public class NewEntryViewModel {
     private final StringProperty bibtexText;
     private final Validator bibtexTextValidator;
     private Task<Optional<List<BibEntry>>> bibtexWorker;
+    private BibEntry duplicateEntry;
+    private final Map<String, BibEntry> doiCache;
 
     public NewEntryViewModel(GuiPreferences preferences,
                                     LibraryTab libraryTab,
@@ -98,12 +105,17 @@ public class NewEntryViewModel {
 
         executing = new SimpleBooleanProperty(false);
         executedSuccessfully = new SimpleBooleanProperty(false);
+        doiCache = new HashMap<>();
 
         idText = new SimpleStringProperty();
         idTextValidator = new FunctionBasedValidator<>(
             idText,
             StringUtil::isNotBlank,
             ValidationMessage.error(Localization.lang("You must specify an identifier.")));
+        duplicateDoiValidator = new FunctionBasedValidator<>(
+            idText,
+            this::checkDOI,
+            ValidationMessage.error(Localization.lang("DOI already exists in a library.")));
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -131,8 +143,33 @@ public class NewEntryViewModel {
         bibtexWorker = null;
     }
 
-    public BooleanProperty isDuplicateEntryProperty() {
-        return isDuplicateEntry;
+    public void populateDOICache() {
+        LayoutFormatter doiStrip = new DOIStrip();
+        doiCache.clear();
+        stateManager.getOpenDatabases().stream()
+                    .flatMap(context -> context.getEntries().stream())
+                    .forEach(entry -> entry.getField(StandardField.DOI).ifPresent(doi -> {
+                        String stripped = doiStrip.format(doi);
+                        doiCache.put(stripped, entry);
+                    }));
+    }
+
+    public boolean checkDOI(String doiInput) {
+        if (doiInput == null || doiInput.isBlank()) {
+            return false;
+        }
+
+        LayoutFormatter doiStrip = new DOIStrip();
+        String normalized = doiStrip.format(doiInput);
+        if (doiCache.containsKey(normalized)) {
+            duplicateEntry = doiCache.get(normalized);
+            return true;
+        }
+        return false;
+    }
+
+    public BibEntry getDuplicateEntry() {
+        return duplicateEntry;
     }
 
     public ReadOnlyBooleanProperty executingProperty() {
@@ -149,6 +186,10 @@ public class NewEntryViewModel {
 
     public ReadOnlyBooleanProperty idTextValidatorProperty() {
         return idTextValidator.getValidationStatus().validProperty();
+    }
+
+    public ReadOnlyBooleanProperty duplicateDoiValidatorProperty() {
+        return duplicateDoiValidator.getValidationStatus().validProperty();
     }
 
     public ListProperty<IdBasedFetcher> idFetchersProperty() {
