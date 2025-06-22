@@ -276,6 +276,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
         requires("jakarta.xml.bind")
+        requires("org.glassfish.jersey.hk2")
     }
     // module("org.glassfish.jersey.containers:jersey-container-servlet", "org.glassfish.jersey.servlet")
     module("org.glassfish.jersey.inject:jersey-hk2", "org.glassfish.jersey.hk2") {

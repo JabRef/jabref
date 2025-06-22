@@ -31,6 +31,7 @@ dependencies {
     implementation("org.glassfish.jersey.containers:jersey-container-grizzly2-http")
     implementation("org.glassfish.grizzly:grizzly-http-server")
     implementation("org.glassfish.grizzly:grizzly-framework")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.4")
     testImplementation("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2")
     // implementation("org.glassfish.jersey.containers:jersey-container-servlet:3.1.10")
     implementation("jakarta.validation:jakarta.validation-api")
