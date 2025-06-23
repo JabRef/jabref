@@ -25,7 +25,6 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.os.OS;
 import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -55,7 +54,6 @@ public class ThemeManager {
     );
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ThemeManager.class);
-    private static final boolean SUPPORTS_DARK_MODE = OS.WINDOWS || OS.OS_X;
 
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -97,10 +95,6 @@ public class ThemeManager {
     }
 
     private void initializeWindowThemeUpdater(boolean darkMode) {
-        if (!SUPPORTS_DARK_MODE) {
-            return;
-        }
-
         this.isDarkMode = darkMode;
 
         ListChangeListener<Window> windowsListener = change -> {
@@ -111,16 +105,8 @@ public class ThemeManager {
                 change.getAddedSubList().stream()
                       .filter(Stage.class::isInstance)
                       .map(Stage.class::cast)
-                      .forEach(stage -> {
-                          BindingsHelper.subscribeFuture(stage.showingProperty(), showing -> {
-                              if (showing) {
-                                  applyDarkModeToWindow(stage, isDarkMode);
-                              }
-                          });
-                          if (stage.isShowing()) {
-                              applyDarkModeToWindow(stage, isDarkMode);
-                          }
-                      });
+                      .forEach(stage -> stage.showingProperty()
+                                         .addListener(_ -> applyDarkModeToWindow(stage, isDarkMode)));
             }
         };
 
@@ -131,7 +117,7 @@ public class ThemeManager {
     }
 
     private void applyDarkModeToWindow(Stage stage, boolean darkMode) {
-        if (!SUPPORTS_DARK_MODE || stage == null || !stage.isShowing()) {
+        if (stage == null || !stage.isShowing()) {
             return;
         }
 
