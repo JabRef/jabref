@@ -72,7 +72,7 @@ dependencies.constraints {
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
     api("io.zonky.test:embedded-postgres:2.1.0")
-    api("jakarta.annotation:jakarta.annotation-api:2.1.1")
+    api("jakarta.annotation:jakarta.annotation-api:3.0.0")
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
