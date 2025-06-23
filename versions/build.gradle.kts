@@ -12,6 +12,12 @@ val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.1.0"))
+    api("dev.langchain4j:langchain4j")
+    api("dev.langchain4j:langchain4j-google-ai-gemini")
+    api("dev.langchain4j:langchain4j-hugging-face")
+    api("dev.langchain4j:langchain4j-mistral-ai")
+    api("dev.langchain4j:langchain4j-open-ai")
     api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.5.0"))
 }
 
@@ -56,11 +62,6 @@ dependencies.constraints {
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.3.0")
-    api("dev.langchain4j:langchain4j-google-ai-gemini:1.0.1-beta6")
-    api("dev.langchain4j:langchain4j-hugging-face:1.0.1-beta6")
-    api("dev.langchain4j:langchain4j-mistral-ai:1.0.1-beta6")
-    api("dev.langchain4j:langchain4j-open-ai:1.0.1")
-    api("dev.langchain4j:langchain4j:1.0.1")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
