@@ -3,10 +3,10 @@ name: Publish to maven central
 on:
   pull_request:
     paths:
-     - .github\workflows\publish.yml
+     - .github/workflows/publish.yml
   push:
     paths:
-     - .github\workflows\publish.yml
+     - .github/workflows/publish.yml
     tags:
       - '*'
   schedule:
