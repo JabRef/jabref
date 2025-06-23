@@ -15,6 +15,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
 - We added the field `monthfiled` to the default list of fields to resolve BibTeX-Strings for [#13375](https://github.com/JabRef/jabref/issues/13375)
 - We added a new ID based fetcher for [EuropePMC](https://europepmc.org/). [#13389](https://github.com/JabRef/jabref/pull/13389)
+- We added tooltips to the "User-specific file directory" and "LaTeX file directory" fields of the library properties window. [#12269](https://github.com/JabRef/jabref/issues/12269)
+
 
 ### Changed
 
@@ -107,7 +109,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added path validation to file directories in library properties dialog. [#11840](https://github.com/JabRef/jabref/issues/11840)
 - We now support usage of custom CSL styles in the Open/LibreOffice integration. [#12337](https://github.com/JabRef/jabref/issues/12337)
 - We added support for citation-only CSL styles which don't specify bibliography formatting. [#12996](https://github.com/JabRef/jabref/pull/12996)
-- We added tooltips to the "User-specific file directory" and "LaTeX file directory" fields of the library properties window. [#12269](https://github.com/JabRef/jabref/issues/12269)
 
 ### Changed
 
