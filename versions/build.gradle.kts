@@ -12,7 +12,7 @@ val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.4.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.5.0"))
 }
 
 dependencies.constraints {
