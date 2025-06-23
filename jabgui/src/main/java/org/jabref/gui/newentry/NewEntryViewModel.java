@@ -42,6 +42,7 @@ import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.layout.LayoutFormatter;
 import org.jabref.logic.layout.format.DOIStrip;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
@@ -115,7 +116,7 @@ public class NewEntryViewModel {
         duplicateDoiValidator = new FunctionBasedValidator<>(
             idText,
             this::checkDOI,
-            ValidationMessage.error(Localization.lang("DOI already exists in a library.")));
+            ValidationMessage.error(Localization.lang("DOI already exists in a library")));
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -144,14 +145,13 @@ public class NewEntryViewModel {
     }
 
     public void populateDOICache() {
-        LayoutFormatter doiStrip = new DOIStrip();
         doiCache.clear();
-        stateManager.getOpenDatabases().stream()
-                    .flatMap(context -> context.getEntries().stream())
-                    .forEach(entry -> entry.getField(StandardField.DOI).ifPresent(doi -> {
-                        String stripped = doiStrip.format(doi);
-                        doiCache.put(stripped, entry);
-                    }));
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+
+        activeDatabase.ifPresent(bibDatabaseContext -> bibDatabaseContext.getEntries()
+                                                                         .forEach(entry -> entry.getField(StandardField.DOI).ifPresent(doi -> {
+                                                                             doiCache.put(doi, entry);
+                                                                         })));
     }
 
     public boolean checkDOI(String doiInput) {
@@ -160,7 +160,8 @@ public class NewEntryViewModel {
         }
 
         LayoutFormatter doiStrip = new DOIStrip();
-        String normalized = doiStrip.format(doiInput);
+        String normalized = doiStrip.format(doiInput.toLowerCase());
+
         if (doiCache.containsKey(normalized)) {
             duplicateEntry = doiCache.get(normalized);
             return true;
