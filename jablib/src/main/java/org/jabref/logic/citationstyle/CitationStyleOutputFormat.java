@@ -6,7 +6,7 @@ public enum CitationStyleOutputFormat {
 
     HTML("html", OS.NEWLINE + "<br>" + OS.NEWLINE),
     TEXT("text", ""),
-    MARKDOWN("markdown", OS.NEWLINE + "<br>" + OS.NEWLINE);
+    MARKDOWN("markdown", "");
 
     private final String format;
     private final String lineSeparator;

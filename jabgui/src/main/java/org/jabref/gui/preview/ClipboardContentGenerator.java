@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 public class ClipboardContentGenerator {
 
@@ -122,9 +123,23 @@ public class ClipboardContentGenerator {
     }
 
     static ClipboardContent processMarkdown(List<String> citations) {
-        String result = String.join(CitationStyleOutputFormat.MARKDOWN.getLineSeparator(), citations);
+        String result = "<!DOCTYPE html>" + OS.NEWLINE +
+                "<html>" + OS.NEWLINE +
+                "   <head>" + OS.NEWLINE +
+                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
+                "   </head>" + OS.NEWLINE +
+                "   <body>" + OS.NEWLINE + OS.NEWLINE;
+
+        result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
+        result += OS.NEWLINE +
+                "   </body>" + OS.NEWLINE +
+                "</html>" + OS.NEWLINE;
+
+        FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
+        String markdown = converter.convert(result);
+
         ClipboardContent content = new ClipboardContent();
-        content.putString(result);
+        content.putString(markdown);
         return content;
     }
 
