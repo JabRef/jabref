@@ -7,7 +7,7 @@ javaPlatform {
 }
 
 val javafx = "24.0.1"
-val lucene = "10.2.1"
+val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
 dependencies {
@@ -18,7 +18,7 @@ dependencies {
     api("dev.langchain4j:langchain4j-hugging-face")
     api("dev.langchain4j:langchain4j-mistral-ai")
     api("dev.langchain4j:langchain4j-open-ai")
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.4.0"))
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.5.0"))
 }
 
 dependencies.constraints {
@@ -73,7 +73,7 @@ dependencies.constraints {
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
     api("io.zonky.test:embedded-postgres:2.1.0")
-    api("jakarta.annotation:jakarta.annotation-api:2.1.1")
+    api("jakarta.annotation:jakarta.annotation-api:3.0.0")
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
@@ -111,7 +111,7 @@ dependencies.constraints {
     api("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
     api("org.hamcrest:hamcrest-library:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.0.0.Final")
+    api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.2.1-SNAPSHOT")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
