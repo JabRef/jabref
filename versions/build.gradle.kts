@@ -7,7 +7,7 @@ javaPlatform {
 }
 
 val javafx = "24.0.1"
-val lucene = "10.2.1"
+val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
 dependencies {
