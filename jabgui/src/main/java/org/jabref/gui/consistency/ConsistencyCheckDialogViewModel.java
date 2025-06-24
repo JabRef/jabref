@@ -45,7 +45,8 @@ import org.slf4j.LoggerFactory;
 
 public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConsistencyCheckDialogViewModel.class);
+    private static final int EXTRA_COLUMNS_COUNT = 2;
 
     private final BibliographyConsistencyCheck.Result result;
     private final DialogService dialogService;
@@ -54,7 +55,6 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     private final List<Field> allReportedFields;
     private final int columnCount;
-    private final int EXTRA_COLUMNS_COUNT = 2;
     private final ObservableList<ConsistencyMessage> tableData = FXCollections.observableArrayList();
     private final StringProperty selectedEntryType = new SimpleStringProperty();
 
@@ -85,9 +85,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
 
     public List<String> getEntryTypes() {
         List<String> entryTypes = new ArrayList<>();
-        result.entryTypeToResultMap().forEach((entrySet, entryTypeResult) -> {
-            entryTypes.add(entrySet.toString());
-        });
+        result.entryTypeToResultMap().forEach((entrySet, _) -> entryTypes.add(entrySet.toString()));
         return entryTypes;
     }
 
@@ -96,7 +94,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
     }
 
     public Set<String> getColumnNames() {
-        Set<String> result = new LinkedHashSet<>(columnCount + EXTRA_COLUMNS_COUNT);
+        Set<String> result = LinkedHashSet.newLinkedHashSet(columnCount + EXTRA_COLUMNS_COUNT);
         result.add("Entry Type");
         result.add("CitationKey");
         allReportedFields.forEach(field-> result.add(field.getDisplayName().trim()));
@@ -124,12 +122,12 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         BibliographyConsistencyCheck.EntryTypeResult entries = mapEntry.getValue();
         SequencedCollection<BibEntry> bibEntries = entries.sortedEntries();
 
-        bibEntries.forEach(Unchecked.consumer(bibEntry -> {
-            writeBibEntry(bibEntry, entryType, requiredFields, optionalFields);
-        }));
+        bibEntries.forEach(Unchecked.consumer(bibEntry ->
+            writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)
+        ));
     }
 
-    private void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) throws IOException {
+    private void writeBibEntry(BibEntry bibEntry, String entryType, Set<Field> requiredFields, Set<Field> optionalFields) {
         List<String> theRecord = getFindingsAsList(bibEntry, entryType, requiredFields, optionalFields);
         List<String> message = new ArrayList<>();
         for (String s: theRecord) {
@@ -143,7 +141,7 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
         List<String> result = new ArrayList<>(columnCount + EXTRA_COLUMNS_COUNT);
         result.add(entryType);
         result.add(bibEntry.getCitationKey().orElse(""));
-        allReportedFields.forEach(field -> {
+        allReportedFields.forEach(field ->
             result.add(bibEntry.getField(field).map(_ -> {
                 if (requiredFields.contains(field)) {
                     return ConsistencySymbol.REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
@@ -152,8 +150,8 @@ public class ConsistencyCheckDialogViewModel extends AbstractViewModel {
                 } else {
                     return ConsistencySymbol.UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText();
                 }
-            }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()));
-        });
+            }).orElse(ConsistencySymbol.UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY.getText()))
+        );
         return result;
     }
 

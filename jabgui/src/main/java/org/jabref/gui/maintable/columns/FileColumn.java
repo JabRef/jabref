@@ -104,7 +104,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                 .withOnMouseClickedEvent((entry, linkedFiles) -> event -> {
                     List<LinkedFile> filteredFiles = linkedFiles.stream()
                                                                 .filter(linkedFile -> linkedFile.getFileType().equalsIgnoreCase(fileType))
-                                                                .collect(Collectors.toList());
+                                                                .toList();
 
                     if (event.getButton() == MouseButton.PRIMARY) {
                         if (filteredFiles.size() == 1) {
@@ -120,7 +120,7 @@ public class FileColumn extends MainTableColumn<List<LinkedFile>> {
                                         entry.getEntry(), database, taskExecutor, dialogService, preferences);
                                 MenuItem menuItem = new MenuItem(linkedFileViewModel.getTruncatedDescriptionAndLink(),
                                         linkedFileViewModel.getTypeIcon().getGraphicNode());
-                                menuItem.setOnAction(e -> linkedFileViewModel.open());
+                                menuItem.setOnAction(_ -> linkedFileViewModel.open());
                                 contextMenu.getItems().add(menuItem);
                             }
                             contextMenu.show((Node) event.getSource(), event.getScreenX(), event.getScreenY());

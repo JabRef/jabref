@@ -73,22 +73,7 @@ class CheckConsistency implements Callable<Integer> {
         });
 
         Writer writer = new OutputStreamWriter(System.out);
-        BibliographyConsistencyCheckResultWriter checkResultWriter;
-        if ("txt".equalsIgnoreCase(outputFormat)) {
-            checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
-                    result,
-                    writer,
-                    sharedOptions.porcelain,
-                    argumentProcessor.entryTypesManager,
-                    databaseContext.getMode());
-        } else {
-            checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
-                    result,
-                    writer,
-                    sharedOptions.porcelain,
-                    argumentProcessor.entryTypesManager,
-                    databaseContext.getMode());
-        }
+        BibliographyConsistencyCheckResultWriter checkResultWriter = getBibliographyConsistencyCheckResultWriter(result, writer, databaseContext);
 
         // System.out should not be closed, therefore no try-with-resources
         try {
@@ -107,5 +92,30 @@ class CheckConsistency implements Callable<Integer> {
             System.out.println(Localization.lang("Consistency check completed"));
         }
         return 0;
+    }
+
+    private BibliographyConsistencyCheckResultWriter getBibliographyConsistencyCheckResultWriter(
+            BibliographyConsistencyCheck.Result result,
+            Writer writer,
+            BibDatabaseContext databaseContext) {
+        BibliographyConsistencyCheckResultWriter checkResultWriter;
+        
+        if ("txt".equalsIgnoreCase(outputFormat)) {
+            checkResultWriter = new BibliographyConsistencyCheckResultTxtWriter(
+                    result,
+                    writer,
+                    sharedOptions.porcelain,
+                    argumentProcessor.entryTypesManager,
+                    databaseContext.getMode());
+        } else {
+            checkResultWriter = new BibliographyConsistencyCheckResultCsvWriter(
+                    result,
+                    writer,
+                    sharedOptions.porcelain,
+                    argumentProcessor.entryTypesManager,
+                    databaseContext.getMode());
+        }
+
+        return checkResultWriter;
     }
 }
