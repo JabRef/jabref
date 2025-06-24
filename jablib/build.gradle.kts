@@ -42,13 +42,12 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
     dependsOn(tasks.withType<AntlrTask>())
 }
 
+// See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+val mockitoAgent = configurations.create("mockitoAgent")
+
 dependencies {
     implementation("org.openjfx:javafx-base")
 
-    // Required by afterburner.fx
-    implementation("org.openjfx:javafx-controls")
-    implementation("org.openjfx:javafx-fxml")
-    implementation("org.openjfx:javafx-graphics")
     implementation("com.ibm.icu:icu4j")
 
     // Fix "error: module not found: javafx.controls" during compilation
@@ -58,6 +57,9 @@ dependencies {
     // exclusions are not supported
 
     implementation("org.jabref:afterburner.fx")
+    // Required by afterburner.fx
+    implementation("org.openjfx:javafx-fxml")
+
     implementation("org.jabref:easybind")
 
     implementation ("org.apache.pdfbox:pdfbox")
@@ -96,6 +98,8 @@ dependencies {
 
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    // TODO: Somwewhere we get a warning: unknown enum constant Id.CLASS reason: class file for com.fasterxml.jackson.annotation.JsonTypeInfo$Id not found
+    // implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
 
     implementation("com.fasterxml:aalto-xml")
 
@@ -193,16 +197,22 @@ dependencies {
     testImplementation("org.junit.platform:junit-platform-launcher")
 
     testImplementation("org.mockito:mockito-core")
+    // TODO: Use versions of versions/build.gradle.kts
+    mockitoAgent("org.mockito:mockito-core:5.18.0") { isTransitive = false }
     testImplementation("net.bytebuddy:byte-buddy")
 
     testImplementation("org.xmlunit:xmlunit-core")
     testImplementation("org.xmlunit:xmlunit-matchers")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
 
-    testImplementation("org.hamcrest:hamcrest-library")
+    testImplementation("org.hamcrest:hamcrest")
 
-    testImplementation("org.wiremock:wiremock")
+    testImplementation("org.wiremock:wiremock") {
+        exclude(group = "net.sf.jopt-simple", module = "jopt-simple")
+    }
+    testImplementation("org.ow2.asm:asm")
 
     // Required for LocalizationConsistencyTest
     testImplementation("org.testfx:testfx-core")
@@ -403,6 +413,11 @@ tasks.test {
     useJUnitPlatform {
         excludeTags("DatabaseTest", "FetcherTest")
     }
+    jvmArgs = listOf(
+        "-javaagent:${mockitoAgent.asPath}",
+        "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
+        "--add-opens", "java.base/java.nio=org.apache.pdfbox.io"
+    )
 }
 
 jmh {
@@ -529,11 +544,15 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.junit.jupiter.api")
     requires.add("org.junit.jupiter.params")
     requires.add("org.jabref.testsupport")
+    requires.add("org.hamcrest")
     requires.add("org.mockito")
+
+    // Required for LocalizationConsistencyTest
+    requires.add("org.testfx.junit5")
+    // requires.add("org.assertj.core")
+
+    requires.add("org.xmlunit")
+    requires.add("org.xmlunit.matchers")
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
-
-    // --add-reads
-    //reads.add("org.jabref.jablib=io.github.classgraph")
-    //reads.add("org.jabref.jablib=org.jabref.testsupport")
 }
