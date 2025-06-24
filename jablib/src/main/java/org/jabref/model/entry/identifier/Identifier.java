@@ -27,7 +27,7 @@ public interface Identifier {
 
     Optional<URI> getExternalURI();
 
-    public static Optional<Identifier> from(String identifier) {
+    static Optional<Identifier> from(String identifier) {
         if (StringUtil.isBlank(identifier)) {
             return Optional.empty();
         }
