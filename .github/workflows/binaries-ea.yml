@@ -4,8 +4,6 @@
 name: Binaries (JDK and JavaFX early access builds)
 
 on:
-  schedule:
-    - cron: "0 18 * * *"
   pull_request:
     types:
       - opened
@@ -121,9 +119,8 @@ jobs:
     needs: [conditions]
     if: ${{ needs.conditions.outputs.should-build == 'true' }}
     env:
-      javafx: '25'
-      jdk_version: '25'
-      jdk: 'openjdk-25.0.0-ea+21'
+      jdk_version: '24'
+      jdk_distribution: 'openjdk-25.0.0-ea+27'
     strategy:
       fail-fast: false
       matrix:
@@ -134,6 +131,13 @@ jobs:
             archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distribution/JabRef
             archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distribution/jabkit
             suffix: '-ea'
+            archForDebianRepack: "_amd64"
+          - os: ubuntu-22.04-arm
+            displayName: linux-arm
+            archivePortable: tar -c -C jabgui/build/distribution JabRef | pigz --rsyncable > jabgui/build/distribution/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/distribution/JabRef
+            archivePortableJabKit: tar -c -C jabkit/build/distribution jabkit | pigz --rsyncable > jabkit/build/distribution/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/distribution/jabkit
+            suffix: '-ea_arm64'
+            archForDebianRepack: '_arm64'
           - os: windows-latest
             displayName: windows
             archivePortable: 7z a -r jabgui/build/distribution/JabRef-portable_windows.zip ./jabgui/build/distribution/JabRef && rm -R jabgui/build/distribution/JabRef
@@ -145,6 +149,7 @@ jobs:
           - os: macos-14
             displayName: macOS (ARM64)
             suffix: '-ea_arm64'
+            archForDebianRepack: ""
     runs-on: ${{ matrix.os }}
     outputs:
       major: ${{ steps.gitversion.outputs.Major }}
@@ -159,7 +164,7 @@ jobs:
           submodules: 'true'
           show-progress: 'false'
       - name: Install pigz and cache (linux)
-        if: (matrix.os == 'ubuntu-22.04')
+        if: (startsWith(matrix.os, 'ubuntu'))
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: pigz
@@ -175,24 +180,34 @@ jobs:
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (linux, Windows)
         if: ${{ !startsWith(matrix.os, 'macos') }}
         run: |
-          sed -i "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          # Update JavaLanguageVersion
+          sed -i "s/JavaLanguageVersion.of..../JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+
+          # Update options.release
+          sed -i "s/options\.release = ../options.release = ${{ env.jdk_version }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+
+          # Use default vendor
+          # sed -i "s#vendor = JvmVendorSpec\..*##" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+
+          cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
       - name: Tell gradle to use JDK ${{ env.jdk_version }} (macOS)
         if: ${{ startsWith(matrix.os, 'macos') }}
         run: |
-          sed -i '.bak' "s/JavaLanguageVersion.of(24)/JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          sed -i '.bak' "s#vendor = JvmVendorSpec.AZUL##" build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
-          cat build-logic/src/main/kotlin/buildlogic.java-common-conventions.gradle.kts
+          sed -i '.bak' "s/JavaLanguageVersion.of..../JavaLanguageVersion.of(${{ env.jdk_version }})/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          sed -i '.bak' "s/options\.release = ../options.release = ${{ env.jdk_version }}/" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          # sed -i '.bak' "s#vendor = JvmVendorSpec\..*##" build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
+          cat build-logic/src/main/kotlin/org.jabref.gradle.feature.compile.gradle.kts
 
       # region setup-JDK
       - name: Setup JDK ${{ env.jdk_version }} (${{ env.jdk }}) for "java toolchain" of Gradle
+        if: false
         uses: jdx/mise-action@v2
         with:
           mise_toml: |
             [tools]
-            java = { version = "${{ env.jdk }}", release_type = "ea" }
+            java = { version = "${{ env.jdk_distribution }}", release_type = "ea" }
       - name: Debug
+        if: false
         shell: bash
         run: |
           set -x
@@ -200,110 +215,50 @@ jobs:
           echo $JAVA_HOME
           java --version
       - name: Make JDK known to gradle (Linux, macOS)
-        if: (matrix.os != 'windows-latest')
+        if: false && (matrix.os != 'windows-latest')
         shell: bash
         # Hint by https://github.com/gradle/gradle/issues/29355#issuecomment-2598556970
         run: ln -s ~/.local/share/mise ~/.asdf
       - name: Make JDK known to gradle (Windows)
-        if: (matrix.os == 'windows-latest')
+        if: false && (matrix.os == 'windows-latest')
         shell: bash
         run: mv ~/AppData/Local/mise ~/.asdf
       - name: Setup JDK for gradle itself
+        if: false
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+      - name: Setup JDK ${{ env.jdk_version }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '${{ env.jdk_version }}'
+          distribution: 'corretto'
+          java-package: 'jdk'
       # endregion
 
       # region JavaFX
-      - name: Download and extract JavaFX ${{ env.javafx }}
-        if: (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm')
+      - name: 'Determine latest JavaFX version'
+        id: javafx
         shell: bash
-        run: |
-          set -e
-          set -x
-          mkdir javafx
-          cd javafx
-          curl --no-progress-meter https://jdk.java.net/javafx${{ env.javafx }}/ > javafx.html
-
-          case "${{ matrix.os }}" in
-            "ubuntu-22.04")
-              OS="linux-x64"
-              EXTRACT="tar xzf *.tar.gz"
-              EXT="tar.gz"
-              ;;
-            "windows-latest")
-              OS="windows-x64"
-              EXTRACT="unzip -qq *.zip"
-              EXT="zip"
-              ;;
-            "macos-13")
-              OS="macos-x64"
-              EXTRACT="tar xzf *.tar.gz"
-              EXT="tar.gz"
-              ;;
-            "macos-14")
-              OS="macos-aarch64"
-              EXTRACT="tar xzf *.tar.gz"
-              EXT="tar.gz"
-              ;;
-            *)
-              echo "Unsupported OS"
-              exit 1
-              ;;
-          esac
-          echo "OS set to $OS"
-
-          URL_SDK=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}_bin-sdk.${EXT}" javafx.html | head -n 1)
-          echo "Downloading $URL_SDK..."
-          curl -OJ --no-progress-meter $URL_SDK
-          $EXTRACT
-          rm *.$EXT
-
-          URL_JMODS=$(grep -o "https://download.java.net/java/.*/javafx.*${OS}_bin-jmods.${EXT}" javafx.html | head -n 1)
-          echo "Downloading $URL_JMODS..."
-          curl -OJ --no-progress-meter $URL_JMODS
-          $EXTRACT
-          rm *.$EXT
-
-          ls -la
-      - name: 'Set JavaFX ${{ env.javafx }} (linux, Windows)'
-        if: ${{ !startsWith(matrix.os, 'macos') && (matrix.os != 'buildjet-8vcpu-ubuntu-2204-arm') }}
-        shell: bash
-        run: |
-          set -e
-          shopt -s globstar
-          for buildgradle in **/build.gradle.kts; do
-            sed -i '/javafx {/{n;s#version = ".*"#sdk = "../javafx/javafx-sdk-${{ env.javafx }}"#}' $buildgradle
-            sed -i "s#jlink {#jlink { addExtraModulePath(\"../javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
-            echo "=========="
-            echo $buidgradle
-            echo "=========="
-            cat $buildgradle
-          done
-      - name: 'Set JavaFX ${{ env.javafx }} (macOS)'
-        if: startsWith(matrix.os, 'macos')
-        run: |
-          set -e
-          find . -name 'build.gradle.kts' | while read -r buildgradle; do
-            sed -i '.bak' -e '/javafx {/{n' -e 's#version = ".*"#sdk = "../javafx/javafx-sdk-${{ env.javafx }}"#;}' $buildgradle
-            sed -i '.bak' -e "s#jlink {#jlink { addExtraModulePath(\"../javafx/javafx-jmods-${{ env.javafx }}\")#" $buildgradle
-            cat $buildgradle
-          done
-      - name: 'Set JavaFX ${{ env.javafx }} (linux-arm)'
-        if: (matrix.os == 'buildjet-8vcpu-ubuntu-2204-arm')
-        # No JavaFX EA build for ARM at https://jdk.java.net/javafx23/, therefore using Maven Central artifact
         run: |
           set -e
           curl -s "https://search.maven.org/solrsearch/select?q=g:org.openjfx+AND+a:javafx&rows=10&core=gav" > /tmp/versions.json
-          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17|^18|^19|^20|^21|^22") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
+          jq '[.response.docs[] | select(.v | test(".*-ea\\+.*")) | select(.v | test("^17|^18|^19|^20|^21|^22|^23") | not) | {version: .v}] | group_by(.version | capture("^(?<major>\\d+).*").major) | map(max_by(.version))' < /tmp/versions.json > /tmp/versions-latest.json
           JAVAFX=$(jq -r '.[-1].version' /tmp/versions-latest.json)
           echo "Using JavaFX ${JAVAFX}"
-          shopt -s globstar
-          for buildgradle in **/build.gradle.kts; do
-            sed -i "/javafx {/{n;s#version = \".*\"#version = \"${JAVAFX}\"#}" $buildgradle
-            cat $buildgradle
-          done
+          echo "version=${JAVAFX}" >> $GITHUB_OUTPUT
+      - name: 'Set JavaFX ${{ steps.javafx.output.version }} (linux, Windows)'
+        if: ${{ !startsWith(matrix.os, 'macos') }}
+        shell: bash
+        run: |
+          set -e
+          sed -i 's/val javafx = ".*/val javafx = "${{ steps.javafx.outputs.version }}"/' versions/build.gradle.kts
+      - name: 'Set JavaFX ${{ steps.javafx.output.version }} (macOS)'
+        if: startsWith(matrix.os, 'macos')
+        run: |
+          set -e
+          sed -i '.bak' 's/val javafx = ".*/val javafx = "${{ steps.javafx.outputs.version }}"/' versions/build.gradle.kts
       # endregion
 
       - name: Setup Gradle
@@ -335,9 +290,9 @@ jobs:
           cd jabgui
 
           # see https://github.com/jdx/mise/discussions/4973
-          eval $(mise hook-env -f | grep 'export JAVA_HOME')
-          eval $(mise hook-env -f | grep 'export PATH')
-          echo $JAVA_HOME
+          # eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          # eval $(mise hook-env -f | grep 'export PATH')
+          # echo $JAVA_HOME
 
           jpackage \
           --module org.jabref/org.jabref.Launcher \
@@ -387,9 +342,9 @@ jobs:
           cd jabgui
 
           # see https://github.com/jdx/mise/discussions/4973
-          eval $(mise hook-env -f | grep 'export JAVA_HOME')
-          eval $(mise hook-env -f | grep 'export PATH')
-          echo $JAVA_HOME
+          # eval $(mise hook-env -f | grep 'export JAVA_HOME')
+          # eval $(mise hook-env -f | grep 'export PATH')
+          # echo $JAVA_HOME
 
           jpackage \
           --module org.jabref/org.jabref.Launcher \
@@ -450,16 +405,17 @@ jobs:
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
           get-childitem -Path jabgui/build/distribution/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
       - name: Repack deb file for Debian
-        if: (matrix.os == 'ubuntu-22.04')
+        if: (startsWith(matrix.os, 'ubuntu'))
         shell: bash
         run: |
           cd jabgui/build/distribution
-          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
+          ls -l
+          ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
           zstd -d < control.tar.zst | xz > control.tar.xz
           zstd -d < data.tar.zst | xz > data.tar.xz
-          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb debian-binary control.tar.xz data.tar.xz
+          ar -m -c -a sdsd jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb debian-binary control.tar.xz data.tar.xz
           rm debian-binary control.tar.* data.tar.*
-          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}_amd64.deb
+          mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
 
       - name: Build JabKit
         shell: bash
