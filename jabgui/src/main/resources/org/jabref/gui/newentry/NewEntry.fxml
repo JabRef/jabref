@@ -89,14 +89,14 @@
                         <Label fx:id="idErrorInvalidText" text="%You must provide an identifier.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>
-                        <HBox>
-                            <Label fx:id="duplicateSelectLabel" text="Entry already exists in library.">
-                                <font><Font name="System Italic" size="13.0"/></font>
-                            </Label>
-                            <Hyperlink fx:id="duplicateSelectLink" text=" Jump to entry.">
-                                <font><Font name="System Italic" size="13.0"/></font>
-                            </Hyperlink>
-                        </HBox>
+<!--                        <HBox>-->
+<!--                            <Label fx:id="duplicateSelectLabel" text="Entry already exists in library.">-->
+<!--                                <font><Font name="System Italic" size="13.0"/></font>-->
+<!--                            </Label>-->
+<!--                            <Hyperlink fx:id="duplicateSelectLink" text=" Jump to entry.">-->
+<!--                                <font><Font name="System Italic" size="13.0"/></font>-->
+<!--                            </Hyperlink>-->
+<!--                        </HBox>-->
                         <Label fx:id="idErrorInvalidFetcher" text="%You must select an identifier type.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>

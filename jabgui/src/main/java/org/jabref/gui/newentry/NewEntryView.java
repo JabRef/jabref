@@ -17,6 +17,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -28,6 +29,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
@@ -307,15 +309,17 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
-        duplicateSelectLabel.visibleProperty().bind(viewModel.duplicateDoiValidatorProperty());
-        duplicateSelectLink.visibleProperty().bind(viewModel.duplicateDoiValidatorProperty());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
 
-        duplicateSelectLink.setOnAction(_ -> {
-            if (viewModel.duplicateDoiValidatorProperty() != null) {
-                libraryTab.showAndEdit(viewModel.getDuplicateEntry());
-            }
-        });
+//        duplicateSelectLink.setOnAction(_ -> {
+//            if (viewModel.duplicateDoiValidatorProperty() != null) {
+//                libraryTab.showAndEdit(viewModel.getDuplicateEntry());
+//            }
+//        });
+
+        TextInputControl textInput = idText;
+        EditorValidator validator = new EditorValidator(this.guiPreferences);
+        validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);
     }
 
     private void initializeInterpretCitations() {

@@ -50,6 +50,7 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,8 +116,7 @@ public class NewEntryViewModel {
             ValidationMessage.error(Localization.lang("You must specify an identifier.")));
         duplicateDoiValidator = new FunctionBasedValidator<>(
             idText,
-            this::checkDOI,
-            ValidationMessage.error(Localization.lang("DOI already exists in a library")));
+            this::checkDOI);
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -154,24 +154,23 @@ public class NewEntryViewModel {
                                                                          })));
     }
 
-    public boolean checkDOI(String doiInput) {
-        if (doiInput == null || doiInput.isBlank()) {
-            return false;
+    public ValidationMessage checkDOI(String doiInput) {
+        if (doiInput == null) {
+            return null;
         }
-
         LayoutFormatter doiStrip = new DOIStrip();
         String normalized = doiStrip.format(doiInput.toLowerCase());
 
         if (doiCache.containsKey(normalized)) {
             duplicateEntry = doiCache.get(normalized);
-            return true;
+            return ValidationMessage.warning(Localization.lang("Entry already exists in a library"));
         }
-        return false;
+        return null;
     }
 
-    public BibEntry getDuplicateEntry() {
-        return duplicateEntry;
-    }
+//    public BibEntry getDuplicateEntry() {
+//        return duplicateEntry;
+//    }
 
     public ReadOnlyBooleanProperty executingProperty() {
         return executing;
@@ -189,8 +188,8 @@ public class NewEntryViewModel {
         return idTextValidator.getValidationStatus().validProperty();
     }
 
-    public ReadOnlyBooleanProperty duplicateDoiValidatorProperty() {
-        return duplicateDoiValidator.getValidationStatus().validProperty();
+    public ValidationStatus duplicateDoiValidatorStatus() {
+        return duplicateDoiValidator.getValidationStatus();
     }
 
     public ListProperty<IdBasedFetcher> idFetchersProperty() {
