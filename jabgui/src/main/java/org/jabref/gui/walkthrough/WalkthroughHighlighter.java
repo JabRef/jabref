@@ -22,7 +22,7 @@ import org.jspecify.annotations.Nullable;
  * Manages highlight effects across multiple windows for walkthrough steps.
  */
 public class WalkthroughHighlighter {
-    // backdropHighlights, pulseIndicators, and fullScreenDarkens needs to be mutable
+    // backdropHighlights, pulseIndicators, and fullScreenDarkens represents the current state of walkthrough GUI effects
     private final Map<Window, BackdropHighlight> backdropHighlights = new HashMap<>();
     private final Map<Window, PulseAnimateIndicator> pulseIndicators = new HashMap<>();
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
