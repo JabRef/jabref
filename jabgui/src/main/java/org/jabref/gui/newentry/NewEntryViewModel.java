@@ -1,5 +1,6 @@
 package org.jabref.gui.newentry;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
@@ -87,7 +89,6 @@ public class NewEntryViewModel {
     private final StringProperty bibtexText;
     private final Validator bibtexTextValidator;
     private Task<Optional<List<BibEntry>>> bibtexWorker;
-    private BibEntry duplicateEntry;
     private final Map<String, BibEntry> doiCache;
 
     public NewEntryViewModel(GuiPreferences preferences,
@@ -146,12 +147,15 @@ public class NewEntryViewModel {
 
     public void populateDOICache() {
         doiCache.clear();
-        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+        ObservableList<BibDatabaseContext> activeDatabase = stateManager.getOpenDatabases();
 
-        activeDatabase.ifPresent(bibDatabaseContext -> bibDatabaseContext.getEntries()
-                                                                         .forEach(entry -> entry.getField(StandardField.DOI).ifPresent(doi -> {
-                                                                             doiCache.put(doi, entry);
-                                                                         })));
+        activeDatabase.stream()
+                      .map(BibDatabaseContext::getEntries)
+                      .flatMap(Collection::stream)
+                      .forEach(bibEntry -> bibEntry.getField(StandardField.DOI)
+                      .ifPresent(doi ->
+                         doiCache.put(doi, bibEntry)
+                     ));
     }
 
     public ValidationMessage checkDOI(String doiInput) {
@@ -162,15 +166,10 @@ public class NewEntryViewModel {
         String normalized = doiStrip.format(doiInput.toLowerCase());
 
         if (doiCache.containsKey(normalized)) {
-            duplicateEntry = doiCache.get(normalized);
             return ValidationMessage.warning(Localization.lang("Entry already exists in a library"));
         }
         return null;
     }
-
-//    public BibEntry getDuplicateEntry() {
-//        return duplicateEntry;
-//    }
 
     public ReadOnlyBooleanProperty executingProperty() {
         return executing;

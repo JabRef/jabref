@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -112,8 +111,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
     @FXML private Label idErrorInvalidText;
     @FXML private Label idErrorInvalidFetcher;
-    @FXML private Label duplicateSelectLabel;
-    @FXML private Hyperlink duplicateSelectLink;
 
     @FXML private TextArea interpretText;
     @FXML private ComboBox<PlainCitationParserChoice> interpretParser;
@@ -310,12 +307,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
-
-//        duplicateSelectLink.setOnAction(_ -> {
-//            if (viewModel.duplicateDoiValidatorProperty() != null) {
-//                libraryTab.showAndEdit(viewModel.getDuplicateEntry());
-//            }
-//        });
 
         TextInputControl textInput = idText;
         EditorValidator validator = new EditorValidator(this.guiPreferences);
