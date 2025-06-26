@@ -25,10 +25,10 @@ import org.h2.mvstore.MVStore;
 public class JournalAbbreviationRepository {
     static final Pattern QUESTION_MARK = Pattern.compile("\\?");
 
-    private final Map<String, Abbreviation> fullToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> abbreviationToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> dotlessToAbbreviationObject = new HashMap<>();
-    private final Map<String, Abbreviation> shortestUniqueToAbbreviationObject = new HashMap<>();
+    private final MVMap<String, Abbreviation> fullToAbbreviationObject;
+    private final MVMap<String, Abbreviation> abbreviationToAbbreviationObject;
+    private final MVMap<String, Abbreviation> dotlessToAbbreviationObject;
+    private final MVMap<String, Abbreviation> shortestUniqueToAbbreviationObject;
     private final TreeSet<Abbreviation> customAbbreviations = new TreeSet<>();
     private final StringSimilarity similarity = new StringSimilarity();
     private final LtwaRepository ltwaRepository;
@@ -40,41 +40,44 @@ public class JournalAbbreviationRepository {
      * @param ltwaRepository The LTWA repository to use for abbreviations.
      */
     public JournalAbbreviationRepository(Path journalList, LtwaRepository ltwaRepository) {
-        MVMap<String, Abbreviation> mvFullToAbbreviationObject;
-        try (MVStore store = new MVStore.Builder().readOnly().fileName(journalList.toAbsolutePath().toString()).open()) {
-            mvFullToAbbreviationObject = store.openMap("FullToAbbreviation");
-            mvFullToAbbreviationObject.forEach((name, abbreviation) -> {
-                String abbrevationString = abbreviation.getAbbreviation();
-                String shortestUniqueAbbreviation = abbreviation.getShortestUniqueAbbreviation();
-                Abbreviation newAbbreviation = new Abbreviation(
-                        name,
-                        abbrevationString,
-                        shortestUniqueAbbreviation
-                );
-                fullToAbbreviationObject.put(name, newAbbreviation);
-                abbreviationToAbbreviationObject.put(abbrevationString, newAbbreviation);
-                dotlessToAbbreviationObject.put(newAbbreviation.getDotlessAbbreviation(), newAbbreviation);
-                shortestUniqueToAbbreviationObject.put(shortestUniqueAbbreviation, newAbbreviation);
-            });
-        }
-        this.ltwaRepository = ltwaRepository;
-    }
+    MVStore store = new MVStore.Builder()
+            .readOnly()
+            .fileName(journalList.toAbsolutePath().toString())
+            .open();
+
+    this.fullToAbbreviationObject = store.openMap("FullToAbbreviation");
+    this.abbreviationToAbbreviationObject = store.openMap("AbbreviationToAbbreviation");
+    this.dotlessToAbbreviationObject = store.openMap("DotlessToAbbreviation");
+    this.shortestUniqueToAbbreviationObject = store.openMap("ShortestUniqueToAbbreviation");
+
+    this.ltwaRepository = ltwaRepository;
+}
+
 
     /**
      * Initializes the repository with demonstration data. Used if no abbreviation file is found.
      */
     public JournalAbbreviationRepository() {
-        Abbreviation newAbbreviation = new Abbreviation(
-                "Demonstration",
-                "Demo",
-                "Dem"
-        );
-        fullToAbbreviationObject.put("Demonstration", newAbbreviation);
-        abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
-        dotlessToAbbreviationObject.put("Demo", newAbbreviation);
-        shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
-        ltwaRepository = new LtwaRepository();
-    }
+    MVStore store = new MVStore.Builder().open(); // in-memory store
+
+    this.fullToAbbreviationObject = store.openMap("FullToAbbreviation");
+    this.abbreviationToAbbreviationObject = store.openMap("AbbreviationToAbbreviation");
+    this.dotlessToAbbreviationObject = store.openMap("DotlessToAbbreviation");
+    this.shortestUniqueToAbbreviationObject = store.openMap("ShortestUniqueToAbbreviation");
+
+    Abbreviation newAbbreviation = new Abbreviation(
+        "Demonstration",
+        "Demo",
+        "Dem"
+    );
+    fullToAbbreviationObject.put("Demonstration", newAbbreviation);
+    abbreviationToAbbreviationObject.put("Demo", newAbbreviation);
+    dotlessToAbbreviationObject.put("Demo", newAbbreviation);
+    shortestUniqueToAbbreviationObject.put("Dem", newAbbreviation);
+
+    this.ltwaRepository = new LtwaRepository();
+}
+
 
     private static boolean isMatched(String name, Abbreviation abbreviation) {
         return name.equalsIgnoreCase(abbreviation.getName())
