@@ -117,7 +117,7 @@ public class NewEntryViewModel {
             ValidationMessage.error(Localization.lang("You must specify an identifier.")));
         duplicateDoiValidator = new FunctionBasedValidator<>(
             idText,
-            this::checkDOI);
+            input -> checkDOI(input).orElse(null));
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -158,17 +158,19 @@ public class NewEntryViewModel {
                      ));
     }
 
-    public ValidationMessage checkDOI(String doiInput) {
-        if (doiInput == null) {
-            return null;
+    public Optional<ValidationMessage> checkDOI(String doiInput) {
+        if (doiInput == null || doiInput.isBlank()) {
+            return Optional.empty();
         }
+
         LayoutFormatter doiStrip = new DOIStrip();
         String normalized = doiStrip.format(doiInput.toLowerCase());
 
         if (doiCache.containsKey(normalized)) {
-            return ValidationMessage.warning(Localization.lang("Entry already exists in a library"));
+            return Optional.of(ValidationMessage.warning(Localization.lang("Entry already exists in a library")));
         }
-        return null;
+
+        return Optional.empty();
     }
 
     public ReadOnlyBooleanProperty executingProperty() {
