@@ -155,11 +155,13 @@ jobs:
             suffix: ''
             archForDebianRepack: ''
           - os: macos-13  # intel image
+            displayName: macos
             archivePortable: 7z a -r jabgui/packages/macos-13/JabRef-portable_windows.zip ./jabgui/packages/macos-13/JabRef && rm -R jabgui/packages/macos-13/JabRef
             archivePortableJabKit: 7z a -r jabkit/packages/macos-13/jabkit-portable_windows.zip ./jabkit/packages/macos-13/jabkit && rm -R jabkit/packages/macos-13/jabkit
             suffix: ''
             archForDebianRepack: ''
           - os: macos-14
+            displayName: macos-arm
             archivePortable: 7z a -r jabgui/packages/macos-14/JabRef-portable_windows.zip ./jabgui/packages/macos-14/JabRef && rm -R jabgui/packages/macos-14/JabRef
             archivePortableJabKit: 7z a -r jabkit/packages/macos-14/jabkit-portable_windows.zip ./jabkit/packages/macos-14/jabkit && rm -R jabkit/packages/macos-14/jabkit
             suffix: '_arm64'
@@ -177,6 +179,12 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+      - name: Fetch preview of java-module-packaging
+        uses: actions/checkout@v4
+        with:
+          repository: gradlex-org/java-module-packaging
+          path: build-logic/java-module-packaging
+          ref: preview
       - name: Install pigz and cache (linux)
         if: (startsWith(matrix.os, 'ubuntu'))
         uses: awalsh128/cache-apt-pkgs-action@latest
