@@ -1,6 +1,7 @@
 package org.jabref.gui.walkthrough;
 
 import java.util.List;
+import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
@@ -11,6 +12,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +31,16 @@ public class Walkthrough {
     private Stage currentStage;
 
     public Walkthrough(List<WalkthroughStep> steps) {
+        if (steps.isEmpty() || steps.stream().anyMatch(Objects::isNull)) {
+            // This throwing is acceptable, since the Walkthrough is often hardcoded and won't make the application crash
+            throw new IllegalArgumentException("Walkthrough must have at least one step and no null steps allowed.");
+        }
         this.currentStep = new SimpleIntegerProperty(0);
         this.active = new SimpleBooleanProperty(false);
         this.steps = steps;
     }
 
-    public Walkthrough(WalkthroughStep... steps) {
+    public Walkthrough(@NonNull WalkthroughStep... steps) {
         this(List.of(steps));
     }
 
@@ -136,7 +142,7 @@ public class Walkthrough {
         overlay.displayStep(step);
     }
 
-    public WalkthroughStep getStepAtIndex(int index) {
+    public @NonNull WalkthroughStep getStepAtIndex(int index) {
         return steps.get(index);
     }
 
@@ -144,7 +150,7 @@ public class Walkthrough {
         stop();
     }
 
-    private WalkthroughStep getCurrentStep() {
+    private @NonNull WalkthroughStep getCurrentStep() {
         return steps.get(currentStep.get());
     }
 }
