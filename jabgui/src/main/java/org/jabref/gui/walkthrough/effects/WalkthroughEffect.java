@@ -7,9 +7,7 @@ import org.jabref.gui.walkthrough.WalkthroughUpdater;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Base class for walkthrough effects BackdropHighlight, TooltipHighlight, FullScreenDarken, etc.
- */
+/// Base class for walkthrough effects BackdropHighlight, TooltipHighlight, FullScreenDarken, etc.
 public abstract class WalkthroughEffect {
     protected final Pane pane;
     protected final WalkthroughUpdater updater = new WalkthroughUpdater();
