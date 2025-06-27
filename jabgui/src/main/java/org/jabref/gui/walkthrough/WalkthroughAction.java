@@ -2,6 +2,7 @@ package org.jabref.gui.walkthrough;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import javafx.scene.control.ContextMenu;
 
@@ -23,14 +24,15 @@ import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 import org.jabref.logic.l10n.Localization;
 
 public class WalkthroughAction extends SimpleCommand {
-    private static final Map<String, Walkthrough> WALKTHROUGH_REGISTRY = buildRegistry();
+    private static final Map<String, Supplier<Walkthrough>> WALKTHROUGH_REGISTRY = Map.of("mainFileDirectory", WalkthroughAction::createMainFileDirectoryWalkthrough);
 
     private final Walkthrough walkthrough;
     private final JabRefFrame frame;
 
     public WalkthroughAction(String name, JabRefFrame frame) {
-        this.walkthrough = WALKTHROUGH_REGISTRY.get(name);
-        Objects.requireNonNull(this.walkthrough);
+        Supplier<Walkthrough> walkthroughSupplier = WALKTHROUGH_REGISTRY.get(name);
+        Objects.requireNonNull(walkthroughSupplier, "Walkthrough not found: " + name);
+        this.walkthrough = walkthroughSupplier.get();
         this.frame = frame;
     }
 
@@ -39,7 +41,7 @@ public class WalkthroughAction extends SimpleCommand {
         walkthrough.start(frame.getMainStage());
     }
 
-    private static Map<String, Walkthrough> buildRegistry() {
+    private static Walkthrough createMainFileDirectoryWalkthrough() {
         WalkthroughStep step1 = TooltipStep
                 .builder(Localization.lang("Click on \"File\" menu"))
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
@@ -107,7 +109,6 @@ public class WalkthroughAction extends SimpleCommand {
                 .activeWindow(WindowResolver.title("JabRef preferences"))
                 .build();
 
-        Walkthrough mainFileDirectory = new Walkthrough(step1, step2, step3, step4, step5);
-        return Map.of("mainFileDirectory", mainFileDirectory);
+        return new Walkthrough(step1, step2, step3, step4, step5);
     }
 }
