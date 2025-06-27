@@ -18,28 +18,28 @@ javaModulePackaging {
     target("ubuntu-22.04") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("deb")
+        packageTypes = listOf("app-image", "deb")
     }
     target("ubuntu-22.04-arm") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.ARM64
-        packageTypes = listOf("deb")
+        packageTypes = listOf("app-image", "deb")
     }
     target("macos-13") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("dmg")
+        packageTypes = listOf("app-image", "dmg")
         singleStepPackaging = true
     }
     target("macos-14") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.ARM64
-        packageTypes = listOf("dmg")
+        packageTypes = listOf("app-image", "dmg")
         singleStepPackaging = true
     }
     target("windows-2022") {
         operatingSystem = OperatingSystemFamily.WINDOWS
         architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("msi")
+        packageTypes = listOf("app-image", "msi")
     }
 }

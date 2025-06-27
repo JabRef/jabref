@@ -116,6 +116,7 @@ dependencies.constraints {
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
     api("org.jabref:afterburner.fx:2.0.0")
     api("org.jabref:easybind:2.2.1-SNAPSHOT")
+    api("org.jetbrains:annotations:26.0.2")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
