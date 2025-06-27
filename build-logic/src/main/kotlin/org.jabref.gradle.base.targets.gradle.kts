@@ -28,13 +28,13 @@ javaModulePackaging {
     target("macos-13") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("app-image", "dmg")
+        packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
     }
     target("macos-14") {
         operatingSystem = OperatingSystemFamily.MACOS
         architecture = MachineArchitecture.ARM64
-        packageTypes = listOf("app-image", "dmg")
+        packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
     }
     target("windows-2022") {
