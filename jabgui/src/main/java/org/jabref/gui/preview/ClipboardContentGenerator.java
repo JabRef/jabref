@@ -122,6 +122,11 @@ public class ClipboardContentGenerator {
         return content;
     }
 
+    /**
+     * Insert each citation into HTML.
+     * convert HTML to markdown using flexmark.
+    */
+    @VisibleForTesting
     static ClipboardContent processMarkdown(List<String> citations) {
         String result = "<!DOCTYPE html>" + OS.NEWLINE +
                 "<html>" + OS.NEWLINE +
