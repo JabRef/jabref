@@ -138,28 +138,30 @@ jobs:
           # if you change the os version rename all other occurrences
           - os: ubuntu-22.04
             displayName: linux
-            archivePortable: tar -c -C jabgui/packages/${{ matrix.os }} JabRef | pigz --rsyncable > jabgui/packages/${{ matrix.os }}/JabRef-portable_linux.tar.gz && rm -R jabgui/packages/${{ matrix.os }}/JabRef
-            archivePortableJabKit: tar -c -C jabkit/packages/${{ matrix.os }} jabkit | pigz --rsyncable > jabkit/packages/${{ matrix.os }}/jabkit-portable_linux.tar.gz && rm -R jabkit/packages/${{ matrix.os }}/jabkit
+            archivePortable: tar -c -C jabgui/packages/ubuntu-22.04 JabRef | pigz --rsyncable > jabgui/packages/ubuntu-22.04/JabRef-portable_linux.tar.gz && rm -R jabgui/packages/ubuntu-22.04/JabRef
+            archivePortableJabKit: tar -c -C jabkit/packages/ubuntu-22.04 jabkit | pigz --rsyncable > jabkit/packages/ubuntu-22.04/jabkit-portable_linux.tar.gz && rm -R jabkit/packages/ubuntu-22.04/jabkit
             suffix: ''
             archForDebianRepack: '_amd64'
           - os: ubuntu-22.04-arm
             displayName: linux-arm
-            archivePortable: tar -c -C jabgui/packages/${{ matrix.os }} JabRef | pigz --rsyncable > jabgui/packages/${{ matrix.os }}/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/packages/${{ matrix.os }}/JabRef
-            archivePortableJabKit: tar -c -C jabkit/packages/${{ matrix.os }} jabkit | pigz --rsyncable > jabkit/packages/${{ matrix.os }}/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/packages/${{ matrix.os }}/jabkit
+            archivePortable: tar -c -C jabgui/packages/ubuntu-22.04-arm JabRef | pigz --rsyncable > jabgui/packages/ubuntu-22.04-arm/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/packages/ubuntu-22.04-arm/JabRef
+            archivePortableJabKit: tar -c -C jabkit/packages/ubuntu-22.04-arm jabkit | pigz --rsyncable > jabkit/packages/ubuntu-22.04-arm/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/packages/ubuntu-22.04-arm/jabkit
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
           - os: windows-latest
             displayName: windows
-            archivePortable: 7z a -r jabgui/packages/${{ matrix.os }}/JabRef-portable_windows.zip ./jabgui/packages/${{ matrix.os }}/JabRef && rm -R jabgui/packages/${{ matrix.os }}/JabRef
-            archivePortableJabKit: 7z a -r jabkit/packages/${{ matrix.os }}/jabkit-portable_windows.zip ./jabkit/packages/${{ matrix.os }}/jabkit && rm -R jabkit/packages/${{ matrix.os }}/jabkit
+            archivePortable: 7z a -r jabgui/packages/windows-latest/JabRef-portable_windows.zip ./jabgui/packages/windows-latest/JabRef && rm -R jabgui/packages/windows-latest/JabRef
+            archivePortableJabKit: 7z a -r jabkit/packages/windows-latest/jabkit-portable_windows.zip ./jabkit/packages/windows-latest/jabkit && rm -R jabkit/packages/windows-latest/jabkit
             suffix: ''
             archForDebianRepack: ''
           - os: macos-13  # intel image
-            displayName: macOS
+            archivePortable: 7z a -r jabgui/packages/macos-13/JabRef-portable_windows.zip ./jabgui/packages/macos-13/JabRef && rm -R jabgui/packages/macos-13/JabRef
+            archivePortableJabKit: 7z a -r jabkit/packages/macos-13/jabkit-portable_windows.zip ./jabkit/packages/macos-13/jabkit && rm -R jabkit/packages/macos-13/jabkit
             suffix: ''
             archForDebianRepack: ''
           - os: macos-14
-            displayName: macOS (ARM64)
+            archivePortable: 7z a -r jabgui/packages/macos-14/JabRef-portable_windows.zip ./jabgui/packages/macos-14/JabRef && rm -R jabgui/packages/macos-14/JabRef
+            archivePortableJabKit: 7z a -r jabkit/packages/macos-14/jabkit-portable_windows.zip ./jabkit/packages/macos-14/jabkit && rm -R jabkit/packages/macos-14/jabkit
             suffix: '_arm64'
             archForDebianRepack: ''
     runs-on: ${{ matrix.os }}
