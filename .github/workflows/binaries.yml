@@ -156,14 +156,14 @@ jobs:
             archForDebianRepack: ''
           - os: macos-13  # intel image
             displayName: macos
-            archivePortable: 7z a -r jabgui/build/packages/macos-13/JabRef-portable_macos.zip ./jabgui/build/packages/macos-13/JabRef.app && rm -R jabgui/build/packages/macos-13/JabRef
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-13/jabkit-portable_macos.zip ./jabkit/build/packages/macos-13/jabkit.app && rm -R jabkit/build/packages/macos-13/jabkit
+            archivePortable: 7z a -r jabgui/build/packages/macos-13/JabRef-portable_macos.zip ./jabgui/build/packages/macos-13/JabRef.app && rm -R jabgui/build/packages/macos-13/JabRef.app
+            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-13/jabkit-portable_macos.zip ./jabkit/build/packages/macos-13/jabkit.app && rm -R jabkit/build/packages/macos-13/jabkit.app
             suffix: ''
             archForDebianRepack: ''
           - os: macos-14
             displayName: macos-arm
-            archivePortable: 7z a -r jabgui/build/packages/macos-14/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-14/JabRef.app && rm -R jabgui/build/packages/macos-14/JabRef.app
-            archivePortableJabKit: 7z a -r jabkit/build/packages/macos-14/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-14/jabkit.app && rm -R jabkit/build/packages/macos-14/jabkit.app
+            archivePortable: tar -c -C jabgui/build/packages/macos-14/JabRef-portable_macos-arm.zip ./jabgui/build/packages/macos-14/JabRef.app && rm -R jabgui/build/packages/macos-14/JabRef.app
+            archivePortableJabKit: tar -c -C jabkit/build/packages/macos-14/jabkit-portable_macos-arm.zip ./jabkit/build/packages/macos-14/jabkit.app && rm -R jabkit/build/packages/macos-14/jabkit.app
             suffix: '_arm64'
             archForDebianRepack: ''
     runs-on: ${{ matrix.os }}
@@ -270,7 +270,7 @@ jobs:
       - name: Build JabKit
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Package JabKit application image (linux, Windows)
+      - name: Package JabKit application image
         shell: bash
         run: |
           set -e
