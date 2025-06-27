@@ -37,7 +37,7 @@ javaModulePackaging {
         packageTypes = listOf("app-image", "dmg", "pkg")
         singleStepPackaging = true
     }
-    target("windows-2022") {
+    target("windows-latest") {
         operatingSystem = OperatingSystemFamily.WINDOWS
         architecture = MachineArchitecture.X86_64
         packageTypes = listOf("app-image", "msi")
