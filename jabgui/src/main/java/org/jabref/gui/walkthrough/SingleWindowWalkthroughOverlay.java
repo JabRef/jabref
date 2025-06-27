@@ -63,9 +63,14 @@ public class SingleWindowWalkthroughOverlay {
         scene.setRoot(stackPane);
     }
 
+    /// Display a walkthrough step without a target node.
+    public void displayStep(WalkthroughStep step, Runnable beforeNavigate, Walkthrough walkthrough) {
+        displayStep(step, null, beforeNavigate, walkthrough);
+    }
+
     /// Displays a walkthrough step, with or without a target node.
     public void displayStep(WalkthroughStep step,
-                            Node targetNode,
+                            @Nullable Node targetNode,
                             Runnable beforeNavigate,
                             Walkthrough walkthrough) {
         hide();
