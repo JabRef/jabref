@@ -136,7 +136,7 @@ public class SingleWindowWalkthroughOverlay {
 
     private void displayTooltipStep(Node content, @Nullable Node targetNode, TooltipStep step) {
         PopOver popover = new PopOver();
-        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets());
+        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets()); // FIXME: walkaround to prevent popover from not properly inheriting styles
         popover.setContentNode(content);
         popover.setDetachable(false);
         popover.setCloseButtonEnabled(false);
@@ -201,28 +201,34 @@ public class SingleWindowWalkthroughOverlay {
     }
 
     private void configurePanelLayout(PanelPosition position) {
-        RowConstraints rowConstraints = new RowConstraints();
-        ColumnConstraints columnConstraints = new ColumnConstraints();
-
-        switch (position) {
+        overlayPane.getRowConstraints().add(switch (position) {
             case LEFT,
                  RIGHT -> {
+                RowConstraints rowConstraints = new RowConstraints();
                 rowConstraints.setVgrow(Priority.ALWAYS);
-                columnConstraints.setHgrow(Priority.NEVER);
+                yield rowConstraints;
             }
             case TOP,
                  BOTTOM -> {
-                columnConstraints.setHgrow(Priority.ALWAYS);
+                RowConstraints rowConstraints = new RowConstraints();
                 rowConstraints.setVgrow(Priority.NEVER);
+                yield rowConstraints;
             }
-            default -> {
-                rowConstraints.setVgrow(Priority.NEVER);
+        });
+        overlayPane.getColumnConstraints().add(switch (position) {
+            case LEFT,
+                 RIGHT -> {
+                ColumnConstraints columnConstraints = new ColumnConstraints();
                 columnConstraints.setHgrow(Priority.NEVER);
+                yield columnConstraints;
             }
-        }
-
-        overlayPane.getRowConstraints().add(rowConstraints);
-        overlayPane.getColumnConstraints().add(columnConstraints);
+            case TOP,
+                 BOTTOM -> {
+                ColumnConstraints columnConstraints = new ColumnConstraints();
+                columnConstraints.setHgrow(Priority.ALWAYS);
+                yield columnConstraints;
+            }
+        });
     }
 
     private Optional<PopOver.ArrowLocation> mapToArrowLocation(TooltipPosition position) {
