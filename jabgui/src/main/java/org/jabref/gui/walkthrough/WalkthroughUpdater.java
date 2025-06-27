@@ -83,16 +83,19 @@ public class WalkthroughUpdater {
     public void setupScrollContainerListeners(@NonNull Node node, @NonNull Runnable updateHandler) {
         EventHandler<ScrollEvent> scrollHandler = _ -> handleScrollEvent(updateHandler);
 
-        Stream.iterate(node, Objects::nonNull, Node::getParent).filter(p -> p instanceof ScrollPane || p instanceof ListView).findFirst().ifPresent(parent -> {
-            if (parent instanceof ScrollPane scrollPane) {
-                ChangeListener<Number> scrollListener = (_, _, _) -> handleScrollEvent(updateHandler);
-                listen(scrollPane.vvalueProperty(), scrollListener);
-            } else if (parent instanceof ListView<?> listView) {
-                listView.addEventFilter(ScrollEvent.ANY, scrollHandler);
-                cleanupTasks.add(() -> listView.removeEventFilter(ScrollEvent.ANY, scrollHandler));
-                listen(listView.focusModelProperty(), _ -> updateHandler.run());
-            }
-        });
+        Stream.iterate(node, Objects::nonNull, Node::getParent)
+              .filter(p -> p instanceof ScrollPane || p instanceof ListView)
+              .findFirst()
+              .ifPresent(parent -> {
+                  if (parent instanceof ScrollPane scrollPane) {
+                      ChangeListener<Number> scrollListener = (_, _, _) -> handleScrollEvent(updateHandler);
+                      listen(scrollPane.vvalueProperty(), scrollListener);
+                  } else if (parent instanceof ListView<?> listView) {
+                      listView.addEventFilter(ScrollEvent.ANY, scrollHandler);
+                      cleanupTasks.add(() -> listView.removeEventFilter(ScrollEvent.ANY, scrollHandler));
+                      listen(listView.focusModelProperty(), _ -> updateHandler.run());
+                  }
+              });
 
         node.addEventFilter(ScrollEvent.ANY, scrollHandler);
         cleanupTasks.add(() -> node.removeEventFilter(ScrollEvent.ANY, scrollHandler));
