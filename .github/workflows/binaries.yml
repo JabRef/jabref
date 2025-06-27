@@ -138,20 +138,20 @@ jobs:
           # if you change the os version rename all other occurrences
           - os: ubuntu-22.04
             displayName: linux
-            archivePortable: tar -c -C jabgui/build/distributions JabRef | pigz --rsyncable > jabgui/build/distributions/JabRef-portable_linux.tar.gz && rm -R jabgui/build/distributions/JabRef
-            archivePortableJabKit: tar -c -C jabkit/build/distributions jabkit | pigz --rsyncable > jabkit/build/distributions/jabkit-portable_linux.tar.gz && rm -R jabkit/build/distributions/jabkit
+            archivePortable: tar -c -C jabgui/packages/${{ matrix.os }} JabRef | pigz --rsyncable > jabgui/packages/${{ matrix.os }}/JabRef-portable_linux.tar.gz && rm -R jabgui/packages/${{ matrix.os }}/JabRef
+            archivePortableJabKit: tar -c -C jabkit/packages/${{ matrix.os }} jabkit | pigz --rsyncable > jabkit/packages/${{ matrix.os }}/jabkit-portable_linux.tar.gz && rm -R jabkit/packages/${{ matrix.os }}/jabkit
             suffix: ''
             archForDebianRepack: '_amd64'
           - os: ubuntu-22.04-arm
             displayName: linux-arm
-            archivePortable: tar -c -C jabgui/build/distributions JabRef | pigz --rsyncable > jabgui/build/distributions/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/build/distributions/JabRef
-            archivePortableJabKit: tar -c -C jabkit/build/distributions jabkit | pigz --rsyncable > jabkit/build/distributions/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/build/distributions/jabkit
+            archivePortable: tar -c -C jabgui/packages/${{ matrix.os }} JabRef | pigz --rsyncable > jabgui/packages/${{ matrix.os }}/JabRef-portable_linux_arm64.tar.gz && rm -R jabgui/packages/${{ matrix.os }}/JabRef
+            archivePortableJabKit: tar -c -C jabkit/packages/${{ matrix.os }} jabkit | pigz --rsyncable > jabkit/packages/${{ matrix.os }}/jabkit-portable_linux_arm64.tar.gz && rm -R jabkit/packages/${{ matrix.os }}/jabkit
             suffix: '_arm64'
             archForDebianRepack: '_arm64'
           - os: windows-latest
             displayName: windows
-            archivePortable: 7z a -r jabgui/build/distributions/JabRef-portable_windows.zip ./jabgui/build/distributions/JabRef && rm -R jabgui/build/distributions/JabRef
-            archivePortableJabKit: 7z a -r jabkit/build/distributions/jabkit-portable_windows.zip ./jabkit/build/distributions/jabkit && rm -R jabkit/build/distributions/jabkit
+            archivePortable: 7z a -r jabgui/packages/${{ matrix.os }}/JabRef-portable_windows.zip ./jabgui/packages/${{ matrix.os }}/JabRef && rm -R jabgui/packages/${{ matrix.os }}/JabRef
+            archivePortableJabKit: 7z a -r jabkit/packages/${{ matrix.os }}/jabkit-portable_windows.zip ./jabkit/packages/${{ matrix.os }}/jabkit && rm -R jabkit/packages/${{ matrix.os }}/jabkit
             suffix: ''
             archForDebianRepack: ''
           - os: macos-13  # intel image
@@ -175,12 +175,6 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
-      - name: Fetch preview of java-module-packaging
-        uses: actions/checkout@v4
-        with:
-          repository: gradlex-org/java-module-packaging
-          path: build-logic/java-module-packaging
-          ref: preview
       - name: Install pigz and cache (linux)
         if: (startsWith(matrix.os, 'ubuntu'))
         uses: awalsh128/cache-apt-pkgs-action@latest
@@ -236,132 +230,24 @@ jobs:
           p12-password: ${{ secrets.OSX_CERT_PWD }}
           create-keychain: false
           keychain-password: jabref
-      - name: Build dmg (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
-        shell: bash
-        run: |
-          set -e
-          cd jabgui
-
-          jpackage \
-          --module org.jabref/org.jabref.Launcher \
-          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
-          --add-modules org.jabref,org.jabref.merged.module  \
-          --add-modules jdk.incubator.vector \
-          --dest build/distributions \
-          --app-content buildres/mac/Resources \
-          --name JabRef \
-          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
-          --verbose \
-          --mac-sign \
-          --vendor "JabRef e.V." \
-          --mac-package-identifier JabRef \
-          --mac-package-name JabRef \
-          --type dmg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
-          --mac-package-signing-prefix org.jabref \
-          --mac-entitlements buildres/mac/jabref.entitlements \
-          --icon src/main/resources/icons/jabref.icns \
-          --resource-dir buildres/mac \
-          --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services \
-          --java-options -XX:+UnlockExperimentalVMOptions \
-          --java-options -XX:+UseCompactObjectHeaders \
-          --java-options -XX:+UseZGC --java-options -XX:+ZUncommit \
-          --java-options -XX:+UseStringDeduplication \
-          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
-          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/javafx.scene.control.skin=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
-          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
-          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
-          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
-          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
-          --java-options --add-modules=jdk.incubator.vector \
-          --java-options --enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,jkeychain,org.apache.lucene.core
-      - name: Build pkg (macOS)
-        if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
-        shell: bash
-        run: |
-          set -e
-          cd jabgui
-
-          jpackage \
-          --module org.jabref/org.jabref.Launcher \
-          --module-path $JAVA_HOME/jmods/:build/jlinkbase/jlinkjars \
-          --add-modules org.jabref,org.jabref.merged.module  \
-          --add-modules jdk.incubator.vector \
-          --dest build/distributions \
-          --app-content buildres/mac/Resources \
-          --name JabRef \
-          --app-version ${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }} \
-          --verbose \
-          --mac-sign \
-          --vendor "JabRef e.V." \
-          --mac-package-identifier JabRef \
-          --mac-package-name JabRef \
-          --type pkg --mac-signing-key-user-name "JabRef e.V. (6792V39SK3)" \
-          --mac-package-signing-prefix org.jabref \
-          --mac-entitlements buildres/mac/jabref.entitlements \
-          --icon src/main/resources/icons/jabref.icns \
-          --resource-dir buildres/mac \
-          --file-associations buildres/mac/bibtexAssociations.properties \
-          --jlink-options --bind-services \
-          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref.merged.module \
-          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref.merged.module \
-          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
-          --java-options --add-exports=javafx.base/com.sun.javafx.event=org.jabref \
-          --java-options --add-exports=javafx.controls/com.sun.javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.graphics/javafx.scene=org.jabref \
-          --java-options --add-opens=javafx.controls/javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.controls/com.sun.javafx.scene.control=org.jabref \
-          --java-options --add-opens=javafx.base/javafx.collections=org.jabref \
-          --java-options --add-opens=javafx.base/javafx.collections.transformation=org.jabref \
-          --java-options --add-modules=jdk.incubator.vector \
-          --java-options --enable-native-access=org.jabref.merged.module,ai.djl.tokenizers,ai.djl.pytorch_engine,com.sun.jna,javafx.graphics,javafx.media,javafx.web,jkeychain,org.apache.lucene.core
-      - name: Rename files for mac
-        if: (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.secretspresent == 'true')
-        shell: bash
-        run: |
-          cd jabgui
-          ls build/distributions
-          mv build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.dmg  build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.dmg
-          mv build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}.pkg  build/distributions/JabRef-${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.pkg
-      - name: Build runtime image and installer (linux, Windows)
-        if: ${{ !startsWith(matrix.os, 'macos') }}
+      - name: Build runtime image and installer
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabgui:jpackage
-      - name: Package JabGui application image (linux, Windows)
-        if: ${{ !startsWith(matrix.os, 'macos') }}
+      - name: Package JabGui application image
         shell: bash
         run: |
           set -e
-          ls -la jabgui/build/distributions
-          # TODO: portable version is currently very different
-          # ${{ matrix.archivePortable }}
+          ${{ matrix.archivePortable }}
       - name: Rename files
-        if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: pwsh
         run: |
-          ls jabgui/build/distributions
-          # get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
-          # get-childitem -Path jabgui/build/distributions/* | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
-          ls jabgui/build/packages
           get-childitem -Path 'jabgui/build/packages/*/*' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
           get-childitem -Path 'jabgui/build/packages/*/*' | rename-item -NewName {$_.name -replace "portable","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}-portable"}
       - name: Repack deb file for Debian
         if: (startsWith(matrix.os, 'ubuntu'))
         shell: bash
         run: |
-          cd jabgui/build/packages/${{ matrix. os}}
+          cd jabgui/build/packages/${{ matrix.os }}
           ls -l
           ar x jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
           rm jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}.deb
@@ -372,19 +258,13 @@ jobs:
           mv -f jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}${{ matrix.archForDebianRepack }}_repackaged.deb jabref_${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}.deb
 
       - name: Build JabKit
-        if: ${{ !startsWith(matrix.os, 'macos') }}
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Remove JabKit app build (macOS)
-        if: ${{ false && startsWith(matrix.os, 'macos') }}
-        run: rm -rf jabkit/build/distributions/jabkit.app
       - name: Package JabKit application image (linux, Windows)
-        if: ${{ !startsWith(matrix.os, 'macos') && (needs.conditions.outputs.secretspresent == 'true') }}
         shell: bash
         run: |
           set -e
-          # TODO: portable version is currently very different
-          # ${{ matrix.archivePortableJabKit }}
+          ${{ matrix.archivePortableJabKit }}
 
       # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
@@ -420,23 +300,23 @@ jobs:
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distributions/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkkit to builds.jabref.org (Windows)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (matrix.os == 'windows-latest') }}
         shell: cmd
         # for rsync installed by chocolatey, we need the ssh.exe delivered with that installation
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distributions/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'C:\ProgramData\chocolatey\lib\rsync\tools\bin\ssh.exe -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabgui to builds.jabref.org (linux, macOS)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distributions/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload jabkit to builds.jabref.org (linux, macOS)
         if: ${{ (steps.diskspace.outputs.available == 'true') && (startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')) }}
         shell: bash
         run: |
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/build/distributions/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabkit/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ steps.gitversion.outputs.branchName }}/ || true
       - name: Upload to GitHub workflow artifacts store (macOS)
         if: ${{ (startsWith(matrix.os, 'macos')) && (needs.conditions.outputs.should-notarize == 'true') }}
         uses: actions/upload-artifact@v4
@@ -444,8 +324,8 @@ jobs:
           # tbn = to-be-notarized
           name: JabRef-${{ matrix.os }}-tbn
           path: |
-            jabgui/build/distributions
-            jabkit/build/distributions
+            jabgui/packages/${{ matrix.os }}
+            jabkit/packages/${{ matrix.os }}
           compression-level: 0 # no compression
       # endregion
 
@@ -492,18 +372,18 @@ jobs:
           cd jabgui
           find . -type f
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distributions/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distributions/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
+          xcrun notarytool submit packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.dmg
       - name: Notarize pkg
         shell: bash
         run: |
           cd jabgui
           xcrun notarytool store-credentials "notarytool-profile" --apple-id "vorstand@jabref.org" --team-id "6792V39SK3" --password "${{ secrets.OSX_NOTARIZATION_APP_PWD }}"
-          xcrun notarytool submit build/distributions/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
-          xcrun stapler staple build/distributions/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
+          xcrun notarytool submit packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg --keychain-profile "notarytool-profile" --wait
+          xcrun stapler staple packages/${{ matrix.os }}/JabRef-${{ needs.build.outputs.major }}.${{ needs.build.outputs.minor }}${{ matrix.suffix}}.pkg
       - name: Upload to builds.jabref.org
         shell: bash
         run: |
           echo "${{ secrets.buildJabRefPrivateKey }}" > sshkey
           chmod 600 sshkey
-          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/build/distributions/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
+          rsync -rt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r --itemize-changes --stats --rsync-path="mkdir -p /var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }} && rsync" -e 'ssh -p 9922 -i sshkey -o StrictHostKeyChecking=no' jabgui/packages/${{ matrix.os }}/ jrrsync@build-upload.jabref.org:/var/www/builds.jabref.org/www/${{ needs.build.outputs.branchname }}/
