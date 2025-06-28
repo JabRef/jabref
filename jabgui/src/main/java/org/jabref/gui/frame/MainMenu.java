@@ -239,7 +239,9 @@ public class MainMenu extends MenuBar {
         edit.addEventHandler(ActionEvent.ACTION, event -> {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.
-            if (OS.OS_X && !Injector.instantiateModelOrService(Stage.class).focusedProperty().get()) {
+            boolean isStageUnfocused = !Injector.instantiateModelOrService(Stage.class).focusedProperty().get();
+            
+            if (OS.OS_X && isStageUnfocused) {
                 event.consume();
             }
         });
