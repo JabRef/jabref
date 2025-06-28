@@ -1,4 +1,4 @@
-# Changelog
+  # Changelog
 
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
@@ -8,6 +8,10 @@ In case, there is no issue present, the pull request implementing the feature is
 Note that this project **does not** adhere to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+### Fixed
+- Sidebar width now persists across sessions and resizes proportionally to window width [#13402](https://github.com/JabRef/jabref/issues/13402)
+
 
 ### Added
 
