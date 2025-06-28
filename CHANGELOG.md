@@ -9,8 +9,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ## [Unreleased]
 
-- Sidebar width now persists across sessions and resizes proportionally to window width [#13402](https://github.com/JabRef/jabref/issues/13402)
-
 ### Added
 
 - We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
@@ -42,6 +40,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a highlighted diff regarding changes to the Group Tree Structure of a bib file, made outside JabRef. [#11221](https://github.com/JabRef/jabref/issues/11221)
 - We added a new setting in the 'Entry Editor' preferences to hide the 'File Annotations' tab when no annotations are available. [#13143](https://github.com/JabRef/jabref/issues/13143)
 - We added support for multi-file import across different formats. [#13269](https://github.com/JabRef/jabref/issues/13269)
+- We made the sidebar (SidePane) width persist across sessions and resize proportionally to the window width. [#13402](https://github.com/JabRef/jabref/issues/13402)
+
 
 ### Changed
 
