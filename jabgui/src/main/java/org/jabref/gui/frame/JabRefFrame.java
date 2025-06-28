@@ -112,6 +112,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final EntryEditor entryEditor;
     private final ObjectProperty<PanelMode> panelMode = new SimpleObjectProperty<>(PanelMode.MAIN_TABLE);
 
+    private static final double DEFAULT_SIDEBAR_DIVIDER_POSITION = 0.2;
+
     // We need to keep a reference to the subscription, otherwise the binding gets garbage collected
     private Subscription horizontalDividerSubscription;
     private Subscription verticalDividerSubscription;
@@ -296,14 +298,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void updateHorizontalDividerPosition() {
-    if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-        double savedProportion = preferences.getGuiPreferences().getHorizontalDividerPosition();
-
-        if (savedProportion <= 0.0 || savedProportion >= 1.0 || Double.isNaN(savedProportion)) {
-            savedProportion = 0.2;
+        if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
+            double savedProportion = preferences.getGuiPreferences().getHorizontalDividerPosition();
+        if (Double.isNaN(savedProportion) || savedProportion <= 0 || savedProportion >= 1) {
+            savedProportion = DEFAULT_SIDEBAR_DIVIDER_POSITION;
         }
-
-        horizontalSplit.setDividerPositions(savedProportion);
+            horizontalSplit.setDividerPositions(savedProportion);
 
         if (horizontalDividerSubscription != null) {
             horizontalDividerSubscription.unsubscribe();
