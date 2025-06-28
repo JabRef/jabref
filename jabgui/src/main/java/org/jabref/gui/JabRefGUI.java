@@ -92,6 +92,7 @@ public class JabRefGUI extends Application {
     @Override
     public void start(Stage stage) {
         this.mainStage = stage;
+        Injector.setModelOrService(Stage.class, mainStage);
 
         FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);

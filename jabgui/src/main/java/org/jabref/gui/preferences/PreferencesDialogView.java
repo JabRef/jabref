@@ -31,6 +31,7 @@ import org.controlsfx.control.textfield.CustomTextField;
  */
 public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel> {
 
+    public static final String DIALOG_TITLE = Localization.lang("JabRef preferences");
     @FXML private CustomTextField searchBox;
     @FXML private ListView<PreferencesTab> preferenceTabList;
     @FXML private ScrollPane preferencesContainer;
@@ -45,7 +46,7 @@ public class PreferencesDialogView extends BaseDialog<PreferencesDialogViewModel
     private final Class<? extends PreferencesTab> preferencesTabToSelectClass;
 
     public PreferencesDialogView(Class<? extends PreferencesTab> preferencesTabToSelectClass) {
-        this.setTitle(Localization.lang("JabRef preferences"));
+        this.setTitle(DIALOG_TITLE);
         this.preferencesTabToSelectClass = preferencesTabToSelectClass;
 
         ViewLoader.view(this)
