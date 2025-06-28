@@ -24,7 +24,7 @@
     </buttonTypes>
     <content>
         <TabPane fx:id="tabs">
-            <Tab fx:id="tabCreateEntry" text="%Choose Entry Type" closable="false">
+            <Tab fx:id="tabAddEntry" text="%Choose Entry Type" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
                     <Label text="%The 'add entry' tool uses the last-selected entry type from this menu.">
@@ -52,7 +52,7 @@
             <Tab fx:id="tabLookupIdentifier" text="%Enter Identifier" closable="false">
                 <VBox spacing="10.0">
                     <padding><Insets top="10.0"/></padding>
-                    <Label text="%You can also paste identifiers (using 'Ctrl + V') into the JabRef table to create entries directly.">
+                    <Label text="%You can also paste identifiers (using 'Ctrl + V') into the JabRef table to add entries directly.">
                         <font><Font name="System Italic" size="13.0"/></font>
                         <padding><Insets bottom="5.0"/></padding>
                     </Label>
@@ -115,7 +115,7 @@
                         <Label text="%Plain citation parsing may generate inappropriate results.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>
-                        <Label text="%Verify all entries created with this method.">
+                        <Label text="%Verify all entries added with this method.">
                             <font><Font name="System Italic" size="13.0"/></font>
                         </Label>
                     </VBox>

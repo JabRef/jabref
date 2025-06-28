@@ -4,6 +4,7 @@ on:
     - cron: '0 0 1 * *'
 jobs:
   del_runs:
+    if: ${{ github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     permissions:
       actions: write

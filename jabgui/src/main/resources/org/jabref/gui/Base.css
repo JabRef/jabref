@@ -736,6 +736,12 @@ TextFlow > .tooltip-text-monospaced {
     -fx-padding: 0.2em 0em 0.2em 0.2em;
 }
 
+.lib-change-legend {
+    -fx-font-size: 11px;
+    -fx-text-fill: #555;
+    -fx-padding: 4 0 0 5;
+}
+
 .table-view .groupColumnBackground {
     -fx-stroke: -jr-gray-2;
 }

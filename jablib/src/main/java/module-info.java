@@ -101,9 +101,11 @@ open module org.jabref.jablib {
     exports org.jabref.model.study;
     exports org.jabref.logic.shared.security;
     exports org.jabref.logic.shared.event;
+    exports org.jabref.logic.citation;
     exports org.jabref.logic.crawler;
     exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
+    exports org.jabref.logic.citation.repository;
 
     requires java.base;
 
@@ -138,14 +140,11 @@ open module org.jabref.jablib {
     // endregion
 
     // region: data mapping
-    requires jakarta.xml.bind;
     requires jdk.xml.dom;
     requires com.google.gson;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime, related to XJC
-    requires org.glassfish.jaxb.runtime;
     // endregion
 
     // region HTTP clients

@@ -10,8 +10,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.layout.format.GetOpenOfficeType;
+import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
 import org.jabref.logic.layout.format.RemoveBrackets;
-import org.jabref.logic.layout.format.RemoveWhitespace;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -80,7 +80,7 @@ class OOCalcDatabase {
         addTableCell(document, row, new GetOpenOfficeType().format(entry.getType().getName()));
         toExportFields.forEach(field -> {
             if (field.equals(StandardField.TITLE)) {
-                addTableCell(document, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(entry, StandardField.TITLE))));
+                addTableCell(document, row, new NonSpaceWhitespaceRemover().format(new RemoveBrackets().format(getField(entry, StandardField.TITLE))));
             } else {
                 addTableCell(document, row, getField(entry, field));
             }

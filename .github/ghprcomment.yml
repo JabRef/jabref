@@ -79,12 +79,20 @@
     If you made changes that are visible to the user, please add a brief description along with the issue number to the `CHANGELOG.md` file.
     If you did not, please replace the cross (`[x]`) by a slash (`[/]`) to indicate that no `CHANGELOG.md` entry is necessary.
     More details can be found in our [Developer Documentation about the changelog](https://devdocs.jabref.org/decisions/0007-human-readable-changelog.html).
-- jobName: CHANGELOG.md
+- jobName: 'CHANGELOG.md - only unreleased touched'
   message: >
     While the PR was in progress, a new version of JabRef has been released.
 
 
     You have to merge `upstream/main` and move your entry in `CHANGELOG.md` up to the section `## [Unreleased]`.
+- jobName: CHANGELOG.md
+  message: >
+    You modified `CHANGELOG.md` and did not meet JabRef's rules for consistently formatted Markdown files.
+    To ensure consistent styling, we have [markdown-lint](https://github.com/DavidAnson/markdownlint) in place.
+    [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
+
+
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "CHANGELOG.md".
 - jobName: Markdown
   message: >
     You modified Markdown (`*.md`) files and did not meet JabRef's rules for consistently formatted Markdown files.
