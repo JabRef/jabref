@@ -30,18 +30,13 @@ public class ChatMessageComponent extends HBox {
     private final ObjectProperty<ChatMessage> chatMessage = new SimpleObjectProperty<>();
     private final ObjectProperty<Consumer<ChatMessageComponent>> onDelete = new SimpleObjectProperty<>();
 
-    @FXML
-    private HBox wrapperHBox;
-    @FXML
-    private VBox vBox;
-    @FXML
-    private Label sourceLabel;
-    @FXML
-    private Pane markdownContentPane;
-    @FXML
-    private VBox buttonsVBox;
+    @FXML private HBox wrapperHBox;
+    @FXML private VBox vBox;
+    @FXML private Label sourceLabel;
+    @FXML private Pane markdownContentPane;
+    @FXML private VBox buttonsVBox;
 
-    private MarkdownTextFlow markdownTextFlow;
+    private final MarkdownTextFlow markdownTextFlow;
 
     public ChatMessageComponent() {
         ViewLoader.view(this)
@@ -53,6 +48,11 @@ public class ChatMessageComponent extends HBox {
                 loadChatMessage();
             }
         });
+
+        markdownTextFlow = new MarkdownTextFlow(markdownContentPane);
+        markdownContentPane.getChildren().add(markdownTextFlow);
+        markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
+        markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
     }
 
     public ChatMessageComponent(ChatMessage chatMessage, Consumer<ChatMessageComponent> onDeleteCallback) {
@@ -106,10 +106,6 @@ public class ChatMessageComponent extends HBox {
     @FXML
     private void initialize() {
         buttonsVBox.visibleProperty().bind(wrapperHBox.hoverProperty());
-        markdownTextFlow = new MarkdownTextFlow(markdownContentPane);
-        markdownContentPane.getChildren().add(markdownTextFlow);
-        markdownContentPane.minHeightProperty().bind(markdownTextFlow.heightProperty());
-        markdownContentPane.prefHeightProperty().bind(markdownTextFlow.heightProperty());
         HBox.setHgrow(this, Priority.ALWAYS);
     }
 

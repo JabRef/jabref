@@ -38,6 +38,13 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.jspecify.annotations.NonNull;
 
 public class MarkdownTextFlow extends SelectableTextFlow {
+    private static final String BULLET_LIST_PATTERN = "^\\s*[-*•]\\s+$";
+    private static final String NUMBERED_LIST_PATTERN = "^\\s*\\d+\\.\\s+$";
+    /// Text bullet •. The Unicode codepoint is used because otherwise Rewrite Rule will
+    /// fail
+    private static final String UNICODE_BULLET = "\u2022";
+    private static final String BLOCKQUOTE_MARKER = "> ";
+
     private final Parser parser;
     private final HtmlRenderer htmlRenderer;
 
@@ -149,20 +156,20 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return "*" + astNode.getChildChars() + "*";
         } else if (astNode instanceof StrongEmphasis) {
             return "**" + astNode.getChildChars() + "**";
-        } else if (astNode instanceof FencedCodeBlock fenced) {
-            String info = fenced.getInfo().toString();
-            String openingFence = fenced.getOpeningFence().toString();
-            String closingFence = fenced.getClosingFence().toString();
+        } else if (astNode instanceof FencedCodeBlock fencedCodeBlock) {
+            String info = fencedCodeBlock.getInfo().toString();
+            String openingFence = fencedCodeBlock.getOpeningFence().toString();
+            String closingFence = fencedCodeBlock.getClosingFence().toString();
             // NOTE: Hack. Flexmark always add \n at beginning, \n\n at end.
-            String content = fenced.getContentChars().toString();
+            String content = fencedCodeBlock.getContentChars().toString();
             return openingFence + info + content.substring(0, content.length() - 1) + closingFence;
         } else if (astNode instanceof IndentedCodeBlock) {
             return astNode.getChars().toString();
         } else if (astNode instanceof BlockQuote) {
             return renderedText;
-        } else if (renderedText.matches("^\\s*[-*•]\\s+$")) {
-            return renderedText.replace("\u2022", "-");
-        } else if (renderedText.matches("^\\s*\\d+\\.\\s+$")) {
+        } else if (renderedText.matches(BULLET_LIST_PATTERN)) {
+            return renderedText.replace(UNICODE_BULLET, "-");
+        } else if (renderedText.matches(NUMBERED_LIST_PATTERN)) {
             return renderedText;
         } else {
             return renderedText;
@@ -251,6 +258,13 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private void visit(FencedCodeBlock codeBlock) {
             addNewlinesBetweenBlocks(codeBlock);
             String content = codeBlock.getContentChars().toString();
+            /*
+             * NOTE: Flexmark always append \n at the beginning and \n\n at the end.
+             * For example, ```java
+             * public class HelloWorld { ... }
+             * ``` -> contains content `\npublic class HelloWorld { ... }\n\n`
+             * Therefore, we need to remove the first and last characters.
+             */
             addTextNode(content.substring(1, content.length() - 2), codeBlock, "markdown-code-block");
             previousBlock = codeBlock;
         }
@@ -258,6 +272,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private void visit(IndentedCodeBlock codeBlock) {
             addNewlinesBetweenBlocks(codeBlock);
             String content = codeBlock.getContentChars().toString();
+            // NOTE: Similar to FencedCodeBlock, Flexmark always appends \n at the beginning and \n\n at the end.
             addTextNode(content.substring(1, content.length() - 2), codeBlock, "markdown-code-block");
             previousBlock = codeBlock;
         }
@@ -326,17 +341,9 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
             for (Node child : quote.getChildren()) {
                 if (child instanceof Paragraph) {
-                    String text = child.getChildChars().toString();
-                    String[] lines = text.split("\n", -1);
-                    for (int i = 0; i < lines.length; i++) {
-                        if (i > 0) {
-                            addTextNode("\n", quote);
-                        }
-                        addTextNode("> ", quote, "markdown-blockquote-marker");
-                        addTextNode(lines[i], child, "markdown-blockquote");
-                    }
+                    processQuoteParagraph(quote, child);
                 } else {
-                    addTextNode("> ", quote, "markdown-blockquote-marker");
+                    addTextNode(BLOCKQUOTE_MARKER, quote, "markdown-blockquote-marker");
                     visitor.visit(child);
                 }
             }
@@ -352,6 +359,18 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             addNewlinesBetweenBlocks(html);
             addTextNode(html.getChars().toString(), html, "markdown-code-block");
             previousBlock = html;
+        }
+
+        private void processQuoteParagraph(BlockQuote quote, Node child) {
+            String text = child.getChildChars().toString();
+            String[] lines = text.split("\n", -1);
+            for (int i = 0; i < lines.length; i++) {
+                if (i > 0) {
+                    addTextNode("\n", quote);
+                }
+                addTextNode(BLOCKQUOTE_MARKER, quote, "markdown-blockquote-marker");
+                addTextNode(lines[i], child, "markdown-blockquote");
+            }
         }
 
         private boolean isInsideListItem(Node node) {
