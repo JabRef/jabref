@@ -299,14 +299,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
         double savedProportion = preferences.getGuiPreferences().getHorizontalDividerPosition();
 
-        // Fix: fallback to 0.2 if saved value is invalid
         if (savedProportion <= 0.0 || savedProportion >= 1.0 || Double.isNaN(savedProportion)) {
             savedProportion = 0.2;
         }
 
         horizontalSplit.setDividerPositions(savedProportion);
 
-        // Subscribe to save user-adjusted sidebar position
         if (horizontalDividerSubscription != null) {
             horizontalDividerSubscription.unsubscribe();
         }
