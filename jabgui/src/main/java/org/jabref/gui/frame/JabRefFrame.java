@@ -83,9 +83,9 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private enum PanelMode { MAIN_TABLE, MAIN_TABLE_AND_ENTRY_EDITOR }
 
     public static final String FRAME_TITLE = "JabRef";
-    private static final double DEFAULT_SIDEBAR_DIVIDER_POSITION = 0.2;
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefFrame.class);
+    private static final double DEFAULT_SIDEBAR_DIVIDER_POSITION = 0.2;
 
     private final GuiPreferences preferences;
     private final AiService aiService;
