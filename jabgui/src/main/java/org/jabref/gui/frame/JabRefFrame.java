@@ -319,9 +319,8 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                         preferences.getGuiPreferences().setHorizontalDividerPosition(newPos);
                     }
                 });
-    }
-}
-
+            }
+        }
 
     public void updateVerticalDividerPosition() {
         if (mainStage.isShowing() && panelMode.get() == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
@@ -468,13 +467,12 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     private void initSidebarResizeListener() {
-    mainStage.widthProperty().addListener((obs, oldVal, newVal) -> {
-        if (!sidePane.getChildren().isEmpty()) {
-            updateHorizontalDividerPosition();
-        }
-    });
-}
-
+        mainStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+            if (!sidePane.getChildren().isEmpty()) {
+                updateHorizontalDividerPosition();
+            }
+        });
+    }
 
     private void updateTabBarVisible() {
         if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
