@@ -62,7 +62,7 @@ application {
     mainClass.set("org.jabref.JabKit")
     mainModule.set("org.jabref.jabkit")
 
-    // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
+    // Also passed to launcher by java-module-packaging plugin
     applicationDefaultJvmArgs = listOf(
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",

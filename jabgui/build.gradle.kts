@@ -130,7 +130,13 @@ application {
         "--add-opens", "java.base/java.nio=org.apache.pdfbox.io",
         // https://github.com/uncomplicate/neanderthal/issues/55
         "--add-opens", "java.base/jdk.internal.ref=org.apache.pdfbox.io",
-        "--add-modules", "jdk.incubator.vector"
+        "--add-modules", "jdk.incubator.vector",
+
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+UseCompactObjectHeaders",
+        "-XX:+UseZGC",
+        "-XX:+ZUncommit",
+        "-XX:+UseStringDeduplication"
     )
 }
 
