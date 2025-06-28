@@ -213,6 +213,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         initKeyBindings();
         frameDndHandler.initDragAndDrop();
         initBindings();
+        initSidebarResizeListener();
     }
 
     private void initLayout() {
@@ -295,13 +296,32 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     }
 
     public void updateHorizontalDividerPosition() {
-        if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
-            horizontalSplit.setDividerPositions(preferences.getGuiPreferences().getHorizontalDividerPosition() / horizontalSplit.getWidth());
-            horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
-                                                    .mapObservable(SplitPane.Divider::positionProperty)
-                                                    .listenToValues((_, newValue) -> preferences.getGuiPreferences().setHorizontalDividerPosition(newValue.doubleValue()));
+    if (mainStage.isShowing() && !sidePane.getChildren().isEmpty()) {
+        double savedProportion = preferences.getGuiPreferences().getHorizontalDividerPosition();
+
+        // Fix: fallback to 0.2 if saved value is invalid
+        if (savedProportion <= 0.0 || savedProportion >= 1.0 || Double.isNaN(savedProportion)) {
+            savedProportion = 0.2;
         }
+
+        horizontalSplit.setDividerPositions(savedProportion);
+
+        // Subscribe to save user-adjusted sidebar position
+        if (horizontalDividerSubscription != null) {
+            horizontalDividerSubscription.unsubscribe();
+        }
+
+        horizontalDividerSubscription = EasyBind.valueAt(horizontalSplit.getDividers(), 0)
+                .mapObservable(SplitPane.Divider::positionProperty)
+                .listenToValues((_, newValue) -> {
+                    double newPos = newValue.doubleValue();
+                    if (newPos > 0.0 && newPos < 1.0) {
+                        preferences.getGuiPreferences().setHorizontalDividerPosition(newPos);
+                    }
+                });
     }
+}
+
 
     public void updateVerticalDividerPosition() {
         if (mainStage.isShowing() && panelMode.get() == PanelMode.MAIN_TABLE_AND_ENTRY_EDITOR) {
@@ -446,6 +466,15 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         stateManager.getOpenDatabases().addListener((ListChangeListener<BibDatabaseContext>) _ -> updateTabBarVisible());
         EasyBind.subscribe(preferences.getWorkspacePreferences().hideTabBarProperty(), _ -> updateTabBarVisible());
     }
+
+    private void initSidebarResizeListener() {
+    mainStage.widthProperty().addListener((obs, oldVal, newVal) -> {
+        if (!sidePane.getChildren().isEmpty()) {
+            updateHorizontalDividerPosition();
+        }
+    });
+}
+
 
     private void updateTabBarVisible() {
         if (preferences.getWorkspacePreferences().shouldHideTabBar() && stateManager.getOpenDatabases().size() <= 1) {
