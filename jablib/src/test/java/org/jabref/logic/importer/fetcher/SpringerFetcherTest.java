@@ -43,6 +43,22 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
     @Test
     void searchByQueryFindsEntry() throws FetcherException {
 
+        BibEntry articleSupportingIdentification = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Iftikhar, Umar and Börstler, Jürgen and Bin Ali, Nauman and Kopp, Oliver")
+                .withField(StandardField.DATE, "2025-04-23")
+                .withField(StandardField.DOI, "10.1007/s11219-025-09720-9")
+                .withField(StandardField.FILE, ":http\\://link.springer.com/openurl/pdf?id=doi\\:10.1007/s11219-025-09720-9:PDF")
+                .withField(StandardField.ISSN, "0963-9314")
+                .withField(StandardField.JOURNAL, "Software Quality Journal")
+                .withField(StandardField.MONTH, "#apr#")
+                .withField(StandardField.NUMBER, "2")
+                .withField(StandardField.PAGES, "1--34")
+                .withField(StandardField.PUBLISHER, "Springer")
+                .withField(StandardField.TITLE, "Supporting the identification of prevalent quality issues in code changes by analyzing reviewers’ feedback")
+                .withField(StandardField.VOLUME, "33")
+                .withField(StandardField.YEAR, "2025")
+                .withField(StandardField.ABSTRACT, "Context: Code reviewers provide valuable feedback during the code review. Identifying common issues described in the reviewers’ feedback can provide input for devising context-specific software development improvements. However, the use of reviewer feedback for this purpose is currently less explored. Objective: In this study, we assess how automation can derive more interpretable and informative themes in reviewers’ feedback and whether these themes help to identify recurring quality-related issues in code changes. Method: We conducted a participatory case study using the JabRef system to analyze reviewers’ feedback on merged and abandoned code changes. We used two promising topic modeling methods (GSDMM and BERTopic) to identify themes in 5,560 code review comments. The resulting themes were analyzed and named by a domain expert from JabRef. Results: The domain expert considered the identified themes from the two topic models to represent quality-related issues. Different quality issues are pointed out in code reviews for merged and abandoned code changes. While BERTopic provides higher objective coherence, the domain expert considered themes from short-text topic modeling more informative and easy to interpret than BERTopic-based topic modeling. Conclusions: The identified prevalent code quality issues aim to address the maintainability-focused issues. The analysis of code review comments can enhance the current practices for JabRef by improving the guidelines for new developers and focusing discussions in the developer forums. The topic model choice impacts the interpretability of the generated themes, and a higher coherence (based on objective measures) of generated topics did not lead to improved interpretability by a domain expert.");
+
         BibEntry articleTagThatIssue = new BibEntry(StandardEntryType.Article)
                 .withField(StandardField.AUTHOR, "Santos, Fabio and Vargovich, Joseph and Trinkenreich, Bianca and Santos, Italo and Penney, Jacob and Britto, Ricardo and Pimentel, João Felipe and Wiese, Igor and Steinmacher, Igor and Sarma, Anita and Gerosa, Marco A.")
                 .withField(StandardField.DATE, "2023-08-31")
@@ -121,7 +137,7 @@ class SpringerFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSear
             .withField(StandardField.ABSTRACT, "Several Open-Source Software (OSS) projects depend on the continuity of their development communities to remain sustainable. Understanding how developers become inactive or why they take breaks can help communities prevent abandonment and incentivize developers to come back. In this paper, we propose a novel method to identify developers’ inactive periods by analyzing the individual rhythm of contributions to the projects. Using this method, we quantitatively analyze the inactivity of core developers in 18 OSS organizations hosted on GitHub. We also survey core developers to receive their feedback about the identified breaks and transitions. Our results show that our method was effective for identifying developers’ breaks. About 94% of the surveyed core developers agreed with our state model of inactivity; 71% and 79% of them acknowledged their breaks and state transition, respectively. We also show that all core developers take breaks (at least once) and about a half of them (~45%) have completely disengaged from a project for at least one year. We also analyzed the probability of transitions to/from inactivity and found that developers who pause their activity have a ~35 to ~55% chance to return to an active state; yet, if the break lasts for a year or longer, then the probability of resuming activities drops to ~21–26%, with a ~54% chance of complete disengagement. These results may support the creation of policies and mechanisms to make OSS community managers aware of breaks and potential project abandonment.");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch("JabRef Social Barriers Steinmacher");
-        assertEquals(List.of(articleTagThatIssue, fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
+        assertEquals(List.of(articleSupportingIdentification, articleTagThatIssue, fourthArticle, thirdArticle, firstArticle, secondArticle), fetchedEntries);
     }
 
     @Test
