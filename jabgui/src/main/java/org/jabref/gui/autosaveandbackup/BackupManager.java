@@ -26,8 +26,8 @@ import org.jabref.gui.maintable.BibEntryTableViewModel;
 import org.jabref.gui.maintable.columns.MainTableColumn;
 import org.jabref.logic.bibtex.InvalidFieldValueException;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackupFileType;
@@ -281,7 +281,7 @@ public class BackupManager {
         //          This MUST NOT create a broken backup file that then jabref wants to "restore" from?
         try (Writer writer = new AtomicFileWriter(backupPath, encoding, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibtexDatabaseWriter(
+            new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     preferences.getFieldPreferences(),

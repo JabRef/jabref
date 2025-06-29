@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
@@ -431,7 +431,7 @@ public class StudyRepository {
                     .withSaveOrder(context.getMetaData().getSaveOrder().map(SelfContainedSaveOrder::of).orElse(SaveOrder.getDefaultSaveOrder()))
                     .withReformatOnSave(preferences.getLibraryPreferences().shouldAlwaysReformatOnSave());
             BibWriter bibWriter = new BibWriter(fileWriter, OS.NEWLINE);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     preferences.getFieldPreferences(),
