@@ -320,7 +320,11 @@ public class MarkdownTextFlow extends SelectableTextFlow {
              * ``` -> contains content `\npublic class HelloWorld { ... }\n\n`
              * Therefore, we need to remove the first and last characters.
              */
-            addTextNode(content.substring(1, content.length() - 2), codeBlock, "markdown-code-block");
+            String processedContent = content;
+            if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
+                processedContent = content.substring(1, content.length() - 2);
+            }
+            addTextNode(processedContent, codeBlock, "markdown-code-block");
             previousBlock = codeBlock;
         }
 
@@ -328,7 +332,11 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             addNewlinesBetweenBlocks(codeBlock);
             String content = codeBlock.getContentChars().toString();
             // NOTE: Similar to FencedCodeBlock, Flexmark always appends \n at the beginning and \n\n at the end.
-            addTextNode(content.substring(1, content.length() - 2), codeBlock, "markdown-code-block");
+            String processedContent = content;
+            if (content.length() >= 3 && content.startsWith("\n") && content.endsWith("\n\n")) {
+                processedContent = content.substring(1, content.length() - 2);
+            }
+            addTextNode(processedContent, codeBlock, "markdown-code-block");
             previousBlock = codeBlock;
         }
 
