@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
-import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;

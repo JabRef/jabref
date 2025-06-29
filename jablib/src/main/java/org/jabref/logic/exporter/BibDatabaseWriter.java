@@ -57,14 +57,14 @@ import org.slf4j.LoggerFactory;
  * The opposite class is {@link org.jabref.logic.importer.fileformat.BibtexImporter}
  */
 public class BibDatabaseWriter {
-
     public enum SaveType { WITH_JABREF_META_DATA, PLAIN_BIBTEX }
-    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseWriter.class);
-    private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
 
     public static final String DATABASE_ID_PREFIX = "DBID:";
+    private static final Logger LOGGER = LoggerFactory.getLogger(BibDatabaseWriter.class);
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("(#[A-Za-z]+#)"); // Used to detect string references in strings
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
+
     private static final String STRING_PREFIX = "@String";
 
     protected final BibWriter bibWriter;
