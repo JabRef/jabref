@@ -42,6 +42,7 @@ import com.vladsch.flexmark.util.ast.NodeVisitor;
 import com.vladsch.flexmark.util.ast.VisitHandler;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 public class MarkdownTextFlow extends SelectableTextFlow {
     private static final String BULLET_LIST_PATTERN = "^\\s*[-*•]\\s+$";
@@ -73,7 +74,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         renderer.render(parser.parse(markdownText));
     }
 
-    private void addTextNode(String content, Node astNode, String... styleClasses) {
+    private void addTextNode(@Nullable String content, Node astNode, String... styleClasses) {
         if (content == null || content.isEmpty()) {
             return;
         }
