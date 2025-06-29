@@ -40,8 +40,7 @@ import org.jspecify.annotations.NonNull;
 public class MarkdownTextFlow extends SelectableTextFlow {
     private static final String BULLET_LIST_PATTERN = "^\\s*[-*•]\\s+$";
     private static final String NUMBERED_LIST_PATTERN = "^\\s*\\d+\\.\\s+$";
-    /// Text bullet •. The Unicode codepoint is used because otherwise Rewrite Rule will
-    /// fail
+    /// Text bullet •. Unicode is used to pass Rewrite tests.
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
 
@@ -87,12 +86,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     @Override
     public void copySelectedText() {
-        if (startHit.isEmpty() || endHit.isEmpty()) {
+        if (startHit == null || endHit == null) {
             return;
         }
 
-        int hitStart = startHit.get().getCharIndex();
-        int hitEnd = endHit.get().getCharIndex();
+        int hitStart = startHit.getCharIndex();
+        int hitEnd = endHit.getCharIndex();
         int selStart = Math.min(hitStart, hitEnd);
         int selEnd = Math.max(hitStart + 1, hitEnd + 1);
 
