@@ -24,6 +24,8 @@ dependencies {
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
 
+    implementation("com.pixelduke:fxthemes:1.6.0")
+
     implementation("org.slf4j:slf4j-api")
     implementation("org.tinylog:tinylog-api")
     implementation("org.tinylog:slf4j-tinylog")
