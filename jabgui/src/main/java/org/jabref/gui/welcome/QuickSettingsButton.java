@@ -14,6 +14,6 @@ public class QuickSettingsButton extends Button {
         }
         getStyleClass().add("quick-settings-button");
         setMaxWidth(Double.MAX_VALUE);
-        setOnAction(e -> action.run());
+        setOnAction(_ -> action.run());
     }
 }
