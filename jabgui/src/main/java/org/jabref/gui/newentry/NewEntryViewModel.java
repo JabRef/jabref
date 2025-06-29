@@ -17,7 +17,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 
 import org.jabref.gui.DialogService;
@@ -90,6 +89,7 @@ public class NewEntryViewModel {
     private final Validator bibtexTextValidator;
     private Task<Optional<List<BibEntry>>> bibtexWorker;
     private final Map<String, BibEntry> doiCache;
+    private BibEntry duplicateEntry;
 
     public NewEntryViewModel(GuiPreferences preferences,
                                     LibraryTab libraryTab,
@@ -147,7 +147,7 @@ public class NewEntryViewModel {
 
     public void populateDOICache() {
         doiCache.clear();
-        ObservableList<BibDatabaseContext> activeDatabase = stateManager.getOpenDatabases();
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
 
         activeDatabase.stream()
                       .map(BibDatabaseContext::getEntries)
@@ -167,10 +167,15 @@ public class NewEntryViewModel {
         String normalized = doiStrip.format(doiInput.toLowerCase());
 
         if (doiCache.containsKey(normalized)) {
+            duplicateEntry = doiCache.get(normalized);
             return Optional.of(ValidationMessage.warning(Localization.lang("Entry already exists in a library")));
         }
 
         return Optional.empty();
+    }
+
+    public BibEntry getDuplicateEntry() {
+        return duplicateEntry;
     }
 
     public ReadOnlyBooleanProperty executingProperty() {

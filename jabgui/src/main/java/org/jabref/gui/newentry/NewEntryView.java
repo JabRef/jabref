@@ -10,6 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -106,6 +107,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private TilePane entryCustom;
 
     @FXML private TextField idText;
+    @FXML private Tooltip idTextTooltip;
+    @FXML private Hyperlink idJumpLink;
     @FXML private RadioButton idLookupGuess;
     @FXML private RadioButton idLookupSpecify;
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
@@ -304,9 +307,20 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
+        idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
+
+        viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+            if (isValid) {
+                Tooltip.install(idText, idTextTooltip);
+            } else {
+                Tooltip.uninstall(idText, idTextTooltip);
+            }
+        });
 
         TextInputControl textInput = idText;
         EditorValidator validator = new EditorValidator(this.guiPreferences);
