@@ -272,6 +272,10 @@ jobs:
         run: |
           set -e
           ${{ matrix.archivePortableJabKit }}
+      - name: Rename files
+        shell: pwsh
+        run: |
+          get-childitem -Path 'jabkit/build/packages/*/*' | rename-item -NewName {$_.name -replace "${{ steps.gitversion.outputs.AssemblySemVer }}","${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}${{ matrix.suffix }}"}
 
       # region Upload to builds.jabref.org / GitHub artifacts store
       - name: Setup SSH key
