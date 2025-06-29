@@ -1768,34 +1768,124 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -jr-theme;
 }
 
-.welcome-footer-container {
-    -fx-padding: 15px;
+
+/* Welcome Tab Layout Styles */
+.welcome-main-container {
+    -fx-max-width: 1024px;
+    -fx-spacing: 28px;
     -fx-alignment: center;
+}
+
+.welcome-top-titles {
+    -fx-spacing: 10px;
+    -fx-alignment: left;
+    -fx-padding: 0 0 20px 0;
+}
+
+.welcome-columns-container {
+    -fx-spacing: 40px;
+    -fx-alignment: top-center;
+}
+
+.welcome-left-column,
+.welcome-right-column {
+    -fx-min-width: 0;
+    -fx-pref-width: 50%;
+    -fx-max-width: 600px;
+}
+
+.welcome-content-column {
+    -fx-spacing: 25px;
+    -fx-alignment: top-left;
+}
+
+.welcome-section {
+    -fx-spacing: 12px;
+    -fx-alignment: top-left;
+}
+
+.welcome-links-content {
+    -fx-spacing: 8px;
+    -fx-alignment: top-left;
+}
+
+/* Quick Settings */
+
+.quick-settings-content {
+    -fx-spacing: 8px;
+    -fx-alignment: top-center;
+}
+
+.quick-settings-button {
+    -fx-background-color: derive(-jr-base, 10%);
+    -fx-border-color: -jr-gray-1;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 12px 16px;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 8px;
+    -fx-font-size: 1.0em;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-cursor: hand;
+}
+
+.quick-settings-button:hover {
+    -fx-background-color: -jr-hover;
+    -fx-border-color: -jr-accent;
+}
+
+.quick-settings-button .glyph-icon,
+.quick-settings-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
+    -fx-font-size: 1.1em;
+}
+
+.quick-settings-dialog-grid {
+    -fx-hgap: 10px;
+    -fx-vgap: 10px;
+    -fx-padding: 20px;
+}
+
+/* Community Section */
+.welcome-community-content {
+    -fx-spacing: 12px;
+    -fx-alignment: top-left;
+}
+
+.welcome-community-icons {
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
+.welcome-community-links {
     -fx-spacing: 15px;
+    -fx-alignment: center-left;
 }
 
-.welcome-footer-label {
-    -fx-font-size: 2.25em;
-    -fx-text-fill: -jr-theme-text;
-    -fx-font-family: "Arial";
-}
-
-.welcome-footer-link {
-    -fx-font-size: 1.2em;
+.welcome-community-link {
+    -fx-font-size: 1.0em;
     -fx-text-fill: -jr-theme;
     -fx-font-family: "Arial";
 }
 
-.welcome-footer-link:hover {
+.welcome-community-link:hover {
     -fx-underline: true;
     -fx-text-fill: derive(-jr-theme, -20%);
 }
 
-.welcome-footer-version {
-    -fx-font-size: 1.2em;
-    -fx-text-fill: -jr-theme;
+.welcome-community-version {
+    -fx-alignment: center-left;
+    -fx-padding: 5px 0 0 0;
+}
+
+.welcome-community-version-text {
+    -fx-font-size: 0.9em;
+    -fx-text-fill: -jr-gray-2;
     -fx-font-family: "Arial";
 }
+
 
 /* AboutDialog */
 #aboutDialog .about-heading {
