@@ -17,7 +17,6 @@ import org.jabref.gui.ClipBoardManager;
 import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 
-/// A TextFlow that allows text selection and copying.
 public class SelectableTextFlow extends TextFlow {
     @Nullable protected HitInfo startHit;
     @Nullable protected HitInfo endHit;
@@ -26,12 +25,11 @@ public class SelectableTextFlow extends TextFlow {
     private final Pane parentPane;
     private boolean isDragging = false;
     private boolean justFinishedDrag = false;
+    private final ClipBoardManager clipBoardManager;
 
-    /// Creates a SelectableTextFlow instance.
-    ///
-    /// @param parent The parent Pane to which this TextFlow will be added.
     public SelectableTextFlow(Pane parent) {
         this.parentPane = parent;
+        clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         setCursor(Cursor.TEXT);
         setFocusTraversable(true);
 
@@ -61,7 +59,6 @@ public class SelectableTextFlow extends TextFlow {
         }
 
         String selectedText = fullText.substring(startIndex, endIndex);
-        ClipBoardManager clipBoardManager = Injector.instantiateModelOrService(ClipBoardManager.class);
         clipBoardManager.setContent(selectedText);
     }
 
