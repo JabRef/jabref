@@ -11,14 +11,15 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -261,32 +262,39 @@ public class WelcomeTab extends Tab {
         dialog.setTitle(Localization.lang("Visual Theme"));
         dialog.setHeaderText(Localization.lang("Configure Visual Theme"));
 
-        GridPane grid = new GridPane();
-        grid.getStyleClass().add("quick-settings-dialog-grid");
+        VBox mainContainer = new VBox();
+        mainContainer.getStyleClass().add("theme-selection-container");
+        mainContainer.setSpacing(12);
 
-        ComboBox<ThemeTypes> themeCombo = new ComboBox<>();
-        themeCombo.getItems().addAll(ThemeTypes.values());
-
-        ListCell<ThemeTypes> themeTypesListCell = new ListCell<>() {
-            @Override
-            protected void updateItem(ThemeTypes item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.getDisplayName());
-                }
-            }
-        };
-        themeCombo.setCellFactory(_ -> themeTypesListCell);
-        themeCombo.setButtonCell(themeTypesListCell);
+        ToggleGroup themeGroup = new ToggleGroup();
+        HBox radioContainer = new HBox();
+        radioContainer.setSpacing(8);
 
         WorkspacePreferences workspacePreferences = preferences.getWorkspacePreferences();
         Theme currentTheme = workspacePreferences.getTheme();
+
+        RadioButton lightRadio = new RadioButton(ThemeTypes.LIGHT.getDisplayName());
+        lightRadio.setToggleGroup(themeGroup);
+        lightRadio.setUserData(ThemeTypes.LIGHT);
+        VBox lightBox = createThemeOption(lightRadio, new ThemeWireFrameComponent("light"));
+        radioContainer.getChildren().add(lightBox);
+
+        RadioButton darkRadio = new RadioButton(ThemeTypes.DARK.getDisplayName());
+        darkRadio.setToggleGroup(themeGroup);
+        darkRadio.setUserData(ThemeTypes.DARK);
+        VBox darkBox = createThemeOption(darkRadio, new ThemeWireFrameComponent("dark"));
+        radioContainer.getChildren().add(darkBox);
+
+        RadioButton customRadio = new RadioButton(ThemeTypes.CUSTOM.getDisplayName());
+        customRadio.setToggleGroup(themeGroup);
+        customRadio.setUserData(ThemeTypes.CUSTOM);
+        VBox customBox = createThemeOption(customRadio, new ThemeWireFrameComponent("custom"));
+        radioContainer.getChildren().add(customBox);
+
         switch (currentTheme.getType()) {
-            case DEFAULT -> themeCombo.setValue(ThemeTypes.LIGHT);
-            case EMBEDDED -> themeCombo.setValue(ThemeTypes.DARK);
-            case CUSTOM -> themeCombo.setValue(ThemeTypes.CUSTOM);
+            case DEFAULT -> lightRadio.setSelected(true);
+            case EMBEDDED -> darkRadio.setSelected(true);
+            case CUSTOM -> customRadio.setSelected(true);
         }
 
         TextField customThemePath = new TextField();
@@ -300,18 +308,28 @@ public class WelcomeTab extends Tab {
         browseButton.setPrefHeight(20.0);
         browseButton.setPrefWidth(20.0);
 
-        HBox customThemeBox = new HBox(4.0, customThemePath, browseButton);
-        customThemeBox.setAlignment(Pos.CENTER_LEFT);
+        HBox customThemePathBox = new HBox(4.0, customThemePath, browseButton);
+        customThemePathBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(customThemePath, Priority.ALWAYS);
 
-        boolean isCustomTheme = themeCombo.getValue() == ThemeTypes.CUSTOM;
-        customThemePath.setDisable(!isCustomTheme);
-        browseButton.setDisable(!isCustomTheme);
+        mainContainer.getChildren().add(radioContainer);
 
-        themeCombo.valueProperty().addListener((_, _, newValue) -> {
-            boolean isCustom = newValue == ThemeTypes.CUSTOM;
-            customThemePath.setDisable(!isCustom);
-            browseButton.setDisable(!isCustom);
+        boolean isCustomTheme = customRadio.isSelected();
+        if (isCustomTheme) {
+            mainContainer.getChildren().add(customThemePathBox);
+        }
+
+        themeGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
+            boolean isCustom = newValue != null && newValue.getUserData() == ThemeTypes.CUSTOM;
+            boolean isCurrentlyVisible = mainContainer.getChildren().contains(customThemePathBox);
+
+            if (isCustom && !isCurrentlyVisible) {
+                mainContainer.getChildren().add(customThemePathBox);
+                dialog.getDialogPane().getScene().getWindow().sizeToScene();
+            } else if (!isCustom && isCurrentlyVisible) {
+                mainContainer.getChildren().remove(customThemePathBox);
+                dialog.getDialogPane().getScene().getWindow().sizeToScene();
+            }
         });
 
         browseButton.setOnAction(_ -> {
@@ -329,18 +347,14 @@ public class WelcomeTab extends Tab {
                     customThemePath.setText(file.toAbsolutePath().toString()));
         });
 
-        grid.add(new Label(Localization.lang("Visual Theme") + ":"), 0, 0);
-        grid.add(themeCombo, 1, 0);
-        grid.add(new Label(Localization.lang("Custom theme path") + ":"), 0, 1);
-        grid.add(customThemeBox, 1, 1);
-
-        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().setContent(mainContainer);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            ThemeTypes selectedTheme = themeCombo.getValue();
-            if (selectedTheme != null) {
+            Toggle selectedToggle = themeGroup.getSelectedToggle();
+            if (selectedToggle != null) {
+                ThemeTypes selectedTheme = (ThemeTypes) selectedToggle.getUserData();
                 Theme newTheme = switch (selectedTheme) {
                     case LIGHT -> Theme.light();
                     case DARK -> Theme.dark();
@@ -360,6 +374,15 @@ public class WelcomeTab extends Tab {
                 }
             }
         }
+    }
+
+    private VBox createThemeOption(RadioButton radio, Node wireframe) {
+        VBox container = new VBox();
+        container.setSpacing(12);
+        container.setAlignment(Pos.CENTER_LEFT);
+        container.getStyleClass().add("theme-option");
+        container.getChildren().addAll(radio, wireframe);
+        return container;
     }
 
     private VBox createWelcomeStartBox() {

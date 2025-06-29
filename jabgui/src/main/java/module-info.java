@@ -188,5 +188,6 @@ open module org.jabref {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires com.dlsc.pdfviewfx;
+    requires org.jetbrains.annotations;
     // endregion
 }
