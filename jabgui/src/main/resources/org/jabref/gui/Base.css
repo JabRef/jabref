@@ -2605,3 +2605,12 @@ journalInfo .grid-cell-b {
     -fx-fill: -fx-mid-text-color;
     -fx-font-style: italic;
 }
+
+.markdown-link {
+    -fx-text-fill: -jr-theme;
+    -fx-underline: true;
+}
+
+.markdown-link:hover {
+    -fx-text-fill: #004499;
+}

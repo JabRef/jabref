@@ -5,10 +5,14 @@ import java.util.Deque;
 import java.util.StringJoiner;
 
 import javafx.geometry.NodeOrientation;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 
 import org.jabref.gui.ClipBoardManager;
+import org.jabref.gui.DialogService;
+import org.jabref.gui.edit.OpenBrowserAction;
+import org.jabref.gui.preferences.GuiPreferences;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.vladsch.flexmark.ast.BlockQuote;
@@ -21,6 +25,8 @@ import com.vladsch.flexmark.ast.Heading;
 import com.vladsch.flexmark.ast.HtmlBlock;
 import com.vladsch.flexmark.ast.HtmlInline;
 import com.vladsch.flexmark.ast.IndentedCodeBlock;
+import com.vladsch.flexmark.ast.Link;
+import com.vladsch.flexmark.ast.LinkRef;
 import com.vladsch.flexmark.ast.ListBlock;
 import com.vladsch.flexmark.ast.ListItem;
 import com.vladsch.flexmark.ast.OrderedList;
@@ -84,6 +90,30 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         getChildren().add(textNode);
     }
 
+    private void addHyperlinkNode(String text, String url, Node astNode, String... styleClasses) {
+        if (text == null || text.isEmpty()) {
+            return;
+        }
+
+        MarkdownAwareHyperlink hyperlink = new MarkdownAwareHyperlink(text, astNode);
+        hyperlink.setOnAction(_ -> new OpenBrowserAction(
+                url,
+                Injector.instantiateModelOrService(DialogService.class),
+                Injector.instantiateModelOrService(GuiPreferences.class)
+                        .getExternalApplicationsPreferences()).execute()
+        );
+
+        if (styleClasses != null) {
+            for (String styleClass : styleClasses) {
+                if (styleClass != null && !styleClass.isEmpty()) {
+                    hyperlink.getStyleClass().add(styleClass);
+                }
+            }
+        }
+        hyperlink.getStyleClass().add("markdown-link");
+        getChildren().add(hyperlink);
+    }
+
     @Override
     public void copySelectedText() {
         if (startHit == null || endHit == null) {
@@ -99,12 +129,21 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         int currentPos = 0;
 
         for (javafx.scene.Node fxNode : getChildren()) {
-            if (!(fxNode instanceof MarkdownAwareText mat)) {
+            String renderedText;
+            String markdownText;
+            Node astNode;
+
+            if (fxNode instanceof MarkdownAwareText mat) {
+                renderedText = mat.getText();
+                astNode = mat.astNode;
+                markdownText = getMarkdownRepresentation(astNode, renderedText);
+            } else if (fxNode instanceof MarkdownAwareHyperlink mah) {
+                renderedText = mah.getText();
+                astNode = mah.astNode;
+                markdownText = getMarkdownRepresentation(astNode, renderedText);
+            } else {
                 continue;
             }
-
-            String renderedText = mat.getText();
-            String markdownText = getMarkdownRepresentation(mat.astNode, renderedText);
 
             int segmentStart = currentPos;
             int segmentEnd = currentPos + renderedText.length();
@@ -125,7 +164,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                     result.add(markdownText);
                 } else {
                     String partialText = renderedText.substring(startInSegment, endInSegment);
-                    if (mat.astNode instanceof DelimitedNode delimitedNode) {
+                    if (astNode instanceof DelimitedNode delimitedNode) {
                         // e.g., select "llo" inside "*hello*" would return "*llo*"
                         partialText = delimitedNode.getOpeningMarker() + partialText + delimitedNode.getClosingMarker();
                     }
@@ -155,6 +194,19 @@ public class MarkdownTextFlow extends SelectableTextFlow {
             return "*" + astNode.getChildChars() + "*";
         } else if (astNode instanceof StrongEmphasis) {
             return "**" + astNode.getChildChars() + "**";
+        } else if (astNode instanceof Link link) {
+            String linkText = link.getText().toString();
+            String url = link.getUrl().toString();
+            String title = link.getTitle().toString();
+            if (title.isEmpty()) {
+                return "[" + linkText + "](" + url + ")";
+            } else {
+                return "[" + linkText + "](" + url + " \"" + title + "\")";
+            }
+        } else if (astNode instanceof LinkRef linkRef) {
+            String linkText = linkRef.getText().toString();
+            String reference = linkRef.getReference().toString();
+            return "[" + linkText + "][" + reference + "]";
         } else if (astNode instanceof FencedCodeBlock fencedCodeBlock) {
             String info = fencedCodeBlock.getInfo().toString();
             String openingFence = fencedCodeBlock.getOpeningFence().toString();
@@ -191,6 +243,7 @@ public class MarkdownTextFlow extends SelectableTextFlow {
                     new VisitHandler<>(Emphasis.class, this::visit),
                     new VisitHandler<>(StrongEmphasis.class, this::visit),
                     new VisitHandler<>(Code.class, this::visit),
+                    new VisitHandler<>(Link.class, this::visit),
                     new VisitHandler<>(FencedCodeBlock.class, this::visit),
                     new VisitHandler<>(IndentedCodeBlock.class, this::visit),
                     new VisitHandler<>(BulletList.class, this::visit),
@@ -252,6 +305,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
         private void visit(Code code) {
             addTextNode(code.getText().toString(), code, "markdown-code");
+        }
+
+        private void visit(Link link) {
+            String text = link.getText().toString();
+            String url = link.getUrl().toString();
+            addHyperlinkNode(text, url, link);
         }
 
         private void visit(FencedCodeBlock codeBlock) {
@@ -410,6 +469,16 @@ public class MarkdownTextFlow extends SelectableTextFlow {
         private final Node astNode;
 
         public MarkdownAwareText(String text, Node astNode) {
+            super(text);
+            this.astNode = astNode;
+            setUserData(astNode);
+        }
+    }
+
+    private static class MarkdownAwareHyperlink extends Hyperlink {
+        private final Node astNode;
+
+        public MarkdownAwareHyperlink(String text, Node astNode) {
             super(text);
             this.astNode = astNode;
             setUserData(astNode);
