@@ -46,7 +46,6 @@ import org.jspecify.annotations.NonNull;
 public class MarkdownTextFlow extends SelectableTextFlow {
     private static final String BULLET_LIST_PATTERN = "^\\s*[-*•]\\s+$";
     private static final String NUMBERED_LIST_PATTERN = "^\\s*\\d+\\.\\s+$";
-    /// Text bullet •. Unicode is used to pass Rewrite tests.
     private static final String UNICODE_BULLET = "\u2022";
     private static final String BLOCKQUOTE_MARKER = "> ";
 
