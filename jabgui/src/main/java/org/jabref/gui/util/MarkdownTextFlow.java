@@ -115,14 +115,12 @@ public class MarkdownTextFlow extends SelectableTextFlow {
 
     @Override
     public void copySelectedText() {
-        if (startHit == null || endHit == null) {
+        if (!isSelectionActive()) {
             return;
         }
 
-        int hitStart = startHit.getCharIndex();
-        int hitEnd = endHit.getCharIndex();
-        int selStart = Math.min(hitStart, hitEnd);
-        int selEnd = Math.max(hitStart + 1, hitEnd + 1);
+        int selStart = getSelectionStartIndex();
+        int selEnd = getSelectionEndIndex();
 
         StringJoiner result = new StringJoiner("");
         int currentPos = 0;

@@ -18,9 +18,9 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.Nullable;
 
 public class SelectableTextFlow extends TextFlow {
-    @Nullable protected HitInfo startHit;
-    @Nullable protected HitInfo endHit;
-    @Nullable protected Path selectionPath;
+    @Nullable private HitInfo startHit;
+    @Nullable private HitInfo endHit;
+    @Nullable private Path selectionPath;
 
     private final Pane parentPane;
     private boolean isDragging = false;
@@ -46,12 +46,12 @@ public class SelectableTextFlow extends TextFlow {
     }
 
     public void copySelectedText() {
-        if (startHit == null || endHit == null) {
+        if (!isSelectionActive()) {
             return;
         }
 
-        int startIndex = Math.min(startHit.getCharIndex(), endHit.getCharIndex());
-        int endIndex = Math.max(startHit.getCharIndex() + 1, endHit.getCharIndex() + 1);
+        int startIndex = getSelectionStartIndex();
+        int endIndex = getSelectionEndIndex();
 
         String fullText = getTextFlowContent();
         if (startIndex < 0 || endIndex > fullText.length() || startIndex >= endIndex) {
@@ -77,6 +77,22 @@ public class SelectableTextFlow extends TextFlow {
         removeHighlight();
     }
 
+    public boolean isSelectionActive() {
+        return startHit != null && endHit != null && startHit.getCharIndex() != endHit.getCharIndex();
+    }
+
+    /// Returns the start index of the selection. Assumes that the selection is active.
+    public int getSelectionStartIndex() {
+        assert isSelectionActive();
+        return Math.min(startHit.getCharIndex(), endHit.getCharIndex());
+    }
+
+    /// Returns the end index of the selection. Assumes that the selection is active.
+    public int getSelectionEndIndex() {
+        assert isSelectionActive();
+        return Math.max(startHit.getCharIndex() + 1, endHit.getCharIndex() + 1);
+    }
+
     private String getTextFlowContent() {
         StringBuilder sb = new StringBuilder();
         for (Node node : getChildren()) {
@@ -90,14 +106,11 @@ public class SelectableTextFlow extends TextFlow {
     private void updateSelectionHighlight() {
         removeHighlight();
 
-        if (startHit == null || endHit == null || startHit.getCharIndex() == endHit.getCharIndex()) {
+        if (!isSelectionActive()) {
             return;
         }
 
-        int startIndex = Math.min(startHit.getCharIndex(), endHit.getCharIndex());
-        int endIndex = Math.max(startHit.getCharIndex() + 1, endHit.getCharIndex() + 1);
-
-        PathElement[] elements = rangeShape(startIndex, endIndex);
+        PathElement[] elements = rangeShape(getSelectionStartIndex(), getSelectionEndIndex());
 
         Path path = new Path();
         path.getElements().addAll(elements);
