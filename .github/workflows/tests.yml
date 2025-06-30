@@ -396,11 +396,6 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
