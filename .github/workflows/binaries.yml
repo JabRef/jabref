@@ -272,8 +272,9 @@ jobs:
           set -e
           ${{ matrix.archivePortableJabKit }}
       - name: Remove jabkit dmg
+        if: startsWith(matrix.os, 'macos')
         shell: bash
-        run: rm jabkit/build/packages/*.dmg
+        run: rm jabkit/build/packages/*/*.dmg
       - name: Rename files
         shell: pwsh
         run: |
