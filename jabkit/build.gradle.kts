@@ -81,10 +81,7 @@ javaModulePackaging {
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {
-        // Error: Option [--win-console] is not valid with type [msi]
-        // options.addAll(
-        //    "--win-console"
-        // )
+        options.addAll("--win-console")
         packageTypes = listOf("app-image")
     }
     targetsWithOs("linux") {
