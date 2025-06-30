@@ -37,9 +37,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -68,9 +68,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -94,9 +94,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -122,9 +122,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: markdownlint-cli2-action
         uses: DavidAnson/markdownlint-cli2-action@v20
         with:
@@ -144,9 +144,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Generate JBang cache key
         id: cache-key
         shell: bash
@@ -190,9 +190,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Cache clparse jar
         id: cache-clparse
         uses: actions/cache@v4
@@ -222,9 +222,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -249,9 +249,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -304,9 +304,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -345,9 +345,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -373,9 +373,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -404,9 +404,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build .jbang/JabKitLauncher.java
@@ -451,9 +451,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         if: github.ref == 'refs/heads/main'
         uses: actions/setup-java@v4
@@ -489,9 +489,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -515,9 +515,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - uses: gradle/actions/wrapper-validation@v4
 
   mandatory-checks-section-exists:
@@ -542,9 +542,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
 
       - name: Check for existence of Mandatory Checks section
         id: check_mandatory_section
@@ -584,9 +584,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Check for PR checklist
         id: check_changelog_modification
         run: |
@@ -633,9 +633,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Merge Conflict finder
         uses: olivernybroe/action-conflict-finder@v4.1
 
@@ -650,9 +650,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Check force push
         id: force_push_check
         run: |
@@ -680,9 +680,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Check for submodule modifications
         id: check_submodule
         run: |
@@ -736,9 +736,9 @@ jobs:
       - name: Checkout java-module-packaging
         uses: actions/checkout@v4
         with:
-          repository: gradlex-org/java-module-packaging
+          repository: koppor/java-module-packaging
           path: build-logic/java-module-packaging
-          ref: preview
+          ref: fix-params
       - name: Check PR body for changelog note
         id: changelog_check
         run: |
