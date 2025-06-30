@@ -266,14 +266,14 @@ jobs:
       - name: Build JabKit
         shell: bash
         run: ./gradlew -i -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" :jabkit:jpackage
-      - name: Remove jabkit dmg
-        shell: bash
-        run: rm jabkit/build/packages/*.dmg
       - name: Package JabKit application image
         shell: bash
         run: |
           set -e
           ${{ matrix.archivePortableJabKit }}
+      - name: Remove jabkit dmg
+        shell: bash
+        run: rm jabkit/build/packages/*.dmg
       - name: Rename files
         shell: pwsh
         run: |
