@@ -113,15 +113,19 @@ tasks.named<JavaExec>("run") {
 javaModulePackaging {
     applicationName = "jabsrv"
     vendor = "JabRef"
+
+    // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {
-        // Error: Option [--win-console] is not valid with type [msi]
-        // options.addAll(
-        //    "--win-console"
-        // )
+        appImageOptions.addAll("--win-console")
+        packageTypes = listOf("app-image")
     }
     targetsWithOs("linux") {
         options.addAll(
             "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
         )
+        packageTypes = listOf("app-image")
+    }
+    targetsWithOs("macos") {
+        packageTypes = listOf("app-image")
     }
 }
