@@ -10,7 +10,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
