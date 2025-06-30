@@ -1323,8 +1323,8 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 getBoolean(MERGE_DUPLICATE_ENTRIES)
         );
 
-        EasyBind.listen(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_SAME_KEY_ENTRIES, newValue));
-        EasyBind.listen(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntriesProperty(), (obs, oldValue, newValue) -> putBoolean(MERGE_DUPLICATE_ENTRIES, newValue));
+        EasyBind.listen(mergeBibFilesIntoCurrentBibPreferences.shouldMergeSameKeyEntriesProperty(), (_, _, newValue) -> putBoolean(MERGE_SAME_KEY_ENTRIES, newValue));
+        EasyBind.listen(mergeBibFilesIntoCurrentBibPreferences.shouldMergeDuplicateEntriesProperty(), (_, _, newValue) -> putBoolean(MERGE_DUPLICATE_ENTRIES, newValue));
 
         return mergeBibFilesIntoCurrentBibPreferences;
     }

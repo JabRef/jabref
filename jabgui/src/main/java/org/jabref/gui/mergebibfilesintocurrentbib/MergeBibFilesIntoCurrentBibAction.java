@@ -156,7 +156,7 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
     }
 
     private List<Path> getAllBibFiles(Path directory, Path databasePath) {
-        if (!checkPathValidity(directory)) {
+        if (!isValidPath(directory)) {
             return List.of();
         }
         try (Stream<Path> stream = Files.find(
@@ -172,7 +172,7 @@ public class MergeBibFilesIntoCurrentBibAction extends SimpleCommand {
         return List.of();
     }
 
-    private boolean checkPathValidity(Path directory) {
+    private boolean isValidPath(Path directory) {
         if (!Files.exists(directory)) {
             dialogService.showErrorDialogAndWait(Localization.lang("Chosen folder does not exist:") + " " + directory);
             return false;
