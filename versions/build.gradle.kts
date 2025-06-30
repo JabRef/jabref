@@ -127,7 +127,7 @@ dependencies.constraints {
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
     api("org.mockito:mockito-core:5.18.0")
-    api("org.postgresql:postgresql:42.7.5")
+    api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")
     api("org.slf4j:slf4j-api:2.0.17")
     api("org.testfx:testfx-core:4.0.16-alpha")
