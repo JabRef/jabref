@@ -330,11 +330,6 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
       - run: jbang build .jbang/JabKitLauncher.java
