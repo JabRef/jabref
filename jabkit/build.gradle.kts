@@ -81,7 +81,7 @@ javaModulePackaging {
 
     // All targets have to have "app-image" as sole target, since we do not distribute an installer
     targetsWithOs("windows") {
-        options.addAll("--win-console")
+        appImageOptions.addAll("--win-console")
         packageTypes = listOf("app-image")
     }
     targetsWithOs("linux") {
