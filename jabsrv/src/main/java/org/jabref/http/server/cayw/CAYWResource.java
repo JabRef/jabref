@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -100,8 +101,8 @@ public class CAYWResource {
 
         List<String> citationKeys = future.get().stream()
                 .map(BibEntry::getCitationKey)
-                .filter(java.util.Optional::isPresent)
-                .map(java.util.Optional::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
 
         if (citationKeys.isEmpty()) {

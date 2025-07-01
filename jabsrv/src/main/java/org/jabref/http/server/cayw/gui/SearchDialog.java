@@ -1,5 +1,6 @@
 package org.jabref.http.server.cayw.gui;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.function.Function;
 
@@ -12,6 +13,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -21,7 +23,12 @@ import javafx.stage.StageStyle;
 
 import org.jabref.logic.l10n.Localization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SearchDialog<T> {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(SearchDialog.class);
 
     private static final double DIALOG_WIDTH_RATIO = 0.5;
     private static final double DIALOG_HEIGHT_RATIO = 0.4;
@@ -81,6 +88,17 @@ public class SearchDialog<T> {
         scrollPane.getStyleClass().add("scroll-pane");
 
         dialogStage.setScene(scene);
+
+        try (InputStream inputStream = getClass().getResourceAsStream("/JabRef-icon-64.png")) {
+            if (inputStream == null) {
+                LOGGER.warn("Error loading icon for SearchDialog");
+            } else {
+                Image icon = new Image(inputStream);
+                dialogStage.getIcons().add(icon);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error loading icon for SearchDialog", e);
+        }
 
         dialogStage.setX((screenBounds.getWidth() - dialogWidth) / 2);
         dialogStage.setY((screenBounds.getHeight() - dialogHeight) / 2);
