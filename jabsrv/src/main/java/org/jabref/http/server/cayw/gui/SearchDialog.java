@@ -46,7 +46,7 @@ public class SearchDialog<T> {
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.initStyle(StageStyle.DECORATED);
         dialogStage.setTitle(Localization.lang("Search..."));
-        dialogStage.setResizable(false);
+        dialogStage.setResizable(true);
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
         double dialogWidth = screenBounds.getWidth() * DIALOG_WIDTH_RATIO;

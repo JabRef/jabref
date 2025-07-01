@@ -106,7 +106,7 @@ public class CAYWResource {
                 .toList();
 
         if (citationKeys.isEmpty()) {
-            return Response.ok().build();
+            return Response.noContent().build();
         }
 
         return Response.ok(gson.toJson(citationKeys)).build();
