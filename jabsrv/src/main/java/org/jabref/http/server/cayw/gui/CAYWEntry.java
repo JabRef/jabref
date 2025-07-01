@@ -6,8 +6,14 @@ import javafx.event.EventHandler;
 public class CAYWEntry<T> {
 
     private final T value;
-    private final String label;
+
+    // Used on the buttons ("chips")
     private final String shortLabel;
+
+    // Used in the list
+    private final String label;
+
+    // Used when hovering and used as bases on the second line
     private final String description;
 
     private EventHandler<ActionEvent> onClick;

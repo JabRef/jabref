@@ -17,7 +17,7 @@
     -fx-fill: #666666;
 }
 
-.pill-remove-button {
+.chip-remove-button {
     -fx-background-color: transparent;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
@@ -26,11 +26,11 @@
     -fx-cursor: hand;
 }
 
-.pill-remove-button:hover {
+.chip-remove-button:hover {
     -fx-text-fill: #d32f2f;
 }
 
-.pill-style {
+.chip-style {
     -fx-background-color: #e3f2fd;
     -fx-background-radius: 15;
     -fx-border-color: #90caf9;
@@ -39,6 +39,6 @@
     -fx-cursor: hand;
 }
 
-.pill-style:hover {
+.chip-style:hover {
     -fx-background-color: #bbdefb;
 }

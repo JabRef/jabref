@@ -12,9 +12,11 @@ import javafx.util.Duration;
 
 public class SearchField<T> extends TextField {
 
+    private static final int DELAY_IN_MS = 100;
+
     public SearchField(FilteredList<CAYWEntry<T>> filteredEntries, Function<String, List<T>> filter) {
-        PauseTransition pause = new PauseTransition(Duration.millis(100));
-        textProperty().addListener((observable, oldValue, newValue) -> {
+        PauseTransition pause = new PauseTransition(Duration.millis(DELAY_IN_MS));
+        textProperty().addListener((_, _, newValue) -> {
             pause.setOnFinished(event -> {
                 Set<T> currentEntries = new HashSet<>(filter.apply(newValue));
                 filteredEntries.setPredicate(entry -> currentEntries.contains(entry.getValue()));

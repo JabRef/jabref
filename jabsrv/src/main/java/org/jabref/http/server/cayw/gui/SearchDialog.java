@@ -1,8 +1,8 @@
 package org.jabref.http.server.cayw.gui;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,6 +13,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -22,9 +23,19 @@ import javafx.stage.StageStyle;
 
 import org.jabref.logic.l10n.Localization;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SearchDialog<T> {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(SearchDialog.class);
+
+    private static final double DIALOG_WIDTH_RATIO = 0.5;
+    private static final double DIALOG_HEIGHT_RATIO = 0.4;
+    private static final int PREF_HEIGHT = 150;
+
     private final ObservableList<CAYWEntry<T>> selectedItems = FXCollections.observableArrayList();
+
     private Stage dialogStage;
 
     public List<T> show(Function<String, List<T>> searchFunction, List<CAYWEntry<T>> entries) {
@@ -34,12 +45,12 @@ public class SearchDialog<T> {
         dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.initStyle(StageStyle.DECORATED);
-        dialogStage.setTitle(Localization.lang("Search..."));
-        dialogStage.setResizable(false);
+        dialogStage.setTitle(Localization.lang("%0 | Cite As You Write", "JabRef"));
+        dialogStage.setResizable(true);
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        double dialogWidth = screenBounds.getWidth() * 0.5;
-        double dialogHeight = screenBounds.getHeight() * 0.4;
+        double dialogWidth = screenBounds.getWidth() * DIALOG_WIDTH_RATIO;
+        double dialogHeight = screenBounds.getHeight() * DIALOG_HEIGHT_RATIO;
 
         VBox mainLayout = new VBox(10);
         mainLayout.setPadding(new Insets(15));
@@ -49,7 +60,7 @@ public class SearchDialog<T> {
         searchField.setMaxWidth(Double.MAX_VALUE);
 
         SearchResultContainer<T> resultContainer = new SearchResultContainer<>(searchResults, selectedItems);
-        resultContainer.setPrefHeight(150);
+        resultContainer.setPrefHeight(PREF_HEIGHT);
 
         ScrollPane scrollPane = new ScrollPane(resultContainer);
         scrollPane.setFitToWidth(true);
@@ -58,7 +69,7 @@ public class SearchDialog<T> {
 
         SelectedItemsContainer<T> selectedContainer = new SelectedItemsContainer<>(selectedItems);
 
-        Button finishButton = new Button(Localization.lang("Finish Search"));
+        Button finishButton = new Button(Localization.lang("Cite"));
         finishButton.setOnAction(event -> {
             dialogStage.close();
         });
@@ -78,12 +89,23 @@ public class SearchDialog<T> {
 
         dialogStage.setScene(scene);
 
+        try (InputStream inputStream = getClass().getResourceAsStream("/JabRef-icon-64.png")) {
+            if (inputStream == null) {
+                LOGGER.warn("Error loading icon for SearchDialog");
+            } else {
+                Image icon = new Image(inputStream);
+                dialogStage.getIcons().add(icon);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error loading icon for SearchDialog", e);
+        }
+
         dialogStage.setX((screenBounds.getWidth() - dialogWidth) / 2);
         dialogStage.setY((screenBounds.getHeight() - dialogHeight) / 2);
 
         dialogStage.showAndWait();
 
-        return selectedItems.stream().map(CAYWEntry::getValue).collect(Collectors.toList());
+        return selectedItems.stream().map(CAYWEntry::getValue).toList();
     }
 
     public void close() {

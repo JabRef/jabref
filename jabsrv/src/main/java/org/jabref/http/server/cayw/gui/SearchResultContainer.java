@@ -11,14 +11,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.logic.os.OS;
+import org.jabref.model.strings.StringUtil;
 
 public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
-
-    private ObservableList<CAYWEntry<T>> selectedEntries = javafx.collections.FXCollections.observableArrayList();
 
     private final static int MAX_LINES = 3;
     private final static int ESTIMATED_CHARS_PER_LINE = 80;
     private final static int TOOLTIP_WIDTH = 400;
+    private final static double PREF_WIDTH = 300;
+
+    private ObservableList<CAYWEntry<T>> selectedEntries = javafx.collections.FXCollections.observableArrayList();
 
     public SearchResultContainer(ObservableList<CAYWEntry<T>> entries, ObservableList<CAYWEntry<T>> selectedEntries) {
         super(entries);
@@ -30,7 +32,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
         this.setCellFactory(listView -> {
             SearchResultCell<T> searchResultCell = new SearchResultCell<T>();
             searchResultCell.setOnMouseClicked(event -> {
-                if (selectedEntries.contains(searchResultCell.getItem())) {
+                if (searchResultCell.getItem() == null || selectedEntries.contains(searchResultCell.getItem())) {
                     return;
                 }
                 selectedEntries.add(searchResultCell.getItem());
@@ -44,7 +46,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
             if (getParent() != null) {
                 return getParent().getLayoutBounds().getWidth();
             }
-            return 300.0;
+            return PREF_WIDTH;
         }, parentProperty()));
     }
 
@@ -104,33 +106,13 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
                 return "";
             }
 
-            String[] lines = text.split("\n", MAX_LINES + 1);
+            String[] lines = text.split(OS.NEWLINE, MAX_LINES + 1);
 
             if (lines.length <= MAX_LINES) {
-                return estimateAndTruncate(text);
+                return StringUtil.limitStringLength(text, ESTIMATED_CHARS_PER_LINE * MAX_LINES);
             } else {
                 return String.join(OS.NEWLINE, Arrays.copyOf(lines, MAX_LINES)) + "...";
             }
-        }
-
-        private String estimateAndTruncate(String text) {
-            int maxChars = ESTIMATED_CHARS_PER_LINE * MAX_LINES;
-
-            if (text.length() <= maxChars) {
-                return text;
-            }
-
-            int cutoff = Math.min(text.length(), maxChars);
-
-            while (cutoff > 0 && !Character.isWhitespace(text.charAt(cutoff))) {
-                cutoff--;
-            }
-
-            if (cutoff == 0) {
-                cutoff = maxChars;
-            }
-
-            return text.substring(0, cutoff).trim() + "...";
         }
     }
 }

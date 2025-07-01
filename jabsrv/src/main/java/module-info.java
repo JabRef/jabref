@@ -27,26 +27,23 @@ module org.jabref.jabsrv {
     provides com.airhacks.afterburner.views.ResourceLocator
             with org.jabref.http.JabRefResourceLocator;
 
-    // needs to be loaded here as it's otherwise not found at runtime; XJC related maybe
-    // requires org.glassfish.jaxb.runtime;
-
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;
     requires org.glassfish.grizzly.http.server;
     requires jakarta.validation;
     requires jakarta.ws.rs;
 
-    requires jersey.common;
+    requires org.glassfish.jersey.common;
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
     requires com.sun.jna.platform;
 
-    requires jbibtex;
-    requires citeproc.java;
+    requires org.jbibtex;
+    requires de.undercouch.citeproc.java;
 
     requires transitive org.jspecify;
     requires java.logging;
-    requires jersey.container.grizzly2.http;
-    requires jersey.server;
+    requires org.glassfish.jersey.grizzly2.http;
+    requires org.glassfish.jersey.server;
 }
