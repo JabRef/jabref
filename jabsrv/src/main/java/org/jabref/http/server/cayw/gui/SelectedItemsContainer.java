@@ -24,48 +24,48 @@ public class SelectedItemsContainer<T> extends FlowPane {
         this.setVgap(8);
         this.setPadding(new Insets(10));
 
-        items.forEach(this::addPill);
+        items.forEach(this::addChip);
 
         items.addListener((ListChangeListener<CAYWEntry<T>>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(this::addPill);
+                    change.getAddedSubList().forEach(this::addChip);
                 }
                 if (change.wasRemoved()) {
-                    change.getRemoved().forEach(this::removePill);
+                    change.getRemoved().forEach(this::removeChip);
                 }
             }
         });
     }
 
-    private void addPill(CAYWEntry<T> entry) {
-        Pill<T> pill = new Pill<>(entry, items);
-        getChildren().add(pill);
+    private void addChip(CAYWEntry<T> entry) {
+        Chip<T> chip = new Chip<>(entry, items);
+        getChildren().add(chip);
     }
 
-    private void removePill(CAYWEntry<T> entry) {
+    private void removeChip(CAYWEntry<T> entry) {
         getChildren().removeIf(node -> {
-            if (node instanceof Pill<?> pill) {
-                return pill.getEntry().equals(entry);
+            if (node instanceof SelectedItemsContainer.Chip<?> chip) {
+                return chip.getEntry().equals(entry);
             }
             return false;
         });
     }
 
-    private static class Pill<T> extends HBox {
+    private static class Chip<T> extends HBox {
         private final CAYWEntry<T> entry;
 
-        public Pill(CAYWEntry<T> entry, ObservableList<CAYWEntry<T>> parentList) {
+        public Chip(CAYWEntry<T> entry, ObservableList<CAYWEntry<T>> parentList) {
             this.entry = entry;
 
             this.setAlignment(Pos.CENTER_LEFT);
             this.setSpacing(5);
             this.setPadding(new Insets(5, 10, 5, 10));
 
-            this.getStyleClass().add("pill-style");
+            this.getStyleClass().add("chip-style");
 
             Button removeButton = new Button("×");
-            removeButton.getStyleClass().add("pill-remove-button");
+            removeButton.getStyleClass().add("chip-remove-button");
 
             removeButton.setOnAction(e -> {
                 e.consume();

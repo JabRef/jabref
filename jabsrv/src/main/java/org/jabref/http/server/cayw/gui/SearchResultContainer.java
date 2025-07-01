@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.logic.os.OS;
+import org.jabref.model.strings.StringUtil;
 
 public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
 
@@ -108,30 +109,10 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
             String[] lines = text.split(OS.NEWLINE, MAX_LINES + 1);
 
             if (lines.length <= MAX_LINES) {
-                return estimateAndTruncate(text);
+                return StringUtil.limitStringLength(text, ESTIMATED_CHARS_PER_LINE * MAX_LINES);
             } else {
                 return String.join(OS.NEWLINE, Arrays.copyOf(lines, MAX_LINES)) + "...";
             }
-        }
-
-        private String estimateAndTruncate(String text) {
-            int maxChars = ESTIMATED_CHARS_PER_LINE * MAX_LINES;
-
-            if (text.length() <= maxChars) {
-                return text;
-            }
-
-            int cutoff = Math.min(text.length(), maxChars);
-
-            while (cutoff > 0 && !Character.isWhitespace(text.charAt(cutoff))) {
-                cutoff--;
-            }
-
-            if (cutoff == 0) {
-                cutoff = maxChars;
-            }
-
-            return text.substring(0, cutoff).trim() + "...";
         }
     }
 }

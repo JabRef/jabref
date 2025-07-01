@@ -7,7 +7,7 @@ public class CAYWEntry<T> {
 
     private final T value;
 
-    // Used on the buttons ("pills")
+    // Used on the buttons ("chips")
     private final String shortLabel;
 
     // Used in the list
