@@ -41,6 +41,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private Tooltip libSpecificFileDirSwitchTooltip;
     @FXML private Tooltip userSpecificFileDirSwitchTooltip;
     @FXML private Tooltip laTexSpecificFileDirSwitchTooltip;
+    @FXML private Tooltip userSpecificFileDirectoryTooltip;
+    @FXML private Tooltip laTexFileDirectoryTooltip;
 
     private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
@@ -107,6 +109,18 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
+
+        String userHost = preferences.getUsername() + "@" + preferences.getHostname();
+        userSpecificFileDirectoryTooltip.setText(userHost);
+        laTexFileDirectoryTooltip.textProperty().bind(
+                viewModel.laTexFileDirectoryProperty().map(path -> {
+                    if (path.isEmpty()) {
+                        return Localization.lang("Directory for LaTeX files: (not set)");
+                    } else {
+                        return Localization.lang("Directory for LaTeX files: %0", path);
+                    }
+                })
+                );
 
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);

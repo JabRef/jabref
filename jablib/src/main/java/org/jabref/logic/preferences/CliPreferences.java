@@ -28,12 +28,14 @@ import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
+import org.jabref.logic.util.UserAndHost;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 public interface CliPreferences {
+
     void clear() throws BackingStoreException;
 
     void deleteKey(String key) throws IllegalArgumentException;
@@ -43,6 +45,18 @@ public interface CliPreferences {
     void exportPreferences(Path file) throws JabRefException;
 
     void importPreferences(Path file) throws JabRefException;
+
+    UserAndHost getUserAndHost();
+
+    /** Shortcut for getUserAndHost().getUser() */
+    default String getUsername() {
+        return getUserAndHost().user();
+    }
+
+    /** Shortcut for getUserAndHost().getHost() */
+    default String getHostname() {
+        return getUserAndHost().host();
+    }
 
     InternalPreferences getInternalPreferences();
 
