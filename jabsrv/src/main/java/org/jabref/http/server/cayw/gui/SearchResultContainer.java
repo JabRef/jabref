@@ -14,11 +14,12 @@ import org.jabref.logic.os.OS;
 
 public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
 
-    private ObservableList<CAYWEntry<T>> selectedEntries = javafx.collections.FXCollections.observableArrayList();
-
     private final static int MAX_LINES = 3;
     private final static int ESTIMATED_CHARS_PER_LINE = 80;
     private final static int TOOLTIP_WIDTH = 400;
+    private final static double PREF_WIDTH = 300;
+
+    private ObservableList<CAYWEntry<T>> selectedEntries = javafx.collections.FXCollections.observableArrayList();
 
     public SearchResultContainer(ObservableList<CAYWEntry<T>> entries, ObservableList<CAYWEntry<T>> selectedEntries) {
         super(entries);
@@ -30,7 +31,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
         this.setCellFactory(listView -> {
             SearchResultCell<T> searchResultCell = new SearchResultCell<T>();
             searchResultCell.setOnMouseClicked(event -> {
-                if (selectedEntries.contains(searchResultCell.getItem())) {
+                if (searchResultCell.getItem() == null || selectedEntries.contains(searchResultCell.getItem())) {
                     return;
                 }
                 selectedEntries.add(searchResultCell.getItem());
@@ -44,7 +45,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
             if (getParent() != null) {
                 return getParent().getLayoutBounds().getWidth();
             }
-            return 300.0;
+            return PREF_WIDTH;
         }, parentProperty()));
     }
 
@@ -104,7 +105,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
                 return "";
             }
 
-            String[] lines = text.split("\n", MAX_LINES + 1);
+            String[] lines = text.split(OS.NEWLINE, MAX_LINES + 1);
 
             if (lines.length <= MAX_LINES) {
                 return estimateAndTruncate(text);

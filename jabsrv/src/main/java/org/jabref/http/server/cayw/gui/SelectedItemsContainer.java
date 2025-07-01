@@ -45,7 +45,7 @@ public class SelectedItemsContainer<T> extends FlowPane {
 
     private void removePill(CAYWEntry<T> entry) {
         getChildren().removeIf(node -> {
-            if (node instanceof Pill pill) {
+            if (node instanceof Pill<?> pill) {
                 return pill.getEntry().equals(entry);
             }
             return false;

@@ -2,7 +2,6 @@ package org.jabref.http.server.cayw.gui;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,7 +23,12 @@ import org.jabref.logic.l10n.Localization;
 
 public class SearchDialog<T> {
 
+    private static final double DIALOG_WIDTH_RATIO = 0.5;
+    private static final double DIALOG_HEIGHT_RATIO = 0.4;
+    private static final int PREF_HEIGHT = 150;
+
     private final ObservableList<CAYWEntry<T>> selectedItems = FXCollections.observableArrayList();
+
     private Stage dialogStage;
 
     public List<T> show(Function<String, List<T>> searchFunction, List<CAYWEntry<T>> entries) {
@@ -38,8 +42,8 @@ public class SearchDialog<T> {
         dialogStage.setResizable(false);
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-        double dialogWidth = screenBounds.getWidth() * 0.5;
-        double dialogHeight = screenBounds.getHeight() * 0.4;
+        double dialogWidth = screenBounds.getWidth() * DIALOG_WIDTH_RATIO;
+        double dialogHeight = screenBounds.getHeight() * DIALOG_HEIGHT_RATIO;
 
         VBox mainLayout = new VBox(10);
         mainLayout.setPadding(new Insets(15));
@@ -49,7 +53,7 @@ public class SearchDialog<T> {
         searchField.setMaxWidth(Double.MAX_VALUE);
 
         SearchResultContainer<T> resultContainer = new SearchResultContainer<>(searchResults, selectedItems);
-        resultContainer.setPrefHeight(150);
+        resultContainer.setPrefHeight(PREF_HEIGHT);
 
         ScrollPane scrollPane = new ScrollPane(resultContainer);
         scrollPane.setFitToWidth(true);
@@ -83,7 +87,7 @@ public class SearchDialog<T> {
 
         dialogStage.showAndWait();
 
-        return selectedItems.stream().map(CAYWEntry::getValue).collect(Collectors.toList());
+        return selectedItems.stream().map(CAYWEntry::getValue).toList();
     }
 
     public void close() {

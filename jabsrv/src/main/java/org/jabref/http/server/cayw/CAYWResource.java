@@ -1,6 +1,7 @@
 package org.jabref.http.server.cayw;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 @Path("better-bibtex/cayw")
 public class CAYWResource {
     public static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
+    private static final String CHOCOLATEBIB_PATH = "/Chocolate.bib";
     private static boolean initialized = false;
 
     @Inject
@@ -49,23 +51,23 @@ public class CAYWResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getCitation(
+            @QueryParam("probe") String probe,
             @QueryParam("format") @DefaultValue("latex") String format,
-            @QueryParam("command") String command,
-            @QueryParam("brackets") @DefaultValue("1") int brackets,
             @QueryParam("clipboard") String clipboard,
             @QueryParam("minimize") String minimize,
-            @QueryParam("probe") String probe
+            @QueryParam("texstudio") String texstudio,
+            @QueryParam("selected") String selected,
+            @QueryParam("select") String select,
+            @QueryParam("librarypath") String libraryPath
     ) throws IOException, ExecutionException, InterruptedException {
         if (probe != null && !probe.isEmpty()) {
             return Response.ok("ready").build();
         }
 
-        BibtexImporter bibtexImporter = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
-        BibDatabaseContext databaseContext;
-        try (InputStream chocolateBibInputStream = getChocolateBibAsStream()) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(chocolateBibInputStream, StandardCharsets.UTF_8));
-            databaseContext = bibtexImporter.importDatabase(reader).getDatabaseContext();
-        }
+        BibDatabaseContext databaseContext = getBibDatabaseContext(libraryPath);
+
+
+
 /* unused until DatabaseSearcher is fixed
         PostgreServer postgreServer = new PostgreServer();
 
@@ -82,21 +84,7 @@ public class CAYWResource {
                                  .map(this::createCAYWEntry)
                                  .toList();
 
-        // TODO: Implement a better way to handle the window popup since this is a bit hacky.
-        if (!initialized) {
-            CountDownLatch latch = new CountDownLatch(1);
-            Platform.startup(() -> {
-                Platform.setImplicitExit(false);
-                initialized = true;
-                latch.countDown();
-            });
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("JavaFX initialization interrupted", e);
-            }
-        }
+        initializeGUI();
 
         CompletableFuture<List<BibEntry>> future = new CompletableFuture<>();
         Platform.runLater(() -> {
@@ -119,12 +107,51 @@ public class CAYWResource {
                 .map(java.util.Optional::get)
                 .toList();
 
+        if (citationKeys.isEmpty()) {
+            return Response.ok().build();
+        }
+
         return Response.ok(gson.toJson(citationKeys)).build();
+    }
+
+    private BibDatabaseContext getBibDatabaseContext(String libraryPath) throws IOException {
+        InputStream libraryStream;
+        if (libraryPath != null && !libraryPath.isEmpty()) {
+            libraryStream = new FileInputStream(libraryPath);
+        } else {
+            // TODO: Add a way to use latest opened library as the default library
+            libraryStream = getChocolateBibAsStream();
+        }
+
+        BibtexImporter bibtexImporter = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
+        BibDatabaseContext databaseContext;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(libraryStream, StandardCharsets.UTF_8))) {
+            databaseContext = bibtexImporter.importDatabase(reader).getDatabaseContext();
+        }
+        return databaseContext;
+    }
+
+    private synchronized void initializeGUI() {
+        // TODO: Implement a better way to handle the window popup since this is a bit hacky.
+        if (!initialized) {
+            CountDownLatch latch = new CountDownLatch(1);
+            Platform.startup(() -> {
+                Platform.setImplicitExit(false);
+                initialized = true;
+                latch.countDown();
+            });
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("JavaFX initialization interrupted", e);
+            }
+        }
     }
 
     /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
     private @Nullable InputStream getChocolateBibAsStream() {
-        return BibDatabase.class.getResourceAsStream("/Chocolate.bib");
+        return BibDatabase.class.getResourceAsStream(CHOCOLATEBIB_PATH);
     }
 
     private CAYWEntry<BibEntry> createCAYWEntry(BibEntry entry) {
