@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.repository_owner == 'JabRef' }}
+    if: github.repository == 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
