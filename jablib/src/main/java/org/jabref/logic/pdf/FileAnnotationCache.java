@@ -19,7 +19,7 @@ public class FileAnnotationCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileAnnotationCache.class);
 
-    private final static int CACHE_SIZE = 1024;
+    private static final int CACHE_SIZE = 1024;
 
     // the inner list holds the annotations per file, the outer collection maps this to a BibEntry.
     private LoadingCache<BibEntry, Map<Path, List<FileAnnotation>>> annotationCache;
