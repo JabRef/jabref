@@ -1,3 +1,7 @@
-####
+#### Serve chocolate.bib
 
 GET  http://localhost:23119/better-bibtex/cayw
+
+#### Serve a library specified using the URL param
+
+GET http://localhost:6050/better-bibtex/cayw?librarypath=C%3A%5CUsers%5CDEMO%5CDownloads%5CChocolate.bib

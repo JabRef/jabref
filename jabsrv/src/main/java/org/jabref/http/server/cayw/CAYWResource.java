@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -18,6 +19,7 @@ import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -115,10 +117,28 @@ public class CAYWResource {
     private BibDatabaseContext getBibDatabaseContext(String libraryPath) throws IOException {
         InputStream libraryStream;
         if (libraryPath != null && !libraryPath.isEmpty()) {
-            libraryStream = Files.newInputStream(java.nio.file.Path.of(libraryPath));
+            java.nio.file.Path path = java.nio.file.Path.of(libraryPath);
+            if (!Files.exists(path)) {
+                LOGGER.error("Library path does not exist, using the default chocolate.bib: {}", libraryPath);
+                libraryStream = getChocolateBibAsStream();
+            } else {
+                libraryStream = Files.newInputStream(path);
+            }
         } else {
-            // TODO: Add a way to use latest opened library as the default library
-            libraryStream = getChocolateBibAsStream();
+            // Use the latest opened library as the default library
+            final List<java.nio.file.Path> lastOpenedLibraries = new ArrayList<>(JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened());
+            if (lastOpenedLibraries.isEmpty()) {
+                LOGGER.warn("No library path provided and no last opened libraries found, using the default chocolate.bib.");
+                libraryStream = getChocolateBibAsStream();
+            } else {
+                java.nio.file.Path lastOpenedLibrary = lastOpenedLibraries.getFirst();
+                if (!Files.exists(lastOpenedLibrary)) {
+                    LOGGER.error("Last opened library does not exist, using the default chocolate.bib: {}", lastOpenedLibrary);
+                    libraryStream = getChocolateBibAsStream();
+                } else {
+                    libraryStream = Files.newInputStream(lastOpenedLibrary);
+                }
+            }
         }
 
         BibtexImporter bibtexImporter = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
