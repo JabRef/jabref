@@ -39,6 +39,12 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+      - name: Checkout java-module-packaging
+        uses: actions/checkout@v4
+        with:
+          repository: koppor/java-module-packaging
+          path: build-logic/java-module-packaging
+          ref: fix-params
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:
