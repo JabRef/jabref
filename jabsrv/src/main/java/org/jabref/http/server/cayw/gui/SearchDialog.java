@@ -45,7 +45,7 @@ public class SearchDialog<T> {
         dialogStage = new Stage();
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.initStyle(StageStyle.DECORATED);
-        dialogStage.setTitle(Localization.lang("Search..."));
+        dialogStage.setTitle(Localization.lang("%0 | Cite As You Write", "JabRef"));
         dialogStage.setResizable(true);
 
         Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
@@ -69,7 +69,7 @@ public class SearchDialog<T> {
 
         SelectedItemsContainer<T> selectedContainer = new SelectedItemsContainer<>(selectedItems);
 
-        Button finishButton = new Button(Localization.lang("Finish Search"));
+        Button finishButton = new Button(Localization.lang("Cite"));
         finishButton.setOnAction(event -> {
             dialogStage.close();
         });
