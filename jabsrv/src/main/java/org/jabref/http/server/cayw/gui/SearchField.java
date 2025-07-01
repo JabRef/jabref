@@ -12,7 +12,7 @@ import javafx.util.Duration;
 
 public class SearchField<T> extends TextField {
 
-    private final static int DELAY_IN_MS = 100;
+    private static final int DELAY_IN_MS = 100;
 
     public SearchField(FilteredList<CAYWEntry<T>> filteredEntries, Function<String, List<T>> filter) {
         PauseTransition pause = new PauseTransition(Duration.millis(DELAY_IN_MS));
