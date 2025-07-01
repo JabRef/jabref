@@ -4,9 +4,9 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
 public class LinkedPdfFileDTO {
-    private String fileName;
-    private String parentCitationKey;
-    private String path;
+    private final String fileName;
+    private final String parentCitationKey;
+    private final String path;
 
     public LinkedPdfFileDTO(BibEntry parentEntry, LinkedFile file) {
         this.parentCitationKey = parentEntry.getCitationKey().orElse(null);

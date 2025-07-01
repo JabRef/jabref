@@ -360,7 +360,7 @@ public class LibraryResource {
             if (!pathsToFiles.isEmpty()) {
                 for (LinkedFile file : pathsToFiles) {
                     // ignore all non pdf files and online references
-                    if (!file.getFileType().equals("PDF") || file.isOnlineLink(file.getSourceUrl())) {
+                    if (!file.getFileType().equals("PDF") || LinkedFile.isOnlineLink(file.getSourceUrl())) {
                         continue;
                     }
                     // add file to response body
