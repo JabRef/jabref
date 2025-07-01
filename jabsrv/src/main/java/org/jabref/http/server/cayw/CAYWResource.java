@@ -1,11 +1,12 @@
 package org.jabref.http.server.cayw;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -114,7 +115,7 @@ public class CAYWResource {
     private BibDatabaseContext getBibDatabaseContext(String libraryPath) throws IOException {
         InputStream libraryStream;
         if (libraryPath != null && !libraryPath.isEmpty()) {
-            libraryStream = new FileInputStream(libraryPath);
+            libraryStream = Files.newInputStream(Paths.get(libraryPath));
         } else {
             // TODO: Add a way to use latest opened library as the default library
             libraryStream = getChocolateBibAsStream();
