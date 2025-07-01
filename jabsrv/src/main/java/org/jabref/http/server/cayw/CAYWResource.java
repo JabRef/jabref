@@ -66,19 +66,16 @@ public class CAYWResource {
 
         BibDatabaseContext databaseContext = getBibDatabaseContext(libraryPath);
 
-
-
-/* unused until DatabaseSearcher is fixed
+        /* unused until DatabaseSearcher is fixed
         PostgreServer postgreServer = new PostgreServer();
-
         IndexManager.clearOldSearchIndices();
-
         searcher = new DatabaseSearcher(
                 databaseContext,
                 new CurrentThreadTaskExecutor(),
                 preferences,
                 postgreServer);
-*/
+          */
+
         List<CAYWEntry<BibEntry>> entries = databaseContext.getEntries()
                                  .stream()
                                  .map(this::createCAYWEntry)
@@ -90,7 +87,7 @@ public class CAYWResource {
         Platform.runLater(() -> {
                 SearchDialog<BibEntry> dialog = new SearchDialog<>();
                 // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
-                //  searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
+                //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
             List<BibEntry> results = dialog.show(searchQuery ->
                     entries.stream()
                            .filter(bibEntryCAYWEntry -> matches(bibEntryCAYWEntry, searchQuery))
@@ -149,15 +146,15 @@ public class CAYWResource {
         }
     }
 
-    /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
+    /// @return a stream to the `Chocolate.bib` file in the classpath (is null only if the file was moved or there are issues with the classpath)
     private @Nullable InputStream getChocolateBibAsStream() {
         return BibDatabase.class.getResourceAsStream(CHOCOLATEBIB_PATH);
     }
 
     private CAYWEntry<BibEntry> createCAYWEntry(BibEntry entry) {
         String label = entry.getCitationKey().orElse("");
-        String shortLabel = entry.getCitationKey().orElse("");
-        String description = entry.getField(StandardField.TITLE).orElse("");
+        String shortLabel = label;
+        String description = entry.getField(StandardField.TITLE).orElse(entry.getAuthorTitleYear());
         return new CAYWEntry<>(entry, label, shortLabel, description);
     }
 
