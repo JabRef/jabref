@@ -101,8 +101,8 @@ public class CAYWResource {
 
         List<String> citationKeys = future.get().stream()
                 .map(BibEntry::getCitationKey)
-                .filter(java.util.Optional::isPresent)
-                .map(java.util.Optional::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
 
         if (citationKeys.isEmpty()) {
