@@ -444,16 +444,7 @@ public class WelcomeTab extends Tab {
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            optimizeForLargeLibraries(
-                    disableFulltextIndexing.isSelected(),
-                    disableCreationDate.isSelected(),
-                    disableModificationDate.isSelected(),
-                    disableAutosave.isSelected(),
-                    disableGroupCount.isSelected()
-            );
-            dialogService.showInformationDialogAndWait(
-                    Localization.lang("Performance Settings"),
-                    Localization.lang("Performance settings optimized for large libraries"));
+            optimizeForLargeLibraries(disableFulltextIndexing.isSelected(), disableCreationDate.isSelected(), disableModificationDate.isSelected(), disableAutosave.isSelected(), disableGroupCount.isSelected());
         }
     }
 
@@ -507,8 +498,8 @@ public class WelcomeTab extends Tab {
         applicationsList.getItems().addAll(sortedApplications);
         applicationsList.setCellFactory(_ -> new PushApplicationListCell(detectedApplications));
 
-        PushToApplicationPreferences pushPrefs = preferences.getPushToApplicationPreferences();
-        String currentAppName = pushPrefs.getActiveApplicationName();
+        PushToApplicationPreferences pushToApplicationPreferences = preferences.getPushToApplicationPreferences();
+        String currentAppName = pushToApplicationPreferences.getActiveApplicationName();
         if (!currentAppName.isEmpty()) {
             sortedApplications.stream()
                               .filter(app -> app.getDisplayName().equals(currentAppName))
@@ -525,10 +516,7 @@ public class WelcomeTab extends Tab {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             PushToApplication selectedApp = applicationsList.getSelectionModel().getSelectedItem();
             if (selectedApp != null) {
-                pushPrefs.setActiveApplicationName(selectedApp.getDisplayName());
-                dialogService.showInformationDialogAndWait(
-                        Localization.lang("Push Application"),
-                        Localization.lang("Push application set to") + ": " + selectedApp.getDisplayName());
+                pushToApplicationPreferences.setActiveApplicationName(selectedApp.getDisplayName());
             }
         }
     }
