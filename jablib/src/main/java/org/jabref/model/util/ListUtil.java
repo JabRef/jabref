@@ -48,4 +48,11 @@ public class ListUtil {
                 .flatMap(List::stream)
                 .distinct();
     }
+
+    /**
+     * Concatenate two {@link List}s. Does not modify the original lists.
+     */
+    public static <T> List<T> concat(List<T> first, List<T> second) {
+        return Stream.concat(first.stream(), second.stream()).toList();
+    }
 }
