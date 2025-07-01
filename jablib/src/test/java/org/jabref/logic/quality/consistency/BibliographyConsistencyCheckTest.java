@@ -117,7 +117,7 @@ class BibliographyConsistencyCheckTest {
                 .withField(StandardField.PDF, "other.pdf");
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(List.of(a, b), (ignored1, ignored2) -> { });
+                .check(List.of(a, b), (_, _) -> { });
 
         assertEquals(Map.of(), result.entryTypeToResultMap(),
                 "Differences only in filtered fields must be ignored");
@@ -130,11 +130,30 @@ class BibliographyConsistencyCheckTest {
         BibEntry withoutAuthor = new BibEntry(StandardEntryType.Misc, "2");
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(List.of(withAuthor, withoutAuthor), (ignored1, ignored2) -> { });
+                .check(List.of(withAuthor, withoutAuthor), (_, _) -> { });
 
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Misc);
 
         assertEquals(Set.of(StandardField.AUTHOR), typeResult.fields());
+    }
+
+    @Test
+    void unsetFieldsReported() {
+        BibEntry withDate = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("withDate")
+                .withField(StandardField.DATE, "date")
+                .withField(StandardField.URLDATE, "urldate");
+        BibEntry withoutDate = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("withoutDate")
+                .withField(StandardField.URLDATE, "urldate");
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
+                .check(List.of(withDate, withoutDate), (_, _) -> { });
+
+        BibliographyConsistencyCheck.EntryTypeResult typeResult =
+                result.entryTypeToResultMap().get(StandardEntryType.Online);
+
+        assertEquals(List.of(withDate, withoutDate), typeResult.sortedEntries().stream().toList());
     }
 }
