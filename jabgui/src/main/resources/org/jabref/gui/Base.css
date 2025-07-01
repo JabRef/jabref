@@ -1882,10 +1882,11 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-font-size: 1.1em;
 }
 
-.quick-settings-dialog-grid {
-    -fx-hgap: 10px;
-    -fx-vgap: 10px;
-    -fx-padding: 20px;
+.quick-settings-dialog-container {
+    -fx-hgap: 8px;
+    -fx-vgap: 8px;
+    -fx-padding: 16px;
+    -fx-spacing: 16px;
 }
 
 /* Community Section */
@@ -2867,4 +2868,25 @@ journalInfo .grid-cell-b {
 
 .wireframe-custom .wireframe-welcome-tab-item {
     -fx-background-color: #2E838C;
+}
+
+/* Push Application Configuration */
+.detected-application {
+    -fx-background-color: derive(-jr-accent, 80%);
+    -fx-border-color: -jr-accent;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-font-weight: bold;
+}
+
+.detected-application:selected {
+    -fx-background-color: -jr-accent;
+    -fx-text-fill: white;
+}
+
+.detected-application .glyph-icon,
+.detected-application .ikonli-font-icon {
+    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
 }

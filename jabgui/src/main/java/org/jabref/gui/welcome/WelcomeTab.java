@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.collections.ListChangeListener;
@@ -11,9 +13,12 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
@@ -40,6 +45,9 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.PushToApplicationPreferences;
+import org.jabref.gui.push.PushToApplications;
 import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -198,7 +206,19 @@ public class WelcomeTab extends Tab {
                 this::showThemeDialog
         );
 
-        actions.getChildren().addAll(mainFileDirButton, themeButton);
+        QuickSettingsButton largeLibraryButton = new QuickSettingsButton(
+                Localization.lang("Optimize performance for large libraries"),
+                IconTheme.JabRefIcons.SELECTORS,
+                this::showLargeLibraryOptimizationDialog
+        );
+
+        QuickSettingsButton pushApplicationButton = new QuickSettingsButton(
+                Localization.lang("Configure Push to Application"),
+                IconTheme.JabRefIcons.APPLICATION_GENERIC,
+                this::showPushApplicationConfigurationDialog
+        );
+
+        actions.getChildren().addAll(mainFileDirButton, themeButton, largeLibraryButton, pushApplicationButton);
 
         return createVBoxContainer(header, actions);
     }
@@ -224,7 +244,7 @@ public class WelcomeTab extends Tab {
         dialog.setHeaderText(Localization.lang("Configure Main File Directory"));
 
         GridPane grid = new GridPane();
-        grid.getStyleClass().add("quick-settings-dialog-grid");
+        grid.getStyleClass().add("quick-settings-dialog-container");
 
         TextField pathField = new TextField();
         pathField.setPromptText(Localization.lang("Main File Directory"));
@@ -371,6 +391,220 @@ public class WelcomeTab extends Tab {
                 };
                 if (newTheme != null) {
                     workspacePreferences.setTheme(newTheme);
+                }
+            }
+        }
+    }
+
+    private void showLargeLibraryOptimizationDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(Localization.lang("Optimize performance for large libraries"));
+        dialog.setHeaderText(Localization.lang("Configure JabRef settings to optimize performance when working with large libraries"));
+
+        VBox mainContainer = new VBox();
+        mainContainer.getStyleClass().add("quick-settings-dialog-container");
+
+        Label explanationLabel = new Label(Localization.lang("Select which performance optimizations to apply:"));
+        explanationLabel.setWrapText(true);
+        explanationLabel.setMaxWidth(400);
+
+        CheckBox disableFulltextIndexing = new CheckBox(Localization.lang("Disable fulltext indexing of linked files"));
+        disableFulltextIndexing.setSelected(true);
+
+        CheckBox disableCreationDate = new CheckBox(Localization.lang("Disable adding creation date to new entries"));
+        disableCreationDate.setSelected(true);
+
+        CheckBox disableModificationDate = new CheckBox(Localization.lang("Disable adding modification date to entries"));
+        disableModificationDate.setSelected(true);
+
+        CheckBox disableAutosave = new CheckBox(Localization.lang("Disable autosave for local libraries"));
+        disableAutosave.setSelected(true);
+
+        CheckBox disableGroupCount = new CheckBox(Localization.lang("Disable group entry count display"));
+        disableGroupCount.setSelected(true);
+
+        VBox checkboxContainer = new VBox();
+        checkboxContainer.setSpacing(8);
+        checkboxContainer.getChildren().addAll(
+                disableFulltextIndexing,
+                disableCreationDate,
+                disableModificationDate,
+                disableAutosave,
+                disableGroupCount
+        );
+
+        Hyperlink learnMoreLink = new Hyperlink(Localization.lang("Learn more about optimizing JabRef for large libraries"));
+        learnMoreLink.setOnAction(_ -> new OpenBrowserAction("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues",
+                dialogService, preferences.getExternalApplicationsPreferences()).execute());
+
+        mainContainer.getChildren().addAll(explanationLabel, checkboxContainer, learnMoreLink);
+
+        dialog.getDialogPane().setContent(mainContainer);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            optimizeForLargeLibraries(
+                    disableFulltextIndexing.isSelected(),
+                    disableCreationDate.isSelected(),
+                    disableModificationDate.isSelected(),
+                    disableAutosave.isSelected(),
+                    disableGroupCount.isSelected()
+            );
+            dialogService.showInformationDialogAndWait(
+                    Localization.lang("Performance Settings"),
+                    Localization.lang("Performance settings optimized for large libraries"));
+        }
+    }
+
+    private void optimizeForLargeLibraries(boolean disableFulltextIndexing,
+                                           boolean disableCreationDate,
+                                           boolean disableModificationDate,
+                                           boolean disableAutosave,
+                                           boolean disableGroupCount) {
+        if (disableFulltextIndexing) {
+            preferences.getFilePreferences().setFulltextIndexLinkedFiles(false);
+        }
+        if (disableCreationDate) {
+            preferences.getTimestampPreferences().setAddCreationDate(false);
+        }
+        if (disableModificationDate) {
+            preferences.getTimestampPreferences().setAddModificationDate(false);
+        }
+        if (disableAutosave) {
+            preferences.getLibraryPreferences().setAutoSave(false);
+        }
+        if (disableGroupCount) {
+            preferences.getGroupsPreferences().setDisplayGroupCount(false);
+        }
+    }
+
+    private void showPushApplicationConfigurationDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(Localization.lang("Configure Push to Application"));
+        dialog.setHeaderText(Localization.lang("Select your preferred text editor or LaTeX application"));
+
+        VBox mainContainer = new VBox();
+        mainContainer.setSpacing(16);
+        mainContainer.getStyleClass().add("quick-settings-dialog-container");
+
+        Label explanationLabel = new Label(Localization.lang("Detected applications are highlighted. Click to select and configure."));
+        explanationLabel.setWrapText(true);
+        explanationLabel.setMaxWidth(400);
+
+        ListView<PushToApplication> applicationsList = new ListView<>();
+        applicationsList.setPrefHeight(200);
+        applicationsList.setPrefWidth(400);
+
+        List<PushToApplication> allApplications = PushToApplications.getAllApplications(dialogService, preferences);
+        List<PushToApplication> detectedApplications = detectAvailableApplications(allApplications);
+
+        List<PushToApplication> sortedApplications = new ArrayList<>(detectedApplications);
+        allApplications.stream()
+                       .filter(app -> !detectedApplications.contains(app))
+                       .forEach(sortedApplications::add);
+
+        applicationsList.getItems().addAll(sortedApplications);
+        applicationsList.setCellFactory(_ -> new PushApplicationListCell(detectedApplications));
+
+        PushToApplicationPreferences pushPrefs = preferences.getPushToApplicationPreferences();
+        String currentAppName = pushPrefs.getActiveApplicationName();
+        if (!currentAppName.isEmpty()) {
+            sortedApplications.stream()
+                              .filter(app -> app.getDisplayName().equals(currentAppName))
+                              .findFirst()
+                              .ifPresent(applicationsList.getSelectionModel()::select);
+        }
+
+        mainContainer.getChildren().addAll(explanationLabel, applicationsList);
+
+        dialog.getDialogPane().setContent(mainContainer);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            PushToApplication selectedApp = applicationsList.getSelectionModel().getSelectedItem();
+            if (selectedApp != null) {
+                pushPrefs.setActiveApplicationName(selectedApp.getDisplayName());
+                dialogService.showInformationDialogAndWait(
+                        Localization.lang("Push Application"),
+                        Localization.lang("Push application set to") + ": " + selectedApp.getDisplayName());
+            }
+        }
+    }
+
+    private List<PushToApplication> detectAvailableApplications(List<PushToApplication> allApplications) {
+        return allApplications.stream().filter(this::isApplicationAvailable).toList();
+    }
+
+    private boolean isApplicationAvailable(PushToApplication application) {
+        String appName = application.getDisplayName().toLowerCase();
+
+        // TODO: How to best hardcode these names?
+        String[] possibleNames = switch (appName) {
+            case "emacs" -> new String[] {"emacs", "emacsclient"};
+            case "lyx/kile" -> new String[] {"lyx", "kile"};
+            case "texmaker" -> new String[] {"texmaker"};
+            case "texstudio" -> new String[] {"texstudio"};
+            case "texworks" -> new String[] {"texworks"};
+            case "vim" -> new String[] {"vim", "nvim", "gvim"};
+            case "winedt" -> new String[] {"winedt"};
+            case "sublime text" -> new String[] {"subl", "sublime_text"};
+            case "texshop" -> new String[] {"texshop"};
+            case "vscode" -> new String[] {"code", "code-insiders"};
+            default -> new String[] {appName.replace(" ", "").toLowerCase()};
+        };
+
+        for (String executable : possibleNames) {
+            if (isExecutableInPath(executable)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isExecutableInPath(String executable) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder("which", executable);
+            Process process = pb.start();
+            return process.waitFor() == 0;
+        } catch (IOException | InterruptedException e) {
+            try {
+                ProcessBuilder pb = new ProcessBuilder("where", executable);
+                Process process = pb.start();
+                return process.waitFor() == 0;
+            } catch (IOException | InterruptedException ex) {
+                return false;
+            }
+        }
+    }
+
+    private static class PushApplicationListCell extends ListCell<PushToApplication> {
+        private final List<PushToApplication> detectedApplications;
+
+        public PushApplicationListCell(List<PushToApplication> detectedApplications) {
+            this.detectedApplications = detectedApplications;
+        }
+
+        @Override
+        protected void updateItem(PushToApplication application, boolean empty) {
+            super.updateItem(application, empty);
+
+            if (empty || application == null) {
+                setText(null);
+                setGraphic(null);
+                getStyleClass().removeAll("detected-application");
+            } else {
+                setText(application.getDisplayName());
+                setGraphic(application.getApplicationIcon().getGraphicNode());
+
+                if (detectedApplications.contains(application)) {
+                    if (!getStyleClass().contains("detected-application")) {
+                        getStyleClass().add("detected-application");
+                    }
+                } else {
+                    getStyleClass().removeAll("detected-application");
                 }
             }
         }
