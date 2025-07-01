@@ -6,11 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
+import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
@@ -247,7 +249,7 @@ public class LibraryResource {
     }
 
     /// libraries/{id}/entries/{entryId}
-    /*@GET
+    /* @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML)
     public String getPreview(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
@@ -266,41 +268,6 @@ public class LibraryResource {
         // return layout.generatePreview(theEntry, parserResult.getDatabaseContext());
         return theEntry.getAuthorTitleYear();
     }*/
-
-    /// libraries/{id}/entries/pdffiles
-    // returns a list of all pdf files in the library
-    // TODO: change this to json output
-    // TODO: write helper function to extract annotations
-    @GET
-    @Path("entries/pdffiles")
-    @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
-    public String getPDFFilesAsList(@PathParam("id") String id) throws IOException {
-        ParserResult parserResult = getParserResult(id);
-        List<BibEntry> entries = parserResult.getDatabase().getEntries();
-        String response = "";
-        if (entries.isEmpty()) {
-            throw new NotFoundException("No entries found for library: " + id);
-        }
-
-        // loop through all entries to extract pdfs and paths
-        for (BibEntry entry : entries) {
-            List<LinkedFile> pathsToFiles = entry.getFiles();
-            if (pathsToFiles.isEmpty()) {
-                continue;
-            } else {
-                for (LinkedFile file : pathsToFiles) {
-                    // ignore all non pdf files
-                    if (!file.getFileType().equals("PDF")) {
-                        continue;
-                    }
-                    // add source to response body
-                    response += entry.getCitationKey().orElse("(N/A)");
-                    response += "; " + file.getLink() + "\n";
-                }
-            }
-        }
-        return response;
-    }
 
     @GET
     @Path("entries/{entryId}")
@@ -373,4 +340,37 @@ public class LibraryResource {
 
         return preview;
     }
+
+    /// libraries/{id}/entries/pdffiles
+    // returns a list of all pdf files in the library
+    @GET
+    @Path("entries/pdffiles")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public String getPDFFilesAsList(@PathParam("id") String id) throws IOException {
+        ParserResult parserResult = getParserResult(id);
+        List<LinkedPdfFileDTO> response = new ArrayList<LinkedPdfFileDTO>();
+        List<BibEntry> entries = parserResult.getDatabase().getEntries();
+        if (entries.isEmpty()) {
+            throw new NotFoundException("No entries found for library: " + id);
+        }
+
+        // loop through all entries to extract pdfs and paths
+        for (BibEntry entry : entries) {
+            List<LinkedFile> pathsToFiles = entry.getFiles();
+            if (!pathsToFiles.isEmpty()) {
+                for (LinkedFile file : pathsToFiles) {
+                    // ignore all non pdf files and online references
+                    if (!file.getFileType().equals("PDF") || file.isOnlineLink(file.getSourceUrl())) {
+                        continue;
+                    }
+                    // add file to response body
+                    LinkedPdfFileDTO localPdfFile = new LinkedPdfFileDTO(entry, file);
+                    response.add(localPdfFile);
+                }
+            }
+        }
+        return gson.toJson(response);
+    }
+
+    // TODO: write helper function to extract annotations
 }
