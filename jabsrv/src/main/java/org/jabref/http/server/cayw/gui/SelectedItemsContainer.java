@@ -19,7 +19,7 @@ public class SelectedItemsContainer<T> extends FlowPane {
         setup();
     }
 
-    public void setup() {
+    private void setup() {
         this.setHgap(8);
         this.setVgap(8);
         this.setPadding(new Insets(10));
