@@ -37,7 +37,7 @@ public class DublinCoreSchemaCustom extends DublinCoreSchema {
             FieldUtils.writeField(dublinCoreSchemaCustom, "attributes",
                     FieldUtils.readField(dcSchema, "attributes", true), true);
             return dublinCoreSchemaCustom;
-        } catch (Exception e) {
+        } catch (IllegalAccessException e) {
             LOGGER.error("Error making custom DC Schema. Using the default", e);
             return dcSchema;
         }

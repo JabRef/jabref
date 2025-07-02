@@ -2,16 +2,16 @@ package org.jabref.logic.exporter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.comparator.FieldComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import org.jabref.logic.layout.format.GetOpenOfficeType;
+import org.jabref.logic.layout.format.NonSpaceWhitespaceRemover;
 import org.jabref.logic.layout.format.RemoveBrackets;
-import org.jabref.logic.layout.format.RemoveWhitespace;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -34,7 +34,7 @@ class OOCalcDatabase {
 
     private final List<BibEntry> entries = new ArrayList<>();
     private final List<Field> toExportFields = Stream.concat(FieldFactory.getStandardFieldsWithCitationKey().stream(), Stream.of(REPORT_TYPE_FIELD))
-                                                     .collect(Collectors.toList());
+                                                     .toList();
 
     public OOCalcDatabase(BibDatabase bibtex, List<BibEntry> entries) {
         this.entries.addAll(entries != null ? entries : bibtex.getEntries());
@@ -68,7 +68,7 @@ class OOCalcDatabase {
             for (BibEntry entry : entries) {
                 addEntryRow(entry, table, document);
             }
-        } catch (Exception e) {
+        } catch (ParserConfigurationException e) {
             LOGGER.warn("Exception caught...", e);
         }
         return document;
@@ -80,7 +80,7 @@ class OOCalcDatabase {
         addTableCell(document, row, new GetOpenOfficeType().format(entry.getType().getName()));
         toExportFields.forEach(field -> {
             if (field.equals(StandardField.TITLE)) {
-                addTableCell(document, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(entry, StandardField.TITLE))));
+                addTableCell(document, row, new NonSpaceWhitespaceRemover().format(new RemoveBrackets().format(getField(entry, StandardField.TITLE))));
             } else {
                 addTableCell(document, row, getField(entry, field));
             }

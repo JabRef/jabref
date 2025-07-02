@@ -84,6 +84,7 @@ public class CleanupPresetPanel extends VBox {
                         cleanUpBibtex.selectedProperty().setValue(false);
                     }
                 });
+
         cleanUpTimestampToCreationDate.selectedProperty().addListener(
                 (observable, oldValue, newValue) -> {
                     if (newValue) {

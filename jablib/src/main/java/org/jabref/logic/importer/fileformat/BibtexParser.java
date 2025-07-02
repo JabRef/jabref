@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -214,7 +214,7 @@ public class BibtexParser implements Parser {
                 skipWhitespace();
                 String label = parseTextToken().trim();
 
-                if (BibtexDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
+                if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
                     skipWhitespace();
                     database.setSharedDatabaseID(parseTextToken().trim());
                 }
@@ -267,12 +267,13 @@ public class BibtexParser implements Parser {
                     importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
             if (bibDeskGroupTreeNode != null) {
                 metaData.getGroups().ifPresentOrElse(existingGroupTree -> {
-                            var existingGroups = meta.get(MetaData.GROUPSTREE);
+                            String existingGroups = meta.get(MetaData.GROUPSTREE);
                             // We only have one Group BibDeskGroup with n children
                             // instead of iterating through the whole group structure every time we just search in the metadata for the group name
-                            var groupsToAdd = bibDeskGroupTreeNode.getChildren()
-                                                                  .stream().
-                                                                  filter(Predicate.not(groupTreeNode -> existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)));
+                            List<GroupTreeNode> groupsToAdd = bibDeskGroupTreeNode.getChildren()
+                                                                                  .stream()
+                                                                                  .filter(Predicate.not(groupTreeNode -> existingGroups.contains(GROUP_TYPE_SUFFIX + groupTreeNode.getName() + GROUP_QUOTE_CHAR)))
+                                                                                  .toList();
                             groupsToAdd.forEach(existingGroupTree::moveTo);
                         },
                         // metadata does not contain any groups, so we need to create an AllEntriesGroup and add the other groups as children
@@ -435,7 +436,7 @@ public class BibtexParser implements Parser {
                 for (int j = 0; j < keyList.getLength(); j++) {
                     if (keyList.item(j).getTextContent().matches("group name")) {
                         groupName = stringList.item(j).getTextContent();
-                        var staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
+                        ExplicitGroup staticGroup = new ExplicitGroup(groupName, GroupHierarchyType.INDEPENDENT, importFormatPreferences.bibEntryPreferences().getKeywordSeparator());
                         bibDeskGroupTreeNode.addSubgroup(staticGroup);
                     } else if (keyList.item(j).getTextContent().matches("keys")) {
                         citationKeys = stringList.item(j).getTextContent(); // adds group entries
@@ -470,8 +471,8 @@ public class BibtexParser implements Parser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
-        } else if (result.contains(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
-            return purge(result, BibtexDatabaseWriter.DATABASE_ID_PREFIX);
+        } else if (result.contains(BibDatabaseWriter.DATABASE_ID_PREFIX)) {
+            return purge(result, BibDatabaseWriter.DATABASE_ID_PREFIX);
         } else if (result.contains(SaveConfiguration.ENCODING_PREFIX)) {
             return purge(result, SaveConfiguration.ENCODING_PREFIX);
         } else {
@@ -752,7 +753,7 @@ public class BibtexParser implements Parser {
                             entry.addFile(file);
                         } else if (plist.containsKey("$objects") && plist.objectForKey("$objects") instanceof NSArray nsArray) {
                             if (nsArray.getArray().length > INDEX_RELATIVE_PATH_IN_PLIST) {
-                                var relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
+                                NSString relativePath = (NSString) nsArray.objectAtIndex(INDEX_RELATIVE_PATH_IN_PLIST);
                                 Path path = Path.of(relativePath.getContent());
 
                                 LinkedFile file = new LinkedFile("", path, "");

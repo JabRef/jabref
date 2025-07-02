@@ -88,7 +88,7 @@ public class BibEntryTableViewModel {
 
     private static Binding<List<AbstractGroup>> createMatchedGroupsBinding(BibDatabaseContext database, BibEntry entry) {
         return new UiThreadBinding<>(EasyBind.combine(entry.getFieldBinding(StandardField.GROUPS), database.getMetaData().groupsBinding(),
-                (a, b) ->
+                (_, _) ->
                         database.getMetaData().getGroups().map(groupTreeNode ->
                                         groupTreeNode.getMatchingGroups(entry).stream()
                                                      .map(GroupTreeNode::getGroup)
@@ -119,7 +119,7 @@ public class BibEntryTableViewModel {
         Optional<String> currentValue = this.entry.getField(field);
         if (value != null) {
             if (currentValue.isEmpty() && value.getValue().isEmpty()) {
-                var zeroValue = getField(field).flatMapOpt(fieldValue -> field.parseValue("CLEAR_RANK").map(SpecialFieldValueViewModel::new));
+                OptionalBinding<SpecialFieldValueViewModel> zeroValue = getField(field).flatMapOpt(_ -> field.parseValue("CLEAR_RANK").map(SpecialFieldValueViewModel::new));
                 specialFieldValues.put(field, zeroValue);
                 return zeroValue;
             } else if (value.getValue().isEmpty() || !value.getValue().get().getValue().getFieldValue().equals(currentValue)) {

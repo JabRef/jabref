@@ -44,7 +44,7 @@ class SciteTabViewModelTest {
         jsonObject.put("citingPublications", 6);
         jsonObject.put("doi", "test_doi");
 
-        var dto = SciteTallyModel.fromJSONObject(jsonObject);
+        SciteTallyModel dto = SciteTallyModel.fromJSONObject(jsonObject);
 
         assertEquals(1, dto.total());
         assertEquals(2, dto.supporting());
@@ -57,9 +57,9 @@ class SciteTabViewModelTest {
 
     @Test
     void fetchTallies() throws FetcherException {
-        var viewModel = new SciteTabViewModel(preferences, taskExecutor);
+        SciteTabViewModel viewModel = new SciteTabViewModel(preferences, taskExecutor);
         DOI doi = new DOI(SciteTabTest.SAMPLE_DOI);
-        var actual = DOI.parse(viewModel.fetchTallies(doi).doi());
+        Optional<DOI> actual = DOI.parse(viewModel.fetchTallies(doi).doi());
         assertEquals(Optional.of(doi), actual);
     }
 }

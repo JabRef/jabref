@@ -46,21 +46,21 @@ public class SciteTabTest {
 
     @Test
     void shouldShow() {
-        var tab = new SciteTab(preferences, taskExecutor, dialogService);
+        SciteTab tab = new SciteTab(preferences, taskExecutor, dialogService);
         boolean shouldShow = tab.shouldShow(null);
         assertTrue(shouldShow);
     }
 
     @Test
     void bindNullEntry() {
-        var tab = new SciteTab(preferences, taskExecutor, dialogService);
+        SciteTab tab = new SciteTab(preferences, taskExecutor, dialogService);
         tab.bindToEntry(null);
     }
 
     @Test
     void bindEntry() {
-        var tab = new SciteTab(preferences, taskExecutor, dialogService);
-        var entry = new BibEntry()
+        SciteTab tab = new SciteTab(preferences, taskExecutor, dialogService);
+        BibEntry entry = new BibEntry()
                 .withField(StandardField.DOI, SAMPLE_DOI);
 
         tab.bindToEntry(entry);

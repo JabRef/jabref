@@ -1,50 +1,38 @@
 package org.jabref.gui.documentviewer;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollBar;
-import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
-import javafx.stage.Stage;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.util.BaseDialog;
-import org.jabref.gui.util.OnlyIntegerFormatter;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.LinkedFile;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
 public class DocumentViewerView extends BaseDialog<Void> {
 
-    @FXML private ScrollBar scrollBar;
     @FXML private ComboBox<LinkedFile> fileChoice;
     @FXML private BorderPane mainPane;
     @FXML private ToggleGroup toggleGroupMode;
     @FXML private ToggleButton modeLive;
     @FXML private ToggleButton modeLock;
-    @FXML private TextField currentPage;
-    @FXML private Label maxPages;
-    @FXML private Button nextButton;
-    @FXML private Button previousButton;
 
     @Inject private StateManager stateManager;
-    @Inject private TaskExecutor taskExecutor;
     @Inject private CliPreferences preferences;
 
-    private DocumentViewerControl viewer;
+    private final PdfDocumentViewer viewer = new PdfDocumentViewer();
     private DocumentViewerViewModel viewModel;
 
     public DocumentViewerView() {
@@ -62,50 +50,32 @@ public class DocumentViewerView extends BaseDialog<Void> {
 
     @FXML
     private void initialize() {
-        viewModel = new DocumentViewerViewModel(stateManager, preferences);
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        viewModel = new DocumentViewerViewModel(stateManager, preferences, dialogService);
 
         setupViewer();
-        setupScrollbar();
         setupFileChoice();
-        setupPageControls();
         setupModeButtons();
     }
 
     private void setupModeButtons() {
         // make sure that always one toggle is selected
-        toggleGroupMode.selectedToggleProperty().addListener((observable, oldToggle, newToggle) -> {
+        toggleGroupMode.selectedToggleProperty().addListener((_, oldToggle, newToggle) -> {
             if (newToggle == null) {
                 oldToggle.setSelected(true);
             }
         });
 
-        modeLive.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        modeLive.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
                 viewModel.setLiveMode(true);
             }
         });
 
-        modeLock.selectedProperty().addListener((observable, oldValue, newValue) -> {
+        modeLock.selectedProperty().addListener((_, _, newValue) -> {
             if (newValue) {
                 viewModel.setLiveMode(false);
             }
-        });
-    }
-
-    private void setupScrollbar() {
-        scrollBar.valueProperty().bindBidirectional(viewer.scrollYProperty());
-        scrollBar.maxProperty().bind(viewer.scrollYMaxProperty());
-    }
-
-    private void setupPageControls() {
-        OnlyIntegerFormatter integerFormatter = new OnlyIntegerFormatter(1);
-        viewModel.currentPageProperty().bindBidirectional(integerFormatter.valueProperty());
-        currentPage.setTextFormatter(integerFormatter);
-        maxPages.textProperty().bind(viewModel.maxPagesProperty().asString());
-        previousButton.setDisable(true);
-        viewModel.currentPageProperty().addListener((observable, oldValue, newValue) -> {
-            nextButton.setDisable(newValue == viewModel.maxPagesProperty().get());
-            previousButton.setDisable(newValue == 1);
         });
     }
 
@@ -115,28 +85,28 @@ public class DocumentViewerView extends BaseDialog<Void> {
         fileChoice.setButtonCell(cellFactory.call(null));
         fileChoice.setCellFactory(cellFactory);
         fileChoice.getSelectionModel().selectedItemProperty().addListener(
-                (observable, oldValue, newValue) -> viewModel.switchToFile(newValue));
-        // We always want that the first item is selected after a change
-        // This also automatically selects the first file on the initial load
-        Stage stage = (Stage) getDialogPane().getScene().getWindow();
-        fileChoice.itemsProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.isEmpty()) {
-                stage.close();
-            } else {
-                fileChoice.getSelectionModel().selectFirst();
+                (_, _, newValue) -> {
+                    if (newValue != null && !fileChoice.getItems().isEmpty()) {
+                        viewModel.switchToFile(newValue);
+                    }
+                });
+
+        fileChoice.itemsProperty().addListener((_, _, newValue) -> {
+            if (newValue != null && !newValue.isEmpty()) {
+                if (!fileChoice.getItems().isEmpty()) {
+                    fileChoice.getSelectionModel().selectFirst();
+                }
             }
         });
         fileChoice.itemsProperty().bind(viewModel.filesProperty());
     }
 
     private void setupViewer() {
-        viewer = new DocumentViewerControl(taskExecutor);
-        viewModel.currentDocumentProperty().addListener((observable, oldDocument, newDocument) -> {
-            if (newDocument != null) {
+        viewModel.currentDocumentProperty().addListener((_, _, newDocument) -> {
                 viewer.show(newDocument);
-            }
         });
         viewModel.currentPageProperty().bindBidirectional(viewer.currentPageProperty());
+        viewModel.highlightTextProperty().bindBidirectional(viewer.highlightTextProperty());
         mainPane.setCenter(viewer);
     }
 
@@ -152,27 +122,7 @@ public class DocumentViewerView extends BaseDialog<Void> {
         viewModel.showPage(pageNumber);
     }
 
-    public void nextPage(ActionEvent actionEvent) {
-        viewModel.showNextPage();
-    }
-
-    public void previousPage(ActionEvent actionEvent) {
-        viewModel.showPreviousPage();
-    }
-
-    public void fitWidth(ActionEvent actionEvent) {
-        viewer.setPageWidth(viewer.getWidth());
-    }
-
-    public void zoomIn(ActionEvent actionEvent) {
-        viewer.changePageWidth(100);
-    }
-
-    public void zoomOut(ActionEvent actionEvent) {
-        viewer.changePageWidth(-100);
-    }
-
-    public void fitSinglePage(ActionEvent actionEvent) {
-        viewer.setPageHeight(viewer.getHeight());
+    public void highlightText(String text) {
+        viewModel.highlightText(text);
     }
 }

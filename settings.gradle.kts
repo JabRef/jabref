@@ -1,29 +1,32 @@
 pluginManagement {
+    includeBuild("build-logic")
+
+    // get jitpack running
+    // see https://github.com/jitpack/jitpack.io/issues/1459
     resolutionStrategy {
         eachPlugin {
-            // Hint from https://github.com/jitpack/jitpack.io/issues/1459#issuecomment-1279851731
-            // Updated solution at https://github.com/foodiestudio/convention-plugins?tab=readme-ov-file#convention-plugins
-            if (requested.id.id.startsWith("com.github.koppor")) {
-                // This is https://github.com/java9-modularity/gradle-modules-plugin/pull/282
-                useModule("com.github.koppor:gradle-modules-plugin:1.8.15-cmd-1")
+            requested.apply {
+                // com.github.andygoossens is non-jitpack; therefore stronger id check
+                if ("$id".startsWith("com.github.koppor")) {
+                    val (_, _, user, name) = "$id".split(".", limit = 4)
+                    useModule("com.github.$user:$name:$version")
+                }
             }
         }
     }
-
     repositories {
-        maven {
-            url = uri("https://jitpack.io")
-        }
         gradlePluginPortal()
+        maven("https://jitpack.io")
     }
-
-    includeBuild("build-logic")
 }
-
 plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version "0.10.0"
+    id("org.jabref.gradle.build")
 }
 
 rootProject.name = "JabRef"
 
-include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support")
+javaModules {
+    directory(".")
+    versions("versions")
+    // include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support", "versions")
+}

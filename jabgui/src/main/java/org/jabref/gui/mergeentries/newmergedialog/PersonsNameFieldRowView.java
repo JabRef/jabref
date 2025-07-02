@@ -18,7 +18,7 @@ public class PersonsNameFieldRowView extends FieldRowView {
         super(field, leftEntry, rightEntry, mergedEntry, fieldMergerFactory, preferences, rowIndex);
         assert field.getProperties().contains(FieldProperty.PERSON_NAMES);
 
-        var authorsParser = new AuthorListParser();
+        AuthorListParser authorsParser = new AuthorListParser();
         leftEntryNames = authorsParser.parse(viewModel.getLeftFieldValue());
         rightEntryNames = authorsParser.parse(viewModel.getRightFieldValue());
 

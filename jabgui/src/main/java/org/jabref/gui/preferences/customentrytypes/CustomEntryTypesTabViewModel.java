@@ -125,7 +125,7 @@ public class CustomEntryTypesTabViewModel implements PreferenceTabViewModel {
             entryTypesManager.update(newType, bibDatabaseMode);
         }
 
-        for (var entryType : entryTypesToDelete) {
+        for (BibEntryType entryType : entryTypesToDelete) {
             entryTypesManager.removeCustomOrModifiedEntryType(entryType, bibDatabaseMode);
         }
 

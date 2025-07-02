@@ -59,7 +59,7 @@ class GroupDialogViewModelTest {
 
     @Test
     void validateExistingAbsolutePath() throws IOException {
-        var anAuxFile = temporaryFolder.resolve("auxfile.aux").toAbsolutePath();
+        Path anAuxFile = temporaryFolder.resolve("auxfile.aux").toAbsolutePath();
 
         Files.createFile(anAuxFile);
         when(metaData.getLatexFileDirectory(any(String.class))).thenReturn(Optional.of(temporaryFolder));
@@ -70,14 +70,14 @@ class GroupDialogViewModelTest {
 
     @Test
     void validateNonExistingAbsolutePath() {
-        var notAnAuxFile = temporaryFolder.resolve("notanauxfile.aux").toAbsolutePath();
+        Path notAnAuxFile = temporaryFolder.resolve("notanauxfile.aux").toAbsolutePath();
         viewModel.texGroupFilePathProperty().setValue(notAnAuxFile.toString());
         assertFalse(viewModel.texGroupFilePathValidatonStatus().isValid());
     }
 
     @Test
     void validateExistingRelativePath() throws IOException {
-        var anAuxFile = Path.of("auxfile.aux");
+        Path anAuxFile = Path.of("auxfile.aux");
 
         // The file needs to exist
         Files.createFile(temporaryFolder.resolve(anAuxFile));

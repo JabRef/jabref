@@ -151,7 +151,7 @@ class DatabaseSearcherWithBibFilesTest {
     void searchLibrary(List<BibEntry> expected, String testFile, String query, boolean isFullText) throws URISyntaxException, IOException {
         BibDatabaseContext databaseContext = initializeDatabaseFromPath(testFile);
         EnumSet<SearchFlags> flags = isFullText ? EnumSet.of(SearchFlags.FULLTEXT) : EnumSet.noneOf(SearchFlags.class);
-        List<BibEntry> matches = new DatabaseSearcher(new SearchQuery(query, flags), databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches();
+        List<BibEntry> matches = new DatabaseSearcher(databaseContext, TASK_EXECUTOR, preferences, postgreServer).getMatches(new SearchQuery(query, flags));
         assertThat(expected, Matchers.containsInAnyOrder(matches.toArray()));
     }
 }
