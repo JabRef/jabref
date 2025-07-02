@@ -25,6 +25,7 @@
 
 //DEPS org.jabref:jablib:6.+
 //DEPS info.picocli:picocli:4.7.7
+//DEPS org.jspecify:jspecify:1.0.0
 
 // from jabsrv
 //DEPS org.slf4j:slf4j-api:2.0.17

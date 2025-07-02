@@ -1,8 +1,6 @@
 plugins {
     id("org.jabref.gradle.module")
     id("application")
-
-    id("org.beryx.jlink") version "3.1.1"
 }
 
 group = "org.jabref.jabkit"
@@ -60,17 +58,11 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.mockito")
 }
 
-/*
-jacoco {
-    toolVersion = "0.8.13"
-}
-*/
-
 application {
     mainClass.set("org.jabref.JabKit")
     mainModule.set("org.jabref.jabkit")
 
-    // Also passed to launcher (https://badass-jlink-plugin.beryx.org/releases/latest/#launcher)
+    // Also passed to launcher by java-module-packaging plugin
     applicationDefaultJvmArgs = listOf(
         // Enable JEP 450: Compact Object Headers
         "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCompactObjectHeaders",
@@ -83,123 +75,22 @@ application {
     )
 }
 
-// This is more or less a clone of jabgui/build.gradle.kts -> jlink
-jlink {
-    // https://github.com/beryx/badass-jlink-plugin/issues/61#issuecomment-504640018
-    addExtraDependencies(
-        "javafx"
-    )
+javaModulePackaging {
+    applicationName = "jabkit"
+    addModules.add("jdk.incubator.vector")
 
-    mergedModuleName = "jabkit.merged.module"
-
-    // We keep debug statements - otherwise "--strip-debug" would be included
-    addOptions(
-        "--compress",
-        "zip-6",
-        "--no-header-files",
-        "--no-man-pages",
-        "--bind-services",
-        "--add-modules", "jdk.incubator.vector"
-    )
-
-    launcher {
-        name = "jabkit"
+    // All targets have to have "app-image" as sole target, since we do not distribute an installer
+    targetsWithOs("windows") {
+        appImageOptions.addAll("--win-console")
+        packageTypes = listOf("app-image")
     }
-
-    // TODO: Remove as soon as dependencies are fixed (upstream)
-    forceMerge(
-        "bcprov",
-        "jaxb",
-        "istack",
-        "stax"
-    )
-
-    mergedModule {
-        requires("com.google.gson")
-        requires("com.fasterxml.jackson.annotation")
-        requires("com.fasterxml.jackson.databind")
-        requires("com.fasterxml.jackson.core")
-        requires("com.fasterxml.jackson.datatype.jdk8")
-        requires("jakarta.xml.bind")
-        requires("java.compiler")
-        requires("java.datatransfer")
-        requires("java.desktop")
-        requires("java.logging")
-        requires("java.management")
-        requires("java.naming")
-        requires("java.net.http")
-        requires("java.rmi")
-        requires("java.scripting")
-        requires("java.security.jgss")
-        requires("java.security.sasl")
-        requires("java.sql")
-        requires("java.sql.rowset")
-        requires("java.transaction.xa")
-        requires("java.xml")
-        requires("javafx.base")
-        requires("javafx.controls")
-        requires("javafx.fxml")
-        requires("javafx.graphics")
-        requires("jdk.security.jgss")
-        requires("jdk.unsupported")
-        requires("jdk.unsupported.desktop")
-        requires("jdk.xml.dom")
-        requires("org.apache.commons.lang3")
-        requires("org.apache.commons.logging")
-        requires("org.apache.commons.text")
-        requires("org.apache.commons.codec")
-        requires("org.apache.commons.io")
-        requires("org.apache.commons.compress")
-        requires("org.freedesktop.dbus")
-        requires("org.jsoup")
-        requires("org.slf4j")
-        requires("org.tukaani.xz");
-        uses("ai.djl.engine.EngineProvider")
-        uses("ai.djl.repository.RepositoryFactory")
-        uses("ai.djl.repository.zoo.ZooProvider")
-        uses("dev.langchain4j.spi.prompt.PromptTemplateFactory")
-        uses("kong.unirest.core.json.JsonEngine")
-        uses("org.eclipse.jgit.lib.Signer")
-        uses("org.eclipse.jgit.transport.SshSessionFactory")
-        uses("org.postgresql.shaded.com.ongres.stringprep.Profile")
-        provides("java.sql.Driver").with(
-            "org.postgresql.Driver")
-        provides("java.security.Provider").with(
-            "org.bouncycastle.jce.provider.BouncyCastleProvider",
-            "org.bouncycastle.pqc.jcajce.provider.BouncyCastlePQCProvider")
-        provides("kong.unirest.core.json.JsonEngine").with(
-            "kong.unirest.modules.gson.GsonEngine")
-        provides("ai.djl.repository.zoo.ZooProvider").with(
-            "ai.djl.engine.rust.zoo.RsZooProvider",
-            "ai.djl.huggingface.zoo.HfZooProvider",
-            "ai.djl.pytorch.zoo.PtZooProvider",
-            "ai.djl.repository.zoo.DefaultZooProvider")
-        provides("ai.djl.engine.EngineProvider").with(
-            "ai.djl.engine.rust.RsEngineProvider",
-            "ai.djl.pytorch.engine.PtEngineProvider")
-
+    targetsWithOs("linux") {
+        options.addAll(
+            "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
+        )
+        packageTypes = listOf("app-image")
     }
-    jpackage {
-        outputDir = "distribution"
-        skipInstaller = true
-
-        imageOptions.addAll(listOf(
-            "--java-options", "--enable-native-access=jabkit.merged.module"))
-
-        // See https://docs.oracle.com/en/java/javase/24/docs/specs/man/jpackage.html#platform-dependent-options-for-creating-the-application-package for available options
-        if (org.gradle.internal.os.OperatingSystem.current().isWindows) {
-            imageOptions.addAll(
-                listOf(
-                    "--win-console"
-                )
-            )
-        } else if (org.gradle.internal.os.OperatingSystem.current().isLinux) {
-            imageOptions.addAll(
-                listOf(
-                    "--icon", "$projectDir/../jabgui/src/main/resources/icons/JabRef-linux-icon-64.png",
-                    "--app-version", "$version"
-                )
-            )
-        }
+    targetsWithOs("macos") {
+        packageTypes = listOf("app-image")
     }
 }
