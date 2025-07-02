@@ -11,8 +11,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We introduced a settings parameters to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
+- We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
+- We added the field `monthfiled` to the default list of fields to resolve BibTeX-Strings for [#13375](https://github.com/JabRef/jabref/issues/13375)
+- We added a new ID based fetcher for [EuropePMC](https://europepmc.org/). [#13389](https://github.com/JabRef/jabref/pull/13389)
+- We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)  
 
 ### Changed
 
@@ -35,6 +38,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added support for import of a Refer/BibIX file format. [#13069](https://github.com/JabRef/jabref/issues/13069)
 - We added a new `jabkit` command `pseudonymize` to pseudonymize the library. [#13109](https://github.com/JabRef/jabref/issues/13109)
 - We added functionality to focus running instance when trying to start a second instance. [#13129](https://github.com/JabRef/jabref/issues/13129)
+- We added a highlighted diff regarding changes to the Group Tree Structure of a bib file, made outside JabRef. [#11221](https://github.com/JabRef/jabref/issues/11221)
 - We added a new setting in the 'Entry Editor' preferences to hide the 'File Annotations' tab when no annotations are available. [#13143](https://github.com/JabRef/jabref/issues/13143)
 - We added support for multi-file import across different formats. [#13269](https://github.com/JabRef/jabref/issues/13269)
 - We added support for dark title bar on Windows. [#11457](https://github.com/JabRef/jabref/issues/11457)
@@ -68,6 +72,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue showing an empty tooltip in maintable. [#11681](https://github.com/JabRef/jabref/issues/11681)
 - We fixed an issue where Document Viewer showed technical exceptions when opening entries with non-PDF files. [#13198](https://github.com/JabRef/jabref/issues/13198)
 - When creating a library, if you drag a PDF file containing only a single column, the dialog will now automatically close. [#13262](https://github.com/JabRef/jabref/issues/13262)
+- We fixed an issue where the tab showing the fulltext search results would appear blank after switching library. [#13241](https://github.com/JabRef/jabref/issues/13241)
 
 ### Removed
 

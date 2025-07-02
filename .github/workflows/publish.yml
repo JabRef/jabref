@@ -3,10 +3,10 @@ name: Publish to maven central
 on:
   pull_request:
     paths:
-     - .github\workflows\publish.yml
+     - .github/workflows/publish.yml
   push:
     paths:
-     - .github\workflows\publish.yml
+     - .github/workflows/publish.yml
     tags:
       - '*'
   schedule:
@@ -30,7 +30,8 @@ concurrency:
 jobs:
   publish:
     name: jablib
-    runs-on: ubuntu-22.04
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4
@@ -38,6 +39,12 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
+      - name: Checkout java-module-packaging
+        uses: actions/checkout@v4
+        with:
+          repository: koppor/java-module-packaging
+          path: build-logic/java-module-packaging
+          ref: fix-params
       - name: Install GitVersion
         uses: gittools/actions/gitversion/setup@v3.2.1
         with:

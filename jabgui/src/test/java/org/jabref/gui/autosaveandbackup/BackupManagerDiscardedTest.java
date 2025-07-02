@@ -10,7 +10,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -66,7 +65,7 @@ class BackupManagerDiscardedTest {
     private void saveDatabase() throws IOException {
         try (Writer writer = new AtomicFileWriter(testBib, StandardCharsets.UTF_8, false)) {
             BibWriter bibWriter = new BibWriter(writer, bibDatabaseContext.getDatabase().getNewLineSeparator());
-            new BibtexDatabaseWriter(
+            new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     preferences.getFieldPreferences(),
