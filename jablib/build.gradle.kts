@@ -46,7 +46,7 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
-    implementation(enforcedPlatform(project(":versions")))
+    // api(platform(project(":versions")))
 
     implementation("org.openjfx:javafx-base")
 
@@ -526,6 +526,10 @@ mavenPublishing {
   }
 }
 
+tasks.withType<GenerateModuleMetadata> {
+  suppressedValidationErrors.add("dependencies-without-versions")
+}
+
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
@@ -537,8 +541,13 @@ tasks.named<Jar>("sourcesJar") {
     )
 }
 
-tasks.withType<GenerateModuleMetadata> {
-    suppressedValidationErrors.add("enforced-platform")
+
+// Include the BOM in the generated POM ("inline" / "inlining")
+// Source: https://github.com/gradle/gradle/issues/10861#issuecomment-3027387345
+publishing.publications.withType<MavenPublication>().configureEach {
+    versionMapping {
+        allVariants { fromResolutionResult() }
+    }
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
