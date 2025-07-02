@@ -24,6 +24,9 @@
 
 // mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,
 
+// TODO: ASCII things won't work, but we accept for now to keep things going
+//DEPS com.ibm.icu:icu4j:72.1
+
 // disabled due to maven central issues
 // DEPS org.jabref:jablib:6.+
 //DEPS com.github.jabref.jabref:jablib:add-jitpack-SNAPSHOT
