@@ -1,6 +1,8 @@
 jdk:
   - openjdk24
 before_install:
-  - cd build-logic && git clone https://github.com/koppor/java-module-packaging.git
+  - cd build-logic
+  - git clone https://github.com/koppor/java-module-packaging.git
+  - cd ..
 install:
   - ./gradlew :jablib:publishToMavenLocal
