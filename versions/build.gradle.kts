@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavaPlatform
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
 
@@ -155,6 +156,8 @@ dependencies.constraints {
 }
 
 mavenPublishing {
+  configure(JavaPlatform())
+
   publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
 
   signAllPublications()
