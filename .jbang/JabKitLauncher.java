@@ -20,9 +20,14 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/JabKit.java
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
 
-//REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
+//REPOS mavencentral,jitpack=https://jitpack.io,jabref=https://raw.github.com/JabRef/jabref/tree/main/jablib/lib
 
-//DEPS org.jabref:jablib:6.+
+// mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,
+
+// disabled due to maven central issues
+// DEPS org.jabref:jablib:6.+
+//DEPS com.github.jabref.jabref:jablib:add-jitpack-SNAPSHOT
+
 //DEPS info.picocli:picocli:4.7.7
 
 import org.jabref.JabKit;
