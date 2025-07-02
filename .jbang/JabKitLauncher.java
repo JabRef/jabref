@@ -20,6 +20,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/JabKit.java
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
 
+// REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
 //REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
@@ -27,7 +28,7 @@
 
 // disabled due to maven central issues
 // DEPS org.jabref:jablib:6.+
-//DEPS com.github.jabref.jabref:jablib:main-SNAPSHOT
+//DEPS com.github.jabref:jabref:main-SNAPSHOT
 
 //DEPS info.picocli:picocli:4.7.7
 

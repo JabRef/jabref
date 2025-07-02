@@ -27,6 +27,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
 
+// REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
 //REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
@@ -34,7 +35,7 @@
 
 // disabled due to maven central issues
 // DEPS org.jabref:jablib:6.+
-//DEPS com.github.jabref.jabref:jablib:main-SNAPSHOT
+//DEPS com.github.jabref:jabref:main-SNAPSHOT
 
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.jspecify:jspecify:1.0.0
