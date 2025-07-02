@@ -13,6 +13,12 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefResourceLocator.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchDialog.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibraryResource.java
