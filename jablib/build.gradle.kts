@@ -46,7 +46,7 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
-    api(enforcedPlatform(project(":versions")))
+    api(platform(project(":versions")))
 
     implementation("org.openjfx:javafx-base")
 
