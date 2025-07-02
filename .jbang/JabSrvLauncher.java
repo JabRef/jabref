@@ -32,7 +32,7 @@
 // REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
-//DEPS com.ibm.icu:icu4j:72.1
+//DEPS com.ibm.icu:icu4j:77.1
 
 // disabled due to maven central issues
 // DEPS org.jabref:jablib:6.+
