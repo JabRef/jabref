@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 plugins {
     id("org.jabref.gradle.module")
     id("application")
@@ -25,10 +23,10 @@ dependencies {
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
 
-    implementation("com.pixelduke:fxthemes:1.6.0")
+    implementation("com.pixelduke:fxthemes")
 
     // From JavaFX25 onwards
-    implementation("org.openjfx:jdk-jsobject:25-ea+21")
+    implementation("org.openjfx:jdk-jsobject")
 
     implementation("org.slf4j:slf4j-api")
     implementation("org.tinylog:tinylog-api")
