@@ -20,9 +20,7 @@
 //SOURCES ../jabkit/src/main/java/org/jabref/JabKit.java
 //FILES tinylog.properties=../jabkit/src/main/resources/tinylog.properties
 
-//REPOS mavencentral,jitpack=https://jitpack.io,jabref=https://raw.github.com/JabRef/jabref/tree/main/jablib/lib
-
-// mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,
+//REPOS mavencentral,jitpack=https://jitpack.io
 
 // TODO: ASCII things won't work, but we accept for now to keep things going
 //DEPS com.ibm.icu:icu4j:72.1
