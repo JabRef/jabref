@@ -45,9 +45,6 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
 // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 val mockitoAgent = configurations.create("mockitoAgent")
 
-javaPlatform {
-    allowDependencies()
-}
 dependencies {
     api(platform(project(":versions")))
 
