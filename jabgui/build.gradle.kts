@@ -187,7 +187,7 @@ javaModulePackaging {
             "--mac-package-name", "JabRef",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
         )
-        if (providers.environmentVariable("OSXCERT").orNull?.isNotBlank()) {
+        if (providers.environmentVariable("OSXCERT").orNull?.isNotBlank() ?: false) {
             options.addAll(
                 "--mac-sign",
                 "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
