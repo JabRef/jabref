@@ -6,11 +6,11 @@ COPY . .
 
 RUN gradle --no-daemon :jabkit:jpackage
 
-RUN find jabkit/build/distribution
+RUN find jabkit/build/packages
 
 RUN mkdir /dist
 
-RUN mv jabkit/build/distribution/jabkit /dist
+RUN mv jabkit/build/packages/*/* /dist
 
 # jpackage needs glibc; alpine does not work
 FROM debian:bookworm-slim AS runtime
