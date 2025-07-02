@@ -556,11 +556,6 @@ jobs:
     if: (github.actor != 'dependabot[bot]' && github.event_name == 'pull_request')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-          show-progress: 'false'
-          fetch-depth: 2
       - name: Get all submodule changes
         id: changes
         uses: tj-actions/changed-files@v46
