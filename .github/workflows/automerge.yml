@@ -44,6 +44,8 @@ jobs:
           fi
 
           echo "shouldrun=false" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
       - name: Approve PR
         if: steps.shouldrun.outputs.shouldrun == 'true'
         run: gh pr review --approve "$PR_URL"
