@@ -561,7 +561,7 @@ jobs:
           submodules: true
           show-progress: 'false'
           fetch-depth: 2
-      - name: Get all submodule chagnes
+      - name: Get all submodule changes
         id: changes
         uses: tj-actions/changed-files@v46
         with:
