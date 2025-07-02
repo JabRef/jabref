@@ -1,5 +1,15 @@
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     id("java-platform")
+    id("com.vanniktech.maven.publish") version "0.32.0"
+}
+
+var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
+if (project.findProperty("tagbuild")?.toString() != "true") {
+    version += "-SNAPSHOT"
 }
 
 javaPlatform {
@@ -13,12 +23,7 @@ val pdfbox = "3.0.5"
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
     api(platform("dev.langchain4j:langchain4j-bom:1.1.0"))
-    api("dev.langchain4j:langchain4j")
-    api("dev.langchain4j:langchain4j-google-ai-gemini")
-    api("dev.langchain4j:langchain4j-hugging-face")
-    api("dev.langchain4j:langchain4j-mistral-ai")
-    api("dev.langchain4j:langchain4j-open-ai")
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.5.0"))
+    api(platform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.5.0"))
 }
 
 dependencies.constraints {
@@ -147,4 +152,42 @@ dependencies.constraints {
     api("org.xmlunit:xmlunit-matchers:2.10.3")
     api("org.yaml:snakeyaml:2.4")
     api("tech.units:indriya:2.2.3")
+}
+
+mavenPublishing {
+  publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+
+  signAllPublications()
+
+  coordinates("org.jabref", "jabbom", version)
+
+  pom {
+    name.set("jabbom")
+    description.set("JabRef's BOM")
+    inceptionYear.set("2025")
+    url.set("https://github.com/JabRef/jabref/")
+    licenses {
+      license {
+        name.set("MIT")
+        url.set("https://github.com/JabRef/jabref/blob/main/LICENSE")
+      }
+    }
+    developers {
+      developer {
+        id.set("jabref")
+        name.set("JabRef Developers")
+        url.set("https://github.com/JabRef/")
+      }
+    }
+    scm {
+        url.set("https://github.com/JabRef/jabref")
+        connection.set("scm:git:https://github.com/JabRef/jabref")
+        developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
+    }
+  }
+}
+
+tasks.withType<GenerateModuleMetadata> {
+  // because of enforced platform 'io.zonky.test.postgres:embedded-postgres-binaries-bom'
+  suppressedValidationErrors.add("enforced-platform")
 }

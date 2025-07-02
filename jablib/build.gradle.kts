@@ -46,8 +46,6 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
-    api(platform(project(":versions")))
-
     implementation("org.openjfx:javafx-base")
 
     implementation("com.ibm.icu:icu4j")
@@ -524,6 +522,10 @@ mavenPublishing {
         developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
     }
   }
+}
+
+tasks.withType<GenerateModuleMetadata> {
+  suppressedValidationErrors.add("dependencies-without-versions")
 }
 
 tasks.named<Jar>("sourcesJar") {
