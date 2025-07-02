@@ -179,12 +179,6 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           show-progress: 'false'
-      - name: Fetch preview of java-module-packaging
-        uses: actions/checkout@v4
-        with:
-          repository: koppor/java-module-packaging
-          path: build-logic/java-module-packaging
-          ref: fix-params
       - name: Install pigz and cache (linux)
         if: (startsWith(matrix.os, 'ubuntu'))
         uses: awalsh128/cache-apt-pkgs-action@latest
