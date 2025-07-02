@@ -27,7 +27,7 @@
 
 // disabled due to maven central issues
 // DEPS org.jabref:jablib:6.+
-//DEPS com.github.jabref.jabref:jablib:add-jitpack-SNAPSHOT
+//DEPS com.github.jabref.jabref:jablib:main-SNAPSHOT
 
 //DEPS info.picocli:picocli:4.7.7
 

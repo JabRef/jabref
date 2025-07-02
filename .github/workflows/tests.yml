@@ -364,6 +364,8 @@ jobs:
   jbang:
     name: JBang
     runs-on: ubuntu-latest
+    # JBang scripts depend on main-SNAPSHOT; thus, we can only test fully when main is updated
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
