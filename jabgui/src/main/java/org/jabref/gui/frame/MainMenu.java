@@ -377,6 +377,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferences, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction(URLs.WEBPAGE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_PRIVACY_POLICY, new OpenBrowserAction(URLs.PRIVACY_POLICY_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction(URLs.BLOG_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_LINKEDIN, new OpenBrowserAction(URLs.LINKEDIN_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction(URLs.FACEBOOK_URL, dialogService, preferences.getExternalApplicationsPreferences())),

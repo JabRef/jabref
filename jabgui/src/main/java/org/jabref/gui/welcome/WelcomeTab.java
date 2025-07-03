@@ -21,12 +21,13 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -44,10 +45,13 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
+import org.jabref.gui.maintable.ColumnPreferences;
+import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.PushToApplication;
 import org.jabref.gui.push.PushToApplicationPreferences;
 import org.jabref.gui.push.PushToApplications;
+import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -58,6 +62,9 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.SearchBasedFetcher;
+import org.jabref.logic.importer.WebFetchers;
+import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
@@ -65,8 +72,10 @@ import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -218,7 +227,19 @@ public class WelcomeTab extends Tab {
                 this::showPushApplicationConfigurationDialog
         );
 
-        actions.getChildren().addAll(mainFileDirButton, themeButton, largeLibraryButton, pushApplicationButton);
+        QuickSettingsButton onlineServicesButton = new QuickSettingsButton(
+                Localization.lang("Configure Online Services"),
+                IconTheme.JabRefIcons.WWW,
+                this::showOnlineServicesConfigurationDialog
+        );
+
+        QuickSettingsButton entryTableButton = new QuickSettingsButton(
+                Localization.lang("Entry Table Display"),
+                IconTheme.JabRefIcons.TOGGLE_GROUPS,
+                this::showEntryTableConfigurationDialog
+        );
+
+        actions.getChildren().addAll(mainFileDirButton, themeButton, largeLibraryButton, pushApplicationButton, onlineServicesButton, entryTableButton);
 
         return createVBoxContainer(header, actions);
     }
@@ -227,7 +248,7 @@ public class WelcomeTab extends Tab {
         Label header = new Label(Localization.lang("Community"));
         header.getStyleClass().add("welcome-header-label");
 
-        HBox iconLinksContainer = createIconLinksContainer();
+        FlowPane iconLinksContainer = createIconLinksContainer();
         HBox textLinksContainer = createTextLinksContainer();
         HBox versionContainer = createVersionContainer();
 
@@ -242,9 +263,6 @@ public class WelcomeTab extends Tab {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(Localization.lang("Main File Directory"));
         dialog.setHeaderText(Localization.lang("Configure Main File Directory"));
-
-        GridPane grid = new GridPane();
-        grid.getStyleClass().add("quick-settings-dialog-container");
 
         TextField pathField = new TextField();
         pathField.setPromptText(Localization.lang("Main File Directory"));
@@ -263,18 +281,24 @@ public class WelcomeTab extends Tab {
                          .ifPresent(selectedDir -> pathField.setText(selectedDir.toString()));
         });
 
-        grid.add(new Label(Localization.lang("Main File Directory") + ":"), 0, 0);
-        grid.add(pathField, 1, 0);
-        grid.add(browseButton, 2, 0);
-
-        dialog.getDialogPane().setContent(grid);
+        VBox content = new VBox(
+                new HBox(
+                        new Label(Localization.lang("Main File Directory") + ":"),
+                        pathField,
+                        browseButton
+                )
+        );
+        content.getStyleClass().add("quick-settings-dialog-container");
+        dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            filePreferences.setMainFileDirectory(pathField.getText());
-            filePreferences.setStoreFilesRelativeToBibFile(false);
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
         }
+
+        filePreferences.setMainFileDirectory(pathField.getText());
+        filePreferences.setStoreFilesRelativeToBibFile(false);
     }
 
     private void showThemeDialog() {
@@ -282,13 +306,11 @@ public class WelcomeTab extends Tab {
         dialog.setTitle(Localization.lang("Visual Theme"));
         dialog.setHeaderText(Localization.lang("Configure Visual Theme"));
 
-        VBox mainContainer = new VBox();
-        mainContainer.getStyleClass().add("theme-selection-container");
-        mainContainer.setSpacing(12);
+        VBox content = new VBox();
+        content.getStyleClass().add("quick-settings-dialog-container");
 
         ToggleGroup themeGroup = new ToggleGroup();
         HBox radioContainer = new HBox();
-        radioContainer.setSpacing(8);
 
         WorkspacePreferences workspacePreferences = preferences.getWorkspacePreferences();
         Theme currentTheme = workspacePreferences.getTheme();
@@ -332,22 +354,22 @@ public class WelcomeTab extends Tab {
         customThemePathBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(customThemePath, Priority.ALWAYS);
 
-        mainContainer.getChildren().add(radioContainer);
+        content.getChildren().add(radioContainer);
 
         boolean isCustomTheme = customRadio.isSelected();
         if (isCustomTheme) {
-            mainContainer.getChildren().add(customThemePathBox);
+            content.getChildren().add(customThemePathBox);
         }
 
         themeGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
             boolean isCustom = newValue != null && newValue.getUserData() == ThemeTypes.CUSTOM;
-            boolean isCurrentlyVisible = mainContainer.getChildren().contains(customThemePathBox);
+            boolean isCurrentlyVisible = content.getChildren().contains(customThemePathBox);
 
             if (isCustom && !isCurrentlyVisible) {
-                mainContainer.getChildren().add(customThemePathBox);
+                content.getChildren().add(customThemePathBox);
                 dialog.getDialogPane().getScene().getWindow().sizeToScene();
             } else if (!isCustom && isCurrentlyVisible) {
-                mainContainer.getChildren().remove(customThemePathBox);
+                content.getChildren().remove(customThemePathBox);
                 dialog.getDialogPane().getScene().getWindow().sizeToScene();
             }
         });
@@ -367,31 +389,32 @@ public class WelcomeTab extends Tab {
                     customThemePath.setText(file.toAbsolutePath().toString()));
         });
 
-        dialog.getDialogPane().setContent(mainContainer);
+        dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            Toggle selectedToggle = themeGroup.getSelectedToggle();
-            if (selectedToggle != null) {
-                ThemeTypes selectedTheme = (ThemeTypes) selectedToggle.getUserData();
-                Theme newTheme = switch (selectedTheme) {
-                    case LIGHT -> Theme.light();
-                    case DARK -> Theme.dark();
-                    case CUSTOM -> {
-                        String customPath = customThemePath.getText().trim();
-                        if (customPath.isEmpty()) {
-                            dialogService.showErrorDialogAndWait(
-                                    Localization.lang("Error"),
-                                    Localization.lang("Please specify a custom theme file path."));
-                            yield null;
-                        }
-                        yield Theme.custom(customPath);
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+
+        Toggle selectedToggle = themeGroup.getSelectedToggle();
+        if (selectedToggle != null) {
+            ThemeTypes selectedTheme = (ThemeTypes) selectedToggle.getUserData();
+            Theme newTheme = switch (selectedTheme) {
+                case LIGHT -> Theme.light();
+                case DARK -> Theme.dark();
+                case CUSTOM -> {
+                    String customPath = customThemePath.getText().trim();
+                    if (customPath.isEmpty()) {
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Error"),
+                                Localization.lang("Please specify a custom theme file path."));
+                        yield null;
                     }
-                };
-                if (newTheme != null) {
-                    workspacePreferences.setTheme(newTheme);
+                    yield Theme.custom(customPath);
                 }
+            };
+            if (newTheme != null) {
+                workspacePreferences.setTheme(newTheme);
             }
         }
     }
@@ -401,12 +424,11 @@ public class WelcomeTab extends Tab {
         dialog.setTitle(Localization.lang("Optimize performance for large libraries"));
         dialog.setHeaderText(Localization.lang("Configure JabRef settings to optimize performance when working with large libraries"));
 
-        VBox mainContainer = new VBox();
-        mainContainer.getStyleClass().add("quick-settings-dialog-container");
+        Label performanceOptimizationLabel = new Label(Localization.lang("Select which performance optimizations to apply:"));
+        performanceOptimizationLabel.setWrapText(true);
+        performanceOptimizationLabel.setMaxWidth(400);
 
-        Label explanationLabel = new Label(Localization.lang("Select which performance optimizations to apply:"));
-        explanationLabel.setWrapText(true);
-        explanationLabel.setMaxWidth(400);
+        HBox performanceOptimizationHeader = new HBox(performanceOptimizationLabel, makeHelpButton("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues"));
 
         CheckBox disableFulltextIndexing = new CheckBox(Localization.lang("Disable fulltext indexing of linked files"));
         disableFulltextIndexing.setSelected(true);
@@ -423,49 +445,35 @@ public class WelcomeTab extends Tab {
         CheckBox disableGroupCount = new CheckBox(Localization.lang("Disable group entry count display"));
         disableGroupCount.setSelected(true);
 
-        VBox checkboxContainer = new VBox();
-        checkboxContainer.setSpacing(8);
-        checkboxContainer.getChildren().addAll(
+        VBox content = new VBox(
+                performanceOptimizationHeader,
                 disableFulltextIndexing,
                 disableCreationDate,
                 disableModificationDate,
                 disableAutosave,
                 disableGroupCount
         );
-
-        Hyperlink learnMoreLink = new Hyperlink(Localization.lang("Learn more about optimizing JabRef for large libraries"));
-        learnMoreLink.setOnAction(_ -> new OpenBrowserAction("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues",
-                dialogService, preferences.getExternalApplicationsPreferences()).execute());
-
-        mainContainer.getChildren().addAll(explanationLabel, checkboxContainer, learnMoreLink);
-
-        dialog.getDialogPane().setContent(mainContainer);
+        content.getStyleClass().add("quick-settings-dialog-container");
+        dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            optimizeForLargeLibraries(disableFulltextIndexing.isSelected(), disableCreationDate.isSelected(), disableModificationDate.isSelected(), disableAutosave.isSelected(), disableGroupCount.isSelected());
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
         }
-    }
-
-    private void optimizeForLargeLibraries(boolean disableFulltextIndexing,
-                                           boolean disableCreationDate,
-                                           boolean disableModificationDate,
-                                           boolean disableAutosave,
-                                           boolean disableGroupCount) {
-        if (disableFulltextIndexing) {
+        if (disableFulltextIndexing.isSelected()) {
             preferences.getFilePreferences().setFulltextIndexLinkedFiles(false);
         }
-        if (disableCreationDate) {
+        if (disableCreationDate.isSelected()) {
             preferences.getTimestampPreferences().setAddCreationDate(false);
         }
-        if (disableModificationDate) {
+        if (disableModificationDate.isSelected()) {
             preferences.getTimestampPreferences().setAddModificationDate(false);
         }
-        if (disableAutosave) {
+        if (disableAutosave.isSelected()) {
             preferences.getLibraryPreferences().setAutoSave(false);
         }
-        if (disableGroupCount) {
+        if (disableGroupCount.isSelected()) {
             preferences.getGroupsPreferences().setDisplayGroupCount(false);
         }
     }
@@ -475,17 +483,15 @@ public class WelcomeTab extends Tab {
         dialog.setTitle(Localization.lang("Configure Push to Application"));
         dialog.setHeaderText(Localization.lang("Select your preferred text editor or LaTeX application"));
 
-        VBox mainContainer = new VBox();
-        mainContainer.setSpacing(16);
-        mainContainer.getStyleClass().add("quick-settings-dialog-container");
+        VBox content = new VBox();
+        content.getStyleClass().add("quick-settings-dialog-container");
 
         Label explanationLabel = new Label(Localization.lang("Detected applications are highlighted. Click to select and configure."));
         explanationLabel.setWrapText(true);
         explanationLabel.setMaxWidth(400);
 
         ListView<PushToApplication> applicationsList = new ListView<>();
-        applicationsList.setPrefHeight(200);
-        applicationsList.setPrefWidth(400);
+        applicationsList.getStyleClass().add("applications-list");
 
         List<PushToApplication> allApplications = PushToApplications.getAllApplications(dialogService, preferences);
         List<PushToApplication> detectedApplications = detectAvailableApplications(allApplications);
@@ -507,17 +513,17 @@ public class WelcomeTab extends Tab {
                               .ifPresent(applicationsList.getSelectionModel()::select);
         }
 
-        mainContainer.getChildren().addAll(explanationLabel, applicationsList);
+        content.getChildren().addAll(explanationLabel, applicationsList);
 
-        dialog.getDialogPane().setContent(mainContainer);
+        dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-
         Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            PushToApplication selectedApp = applicationsList.getSelectionModel().getSelectedItem();
-            if (selectedApp != null) {
-                pushToApplicationPreferences.setActiveApplicationName(selectedApp.getDisplayName());
-            }
+        if (result.isEmpty() || result.get() == ButtonType.CANCEL) {
+            return;
+        }
+        PushToApplication selectedApp = applicationsList.getSelectionModel().getSelectedItem();
+        if (selectedApp != null) {
+            pushToApplicationPreferences.setActiveApplicationName(selectedApp.getDisplayName());
         }
     }
 
@@ -573,6 +579,7 @@ public class WelcomeTab extends Tab {
 
         public PushApplicationListCell(List<PushToApplication> detectedApplications) {
             this.detectedApplications = detectedApplications;
+            this.getStyleClass().add("application-item");
         }
 
         @Override
@@ -583,18 +590,163 @@ public class WelcomeTab extends Tab {
                 setText(null);
                 setGraphic(null);
                 getStyleClass().removeAll("detected-application");
-            } else {
-                setText(application.getDisplayName());
-                setGraphic(application.getApplicationIcon().getGraphicNode());
-
-                if (detectedApplications.contains(application)) {
-                    if (!getStyleClass().contains("detected-application")) {
-                        getStyleClass().add("detected-application");
-                    }
-                } else {
-                    getStyleClass().removeAll("detected-application");
-                }
+                return;
             }
+
+            setText(application.getDisplayName());
+            setGraphic(application.getApplicationIcon().getGraphicNode());
+
+            if (detectedApplications.contains(application)) {
+                if (!getStyleClass().contains("detected-application")) {
+                    getStyleClass().add("detected-application");
+                }
+            } else {
+                getStyleClass().removeAll("detected-application");
+            }
+        }
+    }
+
+    private void showOnlineServicesConfigurationDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(Localization.lang("Configure Online Services"));
+        dialog.setHeaderText(Localization.lang("Quick configuration for online services and web search"));
+
+        CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for updates on startup"));
+        versionCheckBox.setSelected(preferences.getInternalPreferences().isVersionCheckEnabled());
+
+        CheckBox webSearchBox = new CheckBox(Localization.lang("Enable web search functionality"));
+        webSearchBox.setSelected(preferences.getImporterPreferences().areImporterEnabled());
+
+        CheckBox grobidCheckBox = new CheckBox(Localization.lang("Enable Grobid service for metadata extraction"));
+        grobidCheckBox.setSelected(preferences.getGrobidPreferences().isGrobidEnabled());
+
+        HBox grobidUrl = new HBox();
+        Label grobidUrlLabel = new Label(Localization.lang("Grobid URL") + ":");
+        TextField grobidUrlField = new TextField(preferences.getGrobidPreferences().getGrobidURL());
+        HBox.setHgrow(grobidUrlField, Priority.ALWAYS);
+        grobidUrl.getChildren().addAll(
+                grobidUrlLabel,
+                grobidUrlField,
+                makeHelpButton("https://docs.jabref.org/collect/newentryfromplaintext#grobid")
+        );
+
+        grobidUrl.visibleProperty().bind(grobidCheckBox.selectedProperty());
+        grobidUrl.managedProperty().bind(grobidCheckBox.selectedProperty());
+
+        Label fetchersLabel = new Label(Localization.lang("Online Fetchers") + ":");
+        HBox fetchersHeader = new HBox();
+        fetchersHeader.getChildren().addAll(
+                fetchersLabel,
+                makeHelpButton("https://docs.jabref.org/collect/import-using-online-bibliographic-database")
+        );
+
+        // From WebSearchTabViewModel.
+        List<StudyCatalogItem> availableFetchers = WebFetchers
+                .getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())
+                .stream()
+                .map(SearchBasedFetcher::getName)
+                .filter(name -> !CompositeSearchBasedFetcher.FETCHER_NAME.equals(name))
+                .map(name -> {
+                    boolean enabled = preferences.getImporterPreferences().getCatalogs().contains(name);
+                    return new StudyCatalogItem(name, enabled);
+                })
+                .toList();
+
+        VBox fetchersContainer = new VBox();
+        fetchersContainer.getStyleClass().add("fetchers-container");
+        List<CheckBox> fetcherCheckBoxes = new ArrayList<>();
+
+        for (StudyCatalogItem fetcher : availableFetchers) {
+            CheckBox fetcherCheckBox = new CheckBox(fetcher.getName());
+            fetcherCheckBox.setSelected(fetcher.isEnabled());
+            fetcherCheckBoxes.add(fetcherCheckBox);
+            fetchersContainer.getChildren().add(fetcherCheckBox);
+        }
+
+        ScrollPane fetchersScrollPane = new ScrollPane(fetchersContainer);
+        fetchersScrollPane.setFitToWidth(true);
+        fetchersScrollPane.setMaxHeight(288);
+        fetchersScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        fetchersScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+
+        VBox content = new VBox(
+                versionCheckBox,
+                webSearchBox,
+                grobidCheckBox,
+                grobidUrl,
+                fetchersHeader,
+                fetchersScrollPane
+        );
+        content.getStyleClass().add("quick-settings-dialog-container");
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+
+        preferences.getInternalPreferences().setVersionCheckEnabled(versionCheckBox.isSelected());
+        preferences.getImporterPreferences().setImporterEnabled(webSearchBox.isSelected());
+        preferences.getGrobidPreferences().setGrobidEnabled(grobidCheckBox.isSelected());
+        preferences.getGrobidPreferences().setGrobidURL(grobidUrlField.getText());
+
+        List<String> enabledFetchers = new ArrayList<>();
+        for (int i = 0; i < fetcherCheckBoxes.size(); i++) {
+            if (fetcherCheckBoxes.get(i).isSelected()) {
+                enabledFetchers.add(availableFetchers.get(i).getName());
+            }
+        }
+        preferences.getImporterPreferences().setCatalogs(enabledFetchers);
+    }
+
+    private @NotNull Button makeHelpButton(String url) {
+        Button grobidHelpButton = new Button();
+        grobidHelpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
+        grobidHelpButton.getStyleClass().add("help-button");
+        grobidHelpButton.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
+        return grobidHelpButton;
+    }
+
+    private void showEntryTableConfigurationDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(Localization.lang("Entry Table Display"));
+        dialog.setHeaderText(Localization.lang("Configure entry table display settings"));
+
+        CheckBox showCitationKeyBox = new CheckBox(Localization.lang("Show citation key column in entry table"));
+
+        ColumnPreferences columnPreferences = preferences.getMainTablePreferences()
+                                                         .getColumnPreferences();
+        boolean isCitationKeyVisible = columnPreferences
+                .getColumns()
+                .stream()
+                .anyMatch(column -> column.getType() == MainTableColumnModel.Type.NORMALFIELD
+                        && InternalField.KEY_FIELD.getName().equals(column.getQualifier()));
+
+        showCitationKeyBox.setSelected(isCitationKeyVisible);
+
+        VBox content = new VBox(showCitationKeyBox);
+        content.getStyleClass().add("quick-settings-dialog-container");
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
+        if (result.isEmpty() || result.get() != ButtonType.OK) {
+            return;
+        }
+
+        boolean shouldShow = showCitationKeyBox.isSelected();
+
+        if (shouldShow && !isCitationKeyVisible) {
+            MainTableColumnModel citationKeyColumn = new MainTableColumnModel(
+                    MainTableColumnModel.Type.NORMALFIELD,
+                    InternalField.KEY_FIELD.getName()
+            );
+            columnPreferences.getColumns().addFirst(citationKeyColumn);
+        } else if (!shouldShow && isCitationKeyVisible) {
+            columnPreferences.getColumns().removeIf(column ->
+                    column.getType() == MainTableColumnModel.Type.NORMALFIELD
+                            && InternalField.KEY_FIELD.getName().equals(column.getQualifier()));
         }
     }
 
@@ -700,17 +852,18 @@ public class WelcomeTab extends Tab {
         return box;
     }
 
-    private HBox createIconLinksContainer() {
-        HBox container = new HBox();
+    private FlowPane createIconLinksContainer() {
+        FlowPane container = new FlowPane();
         container.getStyleClass().add("welcome-community-icons");
 
         Hyperlink onlineHelpLink = createFooterLink(Localization.lang("Online help"), StandardActions.HELP, IconTheme.JabRefIcons.HELP);
+        Hyperlink privacyPolicyLink = createFooterLink(Localization.lang("Privacy policy"), StandardActions.OPEN_PRIVACY_POLICY, IconTheme.JabRefIcons.BOOK);
         Hyperlink forumLink = createFooterLink(Localization.lang("Community forum"), StandardActions.OPEN_FORUM, IconTheme.JabRefIcons.FORUM);
         Hyperlink mastodonLink = createFooterLink(Localization.lang("Mastodon"), StandardActions.OPEN_MASTODON, IconTheme.JabRefIcons.MASTODON);
         Hyperlink linkedInLink = createFooterLink(Localization.lang("LinkedIn"), StandardActions.OPEN_LINKEDIN, IconTheme.JabRefIcons.LINKEDIN);
         Hyperlink donationLink = createFooterLink(Localization.lang("Donation"), StandardActions.DONATE, IconTheme.JabRefIcons.DONATE);
 
-        container.getChildren().addAll(onlineHelpLink, forumLink, mastodonLink, linkedInLink, donationLink);
+        container.getChildren().addAll(onlineHelpLink, privacyPolicyLink, forumLink, mastodonLink, linkedInLink, donationLink);
         return container;
     }
 
@@ -737,6 +890,7 @@ public class WelcomeTab extends Tab {
             case DONATE -> URLs.DONATE_URL;
             case OPEN_DEV_VERSION_LINK -> URLs.DEV_VERSION_LINK_URL;
             case OPEN_CHANGELOG -> URLs.CHANGELOG_URL;
+            case OPEN_PRIVACY_POLICY -> URLs.PRIVACY_POLICY_URL;
             default -> null;
         };
 
