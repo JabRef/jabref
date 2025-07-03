@@ -740,15 +740,19 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(StandardField.AUTHOR).orElse("N/A"), getField(StandardField.TITLE).orElse("N/A"),
-                getField(StandardField.YEAR).orElse("N/A")};
+        String author = getField(StandardField.AUTHOR).orElse("N/A");
+        String title = getField(StandardField.TITLE).orElse("N/A");
+        String year = getField(StandardField.YEAR).orElse("N/A");
 
-        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
-        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
-            return text;
+        String formatted = author + ": \"" + title + "\" (" + year + ")";
+
+        if (maxCharacters > 0 && formatted.length() > maxCharacters) {
+            return formatted.substring(0, maxCharacters + 1) + "...";
         }
-        return text.substring(0, maxCharacters + 1) + "...";
+
+        return formatted;
     }
+
 
     /**
      * Returns the title of the given BibTeX entry as an Optional.
