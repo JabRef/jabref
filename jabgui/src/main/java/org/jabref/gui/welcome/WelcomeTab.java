@@ -143,6 +143,38 @@ public class WelcomeTab extends Tab {
         setContent(container);
     }
 
+    private Optional<ButtonType> createQuickSettingsDialog(String titleKey, String headerKey, Node... children) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle(Localization.lang(titleKey));
+        dialog.setHeaderText(Localization.lang(headerKey));
+
+        VBox content = new VBox();
+        content.getStyleClass().add("quick-settings-dialog-container");
+        content.getChildren().addAll(children);
+
+        dialog.getDialogPane().setContent(content);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        return dialogService.showCustomDialogAndWait(dialog);
+    }
+
+    private @NotNull Button createQuickSettingsButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
+        Button button = new Button(text);
+        button.setGraphic(icon.getGraphicNode());
+        button.getStyleClass().add("quick-settings-button");
+        button.setMaxWidth(Double.MAX_VALUE);
+        button.setOnAction(_ -> action.run());
+        return button;
+    }
+
+    private @NotNull Button createHelpButton(String url) {
+        Button helpButton = new Button();
+        helpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
+        helpButton.getStyleClass().add("help-button");
+        helpButton.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
+        return helpButton;
+    }
+
     private VBox createTopTitles() {
         Label welcomeLabel = new Label(Localization.lang("Welcome to JabRef"));
         welcomeLabel.getStyleClass().add("welcome-label");
@@ -203,38 +235,38 @@ public class WelcomeTab extends Tab {
         VBox actions = new VBox();
         actions.getStyleClass().add("quick-settings-content");
 
-        QuickSettingsButton mainFileDirButton = new QuickSettingsButton(
-                Localization.lang("Main File Directory"),
+        Button mainFileDirButton = createQuickSettingsButton(
+                Localization.lang("Set main file directory"),
                 IconTheme.JabRefIcons.FOLDER,
                 this::showMainFileDirectoryDialog
         );
 
-        QuickSettingsButton themeButton = new QuickSettingsButton(
-                Localization.lang("Visual Theme"),
+        Button themeButton = createQuickSettingsButton(
+                Localization.lang("Change visual theme"),
                 IconTheme.JabRefIcons.PREFERENCES,
                 this::showThemeDialog
         );
 
-        QuickSettingsButton largeLibraryButton = new QuickSettingsButton(
-                Localization.lang("Optimize performance for large libraries"),
+        Button largeLibraryButton = createQuickSettingsButton(
+                Localization.lang("Optimize for large libraries"),
                 IconTheme.JabRefIcons.SELECTORS,
                 this::showLargeLibraryOptimizationDialog
         );
 
-        QuickSettingsButton pushApplicationButton = new QuickSettingsButton(
-                Localization.lang("Configure Push to Application"),
+        Button pushApplicationButton = createQuickSettingsButton(
+                Localization.lang("Configure push to applications"),
                 IconTheme.JabRefIcons.APPLICATION_GENERIC,
                 this::showPushApplicationConfigurationDialog
         );
 
-        QuickSettingsButton onlineServicesButton = new QuickSettingsButton(
-                Localization.lang("Configure Online Services"),
+        Button onlineServicesButton = createQuickSettingsButton(
+                Localization.lang("Configure web search services"),
                 IconTheme.JabRefIcons.WWW,
                 this::showOnlineServicesConfigurationDialog
         );
 
-        QuickSettingsButton entryTableButton = new QuickSettingsButton(
-                Localization.lang("Entry Table Display"),
+        Button entryTableButton = createQuickSettingsButton(
+                Localization.lang("Customize entry table"),
                 IconTheme.JabRefIcons.TOGGLE_GROUPS,
                 this::showEntryTableConfigurationDialog
         );
@@ -260,12 +292,8 @@ public class WelcomeTab extends Tab {
     }
 
     private void showMainFileDirectoryDialog() {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(Localization.lang("Main File Directory"));
-        dialog.setHeaderText(Localization.lang("Configure Main File Directory"));
-
         TextField pathField = new TextField();
-        pathField.setPromptText(Localization.lang("Main File Directory"));
+        pathField.setPromptText(Localization.lang("Main file directory path"));
         FilePreferences filePreferences = preferences.getFilePreferences();
         pathField.setText(filePreferences.getMainFileDirectory()
                                          .map(Path::toString).orElse(""));
@@ -281,18 +309,18 @@ public class WelcomeTab extends Tab {
                          .ifPresent(selectedDir -> pathField.setText(selectedDir.toString()));
         });
 
-        VBox content = new VBox(
-                new HBox(
-                        new Label(Localization.lang("Main File Directory") + ":"),
-                        pathField,
-                        browseButton
-                )
+        HBox pathContainer = new HBox(
+                new Label(Localization.lang("Directory path") + ":"),
+                pathField,
+                browseButton
         );
-        content.getStyleClass().add("quick-settings-dialog-container");
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
+        Optional<ButtonType> result = createQuickSettingsDialog(
+                "Set main file directory",
+                "Choose the default directory for storing attached files",
+                pathContainer
+        );
+
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
@@ -302,13 +330,6 @@ public class WelcomeTab extends Tab {
     }
 
     private void showThemeDialog() {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(Localization.lang("Visual Theme"));
-        dialog.setHeaderText(Localization.lang("Configure Visual Theme"));
-
-        VBox content = new VBox();
-        content.getStyleClass().add("quick-settings-dialog-container");
-
         ToggleGroup themeGroup = new ToggleGroup();
         HBox radioContainer = new HBox();
 
@@ -340,7 +361,7 @@ public class WelcomeTab extends Tab {
         }
 
         TextField customThemePath = new TextField();
-        customThemePath.setPromptText(Localization.lang("Path to custom theme file"));
+        customThemePath.setPromptText(Localization.lang("Custom theme file path"));
         customThemePath.setText(currentTheme.getType() == Theme.Type.CUSTOM ? currentTheme.getName() : "");
 
         Button browseButton = new Button();
@@ -354,24 +375,11 @@ public class WelcomeTab extends Tab {
         customThemePathBox.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(customThemePath, Priority.ALWAYS);
 
-        content.getChildren().add(radioContainer);
-
-        boolean isCustomTheme = customRadio.isSelected();
-        if (isCustomTheme) {
-            content.getChildren().add(customThemePathBox);
-        }
-
         themeGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
             boolean isCustom = newValue != null && newValue.getUserData() == ThemeTypes.CUSTOM;
-            boolean isCurrentlyVisible = content.getChildren().contains(customThemePathBox);
-
-            if (isCustom && !isCurrentlyVisible) {
-                content.getChildren().add(customThemePathBox);
-                dialog.getDialogPane().getScene().getWindow().sizeToScene();
-            } else if (!isCustom && isCurrentlyVisible) {
-                content.getChildren().remove(customThemePathBox);
-                dialog.getDialogPane().getScene().getWindow().sizeToScene();
-            }
+            customThemePathBox.setManaged(isCustom);
+            customThemePathBox.setVisible(isCustom);
+            customThemePathBox.getScene().getWindow().sizeToScene();
         });
 
         browseButton.setOnAction(_ -> {
@@ -389,9 +397,17 @@ public class WelcomeTab extends Tab {
                     customThemePath.setText(file.toAbsolutePath().toString()));
         });
 
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
+        if (currentTheme.getType() != Theme.Type.CUSTOM) {
+            customThemePathBox.setVisible(false);
+            customThemePathBox.setManaged(false);
+        }
+
+        Optional<ButtonType> result = createQuickSettingsDialog(
+                "Change visual theme",
+                "Select your preferred theme for the application",
+                radioContainer,
+                customThemePathBox
+        );
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
@@ -407,7 +423,7 @@ public class WelcomeTab extends Tab {
                     if (customPath.isEmpty()) {
                         dialogService.showErrorDialogAndWait(
                                 Localization.lang("Error"),
-                                Localization.lang("Please specify a custom theme file path."));
+                                Localization.lang("Specify a custom theme file path"));
                         yield null;
                     }
                     yield Theme.custom(customPath);
@@ -420,32 +436,33 @@ public class WelcomeTab extends Tab {
     }
 
     private void showLargeLibraryOptimizationDialog() {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(Localization.lang("Optimize performance for large libraries"));
-        dialog.setHeaderText(Localization.lang("Configure JabRef settings to optimize performance when working with large libraries"));
-
-        Label performanceOptimizationLabel = new Label(Localization.lang("Select which performance optimizations to apply:"));
+        Label performanceOptimizationLabel = new Label(Localization.lang("Select performance optimizations to apply"));
         performanceOptimizationLabel.setWrapText(true);
         performanceOptimizationLabel.setMaxWidth(400);
 
-        HBox performanceOptimizationHeader = new HBox(performanceOptimizationLabel, makeHelpButton("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues"));
+        HBox performanceOptimizationHeader = new HBox(
+                performanceOptimizationLabel,
+                createHelpButton("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues")
+        );
 
-        CheckBox disableFulltextIndexing = new CheckBox(Localization.lang("Disable fulltext indexing of linked files"));
+        CheckBox disableFulltextIndexing = new CheckBox(Localization.lang("Disable fulltext indexing"));
         disableFulltextIndexing.setSelected(true);
 
-        CheckBox disableCreationDate = new CheckBox(Localization.lang("Disable adding creation date to new entries"));
+        CheckBox disableCreationDate = new CheckBox(Localization.lang("Disable creation date timestamps"));
         disableCreationDate.setSelected(true);
 
-        CheckBox disableModificationDate = new CheckBox(Localization.lang("Disable adding modification date to entries"));
+        CheckBox disableModificationDate = new CheckBox(Localization.lang("Disable modification date timestamps"));
         disableModificationDate.setSelected(true);
 
-        CheckBox disableAutosave = new CheckBox(Localization.lang("Disable autosave for local libraries"));
+        CheckBox disableAutosave = new CheckBox(Localization.lang("Disable automatic saving"));
         disableAutosave.setSelected(true);
 
-        CheckBox disableGroupCount = new CheckBox(Localization.lang("Disable group entry count display"));
+        CheckBox disableGroupCount = new CheckBox(Localization.lang("Disable group entry counts"));
         disableGroupCount.setSelected(true);
 
-        VBox content = new VBox(
+        Optional<ButtonType> result = createQuickSettingsDialog(
+                "Optimize for large libraries",
+                "Improve performance when working with libraries containing many entries",
                 performanceOptimizationHeader,
                 disableFulltextIndexing,
                 disableCreationDate,
@@ -453,11 +470,7 @@ public class WelcomeTab extends Tab {
                 disableAutosave,
                 disableGroupCount
         );
-        content.getStyleClass().add("quick-settings-dialog-container");
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
@@ -479,14 +492,7 @@ public class WelcomeTab extends Tab {
     }
 
     private void showPushApplicationConfigurationDialog() {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(Localization.lang("Configure Push to Application"));
-        dialog.setHeaderText(Localization.lang("Select your preferred text editor or LaTeX application"));
-
-        VBox content = new VBox();
-        content.getStyleClass().add("quick-settings-dialog-container");
-
-        Label explanationLabel = new Label(Localization.lang("Detected applications are highlighted. Click to select and configure."));
+        Label explanationLabel = new Label(Localization.lang("Detected applications are highlighted"));
         explanationLabel.setWrapText(true);
         explanationLabel.setMaxWidth(400);
 
@@ -513,11 +519,13 @@ public class WelcomeTab extends Tab {
                               .ifPresent(applicationsList.getSelectionModel()::select);
         }
 
-        content.getChildren().addAll(explanationLabel, applicationsList);
+        Optional<ButtonType> result = createQuickSettingsDialog(
+                "Configure push to applications",
+                "Select your text editor or LaTeX application for pushing citations",
+                explanationLabel,
+                applicationsList
+        );
 
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
         if (result.isEmpty() || result.get() == ButtonType.CANCEL) {
             return;
         }
@@ -534,7 +542,6 @@ public class WelcomeTab extends Tab {
     private boolean isApplicationAvailable(PushToApplication application) {
         String appName = application.getDisplayName().toLowerCase();
 
-        // TODO: How to best hardcode these names?
         String[] possibleNames = switch (appName) {
             case "emacs" -> new String[] {"emacs", "emacsclient"};
             case "lyx/kile" -> new String[] {"lyx", "kile"};
@@ -607,40 +614,35 @@ public class WelcomeTab extends Tab {
     }
 
     private void showOnlineServicesConfigurationDialog() {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(Localization.lang("Configure Online Services"));
-        dialog.setHeaderText(Localization.lang("Quick configuration for online services and web search"));
-
-        CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for updates on startup"));
+        CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for updates at startup"));
         versionCheckBox.setSelected(preferences.getInternalPreferences().isVersionCheckEnabled());
 
-        CheckBox webSearchBox = new CheckBox(Localization.lang("Enable web search functionality"));
+        CheckBox webSearchBox = new CheckBox(Localization.lang("Enable web search"));
         webSearchBox.setSelected(preferences.getImporterPreferences().areImporterEnabled());
 
-        CheckBox grobidCheckBox = new CheckBox(Localization.lang("Enable Grobid service for metadata extraction"));
+        CheckBox grobidCheckBox = new CheckBox(Localization.lang("Enable metadata extraction service"));
         grobidCheckBox.setSelected(preferences.getGrobidPreferences().isGrobidEnabled());
 
         HBox grobidUrl = new HBox();
-        Label grobidUrlLabel = new Label(Localization.lang("Grobid URL") + ":");
+        Label grobidUrlLabel = new Label(Localization.lang("Service URL") + ":");
         TextField grobidUrlField = new TextField(preferences.getGrobidPreferences().getGrobidURL());
         HBox.setHgrow(grobidUrlField, Priority.ALWAYS);
         grobidUrl.getChildren().addAll(
                 grobidUrlLabel,
                 grobidUrlField,
-                makeHelpButton("https://docs.jabref.org/collect/newentryfromplaintext#grobid")
+                createHelpButton("https://docs.jabref.org/collect/newentryfromplaintext#grobid")
         );
 
         grobidUrl.visibleProperty().bind(grobidCheckBox.selectedProperty());
         grobidUrl.managedProperty().bind(grobidCheckBox.selectedProperty());
 
-        Label fetchersLabel = new Label(Localization.lang("Online Fetchers") + ":");
+        Label fetchersLabel = new Label(Localization.lang("Web search databases") + ":");
         HBox fetchersHeader = new HBox();
         fetchersHeader.getChildren().addAll(
                 fetchersLabel,
-                makeHelpButton("https://docs.jabref.org/collect/import-using-online-bibliographic-database")
+                createHelpButton("https://docs.jabref.org/collect/import-using-online-bibliographic-database")
         );
 
-        // From WebSearchTabViewModel.
         List<StudyCatalogItem> availableFetchers = WebFetchers
                 .getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences())
                 .stream()
@@ -669,7 +671,9 @@ public class WelcomeTab extends Tab {
         fetchersScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         fetchersScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        VBox content = new VBox(
+        Optional<ButtonType> result = createQuickSettingsDialog(
+                "Configure web search services",
+                "Enable and configure online databases and services for importing entries",
                 versionCheckBox,
                 webSearchBox,
                 grobidCheckBox,
@@ -677,11 +681,7 @@ public class WelcomeTab extends Tab {
                 fetchersHeader,
                 fetchersScrollPane
         );
-        content.getStyleClass().add("quick-settings-dialog-container");
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
@@ -700,20 +700,8 @@ public class WelcomeTab extends Tab {
         preferences.getImporterPreferences().setCatalogs(enabledFetchers);
     }
 
-    private @NotNull Button makeHelpButton(String url) {
-        Button grobidHelpButton = new Button();
-        grobidHelpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
-        grobidHelpButton.getStyleClass().add("help-button");
-        grobidHelpButton.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
-        return grobidHelpButton;
-    }
-
     private void showEntryTableConfigurationDialog() {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle(Localization.lang("Entry Table Display"));
-        dialog.setHeaderText(Localization.lang("Configure entry table display settings"));
-
-        CheckBox showCitationKeyBox = new CheckBox(Localization.lang("Show citation key column in entry table"));
+        CheckBox showCitationKeyBox = new CheckBox(Localization.lang("Show citation key column"));
 
         ColumnPreferences columnPreferences = preferences.getMainTablePreferences()
                                                          .getColumnPreferences();
@@ -725,12 +713,12 @@ public class WelcomeTab extends Tab {
 
         showCitationKeyBox.setSelected(isCitationKeyVisible);
 
-        VBox content = new VBox(showCitationKeyBox);
-        content.getStyleClass().add("quick-settings-dialog-container");
-        dialog.getDialogPane().setContent(content);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        Optional<ButtonType> result = createQuickSettingsDialog(
+                "Customize entry table",
+                "Configure which columns are displayed in the entry table",
+                showCitationKeyBox
+        );
 
-        Optional<ButtonType> result = dialogService.showCustomDialogAndWait(dialog);
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
