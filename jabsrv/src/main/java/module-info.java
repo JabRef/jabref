@@ -8,6 +8,13 @@ module org.jabref.jabsrv {
     exports org.jabref.http.server.cayw;
     opens org.jabref.http.server.cayw to org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
 
+    requires javafx.base;
+
+    // For CAYW feature
+    requires transitive javafx.graphics;
+    requires transitive javafx.controls;
+    requires afterburner.fx;
+
     // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
     requires org.glassfish.hk2.locator;
     uses org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl;
@@ -23,10 +30,6 @@ module org.jabref.jabsrv {
 
     requires jakarta.annotation;
     requires jakarta.inject;
-
-    requires afterburner.fx;
-    provides com.airhacks.afterburner.views.ResourceLocator
-            with org.jabref.http.JabRefResourceLocator;
 
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;
