@@ -75,7 +75,6 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.util.FileUpdateMonitor;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +157,7 @@ public class WelcomeTab extends Tab {
         return dialogService.showCustomDialogAndWait(dialog);
     }
 
-    private @NotNull Button createQuickSettingsButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
+    private Button createQuickSettingsButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
         Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
         button.getStyleClass().add("quick-settings-button");
@@ -167,7 +166,7 @@ public class WelcomeTab extends Tab {
         return button;
     }
 
-    private @NotNull Button createHelpButton(String url) {
+    private Button createHelpButton(String url) {
         Button helpButton = new Button();
         helpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
         helpButton.getStyleClass().add("help-button");
