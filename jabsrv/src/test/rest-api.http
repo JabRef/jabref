@@ -37,7 +37,7 @@ Accept: application/x-bibtex
 
 ### Get list of files in Chocolate.bib
 
-GET http://localhost:6050/libraries/demo/entries/pdffiles
+GET http://localhost:23119/libraries/demo/entries/pdffiles
 Accept: application/json
 
 ### Get CSL JSON of Chocolate.bib
@@ -47,12 +47,12 @@ Accept: application/x-bibtex-library-csl+json
 
 ### Read demo JabMap
 
-GET http://localhost:6050/libraries/Mindmaps.bib-7769f2fa/map
+GET http://localhost:23119/libraries/Mindmaps.bib-7769f2fa/map
 Accept: application/json
 
 ### Save demo JabMap
 
-PUT http://localhost:6050/libraries/demo/map
+PUT http://localhost:23119/libraries/demo/map
 Content-Type: application/json
 
 {
@@ -60,15 +60,15 @@ Content-Type: application/json
 }
 
 ### Get entry preview for "Tokede_2011" of demo library
-GET http://localhost:6050/libraries/demo/entries/Tokede_2011
+GET http://localhost:23119/libraries/demo/entries/Tokede_2011
 Accept: text/html
 
 ### Get entry preview string for "Corti_2009" of chocolate.bib
-GET http://localhost:6050/libraries/Chocolate.bib-13af3778/entries/Corti_2009
+GET http://localhost:23119/libraries/Chocolate.bib-13af3778/entries/Corti_2009
 Accept: text/plain
 
 ### Get text view for "Tokede_2011" of demo library
-GET http://localhost:6050/libraries/demo/entries/Tokede_2011
+GET http://localhost:23119/libraries/demo/entries/Tokede_2011
 Accept: text/plain
 
 ## From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
