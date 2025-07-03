@@ -3,7 +3,7 @@
     -jr-row-odd-background: -fx-control-inner-background-alt;
     -jr-row-even-background: -fx-control-inner-background;
     /*
-    On me, the text is hard to see when it's on top of the accent color. This is an alternative lighter accent color
+    On light theme, the text is hard to see when it's on top of the accent color. This is an alternative lighter accent color
     for better text visibility.
     */
     -jr-accent-alt: derive(-jr-accent, 15%);
