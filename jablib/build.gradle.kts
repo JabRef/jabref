@@ -527,10 +527,6 @@ mavenPublishing {
   }
 }
 
-tasks.withType<GenerateModuleMetadata> {
-  suppressedValidationErrors.add("dependencies-without-versions")
-}
-
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
