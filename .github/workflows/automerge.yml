@@ -14,8 +14,8 @@ jobs:
         id: shouldrun
         shell: bash
         run: |
-          actor="${{ github.actor }}"
-          title="${{ github.event.pull_request.title }}"
+          actor='${{ github.actor }}'
+          title='${{ github.event.pull_request.title }}'
 
           if [[ "$actor" == "renovate-bot" ]]; then
             echo "✅ from renote-bot"
