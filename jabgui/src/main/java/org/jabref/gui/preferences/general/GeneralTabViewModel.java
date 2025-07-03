@@ -59,10 +59,10 @@ import org.slf4j.LoggerFactory;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralTabViewModel.class);
-
     protected static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralTabViewModel.class);
 
     private final ReadOnlyListProperty<Language> languagesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.getSorted()));
