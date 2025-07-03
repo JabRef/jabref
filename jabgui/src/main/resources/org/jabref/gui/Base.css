@@ -2897,7 +2897,7 @@ journalInfo .grid-cell-b {
     -fx-font-weight: bold;
 }
 
-.application-item:filled:selected{
+.application-item:filled:selected {
     -fx-background-color: -jr-accent;
     -fx-text-fill: white;
 }
@@ -2922,7 +2922,7 @@ journalInfo .grid-cell-b {
 .help-button .glyph-icon,
 .help-button .ikonli-font-icon {
     -fx-icon-size: 16px;
-    -fx-icon-fill:-jr-theme-accent;
+    -fx-icon-fill: -jr-theme-accent;
 }
 
 /* Quick Settings: Online Fetchers */

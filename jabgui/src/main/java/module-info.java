@@ -57,7 +57,7 @@ open module org.jabref {
     // endregion
 
     provides org.tinylog.writers.Writer
-    with org.jabref.gui.logging.GuiWriter;
+            with org.jabref.gui.logging.GuiWriter;
 
     // Preferences and XML
     requires java.prefs;
@@ -180,6 +180,9 @@ open module org.jabref {
 
     // region: other libraries (alphabetically)
     // requires cuid;
+    requires com.dlsc.pdfviewfx;
+    requires com.pixelduke.fxthemes;
+    // requires com.sun.jna;
     // requires dd.plist;
     requires io.github.adr;
     // required by okhttp and some AI library

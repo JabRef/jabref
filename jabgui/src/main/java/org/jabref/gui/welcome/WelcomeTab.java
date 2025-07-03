@@ -309,7 +309,7 @@ public class WelcomeTab extends Tab {
         });
 
         HBox pathContainer = new HBox(
-                new Label(Localization.lang("Directory path") + ":"),
+                new Label(Localization.lang("Directory path")),
                 pathField,
                 browseButton
         );
@@ -623,7 +623,7 @@ public class WelcomeTab extends Tab {
         grobidCheckBox.setSelected(preferences.getGrobidPreferences().isGrobidEnabled());
 
         HBox grobidUrl = new HBox();
-        Label grobidUrlLabel = new Label(Localization.lang("Service URL") + ":");
+        Label grobidUrlLabel = new Label(Localization.lang("Service URL"));
         TextField grobidUrlField = new TextField(preferences.getGrobidPreferences().getGrobidURL());
         HBox.setHgrow(grobidUrlField, Priority.ALWAYS);
         grobidUrl.getChildren().addAll(
@@ -635,7 +635,7 @@ public class WelcomeTab extends Tab {
         grobidUrl.visibleProperty().bind(grobidCheckBox.selectedProperty());
         grobidUrl.managedProperty().bind(grobidCheckBox.selectedProperty());
 
-        Label fetchersLabel = new Label(Localization.lang("Web search databases") + ":");
+        Label fetchersLabel = new Label(Localization.lang("Web search databases"));
         HBox fetchersHeader = new HBox();
         fetchersHeader.getChildren().addAll(
                 fetchersLabel,
