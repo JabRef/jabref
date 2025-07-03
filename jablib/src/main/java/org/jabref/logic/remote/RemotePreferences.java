@@ -16,9 +16,12 @@ public class RemotePreferences {
     private final IntegerProperty port;
     private final BooleanProperty useRemoteServer;
 
-    public RemotePreferences(int port, boolean useRemoteServer) {
+    private final BooleanProperty enableHttpServer;
+
+    public RemotePreferences(int port, boolean useRemoteServer, boolean enableHttpServer) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
+        this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
     }
 
     public int getPort() {
@@ -33,6 +36,10 @@ public class RemotePreferences {
         this.port.setValue(port);
     }
 
+    public boolean isDifferentPort(int otherPort) {
+        return getPort() != otherPort;
+    }
+
     public boolean useRemoteServer() {
         return useRemoteServer.getValue();
     }
@@ -45,13 +52,19 @@ public class RemotePreferences {
         this.useRemoteServer.setValue(useRemoteServer);
     }
 
-    public boolean isDifferentPort(int otherPort) {
-        return getPort() != otherPort;
+    public boolean enableHttpServer() {
+        return enableHttpServer.getValue();
     }
 
-    /**
-     * Gets the IP address where the remote server is listening.
-     */
+    public BooleanProperty enableHttpServerProperty() {
+        return enableHttpServer;
+    }
+
+    public void setEnableHttpServer(boolean enableHttpServer) {
+        this.enableHttpServer.setValue(enableHttpServer);
+    }
+
+    /// Gets the IP address where both the remote server and the http server are listening.
     public static InetAddress getIpAddress() throws UnknownHostException {
         return InetAddress.getByName("localhost");
     }

@@ -357,6 +357,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // Remote
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
+    private static final String ENABLE_HTTP_SERVER = "enableHttpServer";
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
@@ -626,6 +627,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(REMOTE_SERVER_PORT, 6050);
+        defaults.put(ENABLE_HTTP_SERVER, Boolean.FALSE);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
@@ -1227,10 +1229,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         remotePreferences = new RemotePreferences(
                 getInt(REMOTE_SERVER_PORT),
-                getBoolean(USE_REMOTE_SERVER));
+                getBoolean(USE_REMOTE_SERVER),
+                getBoolean(ENABLE_HTTP_SERVER));
 
         EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
+        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_HTTP_SERVER, newValue));
 
         return remotePreferences;
     }

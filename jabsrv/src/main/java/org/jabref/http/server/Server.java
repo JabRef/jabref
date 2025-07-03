@@ -7,11 +7,15 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
+import javafx.collections.ObservableList;
+
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
+import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabaseContext;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -27,9 +31,9 @@ import org.slf4j.LoggerFactory;
 public class Server {
     private static final Logger LOGGER = LoggerFactory.getLogger(Server.class);
 
-    /// TODO: Use an observable list of BibDatabaseContexts
+    /// Entry point for the CLI
     public HttpServer run(List<Path> files, URI uri) {
-        List filesToServe;
+        List<Path> filesToServe;
         if (files == null || files.isEmpty()) {
             LOGGER.debug("No library available to serve, serving the demo library...");
             // Server.class.getResource("...") is always null here, thus trying relative path
@@ -46,10 +50,40 @@ public class Server {
         FilesToServe filesToServeService = new FilesToServe();
         filesToServeService.setFilesToServe(filesToServe);
 
-        return startServer(filesToServeService, uri);
+        ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
+        HttpServer httpServer = startServer(serviceLocator, uri);
+
+        // Required for CLI only
+        // GUI uses HttpServerManager
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                System.out.println("Shutting down jabsrv...");
+                httpServer.shutdownNow();
+                System.out.println("Done, exit.");
+            } catch (Exception e) {
+                LOGGER.error("Could not shut down server", e);
+            }
+        }));
+
+        return httpServer;
+    }
+
+    ///  Entry point for the GUI
+    public HttpServer run(ObservableList<BibDatabaseContext> files, URI uri) {
+        ContextsToServe contextsToServe = new ContextsToServe();
+        contextsToServe.setContextsToServe(files);
+
+        ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
+
+        return startServer(serviceLocator, uri);
     }
 
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
+        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
+
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
         // TODO: Add SSL
@@ -64,27 +98,6 @@ public class Server {
         final HttpServer httpServer =
                 GrizzlyHttpServerFactory
                         .createHttpServer(uri, resourceConfig, serviceLocator);
-        return httpServer;
-    }
-
-    private HttpServer startServer(FilesToServe filesToServe, URI uri) {
-        ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
-        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
-        ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-
-        final HttpServer httpServer = startServer(serviceLocator, uri);
-
-        // TODO: Enable use of GUI StateManager
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                System.out.println("Shutting down jabsrv...");
-                httpServer.shutdownNow();
-                System.out.println("Done, exit.");
-            } catch (Exception e) {
-                LOGGER.error("Could not shut down server", e);
-            }
-        }));
 
         return httpServer;
     }

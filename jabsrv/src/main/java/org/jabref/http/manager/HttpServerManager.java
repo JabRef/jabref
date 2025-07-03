@@ -1,8 +1,10 @@
 package org.jabref.http.manager;
 
 import java.net.URI;
-import java.nio.file.Path;
-import java.util.List;
+
+import javafx.collections.ObservableList;
+
+import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,21 +21,25 @@ public class HttpServerManager implements AutoCloseable {
 
     private HttpServerThread httpServerThread;
 
-    public synchronized void start(List<Path> filesToServe, URI uri) {
-        if (!isOpen()) {
-            httpServerThread = new HttpServerThread(filesToServe, uri);
+    public synchronized void start(ObservableList<BibDatabaseContext> contextsToServe, URI uri) {
+        if (!isStarted()) {
+            httpServerThread = new HttpServerThread(contextsToServe, uri);
             httpServerThread.start();
         }
     }
 
     public synchronized void stop() {
-        if (isOpen()) {
+        LOGGER.debug("Stopping HTTP server manager...");
+        if (isStarted()) {
             httpServerThread.interrupt();
             httpServerThread = null;
+            LOGGER.debug("HTTP server manager stopped successfully.");
+        } else {
+            LOGGER.debug("HTTP server manager is not started, nothing to stop.");
         }
     }
 
-    public boolean isOpen() {
+    private boolean isStarted() {
         return httpServerThread != null;
     }
 

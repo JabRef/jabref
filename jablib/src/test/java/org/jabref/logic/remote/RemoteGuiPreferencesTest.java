@@ -13,7 +13,7 @@ class RemoteGuiPreferencesTest {
 
     @BeforeEach
     void setUp() {
-        preferences = new RemotePreferences(1000, true);
+        preferences = new RemotePreferences(1000, true, false);
     }
 
     @Test
