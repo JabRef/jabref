@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -23,7 +22,6 @@ import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -66,7 +64,17 @@ public class CAYWResource {
             return Response.ok("ready").build();
         }
 
-        BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams.getLibraryPath());
+        BibDatabaseContext databaseContext;
+
+        // handle library path parameter
+        if (queryParams.getLibraryPath().isPresent() && queryParams.getLibraryPath().get().equalsIgnoreCase("demo")) {
+            databaseContext = getDatabaseContextFromStream(getChocolateBibAsStream());
+        } else if (queryParams.getLibraryPath().isPresent()) {
+            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(queryParams.getLibraryPath().get()));
+            databaseContext = getDatabaseContextFromStream(inputStream);
+        } else {
+            databaseContext = getDatabaseContextFromStream(getLatestDatabaseStream());
+        }
 
         /* unused until DatabaseSearcher is fixed
         PostgreServer postgreServer = new PostgreServer();
@@ -103,10 +111,10 @@ public class CAYWResource {
             return Response.noContent().build();
         }
 
-        // Format param handling
+        // Format parameter handling
         String response = formatterService.format(queryParams, searchResults);
 
-        // Clipboard param handling
+        // Clipboard parameter handling
         if (queryParams.isClipboard()) {
             Toolkit toolkit = Toolkit.getDefaultToolkit();
             Clipboard systemClipboard = toolkit.getSystemClipboard();
@@ -117,36 +125,37 @@ public class CAYWResource {
         return Response.ok(response).build();
     }
 
-    private BibDatabaseContext getBibDatabaseContext(Optional<String> libraryPath) throws IOException {
+    private InputStream getLatestDatabaseStream() throws IOException {
         InputStream libraryStream;
-        if (libraryPath.isPresent()) {
-            java.nio.file.Path path = java.nio.file.Path.of(libraryPath.get());
-            if (!Files.exists(path)) {
-                LOGGER.error("Library path does not exist, using the default chocolate.bib: {}", libraryPath);
-                libraryStream = getChocolateBibAsStream();
-            } else {
-                libraryStream = Files.newInputStream(path);
-            }
+        // Use the latest opened library as the default library
+        final List<java.nio.file.Path> lastOpenedLibraries = new ArrayList<>(preferences.getLastFilesOpenedPreferences().getLastFilesOpened());
+        if (lastOpenedLibraries.isEmpty()) {
+            LOGGER.warn("No library path provided and no last opened libraries found, using the default chocolate.bib.");
+            libraryStream = getChocolateBibAsStream();
         } else {
-            // Use the latest opened library as the default library
-            final List<java.nio.file.Path> lastOpenedLibraries = new ArrayList<>(JabRefCliPreferences.getInstance().getLastFilesOpenedPreferences().getLastFilesOpened());
-            if (lastOpenedLibraries.isEmpty()) {
-                LOGGER.warn("No library path provided and no last opened libraries found, using the default chocolate.bib.");
+            java.nio.file.Path lastOpenedLibrary = lastOpenedLibraries.getFirst();
+            if (!Files.exists(lastOpenedLibrary)) {
+                LOGGER.error("Last opened library does not exist, using the default chocolate.bib: {}", lastOpenedLibrary);
                 libraryStream = getChocolateBibAsStream();
             } else {
-                java.nio.file.Path lastOpenedLibrary = lastOpenedLibraries.getFirst();
-                if (!Files.exists(lastOpenedLibrary)) {
-                    LOGGER.error("Last opened library does not exist, using the default chocolate.bib: {}", lastOpenedLibrary);
-                    libraryStream = getChocolateBibAsStream();
-                } else {
-                    libraryStream = Files.newInputStream(lastOpenedLibrary);
-                }
+                libraryStream = Files.newInputStream(lastOpenedLibrary);
             }
         }
+        return libraryStream;
+    }
 
+    private InputStream getDatabaseStreamFromPath(java.nio.file.Path path) throws IOException {
+        if (!Files.exists(path)) {
+            LOGGER.warn("The provided library path does not exist: {}. Using the default chocolate.bib.", path);
+            return getChocolateBibAsStream();
+        }
+        return Files.newInputStream(path);
+    }
+
+    private BibDatabaseContext getDatabaseContextFromStream(InputStream inputStream) throws IOException {
         BibtexImporter bibtexImporter = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
         BibDatabaseContext databaseContext;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(libraryStream, StandardCharsets.UTF_8))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             databaseContext = bibtexImporter.importDatabase(reader).getDatabaseContext();
         }
         return databaseContext;
