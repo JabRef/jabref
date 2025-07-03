@@ -45,6 +45,7 @@ public class HttpServerManager implements AutoCloseable {
 
     @Override
     public void close() {
+        LOGGER.debug("Closing HTTP server manager...");
         stop();
     }
 }

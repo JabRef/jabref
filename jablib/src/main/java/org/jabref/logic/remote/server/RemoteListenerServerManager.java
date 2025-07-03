@@ -19,9 +19,13 @@ public class RemoteListenerServerManager implements AutoCloseable {
     private RemoteListenerServerThread remoteServerThread;
 
     public void stop() {
+        LOGGER.debug("Stopping RemoteListenerServerManager");
         if (isOpen()) {
             remoteServerThread.interrupt();
             remoteServerThread = null;
+            LOGGER.debug("RemoteListenerServerManager stopped successfully.");
+        } else {
+            LOGGER.debug("RemoteListenerServerManager was not open, nothing to stop.");
         }
     }
 
@@ -68,6 +72,7 @@ public class RemoteListenerServerManager implements AutoCloseable {
 
     @Override
     public void close() {
+        LOGGER.debug("Closing RemoteListenerServerManager");
         stop();
     }
 }
