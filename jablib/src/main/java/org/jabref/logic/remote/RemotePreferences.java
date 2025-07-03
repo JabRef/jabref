@@ -1,6 +1,7 @@
 package org.jabref.logic.remote;
 
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.UnknownHostException;
 
 import javafx.beans.property.BooleanProperty;
@@ -8,10 +9,15 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Place for handling the preferences for the remote communication
  */
 public class RemotePreferences {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemotePreferences.class);
 
     private final IntegerProperty port;
     private final BooleanProperty useRemoteServer;
@@ -67,5 +73,14 @@ public class RemotePreferences {
     /// Gets the IP address where both the remote server and the http server are listening.
     public static InetAddress getIpAddress() throws UnknownHostException {
         return InetAddress.getByName("localhost");
+    }
+
+    public URI getHttpServerUri() {
+        try {
+            return URI.create("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":23119");
+        } catch (UnknownHostException e) {
+            LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
+            return URI.create("http://localhost:23119");
+        }
     }
 }

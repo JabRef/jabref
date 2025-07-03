@@ -2,7 +2,6 @@ package org.jabref.gui.preferences.general;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -283,12 +282,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
             ObservableList<BibDatabaseContext> openDatabases = Injector.instantiateModelOrService(StateManager.class).getOpenDatabases();
-            try {
-                URI uri = URI.create("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":23119");
-                httpServerManager.start(openDatabases, uri);
-            } catch (UnknownHostException e) {
-                LOGGER.error("Could not start HTTP server due to unknown host.", e);
-            }
+            URI uri = remotePreferences.getHttpServerUri();
+            httpServerManager.start(openDatabases, uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();

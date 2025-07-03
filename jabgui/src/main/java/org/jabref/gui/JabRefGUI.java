@@ -401,12 +401,17 @@ public class JabRefGUI extends Application {
     // Background tasks
     public void startBackgroundTasks() {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
+
         if (remotePreferences.useRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
                             preferences),
                     remotePreferences.getPort());
+        }
+
+        if (remotePreferences.enableHttpServer()) {
+            httpServerManager.start(stateManager.getOpenDatabases(), remotePreferences.getHttpServerUri());
         }
     }
 
