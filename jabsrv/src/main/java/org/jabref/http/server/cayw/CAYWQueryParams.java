@@ -7,6 +7,8 @@ import jakarta.ws.rs.QueryParam;
 
 public class CAYWQueryParams {
 
+    /// See documentation here https://retorque.re/zotero-better-bibtex/citing/cayw/index.html#diy
+
     @QueryParam("probe")
     private String probe;
 
@@ -18,6 +20,7 @@ public class CAYWQueryParams {
     private String clipboard;
 
     @QueryParam("command")
+    @DefaultValue("autocite")
     private String command;
 
     @QueryParam("minimize")
@@ -35,8 +38,8 @@ public class CAYWQueryParams {
     @QueryParam("librarypath")
     private String libraryPath;
 
-    public Optional<String> getCommand() {
-        return Optional.ofNullable(command);
+    public String getCommand() {
+        return command;
     }
 
     public boolean isClipboard() {

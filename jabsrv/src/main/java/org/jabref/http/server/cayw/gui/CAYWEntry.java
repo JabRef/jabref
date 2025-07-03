@@ -9,7 +9,7 @@ import org.jabref.model.entry.BibEntry;
 
 public class CAYWEntry {
 
-    private final BibEntry value;
+    private final BibEntry bibEntry;
 
     // Used on the buttons ("chips")
     private final String shortLabel;
@@ -22,15 +22,15 @@ public class CAYWEntry {
 
     private EventHandler<ActionEvent> onClick;
 
-    public CAYWEntry(BibEntry value, String label, String shortLabel, String description) {
-        this.value = value;
+    public CAYWEntry(BibEntry bibEntry, String label, String shortLabel, String description) {
+        this.bibEntry = bibEntry;
         this.label = label;
         this.shortLabel = shortLabel;
         this.description = description;
     }
 
-    public BibEntry getValue() {
-        return value;
+    public BibEntry getBibEntry() {
+        return bibEntry;
     }
 
     public String getLabel() {
@@ -60,11 +60,11 @@ public class CAYWEntry {
         }
 
         CAYWEntry caywEntry = (CAYWEntry) o;
-        return Objects.equals(getValue(), caywEntry.getValue());
+        return Objects.equals(getBibEntry(), caywEntry.getBibEntry());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getValue());
+        return Objects.hashCode(getBibEntry());
     }
 }
