@@ -13,18 +13,15 @@ public class FormatterService {
     public FormatterService() {
         this.formatters = new HashMap<>();
         registerFormatter(new SimpleJsonFormatter());
+        registerFormatter(new BibLatexFormatter());
     }
 
     public void registerFormatter(CAYWFormatter formatter) {
-        String formatName = formatter.getFormatName();
-        if (formatters.containsKey(formatName)) {
-            return;
-        }
-        formatters.put(formatName, formatter);
+        formatters.putIfAbsent(formatter.getFormatName(), formatter);
     }
 
     public CAYWFormatter getFormatter(String formatName) throws IllegalArgumentException {
-        CAYWFormatter formatter = formatters.get(formatName);
+        CAYWFormatter formatter = formatters.get(formatName.toLowerCase());
         if (formatter == null) {
             throw new IllegalArgumentException("Unknown format: " + formatName);
         }

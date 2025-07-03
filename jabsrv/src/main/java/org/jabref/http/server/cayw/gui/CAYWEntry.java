@@ -1,11 +1,15 @@
 package org.jabref.http.server.cayw.gui;
 
+import java.util.Objects;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-public class CAYWEntry<T> {
+import org.jabref.model.entry.BibEntry;
 
-    private final T value;
+public class CAYWEntry {
+
+    private final BibEntry value;
 
     // Used on the buttons ("chips")
     private final String shortLabel;
@@ -18,14 +22,14 @@ public class CAYWEntry<T> {
 
     private EventHandler<ActionEvent> onClick;
 
-    public CAYWEntry(T value, String label, String shortLabel, String description) {
+    public CAYWEntry(BibEntry value, String label, String shortLabel, String description) {
         this.value = value;
         this.label = label;
         this.shortLabel = shortLabel;
         this.description = description;
     }
 
-    public T getValue() {
+    public BibEntry getValue() {
         return value;
     }
 
@@ -47,5 +51,20 @@ public class CAYWEntry<T> {
 
     public void setOnClick(EventHandler<ActionEvent> onClick) {
         this.onClick = onClick;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CAYWEntry caywEntry = (CAYWEntry) o;
+        return Objects.equals(getValue(), caywEntry.getValue());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getValue());
     }
 }

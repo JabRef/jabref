@@ -1,5 +1,8 @@
 package org.jabref.http.server.cayw;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +36,8 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jspecify.annotations.Nullable;
@@ -64,7 +69,8 @@ public class CAYWResource {
             @QueryParam("texstudio") String texstudio,
             @QueryParam("selected") String selected,
             @QueryParam("select") String select,
-            @QueryParam("librarypath") String libraryPath
+            @QueryParam("librarypath") String libraryPath,
+            @Context HttpHeaders httpHeaders
     ) throws IOException, ExecutionException, InterruptedException {
         if (probe != null && !probe.isEmpty()) {
             return Response.ok("ready").build();
@@ -82,35 +88,41 @@ public class CAYWResource {
                 postgreServer);
           */
 
-        List<CAYWEntry<BibEntry>> entries = databaseContext.getEntries()
+        List<CAYWEntry> entries = databaseContext.getEntries()
                                  .stream()
                                  .map(this::createCAYWEntry)
                                  .toList();
 
         initializeGUI();
 
-        CompletableFuture<List<BibEntry>> future = new CompletableFuture<>();
+        CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
         Platform.runLater(() -> {
-                SearchDialog<BibEntry> dialog = new SearchDialog<>();
+                SearchDialog dialog = new SearchDialog();
                 // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
                 //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
-            List<BibEntry> results = dialog.show(searchQuery ->
-                    entries.stream()
-                           .filter(bibEntryCAYWEntry -> matches(bibEntryCAYWEntry, searchQuery))
-                           .map(CAYWEntry::getValue)
-                           .toList(),
+            List<CAYWEntry> results = dialog.show(searchQuery ->
+                    entries.stream().filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
                     entries);
 
                 future.complete(results);
         });
 
-        List<BibEntry> searchResults = future.get();
+        List<CAYWEntry> searchResults = future.get();
 
         if (searchResults.isEmpty()) {
             return Response.noContent().build();
         }
 
-        String response = formatterService.getFormatter(format).format(searchResults);
+        // Format param handling
+        String response = formatterService.getFormatter(format).format(httpHeaders, searchResults);
+
+        // Clipboard param handling
+        if (clipboard != null && !clipboard.isEmpty()) {
+            Toolkit toolkit = Toolkit.getDefaultToolkit();
+            Clipboard systemClipboard = toolkit.getSystemClipboard();
+            StringSelection strSel = new StringSelection(response);
+            systemClipboard.setContents(strSel, null);
+        }
 
         return Response.ok(response).build();
     }
@@ -173,14 +185,14 @@ public class CAYWResource {
         return BibDatabase.class.getResourceAsStream(CHOCOLATEBIB_PATH);
     }
 
-    private CAYWEntry<BibEntry> createCAYWEntry(BibEntry entry) {
+    private CAYWEntry createCAYWEntry(BibEntry entry) {
         String label = entry.getCitationKey().orElse("");
         String shortLabel = label;
         String description = entry.getField(StandardField.TITLE).orElse(entry.getAuthorTitleYear());
-        return new CAYWEntry<>(entry, label, shortLabel, description);
+        return new CAYWEntry(entry, label, shortLabel, description);
     }
 
-    private boolean matches(CAYWEntry<BibEntry> entry, String searchText) {
+    private boolean matches(CAYWEntry entry, String searchText) {
         if (searchText == null || searchText.isEmpty()) {
             return true;
         }
