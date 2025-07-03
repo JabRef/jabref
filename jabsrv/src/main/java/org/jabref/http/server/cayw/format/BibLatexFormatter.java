@@ -25,7 +25,7 @@ public class BibLatexFormatter implements CAYWFormatter {
                 .map(CAYWEntry::getBibEntry)
                 .toList();
 
-        return String.format("\\%s{%s}", command,
+        return "\\%s{%s}".formatted(command,
                 bibEntries.stream()
                           .map(entry -> entry.getCitationKey().orElse(""))
                           .collect(Collectors.joining(",")));

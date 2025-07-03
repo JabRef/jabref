@@ -67,7 +67,7 @@ public class CAYWResource {
         BibDatabaseContext databaseContext;
 
         // handle library path parameter
-        if (queryParams.getLibraryPath().isPresent() && queryParams.getLibraryPath().get().equalsIgnoreCase("demo")) {
+        if (queryParams.getLibraryPath().isPresent() && "demo".equalsIgnoreCase(queryParams.getLibraryPath().get())) {
             databaseContext = getDatabaseContextFromStream(getChocolateBibAsStream());
         } else if (queryParams.getLibraryPath().isPresent()) {
             InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(queryParams.getLibraryPath().get()));
