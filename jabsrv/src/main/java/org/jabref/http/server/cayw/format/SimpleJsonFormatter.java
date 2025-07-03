@@ -28,11 +28,7 @@ public class SimpleJsonFormatter implements CAYWFormatter {
             SimpleJson simpleJson = SimpleJson.fromBibEntry(bibEntry);
             jsonArray.add(toJson(simpleJson));
         }
-
-        List<SimpleJson> simpleJsons = bibEntries.stream()
-                .map(SimpleJson::fromBibEntry)
-                .toList();
-        return new GsonBuilder().setPrettyPrinting().create().toJson(simpleJsons);
+        return new GsonBuilder().setPrettyPrinting().create().toJson(jsonArray);
     }
 
     private JsonObject toJson(SimpleJson simpleJson) {
