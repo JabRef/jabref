@@ -141,7 +141,7 @@ public interface NavigationPredicate {
                      .filter(menuItem -> Optional.ofNullable(menuItem.getGraphic())
                                                  .map(graphic -> graphic.equals(node)
                                                          || Stream.iterate(graphic, Objects::nonNull, Node::getParent)
-                                                                  .anyMatch(cm -> cm.equals(node)))
+                                                                  .anyMatch(contextMenu -> contextMenu.equals(node)))
                                                  .orElse(false))
                      .findFirst();
     }
@@ -153,6 +153,23 @@ public interface NavigationPredicate {
         return event -> navigate(beforeNavigate, originalHandler, event, onNavigate);
     }
 
+    /// Navigates to the target node by consuming the event.
+    /// 1. Execute beforeNavigate, which typically used to stop node polling and prevent auto-fallback
+    /// navigation during the handler execution.
+    /// 2. Execute the original event handler if it exists.
+    /// 3. Execute the onNavigate runnable, when
+    ///    - The original handler has completed execution, or
+    ///    - The handler has timed out after HANDLER_TIMEOUT_MS milliseconds.
+    ///    - A new window has been opened, or an existing window has been closed.
+    ///
+    ///    Those conditions ensure that we will still navigate if original handler is blocking (e.g., showing a dialog,
+    ///    and we are highlighting a node in the dialog) and is still responsive (i.e., we will navigate after a certain
+    ///    amount of time, or a new window has been opened, and we can start polling the new window).
+    ///
+    /// @param <T> the type of the event
+    /// @param beforeNavigate a runnable to execute before navigation
+    /// @param originalHandler the original event handler to execute
+    /// @param event the event to navigate
     static <T extends Event> void navigate(
             Runnable beforeNavigate,
             EventHandler<? super T> originalHandler,
