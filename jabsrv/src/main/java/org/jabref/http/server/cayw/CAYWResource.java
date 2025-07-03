@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 @Path("better-bibtex/cayw")
 public class CAYWResource {
-    public static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
     private static final String CHOCOLATEBIB_PATH = "/Chocolate.bib";
     private static boolean initialized = false;
 
