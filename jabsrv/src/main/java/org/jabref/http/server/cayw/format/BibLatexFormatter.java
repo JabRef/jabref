@@ -3,6 +3,7 @@ package org.jabref.http.server.cayw.format;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.http.server.cayw.CAYWQueryParams;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.model.entry.BibEntry;
 
@@ -18,8 +19,8 @@ public class BibLatexFormatter implements CAYWFormatter {
     }
 
     @Override
-    public String format(HttpHeaders httpHeaders, List<CAYWEntry> caywEntries) {
-        String command = httpHeaders.getRequestHeaders().getOrDefault("command", List.of("autocite")).getFirst();
+    public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
+        String command = queryParams.getCommand().orElse("autocite");
 
         List<BibEntry> bibEntries = caywEntries.stream()
                 .map(CAYWEntry::getValue)

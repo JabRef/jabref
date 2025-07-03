@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -31,13 +32,10 @@ import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jspecify.annotations.Nullable;
@@ -62,21 +60,13 @@ public class CAYWResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getCitation(
-            @QueryParam("probe") String probe,
-            @QueryParam("format") @DefaultValue("simple-json") String format,
-            @QueryParam("clipboard") String clipboard,
-            @QueryParam("minimize") String minimize,
-            @QueryParam("texstudio") String texstudio,
-            @QueryParam("selected") String selected,
-            @QueryParam("select") String select,
-            @QueryParam("librarypath") String libraryPath,
-            @Context HttpHeaders httpHeaders
+            @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
-        if (probe != null && !probe.isEmpty()) {
+        if (queryParams.isProbe()) {
             return Response.ok("ready").build();
         }
 
-        BibDatabaseContext databaseContext = getBibDatabaseContext(libraryPath);
+        BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams.getLibraryPath());
 
         /* unused until DatabaseSearcher is fixed
         PostgreServer postgreServer = new PostgreServer();
@@ -114,10 +104,10 @@ public class CAYWResource {
         }
 
         // Format param handling
-        String response = formatterService.getFormatter(format).format(httpHeaders, searchResults);
+        String response = formatterService.format(queryParams, searchResults);
 
         // Clipboard param handling
-        if (clipboard != null && !clipboard.isEmpty()) {
+        if (queryParams.isClipboard()) {
             Toolkit toolkit = Toolkit.getDefaultToolkit();
             Clipboard systemClipboard = toolkit.getSystemClipboard();
             StringSelection strSel = new StringSelection(response);
@@ -127,10 +117,10 @@ public class CAYWResource {
         return Response.ok(response).build();
     }
 
-    private BibDatabaseContext getBibDatabaseContext(String libraryPath) throws IOException {
+    private BibDatabaseContext getBibDatabaseContext(Optional<String> libraryPath) throws IOException {
         InputStream libraryStream;
-        if (libraryPath != null && !libraryPath.isEmpty()) {
-            java.nio.file.Path path = java.nio.file.Path.of(libraryPath);
+        if (libraryPath.isPresent()) {
+            java.nio.file.Path path = java.nio.file.Path.of(libraryPath.get());
             if (!Files.exists(path)) {
                 LOGGER.error("Library path does not exist, using the default chocolate.bib: {}", libraryPath);
                 libraryStream = getChocolateBibAsStream();
