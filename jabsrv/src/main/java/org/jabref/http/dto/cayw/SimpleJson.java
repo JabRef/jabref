@@ -12,7 +12,6 @@ public record SimpleJson(
         long id,
         String citationKey) {
 
-
     public static final Logger LOGGER = LoggerFactory.getLogger(SimpleJson.class);
 
     public static SimpleJson fromBibEntry(BibEntry bibEntry) {
