@@ -2677,6 +2677,8 @@ journalInfo .grid-cell-b {
     -fx-padding: 8px;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
 }
 
 .theme-option:hover {

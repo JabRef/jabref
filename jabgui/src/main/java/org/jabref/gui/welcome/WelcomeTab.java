@@ -740,10 +740,9 @@ public class WelcomeTab extends Tab {
 
     private VBox createThemeOption(RadioButton radio, Node wireframe) {
         VBox container = new VBox();
-        container.setSpacing(12);
-        container.setAlignment(Pos.CENTER_LEFT);
         container.getStyleClass().add("theme-option");
         container.getChildren().addAll(radio, wireframe);
+        container.setOnMouseClicked(_ -> radio.fire());
         return container;
     }
 
