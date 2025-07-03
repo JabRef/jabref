@@ -68,7 +68,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Run OpenRewrite
         run: |
-          ./gradlew :test-support:classes :rewriteDryRun
+          ./gradlew :test-support:classes :jabgui:compileTestJava :rewriteDryRun
 
   modernizer:
     name: Modernizer
