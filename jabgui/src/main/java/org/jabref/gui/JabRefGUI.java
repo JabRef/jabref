@@ -423,14 +423,25 @@ public class JabRefGUI extends Application {
         } catch (Exception e) {
             LOGGER.error("Unable to close AI service", e);
         }
+
         LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
+
+        LOGGER.trace("Shutting down remote server manager");
+        remoteListenerServerManager.stop();
+
+        LOGGER.trace("Shutting down http server manager");
+        httpServerManager.stop();
+
         LOGGER.trace("Stopping background tasks");
         stopBackgroundTasks();
+
         LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
+
         LOGGER.trace("Closing citations and relations search service");
         citationsAndRelationsSearchService.close();
+
         LOGGER.trace("Finished stop");
     }
 
