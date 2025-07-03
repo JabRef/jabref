@@ -30,10 +30,9 @@ public class LibrariesResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get() {
         Stream<java.nio.file.Path> pathStream;
-        if (filesToServe != null) {
+        if (!filesToServe.isEmpty()) {
             pathStream = filesToServe.getFilesToServe().stream();
         } else {
-            assert contextsToServe != null;
             pathStream = contextsToServe.getContextsToServe().stream()
                                                        .filter(context -> context.getDatabasePath().isPresent())
                                                        .map(context -> context.getDatabasePath().get());
