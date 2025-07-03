@@ -55,7 +55,7 @@ public class CAYWQueryParams {
     }
 
     public boolean isSelect() {
-        return select != null && select.equalsIgnoreCase("true");
+        return "true".equalsIgnoreCase(select);
     }
 
     public boolean isProbe() {
