@@ -126,7 +126,7 @@ public class LibraryResource {
         }
 
         java.nio.file.Path library = getLibraryPath(id);
-        if (filesToServe != null) {
+        if (!filesToServe.isEmpty()) {
             ParserResult parserResult;
             try {
                 parserResult = bibtexImporter.importDatabase(library);
@@ -137,7 +137,7 @@ public class LibraryResource {
             return parserResult.getDatabaseContext();
         }
 
-        assert contextsToServe != null;
+        // contextsToServe.isEmpty() could be true when no libraries are opened in JabRef
         return contextsToServe.getContextsToServe().stream()
                        .filter(context -> context.getDatabasePath().equals(Optional.of(library)))
                        .findFirst()

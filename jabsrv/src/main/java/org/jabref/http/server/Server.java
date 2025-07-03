@@ -34,25 +34,28 @@ public class Server {
 
     /// Entry point for the CLI
     public HttpServer run(List<Path> files, URI uri) {
-        List<Path> filesToServe;
+        List<Path> filesToServeList;
         if (files == null || files.isEmpty()) {
             LOGGER.debug("No library available to serve, serving the demo library...");
             // Server.class.getResource("...") is always null here, thus trying relative path
             // Path bibPath = Path.of(Server.class.getResource("http-server-demo.bib").toURI());
             Path bibPath = Path.of("src/main/resources/org/jabref/http/server/http-server-demo.bib").toAbsolutePath();
             LOGGER.debug("Location of demo library: {}", bibPath);
-            filesToServe = List.of(bibPath);
+            filesToServeList = List.of(bibPath);
         } else {
-            filesToServe = files;
+            filesToServeList = files;
         }
 
-        LOGGER.debug("Libraries to serve: {}", filesToServe);
+        LOGGER.debug("Libraries to serve: {}", filesToServeList);
 
-        FilesToServe filesToServeService = new FilesToServe();
-        filesToServeService.setFilesToServe(filesToServe);
+        FilesToServe filesToServe = new FilesToServe();
+        filesToServe.setFilesToServe(filesToServeList);
+
+        ContextsToServe contextsToServe = new ContextsToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -72,10 +75,13 @@ public class Server {
 
     ///  Entry point for the GUI
     public HttpServer run(ObservableList<BibDatabaseContext> files, URI uri) {
+        FilesToServe filesToServe = new FilesToServe();
+
         ContextsToServe contextsToServe = new ContextsToServe();
         contextsToServe.setContextsToServe(files);
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
 
         return startServer(serviceLocator, uri);

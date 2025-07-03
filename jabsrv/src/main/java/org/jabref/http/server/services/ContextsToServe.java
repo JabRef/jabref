@@ -1,6 +1,6 @@
 package org.jabref.http.server.services;
 
-import java.util.List;
+import javafx.collections.ObservableList;
 
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -8,13 +8,17 @@ import jakarta.inject.Singleton;
 
 @Singleton
 public class ContextsToServe {
-    private List<BibDatabaseContext> contextsToServe;
+    private ObservableList<BibDatabaseContext> contextsToServe;
 
-    public void setContextsToServe(List<BibDatabaseContext> contextsToServe) {
+    public void setContextsToServe(ObservableList<BibDatabaseContext> contextsToServe) {
         this.contextsToServe = contextsToServe;
     }
 
-    public List<BibDatabaseContext> getContextsToServe() {
+    public ObservableList<BibDatabaseContext> getContextsToServe() {
         return contextsToServe;
+    }
+
+    public boolean isEmpty() {
+        return contextsToServe == null || contextsToServe.isEmpty();
     }
 }
