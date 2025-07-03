@@ -101,6 +101,8 @@ dependencies {
 
     implementation("de.undercouch:citeproc-java")
 
+    implementation("net.sourceforge.tess4j:tess4j")
+
     testImplementation(project(":test-support"))
 
     testImplementation("io.github.classgraph:classgraph")

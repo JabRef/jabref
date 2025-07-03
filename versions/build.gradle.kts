@@ -86,6 +86,7 @@ dependencies.constraints {
     api("net.java.dev.jna:jna-platform:5.17.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
+    api("net.sourceforge.tess4j:tess4j:5.16.0")
     api("org.apache.commons:commons-csv:1.14.0")
     api("org.apache.commons:commons-lang3:3.17.0")
     api("org.apache.commons:commons-text:1.13.1")
