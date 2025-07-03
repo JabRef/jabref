@@ -443,6 +443,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         return remotePortProperty;
     }
 
+    public BooleanProperty enableHttpServerProperty() {
+        return enableHttpServerProperty;
+    }
+
     public void openBrowser() {
         String url = "https://themes.jabref.org";
         try {
