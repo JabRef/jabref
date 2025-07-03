@@ -52,6 +52,7 @@ class MedlineFetcherTest {
                 .withField(new UnknownField("revised"), "2019-11-20")
                 .withField(StandardField.TITLE, "Denial of long-term issues with agriculture on tropical peatlands will have devastating consequences.")
                 .withField(StandardField.VOLUME, "23")
+                .withField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/27670948/")
                 .withField(StandardField.YEAR, "2017");
 
         entryEndharti = new BibEntry(StandardEntryType.Article)
@@ -75,6 +76,7 @@ class MedlineFetcherTest {
                 .withField(StandardField.PUBSTATE, "epublish")
                 .withField(new UnknownField("revised"), "2022-04-08")
                 .withField(StandardField.VOLUME, "16")
+                .withField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/27670445/")
                 .withField(StandardField.YEAR, "2016");
 
         bibEntryIchikawa = new BibEntry(StandardEntryType.Article)
@@ -100,6 +102,7 @@ class MedlineFetcherTest {
                 .withField(new UnknownField("pubmodel"), "Print-Electronic")
                 .withField(StandardField.TITLE, "Seroprevalence of antibody to TgGRA7 antigen of Toxoplasma gondii in livestock animals from Western Java, Indonesia.")
                 .withField(StandardField.VOLUME, "64")
+                .withField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/26197440/")
                 .withField(StandardField.YEAR, "2015");
 
         bibEntrySari = new BibEntry(StandardEntryType.Article)
@@ -123,6 +126,7 @@ class MedlineFetcherTest {
                 .withField(new UnknownField("pubmodel"), "Print")
                 .withField(StandardField.TITLE, "TOXOPLASMA AND VIRAL ANTIBODIES AMONG HIV PATIENTS AND INMATES IN CENTRAL JAVA, INDONESIA.")
                 .withField(StandardField.VOLUME, "46")
+                .withField(StandardField.URL, "https://pubmed.ncbi.nlm.nih.gov/26867355/")
                 .withField(StandardField.YEAR, "2015");
     }
 

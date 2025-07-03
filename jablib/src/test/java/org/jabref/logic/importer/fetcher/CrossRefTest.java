@@ -123,17 +123,17 @@ class CrossRefTest {
     @Test
     void performSearchByIdFindsPaperWithoutTitle() throws FetcherException {
         BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setField(StandardField.AUTHOR, "Dominik Wujastyk");
-        entry.setField(StandardField.DOI, "10.1023/a:1003473214310");
-        entry.setField(StandardField.ISSN, "0019-7246");
-        entry.setField(StandardField.PAGES, "172-176");
-        entry.setField(StandardField.VOLUME, "42");
-        entry.setField(StandardField.YEAR, "1999");
-        entry.setField(StandardField.JOURNAL, "Indo-Iranian Journal");
-        entry.setField(StandardField.NUMBER, "2");
-        entry.setField(StandardField.PUBLISHER, "Walter de Gruyter GmbH");
+        entry.setField(StandardField.AUTHOR, "Leo Breiman");
+        entry.setField(StandardField.DOI, "10.1023/a:1010933404324");
+        entry.setField(StandardField.ISSN, "0885-6125");
+        entry.setField(StandardField.PAGES, "5-32");
+        entry.setField(StandardField.VOLUME, "45");
+        entry.setField(StandardField.YEAR, "2001");
+        entry.setField(StandardField.JOURNAL, "Machine Learning");
+        entry.setField(StandardField.NUMBER, "1");
+        entry.setField(StandardField.PUBLISHER, "Springer Science and Business Media LLC");
 
-        assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1003473214310"));
+        assertEquals(Optional.of(entry), fetcher.performSearchById("10.1023/a:1010933404324"));
     }
 
     @Test

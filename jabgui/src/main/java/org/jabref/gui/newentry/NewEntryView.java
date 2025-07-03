@@ -91,7 +91,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private Button generateButton;
 
     @FXML private TabPane tabs;
-    @FXML private Tab tabCreateEntry;
+    @FXML private Tab tabAddEntry;
     @FXML private Tab tabLookupIdentifier;
     @FXML private Tab tabInterpretCitations;
     @FXML private Tab tabSpecifyBibtex;
@@ -169,8 +169,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
 
         switch (approach) {
             case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
-                tabs.getSelectionModel().select(tabCreateEntry);
-                switchCreateEntry();
+                tabs.getSelectionModel().select(tabAddEntry);
+                switchAddEntry();
                 break;
             case NewEntryDialogTab.ENTER_IDENTIFIER:
                 tabs.getSelectionModel().select(tabLookupIdentifier);
@@ -186,7 +186,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 break;
         }
 
-        tabCreateEntry.setOnSelectionChanged(_ -> switchCreateEntry());
+        tabAddEntry.setOnSelectionChanged(_ -> switchAddEntry());
         tabLookupIdentifier.setOnSelectionChanged(_ -> switchLookupIdentifier());
         tabInterpretCitations.setOnSelectionChanged(_ -> switchInterpretCitations());
         tabSpecifyBibtex.setOnSelectionChanged(_ -> switchSpecifyBibtex());
@@ -206,13 +206,13 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 }
             });
 
-        initializeCreateEntry();
+        initializeAddEntry();
         initializeLookupIdentifier();
         initializeInterpretCitations();
         initializeSpecifyBibTeX();
     }
 
-    private void initializeCreateEntry() {
+    private void initializeAddEntry() {
         entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
         entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
         entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());
@@ -337,8 +337,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     @FXML
-    private void switchCreateEntry() {
-        if (!tabCreateEntry.isSelected()) {
+    private void switchAddEntry() {
+        if (!tabAddEntry.isSelected()) {
             return;
         }
 

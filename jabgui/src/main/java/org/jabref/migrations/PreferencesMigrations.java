@@ -3,11 +3,9 @@ package org.jabref.migrations;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -67,6 +65,7 @@ public class PreferencesMigrations {
         upgradeCleanups(preferences);
         moveApiKeysToKeyring(preferences);
         removeCommentsFromCustomEditorTabs(preferences);
+        upgradeResolveBibTeXStringsFields(preferences);
     }
 
     /**
@@ -238,8 +237,7 @@ public class PreferencesMigrations {
                                                  JabRefCliPreferences prefs, Preferences mainPrefsNode) {
         String preferenceFileNamePattern = mainPrefsNode.get(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, null);
 
-        if ((preferenceFileNamePattern != null) &&
-                oldStylePattern.equals(preferenceFileNamePattern)) {
+        if (oldStylePattern.equals(preferenceFileNamePattern)) {
             // Upgrade the old-style File Name pattern to new one:
             mainPrefsNode.put(JabRefCliPreferences.IMPORT_FILENAMEPATTERN, newStylePattern);
             LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the preference file", JabRefCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
@@ -252,6 +250,16 @@ public class PreferencesMigrations {
                     LOGGER.info("migrated old style {} value \"{}\" to new value \"{}\" in the running application", JabRefCliPreferences.IMPORT_FILENAMEPATTERN, oldStylePattern, newStylePattern);
                 }
             }
+        }
+    }
+
+    static void upgradeResolveBibTeXStringsFields(JabRefCliPreferences prefs) {
+        String oldPrefsValue = "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon";
+        String currentPrefs = prefs.get(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS);
+
+        if (oldPrefsValue.equals(currentPrefs)) {
+            currentPrefs += ";monthfiled";
+            prefs.put(JabRefCliPreferences.RESOLVE_STRINGS_FOR_FIELDS, currentPrefs);
         }
     }
 
@@ -295,11 +303,14 @@ public class PreferencesMigrations {
 
     private static void addCrossRefRelatedFieldsForAutoComplete(JabRefCliPreferences prefs) {
         // LinkedHashSet because we want to retain the order and add new fields to the end
-        Set<String> keys = new LinkedHashSet<>(prefs.getStringList(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS));
-        keys.add("crossref");
-        keys.add("related");
-        keys.add("entryset");
-        prefs.putStringList(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, new ArrayList<>(keys));
+        String oldPrefs = "author;editor;title;journal;publisher;keywords";
+        String newFieldsToAdd = "crossref;related;entryset";
+        String currentPrefs = prefs.get(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS);
+
+        if (oldPrefs.equals(currentPrefs)) {
+            currentPrefs += ";" + newFieldsToAdd;
+            prefs.put(JabRefGuiPreferences.AUTOCOMPLETER_COMPLETE_FIELDS, currentPrefs);
+        }
     }
 
     private static void migrateTypedKeyPrefs(JabRefCliPreferences prefs, Preferences oldPatternPrefs)
@@ -372,7 +383,7 @@ public class PreferencesMigrations {
                 double columnWidth = ColumnPreferences.DEFAULT_COLUMN_WIDTH;
 
                 MainTableColumnModel.Type type = SpecialField.fromName(name)
-                                                             .map(field -> MainTableColumnModel.Type.SPECIALFIELD)
+                                                             .map(_ -> MainTableColumnModel.Type.SPECIALFIELD)
                                                              .orElse(MainTableColumnModel.Type.NORMALFIELD);
 
                 if (i < columnWidths.size()) {

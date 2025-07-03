@@ -26,7 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jabref.logic.bibtex.FieldWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
+import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.groups.DefaultGroupsFactory;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -214,7 +214,7 @@ public class BibtexParser implements Parser {
                 skipWhitespace();
                 String label = parseTextToken().trim();
 
-                if (BibtexDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
+                if (BibDatabaseWriter.DATABASE_ID_PREFIX.equals(label)) {
                     skipWhitespace();
                     database.setSharedDatabaseID(parseTextToken().trim());
                 }
@@ -471,8 +471,8 @@ public class BibtexParser implements Parser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
-        } else if (result.contains(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
-            return purge(result, BibtexDatabaseWriter.DATABASE_ID_PREFIX);
+        } else if (result.contains(BibDatabaseWriter.DATABASE_ID_PREFIX)) {
+            return purge(result, BibDatabaseWriter.DATABASE_ID_PREFIX);
         } else if (result.contains(SaveConfiguration.ENCODING_PREFIX)) {
             return purge(result, SaveConfiguration.ENCODING_PREFIX);
         } else {

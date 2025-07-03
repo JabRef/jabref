@@ -24,6 +24,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
     @FXML private CheckBox enableAiChatTab;
     @FXML private CheckBox acceptRecommendations;
     @FXML private CheckBox enableLatexCitationsTab;
+    @FXML private CheckBox smartFileAnnotationsTab;
     @FXML private CheckBox enableValidation;
     @FXML private CheckBox allowIntegerEdition;
     @FXML private CheckBox journalPopupEnabled;
@@ -55,6 +56,7 @@ public class EntryEditorTab extends AbstractPreferenceTabView<EntryEditorTabView
         enableAiChatTab.selectedProperty().bindBidirectional(viewModel.enableAiChatTabProperty());
         acceptRecommendations.selectedProperty().bindBidirectional(viewModel.acceptRecommendationsProperty());
         enableLatexCitationsTab.selectedProperty().bindBidirectional(viewModel.enableLatexCitationsTabProperty());
+        smartFileAnnotationsTab.selectedProperty().bindBidirectional(viewModel.smartFileAnnotationsTabProperty());
         enableValidation.selectedProperty().bindBidirectional(viewModel.enableValidationProperty());
         allowIntegerEdition.selectedProperty().bindBidirectional(viewModel.allowIntegerEditionProperty());
         journalPopupEnabled.selectedProperty().bindBidirectional(viewModel.journalPopupProperty());

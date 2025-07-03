@@ -6,6 +6,7 @@
 
 <suppressions>
     <suppress checks="[a-zA-Z0-9]*" files="[\\/].jbang[\\/]" />
+    <suppress checks="[a-zA-Z0-9]*" files="[\\/]build-support[\\/]" />
     <suppress checks="[a-zA-Z0-9]*" files="[\\/]generated[\\/]" />
     <suppress checks="[a-zA-Z0-9]*" files="[\\/]generated-sources[\\/]" />
     <suppress checks="[a-zA-Z0-9]*" files="[\\/]generated-src[\\/]" />

@@ -191,13 +191,6 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      com.jthemedetecor.OsThemeDetector
-Project: jSystemThemeDetector
-URL:     https://github.com/Dansoftowner/jSystemThemeDetector
-License: Apache-2.0
-```
-
-```yaml
 Id:      com.kohlschutter.junixsocket
 Project: junixsocket
 URL:     https://github.com/kohlschutter/junixsocket
@@ -264,13 +257,6 @@ License: BSD-2-Clause
 Id:      commons-beanutils:commons-beanutils
 Project: Apache Commons Beanutils
 URL:     https://commons.apache.org/proper/commons-beanutils/
-License: Apache-2.0
-```
-
-```yaml
-Id:      commons-cli:commons-cli
-Project: Apache Commons CLI
-URL:     http://commons.apache.org/cli/
 License: Apache-2.0
 ```
 
@@ -518,21 +504,7 @@ License: Apache-2.0
 ```
 
 ```yaml
-Id:      org.apache.pdfbox:fontbox
-Project: Apache PDFBox
-URL:     http://pdfbox.apache.org
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.pdfbox:jempbox
-Project: Apache PDFBox
-URL:     http://pdfbox.apache.org
-License: Apache-2.0
-```
-
-```yaml
-Id:      org.apache.pdfbox:pdfbox
+Id:      org.apache.pdfbox:*
 Project: Apache PDFBox
 URL:     http://pdfbox.apache.org
 License: Apache-2.0
@@ -864,7 +836,6 @@ com.vladsch.flexmark:flexmark-util-visitor:0.64.8
 com.vladsch.flexmark:flexmark-util:0.64.8
 com.vladsch.flexmark:flexmark:0.64.8
 commons-beanutils:commons-beanutils:1.9.4
-commons-cli:commons-cli:1.9.0
 commons-codec:commons-codec:1.18.0
 commons-collections:commons-collections:3.2.2
 commons-digester:commons-digester:2.1

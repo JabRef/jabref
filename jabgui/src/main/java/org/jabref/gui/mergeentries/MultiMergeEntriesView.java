@@ -57,6 +57,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
+    public static final int ACTIVE_COLUMNS_MINIMUM = 2;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MultiMergeEntriesView.class);
 
@@ -126,13 +127,16 @@ public class MultiMergeEntriesView extends BaseDialog<BibEntry> {
         leftScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
         rightScrollPane.vvalueProperty().bindBidirectional(centerScrollPane.vvalueProperty());
 
-        viewModel.failedSuppliersProperty().addListener((obs, oldValue, newValue) ->
-                failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
-                        "Could not extract Metadata from: %0",
-                        String.join(", ", viewModel.failedSuppliersProperty())
-                ))
-        );
-
+        viewModel.failedSuppliersProperty().addListener((_, _, _) -> {
+            failedSuppliers.setText(viewModel.failedSuppliersProperty().get().isEmpty() ? "" : Localization.lang(
+                    "Could not extract Metadata from: %0",
+                    String.join(", ", viewModel.failedSuppliersProperty())));
+            int activeColumns = viewModel.entriesProperty().get().size() - viewModel.failedSuppliersProperty().get().size();
+            if (activeColumns < ACTIVE_COLUMNS_MINIMUM) {
+                // [impl->req~ux.auto-close.merge-entries~1]
+                close();
+            }
+        });
         fillDiffModes();
     }
 

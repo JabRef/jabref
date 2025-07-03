@@ -1,0 +1,44 @@
+.search-dialog {
+    -fx-background-color: #f5f5f5;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: #e0e0e0;
+}
+
+.search-result-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+.search-result-description {
+    -fx-font-size: 12px;
+    -fx-fill: #666666;
+}
+
+.chip-remove-button {
+    -fx-background-color: transparent;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #666;
+    -fx-padding: 0 0 0 5;
+    -fx-cursor: hand;
+}
+
+.chip-remove-button:hover {
+    -fx-text-fill: #d32f2f;
+}
+
+.chip-style {
+    -fx-background-color: #e3f2fd;
+    -fx-background-radius: 15;
+    -fx-border-color: #90caf9;
+    -fx-border-radius: 15;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.chip-style:hover {
+    -fx-background-color: #bbdefb;
+}

@@ -23,6 +23,7 @@ concurrency:
 
 jobs:
   cache:
+    if: ${{ github.repository_owner == 'JabRef' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out code

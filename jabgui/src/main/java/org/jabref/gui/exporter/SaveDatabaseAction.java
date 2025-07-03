@@ -30,7 +30,6 @@ import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.exporter.AtomicFileWriter;
 import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
-import org.jabref.logic.exporter.BibtexDatabaseWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
 import org.jabref.logic.l10n.Encodings;
@@ -263,7 +262,7 @@ public class SaveDatabaseAction {
         synchronized (bibDatabaseContext) {
             try (AtomicFileWriter fileWriter = new AtomicFileWriter(file, encoding, saveConfiguration.shouldMakeBackup())) {
                 BibWriter bibWriter = new BibWriter(fileWriter, bibDatabaseContext.getDatabase().getNewLineSeparator());
-                BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+                BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                         bibWriter,
                         saveConfiguration,
                         preferences.getFieldPreferences(),

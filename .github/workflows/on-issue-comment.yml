@@ -6,7 +6,7 @@ on:
 
 jobs:
   assign:
-    if: github.repository == 'JabRef/jabref'
+    if: github.repository_owner == 'JabRef'
     runs-on: ubuntu-latest
     permissions:
       contents: read

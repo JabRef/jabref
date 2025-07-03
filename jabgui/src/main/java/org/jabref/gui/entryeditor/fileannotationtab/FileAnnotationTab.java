@@ -4,7 +4,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.entryeditor.EntryEditorTab;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.model.entry.BibEntry;
@@ -15,10 +17,14 @@ import com.airhacks.afterburner.views.ViewLoader;
 public class FileAnnotationTab extends EntryEditorTab {
 
     public static final String NAME = "File annotations";
-    private final StateManager stateManager;
 
-    public FileAnnotationTab(StateManager stateManager) {
+    private final StateManager stateManager;
+    private final EntryEditorPreferences entryEditorPreferences;
+
+    public FileAnnotationTab(StateManager stateManager,
+                             GuiPreferences preferences) {
         this.stateManager = stateManager;
+        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
 
         setText(Localization.lang("File annotations"));
         setTooltip(new Tooltip(Localization.lang("Show file annotations")));
@@ -26,7 +32,18 @@ public class FileAnnotationTab extends EntryEditorTab {
 
     @Override
     public boolean shouldShow(BibEntry entry) {
-        return entry.getField(StandardField.FILE).isPresent();
+        if (!entryEditorPreferences.shouldShowFileAnnotationsTab()) {
+            return entry.getField(StandardField.FILE).isPresent();
+        }
+
+        return entry.getField(StandardField.FILE).isPresent()
+                && stateManager.activeTabProperty().get()
+                .map(tab -> tab.getAnnotationCache()
+                        .getFromCache(entry)
+                        .values()
+                        .stream()
+                        .anyMatch(list -> !list.isEmpty()))
+                .orElse(false);
     }
 
     @Override

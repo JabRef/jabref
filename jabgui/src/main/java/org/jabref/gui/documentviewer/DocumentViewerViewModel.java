@@ -1,5 +1,6 @@
 package org.jabref.gui.documentviewer;
 
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -20,13 +21,19 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DocumentViewerViewModel extends AbstractViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DocumentViewerViewModel.class);
 
     private final StateManager stateManager;
     private final CliPreferences preferences;
@@ -35,10 +42,12 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private final BooleanProperty liveMode = new SimpleBooleanProperty(true);
     private final IntegerProperty currentPage = new SimpleIntegerProperty();
     private final StringProperty highlightText = new SimpleStringProperty();
+    private final DialogService dialogService;
 
-    public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences) {
+    public DocumentViewerViewModel(StateManager stateManager, CliPreferences preferences, DialogService dialogService) {
         this.stateManager = Objects.requireNonNull(stateManager);
         this.preferences = Objects.requireNonNull(preferences);
+        this.dialogService = Objects.requireNonNull(dialogService);
 
         this.stateManager.getSelectedEntries().addListener((ListChangeListener<? super BibEntry>) _ -> {
             // Switch to currently selected entry in live mode
@@ -76,10 +85,21 @@ public class DocumentViewerViewModel extends AbstractViewModel {
     private void setCurrentEntries(List<BibEntry> entries) {
         if (entries.isEmpty()) {
             files.clear();
+            currentDocument.set(null);
         } else {
-            Set<LinkedFile> linkedFiles = entries.stream().map(BibEntry::getFiles).flatMap(List::stream).collect(Collectors.toSet());
-            // We don't need to switch to the first file, this is done automatically in the UI part
-            files.setValue(FXCollections.observableArrayList(linkedFiles));
+            Set<LinkedFile> pdfFiles = entries.stream()
+                                              .map(BibEntry::getFiles)
+                                              .flatMap(List::stream)
+                                              .filter(this::isPdfFile)
+                                              .collect(Collectors.toSet());
+
+            if (pdfFiles.isEmpty()) {
+                files.clear();
+                currentDocument.set(null);
+                dialogService.notify(Localization.lang("No PDF files available"));
+            } else {
+                files.setValue(FXCollections.observableArrayList(pdfFiles));
+            }
         }
     }
 
@@ -89,11 +109,32 @@ public class DocumentViewerViewModel extends AbstractViewModel {
         }
     }
 
+    private boolean isPdfFile(LinkedFile file) {
+        if (file == null || file.getLink() == null || file.getLink().trim().isEmpty()) {
+            return false;
+        }
+
+        try {
+            Path filePath = Path.of(file.getLink());
+            return FileUtil.isPDFFile(filePath);
+        } catch (InvalidPathException | SecurityException e) {
+            return false;
+        }
+    }
+
     public void switchToFile(LinkedFile file) {
         if (file != null) {
             stateManager.getActiveDatabase()
                         .flatMap(database -> file.findIn(database, preferences.getFilePreferences()))
-                        .ifPresent(this::setCurrentDocument);
+                        .ifPresentOrElse(
+                                this::setCurrentDocument,
+                                () -> {
+                                    currentDocument.set(null);
+                                    LOGGER.warn("Could not find or access file: {}", file.getLink());
+                                }
+                        );
+        } else {
+            currentDocument.set(null);
         }
     }
 

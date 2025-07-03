@@ -24,9 +24,9 @@ public class NewEntryBindingPreset implements KeyBindingPreset {
         // Add new entry presets
         keyBindings.put(KeyBinding.NEW_ARTICLE, "ctrl+shift+A");
         keyBindings.put(KeyBinding.NEW_BOOK, "ctrl+shift+B");
-        keyBindings.put(KeyBinding.CREATE_ENTRY, "ctrl+N");
-        keyBindings.put(KeyBinding.CREATE_ENTRY_IDENTIFIER, "ctrl+alt+shift+N");
-        keyBindings.put(KeyBinding.CREATE_ENTRY_PLAINTEXT, "ctrl+shift+N");
+        keyBindings.put(KeyBinding.ADD_ENTRY, "ctrl+N");
+        keyBindings.put(KeyBinding.ADD_ENTRY_IDENTIFIER, "ctrl+alt+shift+N");
+        keyBindings.put(KeyBinding.ADD_ENTRY_PLAINTEXT, "ctrl+shift+N");
         keyBindings.put(KeyBinding.NEW_INBOOK, "ctrl+shift+I");
         keyBindings.put(KeyBinding.NEW_INPROCEEDINGS, "ctrl+shift+C");
         keyBindings.put(KeyBinding.NEW_MASTERSTHESIS, "ctrl+shift+M");

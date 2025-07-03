@@ -9,6 +9,7 @@ import javax.net.ssl.SSLContext;
 
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
+import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
 
@@ -55,6 +56,7 @@ public class Server {
         resourceConfig.register(RootResource.class);
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
+        resourceConfig.register(CAYWResource.class);
         resourceConfig.register(CORSFilter.class);
         resourceConfig.register(GlobalExceptionMapper.class);
 

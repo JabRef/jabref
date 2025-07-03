@@ -27,7 +27,8 @@ jobs:
               > [!WARNING]
               > This issue will be **automatically unassigned** in **{{ days_remaining }} days** if there's no activity.
 
-              Remember that you can ask the [JabRef Guru](https://gurubase.io/g/jabref) about anything regarding JabRef. Additionally, our contributing guide has [hints on creating a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) and a link to our Gitter chat.
+              Remember that you can ask the [JabRef Guru](https://gurubase.io/g/jabref) or [DeepWiki](https://deepwiki.com/JabRef/jabref) about anything regarding JabRef.
+              Additionally, our contributing guide has [hints on creating a pull request](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) and a link to our Gitter chat.
 
               <details open>
               <summary>How to keep your assignment</summary>
@@ -35,7 +36,7 @@ jobs:
               \
               If you are working on it, you can prevent automatic unassignment by:
 
-              - Submitting a draft PR with your progress
+              - Submitting a [draft pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests) with your progress within {{ days_remaining }} days
               - Asking for the **{{{ pin_label }}}** label if you need more time
               </details>
 

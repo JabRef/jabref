@@ -19,7 +19,7 @@ public interface ExternalFileType {
     JabRefIcon getIcon();
 
     /**
-     * Get the bibtex field name used for this file type. Currently we assume that field name equals filename extension.
+     * Get the bibtex field name used for this file type. Currently, we assume that field name equals filename extension.
      *
      * @return The field name.
      */

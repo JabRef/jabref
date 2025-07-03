@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.jabref.logic.cleanup.Formatter;
 import org.jabref.logic.formatter.bibtexfields.CleanupUrlFormatter;
 import org.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import org.jabref.logic.formatter.bibtexfields.ConvertMSCCodesFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeAmpersandsFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeDollarSignFormatter;
 import org.jabref.logic.formatter.bibtexfields.EscapeUnderscoresFormatter;
@@ -62,7 +63,8 @@ public class Formatters {
                 new HtmlToLatexFormatter(),
                 new HtmlToUnicodeFormatter(),
                 new LatexToUnicodeFormatter(),
-                new UnicodeToLatexFormatter()
+                new UnicodeToLatexFormatter(),
+                new ConvertMSCCodesFormatter()
         );
     }
 

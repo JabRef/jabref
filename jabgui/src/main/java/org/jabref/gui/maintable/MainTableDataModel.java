@@ -27,6 +27,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.GroupTreeNode;
 import org.jabref.model.search.SearchDisplayMode;
+import org.jabref.model.search.SearchFlags;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexStartedEvent;
 import org.jabref.model.search.matchers.MatcherSet;
@@ -107,6 +108,19 @@ public class MainTableDataModel {
                 clearSearchMatches();
             }
         }).onSuccess(result -> FilteredListProxy.refilterListReflection(entriesFiltered)).executeWith(taskExecutor);
+    }
+
+    /// Refresh the current search
+    ///
+    /// We need to call this when the database is switched during a fulltext search since
+    /// the listener on the searchQueryProperty will not fire if the query doesn't change
+    /// (this causes searchResults in FullTextResultsTab to be empty)
+    /// [issue 13241](https://github.com/JabRef/jabref/issues/13241)
+    public void refreshSearchMatches() {
+        searchQueryProperty.getValue().ifPresent(searchQuery -> {
+            searchQuery.getSearchFlags().remove(SearchFlags.FULLTEXT);
+            // There is no need to re-add the flag since the UI is unchanged and the flag will be automatically re-added.
+        });
     }
 
     private void setSearchMatches(SearchResults results) {
