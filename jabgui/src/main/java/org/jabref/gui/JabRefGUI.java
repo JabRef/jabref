@@ -28,6 +28,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
+import org.jabref.http.manager.HttpServerManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
@@ -80,6 +81,7 @@ public class JabRefGUI extends Application {
     private static JabRefFrame mainFrame;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
+    private static HttpServerManager httpServerManager;
 
     private Stage mainStage;
 
@@ -156,7 +158,10 @@ public class JabRefGUI extends Application {
         IndexManager.clearOldSearchIndices();
 
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
-        Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
+        Injector.setModelOrService(RemoteListenerServerManager.class, JabRefGUI.remoteListenerServerManager);
+
+        JabRefGUI.httpServerManager = new HttpServerManager();
+        Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
         JabRefGUI.stateManager = new StateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
