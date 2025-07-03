@@ -1,35 +1,60 @@
 package org.jabref.logic.ocr;
 
-import java.util.Optional;
+/**
+ * Represents the result of an OCR operation.
+ * Uses sealed classes to ensure type safety and avoid null parameters.
+ */
+public sealed interface OcrResult {
 
-public class OcrResult {
-    private final boolean success;
-    private final String text;
-    private final String errorMessage;
-
-    private OcrResult(boolean success, String text, String errorMessage) {
-        this.success = success;
-        this.text = text;
-        this.errorMessage = errorMessage;
+    /**
+     * Represents a successful OCR operation with extracted text.
+     */
+    record Success(String text) implements OcrResult {
+        public Success {
+            // Convert null to empty string instead of throwing exception
+            if (text == null) {
+                text = "";
+            }
+        }
     }
 
-    public static OcrResult success(String text) {
-        return new OcrResult(true, text, null);
+    /**
+     * Represents a failed OCR operation with an error message.
+     */
+    record Failure(String errorMessage) implements OcrResult {
+        public Failure {
+            // Provide default message instead of throwing exception
+            if (errorMessage == null || errorMessage.isBlank()) {
+                errorMessage = "Unknown error occurred";
+            }
+        }
     }
 
-    public static OcrResult failure(String errorMessage) {
-        return new OcrResult(false, null, errorMessage);
+    /**
+     * Checks if this result represents a success.
+     */
+    default boolean isSuccess() {
+        return this instanceof Success;
     }
 
-    public boolean isSuccess() {
-        return success;
+    /**
+     * Checks if this result represents a failure.
+     */
+    default boolean isFailure() {
+        return this instanceof Failure;
     }
 
-    public Optional<String> getText() {
-        return Optional.ofNullable(text);
+    /**
+     * Factory method for creating a success result.
+     */
+    static OcrResult success(String text) {
+        return new Success(text);
     }
 
-    public Optional<String> getErrorMessage() {
-        return Optional.ofNullable(errorMessage);
+    /**
+     * Factory method for creating a failure result.
+     */
+    static OcrResult failure(String errorMessage) {
+        return new Failure(errorMessage);
     }
 }

@@ -1,7 +1,8 @@
 package org.jabref.logic.ocr;
 
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.jabref.model.strings.StringUtil;
 
@@ -46,10 +47,10 @@ public class OcrService {
             String originalPath = System.getProperty(JNA_LIBRARY_PATH, "");
             if (Platform.isARM()) {
                 System.setProperty(JNA_LIBRARY_PATH,
-                        originalPath + File.pathSeparator + "/opt/homebrew/lib/");
+                        originalPath + java.io.File.pathSeparator + "/opt/homebrew/lib/");
             } else {
                 System.setProperty(JNA_LIBRARY_PATH,
-                        originalPath + File.pathSeparator + "/usr/local/cellar/");
+                        originalPath + java.io.File.pathSeparator + "/usr/local/cellar/");
             }
         }
     }
@@ -59,11 +60,11 @@ public class OcrService {
         String tessdataPath = System.getenv(TESSDATA_PREFIX);
 
         if (tessdataPath != null && !tessdataPath.isEmpty()) {
-            File tessdataDir = new File(tessdataPath);
-            if (tessdataDir.exists() && tessdataDir.isDirectory()) {
+            Path tessdataDir = Paths.get(tessdataPath);
+            if (Files.exists(tessdataDir) && Files.isDirectory(tessdataDir)) {
                 // Tesseract expects the parent directory of tessdata
-                if (tessdataDir.getName().equals("tessdata")) {
-                    tesseract.setDatapath(tessdataDir.getParent());
+                if (tessdataDir.getFileName().toString().equals("tessdata")) {
+                    tesseract.setDatapath(tessdataDir.getParent().toString());
                 } else {
                     tesseract.setDatapath(tessdataPath);
                 }
@@ -91,11 +92,13 @@ public class OcrService {
                 "/usr/share"  // System
         };
 
-        for (String path : possiblePaths) {
-            File tessdata = new File(path, "tessdata");
-            File engData = new File(tessdata, "eng.traineddata");
-            if (tessdata.exists() && engData.exists()) {
-                return path;  // Return parent of tessdata
+        for (String pathStr : possiblePaths) {
+            Path path = Paths.get(pathStr);
+            Path tessdata = path.resolve("tessdata");
+            Path engData = tessdata.resolve("eng.traineddata");
+
+            if (Files.exists(tessdata) && Files.exists(engData)) {
+                return pathStr;  // Return parent of tessdata
             }
         }
 
@@ -106,8 +109,7 @@ public class OcrService {
      * Performs OCR on a PDF file and returns the extracted text.
      *
      * @param pdfPath Path to the PDF file to process
-     * @return The extracted text, or empty string if no text found
-     * @throws OcrException if OCR processing fails
+     * @return The extracted text result
      */
     public OcrResult performOcr(Path pdfPath) {
         // User error - not an exception
@@ -116,18 +118,16 @@ public class OcrService {
             return OcrResult.failure("No file path provided");
         }
 
-        File pdfFile = pdfPath.toFile();
-
         // User error - not an exception
-        if (!pdfFile.exists()) {
+        if (!Files.exists(pdfPath)) {
             LOGGER.warn("PDF file does not exist: {}", pdfPath);
             return OcrResult.failure("File does not exist: " + pdfPath.getFileName());
         }
 
         try {
-            LOGGER.info("Starting OCR for file: {}", pdfFile.getName());
+            LOGGER.info("Starting OCR for file: {}", pdfPath.getFileName());
 
-            String result = tesseract.doOCR(pdfFile);
+            String result = tesseract.doOCR(pdfPath.toFile());
             result = StringUtil.isBlank(result) ? "" : result.trim();
 
             LOGGER.info("OCR completed successfully. Extracted {} characters", result.length());
@@ -136,7 +136,7 @@ public class OcrService {
         } catch (TesseractException e) {
             // This could be either a user error (corrupt PDF) or our bug
             // Log it as error but return as failure, not exception
-            LOGGER.error("OCR processing failed for file: {}", pdfFile.getName(), e);
+            LOGGER.error("OCR processing failed for file: {}", pdfPath.getFileName(), e);
             return OcrResult.failure("Failed to extract text from PDF: " + e.getMessage());
         }
     }
