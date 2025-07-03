@@ -252,17 +252,6 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         UiMessageHandler uiMessageHandler = Injector.instantiateModelOrService(UiMessageHandler.class);
         RemoteListenerServerManager remoteListenerServerManager = Injector.instantiateModelOrService(RemoteListenerServerManager.class);
         remoteListenerServerManager.stop(); // stop in all cases, because the port might have changed
-
-        if (remoteServerProperty.getValue()) {
-            remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences),
-                    remotePreferences.getPort());
-        } else {
-            remotePreferences.setUseRemoteServer(false);
-        }
-        trustStoreManager.flush();
-
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
