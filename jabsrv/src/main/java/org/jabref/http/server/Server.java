@@ -12,6 +12,7 @@ import javafx.collections.ObservableList;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
+import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.os.OS;
@@ -82,6 +83,7 @@ public class Server {
 
     private HttpServer startServer(ServiceLocator serviceLocator, URI uri) {
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new GsonFactory());
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, new FormatterService());
         ServiceLocatorUtilities.addFactoryConstants(serviceLocator, new PreferencesFactory());
 
         // see https://stackoverflow.com/a/33794265/873282

@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 @Path("libraries/{id}")
 public class LibraryResource {
-    public static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
 
     @Inject
     CliPreferences preferences;
