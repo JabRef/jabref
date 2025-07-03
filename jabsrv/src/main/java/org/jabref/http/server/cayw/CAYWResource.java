@@ -8,13 +8,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 import javafx.application.Platform;
 
+import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
@@ -51,11 +51,14 @@ public class CAYWResource {
     @Inject
     private Gson gson;
 
+    @Inject
+    private FormatterService formatterService;
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getCitation(
             @QueryParam("probe") String probe,
-            @QueryParam("format") @DefaultValue("latex") String format,
+            @QueryParam("format") @DefaultValue("simple-json") String format,
             @QueryParam("clipboard") String clipboard,
             @QueryParam("minimize") String minimize,
             @QueryParam("texstudio") String texstudio,
@@ -101,17 +104,15 @@ public class CAYWResource {
                 future.complete(results);
         });
 
-        List<String> citationKeys = future.get().stream()
-                .map(BibEntry::getCitationKey)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .toList();
+        List<BibEntry> searchResults = future.get();
 
-        if (citationKeys.isEmpty()) {
+        if (searchResults.isEmpty()) {
             return Response.noContent().build();
         }
 
-        return Response.ok(gson.toJson(citationKeys)).build();
+        String response = formatterService.getFormatter(format).format(searchResults);
+
+        return Response.ok(response).build();
     }
 
     private BibDatabaseContext getBibDatabaseContext(String libraryPath) throws IOException {
