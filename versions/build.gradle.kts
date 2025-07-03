@@ -28,6 +28,8 @@ dependencies.constraints {
     api("org.openjfx:javafx-graphics:${javafx}")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
+    // from JavaFX25 onwards
+    api("org.openjfx:jdk-jsobject:25-ea+21")
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
@@ -50,6 +52,7 @@ dependencies.constraints {
     api("com.h2database:h2-mvstore:2.3.232")
     api("com.konghq:unirest-java-core:4.4.7")
     api("com.konghq:unirest-modules-gson:4.4.7")
+    api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:4.12.0")
     api("com.squareup.okio:okio-jvm:3.12.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
@@ -115,7 +118,7 @@ dependencies.constraints {
     api("org.hamcrest:hamcrest:3.0")
     api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
     api("org.jabref:afterburner.fx:2.0.0")
-    api("org.jabref:easybind:2.2.1-SNAPSHOT")
+    api("org.jabref:easybind:2.3.0")
     api("org.jetbrains:annotations:26.0.2")
     api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0")
     api("org.jooq:jool:0.9.15")
