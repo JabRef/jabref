@@ -208,6 +208,7 @@ dependencies {
     testImplementation("org.xmlunit:xmlunit-matchers")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
+    testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
 
     testImplementation("org.hamcrest:hamcrest")

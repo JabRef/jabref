@@ -250,4 +250,6 @@ open module org.jabref.jablib {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     // endregion
+
+    requires com.tngtech.archunit;
 }
