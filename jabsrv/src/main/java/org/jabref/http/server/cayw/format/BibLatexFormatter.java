@@ -22,7 +22,7 @@ public class BibLatexFormatter implements CAYWFormatter {
         String command = queryParams.getCommand();
 
         List<BibEntry> bibEntries = caywEntries.stream()
-                .map(CAYWEntry::getBibEntry)
+                .map(CAYWEntry::bibEntry)
                 .toList();
 
         return "\\%s{%s}".formatted(command,

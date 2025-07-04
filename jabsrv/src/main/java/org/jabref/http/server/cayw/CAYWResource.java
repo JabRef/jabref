@@ -198,8 +198,8 @@ public class CAYWResource {
             return true;
         }
         String lowerSearchText = searchText.toLowerCase();
-        return entry.getLabel().toLowerCase().contains(lowerSearchText) ||
-                entry.getDescription().toLowerCase().contains(lowerSearchText) ||
-                entry.getShortLabel().toLowerCase().contains(lowerSearchText);
+        return entry.label().toLowerCase().contains(lowerSearchText) ||
+                entry.description().toLowerCase().contains(lowerSearchText) ||
+                entry.shortLabel().toLowerCase().contains(lowerSearchText);
     }
 }
