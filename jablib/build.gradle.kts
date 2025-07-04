@@ -18,7 +18,8 @@ plugins {
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
+    // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
+    id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -206,8 +207,10 @@ dependencies {
     testImplementation("org.xmlunit:xmlunit-core")
     testImplementation("org.xmlunit:xmlunit-matchers")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
+
+    testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
 
     testImplementation("org.hamcrest:hamcrest")
 
@@ -526,10 +529,6 @@ mavenPublishing {
   }
 }
 
-tasks.withType<GenerateModuleMetadata> {
-  suppressedValidationErrors.add("dependencies-without-versions")
-}
-
 tasks.named<Jar>("sourcesJar") {
     dependsOn(
         tasks.named("generateGrammarSource"),
@@ -566,4 +565,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.xmlunit.matchers")
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
+
+    requires.add("com.tngtech.archunit")
+    requires.add("com.tngtech.archunit.junit5.api")
 }

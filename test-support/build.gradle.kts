@@ -25,4 +25,7 @@ dependencies {
     implementation("net.bytebuddy:byte-buddy")
 
     implementation("org.jspecify:jspecify")
+
+    implementation("com.tngtech.archunit:archunit")
+    implementation("com.tngtech.archunit:archunit-junit5-api")
 }
