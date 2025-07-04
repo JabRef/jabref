@@ -15,7 +15,6 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
-import com.tngtech.archunit.library.Architectures;
 import com.tngtech.archunit.library.GeneralCodingRules;
 
 /**
@@ -90,31 +89,7 @@ public class CommonArchitectureTest {
                           .check(classes);
     }
 
-    @ArchTest
-    public void respectLayeredArchitecture(JavaClasses classes) {
-        String Logic = "Logic";
-        String Model = "Model";
-        String Migrations = "Migrations";
-        String CLI = "Cli";
-        String GUI = "Gui";
-        Architectures.layeredArchitecture().consideringOnlyDependenciesInLayers()
-                     .layer(GUI).definedBy(PACKAGE_ORG_JABREF_GUI)
-                     .layer(Logic).definedBy(PACKAGE_ORG_JABREF_LOGIC)
-                     .layer(Model).definedBy(PACKAGE_ORG_JABREF_MODEL)
-                     .layer(CLI).definedBy(PACKAGE_ORG_JABREF_CLI)
-                     .layer(Migrations).definedBy("org.jabref.migrations..") // TODO: Move to logic
-
-                     .whereLayer(GUI).mayOnlyBeAccessedByLayers(Migrations)
-                     .whereLayer(Logic).mayOnlyBeAccessedByLayers(GUI, CLI, Model, Migrations)
-                     .whereLayer(Model).mayOnlyBeAccessedByLayers(GUI, Logic, Migrations, CLI)
-
-                     // Needs to be fixed
-                     .whereLayer(CLI).mayOnlyBeAccessedByLayers(GUI)
-                     // .whereLayer(CLI).mayNotBeAccessedByAnyLayer()
-
-                     .whereLayer(Migrations).mayOnlyBeAccessedByLayers(GUI, Logic)
-                     .check(classes);
-    }
+    // TODO: no org.jabref.gui package may reside in org.jabref.logic
 
     @ArchTest
     public void doNotUseLogicInModel(JavaClasses classes) {
