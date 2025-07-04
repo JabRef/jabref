@@ -1,7 +1,7 @@
 plugins {
     id("org.jabref.gradle.base.repositories")
     id("org.jabref.gradle.feature.compile") // for openrewrite
-    id("org.openrewrite.rewrite") version "7.6.1"
+    id("org.openrewrite.rewrite") version "7.8.0"
     id("org.itsallcode.openfasttrace") version "3.0.1"
 }
 
