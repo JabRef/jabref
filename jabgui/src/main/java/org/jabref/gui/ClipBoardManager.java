@@ -28,7 +28,7 @@ import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@AllowedToUseAwt("Requires ava.awt.datatransfer.Clipboard")
+@AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 public class ClipBoardManager {
 
     public static final DataFormat XML = new DataFormat("application/xml");

@@ -62,9 +62,9 @@ public class Server {
         // GUI uses HttpServerManager
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                System.out.println("Shutting down jabsrv...");
+                LOGGER.debug("Shutting down jabsrv...");
                 httpServer.shutdownNow();
-                System.out.println("Done, exit.");
+                LOGGER.debug("Done, exit.");
             } catch (Exception e) {
                 LOGGER.error("Could not shut down server", e);
             }

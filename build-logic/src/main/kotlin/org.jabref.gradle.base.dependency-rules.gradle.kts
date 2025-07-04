@@ -276,13 +276,23 @@ extraJavaModuleInfo {
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
 
-    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
-    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
-    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi")
+    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
     module("com.tngtech.archunit:archunit", "com.tngtech.archunit") {
         exportAllPackages()
+        requireAllDefinedDependencies()
         requires("java.logging")
-        requires("org.slf4j")
+        uses("com.tngtech.archunit.lang.extension.ArchUnitExtension")
     }
 
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")

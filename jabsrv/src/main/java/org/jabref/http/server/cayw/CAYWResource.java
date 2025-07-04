@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutionException;
 
 import javafx.application.Platform;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
@@ -40,6 +41,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 @Path("better-bibtex/cayw")
 public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
