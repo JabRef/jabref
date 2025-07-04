@@ -23,6 +23,8 @@ dependencies {
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
 
+    implementation(project(":jabsrv"))
+
     implementation("com.pixelduke:fxthemes")
 
     // From JavaFX25 onwards
