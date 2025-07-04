@@ -1,6 +1,8 @@
 open module org.jabref {
     requires org.jabref.jablib;
 
+    requires org.jabref.jabsrv;
+
     // Swing
     requires java.desktop;
 
@@ -180,6 +182,9 @@ open module org.jabref {
 
     // region: other libraries (alphabetically)
     // requires cuid;
+    requires com.dlsc.pdfviewfx;
+    requires com.pixelduke.fxthemes;
+    // requires com.sun.jna;
     // requires dd.plist;
     requires io.github.adr;
     // required by okhttp and some AI library
@@ -187,6 +192,5 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires com.dlsc.pdfviewfx;
     // endregion
 }

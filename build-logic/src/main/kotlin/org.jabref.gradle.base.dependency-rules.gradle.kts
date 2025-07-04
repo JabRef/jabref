@@ -39,10 +39,6 @@ jvmDependencyConflicts.patch {
     module("com.konghq:unirest-modules-gson") {
         addApiDependency("com.konghq:unirest-java-core")
     }
-    module("com.github.tomtung:latex2unicode_2.13") {
-        removeDependency("com.lihaoyi:fastparse_2.13")
-        addApiDependency("com.lihaoyi:fastparse:2.3.3")
-    }
     module("de.rototor.jeuclid:jeuclid-core") {
         removeDependency("org.apache.xmlgraphics:batik-svg-dom")
         removeDependency("org.apache.xmlgraphics:batik-ext")
@@ -83,6 +79,7 @@ jvmDependencyConflicts.patch {
 
 extraJavaModuleInfo {
     failOnAutomaticModules = true
+    skipLocalJars = true
 
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
     knownModule("com.github.hypfvieh:dbus-java-transport-native-unixsocket", "org.freedesktop.dbus.transport.jre")
@@ -112,7 +109,27 @@ extraJavaModuleInfo {
     }
     module("at.favre.lib:hkdf", "at.favre.lib.hkdf")
     module("com.github.javakeyring:java-keyring", "com.github.java.keyring")
-    module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode")
+
+    module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("com.lihaoyi:fastparse_2.13", "com.lihaoyi.fastparse") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("scala.library")
+    }
+    module("com.lihaoyi:sourcecode_2.13", "com.lihaoyi.sourcecode") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("scala.library")
+    }
+    module("com.lihaoyi:geny_2.13", "com.lihaoyi.geny") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("scala.library")
+    }
+
     module("com.googlecode.plist:dd-plist", "com.googlecode.dd.plist")
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
@@ -123,9 +140,6 @@ extraJavaModuleInfo {
         uses("kong.unirest.core.json.JsonEngine")
     }
     module("com.konghq:unirest-modules-gson", "com.konghq.unirest.modules.gson")
-    module("com.lihaoyi:fastparse", "com.lihaoyi.fastparse")
-    module("com.lihaoyi:geny", "com.lihaoyi.geny")
-    module("com.lihaoyi:sourcecode", "com.lihaoyi.sourcecode")
     module("com.squareup.okhttp3:okhttp", "okhttp3")
     module("com.squareup.okhttp3:okhttp-sse", "okhttp3.sse")
     module("com.squareup.okio:okio", "okio")
@@ -262,13 +276,23 @@ extraJavaModuleInfo {
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
 
-    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api")
-    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine")
-    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi")
+    module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("com.tngtech.archunit:archunit-junit5-engine", "com.tngtech.archunit.junit5.engine") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("com.tngtech.archunit:archunit-junit5-engine-api", "com.tngtech.archunit.junit5.engineapi") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
     module("com.tngtech.archunit:archunit", "com.tngtech.archunit") {
         exportAllPackages()
+        requireAllDefinedDependencies()
         requires("java.logging")
-        requires("org.slf4j")
+        uses("com.tngtech.archunit.lang.extension.ArchUnitExtension")
     }
 
     module("org.glassfish.hk2.external:aopalliance-repackaged", "org.aopalliance")
