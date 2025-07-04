@@ -18,7 +18,8 @@ plugins {
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
+    // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
+    id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -524,10 +525,6 @@ mavenPublishing {
         developerConnection.set("scm:git:git@github.com:JabRef/jabref.git")
     }
   }
-}
-
-tasks.withType<GenerateModuleMetadata> {
-  suppressedValidationErrors.add("dependencies-without-versions")
 }
 
 tasks.named<Jar>("sourcesJar") {

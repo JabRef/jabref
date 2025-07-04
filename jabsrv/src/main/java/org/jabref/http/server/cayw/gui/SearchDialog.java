@@ -26,7 +26,7 @@ import org.jabref.logic.l10n.Localization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SearchDialog<T> {
+public class SearchDialog {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(SearchDialog.class);
 
@@ -34,12 +34,12 @@ public class SearchDialog<T> {
     private static final double DIALOG_HEIGHT_RATIO = 0.4;
     private static final int PREF_HEIGHT = 150;
 
-    private final ObservableList<CAYWEntry<T>> selectedItems = FXCollections.observableArrayList();
+    private final ObservableList<CAYWEntry> selectedItems = FXCollections.observableArrayList();
 
     private Stage dialogStage;
 
-    public List<T> show(Function<String, List<T>> searchFunction, List<CAYWEntry<T>> entries) {
-        FilteredList<CAYWEntry<T>> searchResults = new FilteredList<>(FXCollections.observableArrayList(entries));
+    public List<CAYWEntry> show(Function<String, List<CAYWEntry>> searchFunction, List<CAYWEntry> entries) {
+        FilteredList<CAYWEntry> searchResults = new FilteredList<>(FXCollections.observableArrayList(entries));
         selectedItems.clear();
 
         dialogStage = new Stage();
@@ -56,10 +56,10 @@ public class SearchDialog<T> {
         mainLayout.setPadding(new Insets(15));
         mainLayout.setAlignment(Pos.TOP_CENTER);
 
-        SearchField<T> searchField = new SearchField<>(searchResults, searchFunction);
+        SearchField searchField = new SearchField(searchResults, searchFunction);
         searchField.setMaxWidth(Double.MAX_VALUE);
 
-        SearchResultContainer<T> resultContainer = new SearchResultContainer<>(searchResults, selectedItems);
+        SearchResultContainer resultContainer = new SearchResultContainer(searchResults, selectedItems);
         resultContainer.setPrefHeight(PREF_HEIGHT);
 
         ScrollPane scrollPane = new ScrollPane(resultContainer);
@@ -67,7 +67,7 @@ public class SearchDialog<T> {
         scrollPane.setFitToHeight(true);
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-        SelectedItemsContainer<T> selectedContainer = new SelectedItemsContainer<>(selectedItems);
+        SelectedItemsContainer selectedContainer = new SelectedItemsContainer(selectedItems);
 
         Button finishButton = new Button(Localization.lang("Cite"));
         finishButton.setOnAction(event -> {
@@ -105,7 +105,7 @@ public class SearchDialog<T> {
 
         dialogStage.showAndWait();
 
-        return selectedItems.stream().map(CAYWEntry::getValue).toList();
+        return selectedItems;
     }
 
     public void close() {
