@@ -2,6 +2,7 @@ package org.jabref.logic.remote;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 
 import javafx.beans.property.BooleanProperty;
@@ -9,6 +10,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,12 +77,17 @@ public class RemotePreferences {
         return InetAddress.getByName("localhost");
     }
 
-    public URI getHttpServerUri() {
+    public @NonNull URI getHttpServerUri() {
         try {
-            return URI.create("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":23119");
-        } catch (UnknownHostException e) {
+            return new URI("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":23119");
+        } catch (UnknownHostException | URISyntaxException e) {
             LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
-            return URI.create("http://localhost:23119");
+            try {
+                return new URI("http://localhost:23119");
+            } catch (URISyntaxException ex) {
+                LOGGER.error("Should never happen, raw string is already valid uri");
+                throw new RuntimeException(ex);
+            }
         }
     }
 }
