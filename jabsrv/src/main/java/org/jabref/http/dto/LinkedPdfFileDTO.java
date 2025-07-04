@@ -9,7 +9,7 @@ public class LinkedPdfFileDTO {
     private final String path;
 
     public LinkedPdfFileDTO(BibEntry parentEntry, LinkedFile file) {
-        this.parentCitationKey = parentEntry.getCitationKey().orElse(null);
+        this.parentCitationKey = parentEntry.getCitationKey().orElse("N/A");
         this.path = file.getLink();
         this.fileName = path.substring(path.lastIndexOf('/') + 1);
     }
