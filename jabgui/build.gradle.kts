@@ -1,5 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
-
 plugins {
     id("org.jabref.gradle.module")
     id("application")
@@ -25,8 +23,10 @@ dependencies {
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
 
+    implementation("com.pixelduke:fxthemes")
+
     // From JavaFX25 onwards
-    implementation("org.openjfx:jdk-jsobject:25-ea+21")
+    implementation("org.openjfx:jdk-jsobject")
 
     implementation("org.slf4j:slf4j-api")
     implementation("org.tinylog:tinylog-api")
@@ -186,10 +186,14 @@ javaModulePackaging {
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
-            "--mac-sign",
-            "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
-            "--mac-package-signing-prefix", "org.jabref",
         )
+        if (providers.environmentVariable("OSXCERT").orNull?.isNotBlank() ?: false) {
+            options.addAll(
+                "--mac-sign",
+                "--mac-signing-key-user-name", "JabRef e.V. (6792V39SK3)",
+                "--mac-package-signing-prefix", "org.jabref",
+            )
+        }
         targetResources.from(layout.projectDirectory.dir("buildres/macos").asFileTree.matching {
             include("Resources/**")
         })
