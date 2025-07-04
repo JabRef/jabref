@@ -18,7 +18,7 @@ plugins {
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
+    id("com.github.koppor.jbang-gradle-plugin") version "0.3.0-SNAPSHOT"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
