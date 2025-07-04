@@ -1,16 +1,21 @@
 FROM gradle:jdk24-noble AS build
 
-WORKDIR /app
+LABEL org.opencontainers.image.title="jabkit"
+LABEL org.opencontainers.image.description="JabRef's CLI tool"
+
+ARG VERSION="100.0.0"
+ARG VERSION_INFO="100.0.0"
+ARG TAG_BUILD="false"
+
+WORKDIR /build
 
 COPY . .
 
-RUN gradle --no-daemon :jabkit:jpackage
-
-RUN find jabkit/build/distribution
+RUN gradle --no-daemon -PprojVersion="${VERSION}" -PprojVersionInfo="${VERSION_INFO}" -Ptagbuild="${TAG_BUILD}" :jabkit:jpackage
 
 RUN mkdir /dist
 
-RUN mv jabkit/build/distribution/jabkit /dist
+RUN mv jabkit/build/packages/*/* /dist
 
 # jpackage needs glibc; alpine does not work
 FROM debian:bookworm-slim AS runtime

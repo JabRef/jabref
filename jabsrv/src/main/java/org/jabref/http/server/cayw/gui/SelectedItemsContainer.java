@@ -10,62 +10,62 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 
-public class SelectedItemsContainer<T> extends FlowPane {
+public class SelectedItemsContainer extends FlowPane {
 
-    private final ObservableList<CAYWEntry<T>> items;
+    private final ObservableList<CAYWEntry> items;
 
-    public SelectedItemsContainer(ObservableList<CAYWEntry<T>> items) {
+    public SelectedItemsContainer(ObservableList<CAYWEntry> items) {
         this.items = items;
         setup();
     }
 
-    public void setup() {
+    private void setup() {
         this.setHgap(8);
         this.setVgap(8);
         this.setPadding(new Insets(10));
 
-        items.forEach(this::addPill);
+        items.forEach(this::addChip);
 
-        items.addListener((ListChangeListener<CAYWEntry<T>>) change -> {
+        items.addListener((ListChangeListener<CAYWEntry>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
-                    change.getAddedSubList().forEach(this::addPill);
+                    change.getAddedSubList().forEach(this::addChip);
                 }
                 if (change.wasRemoved()) {
-                    change.getRemoved().forEach(this::removePill);
+                    change.getRemoved().forEach(this::removeChip);
                 }
             }
         });
     }
 
-    private void addPill(CAYWEntry<T> entry) {
-        Pill<T> pill = new Pill<>(entry, items);
-        getChildren().add(pill);
+    private void addChip(CAYWEntry entry) {
+        Chip chip = new Chip(entry, items);
+        getChildren().add(chip);
     }
 
-    private void removePill(CAYWEntry<T> entry) {
+    private void removeChip(CAYWEntry entry) {
         getChildren().removeIf(node -> {
-            if (node instanceof Pill pill) {
-                return pill.getEntry().equals(entry);
+            if (node instanceof SelectedItemsContainer.Chip chip) {
+                return chip.getEntry().equals(entry);
             }
             return false;
         });
     }
 
-    private static class Pill<T> extends HBox {
-        private final CAYWEntry<T> entry;
+    private static class Chip extends HBox {
+        private final CAYWEntry entry;
 
-        public Pill(CAYWEntry<T> entry, ObservableList<CAYWEntry<T>> parentList) {
+        public Chip(CAYWEntry entry, ObservableList<CAYWEntry> parentList) {
             this.entry = entry;
 
             this.setAlignment(Pos.CENTER_LEFT);
             this.setSpacing(5);
             this.setPadding(new Insets(5, 10, 5, 10));
 
-            this.getStyleClass().add("pill-style");
+            this.getStyleClass().add("chip-style");
 
             Button removeButton = new Button("×");
-            removeButton.getStyleClass().add("pill-remove-button");
+            removeButton.getStyleClass().add("chip-remove-button");
 
             removeButton.setOnAction(e -> {
                 e.consume();
@@ -83,7 +83,7 @@ public class SelectedItemsContainer<T> extends FlowPane {
             });
         }
 
-        public CAYWEntry<T> getEntry() {
+        public CAYWEntry getEntry() {
             return entry;
         }
     }

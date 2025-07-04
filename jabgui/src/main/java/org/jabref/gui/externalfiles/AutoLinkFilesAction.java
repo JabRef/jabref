@@ -67,7 +67,7 @@ public class AutoLinkFilesAction extends SimpleCommand {
                 String oldVal = entry.getField(StandardField.FILE).orElse(null);
                 UndoableFieldChange fieldChange = new UndoableFieldChange(entry, StandardField.FILE, oldVal, newVal);
                 nc.addEdit(fieldChange); // push to undo manager is in succeeded
-                entry.addFile(linkedFile);
+                UiTaskExecutor.runInJavaFXThread(() -> entry.addFile(linkedFile));
             };
 
             @Override

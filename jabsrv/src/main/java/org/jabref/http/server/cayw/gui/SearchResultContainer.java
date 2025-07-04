@@ -11,16 +11,18 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import org.jabref.logic.os.OS;
+import org.jabref.model.strings.StringUtil;
 
-public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
-
-    private ObservableList<CAYWEntry<T>> selectedEntries = javafx.collections.FXCollections.observableArrayList();
+public class SearchResultContainer extends ListView<CAYWEntry> {
 
     private final static int MAX_LINES = 3;
     private final static int ESTIMATED_CHARS_PER_LINE = 80;
     private final static int TOOLTIP_WIDTH = 400;
+    private final static double PREF_WIDTH = 300;
 
-    public SearchResultContainer(ObservableList<CAYWEntry<T>> entries, ObservableList<CAYWEntry<T>> selectedEntries) {
+    private ObservableList<CAYWEntry> selectedEntries = javafx.collections.FXCollections.observableArrayList();
+
+    public SearchResultContainer(ObservableList<CAYWEntry> entries, ObservableList<CAYWEntry> selectedEntries) {
         super(entries);
         this.selectedEntries = selectedEntries;
         setup();
@@ -28,9 +30,9 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
 
     private void setup() {
         this.setCellFactory(listView -> {
-            SearchResultCell<T> searchResultCell = new SearchResultCell<T>();
+            SearchResultCell searchResultCell = new SearchResultCell();
             searchResultCell.setOnMouseClicked(event -> {
-                if (selectedEntries.contains(searchResultCell.getItem())) {
+                if (searchResultCell.getItem() == null || selectedEntries.contains(searchResultCell.getItem())) {
                     return;
                 }
                 selectedEntries.add(searchResultCell.getItem());
@@ -44,11 +46,11 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
             if (getParent() != null) {
                 return getParent().getLayoutBounds().getWidth();
             }
-            return 300.0;
+            return PREF_WIDTH;
         }, parentProperty()));
     }
 
-    private static class SearchResultCell<T> extends ListCell<CAYWEntry<T>> {
+    private static class SearchResultCell extends ListCell<CAYWEntry> {
         private final VBox content;
         private final Text labelText;
         private final Text descriptionText;
@@ -72,7 +74,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
         }
 
         @Override
-        protected void updateItem(CAYWEntry<T> item, boolean empty) {
+        protected void updateItem(CAYWEntry item, boolean empty) {
             super.updateItem(item, empty);
 
             if (empty || item == null) {
@@ -104,33 +106,13 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
                 return "";
             }
 
-            String[] lines = text.split("\n", MAX_LINES + 1);
+            String[] lines = text.split(OS.NEWLINE, MAX_LINES + 1);
 
             if (lines.length <= MAX_LINES) {
-                return estimateAndTruncate(text);
+                return StringUtil.limitStringLength(text, ESTIMATED_CHARS_PER_LINE * MAX_LINES);
             } else {
                 return String.join(OS.NEWLINE, Arrays.copyOf(lines, MAX_LINES)) + "...";
             }
-        }
-
-        private String estimateAndTruncate(String text) {
-            int maxChars = ESTIMATED_CHARS_PER_LINE * MAX_LINES;
-
-            if (text.length() <= maxChars) {
-                return text;
-            }
-
-            int cutoff = Math.min(text.length(), maxChars);
-
-            while (cutoff > 0 && !Character.isWhitespace(text.charAt(cutoff))) {
-                cutoff--;
-            }
-
-            if (cutoff == 0) {
-                cutoff = maxChars;
-            }
-
-            return text.substring(0, cutoff).trim() + "...";
         }
     }
 }
