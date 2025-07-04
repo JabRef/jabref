@@ -41,7 +41,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@AllowedToUseAwt("Requires ava.awt.datatransfer.Clipboard")
+@AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 @Path("better-bibtex/cayw")
 public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
