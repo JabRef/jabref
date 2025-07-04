@@ -163,7 +163,7 @@ public interface NavigationPredicate {
     ///    - The handler has timed out after HANDLER_TIMEOUT_MS milliseconds.
     ///    - A new window has been opened.
     ///
-    ///    These conditions ensure that we will still navigate if original handler is
+    /// These conditions ensure that we will still navigate if original handler is
     /// blocking (e.g., showing a dialog, and we are highlighting a node in the dialog)
     /// and is still responsive (i.e., we will navigate after a certain amount of time,
     /// or a new window has been opened, and we can start polling the new window).
