@@ -281,6 +281,14 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // [impl->req~newentry.clipboard.autofocus~1]
         Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
         if (validClipboardId.isPresent()) {
+
+            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+                if (isValid) {
+                    Tooltip.install(idText, idTextTooltip);
+                } else {
+                    Tooltip.uninstall(idText, idTextTooltip);
+                }
+            });
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
@@ -313,14 +321,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
 
         idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
-
-        viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
-            if (isValid) {
-                Tooltip.install(idText, idTextTooltip);
-            } else {
-                Tooltip.uninstall(idText, idTextTooltip);
-            }
-        });
 
         TextInputControl textInput = idText;
         EditorValidator validator = new EditorValidator(this.guiPreferences);

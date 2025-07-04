@@ -1,6 +1,5 @@
 package org.jabref.gui.newentry;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -149,13 +148,15 @@ public class NewEntryViewModel {
         doiCache.clear();
         Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
 
-        activeDatabase.stream()
-                      .map(BibDatabaseContext::getEntries)
-                      .flatMap(Collection::stream)
-                      .forEach(bibEntry -> bibEntry.getField(StandardField.DOI)
-                      .ifPresent(doi ->
-                         doiCache.put(doi, bibEntry)
-                     ));
+        activeDatabase.map(BibDatabaseContext::getEntries)
+                    .ifPresent(entries -> {
+                        entries.forEach(entry -> {
+                            entry.getField(StandardField.DOI)
+                                 .ifPresent(doi -> {
+                                     doiCache.put(doi, entry);
+                                 });
+                        });
+                    });
     }
 
     public Optional<ValidationMessage> checkDOI(String doiInput) {
