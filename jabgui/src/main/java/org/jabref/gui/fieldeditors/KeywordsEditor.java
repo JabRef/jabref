@@ -142,7 +142,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
             KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
             if (keyBindingRepository.checkKeyCombinationEquality(KeyBinding.PASTE, event)) {
-                String clipboardText = clipBoardManager.getContents();
+                String clipboardText = ClipBoardManager.getContents();
                 if (!clipboardText.isEmpty()) {
                     KeywordList keywordsList = KeywordList.parse(clipboardText, viewModel.getKeywordSeparator());
                     keywordsList.stream().forEach(keyword -> keywordTagsField.addTags(keyword));
