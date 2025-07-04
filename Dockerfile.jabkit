@@ -1,5 +1,8 @@
 FROM gradle:jdk24-noble AS build
 
+LABEL org.opencontainers.image.title="jabkit"
+LABEL org.opencontainers.image.description="JabRef's CLI tool"
+
 ARG VERSION="100.0.0"
 ARG VERSION_INFO="100.0.0"
 ARG TAG_BUILD="false"
