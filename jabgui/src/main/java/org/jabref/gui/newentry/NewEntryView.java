@@ -281,7 +281,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         // [impl->req~newentry.clipboard.autofocus~1]
         Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
         if (validClipboardId.isPresent()) {
-
             viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
                 if (isValid) {
                     Tooltip.install(idText, idTextTooltip);
@@ -289,6 +288,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                     Tooltip.uninstall(idText, idTextTooltip);
                 }
             });
+            
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
