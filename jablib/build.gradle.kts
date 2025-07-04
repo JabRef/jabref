@@ -563,5 +563,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.xmlunit")
     requires.add("org.xmlunit.matchers")
     requires.add("wiremock")
+    requires.add("com.tngtech.archunit")
+    requires.add("com.tngtech.archunit.junit5.api")
     requires.add("wiremock.slf4j.spi.shim")
 }
