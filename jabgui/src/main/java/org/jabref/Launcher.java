@@ -50,6 +50,14 @@ public class Launcher {
     }
 
     public static void main(String[] args) {
+        if (args.length > 0 && Arrays.asList(args).contains("--help")) {
+            System.out.println("JabRef Command Line Help:");
+            System.out.println("--help               Show help information");
+            System.out.println("--debug              Enable debug logging");
+            // You can add more help details as needed
+            System.exit(0);
+        }
+
         initLogging(args);
 
         Injector.setModelOrService(BuildInfo.class, new BuildInfo());
