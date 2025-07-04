@@ -82,6 +82,9 @@
         <Button fx:id="remoteHelp" prefWidth="20.0" />
     </HBox>
 
+    <Label styleClass="sectionHeader" text="%HTTP Server" />
+    <CheckBox fx:id="enableHttpServer" text="%Enable HTTP Server (e.g., for JabMap)" />
+
     <Label styleClass="sectionHeader" text="%Libraries"/>
     <GridPane hgap="10.0" vgap="4.0">
         <columnConstraints>

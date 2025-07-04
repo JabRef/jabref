@@ -8,9 +8,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
+import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.importer.ParserResult;
@@ -18,6 +20,7 @@ import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
@@ -45,6 +48,9 @@ public class LibraryResource {
     CliPreferences preferences;
 
     @Inject
+    ContextsToServe contextsToServe;
+
+    @Inject
     FilesToServe filesToServe;
 
     @Inject
@@ -53,11 +59,11 @@ public class LibraryResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson(@PathParam("id") String id) throws IOException {
-        ParserResult parserResult = getParserResult(id);
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-        List<BibEntryDTO> list = parserResult.getDatabase().getEntries().stream()
+        List<BibEntryDTO> list = databaseContext.getDatabase().getEntries().stream()
                                              .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
-                                             .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldPreferences(), entryTypesManager))
+                                             .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
                                              .toList();
         return gson.toJson(list);
     }
@@ -65,9 +71,9 @@ public class LibraryResource {
     @GET
     @Produces(JabrefMediaType.JSON_CSL_ITEM)
     public String getClsItemJson(@PathParam("id") String id) throws IOException {
-        ParserResult parserResult = getParserResult(id);
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
         JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
-        jabRefItemDataProvider.setData(parserResult.getDatabaseContext(), new BibEntryTypesManager());
+        jabRefItemDataProvider.setData(databaseContext, new BibEntryTypesManager());
         return jabRefItemDataProvider.toJson();
     }
 
@@ -109,25 +115,33 @@ public class LibraryResource {
                           .orElseThrow(NotFoundException::new);
     }
 
-    private ParserResult getParserResult(String id) throws IOException {
+    private BibDatabaseContext getDatabaseContext(String id) throws IOException {
         BibtexImporter bibtexImporter = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor());
 
         if ("demo".equals(id)) {
             try (InputStream chocolateBibInputStream = getChocolateBibAsStream()) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(chocolateBibInputStream, StandardCharsets.UTF_8));
-                return bibtexImporter.importDatabase(reader);
+                return bibtexImporter.importDatabase(reader).getDatabaseContext();
             }
         }
 
         java.nio.file.Path library = getLibraryPath(id);
-        ParserResult parserResult;
-        try {
-            parserResult = bibtexImporter.importDatabase(library);
-        } catch (IOException e) {
-            LOGGER.warn("Could not find open library file {}", library, e);
-            throw new InternalServerErrorException("Could not parse library", e);
+        if (!filesToServe.isEmpty()) {
+            ParserResult parserResult;
+            try {
+                parserResult = bibtexImporter.importDatabase(library);
+            } catch (IOException e) {
+                LOGGER.warn("Could not find open library file {}", library, e);
+                throw new InternalServerErrorException("Could not parse library", e);
+            }
+            return parserResult.getDatabaseContext();
         }
-        return parserResult;
+
+        // contextsToServe.isEmpty() could be true when no libraries are opened in JabRef
+        return contextsToServe.getContextsToServe().stream()
+                       .filter(context -> context.getDatabasePath().equals(Optional.of(library)))
+                       .findFirst()
+                       .orElseThrow(() -> new NotFoundException("No library with id " + id + " found"));
     }
 
     /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
