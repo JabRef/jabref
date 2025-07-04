@@ -77,6 +77,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           file: Dockerfile.${{ matrix.component }}
-          build-args:
+          build-args: |
             VERSION=${{ steps.gitversion.outputs.AssemblySemVer }}
             VERSION_INFO=${{ steps.gitversion.outputs.InformationalVersion }}
