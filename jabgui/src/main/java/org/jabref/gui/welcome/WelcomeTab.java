@@ -108,7 +108,6 @@ public class WelcomeTab extends Tab {
                       TaskExecutor taskExecutor,
                       FileHistoryMenu fileHistoryMenu,
                       BuildInfo buildInfo) {
-
         super(Localization.lang("Welcome"));
         setClosable(true);
 
@@ -128,12 +127,8 @@ public class WelcomeTab extends Tab {
         this.recentLibrariesBox = new VBox();
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        VBox topTitles = createTopTitles();
-        HBox columnsContainer = createColumnsContainer();
-
-        VBox mainContainer = new VBox();
+        VBox mainContainer = new VBox(createColumnsContainer());
         mainContainer.getStyleClass().add("welcome-main-container");
-        mainContainer.getChildren().addAll(topTitles, columnsContainer);
 
         VBox container = new VBox();
         container.getChildren().add(mainContainer);
@@ -206,24 +201,18 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createLeftColumn() {
-        VBox startBox = createWelcomeStartBox();
-        VBox recentBox = createWelcomeRecentBox();
-
-        VBox leftColumn = new VBox();
+        VBox leftColumn = new VBox(
+                createTopTitles(),
+                createWelcomeStartBox(),
+                createWelcomeRecentBox()
+        );
         leftColumn.getStyleClass().add("welcome-content-column");
-        leftColumn.getChildren().addAll(startBox, recentBox);
-
         return leftColumn;
     }
 
     private VBox createRightColumn() {
-        VBox quickSettingsBox = createQuickSettingsBox();
-        VBox communityBox = createCommunityBox();
-
-        VBox rightColumn = new VBox();
+        VBox rightColumn = new VBox(createQuickSettingsBox(), createCommunityBox());
         rightColumn.getStyleClass().add("welcome-content-column");
-        rightColumn.getChildren().addAll(quickSettingsBox, communityBox);
-
         return rightColumn;
     }
 
@@ -272,7 +261,13 @@ public class WelcomeTab extends Tab {
 
         actions.getChildren().addAll(mainFileDirButton, themeButton, largeLibraryButton, pushApplicationButton, onlineServicesButton, entryTableButton);
 
-        return createVBoxContainer(header, actions);
+        ScrollPane scrollPane = new ScrollPane(actions);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setMaxHeight(172); // item-height * 4 + gap * 3 = 35 * 4 + 8 * 3
+
+        return createVBoxContainer(header, scrollPane);
     }
 
     private VBox createCommunityBox() {
@@ -439,10 +434,7 @@ public class WelcomeTab extends Tab {
         performanceOptimizationLabel.setWrapText(true);
         performanceOptimizationLabel.setMaxWidth(400);
 
-        HBox performanceOptimizationHeader = new HBox(
-                performanceOptimizationLabel,
-                createHelpButton("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues")
-        );
+        HBox performanceOptimizationHeader = new HBox(performanceOptimizationLabel, createHelpButton("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues"));
 
         CheckBox disableFulltextIndexing = new CheckBox(Localization.lang("Disable fulltext indexing"));
         disableFulltextIndexing.setSelected(true);
@@ -613,7 +605,7 @@ public class WelcomeTab extends Tab {
     }
 
     private void showOnlineServicesConfigurationDialog() {
-        CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for updates at startup"));
+        CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for software updates at startup"));
         versionCheckBox.setSelected(preferences.getInternalPreferences().isVersionCheckEnabled());
 
         CheckBox webSearchBox = new CheckBox(Localization.lang("Enable web search"));

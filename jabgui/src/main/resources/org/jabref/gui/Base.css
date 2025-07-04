@@ -1774,6 +1774,7 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-max-width: 768px;
     -fx-spacing: 28px;
     -fx-alignment: center;
+    -fx-padding: 32px 24px;
 }
 
 .welcome-top-titles {
