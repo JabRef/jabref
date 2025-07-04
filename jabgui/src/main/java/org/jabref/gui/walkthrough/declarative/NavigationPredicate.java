@@ -181,6 +181,8 @@ public interface NavigationPredicate {
         event.consume();
         beforeNavigate.run();
 
+        // To allow running onNavigate immediately after the original handler,
+        // future is used more as a signal to indicate that the original handler has finished.
         CompletableFuture<Void> handlerFuture = new CompletableFuture<>();
 
         if (originalHandler != null) {
