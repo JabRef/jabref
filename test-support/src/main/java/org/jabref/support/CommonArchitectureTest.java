@@ -155,6 +155,7 @@ public class CommonArchitectureTest {
                           .check(classes);
     }
 
+    /// Use constructor new URI(...) instead
     @ArchTest
     public void shouldNotCallUriCreateMethod(JavaClasses classes) {
        ArchRuleDefinition.noClasses()
