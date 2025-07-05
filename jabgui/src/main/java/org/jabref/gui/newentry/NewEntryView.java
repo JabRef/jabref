@@ -10,12 +10,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -27,6 +29,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
@@ -104,6 +107,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private TilePane entryCustom;
 
     @FXML private TextField idText;
+    @FXML private Tooltip idTextTooltip;
+    @FXML private Hyperlink idJumpLink;
     @FXML private RadioButton idLookupGuess;
     @FXML private RadioButton idLookupSpecify;
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
@@ -260,7 +265,6 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         //       method (each automatically independently, or all through the same fetcher).
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
-        final String clipboardText = ClipBoardManager.getContents().trim();
 
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
@@ -272,9 +276,19 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             idLookupSpecify.selectedProperty().set(true);
         }
 
+        viewModel.populateDOICache();
+
         // [impl->req~newentry.clipboard.autofocus~1]
         Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
         if (validClipboardId.isPresent()) {
+            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+                if (isValid) {
+                    Tooltip.install(idText, idTextTooltip);
+                } else {
+                    Tooltip.uninstall(idText, idTextTooltip);
+                }
+            });
+            
             idText.setText(ClipBoardManager.getContents().trim());
             idText.selectAll();
 
@@ -301,8 +315,16 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
+        idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
+        idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
+
+        TextInputControl textInput = idText;
+        EditorValidator validator = new EditorValidator(this.guiPreferences);
+        validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);
     }
 
     private void initializeInterpretCitations() {

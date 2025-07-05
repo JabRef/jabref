@@ -18,6 +18,7 @@ import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.help.VersionWorker;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -28,6 +29,7 @@ import org.jabref.gui.util.DefaultFileUpdateMonitor;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
+import org.jabref.http.manager.HttpServerManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
@@ -80,6 +82,7 @@ public class JabRefGUI extends Application {
     private static JabRefFrame mainFrame;
 
     private static RemoteListenerServerManager remoteListenerServerManager;
+    private static HttpServerManager httpServerManager;
 
     private Stage mainStage;
 
@@ -92,6 +95,7 @@ public class JabRefGUI extends Application {
     @Override
     public void start(Stage stage) {
         this.mainStage = stage;
+        Injector.setModelOrService(Stage.class, mainStage);
 
         FallbackExceptionHandler.installExceptionHandler((exception, thread) -> UiTaskExecutor.runInJavaFXThread(() -> {
             DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
@@ -156,7 +160,10 @@ public class JabRefGUI extends Application {
         IndexManager.clearOldSearchIndices();
 
         JabRefGUI.remoteListenerServerManager = new RemoteListenerServerManager();
-        Injector.setModelOrService(RemoteListenerServerManager.class, remoteListenerServerManager);
+        Injector.setModelOrService(RemoteListenerServerManager.class, JabRefGUI.remoteListenerServerManager);
+
+        JabRefGUI.httpServerManager = new HttpServerManager();
+        Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
         JabRefGUI.stateManager = new StateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
@@ -267,10 +274,10 @@ public class JabRefGUI extends Application {
         themeManager.installCss(scene);
 
         LOGGER.debug("Handle TextEditor key bindings");
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> TextInputKeyBindings.call(
-                scene,
-                event,
-                preferences.getKeyBindingRepository()));
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
+            SelectableTextFlowKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
+        });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);
         mainStage.getIcons().addAll(IconTheme.getLogoSetFX());
@@ -395,12 +402,17 @@ public class JabRefGUI extends Application {
     // Background tasks
     public void startBackgroundTasks() {
         RemotePreferences remotePreferences = preferences.getRemotePreferences();
+
         if (remotePreferences.useRemoteServer()) {
             remoteListenerServerManager.openAndStart(
                     new CLIMessageHandler(
                             mainFrame,
                             preferences),
                     remotePreferences.getPort());
+        }
+
+        if (remotePreferences.enableHttpServer()) {
+            httpServerManager.start(stateManager.getOpenDatabases(), remotePreferences.getHttpServerUri());
         }
     }
 
@@ -412,14 +424,25 @@ public class JabRefGUI extends Application {
         } catch (Exception e) {
             LOGGER.error("Unable to close AI service", e);
         }
+
         LOGGER.trace("Closing OpenOffice connection");
         OOBibBaseConnect.closeOfficeConnection();
+
+        LOGGER.trace("Shutting down remote server manager");
+        remoteListenerServerManager.stop();
+
+        LOGGER.trace("Shutting down http server manager");
+        httpServerManager.stop();
+
         LOGGER.trace("Stopping background tasks");
         stopBackgroundTasks();
+
         LOGGER.trace("Shutting down thread pools");
         shutdownThreadPools();
+
         LOGGER.trace("Closing citations and relations search service");
         citationsAndRelationsSearchService.close();
+
         LOGGER.trace("Finished stop");
     }
 
