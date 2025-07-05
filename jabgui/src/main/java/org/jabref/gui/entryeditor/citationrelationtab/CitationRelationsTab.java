@@ -20,6 +20,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
@@ -30,6 +31,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
@@ -52,6 +55,9 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.importer.FetcherClientException;
+import org.jabref.logic.importer.FetcherServerException;
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -201,23 +207,25 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         refreshCitingButton.setOnMouseClicked(_ -> {
             searchForRelations(
-                    entry, 
-                    citingListView, 
+                    entry,
+                    citingListView,
                     abortCitingButton,
-                    refreshCitingButton, 
-                    CitationFetcher.SearchType.CITES, 
-                    importCitingButton, 
-                    citingProgress);
+                    refreshCitingButton,
+                    CitationFetcher.SearchType.CITES,
+                    importCitingButton,
+                    citingProgress,
+                    true);
         });
 
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(
-                entry, 
-                citedByListView, 
+                entry,
+                citedByListView,
                 abortCitedButton,
-                refreshCitedByButton, 
-                CitationFetcher.SearchType.CITED_BY, 
-                importCitedByButton, 
-                citedByProgress));
+                refreshCitedByButton,
+                CitationFetcher.SearchType.CITED_BY,
+                importCitedByButton,
+                citedByProgress,
+                true));
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
@@ -225,22 +233,24 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citingListView);
 
         searchForRelations(
-                entry, 
-                citingListView, 
-                abortCitingButton, 
+                entry,
+                citingListView,
+                abortCitingButton,
                 refreshCitingButton,
-                CitationFetcher.SearchType.CITES, 
-                importCitingButton, 
-                citingProgress);
+                CitationFetcher.SearchType.CITES,
+                importCitingButton,
+                citingProgress,
+                false);
 
         searchForRelations(
-                entry, 
-                citedByListView, 
-                abortCitedButton, 
+                entry,
+                citedByListView,
+                abortCitedButton,
                 refreshCitedByButton,
-                CitationFetcher.SearchType.CITED_BY, 
-                importCitedByButton, 
-                citedByProgress);
+                CitationFetcher.SearchType.CITED_BY,
+                importCitedByButton,
+                citedByProgress,
+                false);
 
         return container;
     }
@@ -434,13 +444,29 @@ public class CitationRelationsTab extends EntryEditorTab {
      */
     private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abortButton,
                                     Button refreshButton, CitationFetcher.SearchType searchType, Button importButton,
-                                    ProgressIndicator progress) {
+                                    ProgressIndicator progress, boolean shouldRefresh) {
         if (entry.getDOI().isEmpty()) {
             hideNodes(abortButton, progress);
             showNodes(refreshButton);
             listView.getItems().clear();
-            listView.setPlaceholder(
-                    new Label(Localization.lang("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.")));
+            Text doiLookUpText = new Text(Localization.lang("The selected entry doesn't have a DOI linked to it."));
+            Hyperlink doiLookUpHyperLink = new Hyperlink(Localization.lang("Lookup a DOI and try again."));
+            TextFlow doiLookUpTextFlow = new TextFlow(doiLookUpText, doiLookUpHyperLink);
+            Label placeHolder = new Label("", doiLookUpTextFlow);
+            doiLookUpHyperLink.setOnAction(e -> {
+                CrossRef doiFetcher = new CrossRef();
+                BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
+                              .onRunning(() -> listView.setPlaceholder(new Label("Looking up DOI...")))
+                              .onSuccess(doiIdentifier -> {
+                                  if (doiIdentifier.isPresent()) {
+                                      entry.setField(StandardField.DOI, doiIdentifier.get().asString());
+                                      searchForRelations(entry, listView, abortButton, refreshButton, searchType, importButton, progress, shouldRefresh);
+                                  } else {
+                                      dialogService.notify("No DOI found");
+                                  }
+                              }).onFailure((exception) -> handleIdentifierFetchingError(exception, doiFetcher)).executeWith(taskExecutor);
+            });
+            listView.setPlaceholder(placeHolder);
             return;
         }
 
@@ -479,6 +505,19 @@ public class CitationRelationsTab extends EntryEditorTab {
                 dialogService.notify(exception.getMessage());
             })
             .executeWith(taskExecutor);
+    }
+
+    private void handleIdentifierFetchingError(Exception exception, CrossRef fetcher) {
+        LOGGER.error("Error while fetching identifier", exception);
+        if (exception instanceof FetcherClientException) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("No data was found for the identifier"));
+        } else if (exception instanceof FetcherServerException) {
+            dialogService.showInformationDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Server not available"));
+        } else if (exception.getCause() != null) {
+            dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occurred %0", exception.getCause().getMessage()));
+        } else {
+            dialogService.showWarningDialogAndWait(Localization.lang("Look up %0", fetcher.getName()), Localization.lang("Error occurred %0", exception.getCause().getMessage()));
+        }
     }
 
     /**
