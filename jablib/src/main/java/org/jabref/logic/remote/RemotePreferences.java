@@ -24,11 +24,13 @@ public class RemotePreferences {
     private final IntegerProperty port;
     private final BooleanProperty useRemoteServer;
 
+    private final IntegerProperty httpPort;
     private final BooleanProperty enableHttpServer;
 
-    public RemotePreferences(int port, boolean useRemoteServer, boolean enableHttpServer) {
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
+        this.httpPort = new SimpleIntegerProperty(httpPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
     }
 
@@ -58,6 +60,22 @@ public class RemotePreferences {
 
     public void setUseRemoteServer(boolean useRemoteServer) {
         this.useRemoteServer.setValue(useRemoteServer);
+    }
+
+    public int getHttpPort() {
+        return httpPort.getValue();
+    }
+
+    public IntegerProperty httpPortProperty() {
+        return httpPort;
+    }
+
+    public void setHttpPort(int httpPort) {
+        this.httpPort.setValue(httpPort);
+    }
+
+    public boolean isDifferentHttpPort(int otherHttpPort) {
+        return getHttpPort() != otherHttpPort;
     }
 
     public boolean enableHttpServer() {
