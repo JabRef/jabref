@@ -186,7 +186,7 @@ public class CAYWResource {
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
         if (!initialized) {
-            if (!contextsToServe.getContextsToServe().isEmpty()) {
+            if (!contextsToServe.isEmpty()) {
                 LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
                 initialized = true;
                 return;
