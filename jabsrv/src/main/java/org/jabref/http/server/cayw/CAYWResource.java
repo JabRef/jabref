@@ -138,9 +138,9 @@ public class CAYWResource {
             return ServerUtils.getBibDatabaseContext("demo", filesToServe, contextsToServe, preferences.getImportFormatPreferences());
         }
 
-        if (queryParams.getLibraryPath().isPresent()) {
-            assert !"demo".equalsIgnoreCase(queryParams.getLibraryPath().get());
-            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(queryParams.getLibraryPath().get()));
+        if (libraryPath.isPresent()) {
+            assert !"demo".equalsIgnoreCase(libraryPath.get());
+            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(libraryPath.get()));
             return getDatabaseContextFromStream(inputStream);
         }
 
