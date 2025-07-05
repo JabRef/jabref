@@ -103,6 +103,10 @@ public class SearchDialog {
         dialogStage.setX((screenBounds.getWidth() - dialogWidth) / 2);
         dialogStage.setY((screenBounds.getHeight() - dialogHeight) / 2);
 
+        // Ensure that dialog is not just flashing in the taskbar, but really in front
+        // TODO: Investigate why this is not working
+        // scene.getWindow().requestFocus();
+
         dialogStage.showAndWait();
 
         return selectedItems;
