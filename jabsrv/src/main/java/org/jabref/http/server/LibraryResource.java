@@ -15,7 +15,6 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -202,23 +201,16 @@ public class LibraryResource {
                 .build();
     }
 
-    private java.nio.file.Path getLibraryPath(String id) {
-        return filesToServe.getFilesToServe()
-                          .stream()
-                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-                          .findAny()
-                          .orElseThrow(NotFoundException::new);
-    }
-
     private java.nio.file.Path getJabMapPath(String id) {
-        java.nio.file.Path libraryPath = getLibraryPath(id);
+        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, filesToServe, contextsToServe);
         String newName = libraryPath.getFileName().toString().replaceFirst("\\.bib$", ".jmp");
         return libraryPath.getParent().resolve(newName);
     }
 
     private java.nio.file.Path getJabMapDemoPath() {
         java.nio.file.Path result = java.nio.file.Path.of(System.getProperty("java.io.tmpdir")).resolve("demo.jmp");
-        System.out.println("Demo path: " + result);
+        // TODO: make this debug - and adapt "tinylog.properties" locally to use debug level
+        LOGGER.error("Using temporary file for demo jmp: {}", result);
         return result;
     }
 
