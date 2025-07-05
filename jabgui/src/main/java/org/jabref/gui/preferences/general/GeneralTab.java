@@ -58,7 +58,9 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
     @FXML private CheckBox enableHttpServer;
+    @FXML private TextField enableHttpPort;
     @FXML private Button remoteHelp;
+    @FXML private Button enableHttpHelp;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private BibEntryTypesManager entryTypesManager;
 
@@ -136,6 +138,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         ActionFactory actionFactory = new ActionFactory();
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AUTOSAVE, dialogService, preferences.getExternalApplicationsPreferences()), autosaveLocalLibrariesHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferences.getExternalApplicationsPreferences()), remoteHelp);
+        actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.REMOTE, dialogService, preferences.getExternalApplicationsPreferences()), enableHttpHelp);
 
         createBackup.selectedProperty().bindBidirectional(viewModel.createBackupProperty());
         backupDirectory.textProperty().bindBidirectional(viewModel.backupDirectoryProperty());
@@ -143,6 +146,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
 
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
+            validationVisualizer.initVisualization(viewModel.enableHttpPortValidationStatus(), enableHttpPort);
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
         });
@@ -152,6 +156,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
 
         enableHttpServer.selectedProperty().bindBidirectional(viewModel.enableHttpServerProperty());
+        enableHttpPort.textProperty().bindBidirectional(viewModel.enableHttpPortProperty());
+        enableHttpPort.disableProperty().bind(enableHttpServer.selectedProperty().not());
     }
 
     @FXML
