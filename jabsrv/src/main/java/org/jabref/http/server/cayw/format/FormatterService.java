@@ -10,6 +10,7 @@ import org.jvnet.hk2.annotations.Service;
 @Service
 public class FormatterService {
 
+    private static final String DEFAULT_FORMATTER = "biblatex";
     private final Map<String, CAYWFormatter> formatters;
 
     public FormatterService() {
@@ -22,7 +23,7 @@ public class FormatterService {
         formatters.putIfAbsent(formatter.getFormatName(), formatter);
     }
 
-    public CAYWFormatter getFormatter(CAYWQueryParams queryParams) throws IllegalArgumentException {
-        return formatters.get(queryParams.getFormat().toLowerCase());
+    public CAYWFormatter getFormatter(CAYWQueryParams queryParams) {
+        return formatters.getOrDefault(queryParams.getFormat().toLowerCase(), formatters.get(DEFAULT_FORMATTER));
     }
 }
