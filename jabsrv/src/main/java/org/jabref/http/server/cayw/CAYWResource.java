@@ -33,7 +33,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
@@ -54,9 +53,6 @@ public class CAYWResource {
 
     @Inject
     private CliPreferences preferences;
-
-    @Inject
-    private Gson gson;
 
     @Inject
     private FormatterService formatterService;
@@ -189,6 +185,12 @@ public class CAYWResource {
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
         if (!initialized) {
+            if (!contextsToServe.getContextsToServe().isEmpty()) {
+                LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
+                initialized = true;
+                return;
+            }
+            LOGGER.debug("Initializing JavaFX for CAYW resource.");
             CountDownLatch latch = new CountDownLatch(1);
             Platform.startup(() -> {
                 Platform.setImplicitExit(false);
