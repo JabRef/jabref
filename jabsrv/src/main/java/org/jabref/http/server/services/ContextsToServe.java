@@ -18,6 +18,8 @@ public class ContextsToServe {
         return contextsToServe;
     }
 
+    /// contextsToServe.isEmpty() could be true when no libraries are opened in JabRef
+    /// Check filesToServe.isEmpty() to determine whether called from the CLI or GUI
     public boolean isEmpty() {
         return contextsToServe == null || contextsToServe.isEmpty();
     }
