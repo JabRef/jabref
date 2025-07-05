@@ -93,14 +93,15 @@ public class CAYWResource {
 
         CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
         Platform.runLater(() -> {
-                SearchDialog dialog = new SearchDialog();
-                // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
-                //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
-            List<CAYWEntry> results = dialog.show(searchQuery ->
-                    entries.stream().filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
+            SearchDialog dialog = new SearchDialog();
+            // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
+            //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
+            List<CAYWEntry> results = dialog.show(
+                    searchQuery ->
+                            entries.stream()
+                                   .filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
                     entries);
-
-                future.complete(results);
+            future.complete(results);
         });
 
         List<CAYWEntry> searchResults = future.get();
