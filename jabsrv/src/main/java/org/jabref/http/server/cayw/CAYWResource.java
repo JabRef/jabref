@@ -127,14 +127,14 @@ public class CAYWResource {
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
         Optional<String> libraryId = queryParams.getLibraryId();
         if (libraryId.isPresent()) {
-            if (libraryId.get().equals("demo")) {
+            if ("demo".equals(libraryId.get())) {
                 return ServerUtils.getBibDatabaseContext("demo", filesToServe, contextsToServe, preferences.getImportFormatPreferences());
             }
             return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, contextsToServe, preferences.getImportFormatPreferences());
         }
 
         Optional<String> libraryPath = queryParams.getLibraryPath();
-        if (libraryPath.isPresent() && libraryPath.get().equals("demo")) {
+        if (libraryPath.isPresent() && "demo".equals(libraryPath.get())) {
             return ServerUtils.getBibDatabaseContext("demo", filesToServe, contextsToServe, preferences.getImportFormatPreferences());
         }
 
