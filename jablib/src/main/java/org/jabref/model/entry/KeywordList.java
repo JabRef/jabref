@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -53,13 +53,47 @@ public class KeywordList implements Iterable<Keyword> {
 
         KeywordList keywordList = new KeywordList();
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
-            keywordList.add(chainRoot);
+        List<String> tokens = splitRespectingEscapes(keywordString, delimiter);
+        for (String token : tokens) {
+            if (!token.isBlank()) {
+                List<String> hierarchy = splitRespectingEscapes(token, hierarchicalDelimiter);
+                keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
+            }
         }
+
         return keywordList;
+    }
+
+    private static List<String> splitRespectingEscapes(String keywordString, Character delimiter) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+
+        for (int position = 0; position < keywordString.length(); position++) {
+            char currentChar = keywordString.charAt(position);
+
+            if (currentChar == '\\') {
+                if (position + 1 < keywordString.length()) {
+                    char nextChar = keywordString.charAt(position + 1);
+                    currentToken.append(nextChar);
+                    position++;
+                } else {
+                    currentToken.append('\\');
+                }
+            } else if (currentChar == delimiter) {
+                String token = currentToken.toString().trim();
+                if (!token.isEmpty()) {
+                    tokens.add(token);
+                }
+                currentToken.setLength(0);
+            } else {
+                currentToken.append(currentChar);
+            }
+        }
+        String finalToken = currentToken.toString().trim();
+        if (!finalToken.isEmpty()) {
+            tokens.add(finalToken);
+        }
+        return tokens;
     }
 
     /**
