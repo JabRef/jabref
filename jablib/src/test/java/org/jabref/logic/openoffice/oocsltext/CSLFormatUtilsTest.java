@@ -187,8 +187,6 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-
-
                         "1. Smith, B., Jones, B. & Williams, J. Title of the test entry. <i>BibTeX Journal</i> <b>34</b>, 45–67 (2016).<p></p>",
                         STYLE_LIST.stream().filter(e -> "Nature".equals(e.getTitle())).findAny().get()
                 ),
