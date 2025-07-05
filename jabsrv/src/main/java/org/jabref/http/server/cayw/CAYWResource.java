@@ -38,7 +38,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -67,9 +66,8 @@ public class CAYWResource {
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
-        Response.ResponseBuilder response = Response.ok().type(MediaType.TEXT_PLAIN_TYPE);
         if (queryParams.isProbe()) {
-            return response.entity("ready").build();
+            return Response.ok("ready").build();
         }
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
 
