@@ -562,7 +562,7 @@ gradle-app.setting
 ## !! KEEP THESE LINES !!
 
 # we really version .jar files - needs to be go after the www.gitignore.io-generated ones, because they ignore *.jar files
-!/lib/*.jar
+!/jablib/lib/**/*.jar
 
 # do not distribute Oracle's JDBC driver
 lib/ojdbc.jar
