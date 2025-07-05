@@ -1,11 +1,9 @@
 package org.jabref.http.server.cayw.format;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jabref.http.server.cayw.CAYWQueryParams;
-import org.jabref.http.server.cayw.gui.CAYWEntry;
 
 import org.jvnet.hk2.annotations.Service;
 
@@ -24,8 +22,7 @@ public class FormatterService {
         formatters.putIfAbsent(formatter.getFormatName(), formatter);
     }
 
-    public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) throws IllegalArgumentException {
-        CAYWFormatter formatter = formatters.get(queryParams.getFormat().toLowerCase());
-        return formatter.format(queryParams, caywEntries);
+    public CAYWFormatter getFormatter(CAYWQueryParams queryParams) throws IllegalArgumentException {
+        return formatters.get(queryParams.getFormat().toLowerCase());
     }
 }
