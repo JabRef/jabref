@@ -141,4 +141,9 @@ public class MVStoreBibEntryRelationRepository implements BibEntryRelationReposi
     public void close() {
         this.store.close();
     }
+
+    @Override
+    public void closeImmediately() {
+        this.store.closeImmediately();
+    }
 }
