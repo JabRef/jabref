@@ -581,3 +581,5 @@ CHANGELOG.html
 
 # some strange gradle/IntelliJ extension
 extension 'reporting' property 'baseDirectory'
+
+tessdata/

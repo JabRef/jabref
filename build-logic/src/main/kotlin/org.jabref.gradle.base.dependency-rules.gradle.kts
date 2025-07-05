@@ -210,6 +210,11 @@ extraJavaModuleInfo {
     module("net.java.dev.jna:jna-platform", "com.sun.jna.platform")
     module("net.jcip:jcip-annotations", "net.jcip.annotations")
     module("net.jodah:typetools", "net.jodah.typetools")
+    module("net.sourceforge.tess4j:tess4j", "net.sourceforge.tess4j") {
+        exportAllPackages()
+        requires("java.logging")
+        requires("org.apache.pdfbox.tools")
+    }
     module("org.abego.treelayout:org.abego.treelayout.core", "org.abego.treelayout.core")
     module("org.antlr:antlr4-runtime", "org.antlr.antlr4.runtime")
     module("org.apache.httpcomponents.client5:httpclient5", "org.apache.httpcomponents.client5.httpclient5")
@@ -223,6 +228,8 @@ extraJavaModuleInfo {
         requires("org.apache.commons.logging")
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
+    module("org.apache.pdfbox:pdfbox-tools", "org.apache.pdfbox.tools")
+    module("org.apache.pdfbox:pdfbox-debugger", "org.apache.pdfbox.debugger")
     module("org.apache.velocity:velocity-engine-core", "org.apache.velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
