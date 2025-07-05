@@ -17,9 +17,11 @@ import java.util.concurrent.ExecutionException;
 
 import javafx.application.Platform;
 
+import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
+import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -28,7 +30,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.util.DummyFileUpdateMonitor;
 
-import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
@@ -40,6 +41,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@AllowedToUseAwt("Requires java.awt.datatransfer.Clipboard")
 @Path("better-bibtex/cayw")
 public class CAYWResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(CAYWResource.class);
@@ -50,10 +52,10 @@ public class CAYWResource {
     private CliPreferences preferences;
 
     @Inject
-    private Gson gson;
+    private FormatterService formatterService;
 
     @Inject
-    private FormatterService formatterService;
+    private ContextsToServe contextsToServe;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
@@ -164,6 +166,12 @@ public class CAYWResource {
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
         if (!initialized) {
+            if (!contextsToServe.getContextsToServe().isEmpty()) {
+                LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
+                initialized = true;
+                return;
+            }
+            LOGGER.debug("Initializing JavaFX for CAYW resource.");
             CountDownLatch latch = new CountDownLatch(1);
             Platform.startup(() -> {
                 Platform.setImplicitExit(false);

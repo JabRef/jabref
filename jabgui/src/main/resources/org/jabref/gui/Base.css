@@ -262,9 +262,9 @@
     -jr-header-height: 3em;
 
     /* AI chat style */
-    -jr-ai-message-user: -jr-accent;
+    -jr-ai-message-user: derive(-jr-accent, 50%);
     -jr-ai-message-user-border: -jr-theme;
-    -jr-ai-message-ai: -jr-accent;
+    -jr-ai-message-ai: derive(-jr-accent, 80%);
     -jr-ai-message-ai-border: -jr-theme;
     -jr-ai-message-error: -jr-error;
     -jr-ai-message-error-border: derive(-jr-error, -40%);
@@ -2668,4 +2668,91 @@ journalInfo .grid-cell-b {
     -fx-spacing: 1em;
     -fx-max-width: 48em;
     -fx-fill-width: true;
+}
+
+/* Markdown styles */
+.markdown-textflow {
+    -fx-line-spacing: 2;
+    -fx-text-alignment: left;
+}
+
+.markdown-textflow > * {
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-h1 {
+    -fx-font-size: 2em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h2 {
+    -fx-font-size: 1.5em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h3 {
+    -fx-font-size: 1.25em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h4 {
+    -fx-font-size: 1.1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h5 {
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+}
+
+.markdown-h6 {
+    -fx-font-size: 0.875em;
+    -fx-font-weight: bold;
+}
+
+.markdown-bold {
+    -fx-font-weight: bold;
+}
+
+.markdown-italic {
+    -fx-font-style: italic;
+}
+
+.markdown-code {
+    -fx-font-family: monospace;
+    -fx-fill: -jr-theme;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 1, 0, 0, 1);
+}
+
+.markdown-code-block {
+    -fx-font-family: monospace;
+    -fx-fill: -fx-text-base-color;
+}
+
+.markdown-list-bullet {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-list-number {
+    -fx-fill: -jr-theme;
+    -fx-font-weight: bold;
+}
+
+.markdown-blockquote-marker {
+    -fx-fill: transparent;
+}
+
+.markdown-blockquote {
+    -fx-fill: -fx-mid-text-color;
+    -fx-font-style: italic;
+}
+
+.markdown-link {
+    -fx-text-fill: -jr-theme;
+    -fx-underline: true;
+}
+
+.markdown-link:hover {
+    -fx-text-fill: #004499;
 }
