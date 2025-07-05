@@ -1768,32 +1768,86 @@ We want to have a look that matches our icons in the tool-bar */
     -fx-text-fill: -jr-theme;
 }
 
-.welcome-footer-container {
-    -fx-padding: 15px;
+
+/* Welcome Tab Layout Styles */
+.welcome-main-container {
+    -fx-max-width: 768px;
+    -fx-spacing: 28px;
     -fx-alignment: center;
+    -fx-padding: 32px 24px;
+}
+
+.welcome-top-titles {
+    -fx-spacing: 10px;
+    -fx-alignment: left;
+    -fx-padding: 0 0 20px 0;
+}
+
+.welcome-columns-container {
+    -fx-spacing: 40px;
+    -fx-alignment: top-center;
+}
+
+.welcome-left-column,
+.welcome-right-column {
+    -fx-min-width: 0;
+    -fx-pref-width: 50%;
+    -fx-max-width: 600px;
+}
+
+.welcome-content-column {
+    -fx-spacing: 25px;
+    -fx-alignment: top-left;
+}
+
+.welcome-section {
+    -fx-spacing: 12px;
+    -fx-alignment: top-left;
+}
+
+.welcome-links-content {
+    -fx-spacing: 8px;
+    -fx-alignment: top-left;
+}
+
+
+/* Welcome Community  */
+
+.welcome-community-content {
+    -fx-spacing: 12px;
+    -fx-alignment: top-left;
+}
+
+.welcome-community-icons {
+    -fx-hgap: 12px;
+    -fx-vgap: 8px;
+    -fx-alignment: center-left;
+}
+
+.welcome-community-links {
     -fx-spacing: 15px;
+    -fx-alignment: center-left;
 }
 
-.welcome-footer-label {
-    -fx-font-size: 2.25em;
-    -fx-text-fill: -jr-theme-text;
-    -fx-font-family: "Arial";
-}
-
-.welcome-footer-link {
-    -fx-font-size: 1.2em;
+.welcome-community-link {
+    -fx-font-size: 1.0em;
     -fx-text-fill: -jr-theme;
     -fx-font-family: "Arial";
 }
 
-.welcome-footer-link:hover {
+.welcome-community-link:hover {
     -fx-underline: true;
     -fx-text-fill: derive(-jr-theme, -20%);
 }
 
-.welcome-footer-version {
-    -fx-font-size: 1.2em;
-    -fx-text-fill: -jr-theme;
+.welcome-community-version {
+    -fx-alignment: center-left;
+    -fx-padding: 5px 0 0 0;
+}
+
+.welcome-community-version-text {
+    -fx-font-size: 0.9em;
+    -fx-text-fill: -jr-gray-2;
     -fx-font-family: "Arial";
 }
 
@@ -1984,7 +2038,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 #entryEditor #bibtexSourceCodeArea .search {
     -rtfx-background-color: #ffff00;
-    -fx-fill: #7800A9 ;
+    -fx-fill: #7800A9;
     -fx-font-size: 1.2em;
     -fx-font-weight: bolder;
 }
@@ -2454,7 +2508,7 @@ journalInfo .grid-cell-b {
     -fx-border-width: 2.5;
 }
 
-.three-way-merge .styled-text-area .text{
+.three-way-merge .styled-text-area .text {
     -fx-fill: -fx-text-background-color;
 }
 
@@ -2474,7 +2528,7 @@ journalInfo .grid-cell-b {
     -fx-background-color: -jr-menu-background;
 }
 
-.three-way-merge .merge-header-cell .label{
+.three-way-merge .merge-header-cell .label {
     -fx-font-weight: bold;
     -fx-padding: 1, 0, 1, 0;
 }
@@ -2482,7 +2536,7 @@ journalInfo .grid-cell-b {
 .three-way-merge .field-name .glyph-icon,
 .three-way-merge .field-name .ikonli-font-icon {
     -fx-icon-size: 17;
-    -fx-icon-color:  -jr-theme-text;
+    -fx-icon-color: -jr-theme-text;
 }
 
 /* Miscellaneous */
@@ -2496,7 +2550,9 @@ journalInfo .grid-cell-b {
 }
 
 #styleSelectDialog .currentStyleNameLabel {
-    -fx-font-size: 1em; -fx-font-weight: bold; -fx-text-fill: -jr-theme;
+    -fx-font-size: 1em;
+    -fx-font-weight: bold;
+    -fx-text-fill: -jr-theme;
 }
 
 .exampleQuestionStyle {
@@ -2519,11 +2575,320 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
 }
 
-.text-button-blue{
+.text-button-blue {
     -fx-background-color: transparent;
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.25em;
     -fx-border-color: transparent;
+}
+
+
+/* Quick Settings */
+.quick-settings-content {
+    -fx-spacing: 8px;
+    -fx-alignment: top-center;
+}
+
+.quick-settings-button {
+    -fx-background-color: derive(-jr-base, 10%);
+    -fx-border-color: -jr-gray-1;
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 8px 12px;
+    -fx-alignment: center-left;
+    -fx-graphic-text-gap: 8px;
+    -fx-font-size: 1.0em;
+    -fx-text-fill: -fx-text-base-color;
+    -fx-cursor: hand;
+}
+
+.quick-settings-button:hover {
+    -fx-background-color: -jr-hover;
+    -fx-border-color: -jr-accent;
+}
+
+.quick-settings-button .glyph-icon,
+.quick-settings-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
+    -fx-font-size: 1.1em;
+}
+
+.quick-settings-dialog-container {
+    -fx-padding: 16px;
+    -fx-spacing: 16px;
+    -fx-pref-width: 512px;
+}
+
+.quick-settings-dialog-container > HBox {
+    -fx-alignment: center-left;
+    -fx-spacing: 8px;
+}
+
+.quick-settings-dialog-container > ScrollPane {
+    -fx-border-width: 1px;
+    -fx-border-color: derive(-fx-base, -20%);
+    -fx-border-radius: 4px;
+}
+
+/* Quick Settings: Theme Selection */
+.theme-option {
+    -fx-padding: 8px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
+.theme-option:hover {
+    -fx-background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Wireframe base styles */
+.wireframe-container {
+    -fx-border-width: 1px;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+}
+
+.wireframe-menubar {
+    -fx-padding: 3px 1px;
+}
+
+.wireframe-menu-item {
+    -fx-border-radius: 1px;
+    -fx-background-radius: 1px;
+}
+
+.wireframe-toolbar {
+    -fx-padding: 2px;
+    -fx-spacing: 6px;
+}
+
+.wireframe-tool-item {
+    -fx-border-radius: 1px;
+    -fx-background-radius: 1px;
+}
+
+.wireframe-search {
+    -fx-border-width: 0.5px;
+    -fx-border-radius: 2px;
+    -fx-background-radius: 2px;
+}
+
+.wireframe-search-field {
+    -fx-border-radius: 1px;
+    -fx-background-radius: 1px;
+}
+
+.wireframe-sidebar {
+    -fx-padding: 4px 2px;
+}
+
+.wireframe-sidebar-item {
+    -fx-border-radius: 1px;
+    -fx-background-radius: 1px;
+}
+
+.wireframe-welcome-tab-area {
+    -fx-padding: 4px;
+    -fx-alignment: center;
+}
+
+.wireframe-welcome-tab-item {
+    -fx-border-radius: 1px;
+    -fx-background-radius: 1px;
+}
+
+/* Wireframe light colors */
+.wireframe-light .wireframe-container {
+    -fx-border-color: #ccc;
+}
+
+.wireframe-light .wireframe-menubar {
+    -fx-background-color: #f9f9f9;
+}
+
+.wireframe-light .wireframe-menu-item {
+    -fx-background-color: -jr-gray-1;
+}
+
+.wireframe-light .wireframe-toolbar {
+    -fx-background-color: #f9f9f9;
+}
+
+.wireframe-light .wireframe-tool-item {
+    -fx-background-color: #50618f;
+}
+
+.wireframe-light .wireframe-search {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dddddd;
+}
+
+.wireframe-light .wireframe-search-field {
+    -fx-background-color: #f8f8f8;
+}
+
+.wireframe-light .wireframe-sidebar {
+    -fx-background-color: #dddddd;
+}
+
+.wireframe-light .wireframe-sidebar-item {
+    -fx-background-color: #50618f;
+}
+
+.wireframe-light .wireframe-welcome-tab-area {
+    -fx-background-color: #f3f3f3;
+}
+
+.wireframe-light .wireframe-welcome-tab-item {
+    -fx-background-color: #dddddd;
+}
+
+/* Wireframe dark colors */
+.wireframe-dark .wireframe-container {
+    -fx-border-color: #424758;
+}
+
+.wireframe-dark .wireframe-menubar {
+    -fx-background-color: #141824;
+}
+
+.wireframe-dark .wireframe-menu-item {
+    -fx-background-color: #424758;
+}
+
+.wireframe-dark .wireframe-toolbar {
+    -fx-background-color: #141824;
+}
+
+.wireframe-dark .wireframe-tool-item {
+    -fx-background-color: #2c9490;
+}
+
+.wireframe-dark .wireframe-search {
+    -fx-background-color: #2c2e3b;
+    -fx-border-color: #424758;
+}
+
+.wireframe-dark .wireframe-search-field {
+    -fx-background-color: #424758;
+}
+
+.wireframe-dark .wireframe-sidebar {
+    -fx-background-color: #212330;
+}
+
+.wireframe-dark .wireframe-sidebar-item {
+    -fx-background-color: #2c9490;
+}
+
+.wireframe-dark .wireframe-welcome-tab-area {
+    -fx-background-color: #272b38;
+}
+
+.wireframe-dark .wireframe-welcome-tab-item {
+    -fx-background-color: #7d8591;
+}
+
+/* Wireframe custom theme colors */
+.wireframe-custom .wireframe-container {
+    -fx-border-color: #50618F;
+}
+
+.wireframe-custom .wireframe-menubar {
+    -fx-background-color: #f5ffe5;
+}
+
+.wireframe-custom .wireframe-menu-item {
+    -fx-background-color: #346963;
+}
+
+.wireframe-custom .wireframe-toolbar {
+    -fx-background-color: #f5ffe5;
+}
+
+.wireframe-custom .wireframe-tool-item {
+    -fx-background-color: #2E838C;
+}
+
+.wireframe-custom .wireframe-search {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #2E838C;
+}
+
+.wireframe-custom .wireframe-search-field {
+    -fx-background-color: #f0f3ff;
+}
+
+.wireframe-custom .wireframe-sidebar {
+    -fx-background-color: #e1ebd1;
+}
+
+.wireframe-custom .wireframe-sidebar-item {
+    -fx-background-color: #2E838C;
+}
+
+.wireframe-custom .wireframe-welcome-tab-area {
+    -fx-background-color: #E8F2D8;
+}
+
+.wireframe-custom .wireframe-welcome-tab-item {
+    -fx-background-color: #2E838C;
+}
+
+/* Quick Settings: Push Application Configuration */
+.applications-list {
+    -fx-pref-height: 200px;
+    -fx-pref-width: 400px;
+}
+
+.application-item {
+    -fx-padding: 8px;
+    -fx-border-radius: 4px;
+    -fx-background-color: transparent;
+}
+
+.detected-application {
+    -fx-background-color: derive(-jr-accent, 80%);
+    -fx-font-weight: bold;
+}
+
+.application-item:filled:selected {
+    -fx-background-color: -jr-accent;
+    -fx-text-fill: white;
+}
+
+.detected-application .glyph-icon,
+.detected-application .ikonli-font-icon {
+    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
+}
+
+/* Quick Settings: Help Button */
+.help-button {
+    -fx-min-width: 28px;
+    -fx-max-width: 28px;
+    -fx-min-height: 28px;
+    -fx-max-height: 28px;
+    -fx-padding: 4px;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+}
+
+.help-button .glyph-icon,
+.help-button .ikonli-font-icon {
+    -fx-icon-size: 16px;
+    -fx-icon-fill: -jr-theme-accent;
+}
+
+/* Quick Settings: Online Fetchers */
+.fetchers-container {
+    -fx-padding: 12px;
+    -fx-spacing: 12px;
 }
 
 /* Walkthrough Styles */
