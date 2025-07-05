@@ -47,7 +47,7 @@ Accept: application/x-bibtex-library-csl+json
 
 ### Read demo JabMap
 
-GET http://localhost:23119/libraries/Mindmaps.bib-7769f2fa/map
+GET http://localhost:23119/libraries/demo/map
 Accept: application/json
 
 ### Save demo JabMap
