@@ -45,8 +45,6 @@ public class HeadlessExecutorService implements Executor {
 
     private final Timer timer = new Timer("timer", true);
 
-    private Thread remoteThread;
-
     private HeadlessExecutorService() {
    }
 
@@ -121,22 +119,6 @@ public class HeadlessExecutorService implements Executor {
         }
     }
 
-    public void startRemoteThread(Thread thread) {
-        if (this.remoteThread != null) {
-            throw new IllegalStateException("Tele thread is already attached");
-        } else {
-            this.remoteThread = thread;
-            remoteThread.start();
-        }
-    }
-
-    public void stopRemoteThread() {
-        if (remoteThread != null) {
-            remoteThread.interrupt();
-            remoteThread = null;
-        }
-    }
-
     public void submit(TimerTask timerTask, long millisecondsDelay) {
         timer.schedule(timerTask, millisecondsDelay);
     }
@@ -145,9 +127,6 @@ public class HeadlessExecutorService implements Executor {
      * Shuts everything down. After termination, this method returns.
      */
     public void shutdownEverything() {
-        LOGGER.trace("Stopping remote thread");
-        stopRemoteThread();
-
         LOGGER.trace("Gracefully shut down executor service");
         gracefullyShutdown(this.executorService);
 

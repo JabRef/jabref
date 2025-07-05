@@ -16,6 +16,9 @@ module org.jabref.jabsrv.cli {
     requires jakarta.inject;
 
     requires afterburner.fx;
+    provides com.airhacks.afterburner.views.ResourceLocator
+            with org.jabref.http.cli.JabRefResourceLocator;
+    requires javafx.base;
 
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;
@@ -23,7 +26,7 @@ module org.jabref.jabsrv.cli {
     requires jakarta.validation;
     requires jakarta.ws.rs;
 
-    requires jersey.common;
+    requires org.glassfish.jersey.common;
 
     requires info.picocli;
 
@@ -31,11 +34,11 @@ module org.jabref.jabsrv.cli {
     requires com.sun.jna;
     requires com.sun.jna.platform;
 
-    requires jbibtex;
-    requires citeproc.java;
+    requires org.jbibtex;
+    requires de.undercouch.citeproc.java;
 
     requires transitive org.jspecify;
     requires java.logging;
-    requires jersey.container.grizzly2.http;
-    requires jersey.server;
+    requires org.glassfish.jersey.grizzly2.http;
+    requires org.glassfish.jersey.server;
 }

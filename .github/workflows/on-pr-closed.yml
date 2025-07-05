@@ -9,6 +9,7 @@ jobs:
     name: Determine issue number
     runs-on: ubuntu-latest
     if: >
+      (github.repository == 'JabRef/jabref') &&
       !(
         (github.actor == 'dependabot[bot]') ||
         (
