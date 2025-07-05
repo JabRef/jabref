@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -21,6 +22,9 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
+import org.jabref.http.server.services.ContextsToServe;
+import org.jabref.http.server.services.FilesToServe;
+import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
@@ -57,6 +61,12 @@ public class CAYWResource {
     @Inject
     private FormatterService formatterService;
 
+    @Inject
+    private FilesToServe filesToServe;
+
+    @Inject
+    private ContextsToServe contextsToServe;
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getCitation(
@@ -66,17 +76,7 @@ public class CAYWResource {
             return Response.ok("ready").build();
         }
 
-        BibDatabaseContext databaseContext;
-
-        // handle library path parameter
-        if (queryParams.getLibraryPath().isPresent() && "demo".equalsIgnoreCase(queryParams.getLibraryPath().get())) {
-            databaseContext = getDatabaseContextFromStream(getChocolateBibAsStream());
-        } else if (queryParams.getLibraryPath().isPresent()) {
-            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(queryParams.getLibraryPath().get()));
-            databaseContext = getDatabaseContextFromStream(inputStream);
-        } else {
-            databaseContext = getDatabaseContextFromStream(getLatestDatabaseStream());
-        }
+        BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
 
         /* unused until DatabaseSearcher is fixed
         PostgreServer postgreServer = new PostgreServer();
@@ -125,6 +125,29 @@ public class CAYWResource {
         }
 
         return Response.ok(response).build();
+    }
+
+    private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
+        Optional<String> libraryId = queryParams.getLibraryId();
+        if (libraryId.isPresent()) {
+            if (libraryId.get().equals("demo")) {
+                return ServerUtils.getBibDatabaseContext("demo", filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+            }
+            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+        }
+
+        Optional<String> libraryPath = queryParams.getLibraryPath();
+        if (libraryPath.isPresent() && libraryPath.get().equals("demo")) {
+            return ServerUtils.getBibDatabaseContext("demo", filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+        }
+
+        if (queryParams.getLibraryPath().isPresent()) {
+            assert !"demo".equalsIgnoreCase(queryParams.getLibraryPath().get());
+            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(queryParams.getLibraryPath().get()));
+            return getDatabaseContextFromStream(inputStream);
+        }
+
+        return getDatabaseContextFromStream(getLatestDatabaseStream());
     }
 
     private InputStream getLatestDatabaseStream() throws IOException {
