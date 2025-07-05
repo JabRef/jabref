@@ -133,8 +133,9 @@ public class JabKit {
         SLF4JBridgeHandler.install();
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
-        // argument parsing workflow to parse logging options e.g. --debug
+        // argument parsing workflow to parse logging options: i.e. --debug or --porcelain
         boolean isDebugEnabled = Arrays.stream(args).anyMatch(arg -> "--debug".equalsIgnoreCase(arg));
+        boolean isPorcelainEnabled = Arrays.stream(args).anyMatch(arg -> "--porcelain".equalsIgnoreCase(arg));
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
@@ -147,10 +148,19 @@ public class JabKit {
             return;
         }
 
+        String level;
+        if (isDebugEnabled) {
+            level = "debug";
+        } else if (isPorcelainEnabled) {
+            level = "error";
+        } else {
+            level = "info";
+        }
+
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
-                "level", isDebugEnabled ? "debug" : "info",
+                "level", level,
                 "writerFile", "rolling file",
                 "writerFile.level", isDebugEnabled ? "debug" : "info",
                 // We need to manually join the path, because ".resolve" does not work on Windows, because ":" is not allowed in file names on Windows
