@@ -13,7 +13,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
-//SOURCES ../jabsrv-cli/src/main/java/org/jabref/http/cli/JabRefResourceLocator.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
@@ -33,6 +32,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ContextsToServe.java
+//SOURCES ../jabsrv-cli/src/main/java/org/jabref/http/cli/JabRefResourceLocator.java
 
 // REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
