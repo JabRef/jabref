@@ -68,7 +68,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Run OpenRewrite
         run: |
-          ./gradlew rewriteDryRun
+          ./gradlew --no-configuration-cache :rewriteDryRun
 
   modernizer:
     name: Modernizer
@@ -304,6 +304,8 @@ jobs:
   jbang:
     name: JBang
     runs-on: ubuntu-latest
+    # JBang scripts depend on main-SNAPSHOT; thus, we can only test fully when main is updated
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -330,15 +332,10 @@ jobs:
             jbang-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
-      - name: Checkout source
-        uses: actions/checkout@v4
-        with:
-          submodules: 'false'
-          show-progress: 'false'
       - run: jbang build .jbang/CheckoutPR.java
       - run: jbang build .jbang/CloneJabRef.java
-      - run: jbang build .jbang/JabKitLauncher.java
-      - run: jbang build .jbang/JabSrvLauncher.java
+      - run: jbang build --fresh .jbang/JabKitLauncher.java
+      - run: jbang build --fresh .jbang/JabSrvLauncher.java
 
   codecoverage:
     if: false
@@ -556,33 +553,23 @@ jobs:
 
   unmodified_submodules:
     name: Submodules not modified
-    if: false && (github.actor != 'dependabot[bot]' && github.event_name == 'pull_request')
+    if: (github.actor != 'dependabot[bot]' && github.event_name == 'pull_request')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
+      - name: Get all submodule changes
+        id: changes
+        uses: tj-actions/changed-files@v46
         with:
-          submodules: true
-          show-progress: 'false'
-      - name: Check for submodule modifications
-        id: check_submodule
+          files: |
+            jablib/src/main/abbrv.jabref.org
+            jablib/src/main/resources/csl-styles
+            jablib/src/main/resources/csl-locales
+      - name: Submodules modified
+        if: steps.changes.outputs.any_changed == 'true'
         run: |
-          git fetch origin ${{ github.base_ref }}
-
-          # enable diffing of submodules
-          sed -i "s/ all/ untracked/" .gitmodules
-
-          if git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -Eq "^Submodule .* contains modified content$"; then
-            echo "Debug:"
-            echo "Command: git diff --submodule=log origin/${{ github.base_ref }} HEAD"
-            echo "Result:"
-            git diff --submodule=log origin/${{ github.base_ref }} HEAD
-            echo "--end--"
-            echo "Grep result"
-            git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -E "^Submodule .* contains modified content$"
-            echo "❌ Submodule modifications detected"
-            exit 1
-          fi
-          echo "✅ No submodule modifications"
+          echo "❌ Submodule modifications detected"
+          exit 1
 
   other_than_main:
     if: github.event_name == 'pull_request'

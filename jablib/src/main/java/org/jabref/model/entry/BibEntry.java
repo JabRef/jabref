@@ -740,10 +740,22 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(StandardField.AUTHOR).orElse("N/A"), getField(StandardField.TITLE).orElse("N/A"),
-                getField(StandardField.YEAR).orElse("N/A")};
+        String authorField = getField(StandardField.AUTHOR).orElse("N/A");
+        String titleField = getField(StandardField.TITLE).orElse("N/A");
+        String yearField = getField(StandardField.YEAR).orElse("N/A");
 
-        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
+        String formattedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);
+        String formattedTitle = LatexToUnicodeAdapter.format(titleField);
+
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append(formattedAuthors)
+                .append(": \"")
+                .append(formattedTitle)
+                .append("\" (")
+                .append(yearField)
+                .append(')');
+        String text = textBuilder.toString();
+
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
             return text;
         }

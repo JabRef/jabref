@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import javafx.util.Pair;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.os.OS;
 
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
+@AllowedToUseLogic("OS.NewLine is most basic")
 public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
