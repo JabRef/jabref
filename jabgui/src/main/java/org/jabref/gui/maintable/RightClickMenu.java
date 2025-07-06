@@ -177,7 +177,7 @@ public class RightClickMenu {
                                           TaskExecutor taskExecutor) {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
 
-        clipBoardManager.set
+        clipBoardManager.setSourceBibDatabaseContext(libraryTab.getBibDatabaseContext());
 
         copySpecialMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
