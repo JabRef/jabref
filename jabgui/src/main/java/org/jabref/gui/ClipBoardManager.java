@@ -7,6 +7,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextInputControl;
@@ -19,6 +20,7 @@ import org.jabref.architecture.AllowedToUseAwt;
 import org.jabref.logic.bibtex.BibEntryWriter;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -34,6 +36,8 @@ public class ClipBoardManager {
     public static final DataFormat XML = new DataFormat("application/xml");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
+
+    private static BibDatabaseContext sourceDatabaseContext;
 
     private static Clipboard clipboard;
     private static java.awt.datatransfer.Clipboard primary;
@@ -117,6 +121,10 @@ public class ClipBoardManager {
         return getContents();
     }
 
+    public static Optional<BibDatabaseContext> getSourceBibDatabaseContext() {
+      return Optional.ofNullable(sourceDatabaseContext);
+    }
+
     /**
      * Puts content onto the system clipboard.
      *
@@ -164,6 +172,12 @@ public class ClipBoardManager {
         String serializedEntries = serializeEntries(entries, entryTypesManager);
         builder.append(serializedEntries);
         setContent(builder.toString());
+    }
+
+    public static void setSourceBibDatabaseContext(BibDatabaseContext context) {
+      if (context != null) {
+        sourceDatabaseContext = context;
+      }
     }
 
     private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
