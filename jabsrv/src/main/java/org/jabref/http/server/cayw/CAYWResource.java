@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import javafx.application.Platform;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.http.server.cayw.format.CAYWFormatter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
@@ -37,8 +38,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -64,14 +63,12 @@ public class CAYWResource {
     private ContextsToServe contextsToServe;
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
         if (queryParams.isProbe()) {
             return Response.ok("ready").build();
         }
-
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
 
         /* unused until DatabaseSearcher is fixed
@@ -111,17 +108,18 @@ public class CAYWResource {
         }
 
         // Format parameter handling
-        String response = formatterService.format(queryParams, searchResults);
+        CAYWFormatter formatter = formatterService.getFormatter(queryParams);
+        String formattedResponse = formatter.format(queryParams, searchResults);
 
         // Clipboard parameter handling
         if (queryParams.isClipboard()) {
             Toolkit toolkit = Toolkit.getDefaultToolkit();
             Clipboard systemClipboard = toolkit.getSystemClipboard();
-            StringSelection strSel = new StringSelection(response);
+            StringSelection strSel = new StringSelection(formattedResponse);
             systemClipboard.setContents(strSel, null);
         }
 
-        return Response.ok(response).build();
+        return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
     }
 
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
@@ -186,7 +184,7 @@ public class CAYWResource {
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
         if (!initialized) {
-            if (!contextsToServe.getContextsToServe().isEmpty()) {
+            if (!contextsToServe.isEmpty()) {
                 LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
                 initialized = true;
                 return;
