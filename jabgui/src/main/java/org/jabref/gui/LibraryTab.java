@@ -836,7 +836,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         if (clipBoardManager.getSourceBibDatabaseContext().isPresent()) {
           LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd,
-            clipBoardManager.getSourceBibDatabaseContext().get(), bibDatabaseContext);
+            clipBoardManager.getSourceBibDatabaseContext().get(), bibDatabaseContext, preferences.getFilePreferences());
         }
 
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
