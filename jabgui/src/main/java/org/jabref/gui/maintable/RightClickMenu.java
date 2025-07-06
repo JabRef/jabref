@@ -73,7 +73,7 @@ public class RightClickMenu {
 
         contextMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
-                createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
+                createCopySubMenu(factory, dialogService, stateManager, preferences, libraryTab, clipBoardManager, abbreviationRepository, taskExecutor),
                 createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
                 factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
                 factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
@@ -171,10 +171,13 @@ public class RightClickMenu {
                                           DialogService dialogService,
                                           StateManager stateManager,
                                           GuiPreferences preferences,
+                                          LibraryTab libraryTab,
                                           ClipBoardManager clipBoardManager,
                                           JournalAbbreviationRepository abbreviationRepository,
                                           TaskExecutor taskExecutor) {
         Menu copySpecialMenu = factory.createMenu(StandardActions.COPY_MORE);
+
+        clipBoardManager.set
 
         copySpecialMenu.getItems().addAll(
                 factory.createMenuItem(StandardActions.COPY_TITLE, new CopyMoreAction(StandardActions.COPY_TITLE, dialogService, stateManager, clipBoardManager, preferences, abbreviationRepository)),
