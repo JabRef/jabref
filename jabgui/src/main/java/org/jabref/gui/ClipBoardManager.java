@@ -37,7 +37,7 @@ public class ClipBoardManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
-    private static BibDatabaseContext sourceDatabaseContext;
+    private BibDatabaseContext sourceDatabaseContext;
 
     private static Clipboard clipboard;
     private static java.awt.datatransfer.Clipboard primary;
@@ -121,7 +121,7 @@ public class ClipBoardManager {
         return getContents();
     }
 
-    public static Optional<BibDatabaseContext> getSourceBibDatabaseContext() {
+    public Optional<BibDatabaseContext> getSourceBibDatabaseContext() {
       return Optional.ofNullable(sourceDatabaseContext);
     }
 
@@ -174,7 +174,7 @@ public class ClipBoardManager {
         setContent(builder.toString());
     }
 
-    public static void setSourceBibDatabaseContext(BibDatabaseContext context) {
+    public void setSourceBibDatabaseContext(BibDatabaseContext context) {
       if (context != null) {
         sourceDatabaseContext = context;
       }
