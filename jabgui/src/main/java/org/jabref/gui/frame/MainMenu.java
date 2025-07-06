@@ -240,7 +240,7 @@ public class MainMenu extends MenuBar {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.
             boolean isStageUnfocused = !Injector.instantiateModelOrService(Stage.class).focusedProperty().get();
-            
+
             if (OS.OS_X && isStageUnfocused) {
                 event.consume();
             }
@@ -376,7 +376,8 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
-                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction("mainFileDirectory"))
+                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction("mainFileDirectory")),
+                        factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH, new WalkthroughAction("customizeEntryTable"))
                 ),
 
                 new SeparatorMenuItem(),

@@ -3027,10 +3027,3 @@ journalInfo .grid-cell-b {
     -fx-background-radius: 4;
     -fx-padding: 0.25em 0.5em;
 }
-
-.walkthrough-fullscreen-content {
-    -fx-padding: 0.1875em;
-    -fx-spacing: 1em;
-    -fx-max-width: 48em;
-    -fx-fill-width: true;
-}

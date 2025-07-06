@@ -4,19 +4,14 @@ import java.util.Optional;
 
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Window;
 
-import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
@@ -34,7 +29,7 @@ public class SingleWindowWalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(SingleWindowWalkthroughOverlay.class);
 
     private final Window window;
-    private final GridPane overlayPane;
+    private final BorderPane overlayPane;
     private final Pane originalRoot;
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
@@ -44,22 +39,23 @@ public class SingleWindowWalkthroughOverlay {
         this.window = window;
         this.renderer = new WalkthroughRenderer();
 
-        overlayPane = new GridPane();
+        overlayPane = new BorderPane();
         overlayPane.getStyleClass().add("walkthrough-overlay");
         overlayPane.setPickOnBounds(false);
         overlayPane.setMaxWidth(Double.MAX_VALUE);
         overlayPane.setMaxHeight(Double.MAX_VALUE);
+
+        overlayPane.prefWidthProperty().bind(window.widthProperty());
+        overlayPane.prefHeightProperty().bind(window.heightProperty());
+        overlayPane.minWidthProperty().bind(window.widthProperty());
+        overlayPane.minHeightProperty().bind(window.heightProperty());
 
         Scene scene = window.getScene();
         // This basically never happens, so only a development time check is needed
         assert scene != null;
 
         originalRoot = (Pane) scene.getRoot();
-        stackPane = new StackPane();
-
-        stackPane.getChildren().add(originalRoot);
-        stackPane.getChildren().add(overlayPane);
-
+        stackPane = new StackPane(originalRoot, overlayPane);
         scene.setRoot(stackPane);
     }
 
@@ -84,7 +80,7 @@ public class SingleWindowWalkthroughOverlay {
             case PanelStep panelStep -> {
                 Node content = renderer.render(panelStep, walkthrough, beforeNavigate);
                 displayPanelStep(content, panelStep);
-                setupClipping(content);
+                setupClipping(content, panelStep);
                 overlayPane.toFront();
             }
         }
@@ -101,7 +97,12 @@ public class SingleWindowWalkthroughOverlay {
      * Hide the overlay and clean up any resources.
      */
     public void hide() {
-        overlayPane.getChildren().clear();
+        overlayPane.setTop(null);
+        overlayPane.setBottom(null);
+        overlayPane.setLeft(null);
+        overlayPane.setRight(null);
+        overlayPane.setCenter(null);
+
         overlayPane.setClip(null);
         overlayPane.setVisible(true);
         updater.cleanup();
@@ -149,87 +150,25 @@ public class SingleWindowWalkthroughOverlay {
     }
 
     private void displayPanelStep(Node content, PanelStep step) {
-        overlayPane.getChildren().clear();
-        overlayPane.getRowConstraints().clear();
-        overlayPane.getColumnConstraints().clear();
-
-        configurePanelLayout(step.position());
-
-        overlayPane.getChildren().add(content);
-        GridPane.setHgrow(content, Priority.NEVER);
-        GridPane.setVgrow(content, Priority.NEVER);
-
         switch (step.position()) {
-            case LEFT -> {
-                overlayPane.setAlignment(Pos.CENTER_LEFT);
-                GridPane.setVgrow(content, Priority.ALWAYS);
-                GridPane.setFillHeight(content, true);
-            }
-            case RIGHT -> {
-                overlayPane.setAlignment(Pos.CENTER_RIGHT);
-                GridPane.setVgrow(content, Priority.ALWAYS);
-                GridPane.setFillHeight(content, true);
-            }
-            case TOP -> {
-                overlayPane.setAlignment(Pos.TOP_CENTER);
-                GridPane.setHgrow(content, Priority.ALWAYS);
-                GridPane.setFillWidth(content, true);
-            }
-            case BOTTOM -> {
-                overlayPane.setAlignment(Pos.BOTTOM_CENTER);
-                GridPane.setHgrow(content, Priority.ALWAYS);
-                GridPane.setFillWidth(content, true);
-            }
+            case LEFT -> overlayPane.setLeft(content);
+            case RIGHT -> overlayPane.setRight(content);
+            case TOP -> overlayPane.setTop(content);
+            case BOTTOM -> overlayPane.setBottom(content);
             default -> {
                 LOGGER.warn("Unsupported position for panel step: {}", step.position());
-                overlayPane.setAlignment(Pos.CENTER);
+                overlayPane.setCenter(content);
             }
         }
     }
 
-    private void configurePanelLayout(PanelPosition position) {
-        overlayPane.getRowConstraints().add(switch (position) {
-            case LEFT,
-                 RIGHT -> {
-                RowConstraints rowConstraints = new RowConstraints();
-                rowConstraints.setVgrow(Priority.ALWAYS);
-                yield rowConstraints;
-            }
-            case TOP,
-                 BOTTOM -> {
-                RowConstraints rowConstraints = new RowConstraints();
-                rowConstraints.setVgrow(Priority.NEVER);
-                yield rowConstraints;
-            }
-        });
-        overlayPane.getColumnConstraints().add(switch (position) {
-            case LEFT,
-                 RIGHT -> {
-                ColumnConstraints columnConstraints = new ColumnConstraints();
-                columnConstraints.setHgrow(Priority.NEVER);
-                yield columnConstraints;
-            }
-            case TOP,
-                 BOTTOM -> {
-                ColumnConstraints columnConstraints = new ColumnConstraints();
-                columnConstraints.setHgrow(Priority.ALWAYS);
-                yield columnConstraints;
-            }
-        });
-    }
-
     private Optional<PopOver.ArrowLocation> mapToArrowLocation(TooltipPosition position) {
         return Optional.ofNullable(switch (position) {
-            case TOP ->
-                    PopOver.ArrowLocation.BOTTOM_CENTER;
-            case BOTTOM ->
-                    PopOver.ArrowLocation.TOP_CENTER;
-            case LEFT ->
-                    PopOver.ArrowLocation.RIGHT_CENTER;
-            case RIGHT ->
-                    PopOver.ArrowLocation.LEFT_CENTER;
-            case AUTO ->
-                    null;
+            case TOP -> PopOver.ArrowLocation.BOTTOM_CENTER;
+            case BOTTOM -> PopOver.ArrowLocation.TOP_CENTER;
+            case LEFT -> PopOver.ArrowLocation.RIGHT_CENTER;
+            case RIGHT -> PopOver.ArrowLocation.LEFT_CENTER;
+            case AUTO -> null;
         });
     }
 
@@ -238,15 +177,34 @@ public class SingleWindowWalkthroughOverlay {
         updater.addCleanupTask(() -> overlayPane.setVisible(true));
     }
 
-    private void setupClipping(Node node) {
-        ChangeListener<Bounds> listener = (_, _, bounds) -> {
-            if (bounds != null && bounds.getWidth() > 0 && bounds.getHeight() > 0) {
-                Rectangle clip = new Rectangle(bounds.getMinX(), bounds.getMinY(),
-                        bounds.getWidth(), bounds.getHeight());
-                overlayPane.setClip(clip);
+    private void setupClipping(Node node, PanelStep step) {
+        ChangeListener<Bounds> listener = (_, _, _) -> {
+            Bounds windowBounds = window.getScene().getRoot().getBoundsInLocal();
+            Bounds nodeBounds = node.getBoundsInParent();
+
+            if (windowBounds.getWidth() <= 0 || windowBounds.getHeight() <= 0) {
+                return;
             }
+
+            Rectangle clip = switch (step.position()) {
+                case LEFT ->
+                        new Rectangle(0, 0, nodeBounds.getWidth(), windowBounds.getHeight());
+                case RIGHT ->
+                        new Rectangle(Math.max(0, windowBounds.getWidth() - nodeBounds.getWidth()), 0,
+                                nodeBounds.getWidth(), windowBounds.getHeight());
+                case TOP ->
+                        new Rectangle(0, 0, windowBounds.getWidth(), nodeBounds.getHeight());
+                case BOTTOM ->
+                        new Rectangle(0, Math.max(0, windowBounds.getHeight() - nodeBounds.getHeight()),
+                                windowBounds.getWidth(), nodeBounds.getHeight());
+            };
+
+            overlayPane.setClip(clip);
         };
-        updater.listen(node.boundsInLocalProperty(), listener);
+
+        updater.listen(node.boundsInParentProperty(), listener);
+        updater.listen(overlayPane.boundsInLocalProperty(), listener);
+
         listener.changed(null, null, node.getBoundsInParent());
     }
 }

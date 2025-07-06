@@ -58,6 +58,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.gui.util.URLs;
+import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.Importer;
@@ -161,6 +162,14 @@ public class WelcomeTab extends Tab {
         return button;
     }
 
+    private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
+        return createQuickSettingsButton(
+                Localization.lang("Walkthrough") + ": " + Localization.lang(text),
+                icon,
+                () -> new WalkthroughAction(walkthroughId).execute()
+        );
+    }
+
     private Button createHelpButton(String url) {
         Button helpButton = new Button();
         helpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
@@ -229,6 +238,12 @@ public class WelcomeTab extends Tab {
                 this::showMainFileDirectoryDialog
         );
 
+        Button walkthroughMainFileDirButton = createWalkthroughButton(
+                "Set main file directory",
+                IconTheme.JabRefIcons.FOLDER,
+                "mainFileDirectory"
+        );
+
         Button themeButton = createQuickSettingsButton(
                 Localization.lang("Change visual theme"),
                 IconTheme.JabRefIcons.PREFERENCES,
@@ -259,13 +274,28 @@ public class WelcomeTab extends Tab {
                 this::showEntryTableConfigurationDialog
         );
 
-        actions.getChildren().addAll(mainFileDirButton, themeButton, largeLibraryButton, pushApplicationButton, onlineServicesButton, entryTableButton);
+        Button walkthroughEntryTableButton = createWalkthroughButton(
+                "Customize entry table",
+                IconTheme.JabRefIcons.TOGGLE_GROUPS,
+                "customizeEntryTable"
+        );
+
+        actions.getChildren().addAll(
+                mainFileDirButton,
+                walkthroughMainFileDirButton,
+                themeButton,
+                largeLibraryButton,
+                pushApplicationButton,
+                onlineServicesButton,
+                entryTableButton,
+                walkthroughEntryTableButton
+        );
 
         ScrollPane scrollPane = new ScrollPane(actions);
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setMaxHeight(172); // item-height * 4 + gap * 3 = 35 * 4 + 8 * 3
+        scrollPane.setMaxHeight(172); // Scroll pane show exactly 4 times, item-height * 4 + gap * 3 = 35 * 4 + 8 * 3
 
         return createVBoxContainer(header, scrollPane);
     }
@@ -605,13 +635,13 @@ public class WelcomeTab extends Tab {
     }
 
     private void showOnlineServicesConfigurationDialog() {
-        CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for software updates at startup"));
+        CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for updates at startup"));
         versionCheckBox.setSelected(preferences.getInternalPreferences().isVersionCheckEnabled());
 
         CheckBox webSearchBox = new CheckBox(Localization.lang("Enable web search"));
         webSearchBox.setSelected(preferences.getImporterPreferences().areImporterEnabled());
 
-        CheckBox grobidCheckBox = new CheckBox(Localization.lang("Enable metadata extraction service"));
+        CheckBox grobidCheckBox = new CheckBox(Localization.lang("Enable Grobid (metadata extraction service)"));
         grobidCheckBox.setSelected(preferences.getGrobidPreferences().isGrobidEnabled());
 
         HBox grobidUrl = new HBox();
