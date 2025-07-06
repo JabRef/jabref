@@ -10,6 +10,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -104,6 +105,8 @@ public class CopyTo extends SimpleCommand {
                 dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
             }
         });
+
+        LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd, sourceDatabaseContext, targetDatabaseContext);
 
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
     }

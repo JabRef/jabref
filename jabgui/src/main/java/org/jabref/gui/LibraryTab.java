@@ -59,6 +59,7 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
@@ -831,6 +832,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
         if (entriesToAdd.isEmpty()) {
             return;
+        }
+
+        if (clipBoardManager.getSourceBibDatabaseContext().isPresent()) {
+          LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd,
+            clipBoardManager.getSourceBibDatabaseContext().get(), bibDatabaseContext);
         }
 
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
