@@ -25,6 +25,12 @@ public class HttpServerManager implements AutoCloseable {
         if (!isStarted()) {
             httpServerThread = new HttpServerThread(contextsToServe, uri);
             httpServerThread.start();
+            if (httpServerThread.started()) {
+                LOGGER.debug("HTTP server manager started successfully.");
+            } else {
+                LOGGER.error("Failed to start HTTP server manager.");
+                httpServerThread = null;
+            }
         }
     }
 
