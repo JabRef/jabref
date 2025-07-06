@@ -8,6 +8,7 @@ import org.jabref.http.server.cayw.CAYWQueryParams;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 
 import com.google.gson.Gson;
+import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
 
 @Service
@@ -22,6 +23,11 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     @Override
     public String getFormatName() {
         return "simple-json";
+    }
+
+    @Override
+    public MediaType getMediaType() {
+        return MediaType.APPLICATION_JSON_TYPE;
     }
 
     @Override
