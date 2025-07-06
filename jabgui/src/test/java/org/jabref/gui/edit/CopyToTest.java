@@ -84,7 +84,7 @@ public class CopyToTest {
         selectedEntries.add(entry);
         when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), preferences.getFilePreferences(),
                 importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
@@ -98,7 +98,8 @@ public class CopyToTest {
         selectedEntries.add(entryWithCrossRef);
         when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+          preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
@@ -111,7 +112,8 @@ public class CopyToTest {
 
     @Test
     void executeGetCrossRefEntry() {
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+          preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         BibEntry result = copyTo.getCrossRefEntry(entryWithCrossRef, sourceDatabaseContext).orElse(null);
 
@@ -125,7 +127,8 @@ public class CopyToTest {
         when(stateManager.getSelectedEntries()).thenReturn((ObservableList<BibEntry>) selectedEntries);
         when(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()).thenReturn(false);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+          preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
@@ -140,7 +143,8 @@ public class CopyToTest {
         when(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()).thenReturn(true);
         when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any())).thenReturn(true);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+          preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
@@ -158,7 +162,8 @@ public class CopyToTest {
         when(preferences.getCopyToPreferences().getShouldAskForIncludingCrossReferences()).thenReturn(true);
         when(dialogService.showConfirmationDialogWithOptOutAndWait(anyString(), anyString(), anyString(), anyString(), anyString(), any())).thenReturn(false);
 
-        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
+        copyTo = new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+          preferences.getFilePreferences(), importHandler, sourceDatabaseContext, targetDatabaseContext);
 
         ArgumentCaptor<EntryImportHandlerTracker> trackerCaptor = ArgumentCaptor.forClass(EntryImportHandlerTracker.class);
         copyTo.execute();
