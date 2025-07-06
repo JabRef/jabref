@@ -97,7 +97,7 @@ public class RemotePreferences {
 
     public @NonNull URI getHttpServerUri() {
         try {
-            return new URI("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":23119");
+            return new URI("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":" + getHttpPort());
         } catch (UnknownHostException | URISyntaxException e) {
             LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
             try {
