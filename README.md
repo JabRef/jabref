@@ -56,13 +56,17 @@ Please see our [Installation Guide](https://docs.jabref.org/installation).
 
 JabRef offers a CLI application.
 
-You can run it using docker:
+### Running JabKit without installation
 
-```terminal
-docker run ghcr.io/jabref/jabkit:edge --help
-```
+By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit:
 
-### Running JabKit using `JBang`
+1. Download `gg.cmd` from: <https://github.com/eirikb/gg#ggcmd>. `gg.cmd` is a "binary" running on macOS, Linux, and Windows. No need for different binaries on different operating systems.
+2. Linux/macOS: Run `sh ./gg.cmd jbang jabkit@jabref --help`. This downloads and uses [jbang](https://www.jbang.dev/) as wrapper around running JabKit.
+3. Windows: Run `gg.cmd jbang jabkit@jabref --help`.
+
+You can also put `gg.cmd` on your `PATH` or have an `alias` for `jabkit`.
+
+### Have `jabkit` available in the `PATH` (using `jbang`)
 
 [`JBang`](https://www.jbang.dev/) allows for running Java applications without having a JDK installed (before).
 
@@ -73,6 +77,14 @@ Steps:
 3. Run `jabkit --help`
 
 Now, you have all JabKit functionality available as `jabkit`.
+
+### Running JabKit using Docker
+
+You can run JabKit using docker:
+
+```terminal
+docker run ghcr.io/jabref/jabkit:edge --help
+```
 
 ## Bug Reports, Suggestions, Other Feedback
 
