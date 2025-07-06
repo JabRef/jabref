@@ -157,7 +157,8 @@ public class RightClickMenu {
                 copyToMenu.getItems().addAll(
                         factory.createCustomMenuItem(
                                 StandardActions.COPY_TO,
-                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(), importHandler, sourceDatabaseContext, bibDatabaseContext),
+                                new CopyTo(dialogService, stateManager, preferences.getCopyToPreferences(),
+                                  preferences.getFilePreferences(), importHandler, sourceDatabaseContext, bibDatabaseContext),
                                 destinationDatabaseName
                         )
                 );

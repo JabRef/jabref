@@ -10,6 +10,7 @@ import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,6 +27,7 @@ public class CopyTo extends SimpleCommand {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final CopyToPreferences copyToPreferences;
+    private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final BibDatabaseContext sourceDatabaseContext;
     private final BibDatabaseContext targetDatabaseContext;
@@ -33,12 +35,14 @@ public class CopyTo extends SimpleCommand {
     public CopyTo(DialogService dialogService,
                   StateManager stateManager,
                   CopyToPreferences copyToPreferences,
+                  FilePreferences filePreferences,
                   ImportHandler importHandler,
                   BibDatabaseContext sourceDatabaseContext,
                   BibDatabaseContext targetDatabaseContext) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.copyToPreferences = copyToPreferences;
+        this.filePreferences = filePreferences;
         this.importHandler = importHandler;
         this.sourceDatabaseContext = sourceDatabaseContext;
         this.targetDatabaseContext = targetDatabaseContext;
@@ -106,7 +110,8 @@ public class CopyTo extends SimpleCommand {
             }
         });
 
-        LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd, sourceDatabaseContext, targetDatabaseContext);
+        LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd, sourceDatabaseContext, targetDatabaseContext,
+          filePreferences);
 
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
     }
