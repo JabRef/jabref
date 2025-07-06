@@ -60,6 +60,7 @@ import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -825,6 +826,11 @@ public class LibraryTab extends Tab {
         }
         if (entriesToAdd.isEmpty()) {
             return;
+        }
+
+        if (clipBoardManager.getSourceBibDatabaseContext().isPresent()) {
+          LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd,
+            clipBoardManager.getSourceBibDatabaseContext().get(), bibDatabaseContext);
         }
 
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
