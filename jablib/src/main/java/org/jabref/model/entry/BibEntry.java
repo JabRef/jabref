@@ -717,7 +717,7 @@ public class BibEntry implements Cloneable {
     /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
     /// used, it is output as "field = {#value#}", which may cause headaches in debugging.
     ///
-    /// Alternative for some more readable output: [#getAuthorTitleYear(int)]
+    /// Alternative for some more readable output: [#getAuthorTitleYear(int)] or [#getKeyAuthorTitleYear(int)].
     ///
     /// @return A user-readable string NOT A VALID BibTeX string
     @Override
@@ -727,6 +727,10 @@ public class BibEntry implements Cloneable {
 
     public String getAuthorTitleYear() {
         return getAuthorTitleYear(0);
+    }
+
+    public String getKeyAuthorTitleYear() {
+        return getKeyAuthorTitleYear(0);
     }
 
     /**
@@ -754,12 +758,14 @@ public class BibEntry implements Cloneable {
                 .append("\" (")
                 .append(yearField)
                 .append(')');
-        String text = textBuilder.toString();
 
-        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
-            return text;
-        }
-        return text.substring(0, maxCharacters + 1) + "...";
+        return StringUtil.limitStringLength(textBuilder.toString(), maxCharacters);
+    }
+
+    public String getKeyAuthorTitleYear(int maxCharacters) {
+        String citationKey = getCitationKey().orElse("N/A");
+        String result = citationKey + " - " + getAuthorTitleYear(0);
+        return StringUtil.limitStringLength(result, maxCharacters);
     }
 
     /**
