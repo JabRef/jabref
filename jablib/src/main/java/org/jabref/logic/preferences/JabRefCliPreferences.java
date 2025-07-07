@@ -119,17 +119,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@code JabRefPreferences} class provides the preferences and their defaults using the JDK {@code java.util.prefs}
- * class.
+ * The {@code JabRefPreferences} class provides the preferences and their defaults using
+ * the JDK {@code java.util.prefs} class.
  * <p>
- * Internally it defines symbols used to pick a value from the {@code java.util.prefs} interface and keeps a hashmap
- * with all the default values.
+ * Internally it defines symbols used to pick a value from the {@code java.util.prefs}
+ * interface and keeps a hashmap with all the default values.
  * <p>
- * There are still some similar preferences classes ({@link OpenOfficePreferences} and {@link SharedDatabasePreferences}) which also use
- * the {@code java.util.prefs} API.
+ * There are still some similar preferences classes ({@link OpenOfficePreferences} and
+ * {@link SharedDatabasePreferences}) which also use the {@code java.util.prefs} API.
  * <p>
  * contents of the defaults HashMap that are defined in this class.
  * There are more default parameters in this map which belong to separate preference classes.
+ * <p>
+ *  This class is injected into formatter using reflection to avoid tight coupling and
+ *  is easier than injecting via constructor due to amount of refactoring
  */
 @Singleton
 public class JabRefCliPreferences implements CliPreferences {
@@ -258,6 +261,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String NAME_FORMATER_KEY = "nameFormatterNames";
     public static final String SHOW_RECOMMENDATIONS = "showRecommendations";
     public static final String SHOW_AI_SUMMARY = "showAiSummary";
+    public static final String SMART_FILE_ANNOTATIONS = "smartFileAnnotations";
     public static final String SHOW_AI_CHAT = "showAiChat";
     public static final String ACCEPT_RECOMMENDATIONS = "acceptRecommendations";
     public static final String SHOW_LATEX_CITATIONS = "showLatexCitations";
@@ -268,7 +272,15 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String SHOW_SCITE_TAB = "showSciteTab";
 
     /**
-     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for OO/LO installation, used to detect location on Win/macOS when using manual connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size and position of "Select style" dialog
+     * The OpenOffice/LibreOffice connection preferences are: OO_PATH main directory for
+     * OO/LO installation, used to detect location on Win/macOS when using manual
+     * connect OO_EXECUTABLE_PATH path to soffice-file OO_JARS_PATH directory that
+     * contains juh.jar, jurt.jar, ridl.jar, unoil.jar OO_SYNC_WHEN_CITING true if the
+     * reference list is updated when adding a new citation OO_SHOW_PANEL true if the OO
+     * panel is shown on startup OO_USE_ALL_OPEN_DATABASES true if all databases should
+     * be used when citing OO_BIBLIOGRAPHY_STYLE_FILE path to the used style file
+     * OO_EXTERNAL_STYLE_FILES list with paths to external style files STYLES_*_* size
+     * and position of "Select style" dialog
      */
     public static final String OO_EXECUTABLE_PATH = "ooExecutablePath";
     public static final String OO_SYNC_WHEN_CITING = "syncOOWhenCiting";
@@ -353,6 +365,7 @@ public class JabRefCliPreferences implements CliPreferences {
     // Remote
     private static final String USE_REMOTE_SERVER = "useRemoteServer";
     private static final String REMOTE_SERVER_PORT = "remoteServerPort";
+    private static final String ENABLE_HTTP_SERVER = "enableHttpServer";
 
     private static final String AI_ENABLED = "aiEnabled";
     private static final String AI_AUTO_GENERATE_EMBEDDINGS = "aiAutoGenerateEmbeddings";
@@ -391,6 +404,8 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private static final String OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY = "openFileExplorerInFileDirectory";
     private static final String OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY = "openFileExplorerInLastUsedDirectory";
+
+    private static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED = "mainFileDirectoryWalkthroughCompleted";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
     private static final Preferences PREFS_NODE = Preferences.userRoot().node("/org/jabref");
@@ -435,11 +450,14 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
+    private WalkthroughPreferences walkthroughPreferences;
 
     /**
-     * @implNote The constructor is made protected to enforce this as a singleton class:
+     * @implNote The constructor was made public because dependency injection via constructor
+     * required widespread refactoring, currently we are using reflection in some formatters
+     * to gain access
      */
-    protected JabRefCliPreferences() {
+    public JabRefCliPreferences() {
         try {
             if (Files.exists(Path.of("jabref.xml"))) {
                 importPreferences(Path.of("jabref.xml"));
@@ -552,6 +570,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(SHOW_RECOMMENDATIONS, Boolean.TRUE);
         defaults.put(SHOW_AI_CHAT, Boolean.TRUE);
         defaults.put(SHOW_AI_SUMMARY, Boolean.TRUE);
+        defaults.put(SMART_FILE_ANNOTATIONS, Boolean.TRUE);
         defaults.put(ACCEPT_RECOMMENDATIONS, Boolean.FALSE);
         defaults.put(SHOW_LATEX_CITATIONS, Boolean.TRUE);
         defaults.put(SHOW_SCITE_TAB, Boolean.TRUE);
@@ -603,7 +622,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY, Boolean.FALSE);
         defaults.put(DEFAULT_CITATION_KEY_PATTERN, "[auth][year]");
         defaults.put(UNWANTED_CITATION_KEY_CHARACTERS, "-`ʹ:!;?^$");
-        defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;publisher;shortauthor;shorteditor;subtitle;titleaddon");
+        defaults.put(RESOLVE_STRINGS_FOR_FIELDS, "author;booktitle;editor;editora;editorb;editorc;institution;issuetitle;journal;journalsubtitle;journaltitle;mainsubtitle;month;monthfiled;publisher;shortauthor;shorteditor;subtitle;titleaddon");
         defaults.put(DO_NOT_RESOLVE_STRINGS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file;isbn;issn");
         defaults.put(WARN_ABOUT_DUPLICATES_IN_INSPECTION, Boolean.TRUE);
@@ -619,6 +638,7 @@ public class JabRefCliPreferences implements CliPreferences {
 
         defaults.put(USE_REMOTE_SERVER, Boolean.TRUE);
         defaults.put(REMOTE_SERVER_PORT, 6050);
+        defaults.put(ENABLE_HTTP_SERVER, Boolean.FALSE);
 
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
         defaults.put(USE_AMS_FJOURNAL, true);
@@ -702,6 +722,9 @@ public class JabRefCliPreferences implements CliPreferences {
         // endregion
 
         // endregion
+
+        // WalkThrough
+        defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -716,9 +739,10 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * @deprecated Never ever add a call to this method. There should be only one caller.
-     *             All other usages should get the preferences passed (or injected).
-     *             The JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing this method with a strike-through.
+     * @deprecated Never ever add a call to this method. There should be only one
+     * caller. All other usages should get the preferences passed (or injected). The
+     * JabRef team leaves the {@code @deprecated} annotation to have IntelliJ listing
+     * this method with a strike-through.
      */
     @Deprecated
     public static JabRefCliPreferences getInstance() {
@@ -834,7 +858,9 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * Puts a list of strings into the Preferences, by linking its elements with a STRINGLIST_DELIMITER into a single string. Escape characters make the process transparent even if strings contains a STRINGLIST_DELIMITER.
+     * Puts a list of strings into the Preferences, by linking its elements with a
+     * STRINGLIST_DELIMITER into a single string. Escape characters make the process
+     * transparent even if strings contains a STRINGLIST_DELIMITER.
      */
     public void putStringList(String key, List<String> value) {
         if (value == null) {
@@ -863,7 +889,8 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * Clear all preferences.
      *
-     * @throws BackingStoreException if JabRef is unable to write to the registry/the preferences storage
+     * @throws BackingStoreException if JabRef is unable to write to the registry/the
+     *                               preferences storage
      */
     @Override
     public void clear() throws BackingStoreException {
@@ -971,7 +998,8 @@ public class JabRefCliPreferences implements CliPreferences {
     }
 
     /**
-     * Removes all entries keyed by prefix+number, where number is equal to or higher than the given number.
+     * Removes all entries keyed by prefix+number, where number is equal to or higher
+     * than the given number.
      *
      * @param number or higher.
      */
@@ -1006,7 +1034,8 @@ public class JabRefCliPreferences implements CliPreferences {
      * Imports Preferences from an XML file.
      *
      * @param file Path of file to import from
-     * @throws JabRefException thrown if importing the preferences failed due to an InvalidPreferencesFormatException or an IOException
+     * @throws JabRefException thrown if importing the preferences failed due to an
+     *                         InvalidPreferencesFormatException or an IOException
      */
     @Override
     public void importPreferences(Path file) throws JabRefException {
@@ -1220,10 +1249,12 @@ public class JabRefCliPreferences implements CliPreferences {
 
         remotePreferences = new RemotePreferences(
                 getInt(REMOTE_SERVER_PORT),
-                getBoolean(USE_REMOTE_SERVER));
+                getBoolean(USE_REMOTE_SERVER),
+                getBoolean(ENABLE_HTTP_SERVER));
 
         EasyBind.listen(remotePreferences.portProperty(), (_, _, newValue) -> putInt(REMOTE_SERVER_PORT, newValue));
         EasyBind.listen(remotePreferences.useRemoteServerProperty(), (_, _, newValue) -> putBoolean(USE_REMOTE_SERVER, newValue));
+        EasyBind.listen(remotePreferences.enableHttpServerProperty(), (_, _, newValue) -> putBoolean(ENABLE_HTTP_SERVER, newValue));
 
         return remotePreferences;
     }
@@ -1681,10 +1712,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("Table sort order requested, but JabRef is in CLI mode. Falling back to defeault save order");
                 yield SaveOrder.getDefaultSaveOrder();
             }
-            case SPECIFIED ->
-                    SelfContainedSaveOrder.of(exportSaveOrder);
-            case ORIGINAL ->
-                    SaveOrder.getDefaultSaveOrder();
+            case SPECIFIED -> SelfContainedSaveOrder.of(exportSaveOrder);
+            case ORIGINAL -> SaveOrder.getDefaultSaveOrder();
         };
 
         return new SelfContainedSaveConfiguration(
@@ -1740,7 +1769,8 @@ public class JabRefCliPreferences implements CliPreferences {
                                                           .map(CleanupPreferences.CleanupStep::valueOf)
                                                           .collect(Collectors.toSet())),
                 new FieldFormatterCleanups(getBoolean(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))));
+                        FieldFormatterCleanups.parse(StringUtil.unifyLineBreaks(get(CLEANUP_FIELD_FORMATTERS), ""))
+                ));
 
         cleanupPreferences.getObservableActiveJobs().addListener((SetChangeListener<CleanupPreferences.CleanupStep>) _ ->
                 putStringList(CLEANUP_JOBS, cleanupPreferences.getActiveJobs().stream().map(Enum::name).collect(Collectors.toList())));
@@ -1759,7 +1789,8 @@ public class JabRefCliPreferences implements CliPreferences {
                 getDefaultCleanupJobs(),
                 new FieldFormatterCleanups(
                         (Boolean) defaults.get(CLEANUP_FIELD_FORMATTERS_ENABLED),
-                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))));
+                        FieldFormatterCleanups.parse((String) defaults.get(CLEANUP_FIELD_FORMATTERS))
+                ));
     }
 
     private static EnumSet<CleanupPreferences.CleanupStep> getDefaultCleanupJobs() {
@@ -2294,5 +2325,16 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
+    }
+
+    @Override
+    public WalkthroughPreferences getWalkthroughPreferences() {
+        if (walkthroughPreferences != null) {
+            return walkthroughPreferences;
+        }
+
+        walkthroughPreferences = new WalkthroughPreferences(getBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED));
+        EasyBind.listen(walkthroughPreferences.mainFileDirectoryCompletedProperty(), (_, _, newValue) -> putBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, newValue));
+        return walkthroughPreferences;
     }
 }

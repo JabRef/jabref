@@ -138,10 +138,10 @@ public enum StandardActions implements Action {
     EXPAND_ALL(Localization.lang("Expand all")),
     COLLAPSE_ALL(Localization.lang("Collapse all")),
 
-    CREATE_ENTRY_IMMEDIATE(Localization.lang("Add entry"), IconTheme.JabRefIcons.CREATE_ENTRY_IMMEDIATE),
-    CREATE_ENTRY(Localization.lang("Create new entry..."), IconTheme.JabRefIcons.CREATE_ENTRY, KeyBinding.CREATE_ENTRY),
-    CREATE_ENTRY_IDENTIFIER(Localization.lang("Enter identifier..."), IconTheme.JabRefIcons.CREATE_ENTRY_IDENTIFIER, KeyBinding.CREATE_ENTRY_IDENTIFIER),
-    CREATE_ENTRY_PLAINTEXT(Localization.lang("Interpret citations..."), IconTheme.JabRefIcons.CREATE_ENTRY_PLAINTEXT, KeyBinding.CREATE_ENTRY_PLAINTEXT),
+    ADD_ENTRY_IMMEDIATE(Localization.lang("Add entry"), IconTheme.JabRefIcons.ADD_ENTRY_IMMEDIATE),
+    ADD_ENTRY(Localization.lang("Add entry using..."), IconTheme.JabRefIcons.ADD_ENTRY, KeyBinding.ADD_ENTRY),
+    ADD_ENTRY_IDENTIFIER(Localization.lang("Enter identifier..."), IconTheme.JabRefIcons.ADD_ENTRY_IDENTIFIER, KeyBinding.ADD_ENTRY_IDENTIFIER),
+    ADD_ENTRY_PLAINTEXT(Localization.lang("Interpret citations..."), IconTheme.JabRefIcons.ADD_ENTRY_PLAINTEXT, KeyBinding.ADD_ENTRY_PLAINTEXT),
 
     LIBRARY_PROPERTIES(Localization.lang("Library properties")),
     FIND_DUPLICATES(Localization.lang("Find duplicates"), IconTheme.JabRefIcons.FIND_DUPLICATES),
@@ -187,6 +187,8 @@ public enum StandardActions implements Action {
     OPEN_DEV_VERSION_LINK(Localization.lang("Development version"), Localization.lang("Opens a link where the current development version can be downloaded")),
     OPEN_CHANGELOG(Localization.lang("View change log"), Localization.lang("See what has been changed in the JabRef versions")),
     OPEN_GITHUB("GitHub", Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcons.GITHUB),
+    WALKTHROUGH_MENU(Localization.lang("Walkthroughs"), IconTheme.JabRefIcons.BOOK),
+    MAIN_FILE_DIRECTORY_WALKTHROUGH(Localization.lang("Configure main file directory"), IconTheme.JabRefIcons.LATEX_FILE_DIRECTORY),
     DONATE(Localization.lang("Donate to JabRef"), Localization.lang("Donate to JabRef"), IconTheme.JabRefIcons.DONATE),
     OPEN_FORUM(Localization.lang("Community forum"), Localization.lang("Community forum"), IconTheme.JabRefIcons.FORUM),
     ERROR_CONSOLE(Localization.lang("View event log"), Localization.lang("Display all error messages")),

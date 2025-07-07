@@ -349,11 +349,12 @@ public class BibEntry implements Cloneable {
                 Optional.of(database.resolveForStrings(result.get()));
     }
 
-    /**
-     * Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
-     * <p>
-     * It is <em>not</em> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
-     */
+    /// Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
+    //  It is **not** the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+    ///
+    /// This id changes on each run of JabRef (because it is currently generated as increasing number).
+    ///
+    /// For more stable ids, check {@link org.jabref.model.entry.SharedBibEntryData#getSharedID}
     public String getId() {
         return id;
     }
@@ -717,7 +718,7 @@ public class BibEntry implements Cloneable {
     /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
     /// used, it is output as "field = {#value#}", which may cause headaches in debugging.
     ///
-    /// Alternative for some more readable output: [#getAuthorTitleYear(int)]
+    /// Alternative for some more readable output: [#getAuthorTitleYear(int)] or [#getKeyAuthorTitleYear(int)].
     ///
     /// @return A user-readable string NOT A VALID BibTeX string
     @Override
@@ -727,6 +728,10 @@ public class BibEntry implements Cloneable {
 
     public String getAuthorTitleYear() {
         return getAuthorTitleYear(0);
+    }
+
+    public String getKeyAuthorTitleYear() {
+        return getKeyAuthorTitleYear(0);
     }
 
     /**
@@ -740,14 +745,28 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(StandardField.AUTHOR).orElse("N/A"), getField(StandardField.TITLE).orElse("N/A"),
-                getField(StandardField.YEAR).orElse("N/A")};
+        String authorField = getField(StandardField.AUTHOR).orElse("N/A");
+        String titleField = getField(StandardField.TITLE).orElse("N/A");
+        String yearField = getField(StandardField.YEAR).orElse("N/A");
 
-        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
-        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
-            return text;
-        }
-        return text.substring(0, maxCharacters + 1) + "...";
+        String formattedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);
+        String formattedTitle = LatexToUnicodeAdapter.format(titleField);
+
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append(formattedAuthors)
+                .append(": \"")
+                .append(formattedTitle)
+                .append("\" (")
+                .append(yearField)
+                .append(')');
+
+        return StringUtil.limitStringLength(textBuilder.toString(), maxCharacters);
+    }
+
+    public String getKeyAuthorTitleYear(int maxCharacters) {
+        String citationKey = getCitationKey().orElse("N/A");
+        String result = citationKey + " - " + getAuthorTitleYear(0);
+        return StringUtil.limitStringLength(result, maxCharacters);
     }
 
     /**
