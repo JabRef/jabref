@@ -43,6 +43,7 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -834,12 +835,12 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             return;
         }
 
-        if (clipBoardManager.getSourceBibDatabaseContext().isPresent()) {
-          LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd,
-            clipBoardManager.getSourceBibDatabaseContext().get(), bibDatabaseContext, preferences.getFilePreferences());
-        }
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
 
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+        tracker.setOnFinish(() -> LinkedFileTransferHelper
+          .adjustLinkedFilesForTarget(bibDatabaseContext, preferences.getFilePreferences())
+        );
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {

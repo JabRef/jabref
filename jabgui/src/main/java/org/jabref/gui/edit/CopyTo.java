@@ -110,10 +110,10 @@ public class CopyTo extends SimpleCommand {
             }
         });
 
-        LinkedFileTransferHelper.adjustLinkedFilesForTarget(entriesToAdd, sourceDatabaseContext, targetDatabaseContext,
-          filePreferences);
-
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
+        tracker.setOnFinish(() -> LinkedFileTransferHelper
+          .adjustLinkedFilesForTarget(targetDatabaseContext, filePreferences)
+        );
     }
 
     public Optional<BibEntry> getCrossRefEntry(BibEntry bibEntryToCheck, BibDatabaseContext sourceDatabaseContext) {
