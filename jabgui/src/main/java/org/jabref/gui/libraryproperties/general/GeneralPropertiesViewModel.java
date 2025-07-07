@@ -137,9 +137,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         ValidationStatus userSpecificFileDirectoryStatus = userSpecificFileDirectoryStatus();
         ValidationStatus laTexFileDirectoryStatus = laTexFileDirectoryStatus();
 
-        return validateAndShowError(librarySpecificFileDirectoryStatus) &&
-                validateAndShowError(userSpecificFileDirectoryStatus) &&
-                validateAndShowError(laTexFileDirectoryStatus);
+        return promptUserToConfirmAction(librarySpecificFileDirectoryStatus) &&
+                promptUserToConfirmAction(userSpecificFileDirectoryStatus) &&
+                promptUserToConfirmAction(laTexFileDirectoryStatus);
     }
 
     public void browseLibrarySpecificDir() {
@@ -243,13 +243,14 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return null;
     }
 
-    private boolean validateAndShowError(ValidationStatus status) {
+    private boolean promptUserToConfirmAction(ValidationStatus status) {
         if (!status.isValid()) {
             return status.getHighestMessage()
                          .map(message -> dialogService.showConfirmationDialogAndWait(
-                                 "Action Required: Override Default File Directories",
-                                 message.getMessage() + "\n Would you like to save your other preferences?",
-                                 "Save", "Return to Properties"))
+                                 Localization.lang("Action required: override default file directories"),
+                                 message.getMessage() + "\n" + Localization.lang("Would you like to save your other preferences?"),
+                                 Localization.lang("Save"),
+                                 Localization.lang("Return to Properties")))
                          .orElse(false);
         }
         return true;
