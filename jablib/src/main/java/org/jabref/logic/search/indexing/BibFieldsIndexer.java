@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -164,24 +165,25 @@ public class BibFieldsIndexer {
         addToIndex(databaseContext.getDatabase().getEntries(), task);
     }
 
-    public void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
-        if (entries.size() > 1) {
+    public void addToIndex(List<BibEntry> entries, BackgroundTask<?> task) {
+        int count = entries.size();
+        if (count > 1) {
             task.showToUser(true);
             task.setTitle(Localization.lang("Indexing bib fields for %0", libraryName));
         }
-        int i = 0;
         long startTime = System.currentTimeMillis();
-        LOGGER.debug("Adding {} entries to index", entries.size());
-        for (BibEntry entry : entries) {
+        LOGGER.debug("Adding {} entries to index", count);
+        for (int i = 0; i < count; i++) {
             if (task.isCancelled()) {
                 LOGGER.debug("Indexing canceled");
                 return;
             }
+            BibEntry entry = entries.get(i);
             addToIndex(entry);
-            task.updateProgress(i++, entries.size());
-            task.updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, entries.size()));
+            task.updateProgress(i, count);
+            task.updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, count));
         }
-        LOGGER.debug("Added {} entries to index in {} ms", entries.size(), System.currentTimeMillis() - startTime);
+        LOGGER.debug("Added {} entries to index in {} ms", count, System.currentTimeMillis() - startTime);
     }
 
     private void addToIndex(BibEntry bibEntry) {
