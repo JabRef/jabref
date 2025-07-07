@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.general;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +18,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.UiMessageHandler;
@@ -31,6 +34,7 @@ import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
+import org.jabref.http.manager.HttpServerManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.l10n.Language;
@@ -40,6 +44,7 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -50,11 +55,15 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     protected static SpinnerValueFactory<Integer> fontSizeValueFactory =
             new SpinnerValueFactory.IntegerSpinnerValueFactory(9, Integer.MAX_VALUE);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GeneralTabViewModel.class);
 
     private final ReadOnlyListProperty<Language> languagesListProperty =
             new ReadOnlyListWrapper<>(FXCollections.observableArrayList(Language.getSorted()));
@@ -103,8 +112,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty remoteServerProperty = new SimpleBooleanProperty();
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final Validator remotePortValidator;
-    private final FileUpdateMonitor fileUpdateMonitor;
+    private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
     private final TrustStoreManager trustStoreManager;
+
+    private final FileUpdateMonitor fileUpdateMonitor;
 
     private final BooleanProperty mergeSameKeyEntriesProperty = new SimpleBooleanProperty();
     private final BooleanProperty mergeDuplicateEntriesProperty = new SimpleBooleanProperty();
@@ -206,6 +217,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         remoteServerProperty.setValue(remotePreferences.useRemoteServer());
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
+
+        enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());
     }
 
     @Override
@@ -263,18 +276,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         UiMessageHandler uiMessageHandler = Injector.instantiateModelOrService(UiMessageHandler.class);
         RemoteListenerServerManager remoteListenerServerManager = Injector.instantiateModelOrService(RemoteListenerServerManager.class);
-        remoteListenerServerManager.stop(); // stop in all cases, because the port might have changed
-
-        if (remoteServerProperty.getValue()) {
-            remotePreferences.setUseRemoteServer(true);
-            remoteListenerServerManager.openAndStart(
-                    new CLIMessageHandler(uiMessageHandler, preferences),
-                    remotePreferences.getPort());
-        } else {
-            remotePreferences.setUseRemoteServer(false);
-        }
-        trustStoreManager.flush();
-
+        // stop in all cases, because the port might have changed
+        remoteListenerServerManager.stop();
         if (remoteServerProperty.getValue()) {
             remotePreferences.setUseRemoteServer(true);
             remoteListenerServerManager.openAndStart(
@@ -284,6 +287,20 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             remotePreferences.setUseRemoteServer(false);
             remoteListenerServerManager.stop();
         }
+
+        HttpServerManager httpServerManager = Injector.instantiateModelOrService(HttpServerManager.class);
+        // stop in all cases, because the port might have changed
+        httpServerManager.stop();
+        if (enableHttpServerProperty.getValue()) {
+            remotePreferences.setEnableHttpServer(true);
+            ObservableList<BibDatabaseContext> openDatabases = Injector.instantiateModelOrService(StateManager.class).getOpenDatabases();
+            URI uri = remotePreferences.getHttpServerUri();
+            httpServerManager.start(openDatabases, uri);
+        } else {
+            remotePreferences.setEnableHttpServer(false);
+            httpServerManager.stop();
+        }
+
         trustStoreManager.flush();
     }
 
@@ -439,6 +456,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty remotePortProperty() {
         return remotePortProperty;
+    }
+
+    public BooleanProperty enableHttpServerProperty() {
+        return enableHttpServerProperty;
     }
 
     public void openBrowser() {

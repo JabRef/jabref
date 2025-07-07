@@ -7,12 +7,18 @@ javaPlatform {
 }
 
 val javafx = "24.0.1"
-val lucene = "10.2.1"
+val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
-    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.4.0"))
+    api(platform("dev.langchain4j:langchain4j-bom:1.1.0"))
+    api("dev.langchain4j:langchain4j")
+    api("dev.langchain4j:langchain4j-google-ai-gemini")
+    api("dev.langchain4j:langchain4j-hugging-face")
+    api("dev.langchain4j:langchain4j-mistral-ai")
+    api("dev.langchain4j:langchain4j-open-ai")
+    api(enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:17.5.0"))
 }
 
 dependencies.constraints {
@@ -22,6 +28,8 @@ dependencies.constraints {
     api("org.openjfx:javafx-graphics:${javafx}")
     api("org.openjfx:javafx-swing:$javafx")
     api("org.openjfx:javafx-web:$javafx")
+    // from JavaFX25 onwards
+    api("org.openjfx:jdk-jsobject:25-ea+21")
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
@@ -44,8 +52,11 @@ dependencies.constraints {
     api("com.h2database:h2-mvstore:2.3.232")
     api("com.konghq:unirest-java-core:4.4.7")
     api("com.konghq:unirest-modules-gson:4.4.7")
+    api("com.pixelduke:fxthemes:1.6.0")
     api("com.squareup.okhttp3:okhttp:4.12.0")
+    api("com.squareup.okio:okio-jvm:3.12.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
+    api("com.tngtech.archunit:archunit:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-api:1.4.1")
     api("com.tngtech.archunit:archunit-junit5-engine:1.4.1")
     api("com.vladsch.flexmark:flexmark-html2md-converter:0.64.8")
@@ -56,11 +67,6 @@ dependencies.constraints {
     api("de.rototor.snuggletex:snuggletex-jeuclid:1.3.0")
     api("de.saxsys:mvvmfx:1.8.0")
     api("de.undercouch:citeproc-java:3.3.0")
-    api("dev.langchain4j:langchain4j-google-ai-gemini:1.0.1-beta6")
-    api("dev.langchain4j:langchain4j-hugging-face:1.0.1-beta6")
-    api("dev.langchain4j:langchain4j-mistral-ai:1.0.1-beta6")
-    api("dev.langchain4j:langchain4j-open-ai:1.0.1")
-    api("dev.langchain4j:langchain4j:1.0.1")
     api("info.debatty:java-string-similarity:2.0.0")
     api("info.picocli:picocli-codegen:4.7.7")
     api("info.picocli:picocli:4.7.7")
@@ -72,11 +78,11 @@ dependencies.constraints {
     api("io.zonky.test.postgres:embedded-postgres-binaries-darwin-arm64v8")
     api("io.zonky.test.postgres:embedded-postgres-binaries-linux-arm64v8")
     api("io.zonky.test:embedded-postgres:2.1.0")
-    api("jakarta.annotation:jakarta.annotation-api:2.1.1")
+    api("jakarta.annotation:jakarta.annotation-api:3.0.0")
     api("jakarta.inject:jakarta.inject-api:2.0.1")
     api("jakarta.validation:jakarta.validation-api:3.1.1")
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
-    api("net.bytebuddy:byte-buddy:1.17.5")
+    api("net.bytebuddy:byte-buddy:1.17.6")
     api("net.harawata:appdirs:1.4.0")
     api("net.java.dev.jna:jna-platform:5.17.0")
     api("org.antlr:antlr4-runtime:4.13.2")
@@ -105,15 +111,17 @@ dependencies.constraints {
     api("org.glassfish.hk2:hk2-api:3.1.1")
     api("org.glassfish.hk2:hk2-locator:3.1.1")
     api("org.glassfish.hk2:hk2-utils:3.1.1")
+    api("org.glassfish.jaxb:jaxb-runtime:4.0.4")
     api("org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10")
     api("org.glassfish.jersey.core:jersey-server:3.1.10")
     api("org.glassfish.jersey.inject:jersey-hk2:3.1.10")
     api("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:3.1.10")
-    api("org.hamcrest:hamcrest-library:3.0")
-    api("org.hibernate.validator:hibernate-validator:9.0.0.Final")
+    api("org.hamcrest:hamcrest:3.0")
+    api("org.hibernate.validator:hibernate-validator:9.0.1.Final")
     api("org.jabref:afterburner.fx:2.0.0")
-    api("org.jabref:easybind:2.2.1-SNAPSHOT")
-    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.21")
+    api("org.jabref:easybind:2.3.0")
+    api("org.jetbrains:annotations:26.0.2")
+    api("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.2.0")
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
     api("org.jspecify:jspecify:1.0.0")
@@ -126,17 +134,18 @@ dependencies.constraints {
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
     api("org.mockito:mockito-core:5.18.0")
-    api("org.postgresql:postgresql:42.7.5")
+    api("org.ow2.asm:asm:9.6")
+    api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")
     api("org.slf4j:slf4j-api:2.0.17")
-    api("org.testfx:testfx-core:4.0.16-alpha")
-    api("org.testfx:testfx-junit5:4.0.16-alpha")
+    api("org.testfx:testfx-core:4.0.18")
+    api("org.testfx:testfx-junit5:4.0.18")
     api("org.tinylog:slf4j-tinylog:2.7.0")
     api("org.tinylog:tinylog-api:2.7.0")
     api("org.tinylog:tinylog-impl:2.7.0")
     api("org.wiremock:wiremock:3.13.0")
-    api("org.xmlunit:xmlunit-core:2.10.2")
-    api("org.xmlunit:xmlunit-matchers:2.10.2")
+    api("org.xmlunit:xmlunit-core:2.10.3")
+    api("org.xmlunit:xmlunit-matchers:2.10.3")
     api("org.yaml:snakeyaml:2.4")
     api("tech.units:indriya:2.2.3")
 }

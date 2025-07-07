@@ -27,6 +27,7 @@ import com.google.common.collect.Sets;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -811,6 +812,25 @@ class BibEntryTest {
 
         copyEntry.mergeWith(otherEntry, otherPrioritizedFields);
         assertEquals(expected.getFields(), copyEntry.getFields());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "John Doe, Some Title, 2023, Doe: \"Some Title\" (2023)",
+            "Jane Smith and Tom Brown, Another Research, 2022, Smith and Brown: \"Another Research\" (2022)",
+            ", Some Title, , N/A: \"Some Title\" (N/A)",
+            "Single Author, , 2020, Author: \"N/A\" (2020)",
+            "Test, Article, , Test: \"Article\" (N/A)",
+            ", , , N/A: \"N/A\" (N/A)",
+            "Author One, \\\"{O}lala Title, 2021, One: \"Ölala Title\" (2021)",
+            "Another Author, A \\'{e}xample with \\\"u, 2019, Author: \"A éxample with ü\" (2019)",
+            "Last One, Title with {B}races, 2024, One: \"Title with Braces\" (2024)"
+    })
+    void getAuthorTitleYearFormatted(String author, String title, String year, String expected) {
+        entry.setField(StandardField.AUTHOR, author != null ? author : "");
+        entry.setField(StandardField.TITLE, title != null ? title : "");
+        entry.setField(StandardField.YEAR, year != null ? year : "");
+        assertEquals(expected, entry.getAuthorTitleYear(0));
     }
 
     public static Stream<BibEntry> isEmpty() {
