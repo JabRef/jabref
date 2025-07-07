@@ -13,9 +13,12 @@ import java.util.function.Consumer;
 
 import javafx.application.ColorScheme;
 import javafx.application.Platform;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.web.WebEngine;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 
 import org.jabref.gui.WorkspacePreferences;
 import org.jabref.gui.icon.IconTheme;
@@ -26,6 +29,8 @@ import org.jabref.model.util.FileUpdateListener;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.pixelduke.window.ThemeWindowManager;
+import com.pixelduke.window.ThemeWindowManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +58,11 @@ public class ThemeManager {
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
+    private final ThemeWindowManager themeWindowManager;
 
     private final StyleSheet baseStyleSheet;
     private Theme theme;
+    private boolean isDarkMode;
 
     private Scene mainWindowScene;
     private final Set<WebEngine> webEngines = Collections.newSetFromMap(new WeakHashMap<>());
@@ -66,9 +73,13 @@ public class ThemeManager {
         this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
+        this.themeWindowManager = ThemeWindowManagerFactory.create();
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
         this.theme = workspacePreferences.getTheme();
+        this.isDarkMode = Theme.EMBEDDED_DARK_CSS.equals(this.theme.getName());
+
+        initializeWindowThemeUpdater(this.isDarkMode);
 
         // Watching base CSS only works in development and test scenarios, where the build system exposes the CSS as a
         // file (e.g. for Gradle run task it will be in build/resources/main/org/jabref/gui/Base.css)
@@ -81,6 +92,46 @@ public class ThemeManager {
         BindingsHelper.subscribeFuture(workspacePreferences.mainFontSizeProperty(), size -> updateFontSettings());
         BindingsHelper.subscribeFuture(Platform.getPreferences().colorSchemeProperty(), colorScheme -> updateThemeSettings());
         updateThemeSettings();
+    }
+
+    private void initializeWindowThemeUpdater(boolean darkMode) {
+        this.isDarkMode = darkMode;
+
+        ListChangeListener<Window> windowsListener = change -> {
+            while (change.next()) {
+                if (!change.wasAdded()) {
+                    continue;
+                }
+                change.getAddedSubList().stream()
+                      .filter(Stage.class::isInstance)
+                      .map(Stage.class::cast)
+                      .forEach(stage -> stage.showingProperty()
+                                         .addListener(_ -> applyDarkModeToWindow(stage, isDarkMode)));
+            }
+        };
+
+        Window.getWindows().addListener(windowsListener);
+        applyDarkModeToAllWindows(darkMode);
+
+        LOGGER.debug("Window theme monitoring initialized");
+    }
+
+    private void applyDarkModeToWindow(Stage stage, boolean darkMode) {
+        if (stage == null || !stage.isShowing()) {
+            return;
+        }
+
+        themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
+        LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
+    }
+
+    private void applyDarkModeToAllWindows(boolean darkMode) {
+        this.isDarkMode = darkMode;
+        Window.getWindows().stream()
+              .filter(Window::isShowing)
+              .filter(window -> window instanceof Stage)
+              .map(window -> (Stage) window)
+              .forEach(stage -> applyDarkModeToWindow(stage, darkMode));
     }
 
     private void updateThemeSettings() {
@@ -102,6 +153,12 @@ public class ThemeManager {
 
         this.theme = newTheme;
         LOGGER.info("Theme set to {} with base css {}", newTheme, baseStyleSheet);
+
+        boolean isDarkTheme = Theme.EMBEDDED_DARK_CSS.equals(newTheme.getName());
+        if (this.isDarkMode != isDarkTheme) {
+            this.isDarkMode = isDarkTheme;
+            applyDarkModeToAllWindows(isDarkTheme);
+        }
 
         this.theme.getAdditionalStylesheet().ifPresent(
                 styleSheet -> addStylesheetToWatchlist(styleSheet, this::additionalCssLiveUpdate));

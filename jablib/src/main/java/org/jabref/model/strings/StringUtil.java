@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import javafx.util.Pair;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.os.OS;
 
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
+@AllowedToUseLogic("OS.NewLine is most basic")
 public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
@@ -30,6 +32,18 @@ public class StringUtil {
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
+
+    /**
+     * Pattern for normalizing whitespace and punctuation using named capture groups
+     */
+    private static final Pattern NORMALIZE_PATTERN = Pattern.compile(
+            "(?<whitespace>\\s+)|" +                   // multiple whitespace
+                    "(?<hyphen>\\s*-+\\s*)|" +         // hyphens with surrounding spaces
+                    "(?<comma>\\s*,\\s*)|" +           // commas with surrounding spaces
+                    "(?<semicolon>\\s*;\\s*)|" +       // semicolons with surrounding spaces
+                    "(?<colon>\\s*:\\s*)"              // colons with surrounding spaces
+    );
+
     private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
     private static final String WRAPPED_LINE_PREFIX = ""; // If a line break is added, this prefix will be inserted at the beginning of the next line
     private static final String STRING_TABLE_DELIMITER = " : ";
@@ -555,16 +569,21 @@ public class StringUtil {
         return list;
     }
 
+    /// Limits the length of a string to a maximum length.
+    ///
+    /// Note the implementation is different from [StringUtils.substring](https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/StringUtils.html#substring%28java.lang.String,%20int,%20int%29), because it accepts parameters smaller than 4.
+    ///
+    /// @param maxLength the maximum length of the string - <= 0 means no limit
     public static String limitStringLength(String s, int maxLength) {
         if (s == null) {
             return "";
         }
 
-        if (s.length() <= maxLength) {
+        if (maxLength <= 0 || s.length() <= maxLength) {
             return s;
         }
 
-        return s.substring(0, maxLength - 3) + "...";
+        return s.substring(0, Math.max(0, maxLength - 3)) + "...";
     }
 
     /**
