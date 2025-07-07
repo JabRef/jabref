@@ -6,9 +6,13 @@ nav_order: 91
 
 # Advanced: VS Code as IDE
 
-We are working on supporting VS Code for development.
-There is basic support, but important things such as our code conventions are not in place.
-Thus, use at your own risk.
+> {: .warning }
+> We do not recommend using VS Code, because it does not offer all important features essential for JabRef development.
+
+{: .important }
+> We are working on supporting VS Code for development.
+> There is basic support, but important things such as our code conventions are not in place.
+> Thus, use at your own risk.
 
 Quick howto:
 
