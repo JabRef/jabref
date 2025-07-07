@@ -80,6 +80,8 @@ interface SearchBasedFetcherCapabilityTest {
         List<String> yearsInYearRange = List.of("2018", "2019", "2020");
 
         List<BibEntry> result = getFetcher().performSearch("year-range:2018-2020");
+        assertFalse(result.isEmpty());
+
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);

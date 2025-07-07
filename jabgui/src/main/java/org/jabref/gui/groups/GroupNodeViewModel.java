@@ -46,6 +46,7 @@ import org.jabref.model.groups.KeywordGroup;
 import org.jabref.model.groups.LastNameGroup;
 import org.jabref.model.groups.RegexKeywordGroup;
 import org.jabref.model.groups.SearchGroup;
+import org.jabref.model.groups.SmartGroup;
 import org.jabref.model.groups.TexGroup;
 import org.jabref.model.search.event.IndexAddedOrUpdatedEvent;
 import org.jabref.model.search.event.IndexClosedEvent;
@@ -78,7 +79,7 @@ public class GroupNodeViewModel {
     @SuppressWarnings("FieldCanBeLocal")
     private final ObservableList<BibEntry> entriesList;
     @SuppressWarnings("FieldCanBeLocal")
-    private final InvalidationListener onInvalidatedGroup = listener -> refreshGroup();
+    private final InvalidationListener onInvalidatedGroup = _ -> refreshGroup();
 
     public GroupNodeViewModel(BibDatabaseContext databaseContext, StateManager stateManager, TaskExecutor taskExecutor, GroupTreeNode groupNode, CustomLocalDragboard localDragBoard, GuiPreferences preferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -111,9 +112,9 @@ public class GroupNodeViewModel {
 
         hasChildren = new SimpleBooleanProperty();
         hasChildren.bind(Bindings.isNotEmpty(children));
-        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), shouldDisplay -> updateMatchedEntries());
+        EasyBind.subscribe(preferences.getGroupsPreferences().displayGroupCountProperty(), _ -> updateMatchedEntries());
         expandedProperty.set(groupNode.getGroup().isExpanded());
-        expandedProperty.addListener((observable, oldValue, newValue) -> groupNode.getGroup().setExpanded(newValue));
+        expandedProperty.addListener((_, _, newValue) -> groupNode.getGroup().setExpanded(newValue));
 
         // Register listener
         // The wrapper created by the FXCollections will set a weak listener on the wrapped list. This weak listener gets garbage collected. Hence, we need to maintain a reference to this list.
@@ -147,7 +148,7 @@ public class GroupNodeViewModel {
         //    return; // user aborted operation
         // }
 
-        var changes = groupNode.addEntriesToGroup(entries);
+        List<FieldChange> changes = groupNode.addEntriesToGroup(entries);
 
         // Update appearance of group
         anySelectedEntriesMatched.invalidate();
@@ -432,6 +433,8 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         if (group instanceof AllEntriesGroup) {
             return false;
+        } else if (group instanceof SmartGroup) {
+            return false;
         } else if (group instanceof ExplicitGroup) {
             return true;
         } else if (group instanceof LastNameGroup || group instanceof RegexKeywordGroup) {
@@ -458,7 +461,7 @@ public class GroupNodeViewModel {
     public boolean canBeDragged() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ -> false;
+            case AllEntriesGroup _, SmartGroup _ -> false;
             case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -477,13 +480,13 @@ public class GroupNodeViewModel {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
             case AllEntriesGroup _, ExplicitGroup _, SearchGroup _, TexGroup _ -> true;
+            case AutomaticKeywordGroup _, AutomaticPersonsGroup _, SmartGroup _ -> false;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
                     groupNode.getParent()
                             .map(GroupTreeNode::getGroup)
                             .map(groupParent -> !(groupParent instanceof AutomaticKeywordGroup || groupParent instanceof AutomaticPersonsGroup))
                             .orElse(false);
-            case AutomaticKeywordGroup _, AutomaticPersonsGroup _ -> false;
             case null -> throw new IllegalArgumentException("Group cannot be null");
             default -> throw new UnsupportedOperationException("canAddGroupsIn method not yet implemented in group: " + group.getClass().getName());
         };
@@ -492,7 +495,7 @@ public class GroupNodeViewModel {
     public boolean canRemove() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ -> false;
+            case AllEntriesGroup _, SmartGroup _ -> false;
             case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup
@@ -508,7 +511,7 @@ public class GroupNodeViewModel {
     public boolean isEditable() {
         AbstractGroup group = groupNode.getGroup();
         return switch (group) {
-            case AllEntriesGroup _ -> false;
+            case AllEntriesGroup _, SmartGroup _ -> false;
             case ExplicitGroup _, SearchGroup _, AutomaticKeywordGroup _, AutomaticPersonsGroup _, TexGroup _ -> true;
             case KeywordGroup _ ->
                 // KeywordGroup is parent of LastNameGroup, RegexKeywordGroup and WordKeywordGroup

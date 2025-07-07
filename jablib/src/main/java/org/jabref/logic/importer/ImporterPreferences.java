@@ -7,8 +7,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,6 +31,7 @@ public class ImporterPreferences {
     private final BooleanProperty persistCustomKeys;
     private final ObservableList<String> catalogs;
     private final ObjectProperty<PlainCitationParserChoice> defaultPlainCitationParser;
+    private final IntegerProperty citationsRelationsStoreTTL;
 
     public ImporterPreferences(boolean importerEnabled,
                                boolean generateNewKeyOnImport,
@@ -39,7 +42,8 @@ public class ImporterPreferences {
                                Map<String, String> defaultApiKeys,
                                boolean persistCustomKeys,
                                List<String> catalogs,
-                               PlainCitationParserChoice defaultPlainCitationParser
+                               PlainCitationParserChoice defaultPlainCitationParser,
+                               int citationsRelationsStoreTTL
     ) {
         this.importerEnabled = new SimpleBooleanProperty(importerEnabled);
         this.generateNewKeyOnImport = new SimpleBooleanProperty(generateNewKeyOnImport);
@@ -51,6 +55,7 @@ public class ImporterPreferences {
         this.persistCustomKeys = new SimpleBooleanProperty(persistCustomKeys);
         this.catalogs = FXCollections.observableArrayList(catalogs);
         this.defaultPlainCitationParser = new SimpleObjectProperty<>(defaultPlainCitationParser);
+        this.citationsRelationsStoreTTL = new SimpleIntegerProperty(citationsRelationsStoreTTL);
     }
 
     public boolean areImporterEnabled() {
@@ -158,5 +163,17 @@ public class ImporterPreferences {
 
     public void setDefaultPlainCitationParser(PlainCitationParserChoice defaultPlainCitationParser) {
         this.defaultPlainCitationParser.set(defaultPlainCitationParser);
+    }
+
+    public int getCitationsRelationsStoreTTL() {
+        return this.citationsRelationsStoreTTL.get();
+    }
+
+    public IntegerProperty citationsRelationsStoreTTLProperty() {
+        return this.citationsRelationsStoreTTL;
+    }
+
+    public void setCitationsRelationsStoreTTL(int citationsRelationsStoreTTL) {
+        this.citationsRelationsStoreTTL.set(citationsRelationsStoreTTL);
     }
 }

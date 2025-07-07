@@ -197,6 +197,7 @@ public class OpenDatabaseAction extends SimpleCommand {
         // Run the actual open in a thread to prevent the program
         // locking until the file is loaded.
         if (!filesToOpen.isEmpty()) {
+            assert fileUpdateMonitor != null;
             FileHistory fileHistory = preferences.getLastFilesOpenedPreferences().getFileHistory();
             filesToOpen.forEach(theFile -> {
                 // This method will execute the concrete file opening and loading in a background thread
@@ -223,6 +224,8 @@ public class OpenDatabaseAction extends SimpleCommand {
         if (!Files.exists(file)) {
             return;
         }
+
+        assert fileUpdateMonitor != null;
 
         BackgroundTask<ParserResult> backgroundTask = BackgroundTask.wrap(() -> loadDatabase(file));
         // The backgroundTask is executed within the method createLibraryTab

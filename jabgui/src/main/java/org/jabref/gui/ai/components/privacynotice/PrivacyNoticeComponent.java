@@ -14,11 +14,11 @@ import javafx.scene.text.Text;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.entryeditor.EntryEditorPreferences;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.ai.AiPreferences;
-import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiProvider;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -36,15 +36,17 @@ public class PrivacyNoticeComponent extends ScrollPane {
     private final AiPreferences aiPreferences;
     private final Runnable onIAgreeButtonClickCallback;
     private final DialogService dialogService;
+    private final AdaptVisibleTabs adaptVisibleTabs;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
 
     @Inject private GuiPreferences preferences;
 
-    public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
+    public PrivacyNoticeComponent(AiPreferences aiPreferences, Runnable onIAgreeButtonClickCallback, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService, AdaptVisibleTabs adaptVisibleTabs) {
         this.aiPreferences = aiPreferences;
         this.onIAgreeButtonClickCallback = onIAgreeButtonClickCallback;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.dialogService = dialogService;
+        this.adaptVisibleTabs = adaptVisibleTabs;
 
         ViewLoader.view(this)
                   .root(this)
@@ -112,6 +114,6 @@ public class PrivacyNoticeComponent extends ScrollPane {
         EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
         entryEditorPreferences.setShouldShowAiSummaryTab(false);
         entryEditorPreferences.setShouldShowAiChatTab(false);
-        dialogService.showWarningDialogAndWait(Localization.lang("Restart"), Localization.lang("Please restart JabRef for preferences to take effect."));
+        adaptVisibleTabs.adaptVisibleTabs();
     }
 }

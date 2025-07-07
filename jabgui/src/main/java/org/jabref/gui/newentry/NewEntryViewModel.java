@@ -1,6 +1,8 @@
 package org.jabref.gui.newentry;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -38,12 +40,17 @@ import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.importer.plaincitation.RuleBasedPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.SeveralPlainCitationParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.layout.LayoutFormatter;
+import org.jabref.logic.layout.format.DOIStrip;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
 import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +72,7 @@ public class NewEntryViewModel {
 
     private final StringProperty idText;
     private final Validator idTextValidator;
+    private final Validator duplicateDoiValidator;
     private final ListProperty<IdBasedFetcher> idFetchers;
     private final ObjectProperty<IdBasedFetcher> idFetcher;
     private final Validator idFetcherValidator;
@@ -79,6 +87,8 @@ public class NewEntryViewModel {
     private final StringProperty bibtexText;
     private final Validator bibtexTextValidator;
     private Task<Optional<List<BibEntry>>> bibtexWorker;
+    private final Map<String, BibEntry> doiCache;
+    private BibEntry duplicateEntry;
 
     public NewEntryViewModel(GuiPreferences preferences,
                                     LibraryTab libraryTab,
@@ -97,12 +107,16 @@ public class NewEntryViewModel {
 
         executing = new SimpleBooleanProperty(false);
         executedSuccessfully = new SimpleBooleanProperty(false);
+        doiCache = new HashMap<>();
 
         idText = new SimpleStringProperty();
         idTextValidator = new FunctionBasedValidator<>(
             idText,
             StringUtil::isNotBlank,
             ValidationMessage.error(Localization.lang("You must specify an identifier.")));
+        duplicateDoiValidator = new FunctionBasedValidator<>(
+            idText,
+            input -> checkDOI(input).orElse(null));
         idFetchers = new SimpleListProperty<>(FXCollections.observableArrayList());
         idFetchers.addAll(WebFetchers.getIdBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
         idFetcher = new SimpleObjectProperty<>();
@@ -130,6 +144,41 @@ public class NewEntryViewModel {
         bibtexWorker = null;
     }
 
+    public void populateDOICache() {
+        doiCache.clear();
+        Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
+
+        activeDatabase.map(BibDatabaseContext::getEntries)
+                    .ifPresent(entries -> {
+                        entries.forEach(entry -> {
+                            entry.getField(StandardField.DOI)
+                                 .ifPresent(doi -> {
+                                     doiCache.put(doi, entry);
+                                 });
+                        });
+                    });
+    }
+
+    public Optional<ValidationMessage> checkDOI(String doiInput) {
+        if (doiInput == null || doiInput.isBlank()) {
+            return Optional.empty();
+        }
+
+        LayoutFormatter doiStrip = new DOIStrip();
+        String normalized = doiStrip.format(doiInput.toLowerCase());
+
+        if (doiCache.containsKey(normalized)) {
+            duplicateEntry = doiCache.get(normalized);
+            return Optional.of(ValidationMessage.warning(Localization.lang("Entry already exists in a library")));
+        }
+
+        return Optional.empty();
+    }
+
+    public BibEntry getDuplicateEntry() {
+        return duplicateEntry;
+    }
+
     public ReadOnlyBooleanProperty executingProperty() {
         return executing;
     }
@@ -144,6 +193,10 @@ public class NewEntryViewModel {
 
     public ReadOnlyBooleanProperty idTextValidatorProperty() {
         return idTextValidator.getValidationStatus().validProperty();
+    }
+
+    public ValidationStatus duplicateDoiValidatorStatus() {
+        return duplicateDoiValidator.getValidationStatus();
     }
 
     public ListProperty<IdBasedFetcher> idFetchersProperty() {
@@ -271,6 +324,7 @@ public class NewEntryViewModel {
                     Localization.lang(
                         "An unknown error has occurred.\n" +
                         "This entry may need to be added manually."));
+                executing.set(false);
                 return;
             }
 
@@ -285,6 +339,7 @@ public class NewEntryViewModel {
             handler.importEntryWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
 
             executedSuccessfully.set(true);
+            executing.set(false);
         });
 
         taskExecutor.execute(idLookupWorker);
@@ -304,7 +359,7 @@ public class NewEntryViewModel {
             final PlainCitationParser parser = switch (parserChoice) {
                 case PlainCitationParserChoice.RULE_BASED -> new RuleBasedPlainCitationParser();
                 case PlainCitationParserChoice.GROBID -> new GrobidPlainCitationParser(preferences.getGrobidPreferences(), preferences.getImportFormatPreferences());
-                case PlainCitationParserChoice.LLM -> new LlmPlainCitationParser(preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
+                case PlainCitationParserChoice.LLM -> new LlmPlainCitationParser(aiService.getTemplatesService(), preferences.getImportFormatPreferences(), aiService.getChatLanguageModel());
             };
 
             final SeveralPlainCitationParser setParser = new SeveralPlainCitationParser(parser);
@@ -362,6 +417,7 @@ public class NewEntryViewModel {
                         "An unknown error has occurred.\n" +
                         "Entries may need to be added manually."));
                 LOGGER.error("An invalid result was returned when parsing citations.");
+                executing.set(false);
                 return;
             }
 
@@ -376,6 +432,7 @@ public class NewEntryViewModel {
             handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
 
             executedSuccessfully.set(true);
+            executing.set(false);
         });
 
         taskExecutor.execute(interpretWorker);
@@ -445,6 +502,7 @@ public class NewEntryViewModel {
                         "An unknown error has occurred.\n" +
                         "Entries may need to be added manually."));
                 LOGGER.error("An invalid result was returned when parsing Bib(La)Tex entries.");
+                executing.set(false);
                 return;
             }
 
@@ -459,6 +517,7 @@ public class NewEntryViewModel {
             handler.importEntriesWithDuplicateCheck(libraryTab.getBibDatabaseContext(), result.get());
 
             executedSuccessfully.set(true);
+            executing.set(false);
         });
 
         taskExecutor.execute(bibtexWorker);

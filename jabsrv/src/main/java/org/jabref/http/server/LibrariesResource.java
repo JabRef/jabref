@@ -1,7 +1,10 @@
 package org.jabref.http.server;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.util.io.BackupFileUtil;
 
@@ -15,6 +18,9 @@ import jakarta.ws.rs.core.MediaType;
 @Path("libraries")
 public class LibrariesResource {
     @Inject
+    private ContextsToServe contextsToServe;
+
+    @Inject
     private FilesToServe filesToServe;
 
     @Inject
@@ -23,9 +29,18 @@ public class LibrariesResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String get() {
-        List<String> fileNamesWithUniqueSuffix = filesToServe.getFilesToServe().stream()
-                                                            .map(p -> p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p))
-                                                            .toList();
-        return gson.toJson(fileNamesWithUniqueSuffix);
+        Stream<java.nio.file.Path> pathStream;
+        if (!filesToServe.isEmpty()) {
+            pathStream = filesToServe.getFilesToServe().stream();
+        } else {
+            pathStream = contextsToServe.getContextsToServe().stream()
+                                                       .filter(context -> context.getDatabasePath().isPresent())
+                                                       .map(context -> context.getDatabasePath().get());
+        }
+        List<String> fileNamesWithUniqueSuffix = pathStream.map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
+                                                           .toList();
+        List<String> result = new ArrayList<>(fileNamesWithUniqueSuffix);
+        result.add("demo");
+        return gson.toJson(result);
     }
 }

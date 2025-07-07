@@ -68,7 +68,7 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
                 }
 
                 pushbackInputStream.unread(data);
-                DocumentBuilder builder = this.DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
+                DocumentBuilder builder = DOCUMENT_BUILDER_FACTORY.newDocumentBuilder();
                 Document document = builder.parse(pushbackInputStream);
 
                 // Assuming the root element represents an entry
@@ -115,12 +115,12 @@ public class ISIDOREFetcher implements PagedSearchBasedParserFetcher {
     }
 
     private List<BibEntry> parseXMl(Element element) {
-        var list = element.getElementsByTagName("isidore");
+        NodeList list = element.getElementsByTagName("isidore");
         List<BibEntry> bibEntryList = new ArrayList<>();
 
         for (int i = 0; i < list.getLength(); i++) {
             Element elem = (Element) list.item(i);
-            var bibEntry = xmlItemToBibEntry(elem);
+            BibEntry bibEntry = xmlItemToBibEntry(elem);
             bibEntryList.add(bibEntry);
         }
         return bibEntryList;

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.testfx.api.FxRobot;
+import org.testfx.api.FxRobotInterface;
 import org.testfx.framework.junit5.ApplicationExtension;
 import org.testfx.framework.junit5.Start;
 
@@ -81,7 +82,7 @@ public class GlobalSearchBarTest {
         TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
 
         // The focus is on searchField node, as we click on the search box
-        var searchFieldRoboto = robot.clickOn(searchField);
+        FxRobotInterface searchFieldRoboto = robot.clickOn(searchField);
         for (char c : searchQuery.toCharArray()) {
             searchFieldRoboto.write(String.valueOf(c));
             Thread.sleep(401);
@@ -101,7 +102,7 @@ public class GlobalSearchBarTest {
         String searchQuery = "";
         TextInputControl searchField = robot.lookup("#searchField").queryTextInputControl();
 
-        var searchFieldRoboto = robot.clickOn(searchField);
+        FxRobotInterface searchFieldRoboto = robot.clickOn(searchField);
         searchFieldRoboto.write(searchQuery);
 
         UiTaskExecutor.runAndWaitInJavaFXThread(hBox::requestFocus);

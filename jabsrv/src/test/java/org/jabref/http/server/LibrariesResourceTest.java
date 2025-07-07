@@ -14,6 +14,7 @@ class LibrariesResourceTest extends ServerTest {
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
         addFilesToServeToResourceConfig(resourceConfig);
+        addContextsToServeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         addGlobalExceptionMapperToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();
@@ -23,8 +24,9 @@ class LibrariesResourceTest extends ServerTest {
     void defaultOneTestLibrary() {
         String expected = """
                 [
+                  "%s",
                   "%s"
-                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id);
+                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id, "demo");
         assertEquals(expected, target("/libraries").request().get(String.class));
     }
 
@@ -36,8 +38,9 @@ class LibrariesResourceTest extends ServerTest {
         String expected = """
                 [
                   "%s",
+                  "%s",
                   "%s"
-                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id, TestBibFile.CHOCOLATE_BIB.id);
+                ]""".formatted(TestBibFile.GENERAL_SERVER_TEST.id, TestBibFile.CHOCOLATE_BIB.id, "demo");
         assertEquals(expected, target("/libraries").request().get(String.class));
     }
 }

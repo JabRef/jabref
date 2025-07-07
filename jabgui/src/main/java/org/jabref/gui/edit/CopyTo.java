@@ -8,6 +8,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
@@ -62,10 +63,8 @@ public class CopyTo extends SimpleCommand {
 
         if (includeCrossReferences) {
             copyEntriesWithCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entries copied successfully, including cross-references."));
         } else {
             copyEntriesWithoutCrossRef(selectedEntries, targetDatabaseContext);
-            dialogService.notify(Localization.lang("Entries copied successfully, without cross-references."));
         }
     }
 
@@ -75,11 +74,38 @@ public class CopyTo extends SimpleCommand {
         List<BibEntry> entriesWithCrossRef = selectedEntries.stream().filter(bibEntry -> bibEntry.hasField(StandardField.CROSSREF))
                                                             .flatMap(entry -> getCrossRefEntry(entry, sourceDatabaseContext).stream()).toList();
         entriesToAdd.addAll(entriesWithCrossRef);
-        importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd);
+
+        copyEntriesWithFeedback(entriesToAdd, targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1, including cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped including cross-references"));
     }
 
     public void copyEntriesWithoutCrossRef(List<BibEntry> selectedEntries, BibDatabaseContext targetDatabaseContext) {
-        importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, selectedEntries);
+        copyEntriesWithFeedback(selectedEntries, targetDatabaseContext,
+                Localization.lang("Copied %0 entry(s) to %1 without cross-references"),
+                Localization.lang("Copied %0 entry(s) to %1. %2 were skipped without cross-references"));
+    }
+
+    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd, BibDatabaseContext targetDatabaseContext, String successMessage, String partialMessage) {
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
+        tracker.setOnFinish(() -> {
+            int importedCount = tracker.getImportedCount();
+            int skippedCount = tracker.getSkippedCount();
+
+            String targetName = targetDatabaseContext.getDatabasePath()
+                                                     .map(path -> path.getFileName().toString())
+                                                     .orElse(Localization.lang("target library"));
+
+            if (importedCount == entriesToAdd.size()) {
+                dialogService.notify(Localization.lang(successMessage, String.valueOf(importedCount), targetName));
+            } else if (importedCount == 0) {
+                dialogService.notify(Localization.lang("No entry was copied to %0", targetName));
+            } else {
+                dialogService.notify(Localization.lang(partialMessage, String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
+            }
+        });
+
+        importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
     }
 
     public Optional<BibEntry> getCrossRefEntry(BibEntry bibEntryToCheck, BibDatabaseContext sourceDatabaseContext) {

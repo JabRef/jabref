@@ -1,11 +1,16 @@
 package org.jabref.cli;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import org.jabref.logic.exporter.Exporter;
 import org.jabref.logic.exporter.ExporterFactory;
+import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
@@ -102,7 +107,10 @@ public class Convert implements Runnable {
                     parserResult.getDatabaseContext().getDatabase().getEntries(),
                     fileDirForDatabase,
                     Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
-        } catch (Exception ex) {
+        } catch (IOException
+                | SaveException
+                | ParserConfigurationException
+                | TransformerException ex) {
             LOGGER.error("Could not export file '{}'.", outputFile, ex);
         }
     }

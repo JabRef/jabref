@@ -10,12 +10,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -27,6 +29,7 @@ import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.util.BaseDialog;
@@ -37,7 +40,10 @@ import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.IdBasedFetcher;
 import org.jabref.logic.importer.WebFetcher;
+import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
+import org.jabref.logic.importer.fetcher.RfcFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -45,6 +51,12 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.BibEntryTypesManager;
+import org.jabref.model.entry.identifier.ArXivIdentifier;
+import org.jabref.model.entry.identifier.DOI;
+import org.jabref.model.entry.identifier.ISBN;
+import org.jabref.model.entry.identifier.Identifier;
+import org.jabref.model.entry.identifier.RFC;
+import org.jabref.model.entry.identifier.SSRN;
 import org.jabref.model.entry.types.BiblatexAPAEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BiblatexSoftwareEntryTypeDefinitions;
@@ -82,7 +94,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private Button generateButton;
 
     @FXML private TabPane tabs;
-    @FXML private Tab tabCreateEntry;
+    @FXML private Tab tabAddEntry;
     @FXML private Tab tabLookupIdentifier;
     @FXML private Tab tabInterpretCitations;
     @FXML private Tab tabSpecifyBibtex;
@@ -95,6 +107,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     @FXML private TilePane entryCustom;
 
     @FXML private TextField idText;
+    @FXML private Tooltip idTextTooltip;
+    @FXML private Hyperlink idJumpLink;
     @FXML private RadioButton idLookupGuess;
     @FXML private RadioButton idLookupSpecify;
     @FXML private ComboBox<IdBasedFetcher> idFetcher;
@@ -143,13 +157,25 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     private void finalizeTabs() {
         NewEntryDialogTab approach = initialApproach;
         if (approach == null) {
-            approach = preferences.getLatestApproach();
+            final String clipboardText = ClipBoardManager.getContents().trim();
+            if (!StringUtil.isBlank(clipboardText)) {
+                Optional<Identifier> identifier = Identifier.from(clipboardText);
+                if (identifier.isPresent()) {
+                    approach = NewEntryDialogTab.ENTER_IDENTIFIER;
+                    interpretText.setText(clipboardText);
+                    interpretText.selectAll();
+                } else {
+                    approach = preferences.getLatestApproach();
+                }
+            } else {
+                approach = preferences.getLatestApproach();
+            }
         }
 
         switch (approach) {
             case NewEntryDialogTab.CHOOSE_ENTRY_TYPE:
-                tabs.getSelectionModel().select(tabCreateEntry);
-                switchCreateEntry();
+                tabs.getSelectionModel().select(tabAddEntry);
+                switchAddEntry();
                 break;
             case NewEntryDialogTab.ENTER_IDENTIFIER:
                 tabs.getSelectionModel().select(tabLookupIdentifier);
@@ -165,7 +191,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 break;
         }
 
-        tabCreateEntry.setOnSelectionChanged(_ -> switchCreateEntry());
+        tabAddEntry.setOnSelectionChanged(_ -> switchAddEntry());
         tabLookupIdentifier.setOnSelectionChanged(_ -> switchLookupIdentifier());
         tabInterpretCitations.setOnSelectionChanged(_ -> switchInterpretCitations());
         tabSpecifyBibtex.setOnSelectionChanged(_ -> switchSpecifyBibtex());
@@ -185,13 +211,13 @@ public class NewEntryView extends BaseDialog<BibEntry> {
                 }
             });
 
-        initializeCreateEntry();
+        initializeAddEntry();
         initializeLookupIdentifier();
         initializeInterpretCitations();
-        initializeSpecifyBibTex();
+        initializeSpecifyBibTeX();
     }
 
-    private void initializeCreateEntry() {
+    private void initializeAddEntry() {
         entryRecommendedTitle.managedProperty().bind(entryRecommendedTitle.visibleProperty());
         entryRecommendedTitle.expandedProperty().bindBidirectional(preferences.typesRecommendedExpandedProperty());
         entryRecommended.managedProperty().bind(entryRecommended.visibleProperty());
@@ -234,20 +260,11 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     private void initializeLookupIdentifier() {
-        // :TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
-        // model would then iterate through all non-blank lines, passing each of them through the specified lookup
-        // method (each automatically independently, or all through the same fetcher).
+        // TODO: It would be nice if this was a `TextArea`, so that users could enter multiple IDs at once. The view
+        //       model would then iterate through all non-blank lines, passing each of them through the specified lookup
+        //       method (each automatically independently, or all through the same fetcher).
         idText.setPromptText(Localization.lang("Enter the reference identifier to search for."));
         idText.textProperty().bindBidirectional(viewModel.idTextProperty());
-        final String clipboardText = ClipBoardManager.getContents().trim();
-        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
-            // :TODO: Better validation would be nice here, so clipboard text is only copied over if it matches a
-            // supported identifier format.
-            idText.setText(clipboardText);
-            idText.selectAll();
-        }
-
-        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
 
         ToggleGroup toggleGroup = new ToggleGroup();
         idLookupGuess.setToggleGroup(toggleGroup);
@@ -258,6 +275,33 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         } else {
             idLookupSpecify.selectedProperty().set(true);
         }
+
+        viewModel.populateDOICache();
+
+        // [impl->req~newentry.clipboard.autofocus~1]
+        Optional<Identifier> validClipboardId = extractValidIdentifierFromClipboard();
+        if (validClipboardId.isPresent()) {
+            viewModel.duplicateDoiValidatorStatus().validProperty().addListener((_, _, isValid) -> {
+                if (isValid) {
+                    Tooltip.install(idText, idTextTooltip);
+                } else {
+                    Tooltip.uninstall(idText, idTextTooltip);
+                }
+            });
+            
+            idText.setText(ClipBoardManager.getContents().trim());
+            idText.selectAll();
+
+            Identifier id = validClipboardId.get();
+            Platform.runLater(() -> {
+                idLookupSpecify.setSelected(true);
+                fetcherForIdentifier(id).ifPresent(idFetcher::setValue);
+            });
+        } else {
+            Platform.runLater(() -> idLookupGuess.setSelected(true));
+        }
+
+        idLookupGuess.selectedProperty().addListener((_, _, newValue) -> preferences.setIdLookupGuessing(newValue));
 
         idFetcher.itemsProperty().bind(viewModel.idFetchersProperty());
         new ViewModelListCellFactory<IdBasedFetcher>().withText(WebFetcher::getName).install(idFetcher);
@@ -271,8 +315,16 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         idFetcher.setValue(initialFetcher);
         idFetcher.setOnAction(_ -> preferences.setLatestIdFetcher(idFetcher.getValue().getName()));
 
+        idJumpLink.visibleProperty().bind(viewModel.duplicateDoiValidatorStatus().validProperty().not());
         idErrorInvalidText.visibleProperty().bind(viewModel.idTextValidatorProperty().not());
+        idErrorInvalidText.managedProperty().bind(viewModel.idTextValidatorProperty().not());
         idErrorInvalidFetcher.visibleProperty().bind(idLookupSpecify.selectedProperty().and(viewModel.idFetcherValidatorProperty().not()));
+
+        idJumpLink.setOnAction(_ -> libraryTab.showAndEdit(viewModel.getDuplicateEntry()));
+
+        TextInputControl textInput = idText;
+        EditorValidator validator = new EditorValidator(this.guiPreferences);
+        validator.configureValidation(viewModel.duplicateDoiValidatorStatus(), textInput);
     }
 
     private void initializeInterpretCitations() {
@@ -295,7 +347,7 @@ public class NewEntryView extends BaseDialog<BibEntry> {
         interpretParser.setOnAction(_ -> preferences.setLatestInterpretParser(interpretParser.getValue().getLocalizedName()));
     }
 
-    private void initializeSpecifyBibTex() {
+    private void initializeSpecifyBibTeX() {
         bibtexText.textProperty().bindBidirectional(viewModel.bibtexTextProperty());
         final String clipboardText = ClipBoardManager.getContents().trim();
         if (!StringUtil.isBlank(clipboardText)) {
@@ -307,8 +359,8 @@ public class NewEntryView extends BaseDialog<BibEntry> {
     }
 
     @FXML
-    private void switchCreateEntry() {
-        if (!tabCreateEntry.isSelected()) {
+    private void switchAddEntry() {
+        if (!tabAddEntry.isSelected()) {
             return;
         }
 
@@ -508,5 +560,42 @@ public class NewEntryView extends BaseDialog<BibEntry> {
             }
         }
         return null;
+    }
+
+    private Optional<Identifier> extractValidIdentifierFromClipboard() {
+        String clipboardText = ClipBoardManager.getContents().trim();
+
+        if (!StringUtil.isBlank(clipboardText) && !clipboardText.contains("\n")) {
+            Optional<Identifier> identifier = Identifier.from(clipboardText);
+            if (identifier.isPresent()) {
+                Identifier id = identifier.get();
+                boolean isValid = switch (id) {
+                    case DOI doi ->
+                            DOI.isValid(doi.asString());
+                    case ISBN isbn ->
+                            isbn.isValid();
+                    default ->
+                            true;
+                };
+                if (isValid) {
+                    return Optional.of(id);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<IdBasedFetcher> fetcherForIdentifier(Identifier id) {
+        for (IdBasedFetcher fetcher : idFetcher.getItems()) {
+            if ((id instanceof DOI && fetcher instanceof DoiFetcher) ||
+                    (id instanceof ISBN && (fetcher instanceof IsbnFetcher) ||
+                    (id instanceof ArXivIdentifier && fetcher instanceof ArXivFetcher) ||
+                    (id instanceof RFC && fetcher instanceof RfcFetcher) ||
+                    (id instanceof SSRN && fetcher instanceof DoiFetcher))) {
+                return Optional.of(fetcher);
+            }
+        }
+        return Optional.empty();
     }
 }

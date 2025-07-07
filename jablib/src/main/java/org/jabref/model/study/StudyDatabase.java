@@ -1,8 +1,6 @@
 package org.jabref.model.study;
 
-/**
- * data model for the view {@link org.jabref.gui.slr.StudyCatalogItem}
- */
+/// data model for the view `org.jabref.gui.slr.StudyCatalogItem`
 public class StudyDatabase {
     private String name;
     private boolean enabled;

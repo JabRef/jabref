@@ -3,6 +3,7 @@ package org.jabref.logic.importer;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,6 +19,7 @@ import org.jabref.logic.importer.fetcher.JstorFetcher;
 import org.jabref.logic.importer.fetcher.MrDLibFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.DoiToBibtexConverterComIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.EbookDeIsbnFetcher;
+import org.jabref.logic.importer.fetcher.isbntobibtex.LOBIDIsbnFetcher;
 import org.jabref.logic.importer.fetcher.isbntobibtex.OpenLibraryIsbnFetcher;
 import org.jabref.logic.importer.plaincitation.GrobidPlainCitationParser;
 import org.jabref.logic.importer.plaincitation.LlmPlainCitationParser;
@@ -55,7 +57,6 @@ class WebFetchersTest {
 
     private Set<Class<?>> getIgnoredInaccessibleClasses() {
         return IGNORED_INACCESSIBLE_FETCHERS.stream()
-                     .map(className -> "" + className)
                      .map(classPath -> {
                          try {
                              return Class.forName(classPath);
@@ -72,7 +73,7 @@ class WebFetchersTest {
 
         try (ScanResult scanResult = classGraph.scan()) {
             ClassInfoList controlClasses = scanResult.getClassesImplementing(IdBasedFetcher.class.getCanonicalName());
-            Set<Class<?>> expected = new HashSet<>(controlClasses.loadClasses());
+            Set<Class<?>> expected = new LinkedHashSet<>(controlClasses.loadClasses());
 
             // Some classes implement IdBasedFetcher, but are only accessible to other fetcher, so ignore them
             expected.removeAll(getIgnoredInaccessibleClasses());
@@ -82,6 +83,7 @@ class WebFetchersTest {
 
             // Remove special ISBN fetcher since we don't want to expose them to the user
             expected.remove(OpenLibraryIsbnFetcher.class);
+            expected.remove(LOBIDIsbnFetcher.class);
             expected.remove(EbookDeIsbnFetcher.class);
             expected.remove(GvkFetcher.class);
             expected.remove(DoiToBibtexConverterComIsbnFetcher.class);

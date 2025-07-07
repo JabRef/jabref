@@ -16,21 +16,21 @@ Click on "Install" choose "CheckStyle-IDEA".<br>
 **Note:** In some MacBooks, `Settings` can be found at the "IntelliJ" button of the app menu instead of at "File".
 
 {% figure caption:"Install CheckStyle" %}
-![Install CheckStyle](guidelines-intellij-install-checkstyle.png)
+![Install CheckStyle](13-01-install-checkstyle.png)
 {% endfigure %}
 
 After clicking, IntelliJ asks for confirmation:
 
 {% figure caption:"Third Party Plugin Privacy Notice" %}
-![Third Party Plugin Privacy Notice](guidelines-intellij-checkstyle-confirmation.png)
+![Third Party Plugin Privacy Notice](13-02-checkstyle-confirmation.png)
 {% endfigure %}
 
 If you agree, click on "Agree" and you can continue.
 
-Afterwards, use the "Restart IDE" button to restart IntelliJ.
+Afterward, use the "Restart IDE" button to restart IntelliJ.
 
 {% figure caption:"IntelliJ restart IDE" %}
-![IntelliJ restart IDE](guidelines-intellij-checkstyle-restart-ide.png)
+![IntelliJ restart IDE](13-03-checkstyle-restart-ide.png)
 {% endfigure %}
 
 Click on "Restart" to finally restart.
@@ -44,14 +44,14 @@ then click "Import Scheme >",
 then click "IntelliJ IDEA code style XML"
 
 {% figure caption:"Location of “Import Scheme > IntelliJ IDEA code style XML”" %}
-![Location of IntelliJ IDEA code style XML](guidelines-intellij-codestyle-import.png)
+![Location of IntelliJ IDEA code style XML](13-04-import-checkstyle.png)
 {% endfigure %}
 
 You have to browse for the directory `config` in JabRef's code.
 There is an `IntelliJ Code Style.xml`.
 
 {% figure caption:"Browsing for `config/IntelliJ Code Style.xml`" %}
-![Browsing for config/IntelliJ Code Style.xml](guidelines-intellij-codestyle-import-select-xml-file.png)
+![Browsing for config/IntelliJ Code Style.xml](13-05-select-checkstyle-xml-file.png)
 {% endfigure %}
 
 Click "OK".
@@ -60,7 +60,7 @@ At following dialog is "Import Scheme".
 Click there "OK", too.
 
 {% figure caption:"Import to JabRef" %}
-![Import to JabRef](guidelines-intellij-codestyle-import-as-jabref.png)
+![Import to JabRef](13-06-code-style-import-as-jabref.png)
 {% endfigure %}
 
 Click on "Apply" to store the preferences.
@@ -74,7 +74,7 @@ Go to **File > Settings... > Tools > Checkstyle > Configuration File**
 Trigger the import dialog of a CheckStyle style by clicking the \[+] button:
 
 {% figure caption:"Trigger the rule import dialog" %}
-![Trigger the rule import dialog](guidelines-intellij-checkstyle-start-import.png)
+![Trigger the rule import dialog](13-07-checkstyle-start-import.png)
 {% endfigure %}
 
 Then:
@@ -85,7 +85,7 @@ Then:
 * Click "Next"
 
 {% figure caption:"Filled Rule Import Dialog" %}
-![Filled Rule Import Dialog](guidelines-intellij-checkstyle-import-file.png)
+![Filled Rule Import Dialog](13-08-checkstyle-import-file.png)
 {% endfigure %}
 
 Click on "Finish"
@@ -93,14 +93,14 @@ Click on "Finish"
 Activate the CheckStyle configuration file by ticking it in the list
 
 {% figure caption:"JabRef's checkstyle config is activated" %}
-![JabRef's checkstyle config is activated](guidelines-intellij-checkstyle-jabref-active.png)
+![JabRef's checkstyle config is activated](13-09-checkstyle-jabref-active.png)
 {% endfigure %}
 
 Ensure that the [latest CheckStyle version](https://checkstyle.org/releasenotes.html) is selected (10.21.0 or higher).
 Also, set the "Scan Scope" to "Only Java sources (including tests)".
 
 {% figure caption:"Checkstyle is the highest version - and tests are also scanned" %}
-![Checkstyle is the highest version - and tests are also scanned](guidelines-intellij-checkstyle-final-settings.png)
+![Checkstyle is the highest version - and tests are also scanned](13-10-checkstyle-final-settings.png)
 {% endfigure %}
 
 Save settings by clicking "Apply" and then "OK"
@@ -112,7 +112,7 @@ In "Rules", change to "JabRef".
 Then, you can run a check on all modified files.
 
 {% figure caption:"JabRef's style is active - and we are ready to run a check on all modified files" %}
-![JabRef's style is active - and we are ready to run a check on all modified files](guidelines-intellij-checkstyle-window.png)
+![JabRef's style is active - and we are ready to run a check on all modified files](13-11-checkstyle-window.png)
 {% endfigure %}
 
 ## Have auto format working properly in JavaDoc
@@ -124,7 +124,7 @@ Go to **File > Settings... > Editor > Code Style > Java > JavaDoc**.
 At "Other", disable "Wrap at right margin"
 
 {% figure caption:"”Wrap at right margin” disabled" %}
-!["Wrap at right margin" disabled](guidelines-intellij-editor-javadoc-do-not-wrap.png)
+!["Wrap at right margin" disabled](13-12-editor-javadoc-do-not-wrap.png)
 {% endfigure %}
 
 ## Enable proper import cleanup
@@ -134,7 +134,7 @@ There, enable both "Add unambiguous imports on the fly" and "Optimize imports on
 (Source: [JetBrains help](https://www.jetbrains.com/help/idea/creating-and-optimizing-imports.html#automatically-add-import-statements)).
 
 {% figure caption:"Auto import enabled" %}
-![Enable auto import](guidelines-intellij-editor-autoimport.png)
+![Enable auto import](13-13-editor-auto-import.png)
 {% endfigure %}
 
 Press "OK".
@@ -146,7 +146,7 @@ At section "General", disable "File header" and "Imports".
 At section "Java", disable "One-line methods".
 
 {% figure caption:"Code foldings disabled" %}
-![Code foldings disabled](guidelines-settings-intellij-code-foldings.png)
+![Code foldings disabled](13-14-code-foldings.png)
 {% endfigure %}
 
 Press "OK".

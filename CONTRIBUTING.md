@@ -1,21 +1,16 @@
 # Contributing
 
-<!-- markdownlint-disable-next-line MD001 -->
-### For programmers
-
-A detailed guide on contributing for programmers is available at <https://devdocs.jabref.org>.
-
-If you are a newcomer, the two most helpful sections to navigate through are the [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) (to get JabRef's source code into your local machine and get the development version running), and [frequently asked questions](https://devdocs.jabref.org/code-howtos/faq) - where you will find solutions to issues that are most commonly faced by new contributors.
-
 We welcome contributions to JabRef and encourage you to follow the [GitHub workflow](https://docs.github.com/en/get-started/using-github/github-flow).
 You can also check out the explanation of [Feature Branch Workflow](https://atlassian.com/git/tutorials/comparing-workflows#feature-branch-workflow) for the idea behind this kind of development.
 
 JabRef regards its contributors as **[software engineers, not just programmers](https://www.phoenix.edu/blog/programmer-vs-software-engineer-key-differences.html)**.
 As one consequence, for non-basic issues, you will have to work on the requirements side, too.
 
-### For non-programmers
-
-For non-programmers, a general overview on contributing is available at <https://docs.jabref.org/contributing>.
+> [!TIP]
+> If you are a newcomer, the two most helpful sections to navigate through are the [guidelines for setting up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) (to get JabRef's source code into your local machine and get the development version running), and [frequently asked questions](https://devdocs.jabref.org/code-howtos/faq) - where you will find solutions to issues that are most commonly faced by new contributors.
+<!-- markdownlint-disable-next-line MD028 -->
+> [!NOTE]
+> For non-programmers, a general overview on contributing is available at <https://docs.jabref.org/contributing>.
 
 ## Table of Contents
 
@@ -92,10 +87,11 @@ GitHub will then automatically assign you.
 <!-- markdownlint-disable-next-line MD026 -->
 ## Give JabRef a Star!
 
-JabRef is completely free and used by students and researchers all over the world.
-It is actively developed and maintained primarily by volunteers in their free time.
-Keep them motivated by giving the project a GitHub star:
-Simply navigate to <https://github.com/jabref/jabref/> and click on the Star button!
+> [!IMPORTANT]
+> JabRef is completely free and used by students and researchers all over the world.
+> It is actively developed and maintained primarily by volunteers in their free time.
+> Keep them motivated by giving the project a GitHub star:
+> Simply navigate to <https://github.com/jabref/jabref/> and click on the Star button!
 
 ## Pull Request Process
 
@@ -166,9 +162,10 @@ Your contribution is considered being made under [MIT license](https://tldrlegal
 #### Notes on AI usage
 
 Please keep these two principles in mind when you contribute:
-
-1. Never let an LLM speak for you.
-2. Never let an LLM think for you.
+> [!IMPORTANT]
+>
+> 1. Never let an LLM speak for you.
+> 2. Never let an LLM think for you.
 
 More reading on that is available at <https://roe.dev/blog/using-ai-in-open-source>.
 
@@ -187,7 +184,8 @@ Please look into them and handle accordingly.
 After implementing changes, commit to the branch your pull request is *from* and push.
 The pull request will automatically be updated with your changes.
 To maintain a clean git history, your commits will also be automatically squashed upon acceptance of the pull request, during merging.
-Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules), and force-pushing should be **avoided**.
+Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules).
+As a concequece, force-pushing is not required - and must be **avoided**.
 
 After all the basic checks are green, maintainers will look at your pull request.
 Since JabRef is driven by volunteers in their spare time, reviews may take more time than a project with full time developers.
@@ -199,6 +197,7 @@ This causes unnecessary work on our side, and is not in the style of the GitHub 
 You can push any changes you need to make to the branch your pull request is *from*.
 These changes will be automatically reflected in your pull request.
 
+> [!CAUTION]
 > **If you close your pull request, you will be unassigned from the issue automatically.**
 
 ### Development hints

@@ -1,6 +1,8 @@
 open module org.jabref {
     requires org.jabref.jablib;
 
+    requires org.jabref.jabsrv;
+
     // Swing
     requires java.desktop;
 
@@ -10,10 +12,11 @@ open module org.jabref {
 
     // region JavaFX
     requires javafx.base;
-    requires javafx.graphics;
     requires javafx.controls;
-    requires javafx.web;
     requires javafx.fxml;
+    requires javafx.graphics;
+    requires javafx.web;
+
     requires com.tobiasdiez.easybind;
 
     requires afterburner.fx;
@@ -43,7 +46,7 @@ open module org.jabref {
     provides org.kordamp.ikonli.IkonProvider
             with org.jabref.gui.icon.JabrefIconProvider;
 
-    requires reactfx;
+    requires org.reactfx;
     // endregion
 
     // region: Logging
@@ -75,14 +78,11 @@ open module org.jabref {
     // endregion
 
     // region: data mapping
-    // requires jakarta.xml.bind;
     requires jdk.xml.dom;
     // requires com.google.gson;
     // requires com.fasterxml.jackson.databind;
     // requires com.fasterxml.jackson.dataformat.yaml;
     // requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime
-    // requires org.glassfish.jaxb.runtime;
     // endregion
 
     // dependency injection using HK2
@@ -91,7 +91,7 @@ open module org.jabref {
     // region HTTP clients
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
-    requires unirest.java.core;
+    requires com.konghq.unirest.java.core;
     // requires unirest.modules.gson;
     // endregion
 
@@ -129,14 +129,14 @@ open module org.jabref {
     // requires org.apache.xmpbox;
     // requires com.ibm.icu;
 
-    // requires flexmark;
-    requires flexmark.html2md.converter;
-    // requires flexmark.util.ast;
-    // requires flexmark.util.data;
+    requires com.vladsch.flexmark;
+    requires com.vladsch.flexmark.html2md.converter;
+    requires com.vladsch.flexmark.util.ast;
+    requires com.vladsch.flexmark.util.data;
 
     // requires com.h2database.mvstore;
 
-    requires java.keyring;
+    requires com.github.java.keyring;
     // requires org.freedesktop.dbus;
 
     requires org.jooq.jool;
@@ -147,7 +147,7 @@ open module org.jabref {
     // requires ai.djl.tokenizers;
     // requires jvm.openai;
     // requires langchain4j;
-    requires langchain4j.core;
+    requires dev.langchain4j.core;
     // requires langchain4j.google.ai.gemini;
     // requires langchain4j.hugging.face;
     // requires langchain4j.mistral.ai;
@@ -182,6 +182,9 @@ open module org.jabref {
 
     // region: other libraries (alphabetically)
     // requires cuid;
+    requires com.dlsc.pdfviewfx;
+    requires com.pixelduke.fxthemes;
+    // requires com.sun.jna;
     // requires dd.plist;
     requires io.github.adr;
     // required by okhttp and some AI library

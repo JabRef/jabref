@@ -1,41 +1,46 @@
 package org.jabref.http.server;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
+import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
-import org.jabref.logic.util.io.BackupFileUtil;
+import org.jabref.model.database.BibDatabase;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.util.DummyFileUpdateMonitor;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.StreamingOutput;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("libraries/{id}")
 public class LibraryResource {
-    public static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LibraryResource.class);
 
     @Inject
     CliPreferences preferences;
+
+    @Inject
+    ContextsToServe contextsToServe;
 
     @Inject
     FilesToServe filesToServe;
@@ -45,41 +50,42 @@ public class LibraryResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public String getJson(@PathParam("id") String id) {
-        ParserResult parserResult = getParserResult(id);
+    public String getJson(@PathParam("id") String id) throws IOException {
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
-        List<BibEntryDTO> list = parserResult.getDatabase().getEntries().stream()
+        List<BibEntryDTO> list = databaseContext.getDatabase().getEntries().stream()
                                              .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
-                                             .map(entry -> new BibEntryDTO(entry, parserResult.getDatabaseContext().getMode(), preferences.getFieldPreferences(), entryTypesManager))
+                                             .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
                                              .toList();
         return gson.toJson(list);
     }
 
     @GET
     @Produces(JabrefMediaType.JSON_CSL_ITEM)
-    public String getClsItemJson(@PathParam("id") String id) {
-        ParserResult parserResult = getParserResult(id);
+    public String getClsItemJson(@PathParam("id") String id) throws IOException {
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
         JabRefItemDataProvider jabRefItemDataProvider = new JabRefItemDataProvider();
-        jabRefItemDataProvider.setData(parserResult.getDatabaseContext(), new BibEntryTypesManager());
+        jabRefItemDataProvider.setData(databaseContext, new BibEntryTypesManager());
         return jabRefItemDataProvider.toJson();
-    }
-
-    private ParserResult getParserResult(String id) {
-        java.nio.file.Path library = getLibraryPath(id);
-        ParserResult parserResult;
-        try {
-            parserResult = new BibtexImporter(preferences.getImportFormatPreferences(), new DummyFileUpdateMonitor()).importDatabase(library);
-        } catch (IOException e) {
-            LOGGER.warn("Could not find open library file {}", library, e);
-            throw new InternalServerErrorException("Could not parse library", e);
-        }
-        return parserResult;
     }
 
     @GET
     @Produces(JabrefMediaType.BIBTEX)
     public Response getBibtex(@PathParam("id") String id) {
-        java.nio.file.Path library = getLibraryPath(id);
+        if ("demo".equals(id)) {
+            StreamingOutput stream = output -> {
+                try (InputStream in = getChocolateBibAsStream()) {
+                    in.transferTo(output);
+                }
+            };
+
+            return Response.ok(stream)
+                           // org.glassfish.jersey.media would be required for a "nice" Java to create ContentDisposition; we avoid this
+                           .header("Content-Disposition", "attachment; filename=\"Chocolate.bib\"")
+                           .build();
+        }
+
+        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, contextsToServe);
         String libraryAsString;
         try {
             libraryAsString = Files.readString(library);
@@ -88,15 +94,18 @@ public class LibraryResource {
             throw new InternalServerErrorException("Could not read library " + library, e);
         }
         return Response.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + library.getFileName() + "\"")
                 .entity(libraryAsString)
                 .build();
     }
 
-    private java.nio.file.Path getLibraryPath(String id) {
-        return filesToServe.getFilesToServe()
-                          .stream()
-                          .filter(p -> (p.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(p)).equals(id))
-                          .findAny()
-                          .orElseThrow(NotFoundException::new);
+    /// @param id - also "demo" for the Chocolate.bib file
+    private BibDatabaseContext getDatabaseContext(String id) throws IOException {
+        return ServerUtils.getBibDatabaseContext(id, filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+    }
+
+    /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
+    private @Nullable InputStream getChocolateBibAsStream() {
+        return BibDatabase.class.getResourceAsStream("/Chocolate.bib");
     }
 }

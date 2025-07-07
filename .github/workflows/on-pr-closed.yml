@@ -9,6 +9,7 @@ jobs:
     name: Determine issue number
     runs-on: ubuntu-latest
     if: >
+      (github.repository == 'JabRef/jabref') &&
       !(
         (github.actor == 'dependabot[bot]') ||
         (
@@ -40,8 +41,8 @@ jobs:
           ticketPrefix: '#'
           titleRegex: '^#(?<ticketNumber>\d+)'
           branchRegex: '^(?<ticketNumber>\d+)'
-          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #12345` in PULL_REQUEST_TEMPLATE
-          bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!12345\b)\d+)'
+          # Matches GitHub's closes/fixes/resolves #{number}, but does not match our example `Closes #13109` in PULL_REQUEST_TEMPLATE
+          bodyRegex: '(?<action>fixes|closes|resolves)\s+(?:https?:\/\/github\.com\/JabRef\/jabref\/issues\/)?#?(?<ticketNumber>(?!13109\b)\d+)'
           bodyRegexFlags: 'i'
           outputOnly: true
       - run: echo "${{ steps.get_issue_number.outputs.ticketNumber }}"
@@ -88,7 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Move issue to "Free to take" in "Good First Issues"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/5"
@@ -100,7 +101,7 @@ jobs:
           skip-if-not-in-project: true
       - name: Move issue to "Free to take" in "Candidates for University Projects"
         if: steps.check_assignee.outputs.assigned == 'no'
-        uses: m7kvqbe1/github-action-move-issues/@add-issue-parameter
+        uses: m7kvqbe1/github-action-move-issues/@main
         with:
           github-token: ${{ secrets.GH_TOKEN_ACTION_MOVE_ISSUE }}
           project-url: "https://github.com/orgs/JabRef/projects/3"

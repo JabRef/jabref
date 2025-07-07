@@ -48,14 +48,12 @@ public class UTF8Checker implements EntryChecker {
         return results;
     }
 
-    /**
-     * Check whether a byte array is encoded in UTF-8 charset
-     *
-     * Use java api decoder and try&catch block to check the charset.
-     *
-     * @param data the byte array used to check the encoding charset
-     * @return true if is encoded in UTF-8 & false is not encoded in UTF-8
-     */
+    /// Check whether a byte array is encoded in UTF-8 charset.
+    ///
+    /// Use java api decoder and try&catch block to check the charset.
+    ///
+    /// @param data the byte array used to check the encoding charset
+    /// @return true if is encoded in UTF-8 and false is not encoded in UTF-8
     public static boolean UTF8EncodingChecker(byte[] data) {
         CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
         try {

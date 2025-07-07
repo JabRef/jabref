@@ -11,11 +11,9 @@ import java.util.regex.Pattern;
 
 import org.jabref.logic.util.io.FileUtil;
 
-/**
- * URL utilities for URLs in the JabRef logic.
- * <p>
- * For GUI-oriented URL utilities see {@link org.jabref.gui.fieldeditors.URLUtil}.
- */
+/// URL utilities for URLs in the JabRef logic.
+///
+/// For GUI-oriented URL utilities see `org.jabref.gui.fieldeditors.URLUtil`
 public class URLUtil {
 
     private static final String URL_REGEX = "(?i)\\b((?:https?|ftp)://[^\\s]+)";
@@ -76,14 +74,12 @@ public class URLUtil {
         }
     }
 
-    /**
-     * Checks whether the given String is a URL.
-     * <p>
-     * Currently only checks for a protocol String.
-     *
-     * @param url the String to check for a URL
-     * @return true if <c>url</c> contains a valid URL
-     */
+    /// Checks whether the given String is a URL.
+    ///
+    /// Currently only checks for a protocol String.
+    ///
+    /// @param url the String to check for a URL
+    /// @return true if `url` contains a valid URL
     public static boolean isURL(String url) {
         try {
             create(url);
@@ -101,7 +97,21 @@ public class URLUtil {
      * @throws MalformedURLException if the URL is malformed and cannot be converted to a {@link URL}.
      */
     public static URL create(String url) throws MalformedURLException {
-        return createUri(url).toURL();
+        if (url == null || url.trim().isEmpty()) {
+            throw new IllegalArgumentException("URL must not be null or empty.");
+        }
+        try {
+            URI parsedUri = new URI(url.trim());
+            if (!parsedUri.isAbsolute()) {
+                throw new MalformedURLException("URI is not absolute: " + url);
+            }
+            if (parsedUri.getScheme() == null || parsedUri.getHost() == null) {
+                throw new MalformedURLException("URI must include both scheme and host: " + url);
+            }
+            return parsedUri.toURL();
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            throw new MalformedURLException("Invalid URI: " + url + " | " + e.getMessage());
+        }
     }
 
     /**

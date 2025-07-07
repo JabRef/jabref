@@ -26,6 +26,7 @@ import org.jabref.logic.importer.fetcher.DOAJFetcher;
 import org.jabref.logic.importer.fetcher.DiVA;
 import org.jabref.logic.importer.fetcher.DoiFetcher;
 import org.jabref.logic.importer.fetcher.DoiResolution;
+import org.jabref.logic.importer.fetcher.EuropePmcFetcher;
 import org.jabref.logic.importer.fetcher.GvkFetcher;
 import org.jabref.logic.importer.fetcher.IEEE;
 import org.jabref.logic.importer.fetcher.INSPIREFetcher;
@@ -129,7 +130,7 @@ public class WebFetchers {
         set.add(new SemanticScholar(importerPreferences));
         set.add(new ResearchGate(importFormatPreferences));
         set.add(new BiodiversityLibrary(importerPreferences));
-        set.add(new LOBIDFetcher(importerPreferences));
+        set.add(new LOBIDFetcher());
         set.add(new ScholarArchiveFetcher());
         return set;
     }
@@ -147,12 +148,14 @@ public class WebFetchers {
                 // .addRetryFetcher(new DoiToBibtexConverterComIsbnFetcher(importFormatPreferences)));
         set.add(new DiVA(importFormatPreferences));
         set.add(new DoiFetcher(importFormatPreferences));
+        set.add(new EuropePmcFetcher());
         set.add(new MedlineFetcher());
         set.add(new TitleFetcher(importFormatPreferences));
         set.add(new MathSciNet(importFormatPreferences));
         set.add(new ZbMATH(importFormatPreferences));
         set.add(new CrossRef());
         set.add(new LibraryOfCongress(importFormatPreferences));
+        set.add(new LOBIDFetcher());
         set.add(new IacrEprintFetcher(importFormatPreferences));
         set.add(new RfcFetcher(importFormatPreferences));
         set.add(new Medra());

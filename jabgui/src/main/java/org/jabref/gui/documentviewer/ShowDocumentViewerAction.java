@@ -26,3 +26,4 @@ public class ShowDocumentViewerAction extends SimpleCommand {
         dialogService.showCustomDialog(documentViewerView);
     }
 }
+

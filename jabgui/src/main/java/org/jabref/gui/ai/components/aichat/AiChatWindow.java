@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.BaseWindow;
 import org.jabref.logic.ai.AiPreferences;
@@ -22,6 +23,7 @@ public class AiChatWindow extends BaseWindow {
     private final AiPreferences aiPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final TaskExecutor taskExecutor;
+    private final AdaptVisibleTabs adaptVisibleTabs;
 
     // This field is used for finding an existing AI chat window when user wants to chat with the same group again.
     private String chatName;
@@ -30,12 +32,14 @@ public class AiChatWindow extends BaseWindow {
                         DialogService dialogService,
                         AiPreferences aiPreferences,
                         ExternalApplicationsPreferences externalApplicationsPreferences,
+                        AdaptVisibleTabs adaptVisibleTabs,
                         TaskExecutor taskExecutor
     ) {
         this.aiService = aiService;
         this.dialogService = dialogService;
         this.aiPreferences = aiPreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
+        this.adaptVisibleTabs = adaptVisibleTabs;
         this.taskExecutor = taskExecutor;
     }
 
@@ -53,6 +57,7 @@ public class AiChatWindow extends BaseWindow {
                                 dialogService,
                                 aiPreferences,
                                 externalApplicationsPreferences,
+                                adaptVisibleTabs,
                                 taskExecutor
                         ),
                         800,

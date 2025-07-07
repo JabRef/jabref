@@ -17,9 +17,7 @@ import static org.jabref.model.search.SearchFlags.INEXACT_MATCH;
 import static org.jabref.model.search.SearchFlags.NEGATION;
 import static org.jabref.model.search.SearchFlags.REGULAR_EXPRESSION;
 
-/**
- * Tests are located in {@link org.jabref.logic.search.query.SearchQueryFlagsConversionTest}.
- */
+/// Tests are located in `org.jabref.logic.search.query.SearchQueryFlagsConversionTest`
 public class SearchFlagsToExpressionVisitor extends SearchBaseVisitor<String> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchFlagsToExpressionVisitor.class);

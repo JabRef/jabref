@@ -2,11 +2,9 @@ package org.jabref.model.entry;
 
 import java.text.NumberFormat;
 
-/**
- * IDs are at least 8 digit long. The lowest ID is 00000000, the next would be 00000001.
- * <p/>
- * The generator is thread safe!
- */
+/// IDs are at least 8 digit long. The lowest ID is 00000000, the next would be 00000001.
+///
+/// The generator is thread safe!
 public class IdGenerator {
 
     private static final NumberFormat ID_FORMAT;

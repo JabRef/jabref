@@ -17,11 +17,9 @@ import javafx.collections.ObservableList;
 
 import org.jabref.model.TreeNode;
 
-/**
- * Merges a list of nodes into a tree.
- * Nodes with a common parent are added as direct children.
- * For example, the list { A > A1, A > A2, B } is transformed into the forest { A > A1, A2, B}.
- */
+/// Merges a list of nodes into a tree.
+/// Nodes with a common parent are added as direct children.
+/// For example, the list { A > A1, A > A2, B } is transformed into the forest { A > A1, A2, B}.
 public class TreeCollector<T> implements Collector<T, ObservableList<T>, ObservableList<T>> {
 
     private Function<T, List<T>> getChildren;

@@ -20,7 +20,7 @@ import mslinks.ShellLinkException;
 import org.slf4j.LoggerFactory;
 
 /**
- * For GUI-specific things, see {@link org.jabref.gui.desktop.os.NativeDesktop}
+ * For GUI-specific things, see `jabref.gui.desktop.os.NativeDesktop`
  */
 public class OS {
     // No LOGGER may be initialized directly

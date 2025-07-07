@@ -9,11 +9,13 @@ import org.jabref.model.entry.field.StandardField;
 import org.jabref.testutils.category.FetcherTest;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @FetcherTest
+@Disabled("See https://github.com/JabRef/jabref/issues/12864")
 class ApsFetcherTest {
 
     private ApsFetcher finder;

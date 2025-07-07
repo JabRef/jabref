@@ -66,9 +66,24 @@ jobs:
           distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          lookup-only: true
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Run OpenRewrite
         run: |
-          ./gradlew rewriteDryRun
+          ./gradlew --no-configuration-cache :rewriteDryRun
 
   modernizer:
     name: Modernizer
@@ -102,7 +117,7 @@ jobs:
           submodules: 'false'
           show-progress: 'false'
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v19
+        uses: DavidAnson/markdownlint-cli2-action@v20
         with:
           globs: |
             *.md
@@ -117,14 +132,25 @@ jobs:
         with:
           submodules: 'false'
           show-progress: 'false'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          lookup-only: true
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
-          # Install jbang
-          curl -Ls https://sh.jbang.dev | bash -s - app setup
-          export PATH=$PATH:$HOME/.jbang/bin
-
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.9.3:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.10.0:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
@@ -166,8 +192,23 @@ jobs:
             <(git show origin/main:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)') \
             <(git show HEAD:CHANGELOG.md | clparse --format=json --separator=– - | jq '.releases[] | select(.version != null)')
 
+  javadoc:
+    name: JavaDoc
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew javadoc
+
   tests:
-    name: Unit tests – ${{ matrix.module }}
+    name: "Unit tests – ${{ matrix.module }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -183,6 +224,21 @@ jobs:
         with:
           java-version: 24.0.1
           distribution: 'zulu'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          lookup-only: true
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Run ${{ matrix.module }} tests
@@ -199,7 +255,33 @@ jobs:
         if: failure()
         run: scripts/after-failure.sh
 
+  tests-windows:
+    name: "Unit tests (Windows) – ${{ matrix.module }}"
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        module: [jablib]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Run ${{ matrix.module }} tests
+        run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
+        env:
+          CI: "true"
+
   databasetests:
+    if: (github.repository_owner == 'JabRef')
     name: Database tests
     runs-on: ubuntu-latest
     services:
@@ -233,6 +315,42 @@ jobs:
         env:
           CI: "true"
           DBMS: "postgresql"
+
+  jbang:
+    name: JBang
+    runs-on: ubuntu-latest
+    # JBang scripts depend on main-SNAPSHOT; thus, we can only test fully when main is updated
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          lookup-only: true
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
+      - run: jbang build .jbang/CheckoutPR.java
+      - run: jbang build .jbang/CloneJabRef.java
+      - run: jbang build --fresh .jbang/JabKitLauncher.java
+      - run: jbang build --fresh .jbang/JabSrvLauncher.java
 
   codecoverage:
     if: false
@@ -362,7 +480,8 @@ jobs:
 
   checklist-checked:
     if: >
-      github.event_name == 'pull_request' && !(
+      (github.repository_owner != 'JabRef') &&
+      (github.event_name == 'pull_request') && !(
         (github.actor == 'dependabot[bot]') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
@@ -450,33 +569,23 @@ jobs:
 
   unmodified_submodules:
     name: Submodules not modified
-    if: false && (github.actor != 'dependabot[bot]' && github.event_name == 'pull_request')
+    if: (github.actor != 'dependabot[bot]' && github.event_name == 'pull_request')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
+      - name: Get all submodule changes
+        id: changes
+        uses: tj-actions/changed-files@v46
         with:
-          submodules: true
-          show-progress: 'false'
-      - name: Check for submodule modifications
-        id: check_submodule
+          files: |
+            jablib/src/main/abbrv.jabref.org
+            jablib/src/main/resources/csl-styles
+            jablib/src/main/resources/csl-locales
+      - name: Submodules modified
+        if: steps.changes.outputs.any_changed == 'true'
         run: |
-          git fetch origin ${{ github.base_ref }}
-
-          # enable diffing of submodules
-          sed -i "s/ all/ untracked/" .gitmodules
-
-          if git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -Eq "^Submodule .* contains modified content$"; then
-            echo "Debug:"
-            echo "Command: git diff --submodule=log origin/${{ github.base_ref }} HEAD"
-            echo "Result:"
-            git diff --submodule=log origin/${{ github.base_ref }} HEAD
-            echo "--end--"
-            echo "Grep result"
-            git diff --submodule=log origin/${{ github.base_ref }} HEAD | grep -E "^Submodule .* contains modified content$"
-            echo "❌ Submodule modifications detected"
-            exit 1
-          fi
-          echo "✅ No submodule modifications"
+          echo "❌ Submodule modifications detected"
+          exit 1
 
   other_than_main:
     if: github.event_name == 'pull_request'

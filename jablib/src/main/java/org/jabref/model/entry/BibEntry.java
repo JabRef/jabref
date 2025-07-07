@@ -55,45 +55,35 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
- * <p>
- * Example:
- *
- * <pre>{@code
- * Some commment
- * @misc{key,
- *   fieldName = {fieldValue},
- *   otherFieldName = {otherFieldValue}
- * }
- * }</pre>
- * <p>
- * Then,
- *     <ul>
- *         <li>"Some comment" is the comment before the entry,</li>
- *         <li>"misc" is the entry type</li>
- *         <li>"key" the citation key</li>
- *         <li>"fieldName" and "otherFieldName" the fields of the BibEntry</li>
- *     </ul>
- * A BibTeX entry has following properties:
- * <ul>
- *     <li>comments before entry</li>
- *     <li>entry type</li>
- *     <li>citation key</li>
- *     <li>fields</li>
- * </ul>
- * In JabRef, this is modeled the following way:
- * <ul>
- *     <li>comments before entry --&gt; {@link BibEntry#commentsBeforeEntry}</li>
- *     <li>entry type --&gt; {@link BibEntry#type}</li>
- *     <li>citation key --&gt; contained in {@link BibEntry#fields} using they hashmap key {@link InternalField#KEY_FIELD}</li>
- *     <li>fields --&gt; contained in {@link BibEntry#fields}</li>
- * </ul>
- * </p>
- * <p>
- * In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods {@link #withCitationKey(String)} and {@link #withField(Field, String)}. All these methods set {@link #hasChanged()} to <code>false</code>. In case <code>changed</code>, use {@link #withChanged(boolean)}.
- * </p>
- */
+/// Represents a Bib(La)TeX entry, which can be BibTeX or BibLaTeX.
+///
+/// Example:
+///
+///     Some commment={fieldValue},otherFieldName ={otherFieldValue}
+///
+/// Then,
+///
+/// - "Some comment" is the comment before the entry,
+/// - "misc" is the entry type
+/// - "key" the citation key
+/// - "fieldName" and "otherFieldName" the fields of the BibEntry
+///
+/// A BibTeX entry has following properties:
+///
+/// - comments before entry
+/// - entry type
+/// - citation key
+/// - fields
+///
+/// In JabRef, this is modeled the following way:
+///
+/// - comments before entry --&gt; [#commentsBeforeEntry]
+/// - entry type --&gt; [#type]
+/// - citation key --&gt; contained in [#fields] using they hashmap key `KEY_FIELD`
+/// - fields --&gt; contained in [#fields]
+///
+/// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
+///
 @AllowedToUseLogic("because it needs access to parser and writers")
 public class BibEntry implements Cloneable {
 
@@ -194,7 +184,7 @@ public class BibEntry implements Cloneable {
      * @return the mapped field or null if there is no valid mapping available
      */
     private Optional<Field> getSourceField(Field targetField, EntryType targetEntry, EntryType sourceEntry) {
-        //// 1. Sort out forbidden fields
+        // 1. Sort out forbidden fields
         if ((targetField == StandardField.IDS) ||
                 (targetField == StandardField.CROSSREF) ||
                 (targetField == StandardField.XREF) ||
@@ -204,7 +194,7 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        //// 2. Handle special field mappings
+        // 2. Handle special field mappings
         if (((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.InBook)) ||
                 ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.BookInBook)) ||
                 ((sourceEntry == StandardEntryType.MvBook) && (targetEntry == StandardEntryType.SuppBook)) ||
@@ -304,7 +294,7 @@ public class BibEntry implements Cloneable {
             }
         }
 
-        //// 3. Fallback to inherit the field with the same name.
+        // 3. Fallback to inherit the field with the same name.
         return Optional.ofNullable(targetField);
     }
 
@@ -359,11 +349,12 @@ public class BibEntry implements Cloneable {
                 Optional.of(database.resolveForStrings(result.get()));
     }
 
-    /**
-     * Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
-     * <p>
-     * It is <em>not</em> the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
-     */
+    /// Returns this entry's ID. It is used internally to distinguish different BibTeX entries.
+    //  It is **not** the citation key (which is stored in the {@link InternalField#KEY_FIELD} and also known as BibTeX key).
+    ///
+    /// This id changes on each run of JabRef (because it is currently generated as increasing number).
+    ///
+    /// For more stable ids, check {@link org.jabref.model.entry.SharedBibEntryData#getSharedID}
     public String getId() {
         return id;
     }
@@ -561,30 +552,28 @@ public class BibEntry implements Cloneable {
         return Optional.empty();
     }
 
-    /**
-     * Returns the contents of the given field or its alias as an Optional
-     * <p>
-     * The following aliases are considered (old bibtex <-> new biblatex) based
-     * on the biblatex documentation, chapter 2.2.5:<br>
-     * address        <-> location <br>
-     * annote         <-> annotation <br>
-     * archiveprefix  <-> eprinttype <br>
-     * journal        <-> journaltitle <br>
-     * key            <-> sortkey <br>
-     * pdf            <-> file <br>
-     * primaryclass   <-> eprintclass <br>
-     * school         <-> institution <br>
-     * These work bidirectional. <br>
-     * </p>
-     *
-     * <p>
-     * Special attention is paid to dates: (see the biblatex documentation,
-     * chapter 2.3.8)
-     * The fields 'year' and 'month' are used if the 'date'
-     * field is empty. Conversely, getFieldOrAlias("year") also tries to
-     * extract the year from the 'date' field (analogously for 'month').
-     * </p>
-     */
+    /// Returns the contents of the given field or its alias as an Optional
+    ///
+    /// The following aliases are considered (old bibtex <-> new biblatex) based
+    /// on the biblatex documentation, chapter 2.2.5:
+    ///
+    /// - address        <-> location
+    /// - annote         <-> annotation
+    /// - archiveprefix  <-> eprinttype
+    /// - journal        <-> journaltitle
+    /// - key            <-> sortkey
+    /// - pdf            <-> file
+    /// - primaryclass   <-> eprintclass
+    /// - school         <-> institution
+    ///
+    /// These work bidirectional.
+    ///
+    /// Special attention is paid to dates: (see the biblatex documentation,
+    /// chapter 2.3.8)
+    /// The fields 'year' and 'month' are used if the 'date'
+    /// field is empty. Conversely, getFieldOrAlias("year") also tries to
+    /// extract the year from the 'date' field (analogously for 'month').
+    ///
     public Optional<String> getFieldOrAlias(Field field) {
         return genericGetFieldOrAlias(field, BibEntry::getField);
     }
@@ -718,16 +707,20 @@ public class BibEntry implements Cloneable {
         return clone;
     }
 
-    /**
-     * This returns a canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
-     * as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
-     * used, it is output as "field = {#value#}", which may cause headaches in debugging. We nevertheless do it this way
-     * to a) enable debugging the internal representation and b) save time at this method.
-     * <p>
-     * Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
-     * <p>
-     * Alternative for some more readable output: {@link #getAuthorTitleYear(int)}
-     */
+    /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
+    ///
+    /// We do it this way to
+    ///   a) enable debugging the internal representation and
+    ///   b) save time at this method.
+    ///
+    ///
+    /// This returns canonical BibTeX serialization. Special characters such as "{" or "&" are NOT escaped, but written
+    /// as is. In case the JabRef "hack" for distinguishing "field = value" and "field = {value}" (in .bib files) is
+    /// used, it is output as "field = {#value#}", which may cause headaches in debugging.
+    ///
+    /// Alternative for some more readable output: [#getAuthorTitleYear(int)] or [#getKeyAuthorTitleYear(int)].
+    ///
+    /// @return A user-readable string NOT A VALID BibTeX string
     @Override
     public String toString() {
         return CanonicalBibEntry.getCanonicalRepresentation(this);
@@ -735,6 +728,10 @@ public class BibEntry implements Cloneable {
 
     public String getAuthorTitleYear() {
         return getAuthorTitleYear(0);
+    }
+
+    public String getKeyAuthorTitleYear() {
+        return getKeyAuthorTitleYear(0);
     }
 
     /**
@@ -748,14 +745,28 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[]{getField(StandardField.AUTHOR).orElse("N/A"), getField(StandardField.TITLE).orElse("N/A"),
-                getField(StandardField.YEAR).orElse("N/A")};
+        String authorField = getField(StandardField.AUTHOR).orElse("N/A");
+        String titleField = getField(StandardField.TITLE).orElse("N/A");
+        String yearField = getField(StandardField.YEAR).orElse("N/A");
 
-        String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
-        if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
-            return text;
-        }
-        return text.substring(0, maxCharacters + 1) + "...";
+        String formattedAuthors = AuthorList.fixAuthorLastNameOnlyCommas(authorField, false);
+        String formattedTitle = LatexToUnicodeAdapter.format(titleField);
+
+        StringBuilder textBuilder = new StringBuilder();
+        textBuilder.append(formattedAuthors)
+                .append(": \"")
+                .append(formattedTitle)
+                .append("\" (")
+                .append(yearField)
+                .append(')');
+
+        return StringUtil.limitStringLength(textBuilder.toString(), maxCharacters);
+    }
+
+    public String getKeyAuthorTitleYear(int maxCharacters) {
+        String citationKey = getCitationKey().orElse("N/A");
+        String result = citationKey + " - " + getAuthorTitleYear(0);
+        return StringUtil.limitStringLength(result, maxCharacters);
     }
 
     /**

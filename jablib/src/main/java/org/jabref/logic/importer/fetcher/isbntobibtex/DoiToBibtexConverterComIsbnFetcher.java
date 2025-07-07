@@ -73,7 +73,7 @@ public class DoiToBibtexConverterComIsbnFetcher extends AbstractIsbnFetcher {
     private BibEntry jsonItemToBibEntry(JSONObject item) throws ParseException {
         try {
             JSONArray data = item.optJSONArray("data");
-            var type = getElementFromJSONArrayByKey(data, "type");
+            String type = getElementFromJSONArrayByKey(data, "type");
 
             BibEntry entry = new BibEntry(evaluateBibEntryTypeFromString(type));
             entry.setField(StandardField.AUTHOR, getElementFromJSONArrayByKey(data, "author"));

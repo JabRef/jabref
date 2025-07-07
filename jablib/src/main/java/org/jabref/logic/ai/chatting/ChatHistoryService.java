@@ -17,7 +17,6 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.InternalField;
-import org.jabref.model.groups.AbstractGroup;
 import org.jabref.model.groups.GroupTreeNode;
 
 import com.google.common.eventbus.Subscribe;
@@ -25,28 +24,26 @@ import dev.langchain4j.data.message.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Main class for getting and storing chat history for entries and groups.
- * Use this class <s>in logic and</s> UI.
- * It currently resides in the UI package because it relies on the {@link org.jabref.gui.StateManager} to get the open databases and to find the correct {@link BibDatabaseContext} based on an entry.
- * <p>
- * The returned chat history is a {@link ObservableList}. So chat history exists for every possible
- * {@link BibEntry} and {@link AbstractGroup}. The chat history is stored in runtime.
- * <p>
- * To save and load chat history, {@link BibEntry} and {@link AbstractGroup} must satisfy several constraints.
- * Serialization and deserialization is handled in {@link ChatHistoryStorage}.
- * <p>
- * Constraints for serialization and deserialization of a chat history of a {@link BibEntry}:
- * 1. There should exist an associated {@link BibDatabaseContext} for the {@link BibEntry}.
- * 2. The database path of the associated {@link BibDatabaseContext} must be set.
- * 3. The citation key of the {@link BibEntry} must be set and unique.
- * <p>
- * Constraints for serialization and deserialization of a chat history of an {@link GroupTreeNode}:
- * 1. There should exist an associated {@link BibDatabaseContext} for the {@link GroupTreeNode}.
- * 2. The database path of the associated {@link BibDatabaseContext} must be set.
- * 3. The name of an {@link GroupTreeNode} must be set and unique (this requirement is possibly already satisfied in
- *    JabRef, but for {@link BibEntry} it is definitely not).
- */
+/// Main class for getting and storing chat history for entries and groups.
+/// Use this class <s>in logic and</s> UI.
+/// It currently resides in the UI package because it relies on the `org.jabref.gui.StateManager` to get the open databases and to find the correct [BibDatabaseContext] based on an entry.
+///
+/// The returned chat history is a [ObservableList]. So chat history exists for every possible
+/// [BibEntry] and [org.jabref.model.groups.AbstractGroup]. The chat history is stored in runtime.
+///
+/// To save and load chat history, [BibEntry] and [org.jabref.model.groups.AbstractGroup] must satisfy several constraints.
+/// Serialization and deserialization is handled in [ChatHistoryStorage].
+///
+/// Constraints for serialization and deserialization of a chat history of a [BibEntry]:
+/// 1. There should exist an associated [BibDatabaseContext] for the [BibEntry].
+/// 2. The database path of the associated [BibDatabaseContext] must be set.
+/// 3. The citation key of the [BibEntry] must be set and unique.
+///
+/// Constraints for serialization and deserialization of a chat history of an [GroupTreeNode]:
+/// 1. There should exist an associated [BibDatabaseContext] for the [GroupTreeNode].
+/// 2. The database path of the associated [BibDatabaseContext] must be set.
+/// 3. The name of an [GroupTreeNode] must be set and unique (this requirement is possibly already satisfied in
+///    JabRef, but for [BibEntry] it is definitely not).
 public class ChatHistoryService implements AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChatHistoryService.class);
 

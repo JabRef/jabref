@@ -3,7 +3,6 @@ package org.jabref.logic.importer.fetcher;
 import java.util.List;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.model.entry.BibEntry;
@@ -16,17 +15,15 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 @FetcherTest
 class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchFetcherTest {
 
-    ImporterPreferences importerPreferences = mock(ImporterPreferences.class);
     LOBIDFetcher fetcher;
 
     @BeforeEach
     void setUp() {
-        fetcher = new LOBIDFetcher(importerPreferences);
+        fetcher = new LOBIDFetcher();
     }
 
     @Override
@@ -91,6 +88,12 @@ class LOBIDFetcherTest implements SearchBasedFetcherCapabilityTest, PagedSearchF
     @Override
     @Disabled("Results returned contain a few incorrect years. The majority are accurate")
     public void supportsYearSearch() {
+    }
+
+    @Test
+    @Override
+    @Disabled("Results returned contain a few incorrect years. The majority are accurate")
+    public void supportsYearRangeSearch() {
     }
 
     @Override

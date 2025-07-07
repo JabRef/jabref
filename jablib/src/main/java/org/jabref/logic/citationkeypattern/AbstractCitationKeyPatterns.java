@@ -8,10 +8,8 @@ import java.util.stream.Collectors;
 
 import org.jabref.model.entry.types.EntryType;
 
-/**
- * A small table, where an entry type is associated with a Bibtex key pattern (an
- * <code>ArrayList</code>). A parent CitationKeyPattern can be set.
- */
+/// A small table, where an entry type is associated with a citation key pattern.
+/// A parent CitationKeyPattern can be set.
 public abstract class AbstractCitationKeyPatterns {
 
     protected CitationKeyPattern defaultPattern = CitationKeyPattern.NULL_CITATION_KEY_PATTERN;

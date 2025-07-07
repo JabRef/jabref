@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jabref.support.DisabledOnCIServerWindows;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // Need to run on JavaFX thread since we are parsing FXML files
 @ExtendWith(ApplicationExtension.class)
+@DisabledOnCIServerWindows("Needs DISPLAY variable to be set")
 class LocalizationConsistencyTest {
 
     @Test

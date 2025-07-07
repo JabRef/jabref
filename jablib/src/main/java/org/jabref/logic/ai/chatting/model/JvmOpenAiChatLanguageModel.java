@@ -10,9 +10,9 @@ import dev.langchain4j.data.message.ChatMessage;
 import dev.langchain4j.data.message.SystemMessage;
 import dev.langchain4j.data.message.ToolExecutionResultMessage;
 import dev.langchain4j.data.message.UserMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.response.ChatResponse;
 import dev.langchain4j.model.output.FinishReason;
-import dev.langchain4j.model.output.Response;
 import dev.langchain4j.model.output.TokenUsage;
 import io.github.stefanbratanov.jvm.openai.ChatClient;
 import io.github.stefanbratanov.jvm.openai.ChatCompletion;
@@ -22,7 +22,7 @@ import io.github.stefanbratanov.jvm.openai.Usage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
+public class JvmOpenAiChatLanguageModel implements ChatModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(JvmOpenAiChatLanguageModel.class);
 
     private final AiPreferences aiPreferences;
@@ -42,16 +42,21 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
     }
 
     @Override
-    public Response<AiMessage> generate(List<ChatMessage> list) {
+    public ChatResponse chat(List<ChatMessage> list) {
         LOGGER.debug("Generating response from jvm-openai chat model with {} messages: {}", list.size(), list);
 
         List<io.github.stefanbratanov.jvm.openai.ChatMessage> messages =
                 list.stream().map(chatMessage -> (io.github.stefanbratanov.jvm.openai.ChatMessage) switch (chatMessage) {
-                    case AiMessage aiMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.assistantMessage(aiMessage.text());
-                    case SystemMessage systemMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.systemMessage(systemMessage.text());
-                    case ToolExecutionResultMessage toolExecutionResultMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.toolMessage(toolExecutionResultMessage.text(), toolExecutionResultMessage.id());
-                    case UserMessage userMessage -> io.github.stefanbratanov.jvm.openai.ChatMessage.userMessage(userMessage.singleText());
-                    default -> throw new IllegalStateException("unknown conversion of chat message from langchain4j to jvm-openai");
+                    case AiMessage aiMessage ->
+                            io.github.stefanbratanov.jvm.openai.ChatMessage.assistantMessage(aiMessage.text());
+                    case SystemMessage systemMessage ->
+                            io.github.stefanbratanov.jvm.openai.ChatMessage.systemMessage(systemMessage.text());
+                    case ToolExecutionResultMessage toolExecutionResultMessage ->
+                            io.github.stefanbratanov.jvm.openai.ChatMessage.toolMessage(toolExecutionResultMessage.text(), toolExecutionResultMessage.id());
+                    case UserMessage userMessage ->
+                            io.github.stefanbratanov.jvm.openai.ChatMessage.userMessage(userMessage.singleText());
+                    default ->
+                            throw new IllegalStateException("unknown conversion of chat message from langchain4j to jvm-openai");
                 }).toList();
 
         CreateChatCompletionRequest request = CreateChatCompletionRequest
@@ -79,6 +84,8 @@ public class JvmOpenAiChatLanguageModel implements ChatLanguageModel {
 
         ChatCompletion.Choice choice = choices.getFirst();
 
-        return new Response<>(new AiMessage(choice.message().content()), new TokenUsage(usage.promptTokens(), usage.completionTokens()), FinishReason.OTHER);
+        return new ChatResponse.Builder().aiMessage(new AiMessage(choice.message().content()))
+                                         .tokenUsage(new TokenUsage(usage.promptTokens(), usage.completionTokens()))
+                                         .finishReason(FinishReason.OTHER).build();
     }
 }

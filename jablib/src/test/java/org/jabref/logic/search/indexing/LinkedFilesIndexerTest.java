@@ -16,6 +16,7 @@ import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.types.StandardEntryType;
 
 import org.apache.lucene.index.IndexReader;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -44,11 +45,16 @@ public class LinkedFilesIndexerTest {
         this.indexer = new DefaultLinkedFilesIndexer(context, filePreferences);
     }
 
+    @AfterEach
+    void tearDown() {
+        this.indexer.closeAndWait();
+    }
+
     @Test
     void exampleThesisIndex() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
+                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -63,8 +69,8 @@ public class LinkedFilesIndexerTest {
     @Test
     void dontIndexNonPdf() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
+                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.AUX.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -79,8 +85,8 @@ public class LinkedFilesIndexerTest {
     @Test
     void dontIndexOnlineLinks() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setFiles(List.of(new LinkedFile("Example Thesis", "https://raw.githubusercontent.com/JabRef/jabref/main/src/test/resources/pdfs/thesis-example.pdf", StandardFileType.PDF.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
+                .withFiles(List.of(new LinkedFile("Example Thesis", "https://raw.githubusercontent.com/JabRef/jabref/main/src/test/resources/pdfs/thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -95,9 +101,9 @@ public class LinkedFilesIndexerTest {
     @Test
     void exampleThesisIndexWithKey() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setCitationKey("Example2017");
-        entry.setFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
+                .withCitationKey("Example2017")
+                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -112,8 +118,8 @@ public class LinkedFilesIndexerTest {
     @Test
     void metaDataIndex() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.Article);
-        entry.setFiles(List.of(new LinkedFile("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.Article)
+                .withFiles(List.of(new LinkedFile("Example Thesis", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
@@ -128,9 +134,9 @@ public class LinkedFilesIndexerTest {
     @Test
     void exampleThesisIndexAppendMetaData() throws IOException {
         // given
-        BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis);
-        exampleThesis.setCitationKey("ExampleThesis2017");
-        exampleThesis.setFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+        BibEntry exampleThesis = new BibEntry(StandardEntryType.PhdThesis)
+                .withCitationKey("ExampleThesis2017")
+                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(exampleThesis), mock(BackgroundTask.class));
@@ -141,9 +147,9 @@ public class LinkedFilesIndexerTest {
             assertEquals(33, reader.numDocs());
         }
 
-        BibEntry metadata = new BibEntry(StandardEntryType.Article);
-        metadata.setCitationKey("MetaData2017");
-        metadata.setFiles(List.of(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
+        BibEntry metadata = new BibEntry(StandardEntryType.Article)
+                .withCitationKey("MetaData2017")
+                .withFiles(List.of(new LinkedFile("Metadata file", "metaData.pdf", StandardFileType.PDF.getName())));
 
         // when
         indexer.addToIndex(List.of(metadata), mock(BackgroundTask.class));
@@ -158,9 +164,9 @@ public class LinkedFilesIndexerTest {
     @Test
     public void flushIndex() throws IOException {
         // given
-        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis);
-        entry.setCitationKey("Example2017");
-        entry.setFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
+        BibEntry entry = new BibEntry(StandardEntryType.PhdThesis)
+                .withCitationKey("Example2017")
+                .withFiles(List.of(new LinkedFile("Example Thesis", "thesis-example.pdf", StandardFileType.PDF.getName())));
 
         indexer.addToIndex(List.of(entry), mock(BackgroundTask.class));
 

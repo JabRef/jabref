@@ -2,14 +2,9 @@ package org.jabref.logic.layout.format;
 
 import org.jabref.logic.layout.LayoutFormatter;
 
-/**
- * Remove brackets formatter.
- *
- * <h4>Example</h4>
- * <pre>{@code
- *     "{Stefan Kolb}" -> "Stefan Kolb"
- * }</pre>
- */
+/// Remove brackets formatter.
+///
+/// Example: `"{Stefan Kolb}" -> "Stefan Kolb"`
 public class RemoveBrackets implements LayoutFormatter {
     @Override
     public String format(String fieldText) {

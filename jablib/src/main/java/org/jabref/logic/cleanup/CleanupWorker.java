@@ -11,8 +11,12 @@ import org.jabref.model.FieldChange;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CleanupWorker {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CleanupWorker.class);
     private final BibDatabaseContext databaseContext;
     private final FilePreferences filePreferences;
     private final TimestampPreferences timestampPreferences;
@@ -44,8 +48,9 @@ public class CleanupWorker {
     private List<CleanupJob> determineCleanupActions(CleanupPreferences preset) {
         List<CleanupJob> jobs = new ArrayList<>();
 
+        // Add active jobs from preset panel
         for (CleanupPreferences.CleanupStep action : preset.getActiveJobs()) {
-            jobs.add(toJob(action));
+                jobs.add(toJob(action));
         }
 
         if (preset.getFieldFormatterCleanups().isEnabled()) {

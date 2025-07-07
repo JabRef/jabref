@@ -16,19 +16,16 @@ public class CanonicalBibEntry {
     private CanonicalBibEntry() {
     }
 
-    /**
-     * This returns a canonical BibTeX serialization.
-     * The result is close to BibTeX, but not a valid BibTeX representation in all cases
-     *
-     * <ul>
-     *     <li>Serializes all fields, even the JabRef internal ones.</li>
-     *     <li>Does NOT serialize "KEY_FIELD" as field, but as key.</li>
-     *     <li>Special characters such as "{" or "&" are NOT escaped, but written as is.</li>
-     *     <li>New lines are written as is.</li>
-     *     <li>String constants are not handled. That means, <code>month = apr</code> in a bib file gets <code>month = {#apr#}</code>.
-     *         This indicates that the month field is correctly stored.</li>
-     * </ul>
-     */
+    /// This returns a canonical BibTeX serialization.
+    /// The result is close to BibTeX, but not a valid BibTeX representation in all cases
+    ///
+    ///  - Serializes all fields, even the JabRef internal ones.
+    ///  - Does NOT serialize "KEY_FIELD" as field, but as key.
+    ///  - Special characters such as "{" or "&" are NOT escaped, but written as is.
+    ///  - New lines are written as is.
+    ///  - String constants are not handled. That means, `month = apr` in a bib file gets `month = {#apr#}`.
+    ///    This indicates that the month field is correctly stored.
+    ///
     public static String getCanonicalRepresentation(BibEntry entry) {
         StringBuilder sb = new StringBuilder();
 

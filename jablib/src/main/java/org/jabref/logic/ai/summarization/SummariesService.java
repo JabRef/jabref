@@ -12,7 +12,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.processingstatus.ProcessingInfo;
 import org.jabref.logic.ai.processingstatus.ProcessingState;
-import org.jabref.logic.ai.templates.TemplatesService;
+import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.ai.util.CitationKeyCheck;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -22,7 +22,7 @@ import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 
 import com.google.common.eventbus.Subscribe;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.model.chat.ChatModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,16 +44,16 @@ public class SummariesService {
 
     private final AiPreferences aiPreferences;
     private final SummariesStorage summariesStorage;
-    private final ChatLanguageModel chatLanguageModel;
-    private final TemplatesService templatesService;
+    private final ChatModel chatLanguageModel;
+    private final AiTemplatesService aiTemplatesService;
     private final BooleanProperty shutdownSignal;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
 
     public SummariesService(AiPreferences aiPreferences,
                             SummariesStorage summariesStorage,
-                            ChatLanguageModel chatLanguageModel,
-                            TemplatesService templatesService,
+                            ChatModel chatLanguageModel,
+                            AiTemplatesService aiTemplatesService,
                             BooleanProperty shutdownSignal,
                             FilePreferences filePreferences,
                             TaskExecutor taskExecutor
@@ -61,7 +61,7 @@ public class SummariesService {
         this.aiPreferences = aiPreferences;
         this.summariesStorage = summariesStorage;
         this.chatLanguageModel = chatLanguageModel;
-        this.templatesService = templatesService;
+        this.aiTemplatesService = aiTemplatesService;
         this.shutdownSignal = shutdownSignal;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
@@ -113,32 +113,30 @@ public class SummariesService {
     }
 
     public ProcessingInfo<BibEntry, Summary> getProcessingInfo(BibEntry entry) {
-        return summariesStatusMap.computeIfAbsent(entry, file -> new ProcessingInfo<>(entry, ProcessingState.STOPPED));
+        return summariesStatusMap.computeIfAbsent(entry, _ -> new ProcessingInfo<>(entry, ProcessingState.STOPPED));
     }
 
     public List<ProcessingInfo<BibEntry, Summary>> getProcessingInfo(List<BibEntry> entries) {
         return entries.stream().map(this::getProcessingInfo).toList();
     }
 
-    public List<ProcessingInfo<BibEntry, Summary>> summarize(StringProperty groupName, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
+    public void summarize(StringProperty groupName, List<BibEntry> entries, BibDatabaseContext bibDatabaseContext) {
         List<ProcessingInfo<BibEntry, Summary>> result = getProcessingInfo(entries);
 
         if (listsUnderSummarization.contains(entries)) {
-            return result;
+            return;
         }
 
         listsUnderSummarization.add(entries);
 
         List<ProcessingInfo<BibEntry, Summary>> needToProcess = result.stream().filter(processingInfo -> processingInfo.getState() == ProcessingState.STOPPED).toList();
         startSummarizationTask(groupName, needToProcess, bibDatabaseContext);
-
-        return result;
     }
 
     private void startSummarizationTask(BibEntry entry, BibDatabaseContext bibDatabaseContext, ProcessingInfo<BibEntry, Summary> processingInfo) {
         processingInfo.setState(ProcessingState.PROCESSING);
 
-        new GenerateSummaryTask(entry, bibDatabaseContext, summariesStorage, chatLanguageModel, templatesService, shutdownSignal, aiPreferences, filePreferences)
+        new GenerateSummaryTask(entry, bibDatabaseContext, summariesStorage, chatLanguageModel, aiTemplatesService, shutdownSignal, aiPreferences, filePreferences)
                 .onSuccess(processingInfo::setSuccess)
                 .onFailure(processingInfo::setException)
                 .executeWith(taskExecutor);
@@ -147,7 +145,7 @@ public class SummariesService {
     private void startSummarizationTask(StringProperty groupName, List<ProcessingInfo<BibEntry, Summary>> entries, BibDatabaseContext bibDatabaseContext) {
         entries.forEach(processingInfo -> processingInfo.setState(ProcessingState.PROCESSING));
 
-        new GenerateSummaryForSeveralTask(groupName, entries, bibDatabaseContext, summariesStorage, chatLanguageModel, templatesService, shutdownSignal, aiPreferences, filePreferences, taskExecutor)
+        new GenerateSummaryForSeveralTask(groupName, entries, bibDatabaseContext, summariesStorage, chatLanguageModel, aiTemplatesService, shutdownSignal, aiPreferences, filePreferences, taskExecutor)
                 .executeWith(taskExecutor);
     }
 

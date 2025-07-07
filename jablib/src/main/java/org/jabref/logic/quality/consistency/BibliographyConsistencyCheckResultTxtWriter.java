@@ -3,16 +3,20 @@ package org.jabref.logic.quality.consistency;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck.EntryTypeResult;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.types.EntryType;
 
 /**
  * Outputs the findings as plain text.
@@ -53,44 +57,41 @@ public class BibliographyConsistencyCheckResultTxtWriter extends BibliographyCon
         super.writeFindings();
 
         if (!isPorcelain) {
+            int widthSymbol = Localization.lang("Symbol").length();
+            int widthMeaning = Collections.max(List.of(
+                    Localization.lang("Meaning").length(),
+                    Localization.lang("required field is present").length(),
+                    Localization.lang("optional field is present").length(),
+                    Localization.lang("unknown field is present").length(),
+                    Localization.lang("field is absent").length()
+            ));
+
             writer.write("\n");
-            writer.write("%s | %s\n".formatted(REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("required field is present")));
-            writer.write("%s | %s\n".formatted(OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("optional field is present")));
-            writer.write("%s | %s\n".formatted(UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("unknown field is present")));
-            writer.write("%s | %s\n".formatted(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("field is absent")));
+            writer.write(("| %-" + widthSymbol + "s | %-" + widthMeaning + "s |\n").formatted(Localization.lang("Symbol"), Localization.lang("Meaning")));
+            writer.write(("| " + "-".repeat(widthSymbol) + " | " + "-".repeat(widthMeaning) + " |\n").formatted("--", "--"));
+            writer.write(("| %-" + widthSymbol + "s | %-" + widthMeaning + "s |\n").formatted(REQUIRED_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("required field is present")));
+            writer.write(("| %-" + widthSymbol + "s | %-" + widthMeaning + "s |\n").formatted(OPTIONAL_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("optional field is present")));
+            writer.write(("| %-" + widthSymbol + "s | %-" + widthMeaning + "s |\n").formatted(UNKNOWN_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("unknown field is present")));
+            writer.write(("| %-" + widthSymbol + "s | %-" + widthMeaning + "s |\n").formatted(UNSET_FIELD_AT_ENTRY_TYPE_CELL_ENTRY, Localization.lang("field is absent")));
         }
     }
 
     private void initializeColumnWidths() {
         columnWidths = new ArrayList<>(columnNames.size());
 
-        Integer max = getColumnWidthOfEntryTypes();
-        columnWidths.add(max);
+        int entryTypeWidth = "entry type".length();
+        int citationKeyWidth = "citation key".length();
 
-        max = getColumnWidthOfCitationKeys(max);
-        columnWidths.add(max);
+        for (Map.Entry<EntryType, EntryTypeResult> keysAndValue : result.entryTypeToResultMap().entrySet()) {
+            entryTypeWidth = Math.max(entryTypeWidth, keysAndValue.getKey().getDisplayName().length());
+            for (BibEntry entry : keysAndValue.getValue().sortedEntries()) {
+                citationKeyWidth = Math.max(citationKeyWidth, entry.getCitationKey().orElse("").length());
+            }
+        }
 
+        columnWidths.add(entryTypeWidth);
+        columnWidths.add(citationKeyWidth);
         columnWidths.addAll(columnNames.stream().skip(2).map(String::length).toList());
-    }
-
-    private Integer getColumnWidthOfEntryTypes() {
-        int max = result.entryTypeToResultMap().keySet()
-                            .stream()
-                            .map(entryType -> entryType.getDisplayName().length())
-                            .max(Integer::compareTo)
-                            .get();
-        max = Math.max(max, "entry type".length());
-        return max;
-    }
-
-    private Integer getColumnWidthOfCitationKeys(Integer max) {
-        result.entryTypeToResultMap().values()
-              .stream()
-              .flatMap(entryTypeResult -> entryTypeResult.sortedEntries().stream())
-              .map(entry -> entry.getCitationKey().orElse("").length())
-              .max(Integer::compareTo)
-              .get();
-        return Math.max(max, "citation key".length());
     }
 
     @Override

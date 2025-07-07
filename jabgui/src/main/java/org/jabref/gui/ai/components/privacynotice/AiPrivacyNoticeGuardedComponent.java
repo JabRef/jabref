@@ -4,6 +4,7 @@ import javafx.scene.Node;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.ai.components.aichat.AiChatGuardedComponent;
+import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.util.DynamicallyChangeableNode;
 import org.jabref.logic.ai.AiPreferences;
@@ -16,11 +17,13 @@ public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangea
     private final AiPreferences aiPreferences;
     private final ExternalApplicationsPreferences externalApplicationsPreferences;
     private final DialogService dialogService;
+    private final AdaptVisibleTabs adaptVisibleTabs;
 
-    public AiPrivacyNoticeGuardedComponent(AiPreferences aiPreferences, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
+    public AiPrivacyNoticeGuardedComponent(AiPreferences aiPreferences, ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService, AdaptVisibleTabs adaptVisibleTabs) {
         this.aiPreferences = aiPreferences;
         this.externalApplicationsPreferences = externalApplicationsPreferences;
         this.dialogService = dialogService;
+        this.adaptVisibleTabs = adaptVisibleTabs;
 
         aiPreferences.enableAiProperty().addListener(observable -> rebuildUi());
     }
@@ -34,7 +37,8 @@ public abstract class AiPrivacyNoticeGuardedComponent extends DynamicallyChangea
                             aiPreferences,
                             this::rebuildUi,
                             externalApplicationsPreferences,
-                            dialogService
+                            dialogService,
+                            adaptVisibleTabs
                     )
             );
         }
