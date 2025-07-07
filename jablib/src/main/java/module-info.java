@@ -107,17 +107,14 @@ open module org.jabref.jablib {
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
 
-    requires java.base;
-
-    requires javafx.base;
+  requires javafx.base;
     requires javafx.graphics; // because of javafx.scene.paint.Color
     requires afterburner.fx;
     requires com.tobiasdiez.easybind;
 
     // for java.awt.geom.Rectangle2D required by org.jabref.logic.pdf.TextExtractor
-    requires java.desktop;
 
-    // SQL
+  // SQL
     requires java.sql;
     requires java.sql.rowset;
 
@@ -249,6 +246,6 @@ open module org.jabref.jablib {
     requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires org.jetbrains.annotations;
-    // endregion
+  requires org.jetbrains.annotations;
+  // endregion
 }
