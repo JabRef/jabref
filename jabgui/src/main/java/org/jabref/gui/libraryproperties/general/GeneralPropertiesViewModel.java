@@ -98,21 +98,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
         if (librarySpecificFileDirectory.isEmpty()) {
             newMetaData.clearLibrarySpecificFileDirectory();
-        } else {
+        } else if (librarySpecificFileDirectoryStatus().isValid()) {
             newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
             newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else {
+        } else if (userSpecificFileDirectoryStatus().isValid()) {
             newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else {
+        } else if (laTexFileDirectoryStatus().isValid()) {
             newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
         }
 
@@ -231,7 +231,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
                         .map(Files::isDirectory)
                         .orElse(false)) {
                 return ValidationMessage.error(
-                        Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
+                        Localization.lang("The file directory '%0' for the %1 file path is not found or is inaccessible.", directoryPath, messageKey)
                 );
             }
         } catch (InvalidPathException ex) {
@@ -245,9 +245,12 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private boolean validateAndShowError(ValidationStatus status) {
         if (!status.isValid()) {
-            status.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
+            return status.getHighestMessage()
+                         .map(message -> dialogService.showConfirmationDialogAndWait(
+                                 "Action Required: Override Default File Directories",
+                                 message.getMessage() + "\n Would you like to save your other preferences?",
+                                 "Save", "Return to Properties"))
+                         .orElse(false);
         }
         return true;
     }
