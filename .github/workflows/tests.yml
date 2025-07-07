@@ -480,7 +480,8 @@ jobs:
 
   checklist-checked:
     if: >
-      github.event_name == 'pull_request' && !(
+      (github.repository_owner != 'JabRef') &&
+      (github.event_name == 'pull_request') && !(
         (github.actor == 'dependabot[bot]') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
