@@ -92,7 +92,7 @@ public class AutoSetFileLinksUtil {
 
     /// Scans for missing files which should be linked to the given entry.
     ///
-    /// Related:{@link org.jabref.gui.externalfiles.UnlinkedFilesCrawler} scanning files missing at all entries
+    /// Related: {@link org.jabref.gui.externalfiles.UnlinkedFilesCrawler} for scanning files missing at all entries
     ///
     /// NOTE: This method does not check if the file is already linked to another entry.
     public List<LinkedFile> findAssociatedNotLinkedFiles(BibEntry entry) throws IOException {
