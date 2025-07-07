@@ -169,7 +169,7 @@ public class BibFieldsIndexer {
             task.showToUser(true);
             task.setTitle(Localization.lang("Indexing bib fields for %0", libraryName));
         }
-        int i = 1;
+        int i = 0;
         long startTime = System.currentTimeMillis();
         LOGGER.debug("Adding {} entries to index", entries.size());
         for (BibEntry entry : entries) {
@@ -178,9 +178,8 @@ public class BibFieldsIndexer {
                 return;
             }
             addToIndex(entry);
-            task.updateProgress(i, entries.size());
+            task.updateProgress(i++, entries.size());
             task.updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, entries.size()));
-            i++;
         }
         LOGGER.debug("Added {} entries to index in {} ms", entries.size(), System.currentTimeMillis() - startTime);
     }
