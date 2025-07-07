@@ -2,6 +2,8 @@ package org.jabref.gui;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.undo.UndoManager;
 
@@ -418,53 +420,90 @@ public class JabRefGUI extends Application {
 
     @Override
     public void stop() {
-        LOGGER.trace("Closing AI service");
-        try {
-            aiService.close();
-        } catch (Exception e) {
-            LOGGER.error("Unable to close AI service", e);
+        LOGGER.trace("Stopping JabRef GUI");
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            LOGGER.trace("Stopping JabRef GUI using a virtual thread executor");
+
+            // Shutdown everything in parallel to prevent causing non-shutdown of something in case of issues
+            executor.submit(() -> {
+                LOGGER.trace("Closing citations and relations search service");
+                citationsAndRelationsSearchService.close();
+                LOGGER.trace("Citations and relations search service closed");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Closing AI service");
+                try {
+                    aiService.close();
+                } catch (Exception e) {
+                    LOGGER.error("Unable to close AI service", e);
+                }
+                LOGGER.trace("AI service closed");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Closing OpenOffice connection");
+                OOBibBaseConnect.closeOfficeConnection();
+                LOGGER.trace("OpenOffice connection closed");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down remote server manager");
+                remoteListenerServerManager.stop();
+                LOGGER.trace("RemoteListenerServerManager shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down http server manager");
+                httpServerManager.stop();
+                LOGGER.trace("HttpServerManager shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Stopping background tasks");
+                Unirest.shutDown();
+                LOGGER.trace("Unirest shut down");
+            });
+
+            // region All threading related shutdowns
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down taskExecutor");
+                if (taskExecutor != null) {
+                    taskExecutor.shutdown();
+                }
+                LOGGER.trace("TaskExecutor shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down fileUpdateMonitor");
+                fileUpdateMonitor.shutdown();
+                LOGGER.trace("FileUpdateMonitor shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down directoryMonitor");
+                DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
+                directoryMonitor.shutdown();
+                LOGGER.trace("DirectoryMonitor shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down postgreServer");
+                PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
+                postgreServer.shutdown();
+                LOGGER.trace("PostgreServer shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down HeadlessExecutorService");
+                HeadlessExecutorService.INSTANCE.shutdownEverything();
+                LOGGER.trace("HeadlessExecutorService shut down");
+            });
+            // endregion
+
+            HeadlessExecutorService.gracefullyShutdown("HeadlessExecutorService", executor, 30);
         }
-
-        LOGGER.trace("Closing OpenOffice connection");
-        OOBibBaseConnect.closeOfficeConnection();
-
-        LOGGER.trace("Shutting down remote server manager");
-        remoteListenerServerManager.stop();
-
-        LOGGER.trace("Shutting down http server manager");
-        httpServerManager.stop();
-
-        LOGGER.trace("Stopping background tasks");
-        stopBackgroundTasks();
-
-        LOGGER.trace("Shutting down thread pools");
-        shutdownThreadPools();
-
-        LOGGER.trace("Closing citations and relations search service");
-        citationsAndRelationsSearchService.close();
 
         LOGGER.trace("Finished stop");
-    }
-
-    public void stopBackgroundTasks() {
-        Unirest.shutDown();
-    }
-
-    public static void shutdownThreadPools() {
-        LOGGER.trace("Shutting down taskExecutor");
-        if (taskExecutor != null) {
-            taskExecutor.shutdown();
-        }
-        LOGGER.trace("Shutting down fileUpdateMonitor");
-        fileUpdateMonitor.shutdown();
-        LOGGER.trace("Shutting down directoryMonitor");
-        DirectoryMonitor directoryMonitor = Injector.instantiateModelOrService(DirectoryMonitor.class);
-        directoryMonitor.shutdown();
-        LOGGER.trace("Shutting down postgreServer");
-        PostgreServer postgreServer = Injector.instantiateModelOrService(PostgreServer.class);
-        postgreServer.shutdown();
-        LOGGER.trace("Shutting down HeadlessExecutorService");
-        HeadlessExecutorService.INSTANCE.shutdownEverything();
-        LOGGER.trace("Finished shutdownThreadPools");
     }
 }

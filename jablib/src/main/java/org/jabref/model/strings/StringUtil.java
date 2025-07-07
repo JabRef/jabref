@@ -569,16 +569,21 @@ public class StringUtil {
         return list;
     }
 
+    /// Limits the length of a string to a maximum length.
+    ///
+    /// Note the implementation is different from [StringUtils.substring](https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/StringUtils.html#substring%28java.lang.String,%20int,%20int%29), because it accepts parameters smaller than 4.
+    ///
+    /// @param maxLength the maximum length of the string - <= 0 means no limit
     public static String limitStringLength(String s, int maxLength) {
         if (s == null) {
             return "";
         }
 
-        if (s.length() <= maxLength) {
+        if (maxLength <= 0 || s.length() <= maxLength) {
             return s;
         }
 
-        return s.substring(0, maxLength - 3) + "...";
+        return s.substring(0, Math.max(0, maxLength - 3)) + "...";
     }
 
     /**
