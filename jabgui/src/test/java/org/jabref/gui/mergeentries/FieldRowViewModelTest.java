@@ -178,7 +178,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCanBeMerged() {
+    void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCannotBeMerged() {
         FieldRowViewModel authorField = createViewModelForField(StandardField.AUTHOR);
         assertThrows(UnsupportedOperationException.class, authorField::mergeFields);
     }

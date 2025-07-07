@@ -191,6 +191,12 @@ public class LibraryTab extends Tab {
 
         setOnCloseRequest(this::onCloseRequest);
         setOnClosed(this::onClosed);
+
+        stateManager.activeDatabaseProperty().addListener((_, _, _) -> {
+            if (preferences.getSearchPreferences().isFulltext()) {
+              mainTable.getTableModel().refreshSearchMatches();
+           }
+        });
     }
 
     private void initializeComponentsAndListeners(boolean isDummyContext) {
@@ -201,7 +207,6 @@ public class LibraryTab extends Tab {
         if (tableModel != null) {
             tableModel.unbind();
         }
-
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
         new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences);

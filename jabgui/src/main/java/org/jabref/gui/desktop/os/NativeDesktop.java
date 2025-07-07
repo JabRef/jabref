@@ -184,15 +184,12 @@ public abstract class NativeDesktop {
             return true;
         }
         Optional<Path> file = FileUtil.find(databaseContext, link, filePreferences);
-        if (file.isPresent() && Files.exists(file.get())) {
-            // Open the file:
-            String filePath = file.get().toString();
-            openExternalFilePlatformIndependent(type, filePath, externalApplicationsPreferences);
-            return true;
+        if (file.isEmpty()) {
+            return false;
         }
 
-        // No file matched the name, try to open it directly using the given app
-        openExternalFilePlatformIndependent(type, link, externalApplicationsPreferences);
+        String filePath = file.get().toString();
+        openExternalFilePlatformIndependent(type, filePath, externalApplicationsPreferences);
         return true;
     }
 

@@ -5,13 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,6 +23,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import io.github.thibaultmeyer.cuid.CUID;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ import static org.jabref.model.search.PostgreConstants.SPLIT_TABLE_SUFFIX;
 
 public class BibFieldsIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
-    private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
+
     private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
     private static final Set<Field> DATE_FIELDS = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
 
@@ -164,25 +165,25 @@ public class BibFieldsIndexer {
         addToIndex(databaseContext.getDatabase().getEntries(), task);
     }
 
-    public void addToIndex(Collection<BibEntry> entries, BackgroundTask<?> task) {
-        if (entries.size() > 1) {
+    public void addToIndex(List<BibEntry> entries, BackgroundTask<?> task) {
+        int count = entries.size();
+        if (count > 1) {
             task.showToUser(true);
             task.setTitle(Localization.lang("Indexing bib fields for %0", libraryName));
         }
-        int i = 1;
         long startTime = System.currentTimeMillis();
-        LOGGER.debug("Adding {} entries to index", entries.size());
-        for (BibEntry entry : entries) {
+        LOGGER.debug("Adding {} entries to index", count);
+        for (int i = 0; i < count; i++) {
             if (task.isCancelled()) {
                 LOGGER.debug("Indexing canceled");
                 return;
             }
+            BibEntry entry = entries.get(i);
             addToIndex(entry);
-            task.updateProgress(i, entries.size());
-            task.updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, entries.size()));
-            i++;
+            task.updateProgress(i, count);
+            task.updateMessage(Localization.lang("%0 of %1 entries added to the index.", i, count));
         }
-        LOGGER.debug("Added {} entries to index in {} ms", entries.size(), System.currentTimeMillis() - startTime);
+        LOGGER.debug("Added {} entries to index in {} ms", count, System.currentTimeMillis() - startTime);
     }
 
     private void addToIndex(BibEntry bibEntry) {
@@ -209,20 +210,21 @@ public class BibFieldsIndexer {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery);
              PreparedStatement preparedStatementSplitValues = connection.prepareStatement(insertIntoSplitTable)) {
             String entryId = bibEntry.getId();
+            LOGGER.atTrace().setMessage("Adding entry {}").addArgument(() -> bibEntry.getKeyAuthorTitleYear()).log();
             for (Map.Entry<Field, String> fieldPair : bibEntry.getFieldMap().entrySet()) {
                 Field field = fieldPair.getKey();
                 String value = fieldPair.getValue();
 
-                // If a field exists, there also exists a resolved field latex free.
-                // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
-                // To uncover these flaws, we add the "assert" statement.
-                // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
                 // Skip indexing of date-related fields separately to ensure proper handling later in the process.
                 if (!DATE_FIELDS.contains(field)) {
-                    Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-                    assert resolvedFieldLatexFree.isPresent();
-                    addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                    // If a field exists, there also exists a resolved field latex free.
+                    // Only exception: If the content of the field is empty, then the resolved field is also empty. Example: `series = {{}}`.
+                    String resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase()).orElse("");
+
+                    // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
+                    addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree);
                 }
+
                 // region Handling of known multi-value fields
                 // split and convert to Unicode
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
@@ -457,7 +459,7 @@ public class BibFieldsIndexer {
     }
 
     private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value) {
-        addBatch(preparedStatement, entryId, field, value, LATEX_TO_UNICODE_FORMATTER.format(value));
+        addBatch(preparedStatement, entryId, field, value, LatexToUnicodeAdapter.format(value));
     }
 
     /**

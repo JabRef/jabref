@@ -76,7 +76,7 @@ recipeList:
   #  - org.openrewrite.staticanalysis.ReplaceTextBlockWithString
   # Hangs
   #  - org.openrewrite.staticanalysis.ReplaceValidateNotNullHavingVarargsWithObjectsRequireNonNull
-  # We need that in OOBibStyleTest
+  # We need that in JStyleTest
   #  - org.openrewrite.staticanalysis.SimplifyConstantIfBranchExecution
 
   # We log and wrap the exceptions
