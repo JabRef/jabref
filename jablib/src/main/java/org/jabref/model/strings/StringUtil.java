@@ -571,7 +571,7 @@ public class StringUtil {
 
     /// Limits the length of a string to a maximum length.
     ///
-    /// Note the implementation is different from [StringUTils.substring](https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/StringUtils.html#substring%28java.lang.String,%20int,%20int%29), because it accepts parameters smalelr than 4.
+    /// Note the implementation is different from [StringUtils.substring](https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/StringUtils.html#substring%28java.lang.String,%20int,%20int%29), because it accepts parameters smalelr than 4.
     ///
     /// @param maxLength the maximum length of the string - <= 0 means no limit
     public static String limitStringLength(String s, int maxLength) {
