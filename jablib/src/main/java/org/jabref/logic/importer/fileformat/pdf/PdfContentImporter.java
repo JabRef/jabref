@@ -578,11 +578,11 @@ public class PdfContentImporter extends PdfImporter {
     }
 
     private @Nullable String getDoi(@Nullable String currentDoi) {
-        int pos;
-        if (currentDoi == null) {
-            return DOI.findInText(curString).map(DOI::asString).orElse(null);
+        if (currentDoi != null) {
+            return currentDoi;
         }
-        return currentDoi;
+
+        return DOI.findInText(curString).map(DOI::asString).orElse(null);
     }
 
     private String getArXivId(String arXivId) {
