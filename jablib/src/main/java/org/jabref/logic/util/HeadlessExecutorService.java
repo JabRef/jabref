@@ -29,16 +29,19 @@ public class HeadlessExecutorService implements Executor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HeadlessExecutorService.class);
 
+    private static final String EXECUTOR_NAME = "JabRef CachedThreadPool";
+    private static final String LOW_PRIORITY_EXECUTOR_NAME = "JabRef LowPriorityCachedThreadPool";
+
     private final ExecutorService executorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
-        thread.setName("JabRef CachedThreadPool");
+        thread.setName(EXECUTOR_NAME);
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
 
     private final ExecutorService lowPriorityExecutorService = Executors.newCachedThreadPool(r -> {
         Thread thread = new Thread(r);
-        thread.setName("JabRef LowPriorityCachedThreadPool");
+        thread.setName(LOW_PRIORITY_EXECUTOR_NAME);
         thread.setUncaughtExceptionHandler(new FallbackExceptionHandler());
         return thread;
     });
@@ -128,10 +131,10 @@ public class HeadlessExecutorService implements Executor {
      */
     public void shutdownEverything() {
         LOGGER.trace("Gracefully shut down executor service");
-        gracefullyShutdown("executorService", this.executorService, 15);
+        gracefullyShutdown(EXECUTOR_NAME, this.executorService, 15);
 
         LOGGER.trace("Gracefully shut down low priority executor service");
-        gracefullyShutdown("lowPriorityExecutorService", this.lowPriorityExecutorService, 15);
+        gracefullyShutdown(LOW_PRIORITY_EXECUTOR_NAME, this.lowPriorityExecutorService, 15);
 
         LOGGER.trace("Canceling timer");
         timer.cancel();
