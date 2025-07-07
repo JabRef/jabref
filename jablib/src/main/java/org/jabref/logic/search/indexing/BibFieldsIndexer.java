@@ -209,6 +209,7 @@ public class BibFieldsIndexer {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery);
              PreparedStatement preparedStatementSplitValues = connection.prepareStatement(insertIntoSplitTable)) {
             String entryId = bibEntry.getId();
+            LOGGER.atTrace().setMessage("Adding entry {}").addArgument(() -> bibEntry.getKeyAuthorTitleYear());
             for (Map.Entry<Field, String> fieldPair : bibEntry.getFieldMap().entrySet()) {
                 Field field = fieldPair.getKey();
                 String value = fieldPair.getValue();
