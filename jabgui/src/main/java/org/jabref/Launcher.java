@@ -150,14 +150,6 @@ public class Launcher {
     private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         LOGGER.trace("Checking for remote handling...");
 
-        // Check if --help is in the arguments
-        boolean helpRequested = Arrays.stream(args).anyMatch(arg -> arg.equals("--help") || arg.equals("-h") || arg.equals("?"));
-        if (helpRequested) {
-            // If help is requested, we want to process it locally, not send it to the running instance
-            LOGGER.debug("Help requested, processing locally");
-            return MultipleInstanceAction.CONTINUE;
-        }
-
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
