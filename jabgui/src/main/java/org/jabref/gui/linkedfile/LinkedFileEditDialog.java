@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.application.Platform;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
@@ -86,6 +87,8 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         link.textProperty().bindBidirectional(viewModel.linkProperty());
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
         sourceUrl.textProperty().bindBidirectional(viewModel.sourceUrlProperty());
+
+        Platform.runLater(() -> link.requestFocus());
     }
 
     @FXML
