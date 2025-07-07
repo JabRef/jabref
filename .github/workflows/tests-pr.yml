@@ -175,6 +175,7 @@ jobs:
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
+    if: (github.actor != 'dependabot[bot]') && (github.repository_owner != 'JabRef')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
