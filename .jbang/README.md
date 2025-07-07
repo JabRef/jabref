@@ -14,7 +14,7 @@ Three use cases:
 By using [gg.cmd](https://github.com/eirikb/gg#ggcmd) you can "just run" JabKit with minimal setup:
 
 1. Download `gg.cmd` from: <https://github.com/eirikb/gg#ggcmd>. `gg.cmd` is a "binary" running on macOS, Linux, and Windows. No need for different binaries on different operating systems.
-2. Run `gg.cmd`. This will download and use [jbang](https://www.jbang.dev/) as wrapper around running JabKit:
+2. Run `gg.cmd`. This will download and use JBang as wrapper around running JabKit:
 
     - Linux/macOS: Run `sh ./gg.cmd jbang jabkit@jabref --help`.
     - Windows: Run `gg.cmd jbang jabkit@jabref --help`.
