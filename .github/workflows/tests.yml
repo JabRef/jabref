@@ -135,7 +135,7 @@ jobs:
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.9.3:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.10.0:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
