@@ -22,25 +22,28 @@ public class HttpServerManager implements AutoCloseable {
     private HttpServerThread httpServerThread;
 
     public synchronized void start(ObservableList<BibDatabaseContext> contextsToServe, URI uri) {
-        if (!isStarted()) {
-            httpServerThread = new HttpServerThread(contextsToServe, uri);
-            httpServerThread.start();
+        if (httpServerThread != null) {
+            LOGGER.warn("HTTP server manager already started, cannot start again.");
+            return;
         }
+
+        httpServerThread = new HttpServerThread(contextsToServe, uri);
+        // This enqueues the thread to run in the background
+        // The JVM will take care of running it at some point in time in the future
+        // Thus, we cannot check directly if it really runs
+        httpServerThread.start();
+        LOGGER.debug("Triggered HTTP server start up.");
     }
 
     public synchronized void stop() {
         LOGGER.debug("Stopping HTTP server manager...");
-        if (isStarted()) {
+        if (httpServerThread != null) {
             httpServerThread.interrupt();
             httpServerThread = null;
-            LOGGER.debug("HTTP server manager stopped successfully.");
+            LOGGER.debug("HTTP server stopped successfully.");
         } else {
-            LOGGER.debug("HTTP server manager is not started, nothing to stop.");
+            LOGGER.debug("HTTP server is not started, nothing to stop.");
         }
-    }
-
-    private boolean isStarted() {
-        return httpServerThread != null;
     }
 
     @Override
