@@ -26,6 +26,11 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
+          show-progress: 'false'
       - name: Check PR title
         run: |
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
