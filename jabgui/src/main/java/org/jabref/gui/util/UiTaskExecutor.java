@@ -152,7 +152,7 @@ public class UiTaskExecutor implements TaskExecutor {
         }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
-        throttlers.forEach((throttler, aVoid) -> throttler.shutdown());
+        throttlers.forEach((throttler, _) -> throttler.shutdown());
     }
 
     @Override

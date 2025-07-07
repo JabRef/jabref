@@ -502,9 +502,7 @@ public class JabRefGUI extends Application {
             });
             // endregion
 
-            executor.awaitTermination(60, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            LOGGER.error("Error while shutdowwn", e);
+            HeadlessExecutorService.gracefullyShutdown("HeadlessExecutorService", executor, 30);
         }
 
         LOGGER.trace("Finished stop");
