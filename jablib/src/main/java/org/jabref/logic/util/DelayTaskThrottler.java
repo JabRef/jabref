@@ -80,6 +80,7 @@ public class DelayTaskThrottler {
      * Shuts everything down. Upon termination, this method returns.
      */
     public void shutdown() {
-        HeadlessExecutorService.gracefullyShutdown(executor);
+        LOGGER.trace("Gracefully shutting down DelayTaskThrottler");
+        HeadlessExecutorService.gracefullyShutdown("ScheduledThreadPoolExecutor of DelayTaskThrottler", executor, 15);
     }
 }

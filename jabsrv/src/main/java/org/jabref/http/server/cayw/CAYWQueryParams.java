@@ -38,6 +38,9 @@ public class CAYWQueryParams {
     @QueryParam("librarypath")
     private String libraryPath;
 
+    @QueryParam("libraryid")
+    private String libraryId;
+
     public String getCommand() {
         return command;
     }
@@ -72,5 +75,9 @@ public class CAYWQueryParams {
 
     public Optional<String> getLibraryPath() {
         return Optional.ofNullable(libraryPath);
+    }
+
+    public Optional<String> getLibraryId() {
+        return Optional.ofNullable(libraryId);
     }
 }

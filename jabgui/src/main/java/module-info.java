@@ -1,6 +1,8 @@
 open module org.jabref {
     requires org.jabref.jablib;
 
+    requires org.jabref.jabsrv;
+
     // Swing
     requires java.desktop;
 
@@ -127,10 +129,10 @@ open module org.jabref {
     // requires org.apache.xmpbox;
     // requires com.ibm.icu;
 
-    // requires flexmark;
+    requires com.vladsch.flexmark;
     requires com.vladsch.flexmark.html2md.converter;
-    // requires flexmark.util.ast;
-    // requires flexmark.util.data;
+    requires com.vladsch.flexmark.util.ast;
+    requires com.vladsch.flexmark.util.data;
 
     // requires com.h2database.mvstore;
 
