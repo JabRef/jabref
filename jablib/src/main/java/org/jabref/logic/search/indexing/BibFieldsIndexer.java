@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,6 +22,7 @@ import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldProperty;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.search.PostgreConstants;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import io.github.thibaultmeyer.cuid.CUID;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ import static org.jabref.model.search.PostgreConstants.SPLIT_TABLE_SUFFIX;
 
 public class BibFieldsIndexer {
     private static final Logger LOGGER = LoggerFactory.getLogger(BibFieldsIndexer.class);
-    private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
+
     private static final Pattern GROUPS_SEPARATOR_REGEX = Pattern.compile("\s*,\s*");
     private static final Set<Field> DATE_FIELDS = Set.of(StandardField.DATE, StandardField.YEAR, StandardField.MONTH, StandardField.DAY);
 
@@ -458,7 +458,7 @@ public class BibFieldsIndexer {
     }
 
     private static void addBatch(PreparedStatement preparedStatement, String entryId, Field field, String value) {
-        addBatch(preparedStatement, entryId, field, value, LATEX_TO_UNICODE_FORMATTER.format(value));
+        addBatch(preparedStatement, entryId, field, value, LatexToUnicodeAdapter.format(value));
     }
 
     /**
