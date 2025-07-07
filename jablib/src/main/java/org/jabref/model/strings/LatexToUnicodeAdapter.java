@@ -1,7 +1,6 @@
 package org.jabref.model.strings;
 
 import java.text.Normalizer;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
