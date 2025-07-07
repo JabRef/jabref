@@ -41,6 +41,7 @@ import org.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -419,8 +420,7 @@ public class BibDatabase {
      * Resolves any references to strings contained in this field content,
      * if possible.
      */
-    public String resolveForStrings(String content) {
-        Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
+    public String resolveForStrings(@NonNull String content) {
         return resolveContent(content, new HashSet<>(), new HashSet<>());
     }
 

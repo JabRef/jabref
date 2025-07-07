@@ -57,6 +57,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private TextField backupDirectory;
     @FXML private CheckBox remoteServer;
     @FXML private TextField remotePort;
+    @FXML private CheckBox enableHttpServer;
     @FXML private Button remoteHelp;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private BibEntryTypesManager entryTypesManager;
@@ -149,6 +150,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         remoteServer.selectedProperty().bindBidirectional(viewModel.remoteServerProperty());
         remotePort.textProperty().bindBidirectional(viewModel.remotePortProperty());
         remotePort.disableProperty().bind(remoteServer.selectedProperty().not());
+
+        enableHttpServer.selectedProperty().bindBidirectional(viewModel.enableHttpServerProperty());
     }
 
     @FXML
