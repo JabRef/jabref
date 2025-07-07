@@ -209,21 +209,21 @@ public class BibFieldsIndexer {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertFieldQuery);
              PreparedStatement preparedStatementSplitValues = connection.prepareStatement(insertIntoSplitTable)) {
             String entryId = bibEntry.getId();
-            LOGGER.atTrace().setMessage("Adding entry {}").addArgument(() -> bibEntry.getKeyAuthorTitleYear());
+            LOGGER.atTrace().setMessage("Adding entry {}").addArgument(() -> bibEntry.getKeyAuthorTitleYear()).log();
             for (Map.Entry<Field, String> fieldPair : bibEntry.getFieldMap().entrySet()) {
                 Field field = fieldPair.getKey();
                 String value = fieldPair.getValue();
 
-                // If a field exists, there also exists a resolved field latex free.
-                // We add a `.orElse("")` only because there could be some flaw in the future in the code - and we want to have search working even if the flaws are present.
-                // To uncover these flaws, we add the "assert" statement.
-                // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
                 // Skip indexing of date-related fields separately to ensure proper handling later in the process.
                 if (!DATE_FIELDS.contains(field)) {
-                    Optional<String> resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase());
-                    assert resolvedFieldLatexFree.isPresent();
-                    addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree.orElse(""));
+                    // If a field exists, there also exists a resolved field latex free.
+                    // Only exception: If the content of the field is empty, then the resolved field is also empty. Example: `series = {{}}`.
+                    String resolvedFieldLatexFree = bibEntry.getResolvedFieldOrAliasLatexFree(field, this.databaseContext.getDatabase()).orElse("");
+
+                    // One potential future flaw is that the bibEntry is modified concurrently and the field being deleted.
+                    addBatch(preparedStatement, entryId, field, value, resolvedFieldLatexFree);
                 }
+
                 // region Handling of known multi-value fields
                 // split and convert to Unicode
                 if (field.getProperties().contains(FieldProperty.PERSON_NAMES)) {
