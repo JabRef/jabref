@@ -2,21 +2,23 @@ package org.jabref.logic.git;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.bibtex.comparator.BibEntryDiff;
-import org.jabref.logic.git.util.GitBibParser;
-import org.jabref.logic.git.util.GitFileReader;
-import org.jabref.logic.git.util.GitFileWriter;
-import org.jabref.logic.git.util.GitRevisionLocator;
-import org.jabref.logic.git.util.MergePlan;
-import org.jabref.logic.git.util.MergeResult;
-import org.jabref.logic.git.util.RevisionTriple;
-import org.jabref.logic.git.util.SemanticConflictDetector;
-import org.jabref.logic.git.util.SemanticMerger;
+import org.jabref.logic.git.conflicts.SemanticConflictDetector;
+import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
+import org.jabref.logic.git.io.GitBibParser;
+import org.jabref.logic.git.io.GitFileReader;
+import org.jabref.logic.git.io.GitFileWriter;
+import org.jabref.logic.git.io.GitRevisionLocator;
+import org.jabref.logic.git.io.RevisionTriple;
+import org.jabref.logic.git.merge.MergePlan;
+import org.jabref.logic.git.merge.SemanticMerger;
+import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -36,7 +38,7 @@ public class GitSyncService {
 
     private static final boolean AMEND = true;
     private final ImportFormatPreferences importFormatPreferences;
-    private GitHandler gitHandler;
+    private final GitHandler gitHandler;
 
     public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler) {
         this.importFormatPreferences = importFormatPreferences;
@@ -77,6 +79,8 @@ public class GitSyncService {
         Path workTree = git.getRepository().getWorkTree().toPath().toRealPath();
         Path relativePath;
 
+        // TODO: Validate that the .bib file is inside the Git repository earlier in the workflow.
+        // This check might be better placed before calling performSemanticMerge.
         if (!bibPath.startsWith(workTree)) {
             throw new IllegalStateException("Given .bib file is not inside repository");
         }
@@ -92,32 +96,35 @@ public class GitSyncService {
         BibDatabaseContext remote = GitBibParser.parseBibFromGit(remoteContent, importFormatPreferences);
 
         // 2. Conflict detection
-        List<BibEntryDiff> conflicts = SemanticConflictDetector.detectConflicts(base, local, remote);
+        List<ThreeWayEntryConflict> conflicts = SemanticConflictDetector.detectConflicts(base, local, remote);
 
+        // 3. If there are conflicts, prompt user to resolve them via GUI
+        BibDatabaseContext effectiveRemote = remote;
         if (!conflicts.isEmpty()) {
-            // Currently only handles non-conflicting cases. In the future, it may:
-            // - Store the current state along with 3 versions
-            // - Return conflicts along with base/local/remote versions for each entry
-            // - Invoke a UI merger (let the UI handle merging and return the result)
-            return MergeResult.withConflicts(conflicts); // TODO: revisit the naming
+            List<BibEntry> resolvedRemoteEntries = new ArrayList<>();
+
+//            for (ThreeWayEntryConflict conflict : conflicts) {
+//                // Uses a GUI dialog to let the user merge entries interactively
+//                BibEntry resolvedEntry = this.conflictResolver.resolveConflict(conflict, prefs, dialogService);
+//                resolvedRemoteEntries.add(resolvedEntry);
+//            }
+//            // Replace conflicted entries in remote with user-resolved ones
+//            effectiveRemote = GitMergeUtil.replaceEntries(remote, resolvedRemoteEntries);
         }
 
-        // If the user returns a manually merged result, it should use: i.e.: MergeResult performSemanticMerge(..., BibDatabaseContext userResolvedResult)
-
-        // 3. Apply remote patch to local
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(base, remote);
+        //  4. Apply resolved remote (either original or conflict-resolved) to local
+        MergePlan plan = SemanticConflictDetector.extractMergePlan(base, effectiveRemote);
         SemanticMerger.applyMergePlan(local, plan);
 
-        // 4. Write back merged result
+        // 5. Write back merged result
         GitFileWriter.write(bibFilePath, local, importFormatPreferences);
 
         return MergeResult.success();
     }
 
     // WIP
+    // TODO: add test
     public void push(Path bibFilePath) throws GitAPIException, IOException {
-        this.gitHandler = new GitHandler(bibFilePath.getParent());
-
         // 1. Auto-commit: commit if there are changes
         boolean committed = gitHandler.createCommitOnCurrentBranch("Changes committed by JabRef", !AMEND);
 

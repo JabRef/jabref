@@ -4,6 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.jabref.logic.git.io.GitRevisionLocator;
+import org.jabref.logic.git.io.RevisionTriple;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.junit.jupiter.api.Test;
@@ -13,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class GitRevisionLocatorTest {
     @Test
-    void testLocateMergeCommits(@TempDir Path tempDir) throws Exception {
+    void locateMergeCommits(@TempDir Path tempDir) throws Exception {
         Path bibFile = tempDir.resolve("library.bib");
         Git git = Git.init().setDirectory(tempDir.toFile()).setInitialBranch("main").call();
 

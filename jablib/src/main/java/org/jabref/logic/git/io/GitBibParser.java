@@ -1,7 +1,7 @@
-package org.jabref.logic.git.util;
+package org.jabref.logic.git.io;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -15,7 +15,8 @@ public class GitBibParser {
         BibtexParser parser = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor());
         ParserResult result;
         try {
-            result = parser.parse(new StringReader(bibContent));
+            Reader reader = Reader.of(bibContent);
+            result = parser.parse(reader);
             return result.getDatabaseContext();
         } catch (IOException e) {
             throw new JabRefException("Failed to parse BibTeX content from Git", e);

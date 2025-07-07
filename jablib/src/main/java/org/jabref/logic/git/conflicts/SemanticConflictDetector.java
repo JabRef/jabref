@@ -1,4 +1,4 @@
-package org.jabref.logic.git.util;
+package org.jabref.logic.git.conflicts;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
+import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -23,7 +24,7 @@ public class SemanticConflictDetector {
      * result := local + remoteDiff
      * and then create merge commit having result as file content and local and remote branch as parent
      */
-    public static List<BibEntryDiff> detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
+    public static List<ThreeWayEntryConflict> detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         // 1. get diffs between base and remote
         List<BibEntryDiff> remoteDiffs = BibDatabaseDiff.compare(base, remote).getEntryDifferences();
         if (remoteDiffs == null) {
@@ -33,7 +34,7 @@ public class SemanticConflictDetector {
         Map<String, BibEntry> baseEntries = toEntryMap(base);
         Map<String, BibEntry> localEntries = toEntryMap(local);
 
-        List<BibEntryDiff> conflicts = new ArrayList<>();
+        List<ThreeWayEntryConflict> conflicts = new ArrayList<>();
 
         // 3. look for entries modified in both local and remote
         for (BibEntryDiff remoteDiff : remoteDiffs) {
@@ -47,10 +48,23 @@ public class SemanticConflictDetector {
             BibEntry localEntry = localEntries.get(citationKey);
             BibEntry remoteEntry = remoteDiff.newEntry();
 
-            // if the entry exists in all 3 versions
+            // Conflict 1: if the entry exists in all 3 versions
             if (baseEntry != null && localEntry != null && remoteEntry != null) {
                 if (hasConflictingFields(baseEntry, localEntry, remoteEntry)) {
-                    conflicts.add(new BibEntryDiff(localEntry, remoteEntry));
+                    conflicts.add(new ThreeWayEntryConflict(baseEntry, localEntry, remoteEntry));
+                }
+            // Conflict 2: base missing, but local + remote both added same citation key with different content
+            } else if (baseEntry == null && localEntry != null && remoteEntry != null) {
+                if (!Objects.equals(localEntry, remoteEntry)) {
+                    conflicts.add(new ThreeWayEntryConflict(null, localEntry, remoteEntry));
+                }
+            // Case 3: one side deleted, other side modified
+            } else if (baseEntry != null) {
+                if (localEntry != null && remoteEntry == null && !Objects.equals(baseEntry, localEntry)) {
+                    conflicts.add(new ThreeWayEntryConflict(baseEntry, localEntry, null));
+                }
+                if (localEntry == null && remoteEntry != null && !Objects.equals(baseEntry, remoteEntry)) {
+                    conflicts.add(new ThreeWayEntryConflict(baseEntry, null, remoteEntry));
                 }
             }
         }

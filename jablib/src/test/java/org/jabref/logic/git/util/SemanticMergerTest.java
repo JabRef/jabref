@@ -2,6 +2,10 @@ package org.jabref.logic.git.util;
 
 import java.util.stream.Stream;
 
+import org.jabref.logic.git.conflicts.SemanticConflictDetector;
+import org.jabref.logic.git.io.GitBibParser;
+import org.jabref.logic.git.merge.MergePlan;
+import org.jabref.logic.git.merge.SemanticMerger;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -28,7 +32,7 @@ public class SemanticMergerTest {
 
     @ParameterizedTest(name = "Database patch: {0}")
     @MethodSource("provideDatabasePatchCases")
-    void testPatchDatabase(String description, String base, String local, String remote, String expectedAuthor) throws Exception {
+    void patchDatabase(String description, String base, String local, String remote, String expectedAuthor) throws Exception {
         BibDatabaseContext baseDatabaseContext = GitBibParser.parseBibFromGit(base, importFormatPreferences);
         BibDatabaseContext localDatabaseContext = GitBibParser.parseBibFromGit(local, importFormatPreferences);
         BibDatabaseContext remoteDatabaseContext = GitBibParser.parseBibFromGit(remote, importFormatPreferences);

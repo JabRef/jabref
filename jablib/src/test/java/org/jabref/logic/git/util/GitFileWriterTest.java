@@ -4,6 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.git.io.GitBibParser;
+import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -26,7 +28,7 @@ class GitFileWriterTest {
     }
 
     @Test
-    void testWriteThenReadBack() throws Exception {
+    void writeThenReadBack() throws Exception {
         BibDatabaseContext inputDatabaseContext = GitBibParser.parseBibFromGit(
         """
                     @article{a,

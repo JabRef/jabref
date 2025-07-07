@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitHandlerTest {
     @TempDir
@@ -93,9 +94,23 @@ class GitHandlerTest {
             gitHandler.fetchOnCurrentBranch();
 
             try (Git git = Git.open(repositoryPath.toFile())) {
-                assertEquals(true, git.getRepository().getRefDatabase().hasRefs());
-                assertEquals(true, git.getRepository().exactRef("refs/remotes/origin/main") != null);
+                assertTrue(git.getRepository().getRefDatabase().hasRefs());
+                assertTrue(git.getRepository().exactRef("refs/remotes/origin/main") != null);
             }
         }
+    }
+
+    @Test
+    void fromAnyPathFindsGitRootFromNestedPath() throws IOException {
+        // Arrange: create a nested directory structure inside the temp Git repo
+        Path nested = repositoryPath.resolve("src/org/jabref");
+        Files.createDirectories(nested);
+
+        // Act: attempt to construct GitHandler from nested path
+        var handlerOpt = GitHandler.fromAnyPath(nested);
+
+        assertTrue(handlerOpt.isPresent(), "Expected GitHandler to be created");
+        assertEquals(repositoryPath.toRealPath(), handlerOpt.get().repositoryPath.toRealPath(),
+                "Expected repositoryPath to match Git root");
     }
 }

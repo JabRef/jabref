@@ -1,8 +1,9 @@
-package org.jabref.logic.git.util;
+package org.jabref.logic.git.merge;
 
 import java.util.Map;
 import java.util.Optional;
 
+import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
@@ -15,7 +16,8 @@ public class SemanticMerger {
 
     /**
      * Implementation-only merge logic: applies changes from remote (relative to base) to local.
-     * does not check for "modifications" or "conflicts" — all decisions should be handled in advance by the SemanticConflictDetector
+     * does not check for "modifications" or "conflicts"
+     * all decisions should be handled in advance by the {@link SemanticConflictDetector}
      */
     public static void applyMergePlan(BibDatabaseContext local, MergePlan plan) {
         applyPatchToDatabase(local, plan.fieldPatches());

@@ -5,14 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.logic.git.util.GitFileReader;
-import org.jabref.logic.git.util.MergeResult;
+import org.jabref.logic.git.io.GitFileReader;
+import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.RefSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -101,7 +100,7 @@ class GitSyncServiceTest {
 
         // Alice: initial commit
         baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
-        git.push().setRemote("origin").setRefSpecs(new RefSpec("main")).call();
+        git.push().setRemote("origin").call();
 
         // Bob clone remote
         Path bobDir = tempDir.resolve("bob");
@@ -113,7 +112,7 @@ class GitSyncServiceTest {
                         .call();
         Path bobLibrary = bobDir.resolve("library.bib");
         bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
-        bobGit.push().setRemote("origin").setRefSpecs(new RefSpec("main")).call();
+        bobGit.push().setRemote("origin").call();
 
         // back to Alice's branch, fetch remote
         aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);

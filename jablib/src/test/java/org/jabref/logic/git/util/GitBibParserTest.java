@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.jabref.logic.git.io.GitBibParser;
+import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;

@@ -1,4 +1,4 @@
-package org.jabref.logic.git.util;
+package org.jabref.logic.git.io;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

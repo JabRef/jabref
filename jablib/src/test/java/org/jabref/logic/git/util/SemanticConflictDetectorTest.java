@@ -7,7 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.jabref.logic.bibtex.comparator.BibEntryDiff;
+import org.jabref.logic.git.conflicts.SemanticConflictDetector;
+import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
+import org.jabref.logic.git.io.GitBibParser;
+import org.jabref.logic.git.io.GitFileReader;
+import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.field.Field;
@@ -52,7 +56,7 @@ class SemanticConflictDetectorTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("provideConflictCases")
-    void testSemanticConflicts(String description, String base, String local, String remote, boolean expectConflict) throws Exception {
+    void semanticConflicts(String description, String base, String local, String remote, boolean expectConflict) throws Exception {
         RevCommit baseCommit = writeAndCommit(base, "base", alice);
         RevCommit localCommit = writeAndCommit(local, "local", alice);
         RevCommit remoteCommit = writeAndCommit(remote, "remote", bob);
@@ -61,7 +65,7 @@ class SemanticConflictDetectorTest {
         BibDatabaseContext localDatabaseContext = parse(localCommit);
         BibDatabaseContext remoteDatabaseContext = parse(remoteCommit);
 
-        List<BibEntryDiff> diffs = SemanticConflictDetector.detectConflicts(baseDatabaseContext, localDatabaseContext, remoteDatabaseContext);
+        List<ThreeWayEntryConflict> diffs = SemanticConflictDetector.detectConflicts(baseDatabaseContext, localDatabaseContext, remoteDatabaseContext);
 
         if (expectConflict) {
             assertEquals(1, diffs.size(), "Expected a conflict but found none");
@@ -412,12 +416,44 @@ class SemanticConflictDetectorTest {
                             }
                         """,
                         true
+                ),
+                Arguments.of("T16 - both sides added entry a with different values",
+                        "",
+                        """
+                            @article{a,
+                                author = {alice},
+                                doi = {xya},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {bob},
+                                doi = {xya},
+                            }
+                        """,
+                        true
+                ),
+                Arguments.of("T17 - both added same content",
+                        "",
+                        """
+                            @article{a,
+                                author = {same},
+                                doi = {123},
+                            }
+                        """,
+                        """
+                            @article{a,
+                                author = {same},
+                                doi = {123},
+                            }
+                        """,
+                        false
                 )
         );
     }
 
     @Test
-    void testExtractMergePlan_T10_onlyRemoteChangedEntryB() throws Exception {
+    void extractMergePlanT10OnlyRemoteChangedEntryB() throws Exception {
         String base = """
             @article{a,
                 author = {lala},
@@ -454,7 +490,7 @@ class SemanticConflictDetectorTest {
     }
 
     @Test
-    void testExtractMergePlan_T11_remoteAddsField() throws Exception {
+    void extractMergePlanT11RemoteAddsField() throws Exception {
         String base = """
             @article{a,
                 author = {lala},
