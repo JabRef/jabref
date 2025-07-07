@@ -152,7 +152,7 @@ public class UiTaskExecutor implements TaskExecutor {
         }
         executor.shutdownNow();
         scheduledExecutor.shutdownNow();
-        throttlers.forEach((throttler, aVoid) -> throttler.shutdown());
+        throttlers.forEach((throttler, _) -> throttler.shutdown());
     }
 
     @Override
@@ -182,7 +182,7 @@ public class UiTaskExecutor implements TaskExecutor {
                         cancel();
                     }
                 });
-                setOnCancelled(event -> task.cancel());
+                setOnCancelled(_ -> task.cancel());
             }
 
             @Override
@@ -193,10 +193,10 @@ public class UiTaskExecutor implements TaskExecutor {
         };
         Runnable onRunning = task.getOnRunning();
         if (onRunning != null) {
-            javaTask.setOnRunning(event -> onRunning.run());
+            javaTask.setOnRunning(_ -> onRunning.run());
         }
         Consumer<V> onSuccess = task.getOnSuccess();
-        javaTask.setOnSucceeded(event -> {
+        javaTask.setOnSucceeded(_ -> {
             // Set to 100% completed on completion
             task.updateProgress(1, 1);
 
@@ -206,12 +206,14 @@ public class UiTaskExecutor implements TaskExecutor {
         });
         Consumer<Exception> onException = task.getOnException();
         if (onException != null) {
-            javaTask.setOnFailed(event -> onException.accept(convertToException(javaTask.getException())));
+            javaTask.setOnFailed(_ -> onException.accept(convertToException(javaTask.getException())));
         }
         return javaTask;
     }
 
     private static Exception convertToException(Throwable throwable) {
+        // LOGGER.warn here, because the exception silently disappears otherwise
+        LOGGER.warn("Converting throwable to Exception", throwable);
         if (throwable instanceof Exception exception) {
             return exception;
         } else {
