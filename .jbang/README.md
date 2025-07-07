@@ -12,19 +12,27 @@ Three use cases:
 
 If you have JBang installed, just run
 
-    jbang jabkit@jabref --help
+```terminal
+jbang jabkit@jabref --help
+```
 
 You can also install `jabkit` permanently in your `PATH`:
 
-    jbang app install jabkit@jabref
+```terminal
+jbang app install jabkit@jabref
+```
 
 If have no JBang available, download [`gg.cmd`](https://github.com/eirikb/gg/tree/main?tab=readme-ov-file#ggcmd), place it in the current directory (or on your `PATH`) and execute:
 
-    sh ./gg.cmd jbang jabkit@jabref --help
+```terminal
+sh ./gg.cmd jbang jabkit@jabref --help
+```terminal
 
 On Windows:
 
-    gg.cmd jbang jabkit@jabref --help
+```terminal
+gg.cmd jbang jabkit@jabref --help
+```
 
 ## Running `JabSrv`
 
@@ -32,4 +40,6 @@ If you have JBang installed, just run `jbang jabsrv@jabref --help`
 
 With `gg.cmd`:
 
-    sh ./gg.cmd jbang jabsrv@jabref --help
+```terminal
+sh ./gg.cmd jbang jabsrv@jabref --help
+```
