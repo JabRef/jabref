@@ -212,6 +212,8 @@ public class UiTaskExecutor implements TaskExecutor {
     }
 
     private static Exception convertToException(Throwable throwable) {
+        // LOGGER.warn here, because the exception silently disappears otherwise
+        LOGGER.warn("Converting throwable to Exception", throwable);
         if (throwable instanceof Exception exception) {
             return exception;
         } else {
