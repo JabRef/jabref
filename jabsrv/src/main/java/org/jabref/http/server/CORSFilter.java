@@ -15,6 +15,8 @@ public class CORSFilter implements ContainerResponseFilter {
             responseContext.getHeaders().add("Access-Control-Allow-Origin", "*");
         } else if (requestOrigin.contains("://localhost")) {
             responseContext.getHeaders().add("Access-Control-Allow-Origin", requestOrigin);
+        } else if (requestOrigin.endsWith("://jabref.github.io")) {
+            responseContext.getHeaders().add("Access-Control-Allow-Origin", requestOrigin);
         }
         responseContext.getHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
         responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept");

@@ -40,6 +40,11 @@ Accept: application/x-bibtex
 GET http://localhost:23119/libraries/demo/entries/pdffiles
 Accept: application/json
 
+### Get pdf annotations from files in demo library
+
+GET http://localhost:23119/libraries/demo/entries/pdffiles/annotations
+Accept: application/json
+
 ### Get CSL JSON of Chocolate.bib
 
 GET http://localhost:23119/libraries/demo
@@ -64,7 +69,7 @@ GET http://localhost:23119/libraries/demo/entries/Tokede_2011
 Accept: text/html
 
 ### Get entry preview string for "Corti_2009" of chocolate.bib
-GET http://localhost:23119/libraries/Chocolate.bib-13af3778/entries/Corti_2009
+GET http://localhost:23119/libraries/demo/entries/Corti_2009
 Accept: text/plain
 
 ### Get text view for "Tokede_2011" of demo library

@@ -67,9 +67,9 @@ public class LibraryResource {
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         BibEntryTypesManager entryTypesManager = Injector.instantiateModelOrService(BibEntryTypesManager.class);
         List<BibEntryDTO> list = databaseContext.getDatabase().getEntries().stream()
-                                             .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
-                                             .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
-                                             .toList();
+                                                .peek(bibEntry -> bibEntry.getSharedBibEntryData().setSharedID(Objects.hash(bibEntry)))
+                                                .map(entry -> new BibEntryDTO(entry, databaseContext.getMode(), preferences.getFieldPreferences(), entryTypesManager))
+                                                .toList();
         return gson.toJson(list);
     }
 
@@ -201,9 +201,9 @@ public class LibraryResource {
             throw new InternalServerErrorException("Could not read library " + library, e);
         }
         return Response.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + library.getFileName() + "\"")
-                .entity(libraryAsString)
-                .build();
+                       .header("Content-Disposition", "attachment; filename=\"" + library.getFileName() + "\"")
+                       .entity(libraryAsString)
+                       .build();
     }
 
     private java.nio.file.Path getJabMapPath(String id) {
@@ -251,13 +251,13 @@ public class LibraryResource {
         String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
 
         String preview =
-                    "Author: " + author
-                + "\nTitle: " + title
-                + "\nJournal: " + journal
-                + "\nVolume: " + volume
-                + "\nNumber: " + number
-                + "\nPages: " + pages
-                + "\nReleased on: " + releaseDate;
+                "Author: " + author
+                        + "\nTitle: " + title
+                        + "\nJournal: " + journal
+                        + "\nVolume: " + volume
+                        + "\nNumber: " + number
+                        + "\nPages: " + pages
+                        + "\nReleased on: " + releaseDate;
 
         return preview;
     }
@@ -298,7 +298,6 @@ public class LibraryResource {
     }
 
     /// libraries/{id}/entries/pdffiles
-    /// @return a list of all pdf files in the library
     @GET
     @Path("entries/pdffiles")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -356,16 +355,8 @@ public class LibraryResource {
     private List<PDFAnnotationDTO> extractAnnotationsFromEntry(BibEntry entry, FileAnnotationCache cache) {
         List<PDFAnnotationDTO> annotationDTOs = new ArrayList<>();
         Map<java.nio.file.Path, List<FileAnnotation>> cacheResult = cache.getFromCache(entry);
+        cacheResult.forEach((path, fileAnnotations) -> annotationDTOs.add(new PDFAnnotationDTO(path, entry, fileAnnotations)));
 
-        for (Map.Entry<java.nio.file.Path, List<FileAnnotation>> mapEntry : cacheResult.entrySet()) {
-            java.nio.file.Path pathToPDF = mapEntry.getKey();
-            List<FileAnnotation> annotations = mapEntry.getValue();
-
-            for (FileAnnotation annotation : annotations) {
-                PDFAnnotationDTO dto = new PDFAnnotationDTO(pathToPDF, entry, annotation);
-                annotationDTOs.add(dto);
-            }
-        }
         return annotationDTOs;
     }
 
