@@ -328,7 +328,6 @@ public class LibraryResource {
         return gson.toJson(response);
     }
 
-    // TODO: write helper function to extract annotations
     /// libraries/{id}/entries/pdffiles/annotations
     @GET
     @Path("entries/pdffiles/annotations")
