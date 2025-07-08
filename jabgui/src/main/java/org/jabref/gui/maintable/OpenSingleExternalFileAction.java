@@ -1,7 +1,5 @@
 package org.jabref.gui.maintable;
 
-import java.util.Objects;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
@@ -10,6 +8,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+
+import org.jspecify.annotations.NonNull;
 
 public class OpenSingleExternalFileAction extends SimpleCommand {
 
@@ -20,18 +20,18 @@ public class OpenSingleExternalFileAction extends SimpleCommand {
     private final TaskExecutor taskExecutor;
     private final BibDatabaseContext databaseContext;
 
-    public OpenSingleExternalFileAction(DialogService dialogService,
-                                        GuiPreferences preferences,
-                                        BibEntry entry,
-                                        LinkedFile linkedFile,
-                                        TaskExecutor taskExecutor,
-                                        BibDatabaseContext databaseContext) {
-        this.dialogService = Objects.requireNonNull(dialogService);
-        this.preferences = Objects.requireNonNull(preferences);
-        this.entry = Objects.requireNonNull(entry);
-        this.linkedFile = Objects.requireNonNull(linkedFile);
-        this.taskExecutor = Objects.requireNonNull(taskExecutor);
-        this.databaseContext = Objects.requireNonNull(databaseContext);
+    public OpenSingleExternalFileAction(@NonNull DialogService dialogService,
+                                        @NonNull GuiPreferences preferences,
+                                        @NonNull BibEntry entry,
+                                        @NonNull LinkedFile linkedFile,
+                                        @NonNull TaskExecutor taskExecutor,
+                                        @NonNull BibDatabaseContext databaseContext) {
+        this.dialogService = dialogService;
+        this.preferences = preferences;
+        this.entry = entry;
+        this.linkedFile = linkedFile;
+        this.taskExecutor = taskExecutor;
+        this.databaseContext = databaseContext;
 
         this.setExecutable(true);
     }
