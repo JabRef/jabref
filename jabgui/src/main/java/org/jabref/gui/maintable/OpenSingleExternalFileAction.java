@@ -39,7 +39,7 @@ public class OpenSingleExternalFileAction extends SimpleCommand {
         LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
                 linkedFile,
                 entry,
-                databaseContext, // gets database context from entry
+                databaseContext,
                 taskExecutor,
                 dialogService,
                 preferences);

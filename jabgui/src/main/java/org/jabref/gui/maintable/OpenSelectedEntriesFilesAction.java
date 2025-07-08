@@ -16,7 +16,7 @@ import org.jabref.model.entry.LinkedFile;
 
 public class OpenSelectedEntriesFilesAction extends SimpleCommand {
 
-    private final int FILES_LIMIT = 10;
+    private static final int FILES_LIMIT = 10;
 
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -78,8 +78,8 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
                 boolean continueOpening = dialogService.showConfirmationDialogAndWait(
                         Localization.lang("Opening large number of files"),
                         Localization.lang("You are about to open %0 files. Continue?", linkedFileViewModelList.size()),
-                        Localization.lang("Continue"),
-                        Localization.lang("Cancel")
+                        Localization.lang("Open all files"),
+                        Localization.lang("Don't open")
                 );
                 if (!continueOpening) {
                     return;
