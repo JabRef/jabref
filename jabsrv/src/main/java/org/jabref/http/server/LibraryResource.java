@@ -5,15 +5,19 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.http.dto.LinkedPdfFileDTO;
+import org.jabref.http.dto.PDFAnnotationDTO;
 import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
+import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -21,6 +25,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.pdf.FileAnnotation;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
@@ -220,26 +225,7 @@ public class LibraryResource {
     }
 
     /// libraries/{id}/entries/{entryId}
-    /* @GET
-    @Path("entries/{entryId}")
-    @Produces(MediaType.TEXT_HTML)
-    public String getPreview(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
-        ParserResult parserResult = getParserResult(id);
-        List<BibEntry> entriesByCitationKey = parserResult.getDatabase().getEntriesByCitationKey(entryId);
-        if (entriesByCitationKey.isEmpty()) {
-            throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
-        }
-        if (entriesByCitationKey.size() > 1) {
-            LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
-        }
-        BibEntry theEntry = entriesByCitationKey.getFirst();
-
-        // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
-        // PreviewLayout layout = preferences.getpr previewPreferences.getSelectedPreviewLayout();
-        // return layout.generatePreview(theEntry, parserResult.getDatabaseContext());
-        return theEntry.getAuthorTitleYear();
-    }*/
-
+    // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
@@ -312,7 +298,7 @@ public class LibraryResource {
     }
 
     /// libraries/{id}/entries/pdffiles
-    // returns a list of all pdf files in the library
+    /// @return a list of all pdf files in the library
     @GET
     @Path("entries/pdffiles")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -342,10 +328,50 @@ public class LibraryResource {
         return gson.toJson(response);
     }
 
+    // TODO: write helper function to extract annotations
+    /// libraries/{id}/entries/pdffiles/annotations
+    @GET
+    @Path("entries/pdffiles/annotations")
+    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+    public String getPDFAnnotationsAsList(@PathParam("id") String id) throws IOException {
+        // Get BibEntries
+        BibDatabaseContext databaseContext = getDatabaseContext(id);
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+
+        if (entries.isEmpty()) {
+            throw new NotFoundException("No entries found for library: " + id);
+        }
+
+        FileAnnotationCache annoCache = new FileAnnotationCache(databaseContext, filePreferences);
+        List<PDFAnnotationDTO> response = new ArrayList<>();
+
+        // loop through all entries to extract annotations
+        for (BibEntry bibEntry : entries) {
+            response.addAll(extractAnnotationsFromEntry(bibEntry, annoCache));
+        }
+
+        return gson.toJson(response);
+    }
+
+    private List<PDFAnnotationDTO> extractAnnotationsFromEntry(BibEntry entry, FileAnnotationCache cache) {
+        List<PDFAnnotationDTO> annotationDTOs = new ArrayList<>();
+        Map<java.nio.file.Path, List<FileAnnotation>> cacheResult = cache.getFromCache(entry);
+
+        for (Map.Entry<java.nio.file.Path, List<FileAnnotation>> mapEntry : cacheResult.entrySet()) {
+            java.nio.file.Path pathToPDF = mapEntry.getKey();
+            List<FileAnnotation> annotations = mapEntry.getValue();
+
+            for (FileAnnotation annotation : annotations) {
+                PDFAnnotationDTO dto = new PDFAnnotationDTO(pathToPDF, entry, annotation);
+                annotationDTOs.add(dto);
+            }
+        }
+        return annotationDTOs;
+    }
+
     /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
     private @Nullable InputStream getChocolateBibAsStream() {
         return BibDatabase.class.getResourceAsStream("/Chocolate.bib");
     }
-
-    // TODO: write helper function to extract annotations
 }
