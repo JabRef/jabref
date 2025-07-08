@@ -1,28 +1,21 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.nio.file.Path;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.NotificationService;
 
 public class PushToTeXstudio extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.TEXSTUDIO;
 
-    public PushToTeXstudio(DialogService dialogService, GuiPreferences preferences) {
+    public PushToTeXstudio(NotificationService dialogService, CliPreferences preferences) {
         super(dialogService, preferences);
     }
 
     @Override
     public String getDisplayName() {
         return NAME;
-    }
-
-    @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_TEXSTUDIO;
     }
 
     @Override

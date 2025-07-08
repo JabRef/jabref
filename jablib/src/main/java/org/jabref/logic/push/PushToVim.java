@@ -1,4 +1,4 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,13 +6,11 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -25,23 +23,13 @@ public class PushToVim extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
-    public PushToVim(DialogService dialogService, GuiPreferences preferences) {
-        super(dialogService, preferences);
+    public PushToVim(NotificationService notificationService, CliPreferences preferences) {
+        super(notificationService, preferences);
     }
 
     @Override
     public String getDisplayName() {
         return NAME;
-    }
-
-    @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_VIM;
-    }
-
-    @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToVimSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     @Override
@@ -91,10 +79,10 @@ public class PushToVim extends AbstractPushToApplication {
     @Override
     public void onOperationCompleted() {
         if (couldNotPush) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
+            sendErrorNotification(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not push to a running Vim server."));
         } else if (couldNotCall) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
+            sendErrorNotification(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not run the 'vim' program."));
         } else {
             super.onOperationCompleted();

@@ -12,6 +12,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.Action;
 import org.jabref.gui.actions.ActionFactory;
+import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BindingsHelper;
@@ -25,9 +26,6 @@ import org.jabref.model.strings.StringUtil;
 import com.tobiasdiez.easybind.EasyBind;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.jabref.gui.actions.ActionHelper.needsDatabase;
-import static org.jabref.gui.actions.ActionHelper.needsEntriesSelected;
 
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
@@ -43,7 +41,7 @@ public class PushToApplicationCommand extends SimpleCommand {
     private final List<Object> reconfigurableControls = new ArrayList<>();
     private final TaskExecutor taskExecutor;
 
-    private PushToApplication application;
+    private GUIPushToApplication application;
 
     public PushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
@@ -57,7 +55,7 @@ public class PushToApplicationCommand extends SimpleCommand {
         EasyBind.subscribe(preferences.getPushToApplicationPreferences().activeApplicationNameProperty(),
                 this::setApplication);
 
-        this.executable.bind(needsDatabase(stateManager).and(needsEntriesSelected(stateManager)));
+        this.executable.bind(ActionHelper.needsDatabase(stateManager).and(ActionHelper.needsEntriesSelected(stateManager)));
         this.statusMessage.bind(BindingsHelper.ifThenElse(
                 this.executable,
                 "",
@@ -75,11 +73,11 @@ public class PushToApplicationCommand extends SimpleCommand {
 
     private void setApplication(String applicationName) {
         final ActionFactory factory = new ActionFactory();
-        PushToApplication application = PushToApplications.getApplicationByName(
+        GUIPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
                                                                   applicationName,
                                                                   dialogService,
                                                                   preferences)
-                                                          .orElse(new PushToEmacs(dialogService, preferences));
+                                                          .orElse(new GUIPushToEmacs(dialogService, preferences));
 
         preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
         this.application = Objects.requireNonNull(application);

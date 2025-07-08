@@ -10,6 +10,8 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.push.PushToApplicationPreferences;
+import org.jabref.logic.push.PushToEmacs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

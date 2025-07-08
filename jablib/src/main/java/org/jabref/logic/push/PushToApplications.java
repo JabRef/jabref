@@ -1,11 +1,11 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.NotificationService;
 
 public class PushToApplications {
 
@@ -25,27 +25,27 @@ public class PushToApplications {
     private PushToApplications() {
     }
 
-    public static List<PushToApplication> getAllApplications(DialogService dialogService, GuiPreferences preferences) {
+    public static List<PushToApplication> getAllApplications(NotificationService notificationService, CliPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
             return APPLICATIONS;
         }
 
         APPLICATIONS.addAll(List.of(
-                new PushToEmacs(dialogService, preferences),
-                new PushToLyx(dialogService, preferences),
-                new PushToSublimeText(dialogService, preferences),
-                new PushToTexmaker(dialogService, preferences),
-                new PushToTeXstudio(dialogService, preferences),
-                new PushToTeXworks(dialogService, preferences),
-                new PushToVim(dialogService, preferences),
-                new PushToWinEdt(dialogService, preferences),
-                new PushToTexShop(dialogService, preferences),
-                new PushToVScode(dialogService, preferences)));
+                new PushToEmacs(notificationService, preferences),
+                new PushToLyx(notificationService, preferences),
+                new PushToSublimeText(notificationService, preferences),
+                new PushToTexmaker(notificationService, preferences),
+                new PushToTeXstudio(notificationService, preferences),
+                new PushToTeXworks(notificationService, preferences),
+                new PushToVim(notificationService, preferences),
+                new PushToWinEdt(notificationService, preferences),
+                new PushToTexShop(notificationService, preferences),
+                new PushToVScode(notificationService, preferences)));
 
         return APPLICATIONS;
     }
 
-    public static Optional<PushToApplication> getApplicationByName(String applicationName, DialogService dialogService, GuiPreferences preferences) {
+    public static Optional<PushToApplication> getApplicationByName(String applicationName, NotificationService dialogService, CliPreferences preferences) {
         return getAllApplications(dialogService, preferences).stream()
                                                              .filter(application -> application.getDisplayName().equals(applicationName))
                                                              .findAny();

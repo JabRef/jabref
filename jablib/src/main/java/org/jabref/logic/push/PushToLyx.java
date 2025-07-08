@@ -1,4 +1,4 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -7,12 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -25,7 +23,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
-    public PushToLyx(DialogService dialogService, GuiPreferences preferences) {
+    public PushToLyx(NotificationService dialogService, CliPreferences preferences) {
         super(dialogService, preferences);
     }
 
@@ -35,26 +33,16 @@ public class PushToLyx extends AbstractPushToApplication {
     }
 
     @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_LYX;
-    }
-
-    @Override
     public void onOperationCompleted() {
         if (couldNotPush) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
+            this.sendErrorNotification(Localization.lang("Error pushing entries"),
                     Localization.lang("Verify that LyX is running and that the lyxpipe is valid.")
                             + "[" + commandPath + "]");
         } else if (couldNotCall) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Unable to write to %0.", commandPath + ".in"));
+            this.sendErrorNotification(Localization.lang("Unable to write to %0.", commandPath + ".in"));
         } else {
             super.onOperationCompleted();
         }
-    }
-
-    @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToLyxSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     @Override

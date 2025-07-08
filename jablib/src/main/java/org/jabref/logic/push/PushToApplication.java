@@ -1,10 +1,8 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.gui.actions.Action;
-import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -22,18 +20,6 @@ public interface PushToApplication {
     String getDisplayName();
 
     /**
-     * Gets a tooltip for the push operation.
-     */
-    String getTooltip();
-
-    /**
-     * Gets the icon associated with the application.
-     *
-     * @return The icon for the application.
-     */
-    JabRefIcon getApplicationIcon();
-
-    /**
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
      * operations without utilizing invokeLater().
      */
@@ -44,6 +30,10 @@ public interface PushToApplication {
      */
     void onOperationCompleted();
 
+    void sendErrorNotification(String title, String message);
+
+    void sendErrorNotification(String message);
+
     /**
      * Check whether this operation requires citation keys to be set for the entries. If true is returned an error message
      * will be displayed if keys are missing.
@@ -51,10 +41,6 @@ public interface PushToApplication {
      * @return true if citation keys are required for this operation.
      */
     boolean requiresCitationKeys();
-
-    Action getAction();
-
-    PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences pushToApplicationPreferences);
 
     String getDelimiter();
 

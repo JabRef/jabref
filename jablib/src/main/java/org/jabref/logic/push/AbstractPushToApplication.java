@@ -1,18 +1,13 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.actions.Action;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.KeyBinding;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
@@ -33,27 +28,12 @@ public abstract class AbstractPushToApplication implements PushToApplication {
 
     protected String commandPath;
 
-    protected final DialogService dialogService;
-    protected final GuiPreferences preferences;
+    protected final NotificationService notificationService;
+    protected final CliPreferences preferences;
 
-    public AbstractPushToApplication(DialogService dialogService, GuiPreferences preferences) {
-        this.dialogService = dialogService;
+    public AbstractPushToApplication(NotificationService notificationService, CliPreferences preferences) {
+        this.notificationService = notificationService;
         this.preferences = preferences;
-    }
-
-    @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_GENERIC;
-    }
-
-    @Override
-    public String getTooltip() {
-        return Localization.lang("Push entries to external application (%0)", getDisplayName());
-    }
-
-    @Override
-    public Action getAction() {
-        return new PushToApplicationAction();
     }
 
     @Override
@@ -106,19 +86,33 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     @Override
     public void onOperationCompleted() {
         if (notDefined) {
-            dialogService.showErrorDialogAndWait(
+            sendErrorNotification(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Path to %0 not defined", getDisplayName()) + ".");
         } else if (couldNotCall) {
-            dialogService.showErrorDialogAndWait(
+            sendErrorNotification(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not call executable") + " '" + commandPath + "'.");
         } else if (couldNotPush) {
-            dialogService.showErrorDialogAndWait(
+            sendErrorNotification(
                     Localization.lang("Error pushing entries"),
                     Localization.lang("Could not connect to %0", getDisplayName()) + ".");
         } else {
-            dialogService.notify(Localization.lang("Pushed citations to %0", getDisplayName()) + ".");
+            notificationService.notify(Localization.lang("Pushed citations to %0", getDisplayName()) + ".");
+        }
+    }
+
+    @Override
+    public void sendErrorNotification(String message) {
+        this.sendErrorNotification(message, "");
+    }
+
+    @Override
+    public void sendErrorNotification(String title, String message) {
+        if (StringUtil.isNullOrEmpty(message)) {
+            notificationService.notify(title);
+        } else {
+            notificationService.notify(title.concat(" ").concat(message));
         }
     }
 
@@ -145,42 +139,20 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      *
      * @return String with the command name
      */
-    protected String getCommandName() {
+    public String getCommandName() {
         return null;
     }
 
     protected String getCitePrefix() {
-        return preferences.getExternalApplicationsPreferences().getCiteCommand().prefix();
+        return "\\autocite{";
     }
 
     public String getDelimiter() {
-        return preferences.getExternalApplicationsPreferences().getCiteCommand().delimiter();
+        return ",";
     }
 
     protected String getCiteSuffix() {
-        return preferences.getExternalApplicationsPreferences().getCiteCommand().suffix();
-    }
-
-    @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToApplicationSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
-    }
-
-    protected class PushToApplicationAction implements Action {
-        @Override
-        public String getText() {
-            return Localization.lang("Push entries to external application (%0)", getDisplayName());
-        }
-
-        @Override
-        public Optional<JabRefIcon> getIcon() {
-            return Optional.of(getApplicationIcon());
-        }
-
-        @Override
-        public Optional<KeyBinding> getKeyBinding() {
-            return Optional.of(KeyBinding.PUSH_TO_APPLICATION);
-        }
+        return "}";
     }
 
     public void jumpToLine(Path fileName, int line, int column) {

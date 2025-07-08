@@ -16,6 +16,9 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.push.AbstractPushToApplication;
+import org.jabref.logic.push.PushToApplication;
+import org.jabref.logic.push.PushToApplicationPreferences;
 
 public class PushToApplicationSettings {
 

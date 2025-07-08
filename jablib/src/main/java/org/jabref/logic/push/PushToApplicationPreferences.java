@@ -1,4 +1,4 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.util.Map;
 

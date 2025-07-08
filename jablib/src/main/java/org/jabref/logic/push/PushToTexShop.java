@@ -1,16 +1,14 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -23,18 +21,13 @@ public class PushToTexShop extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToTexShop.class);
 
-    public PushToTexShop(DialogService dialogService, GuiPreferences preferences) {
-        super(dialogService, preferences);
+    public PushToTexShop(NotificationService notificationService, CliPreferences preferences) {
+        super(notificationService, preferences);
     }
 
     @Override
     public String getDisplayName() {
         return NAME;
-    }
-
-    @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_TEXSHOP;
     }
 
     @Override
@@ -82,7 +75,7 @@ public class PushToTexShop extends AbstractPushToApplication {
         if (OS.OS_X) {
             return new String[] {"sh", "-c", osascriptTexShop};
         } else {
-            dialogService.showInformationDialogAndWait(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
+            sendErrorNotification(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
             return new String[] {};
         }
     }
