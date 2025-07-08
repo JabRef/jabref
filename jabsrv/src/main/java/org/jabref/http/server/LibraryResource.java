@@ -73,6 +73,13 @@ public class LibraryResource {
         return gson.toJson(list);
     }
 
+    /**
+     * Looks for the .jmp file in the directory of the given library ({id}.bib file)
+     *
+     * @param id The given library
+     * @return A JSON String containing the mindmap data. If no {id}.jmp file could was found, returns the standard mindmap.
+     * @throws IOException
+     */
     @GET
     @Path("map")
     @Produces(MediaType.APPLICATION_JSON)
@@ -84,71 +91,48 @@ public class LibraryResource {
         } else {
             jabMapPath = getJabMapPath(id);
         }
+        // if no file is found, return the default mindmap
         if (!Files.exists(jabMapPath)) {
             return """
-                    {"map" :
-                        {
-                            "meta": {
-                                "name": "jsMind remote",
-                                "author": "hizzgdev@163.com",
-                                "version": "0.2"
+                    {
+                      "map": {
+                        "meta": {
+                          "name": "JabMap",
+                          "author": "JabMap",
+                          "version": "1.0"
+                        },
+                        "format": "node_tree",
+                        "data": {
+                          "id": "root",
+                          "topic": "JabMap",
+                          "expanded": true,
+                          "icons": [],
+                          "highlight": null,
+                          "type": "Text",
+                          "children": [
+                            {
+                              "id": "7eb3d8255e647a7e",
+                              "topic": "Open Source",
+                              "expanded": true,
+                              "direction": "left",
+                              "icons": [
+                                "checked"
+                              ]
                             },
-                            "format": "node_tree",
-                            "data": {
-                                "id": "root",
-                                "topic": "jsMind",
-                                "expanded": true,
-                                "children": [
-                                    {
-                                        "id": "easy",
-                                        "topic": "Easy",
-                                        "expanded": true,
-                                        "direction": "left",
-                                        "children": [
-                                            {
-                                                "id": "easy1",
-                                                "topic": "Easy to show",
-                                                "expanded": true
-                                            },
-                                            {
-                                                "id": "easy2",
-                                                "topic": "Easy to edit",
-                                                "expanded": true
-                                            },
-                                            {
-                                                "id": "easy3",
-                                                "topic": "Easy to store",
-                                                "expanded": true
-                                            },
-                                            {
-                                                "id": "easy4",
-                                                "topic": "Easy to embed",
-                                                "expanded": true
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "id": "open",
-                                        "topic": "Open Source",
-                                        "expanded": true,
-                                        "direction": "right",
-                                        "children": [
-                                            {
-                                                "id": "open1",
-                                                "topic": "on GitHub",
-                                                "expanded": true
-                                            },
-                                            {
-                                                "id": "open2",
-                                                "topic": "BSD License",
-                                                "expanded": true
-                                            }
-                                        ]
-                                    }
-                                ]
+                            {
+                              "id": "7eb3da68fdf12ff5",
+                              "topic": "scientific mindmapping",
+                              "expanded": true,
+                              "direction": "right",
+                              "icons": [
+                                "light_bulb"
+                              ]
                             }
+                          ]
                         }
-                    }""";
+                      }
+                    }
+                    """;
         }
         return Files.readString(jabMapPath);
     }
@@ -226,10 +210,20 @@ public class LibraryResource {
 
     /// libraries/{id}/entries/{entryId}
     // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
+
+    /**
+     * Combines attributes of a given BibEntry into a basic entry preview for as plain text
+     *
+     * @param id The name of the library
+     * @param entryId The CitationKey of the BibEntry
+     * @return a basic entry preview as plain text
+     * @throws IOException
+     */
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
     public String getPlainRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
+        // get entry with given citationkey (entryId)
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
@@ -250,6 +244,7 @@ public class LibraryResource {
         String pages = entry.getField(StandardField.PAGES).orElse("(N/A)");
         String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
 
+        // the only difference to the HTML version of this method is the format of the output:
         String preview =
                 "Author: " + author
                         + "\nTitle: " + title
@@ -262,10 +257,19 @@ public class LibraryResource {
         return preview;
     }
 
+    /**
+     * Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
+     *
+     * @param id The name of the library
+     * @param entryId The CitationKey of the BibEntry
+     * @return a basic entry preview as HTML text
+     * @throws IOException
+     */
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")
     public String getHTMLRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
+        // get entry with given citationkey (entryId)
         List<BibEntry> entriesByCitationKey = getDatabaseContext(id).getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
             throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
@@ -285,6 +289,7 @@ public class LibraryResource {
         String pages = entry.getField(StandardField.PAGES).orElse("(N/A)");
         String releaseDate = entry.getField(StandardField.DATE).orElse("(N/A)");
 
+        // the only difference to the plain text version of this method is the format of the output:
         String preview =
                 "<strong>Author:</strong> " + author + "<br>" +
                         "<strong>Title:</strong> " + title + "<br>" +
@@ -298,10 +303,20 @@ public class LibraryResource {
     }
 
     /// libraries/{id}/entries/pdffiles
+    /**
+     * Loops through all entries in the specified library and adds attached files of type "PDF" to
+     * a list and JSON serialises it.
+     *
+     * @param id The library to get the list of pdf files from
+     * @return A JSON serialised list of LinkedPDFFileDTO containing the name, path to and citationkey of the
+     *         BibEntry the file is attached to.
+     * @throws IOException
+     */
     @GET
     @Path("entries/pdffiles")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
     public String getPDFFilesAsList(@PathParam("id") String id) throws IOException {
+        // get a list of all entries in library (specified by "id")
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         List<LinkedPdfFileDTO> response = new ArrayList<>();
         List<BibEntry> entries = databaseContext.getDatabase().getEntries();
@@ -328,6 +343,15 @@ public class LibraryResource {
     }
 
     /// libraries/{id}/entries/pdffiles/annotations
+    /**
+     * Loops through all entries in the specified library and uses FileAnnotationCache to extract the annotations.
+     * Then, groups them by their "parent" PDF file, represented in this list as a LinkedPDFFileDTO.
+     * Lastly, serialises the list.
+     *
+     * @param id The Name of the specified library
+     * @return A JSON serialised list of FileAnnotationDTOs grouped by their parent PDF files.
+     * @throws IOException
+     */
     @GET
     @Path("entries/pdffiles/annotations")
     @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
@@ -352,9 +376,18 @@ public class LibraryResource {
         return gson.toJson(response);
     }
 
+    /**
+     * Extracts all FileAnnotations from PDF files attached to the given BibEntry and returns them as a list.
+     *
+     * @param entry The BibEntry whose attached PDF files' annotations will be extracted
+     * @param cache A FileAnnotationCache instance which will do the extractions
+     * @return A List of PDFAnnotationDTOs
+     */
     private List<PDFAnnotationDTO> extractAnnotationsFromEntry(BibEntry entry, FileAnnotationCache cache) {
         List<PDFAnnotationDTO> annotationDTOs = new ArrayList<>();
+        // get the Cache result
         Map<java.nio.file.Path, List<FileAnnotation>> cacheResult = cache.getFromCache(entry);
+        // create a new PDFAnnotationDTO for each extracted annotation and add it to the list
         cacheResult.forEach((path, fileAnnotations) -> annotationDTOs.add(new PDFAnnotationDTO(path, entry, fileAnnotations)));
 
         return annotationDTOs;

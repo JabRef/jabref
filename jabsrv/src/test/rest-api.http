@@ -1,4 +1,4 @@
-# JabRef REST AP
+# JabRef REST API
 
 // This file is for IntelliJ's HTTP Client, available in the Ultimate Edition
 
@@ -40,7 +40,7 @@ Accept: application/x-bibtex
 GET http://localhost:23119/libraries/demo/entries/pdffiles
 Accept: application/json
 
-### Get pdf annotations from files in demo library
+### Get annotations from pdf files in Chocolate.bib
 
 GET http://localhost:23119/libraries/demo/entries/pdffiles/annotations
 Accept: application/json
@@ -50,12 +50,12 @@ Accept: application/json
 GET http://localhost:23119/libraries/demo
 Accept: application/x-bibtex-library-csl+json
 
-### Read demo JabMap
+### Read demo JabMap (Chocolate.jmp)
 
 GET http://localhost:23119/libraries/demo/map
 Accept: application/json
 
-### Save demo JabMap
+### Save demo JabMap (Chocolate.jmp) note: this might break the data for the demo map
 
 PUT http://localhost:23119/libraries/demo/map
 Content-Type: application/json
@@ -64,16 +64,14 @@ Content-Type: application/json
   "name": "demo"
 }
 
-### Get entry preview for "Tokede_2011" of demo library
+### Get HTML-representation of entry preview for "Tokede_2011" of Chocolate.bib
+
 GET http://localhost:23119/libraries/demo/entries/Tokede_2011
 Accept: text/html
 
-### Get entry preview string for "Corti_2009" of chocolate.bib
-GET http://localhost:23119/libraries/demo/entries/Corti_2009
-Accept: text/plain
+### Get String-representation of entry preview for "Corti_2009" of Chocolate.bib
 
-### Get text view for "Tokede_2011" of demo library
-GET http://localhost:23119/libraries/demo/entries/Tokede_2011
+GET http://localhost:23119/libraries/demo/entries/Corti_2009
 Accept: text/plain
 
 ## From here: C:\git-repositories\JabRef\jablib\src\main\resources\Chocolate.bib is required
