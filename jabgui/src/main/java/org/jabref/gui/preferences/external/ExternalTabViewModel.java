@@ -99,7 +99,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                 FXCollections.observableArrayList(GUIPushToApplications.getAllGUIApplications(dialogService, preferences)));
         selectedPushToApplicationProperty.setValue(
                 GUIPushToApplications.getGUIApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences)
-                                  .orElse(new GUIPushToEmacs(dialogService, preferences)));
+                                  .orElseGet(() -> new GUIPushToEmacs(dialogService, preferences)));
 
         citeCommandProperty.setValue(initialPushToApplicationPreferences.getCiteCommand().toString());
 

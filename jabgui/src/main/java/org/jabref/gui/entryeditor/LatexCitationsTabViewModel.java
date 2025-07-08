@@ -102,7 +102,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
                                                                       applicationName,
                                                                       dialogService,
                                                                       preferences)
-                                                                    .orElse(new GUIPushToTeXstudio(dialogService, preferences));
+                                                                    .orElseGet(() -> new GUIPushToTeXstudio(dialogService, preferences));
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
             application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
         }

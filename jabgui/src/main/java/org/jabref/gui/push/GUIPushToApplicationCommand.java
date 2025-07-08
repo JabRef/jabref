@@ -77,7 +77,7 @@ public class GUIPushToApplicationCommand extends SimpleCommand {
                                                                   applicationName,
                                                                   dialogService,
                                                                   preferences)
-                                                          .orElse(new GUIPushToEmacs(dialogService, preferences));
+                                                          .orElseGet(() -> new GUIPushToEmacs(dialogService, preferences));
 
         preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
         this.application = Objects.requireNonNull(application);
