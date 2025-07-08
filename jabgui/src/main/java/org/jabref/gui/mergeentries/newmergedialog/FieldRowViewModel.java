@@ -16,7 +16,8 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMerger;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
-import org.jabref.logic.bibtex.comparator.YearFieldValueValidityComparator;
+import org.jabref.logic.bibtex.comparator.ComparisonResult;
+import org.jabref.logic.bibtex.comparator.YearFieldValuePlausibilityComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
@@ -128,16 +129,16 @@ public class FieldRowViewModel {
         String rightValue = getRightFieldValue();
 
         if (field.equals(StandardField.YEAR)) {
-                YearFieldValueValidityComparator comparator = new YearFieldValueValidityComparator();
-                int comparison = comparator.compare(leftValue, rightValue);
-                if (comparison > 0) {
+                YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
+                ComparisonResult comparison = comparator.compare(leftValue, rightValue);
+                if (ComparisonResult.RIGHT_BETTER.equals(comparison)) {
                     selectRightValue();
-                } else if (comparison < 0) {
+                } else if (ComparisonResult.LEFT_BETTER.equals(comparison)) {
                     selectLeftValue();
                 }
         } else if (field.equals(InternalField.TYPE_HEADER)) {
             if (leftValue.equalsIgnoreCase(StandardEntryType.Misc.getName())) {
-                selectRightValue(); // Select right value if left value is "misc"
+                selectRightValue();
             }
         }
     }
