@@ -12,6 +12,9 @@ public class GUIPushToApplications {
 
     private static final List<GUIPushToApplication> APPLICATIONS = new ArrayList<>();
 
+    private GUIPushToApplications() {
+    }
+
     public static List<GUIPushToApplication> getAllGUIApplications(DialogService dialogService, CliPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
             return Collections.unmodifiableList(APPLICATIONS);
