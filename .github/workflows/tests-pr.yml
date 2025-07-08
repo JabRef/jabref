@@ -23,7 +23,7 @@ jobs:
 
   check_title_format:
     name: PR title must not start with "Fix for issue <number>"
-    if: github.actor != 'dependabot[bot]'
+    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
@@ -47,7 +47,7 @@ jobs:
 
   mandatory-checks-section-exists:
     if: >
-      (github.repository_owner != 'JabRef') && !(
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') && !(
         (github.actor == 'dependabot[bot]') ||
         (
           startsWith(github.event.pull_request.title, '[Bot] ') ||
@@ -83,7 +83,7 @@ jobs:
 
   checklist-checked:
     if: >
-      (github.repository_owner != 'JabRef') &&
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
         (github.actor == 'dependabot[bot]') ||
         (
@@ -139,7 +139,7 @@ jobs:
 
   changelog_modified:
     name: CHANGELOG.md needs to be modified
-    if: (github.actor != 'dependabot[bot]') && (github.repository_owner != 'JabRef')
+    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -175,7 +175,7 @@ jobs:
   # This ensures that no git merge conflict markers (<<<, ...) are contained
   merge_conflict_job:
     name: Find merge conflicts
-    if: (github.actor != 'dependabot[bot]') && (github.repository_owner != 'JabRef')
+    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -185,7 +185,7 @@ jobs:
         uses: olivernybroe/action-conflict-finder@v4.1
 
   no-force-push:
-    if: (github.actor != 'dependabot[bot]') && (github.repository_owner != 'JabRef')
+    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -209,7 +209,7 @@ jobs:
 
   unmodified_submodules:
     name: Submodules not modified
-    if: (github.actor != 'dependabot[bot]') && (github.repository_owner != 'JabRef')
+    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       # No checkout -> the action uses GitHub's API (which is more reliable for submodule changes due to our submodule settings)
@@ -229,7 +229,7 @@ jobs:
 
   other_than_main:
     name: Source branch is other than "main"
-    if: (github.actor != 'dependabot[bot]') && (github.repository_owner != 'JabRef')
+    if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
       - if: github.head_ref == 'main'
