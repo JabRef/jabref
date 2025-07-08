@@ -18,7 +18,6 @@ public class GUIPushToEmacs extends PushToEmacs implements GUIPushToApplication 
     private final DialogService dialogService;
 
     /**
-     * @param dialogService
      * @param preferences   getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
      */
     public GUIPushToEmacs(DialogService dialogService, CliPreferences preferences) {

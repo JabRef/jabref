@@ -1,6 +1,7 @@
 package org.jabref.gui.push;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,7 @@ public class GUIPushToApplications {
 
     public static List<GUIPushToApplication> getAllGUIApplications(DialogService dialogService, CliPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
-            return APPLICATIONS;
+            return Collections.unmodifiableList(APPLICATIONS);
         }
 
         APPLICATIONS.addAll(List.of(

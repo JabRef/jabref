@@ -1,6 +1,7 @@
 package org.jabref.logic.push;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ public class PushToApplications {
 
     public static List<PushToApplication> getAllApplications(NotificationService notificationService, CliPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
-            return APPLICATIONS;
+            return Collections.unmodifiableList(APPLICATIONS);
         }
 
         APPLICATIONS.addAll(List.of(
