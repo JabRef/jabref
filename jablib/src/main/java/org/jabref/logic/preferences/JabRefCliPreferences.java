@@ -82,6 +82,7 @@ import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.push.PushToApplications;
 import org.jabref.logic.remote.RemotePreferences;
@@ -423,6 +424,7 @@ public class JabRefCliPreferences implements CliPreferences {
     private static final String PUSH_VIM = "vim";
     private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
     private static final String PUSH_VSCODE_PATH = "VScodePath";
+    private static final String CITE_COMMAND = "citeCommand";
     // endregion
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliPreferences.class);
@@ -754,6 +756,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(PUSH_VIM_SERVER, "vim");
         defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
         defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("Code", "Microsoft VS Code"));
+        defaults.put(CITE_COMMAND, "\\cite{key1,key2}");
 
         if (OS.OS_X) {
             defaults.put(PUSH_EMACS_PATH, "emacsclient");
@@ -804,7 +807,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(PUSH_TO_APPLICATION),
                 applicationCommands,
                 get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
-                get(PUSH_VIM_SERVER)
+                get(PUSH_VIM_SERVER),
+                CitationCommandString.from(get(CITE_COMMAND)),
+                CitationCommandString.from((String) defaults.get(CITE_COMMAND))
         );
 
         EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));

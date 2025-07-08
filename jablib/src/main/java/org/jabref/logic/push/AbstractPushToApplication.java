@@ -42,7 +42,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     @VisibleForTesting
-    protected void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString, ProcessBuilder processBuilder) {
+    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString, ProcessBuilder processBuilder) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -144,15 +144,15 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     protected String getCitePrefix() {
-        return "\\autocite{";
+        return preferences.getPushToApplicationPreferences().getCiteCommand().prefix();
     }
 
     public String getDelimiter() {
-        return ",";
+        return preferences.getPushToApplicationPreferences().getCiteCommand().delimiter();
     }
 
     protected String getCiteSuffix() {
-        return "}";
+        return preferences.getPushToApplicationPreferences().getCiteCommand().suffix();
     }
 
     public void jumpToLine(Path fileName, int line, int column) {

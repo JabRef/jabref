@@ -147,6 +147,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String PUSH_VIM = "vim";
     private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
     private static final String PUSH_VSCODE_PATH = "VScodePath";
+    private static final String CITE_COMMAND = "citeCommand";
     // endregion
 
     // region NameDisplayPreferences
@@ -162,7 +163,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String CONSOLE_COMMAND = "consoleCommand";
     private static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
     private static final String USE_DEFAULT_FILE_BROWSER_APPLICATION = "userDefaultFileBrowserApplication";
-    private static final String CITE_COMMAND = "citeCommand";
     private static final String EMAIL_SUBJECT = "emailSubject";
     private static final String KINDLE_EMAIL = "kindleEmail";
     private static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
@@ -301,7 +301,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
 
         // region ExternalApplicationsPreferences
         defaults.put(EXTERNAL_FILE_TYPES, "");
-        defaults.put(CITE_COMMAND, "\\cite{key1,key2}");
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
         defaults.put(KINDLE_EMAIL, "");
 
@@ -386,6 +385,7 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(PUSH_VIM_SERVER, "vim");
         defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
         defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("Code", "Microsoft VS Code"));
+        defaults.put(CITE_COMMAND, "\\cite{key1,key2}");
 
         if (OS.OS_X) {
             defaults.put(PUSH_EMACS_PATH, "emacsclient");
@@ -814,8 +814,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         externalApplicationsPreferences = new ExternalApplicationsPreferences(
                 get(EMAIL_SUBJECT),
                 getBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES),
-                CitationCommandString.from(get(CITE_COMMAND)),
-                CitationCommandString.from((String) defaults.get(CITE_COMMAND)),
                 ExternalFileTypes.fromString(get(EXTERNAL_FILE_TYPES)),
                 !getBoolean(USE_DEFAULT_CONSOLE_APPLICATION), // mind the !
                 get(CONSOLE_COMMAND),
@@ -827,8 +825,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 (obs, oldValue, newValue) -> put(EMAIL_SUBJECT, newValue));
         EasyBind.listen(externalApplicationsPreferences.autoOpenEmailAttachmentsFolderProperty(),
                 (obs, oldValue, newValue) -> putBoolean(OPEN_FOLDERS_OF_ATTACHED_FILES, newValue));
-        EasyBind.listen(externalApplicationsPreferences.citeCommandProperty(),
-                (obs, oldValue, newValue) -> put(CITE_COMMAND, newValue.toString()));
         EasyBind.listen(externalApplicationsPreferences.useCustomTerminalProperty(),
                 (obs, oldValue, newValue) -> putBoolean(USE_DEFAULT_CONSOLE_APPLICATION, !newValue)); // mind the !
         externalApplicationsPreferences.getExternalFileTypes().addListener((SetChangeListener<ExternalFileType>) c ->
@@ -998,13 +994,18 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
                 get(PUSH_TO_APPLICATION),
                 applicationCommands,
                 get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
-                get(PUSH_VIM_SERVER)
+                get(PUSH_VIM_SERVER),
+                CitationCommandString.from(get(CITE_COMMAND)),
+                CitationCommandString.from((String) defaults.get(CITE_COMMAND))
         );
 
         EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
         pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
         EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
         EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
+        EasyBind.listen(pushToApplicationPreferences.citeCommandProperty(),
+                (obs, oldValue, newValue) -> put(CITE_COMMAND, newValue.toString()));
+
         return pushToApplicationPreferences;
     }
 

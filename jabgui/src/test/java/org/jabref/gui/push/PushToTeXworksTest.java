@@ -7,11 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
-import org.jabref.logic.push.PushToTeXworks;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +26,7 @@ class PushToTeXworksTest {
     private static final String TEXWORKS_CLIENT_PATH = "/usr/bin/texworks";
     private static final String DISPLAY_NAME = "TeXworks";
 
-    private PushToTeXworks pushToTeXworks;
+    private GUIPushToTeXworks pushToTeXworks;
 
     @BeforeEach
     void setup() {
@@ -43,15 +41,14 @@ class PushToTeXworksTest {
         when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         // Mock the return value for getCiteCommand()
-        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
         CitationCommandString mockCiteCommand = mock(CitationCommandString.class);
         when(mockCiteCommand.prefix()).thenReturn("");
         when(mockCiteCommand.suffix()).thenReturn("");
-        when(externalApplicationsPreferences.getCiteCommand()).thenReturn(mockCiteCommand);
-        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        when(pushToApplicationPreferences.getCiteCommand()).thenReturn(mockCiteCommand);
+        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         // Create a new instance of PushToTeXworks
-        pushToTeXworks = new PushToTeXworks(dialogService, preferences);
+        pushToTeXworks = new GUIPushToTeXworks(dialogService, preferences);
     }
 
     /**

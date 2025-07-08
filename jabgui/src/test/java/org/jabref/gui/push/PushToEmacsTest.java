@@ -7,11 +7,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.push.PushToApplicationPreferences;
-import org.jabref.logic.push.PushToEmacs;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -23,7 +21,7 @@ import static org.mockito.Mockito.when;
 
 @Disabled("Needs running emacs daemon. Start emacs with --daemon")
 class PushToEmacsTest {
-    PushToEmacs pushToEmacs;
+    GUIPushToEmacs pushToEmacs;
 
     @BeforeEach
     void setup() {
@@ -41,11 +39,10 @@ class PushToEmacsTest {
 
         when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
-        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getCiteCommand().toString()).thenReturn("\\cite{key1,key2}");
-        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        when(pushToApplicationPreferences.getCiteCommand().toString()).thenReturn("\\cite{key1,key2}");
+        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
-        pushToEmacs = new PushToEmacs(dialogService, preferences);
+        pushToEmacs = new GUIPushToEmacs(dialogService, preferences);
     }
 
     @Test

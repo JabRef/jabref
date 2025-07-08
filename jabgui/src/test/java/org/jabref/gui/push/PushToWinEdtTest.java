@@ -4,7 +4,6 @@ import java.nio.file.Path;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.push.PushToWinEdt;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +25,6 @@ class PushToWinEdtTest {
 
     @Test
     void jumpToLineCommandlineArguments() {
-        assertNotNull(new PushToWinEdt(dialogService, preferences).jumpToLineCommandlineArguments(Path.of("test.tex"), 1, 5));
+        assertNotNull(new GUIPushToWinEdt(dialogService, preferences).jumpToLineCommandlineArguments(Path.of("test.tex"), 1, 5));
     }
 }

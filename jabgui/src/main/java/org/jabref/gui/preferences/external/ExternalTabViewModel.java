@@ -19,9 +19,9 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.push.GUIPushToApplication;
+import org.jabref.gui.push.GUIPushToApplicationSettings;
 import org.jabref.gui.push.GUIPushToApplications;
 import org.jabref.gui.push.GUIPushToEmacs;
-import org.jabref.gui.push.GUIPushToApplicationSettings;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
@@ -68,7 +68,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                 initialPushToApplicationPreferences.getActiveApplicationName(),
                 new HashMap<>(initialPushToApplicationPreferences.getCommandPaths()),
                 initialPushToApplicationPreferences.getEmacsArguments(),
-                initialPushToApplicationPreferences.getVimServer());
+                initialPushToApplicationPreferences.getVimServer(),
+                initialPushToApplicationPreferences.getCiteCommand(),
+                initialPushToApplicationPreferences.getDefaultCiteCommand()
+        );
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
@@ -98,7 +101,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
                 GUIPushToApplications.getGUIApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences)
                                   .orElse(new GUIPushToEmacs(dialogService, preferences)));
 
-        citeCommandProperty.setValue(initialExternalApplicationPreferences.getCiteCommand().toString());
+        citeCommandProperty.setValue(initialPushToApplicationPreferences.getCiteCommand().toString());
 
         useCustomTerminalProperty.setValue(initialExternalApplicationPreferences.useCustomTerminal());
         customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
@@ -112,7 +115,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
         externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
         externalPreferences.setAutoOpenEmailAttachmentsFolder(autoOpenAttachedFoldersProperty.getValue());
-        externalPreferences.setCiteCommand(CitationCommandString.from(citeCommandProperty.getValue()));
         externalPreferences.setUseCustomTerminal(useCustomTerminalProperty.getValue());
         externalPreferences.setCustomTerminalCommand(customTerminalCommandProperty.getValue());
         externalPreferences.setUseCustomFileBrowser(useCustomFileBrowserProperty.getValue());
@@ -124,6 +126,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         pushPreferences.setCommandPaths(workingPushToApplicationPreferences.getCommandPaths());
         pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.getEmacsArguments());
         pushPreferences.setVimServer(workingPushToApplicationPreferences.getVimServer());
+        pushPreferences.setCiteCommand(CitationCommandString.from(citeCommandProperty.getValue()));
     }
 
     public ValidationStatus terminalCommandValidationStatus() {
@@ -231,6 +234,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetCiteCommandToDefault() {
-        this.citeCommandProperty.setValue(preferences.getExternalApplicationsPreferences().getDefaultCiteCommand().toString());
+        this.citeCommandProperty.setValue(preferences.getPushToApplicationPreferences().getDefaultCiteCommand().toString());
     }
 }

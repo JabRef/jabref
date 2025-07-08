@@ -122,10 +122,10 @@ public class PushToEmacs extends AbstractPushToApplication {
     @Override
     public void onOperationCompleted() {
         if (couldNotPush) {
-            sendErrorNotification(Localization.lang("Error pushing entries"),
+            this.sendErrorNotification(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not push to a running emacs daemon."));
         } else if (couldNotCall) {
-            sendErrorNotification(Localization.lang("Error pushing entries"),
+            this.sendErrorNotification(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not run the emacs client."));
         } else {
             super.onOperationCompleted();
