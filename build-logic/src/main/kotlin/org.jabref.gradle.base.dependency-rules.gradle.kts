@@ -108,13 +108,13 @@ extraJavaModuleInfo {
         uses("ai.djl.repository.RepositoryFactory")
     }
     module("at.favre.lib:hkdf", "at.favre.lib.hkdf")
-    module("com.github.javakeyring:java-keyring", "com.github.java.keyring")
+    module("com.github.javakeyring:java-keyring", "java.keyring")
 
     module("com.github.tomtung:latex2unicode_2.13", "com.github.tomtung.latex2unicode") {
         exportAllPackages()
         requireAllDefinedDependencies()
     }
-    module("com.lihaoyi:fastparse_2.13", "com.lihaoyi.fastparse") {
+    module("com.lihaoyi:fastparse_2.13", "fastparse") {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("scala.library")
@@ -130,35 +130,35 @@ extraJavaModuleInfo {
         requires("scala.library")
     }
 
-    module("com.googlecode.plist:dd-plist", "com.googlecode.dd.plist")
+    module("com.googlecode.plist:dd-plist", "dd.plist")
     module("com.h2database:h2-mvstore", "com.h2database.mvstore")
     module("com.ibm.icu:icu4j", "com.ibm.icu")
     module("com.knuddels:jtokkit", "com.knuddels.jtokkit")
-    module("com.konghq:unirest-java-core", "com.konghq.unirest.java.core") {
+    module("com.konghq:unirest-java-core", "unirest.java.core") {
         exportAllPackages()
         requires("java.net.http")
         uses("kong.unirest.core.json.JsonEngine")
     }
-    module("com.konghq:unirest-modules-gson", "com.konghq.unirest.modules.gson")
+    module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
     module("com.squareup.okhttp3:okhttp", "okhttp3")
     module("com.squareup.okhttp3:okhttp-sse", "okhttp3.sse")
     module("com.squareup.okio:okio", "okio")
     module("com.squareup.retrofit2:converter-jackson", "retrofit2.converter.jackson")
     module("com.squareup.retrofit2:retrofit", "retrofit2")
-    module("com.vladsch.flexmark:flexmark", "com.vladsch.flexmark")
+    module("com.vladsch.flexmark:flexmark", "flexmark")
     module("com.vladsch.flexmark:flexmark-ext-emoji", "com.vladsch.flexmark.ext.emoji")
     module("com.vladsch.flexmark:flexmark-ext-gfm-strikethrough", "com.vladsch.flexmark.ext.gfm.strikethrough")
     module("com.vladsch.flexmark:flexmark-ext-ins", "com.vladsch.flexmark.ext.ins")
     module("com.vladsch.flexmark:flexmark-ext-superscript", "com.vladsch.flexmark.ext.superscript")
     module("com.vladsch.flexmark:flexmark-ext-tables", "com.vladsch.flexmark.ext.tables")
     module("com.vladsch.flexmark:flexmark-ext-wikilink", "com.vladsch.flexmark.ext.wikilink")
-    module("com.vladsch.flexmark:flexmark-html2md-converter", "com.vladsch.flexmark.html2md.converter")
+    module("com.vladsch.flexmark:flexmark-html2md-converter", "flexmark.html2md.converter")
     module("com.vladsch.flexmark:flexmark-jira-converter", "com.vladsch.flexmark.jira.converter")
     module("com.vladsch.flexmark:flexmark-util", "com.vladsch.flexmark.util")
-    module("com.vladsch.flexmark:flexmark-util-ast", "com.vladsch.flexmark.util.ast")
+    module("com.vladsch.flexmark:flexmark-util-ast", "flexmark.util.ast")
     module("com.vladsch.flexmark:flexmark-util-builder", "com.vladsch.flexmark.util.builder")
     module("com.vladsch.flexmark:flexmark-util-collection", "com.vladsch.flexmark.util.collection")
-    module("com.vladsch.flexmark:flexmark-util-data", "com.vladsch.flexmark.util.data")
+    module("com.vladsch.flexmark:flexmark-util-data", "flexmark.util.data")
     module("com.vladsch.flexmark:flexmark-util-dependency", "com.vladsch.flexmark.util.dependency")
     module("com.vladsch.flexmark:flexmark-util-format", "com.vladsch.flexmark.util.format")
     module("com.vladsch.flexmark:flexmark-util-html", "com.vladsch.flexmark.util.html")
@@ -170,29 +170,29 @@ extraJavaModuleInfo {
     module("commons-collections:commons-collections", "commons.collections")
     module("commons-digester:commons-digester", "commons.digester")
     module("de.rototor.jeuclid:jeuclid-core", "de.rototor.jeuclid.core")
-    module("de.rototor.snuggletex:snuggletex-core", "de.rototor.snuggletex.core")
+    module("de.rototor.snuggletex:snuggletex-core", "snuggletex.core")
     module("de.rototor.snuggletex:snuggletex-jeuclid", "de.rototor.snuggletex.jeuclid")
     module("de.swiesend:secret-service", "de.swiesend.secret.service")
-    module("de.undercouch:citeproc-java", "de.undercouch.citeproc.java") {
+    module("de.undercouch:citeproc-java", "citeproc.java") {
         exportAllPackages()
         requires("java.xml")
         requires("org.antlr.antlr4.runtime")
         requires("org.apache.commons.lang3")
         requires("org.apache.commons.text")
-        requires("org.jbibtex")
+        requires("jbibtex")
         // Compile time only
         // requires("jackson.annotations")
     }
-    module("dev.langchain4j:langchain4j", "dev.langchain4j")
-    module("dev.langchain4j:langchain4j-core", "dev.langchain4j.core")
-    module("dev.langchain4j:langchain4j-google-ai-gemini", "dev.langchain4j.google.ai.gemini")
-    module("dev.langchain4j:langchain4j-http-client", "dev.langchain4j.http.client")
-    module("dev.langchain4j:langchain4j-http-client-jdk", "dev.langchain4j.http.client.jdk")
-    module("dev.langchain4j:langchain4j-hugging-face", "dev.langchain4j.hugging.face")
-    module("dev.langchain4j:langchain4j-mistral-ai", "dev.langchain4j.mistral.ai")
-    module("dev.langchain4j:langchain4j-open-ai", "dev.langchain4j.open.ai")
+    module("dev.langchain4j:langchain4j", "langchain4j")
+    module("dev.langchain4j:langchain4j-core", "langchain4j.core")
+    module("dev.langchain4j:langchain4j-google-ai-gemini", "langchain4j.google.ai.gemini")
+    module("dev.langchain4j:langchain4j-http-client", "langchain4j.http.client")
+    module("dev.langchain4j:langchain4j-http-client-jdk", "langchain4j.http.client.jdk")
+    module("dev.langchain4j:langchain4j-hugging-face", "langchain4j.hugging.face")
+    module("dev.langchain4j:langchain4j-mistral-ai", "langchain4j.mistral.ai")
+    module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "eu.lestard.doc.annotations")
-    module("info.debatty:java-string-similarity", "info.debatty.java.string.similarity")
+    module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.adr:e-adr", "io.github.adr")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "io.zonky.test.postgres.embedded.postgres.binaries.darwin.amd64")
@@ -223,7 +223,7 @@ extraJavaModuleInfo {
         requires("org.apache.commons.logging")
     }
     module("org.apache.pdfbox:pdfbox-io", "org.apache.pdfbox.io")
-    module("org.apache.velocity:velocity-engine-core", "org.apache.velocity.engine.core")
+    module("org.apache.velocity:velocity-engine-core", "velocity.engine.core")
     module("org.eclipse.jgit:org.eclipse.jgit", "org.eclipse.jgit")
     module("org.fxmisc.undo:undofx", "org.fxmisc.undo")
     module("org.fxmisc.wellbehaved:wellbehavedfx", "org.fxmisc.wellbehaved") {
@@ -231,7 +231,7 @@ extraJavaModuleInfo {
         requires("javafx.graphics")
     }
     module("org.javassist:javassist", "org.javassist")
-    module("org.jbibtex:jbibtex", "org.jbibtex") {
+    module("org.jbibtex:jbibtex", "jbibtex") {
         exportAllPackages()
     }
     module("org.scala-lang:scala-library", "scala.library")
@@ -412,12 +412,12 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requiresTransitive("javafx.graphics")
     }
-    module("io.github.stefanbratanov:jvm-openai", "io.github.stefanbratanov.jvm.openai") {
+    module("io.github.stefanbratanov:jvm-openai", "jvm.openai") {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.net.http")
     }
-    module("io.zonky.test:embedded-postgres", "io.zonky.test.embedded.postgres") {
+    module("io.zonky.test:embedded-postgres", "embedded.postgres") {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.sql")
