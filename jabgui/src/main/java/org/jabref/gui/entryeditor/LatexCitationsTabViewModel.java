@@ -22,14 +22,14 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.push.GUIPushToApplication;
+import org.jabref.gui.push.GUIPushToApplications;
+import org.jabref.gui.push.GUIPushToTeXstudio;
 import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.push.PushToApplication;
-import org.jabref.logic.push.PushToApplications;
-import org.jabref.logic.push.PushToTeXstudio;
 import org.jabref.logic.texparser.DefaultLatexParser;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
@@ -98,11 +98,11 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedItem != null) {
             String applicationName = preferences.getPushToApplicationPreferences()
                                                 .getActiveApplicationName();
-            PushToApplication application = PushToApplications.getApplicationByName(
+            GUIPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
                                                                       applicationName,
                                                                       dialogService,
                                                                       preferences)
-                                                              .orElse(new PushToTeXstudio(dialogService, preferences));
+                                                                    .orElse(new GUIPushToTeXstudio(dialogService, preferences));
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
             application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
         }
