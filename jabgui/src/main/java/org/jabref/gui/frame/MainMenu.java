@@ -62,7 +62,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewControls;
-import org.jabref.gui.push.PushToApplicationCommand;
+import org.jabref.gui.push.GUIPushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
@@ -98,7 +98,7 @@ public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
     private final FileHistoryMenu fileHistoryMenu;
     private final SidePane sidePane;
-    private final PushToApplicationCommand pushToApplicationCommand;
+    private final GUIPushToApplicationCommand GUIPushToApplicationCommand;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -115,7 +115,7 @@ public class MainMenu extends MenuBar {
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
                     SidePane sidePane,
-                    PushToApplicationCommand pushToApplicationCommand,
+                    GUIPushToApplicationCommand GUIPushToApplicationCommand,
                     GuiPreferences preferences,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
@@ -131,7 +131,7 @@ public class MainMenu extends MenuBar {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
-        this.pushToApplicationCommand = pushToApplicationCommand;
+        this.GUIPushToApplicationCommand = GUIPushToApplicationCommand;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -312,8 +312,8 @@ public class MainMenu extends MenuBar {
                 // endregion
         );
 
-        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
-        pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(GUIPushToApplicationCommand.getAction(), GUIPushToApplicationCommand);
+        GUIPushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
 
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),

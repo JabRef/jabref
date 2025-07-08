@@ -21,7 +21,7 @@ import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.push.GUIPushToApplication;
 import org.jabref.gui.push.GUIPushToApplications;
 import org.jabref.gui.push.GUIPushToEmacs;
-import org.jabref.gui.push.PushToApplicationSettings;
+import org.jabref.gui.push.GUIPushToApplicationSettings;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
@@ -157,7 +157,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public void pushToApplicationSettings() {
         GUIPushToApplication selectedApplication = selectedPushToApplicationProperty.getValue();
-        PushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, workingPushToApplicationPreferences);
+        GUIPushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, workingPushToApplicationPreferences);
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(settings.getSettingsPane());

@@ -9,14 +9,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class PushToVimSettings extends PushToApplicationSettings {
+public class GUIPushToVimSettings extends GUIPushToApplicationSettings {
 
     private final TextField vimServer = new TextField();
 
-    public PushToVimSettings(PushToApplication application,
-                             DialogService dialogService,
-                             FilePreferences filePreferences,
-                             PushToApplicationPreferences preferences) {
+    public GUIPushToVimSettings(PushToApplication application,
+                                DialogService dialogService,
+                                FilePreferences filePreferences,
+                                PushToApplicationPreferences preferences) {
         super(application, dialogService, filePreferences, preferences);
 
         settingsPane.add(new Label(Localization.lang("Vim server name") + ":"), 0, 1);

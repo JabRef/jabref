@@ -6,12 +6,12 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class PushToLyxSettings extends PushToApplicationSettings {
+public class GUIPushToLyxSettings extends GUIPushToApplicationSettings {
 
-    public PushToLyxSettings(PushToApplication application,
-                             DialogService dialogService,
-                             FilePreferences filePreferences,
-                             PushToApplicationPreferences preferences) {
+    public GUIPushToLyxSettings(PushToApplication application,
+                                DialogService dialogService,
+                                FilePreferences filePreferences,
+                                PushToApplicationPreferences preferences) {
         super(application, dialogService, filePreferences, preferences);
 
         commandLabel.setText(Localization.lang("Path to LyX pipe") + ":");

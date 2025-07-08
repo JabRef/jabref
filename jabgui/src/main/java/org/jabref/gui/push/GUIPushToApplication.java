@@ -21,7 +21,7 @@ public interface GUIPushToApplication extends PushToApplication {
 
     Action getAction();
 
-    PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences pushToApplicationPreferences);
+    GUIPushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences pushToApplicationPreferences);
 
     void sendErrorNotification(String title, String message);
 }

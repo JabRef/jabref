@@ -20,7 +20,7 @@ import org.jabref.logic.push.AbstractPushToApplication;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class PushToApplicationSettings {
+public class GUIPushToApplicationSettings {
 
     protected final Label commandLabel;
     protected final TextField path;
@@ -28,10 +28,10 @@ public class PushToApplicationSettings {
     protected final PushToApplicationPreferences preferences;
     protected final AbstractPushToApplication application;
 
-    public PushToApplicationSettings(PushToApplication application,
-                                     DialogService dialogService,
-                                     FilePreferences filePreferences,
-                                     PushToApplicationPreferences preferences) {
+    public GUIPushToApplicationSettings(PushToApplication application,
+                                        DialogService dialogService,
+                                        FilePreferences filePreferences,
+                                        PushToApplicationPreferences preferences) {
         this.application = (AbstractPushToApplication) application;
         this.preferences = preferences;
 

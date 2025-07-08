@@ -23,8 +23,8 @@ public class GUIPushToSublimeText extends PushToSublimeText implements GUIPushTo
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToApplicationSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
+    public GUIPushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
+        return new GUIPushToApplicationSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     @Override

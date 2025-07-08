@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
  */
-public class PushToApplicationCommand extends SimpleCommand {
+public class GUIPushToApplicationCommand extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PushToApplicationCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GUIPushToApplicationCommand.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -43,7 +43,7 @@ public class PushToApplicationCommand extends SimpleCommand {
 
     private GUIPushToApplication application;
 
-    public PushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public GUIPushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferences = preferences;

@@ -42,8 +42,8 @@ public class GUIPushToEmacs extends PushToEmacs implements GUIPushToApplication 
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToEmacsSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
+    public GUIPushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
+        return new GUIPushToEmacsSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     protected class PushToApplicationAction implements Action {

@@ -23,8 +23,8 @@ public class GUIPushToLyx extends PushToLyx implements GUIPushToApplication {
     }
 
     @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToLyxSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
+    public GUIPushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
+        return new GUIPushToLyxSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     @Override

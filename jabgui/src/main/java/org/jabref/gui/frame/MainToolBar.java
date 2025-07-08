@@ -28,7 +28,7 @@ import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.NewEntryAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.push.PushToApplicationCommand;
+import org.jabref.gui.push.GUIPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.undo.CountingUndoManager;
@@ -47,7 +47,7 @@ import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
     private final LibraryTabContainer frame;
-    private final PushToApplicationCommand pushToApplicationCommand;
+    private final GUIPushToApplicationCommand GUIPushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -64,7 +64,7 @@ public class MainToolBar extends ToolBar {
     private Subscription taskProgressSubscription;
 
     public MainToolBar(LibraryTabContainer tabContainer,
-                       PushToApplicationCommand pushToApplicationCommand,
+                       GUIPushToApplicationCommand GUIPushToApplicationCommand,
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
                        StateManager stateManager,
@@ -76,7 +76,7 @@ public class MainToolBar extends ToolBar {
                        ClipBoardManager clipBoardManager,
                        CountingUndoManager undoManager) {
         this.frame = tabContainer;
-        this.pushToApplicationCommand = pushToApplicationCommand;
+        this.GUIPushToApplicationCommand = GUIPushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -97,8 +97,8 @@ public class MainToolBar extends ToolBar {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
-        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
+        final Button pushToApplicationButton = factory.createIconButton(GUIPushToApplicationCommand.getAction(), GUIPushToApplicationCommand);
+        GUIPushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
         // Setup Toolbar
 

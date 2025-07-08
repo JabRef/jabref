@@ -9,14 +9,14 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class PushToEmacsSettings extends PushToApplicationSettings {
+public class GUIPushToEmacsSettings extends GUIPushToApplicationSettings {
 
     private final TextField additionalParams = new TextField();
 
-    public PushToEmacsSettings(PushToApplication application,
-                               DialogService dialogService,
-                               FilePreferences filePreferences,
-                               PushToApplicationPreferences preferences) {
+    public GUIPushToEmacsSettings(PushToApplication application,
+                                  DialogService dialogService,
+                                  FilePreferences filePreferences,
+                                  PushToApplicationPreferences preferences) {
         super(application, dialogService, filePreferences, preferences);
 
         settingsPane.add(new Label(Localization.lang("Additional parameters") + ":"), 0, 1);
