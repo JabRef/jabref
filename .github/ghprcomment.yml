@@ -145,7 +145,7 @@
   always: true
   message: >
     The title of the pull request must not start with "Fix for issue xyz".
-    Please use a descriptive summary that explains what the fix or change actually does.
+    Please use a concise one-line summary that explains what the fix or change actually does.
     Example of a good title: "Prevent crash when importing malformed BibTeX entries".
 - jobName: 'Mandatory Checks present'
   always: true

@@ -36,7 +36,7 @@ jobs:
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
           echo "Title: $TITLE"
 
-          if echo "$TITLE" | grep -Eq '^Fix for issue [0-9]+'; then
+          if echo "$TITLE" | grep -Eiq '^Fix for issue #?[0-9]+'; then
             echo "❌ Title starts with 'Fix for issue <number>' — not allowed."
             exit 1
           else
