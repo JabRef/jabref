@@ -11,6 +11,7 @@ open module org.jabref {
     requires java.sql.rowset;
 
     // region JavaFX
+    requires javafx.swing;
     requires javafx.base;
     requires javafx.controls;
     requires javafx.fxml;

@@ -90,6 +90,8 @@ public class FieldEditors {
                     MonthEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.LANGUAGE)) {
             return new OptionEditor<>(new LanguageEditorViewModel(field, suggestionProvider, databaseContext.getMode(), fieldCheckers, undoManager));
+        } else if (field == StandardField.ICORANKING) {
+            return new ICoreRankingEditor(field);
         } else if (field == StandardField.GENDER) {
             return new OptionEditor<>(new GenderEditorViewModel(field, suggestionProvider, fieldCheckers, undoManager));
         } else if (fieldProperties.contains(FieldProperty.EDITOR_TYPE)) {
