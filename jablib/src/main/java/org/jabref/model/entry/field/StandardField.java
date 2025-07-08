@@ -138,7 +138,9 @@ public enum StandardField implements Field {
     OWNER("owner"),
     TIMESTAMP("timestamp", FieldProperty.DATE),
     CREATIONDATE("creationdate", FieldProperty.DATE),
+    CITATIONCOUNT("citationcount", FieldProperty.NUMERIC),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
+
 
     public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 

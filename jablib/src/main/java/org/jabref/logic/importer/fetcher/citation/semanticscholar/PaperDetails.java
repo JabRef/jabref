@@ -160,6 +160,11 @@ public class PaperDetails {
             bibEntry.setField(StandardField.ABSTRACT, getAbstract());
         }
 
+        if(getCitationCount() != 0){
+            bibEntry.setField(StandardField.CITATIONCOUNT, String.valueOf( getCitationCount()));
+        }
+
+
         return bibEntry;
     }
 

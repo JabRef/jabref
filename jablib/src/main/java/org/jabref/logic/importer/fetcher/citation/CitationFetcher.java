@@ -1,6 +1,7 @@
 package org.jabref.logic.importer.fetcher.citation;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.model.entry.BibEntry;
@@ -39,6 +40,14 @@ public interface CitationFetcher {
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     List<BibEntry> searchCiting(BibEntry entry) throws FetcherException;
+
+    /**
+     * Looks for hits which are cited by the given {@link BibEntry}.
+     *
+     * @param entry entry to search articles for
+     * @return @link BibEntry, which is matched by the query (may be empty)
+     */
+    Optional<BibEntry> searchCitationCount(BibEntry entry) throws FetcherException;
 
     /**
      * Returns the localized name of this fetcher.

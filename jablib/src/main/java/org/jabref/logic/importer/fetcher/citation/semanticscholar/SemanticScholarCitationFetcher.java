@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -29,6 +30,11 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
 
     public String getAPIUrl(String entry_point, BibEntry entry) {
         return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString() + "/" + entry_point
+                + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
+                + "&limit=1000";
+    }
+    public String getAPIUrl(BibEntry entry) {
+        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
                 + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
                 + "&limit=1000";
     }
@@ -82,6 +88,27 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
                                  .stream()
                                  .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
                                  .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
+    }
+
+    @Override
+    public Optional<BibEntry> searchCitationCount(BibEntry entry) throws FetcherException {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
+        URL referencesUrl;
+        try {
+            referencesUrl = URLUtil.create(getAPIUrl(entry));
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Malformed URL", e);
+        }
+        URLDownload urlDownload = new URLDownload(referencesUrl);
+        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+        ReferenceDataItem referencesResponse = GSON.fromJson(urlDownload.asString(), ReferenceDataItem.class);
+
+        if (referencesResponse == null) {
+            return Optional.empty();
+        }
+        return Optional.of(referencesResponse.getCitedPaper().toBibEntry());
     }
 
     @Override
