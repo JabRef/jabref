@@ -60,6 +60,41 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     }
 
     @Test
+    void entriesMissingRequiredFieldsAreReported(@TempDir Path tempDir) throws Exception {
+        BibEntry withDate = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("withDate")
+                .withField(StandardField.DATE, "date")
+                .withField(StandardField.URLDATE, "urldate");
+        BibEntry withoutDate = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("withoutDate")
+                .withField(StandardField.URLDATE, "urldate");
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
+                .check(List.of(withDate, withoutDate), (_, _) -> {
+                });
+
+        Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
+        try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
+             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
+            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+        }
+        assertEquals("""
+                Field Presence Consistency Check Result
+
+                | entry type | citation key | Date |
+                | ---------- | ------------ | ---- |
+                | Online     | withDate     | ?    |
+
+                | Symbol | Meaning                   |
+                | ------ | ------------------------- |
+                | x      | required field is present |
+                | o      | optional field is present |
+                | ?      | unknown field is present  |
+                | -      | field is absent           |
+                """, Files.readString(txtFile).replace("\r\n", "\n"));
+    }
+
+    @Test
     void checkDifferentOutputSymbols(@TempDir Path tempDir) throws IOException {
         UnknownField customField = new UnknownField("custom");
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")

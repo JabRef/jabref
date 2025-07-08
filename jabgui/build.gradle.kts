@@ -23,6 +23,8 @@ dependencies {
     implementation("org.openjfx:javafx-swing")
     implementation("org.openjfx:javafx-web")
 
+    implementation(project(":jabsrv"))
+
     implementation("com.pixelduke:fxthemes")
 
     // From JavaFX25 onwards
@@ -119,6 +121,10 @@ dependencies {
 
     testImplementation("com.github.javaparser:javaparser-symbol-solver-core")
     testImplementation("org.ow2.asm:asm")
+
+    testImplementation("com.tngtech.archunit:archunit")
+    testImplementation("com.tngtech.archunit:archunit-junit5-api")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
 }
 
 application {
@@ -216,6 +222,9 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
 
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
+
+    requires.add("com.tngtech.archunit")
+    requires.add("com.tngtech.archunit.junit5.api")
 }
 
 tasks.test {

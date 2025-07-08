@@ -7,13 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RemoteGuiPreferencesTest {
+class RemotePreferencesTest {
 
     private RemotePreferences preferences;
 
     @BeforeEach
     void setUp() {
-        preferences = new RemotePreferences(1000, true);
+        preferences = new RemotePreferences(1000, true, false);
     }
 
     @Test
