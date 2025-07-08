@@ -31,6 +31,7 @@ import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
+import org.jspecify.annotations.Nullable;
 
 import static org.jabref.model.strings.StringUtil.isNullOrEmpty;
 
@@ -576,18 +577,12 @@ public class PdfContentImporter extends PdfImporter {
         return Optional.of(entry);
     }
 
-    private String getDoi(String doi) {
-        int pos;
-        if (doi == null) {
-            pos = curString.indexOf("DOI");
-            if (pos < 0) {
-                pos = curString.indexOf(StandardField.DOI.getName());
-            }
-            if (pos >= 0) {
-                return DOI.findInText(curString).map(DOI::asString).orElse(null);
-            }
+    private @Nullable String getDoi(@Nullable String currentDoi) {
+        if (currentDoi != null) {
+            return currentDoi;
         }
-        return doi;
+
+        return DOI.findInText(curString).map(DOI::asString).orElse(null);
     }
 
     private String getArXivId(String arXivId) {
