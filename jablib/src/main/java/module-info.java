@@ -152,12 +152,12 @@ open module org.jabref.jablib {
     requires jakarta.ws.rs;
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
-    requires com.konghq.unirest.java.core;
-    requires com.konghq.unirest.modules.gson;
+    requires unirest.java.core;
+    requires unirest.modules.gson;
     // endregion
 
     // region: SQL databases
-    requires io.zonky.test.embedded.postgres;
+    requires embedded.postgres;
     requires org.tukaani.xz;
     requires org.postgresql.jdbc;
     // endregion
@@ -165,7 +165,7 @@ open module org.jabref.jablib {
     // region: Apache Commons and other (similar) helper libraries
     requires com.google.common;
     requires io.github.javadiffutils;
-    requires info.debatty.java.string.similarity;
+    requires java.string.similarity;
     requires org.apache.commons.compress;
     requires org.apache.commons.csv;
     requires org.apache.commons.io;
@@ -176,27 +176,27 @@ open module org.jabref.jablib {
 
     // region: latex2unicode
     requires com.github.tomtung.latex2unicode;
-    requires com.lihaoyi.fastparse;
+    requires fastparse;
     requires scala.library;
     // endregion
 
-    requires org.jbibtex;
-    requires de.undercouch.citeproc.java;
+    requires jbibtex;
+    requires citeproc.java;
 
-    requires de.rototor.snuggletex.core;
+    requires snuggletex.core;
 
     requires org.apache.pdfbox;
     requires org.apache.xmpbox;
     requires com.ibm.icu;
 
-    requires com.vladsch.flexmark;
-    requires com.vladsch.flexmark.html2md.converter;
-    requires com.vladsch.flexmark.util.ast;
-    requires com.vladsch.flexmark.util.data;
+    requires flexmark;
+    requires flexmark.html2md.converter;
+    requires flexmark.util.ast;
+    requires flexmark.util.data;
 
     requires com.h2database.mvstore;
 
-    requires com.github.java.keyring;
+    requires java.keyring;
     requires org.freedesktop.dbus;
 
     requires org.jooq.jool;
@@ -205,18 +205,18 @@ open module org.jabref.jablib {
     requires ai.djl.api;
     requires ai.djl.pytorch_model_zoo;
     requires ai.djl.tokenizers;
-    requires io.github.stefanbratanov.jvm.openai;
-    requires dev.langchain4j;
-    requires dev.langchain4j.core;
-    requires dev.langchain4j.google.ai.gemini;
-    requires dev.langchain4j.hugging.face;
-    requires dev.langchain4j.mistral.ai;
-    requires dev.langchain4j.open.ai;
+    requires jvm.openai;
+    requires langchain4j;
+    requires langchain4j.core;
+    requires langchain4j.google.ai.gemini;
+    requires langchain4j.hugging.face;
+    requires langchain4j.mistral.ai;
+    requires langchain4j.open.ai;
     uses ai.djl.engine.EngineProvider;
     uses ai.djl.repository.RepositoryFactory;
     uses ai.djl.repository.zoo.ZooProvider;
     uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
-    requires org.apache.velocity.engine.core;
+    requires velocity.engine.core;
     // endregion
 
     // region: Lucene
@@ -242,7 +242,7 @@ open module org.jabref.jablib {
 
     // region: other libraries (alphabetically)
     requires cuid;
-    requires com.googlecode.dd.plist;
+    requires dd.plist;
     requires io.github.adr;
     // required by okhttp and some AI library
     requires kotlin.stdlib;
