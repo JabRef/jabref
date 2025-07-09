@@ -35,6 +35,7 @@ public class GuiPushToApplications {
         return Collections.unmodifiableList(APPLICATIONS);
     }
 
+    /// In case object "preferences" changes for itself, that update won't be propagated. Does not harm as the current callers do not change that reference itself.
     public static Optional<GuiPushToApplication> getGUIApplicationByName(String applicationName, DialogService dialogService, PushToApplicationPreferences preferences) {
         return getAllGUIApplications(dialogService, preferences).stream()
                                                                 .filter(application -> application.getDisplayName().equalsIgnoreCase(applicationName))
