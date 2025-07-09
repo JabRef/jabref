@@ -183,16 +183,15 @@ public class LibraryResource {
         return result;
     }
 
-    /// @param id - also "demo" for the Chocolate.bib file
+    /**
+     * @param id - also "demo" for the Chocolate.bib file
+     */
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
         return ServerUtils.getBibDatabaseContext(id, filesToServe, contextsToServe, preferences.getImportFormatPreferences());
     }
 
-    /// libraries/{id}/entries/{entryId}
-    // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
-
     /**
-     * Combines attributes of a given BibEntry into a basic entry preview for as plain text
+     * Combines attributes of a given BibEntry into a basic entry preview for as plain text.
      *
      * @param id The name of the library
      * @param entryId The CitationKey of the BibEntry
@@ -213,6 +212,7 @@ public class LibraryResource {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
         }
 
+        // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
         // build the preview
         BibEntry entry = entriesByCitationKey.getFirst();
 
@@ -258,6 +258,7 @@ public class LibraryResource {
             LOGGER.warn("Multiple entries found with citation key '{}'. Using the first one.", entryId);
         }
 
+        // TODO: Currently, the preview preferences are in GUI package, which is not accessible here.
         // build the preview
         BibEntry entry = entriesByCitationKey.getFirst();
 
@@ -282,15 +283,11 @@ public class LibraryResource {
         return preview;
     }
 
-    /// libraries/{id}/entries/pdffiles
     /**
+     * At libraries/{id}/entries/pdffiles <br><br>
+     *
      * Loops through all entries in the specified library and adds attached files of type "PDF" to
      * a list and JSON serialises it.
-     *
-     * @param id The library to get the list of pdf files from
-     * @return A JSON serialised list of LinkedPDFFileDTO containing the name, path to and citationkey of the
-     *         BibEntry the file is attached to.
-     * @throws IOException
      */
     @GET
     @Path("entries/pdffiles")
@@ -322,8 +319,9 @@ public class LibraryResource {
         return gson.toJson(response);
     }
 
-    /// libraries/{id}/entries/pdffiles/annotations
     /**
+     * At libraries/{id}/entries/pdffiles/annotations <br><br>
+     *
      * Loops through all entries in the specified library and uses FileAnnotationCache to extract the annotations.
      * Then, groups them by their "parent" PDF file, represented in this list as a LinkedPDFFileDTO.
      * Lastly, serialises the list.
