@@ -234,4 +234,8 @@ public class GitHandler {
     public File getRepositoryPathAsFile() {
         return repositoryPathAsFile;
     }
+
+    public Git open() throws IOException {
+        return Git.open(this.repositoryPathAsFile);
+    }
 }

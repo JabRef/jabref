@@ -118,16 +118,13 @@ class GitSyncServiceTest {
         aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);
         git.fetch().setRemote("origin").call();
 
-        // ToDo: Replace by call to GitSyncService crafting a merge commit
-//      git.merge().include(aliceCommit).include(bobCommit).call(); // Will throw exception bc of merge conflict
-
         // Debug hint: Show the created git graph on the command line
         //   git log --graph --oneline --decorate --all --reflog
     }
 
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
-        GitHandler gitHandler = mock(GitHandler.class);
+        GitHandler gitHandler = new GitHandler(library.getParent());
         GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler);
         MergeResult result = syncService.fetchAndMerge(library);
 
@@ -151,7 +148,7 @@ class GitSyncServiceTest {
 
     @Test
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
-        GitHandler gitHandler = mock(GitHandler.class);
+        GitHandler gitHandler = new GitHandler(library.getParent());
         GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler);
         syncService.push(library);
 
@@ -170,7 +167,6 @@ class GitSyncServiceTest {
 
         assertEquals(normalize(expected), normalize(pushedContent));
     }
-
 
     @Test
     void readFromCommits() throws Exception {

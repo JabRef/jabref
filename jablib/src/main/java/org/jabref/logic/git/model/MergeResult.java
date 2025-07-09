@@ -14,6 +14,10 @@ public record MergeResult(boolean isSuccessful, List<BibEntryDiff> conflicts) {
         return new MergeResult(SUCCESS, List.of());
     }
 
+    public static MergeResult failure() {
+        return new MergeResult(false, List.of());
+    }
+
     public boolean hasConflicts() {
         return !conflicts.isEmpty();
     }

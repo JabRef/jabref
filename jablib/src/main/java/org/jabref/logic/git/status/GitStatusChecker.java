@@ -18,9 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * GitStatusChecker 用于从任意路径检测当前 Git 仓库状态。
- * 如果找不到仓库，返回 tracking = false 的 GitStatusSnapshot；
- * 否则返回完整状态（tracking + syncStatus + conflict）。
+ * This class is used to determine the status of a Git repository from any given path inside it.
+ * If no repository is found, it returns a {@link GitStatusSnapshot} with tracking = false.
+ * Otherwise, it returns a full snapshot including tracking status, sync status, and conflict state.
  */
 public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
@@ -39,7 +39,7 @@ public class GitStatusChecker {
             boolean hasConflict = !status.getConflicting().isEmpty();
 
             ObjectId localHead = repo.resolve("HEAD");
-            ObjectId remoteHead = repo.resolve("@{u}");
+            ObjectId remoteHead = repo.resolve("refs/remotes/origin/main");
             SyncStatus syncStatus = determineSyncStatus(repo, localHead, remoteHead);
 
             return new GitStatusSnapshot(
