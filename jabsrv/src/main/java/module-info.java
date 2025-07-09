@@ -38,7 +38,7 @@ module org.jabref.jabsrv {
     requires jakarta.validation;
     requires jakarta.ws.rs;
 
-    requires org.glassfish.jersey.common;
+    requires jersey.common;
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
@@ -49,6 +49,6 @@ module org.jabref.jabsrv {
 
     requires transitive org.jspecify;
     requires java.logging;
-    requires org.glassfish.jersey.grizzly2.http;
-    requires org.glassfish.jersey.server;
+    requires jersey.container.grizzly2.http;
+    requires jersey.server;
 }

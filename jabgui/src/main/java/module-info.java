@@ -46,7 +46,7 @@ open module org.jabref {
     provides org.kordamp.ikonli.IkonProvider
             with org.jabref.gui.icon.JabrefIconProvider;
 
-    requires org.reactfx;
+    requires reactfx;
     // endregion
 
     // region: Logging
@@ -155,7 +155,7 @@ open module org.jabref {
     // uses ai.djl.engine.EngineProvider;
     // uses ai.djl.repository.RepositoryFactory;
     // uses ai.djl.repository.zoo.ZooProvider;
-    // uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
+    // uses langchain4j.spi.prompt.PromptTemplateFactory;
     // requires velocity.engine.core;
     // endregion
 
