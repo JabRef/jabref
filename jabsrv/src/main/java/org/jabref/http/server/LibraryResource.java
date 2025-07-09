@@ -11,7 +11,7 @@ import java.util.Objects;
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.http.dto.LinkedPdfFileDTO;
-import org.jabref.http.dto.PDFAnnotationDTO;
+import org.jabref.http.dto.PdfAnnotationDTO;
 import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
@@ -346,7 +346,7 @@ public class LibraryResource {
         }
 
         FileAnnotationCache annoCache = new FileAnnotationCache(databaseContext, filePreferences);
-        List<PDFAnnotationDTO> response = new ArrayList<>();
+        List<PdfAnnotationDTO> response = new ArrayList<>();
 
         // loop through all entries to extract annotations
         for (BibEntry bibEntry : entries) {
@@ -361,14 +361,14 @@ public class LibraryResource {
      *
      * @param entry The BibEntry whose attached PDF files' annotations will be extracted
      * @param cache A FileAnnotationCache instance which will do the extractions
-     * @return A List of PDFAnnotationDTOs
+     * @return A List of PdfAnnotationDTO
      */
-    private List<PDFAnnotationDTO> extractAnnotationsFromEntry(BibEntry entry, FileAnnotationCache cache) {
-        List<PDFAnnotationDTO> annotationDTOs = new ArrayList<>();
+    private List<PdfAnnotationDTO> extractAnnotationsFromEntry(BibEntry entry, FileAnnotationCache cache) {
+        List<PdfAnnotationDTO> annotationDTOs = new ArrayList<>();
         // get the Cache result
         Map<java.nio.file.Path, List<FileAnnotation>> cacheResult = cache.getFromCache(entry);
-        // create a new PDFAnnotationDTO for each extracted annotation and add it to the list
-        cacheResult.forEach((path, fileAnnotations) -> annotationDTOs.add(new PDFAnnotationDTO(path, entry, fileAnnotations)));
+        // create a new PdfAnnotationDTO for each extracted annotation and add it to the list
+        cacheResult.forEach((path, fileAnnotations) -> annotationDTOs.add(new PdfAnnotationDTO(path, entry, fileAnnotations)));
 
         return annotationDTOs;
     }
