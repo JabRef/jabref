@@ -150,6 +150,29 @@ class GitSyncServiceTest {
     }
 
     @Test
+    void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
+        GitHandler gitHandler = mock(GitHandler.class);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler);
+        syncService.push(library);
+
+        String pushedContent = GitFileReader.readFileFromCommit(git, git.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"));
+        String expected = """
+        @article{a,
+          author = {author-a},
+          doi = {xya},
+        }
+
+        @article{b,
+          author = {author-b},
+          doi = {xyz},
+        }
+        """;
+
+        assertEquals(normalize(expected), normalize(pushedContent));
+    }
+
+
+    @Test
     void readFromCommits() throws Exception {
         String base = GitFileReader.readFileFromCommit(git, baseCommit, Path.of("library.bib"));
         String local = GitFileReader.readFileFromCommit(git, aliceCommit, Path.of("library.bib"));

@@ -123,12 +123,38 @@ public class GitSyncService {
     }
 
     // WIP
-    // TODO: add test
-    public void push(Path bibFilePath) throws GitAPIException, IOException {
-        // 1. Auto-commit: commit if there are changes
+    public void push(Path bibFilePath) throws GitAPIException, IOException, JabRefException{
+        // 1. 1: Fetch remote changes
+        gitHandler.fetchOnCurrentBranch();
+
+        // 2: Check if local branch is behind remote
+        if (gitHandler.isBehindRemote()) {
+            LOGGER.info("Remote changes detected — performing semantic merge");
+
+            // 2.1: Resolve commit identifiers
+            RevCommit baseCommit = gitHandler.findMergeBaseWithRemote();
+            RevCommit localCommit = gitHandler.resolveHead();
+            RevCommit remoteCommit = gitHandler.resolveRemoteHead();
+
+            // 2.2: Perform semantic merge of the .bib file
+            MergeResult mergeResult = performSemanticMerge(
+                    gitHandler.getGit(),
+                    baseCommit,
+                    localCommit,
+                    remoteCommit,
+                    bibFilePath
+            );
+
+            if (!mergeResult.isSuccessful()) {
+                LOGGER.warn("Semantic merge failed — aborting push");
+                return;
+            }
+        }
+
+        // 3: Commit changes if there are any
         boolean committed = gitHandler.createCommitOnCurrentBranch("Changes committed by JabRef", !AMEND);
 
-        // 2. push to remote
+        // 4: Push to remote only if a commit was made
         if (committed) {
             gitHandler.pushCommitsToRemoteRepository();
         } else {
