@@ -108,27 +108,7 @@ public class LibraryResource {
                           "expanded": true,
                           "icons": [],
                           "highlight": null,
-                          "type": "Text",
-                          "children": [
-                            {
-                              "id": "7eb3d8255e647a7e",
-                              "topic": "Open Source",
-                              "expanded": true,
-                              "direction": "left",
-                              "icons": [
-                                "checked"
-                              ]
-                            },
-                            {
-                              "id": "7eb3da68fdf12ff5",
-                              "topic": "scientific mindmapping",
-                              "expanded": true,
-                              "direction": "right",
-                              "icons": [
-                                "light_bulb"
-                              ]
-                            }
-                          ]
+                          "type": "Text"
                         }
                       }
                     }
