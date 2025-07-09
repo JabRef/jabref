@@ -98,8 +98,8 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         link.requestFocus();
     }
 
-    private void onDialogShow(DialogEvent e) {
+    private void onDialogShow(DialogEvent event) {
         Platform.runLater(() -> link.requestFocus());
-        e.consume();
+        event.consume();
     }
 }
