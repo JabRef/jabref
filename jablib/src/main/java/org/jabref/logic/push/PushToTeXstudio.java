@@ -6,7 +6,7 @@ import org.jabref.logic.util.NotificationService;
 
 public class PushToTeXstudio extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.TEXSTUDIO;
+    public static final PushApplications APPLICATION = PushApplications.TEXSTUDIO;
 
     public PushToTeXstudio(NotificationService dialogService, PushToApplicationPreferences preferences) {
         super(dialogService, preferences);

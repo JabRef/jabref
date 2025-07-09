@@ -68,20 +68,12 @@ public class CAYWResource {
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
+        // Probe parameter handling
         if (queryParams.isProbe()) {
             return Response.ok("ready").build();
         }
+        
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
-
-        /* unused until DatabaseSearcher is fixed
-        PostgreServer postgreServer = new PostgreServer();
-        IndexManager.clearOldSearchIndices();
-        searcher = new DatabaseSearcher(
-                databaseContext,
-                new CurrentThreadTaskExecutor(),
-                preferences,
-                postgreServer);
-          */
 
         List<CAYWEntry> entries = databaseContext.getEntries()
                                  .stream()
@@ -89,21 +81,7 @@ public class CAYWResource {
                                  .toList();
 
         initializeGUI();
-
-        CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
-        Platform.runLater(() -> {
-            SearchDialog dialog = new SearchDialog();
-            // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
-            //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
-            List<CAYWEntry> results = dialog.show(
-                    searchQuery ->
-                            entries.stream()
-                                   .filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
-                    entries);
-            future.complete(results);
-        });
-
-        List<CAYWEntry> searchResults = future.get();
+        List<CAYWEntry> searchResults = openSearchGui(entries);
 
         if (searchResults.isEmpty()) {
             return Response.noContent().build();
@@ -122,13 +100,41 @@ public class CAYWResource {
         }
 
         // Push to TexStudio parameter handling
-        if (queryParams.isTexstudio()) {
+        if (queryParams.isTexstudio() || queryParams.getApplication().isPresent()) {
+            String applicationId = queryParams.getApplication().orElse("texstudio");
             CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand()).concat("{"), ",", "}");
-            PushToApplications.getApplicationById("TeXstudio", LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
+            PushToApplications.getApplicationById(applicationId, LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }
 
         return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
+    }
+
+    private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries) throws InterruptedException, ExecutionException {
+        /* unused until DatabaseSearcher is fixed
+        PostgreServer postgreServer = new PostgreServer();
+        IndexManager.clearOldSearchIndices();
+        searcher = new DatabaseSearcher(
+                databaseContext,
+                new CurrentThreadTaskExecutor(),
+                preferences,
+                postgreServer);
+          */
+
+        CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
+        Platform.runLater(() -> {
+            SearchDialog dialog = new SearchDialog();
+            // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
+            //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
+            List<CAYWEntry> results = dialog.show(
+                    searchQuery ->
+                            entries.stream()
+                                   .filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
+                    entries);
+            future.complete(results);
+        });
+
+        return future.get();
     }
 
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {

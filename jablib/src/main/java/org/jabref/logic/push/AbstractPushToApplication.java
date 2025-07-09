@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
@@ -36,23 +37,12 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     protected String getKeyString(List<BibEntry> entries, String delimiter) {
-        StringBuilder result = new StringBuilder();
-        Optional<String> citeKey;
-        boolean first = true;
-        for (BibEntry bes : entries) {
-            citeKey = bes.getCitationKey();
-            if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
-                LOGGER.warn("Should never occur, because we made sure that all entries have keys");
-                continue;
-            }
-            if (first) {
-                result.append(citeKey.get());
-                first = false;
-            } else {
-                result.append(delimiter).append(citeKey.get());
-            }
-        }
-        return result.toString();
+        return entries.stream()
+                      .map(BibEntry::getCitationKey)
+                      .filter(Optional::isPresent)
+                      .map(Optional::get)
+                      .filter(key -> !key.isEmpty())
+                      .collect(Collectors.joining(delimiter));
     }
 
     public void pushEntries(List<BibEntry> entries) {

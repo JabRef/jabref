@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToSublimeText extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.SUBLIME_TEXT;
+    public static final PushApplications APPLICATION = PushApplications.SUBLIME_TEXT;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 

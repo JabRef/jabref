@@ -11,8 +11,8 @@ public class PushToApplications {
 
     /// @param applicationId Used by the CLI to select the application to run. Example: `texstudio`
     public static Optional<PushToApplication> getApplicationById(String applicationId, NotificationService notificationService, PushToApplicationPreferences preferences) {
-        return Applications.getApplicationById(applicationId)
-                           .map(application -> switch (application) {
+        return PushApplications.getApplicationById(applicationId)
+                               .map(application -> switch (application) {
                                case EMACS -> new PushToEmacs(notificationService, preferences);
                                case LYX -> new PushToLyx(notificationService, preferences);
                                case SUBLIME_TEXT -> new PushToSublimeText(notificationService, preferences);

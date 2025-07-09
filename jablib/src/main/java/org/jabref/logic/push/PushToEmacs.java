@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.EMACS;
+    public static final PushApplications APPLICATION = PushApplications.EMACS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 

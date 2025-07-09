@@ -6,7 +6,7 @@ import org.jabref.logic.util.NotificationService;
 
 public class PushToTeXworks extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.TEXWORKS;
+    public static final PushApplications APPLICATION = PushApplications.TEXWORKS;
 
     /**
      * Constructs a new {@code PushToTeXworks} instance.

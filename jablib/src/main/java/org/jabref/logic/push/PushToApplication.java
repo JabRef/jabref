@@ -43,6 +43,11 @@ public interface PushToApplication {
      */
     boolean requiresCitationKeys();
 
+    /**
+     * Get the delimiter used to separate citation keys.
+     *
+     * @return The delimiter as a String.
+     */
     String getDelimiter();
 
     void jumpToLine(Path fileName, int line, int column);

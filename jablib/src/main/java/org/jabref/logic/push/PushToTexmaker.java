@@ -9,7 +9,7 @@ import org.jabref.logic.util.NotificationService;
  */
 public class PushToTexmaker extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.TEXMAKER;
+    public static final PushApplications APPLICATION = PushApplications.TEXMAKER;
 
     public PushToTexmaker(NotificationService dialogService, PushToApplicationPreferences preferences) {
         super(dialogService, preferences);

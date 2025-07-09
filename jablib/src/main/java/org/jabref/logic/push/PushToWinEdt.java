@@ -6,7 +6,7 @@ import org.jabref.logic.util.NotificationService;
 
 public class PushToWinEdt extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.WIN_EDT;
+    public static final PushApplications APPLICATION = PushApplications.WIN_EDT;
 
     public PushToWinEdt(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);

@@ -2,7 +2,7 @@ package org.jabref.logic.push;
 
 import java.util.Optional;
 
-public enum Applications {
+public enum PushApplications {
 
     EMACS("emacs", "Emacs"),
     LYX("lyx", "LyX/Kile"),
@@ -18,13 +18,13 @@ public enum Applications {
     private final String id;
     private final String displayName;
 
-    Applications(String id, String displayName) {
+    PushApplications(String id, String displayName) {
         this.id = id;
         this.displayName = displayName;
     }
 
-    public static Optional<Applications> getApplicationByDisplayName(String key) {
-        for (Applications application : Applications.values()) {
+    public static Optional<PushApplications> getApplicationByDisplayName(String key) {
+        for (PushApplications application : PushApplications.values()) {
             if (application.getDisplayName().equalsIgnoreCase(key)) {
                 return Optional.of(application);
             }
@@ -32,8 +32,8 @@ public enum Applications {
         return Optional.empty();
     }
 
-    public static Optional<Applications> getApplicationById(String key) {
-        for (Applications application : Applications.values()) {
+    public static Optional<PushApplications> getApplicationById(String key) {
+        for (PushApplications application : PushApplications.values()) {
             if (application.getId().equalsIgnoreCase(key)) {
                 return Optional.of(application);
             }

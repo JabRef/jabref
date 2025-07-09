@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToLyx extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.LYX;
+    public static final PushApplications APPLICATION = PushApplications.LYX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 

@@ -31,6 +31,4 @@ public interface GuiPushToApplication extends PushToApplication {
     default GuiPushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService, FilePreferences filePreferences, PushToApplicationPreferences pushToApplicationPreferences) {
             return new GuiPushToApplicationSettings(application, dialogService, filePreferences, pushToApplicationPreferences);
     }
-
-    void sendErrorNotification(String title, String message);
 }

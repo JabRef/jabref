@@ -10,7 +10,7 @@ import org.jabref.logic.l10n.Localization;
 public class GuiPushToApplicationAction implements Action {
 
     private final String displayName;
-    private JabRefIcon applicationIcon;
+    private final JabRefIcon applicationIcon;
 
     public GuiPushToApplicationAction(String displayName, JabRefIcon applicationIcon) {
         this.displayName = displayName;

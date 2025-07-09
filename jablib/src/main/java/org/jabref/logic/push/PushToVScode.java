@@ -6,7 +6,7 @@ import org.jabref.logic.util.NotificationService;
 
 public class PushToVScode extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.VSCODE;
+    public static final PushApplications APPLICATION = PushApplications.VSCODE;
 
     public PushToVScode(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);

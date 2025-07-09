@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToVim extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.VIM;
+    public static final PushApplications APPLICATION = PushApplications.VIM;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 

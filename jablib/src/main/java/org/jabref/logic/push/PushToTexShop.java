@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToTexShop extends AbstractPushToApplication {
 
-    public static final Applications APPLICATION = Applications.TEXSHOP;
+    public static final PushApplications APPLICATION = PushApplications.TEXSHOP;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToTexShop.class);
 
