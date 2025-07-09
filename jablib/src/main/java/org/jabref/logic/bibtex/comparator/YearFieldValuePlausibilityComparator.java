@@ -52,7 +52,6 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
      * @param value the input string possibly containing a year
      * @return Optional containing the 4-digit year if found, otherwise Optional.empty()
      */
-
     private Optional<Integer> extractYear(String value) {
         Matcher matcher = YEAR_PATTERN.matcher(value);
         if (matcher.find()) {
