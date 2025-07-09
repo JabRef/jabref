@@ -1,6 +1,7 @@
 # git
 
 ## Conflict Scenarios
+
 - **T1.** Remote changed a field, local did not  
   → No conflict.  
   The local version remained unchanged, so the remote change can be safely applied.
@@ -68,4 +69,3 @@
 - **T17.** Both added the same entry key with identical values  
   → No conflict.  
   Both sides created a new entry with the same citation key and identical fields, so it can be merged safely.
-

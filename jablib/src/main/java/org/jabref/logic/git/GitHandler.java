@@ -215,7 +215,7 @@ public class GitHandler {
 
     /**
      * Try to locate the Git repository root by walking up the directory tree starting from the given path.
-     * If a directory containing a `.git` folder is found, a new GitHandler is created and returned.
+     * If a directory containing a .git folder is found, a new GitHandler is created and returned.
      *
      * @param anyPathInsideRepo Any file or directory path that is assumed to be inside a Git repository
      * @return Optional containing a GitHandler initialized with the repository root, or empty if not found
@@ -229,5 +229,13 @@ public class GitHandler {
             current = current.getParent();
         }
         return Optional.empty();
+    }
+
+    public File getRepositoryPathAsFile() {
+        return repositoryPathAsFile;
+    }
+
+    public Git open() throws IOException {
+        return Git.open(this.repositoryPathAsFile);
     }
 }

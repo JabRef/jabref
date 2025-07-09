@@ -16,6 +16,9 @@ import org.jabref.logic.git.io.RevisionTriple;
 import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.logic.git.merge.SemanticMerger;
 import org.jabref.logic.git.model.MergeResult;
+import org.jabref.logic.git.status.GitStatusChecker;
+import org.jabref.logic.git.status.GitStatusSnapshot;
+import org.jabref.logic.git.status.SyncStatus;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -27,11 +30,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Orchestrator for git sync service
+ * GitSyncService currently serves as an orchestrator for Git pull/push logic.
  * if (hasConflict)
  *     → UI merge;
  * else
  *     → autoMerge := local + remoteDiff
+ *
+ * NOTICE：
+ * - TODO：This class will be **deprecated** in the near future to avoid architecture violation (logic → gui)!
+ * - The underlying business logic will not change significantly.
+ * - Only the coordination responsibilities will shift to GUI/ViewModel layer.
+ *
+ * PLAN:
+ * - All orchestration logic (pull/push, merge, resolve, commit)
+ *   will be **moved into corresponding ViewModels**, such as:
+ *     - GitPullViewModel
+ *     - GitPushViewModel
+ *     - GitStatusViewModel
  */
 public class GitSyncService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitSyncService.class);
@@ -49,24 +64,42 @@ public class GitSyncService {
      * Called when user clicks Pull
      */
     public MergeResult fetchAndMerge(Path bibFilePath) throws GitAPIException, IOException, JabRefException {
-        Git git = Git.open(bibFilePath.getParent().toFile());
+        GitStatusSnapshot status = GitStatusChecker.checkStatus(bibFilePath);
 
-        // 1. fetch latest remote branch
-        gitHandler.fetchOnCurrentBranch();
-
-        // 2. Locating the base / local / remote versions
-        GitRevisionLocator locator = new GitRevisionLocator();
-        RevisionTriple triple = locator.locateMergeCommits(git);
-
-        // 3. Calling semantic merge logic
-        MergeResult result = performSemanticMerge(git, triple.base(), triple.local(), triple.remote(), bibFilePath);
-
-        // 4. Automatic merge
-        if (result.isSuccessful()) {
-            gitHandler.createCommitOnCurrentBranch("Auto-merged by JabRef", !AMEND);
+        if (!status.tracking()) {
+            LOGGER.warn("Pull aborted: The file is not under Git version control.");
+            return MergeResult.failure();
         }
 
-        return result;
+        if (status.conflict()) {
+            LOGGER.warn("Pull aborted: Local repository has unresolved merge conflicts.");
+            return MergeResult.failure();
+        }
+
+        if (status.syncStatus() == SyncStatus.UP_TO_DATE || status.syncStatus() == SyncStatus.AHEAD) {
+            LOGGER.info("Pull skipped: Local branch is already up to date with remote.");
+            return MergeResult.success();
+        }
+
+        // Status is BEHIND or DIVERGED
+        try (Git git = gitHandler.open()) {
+            // 1. Fetch latest remote branch
+            gitHandler.fetchOnCurrentBranch();
+
+            // 2. Locate base / local / remote commits
+            GitRevisionLocator locator = new GitRevisionLocator();
+            RevisionTriple triple = locator.locateMergeCommits(git);
+
+            // 3. Perform semantic merge
+            MergeResult result = performSemanticMerge(git, triple.base(), triple.local(), triple.remote(), bibFilePath);
+
+            // 4. Auto-commit merge result if successful
+            if (result.isSuccessful()) {
+                gitHandler.createCommitOnCurrentBranch("Auto-merged by JabRef", !AMEND);
+            }
+
+            return result;
+        }
     }
 
     public MergeResult performSemanticMerge(Git git,
@@ -80,7 +113,6 @@ public class GitSyncService {
         Path relativePath;
 
         // TODO: Validate that the .bib file is inside the Git repository earlier in the workflow.
-        // This check might be better placed before calling performSemanticMerge.
         if (!bibPath.startsWith(workTree)) {
             throw new IllegalStateException("Given .bib file is not inside repository");
         }
@@ -122,17 +154,61 @@ public class GitSyncService {
         return MergeResult.success();
     }
 
-    // WIP
-    // TODO: add test
-    public void push(Path bibFilePath) throws GitAPIException, IOException {
-        // 1. Auto-commit: commit if there are changes
-        boolean committed = gitHandler.createCommitOnCurrentBranch("Changes committed by JabRef", !AMEND);
+    public void push(Path bibFilePath) throws GitAPIException, IOException, JabRefException {
+        GitStatusSnapshot status = GitStatusChecker.checkStatus(bibFilePath);
 
-        // 2. push to remote
-        if (committed) {
-            gitHandler.pushCommitsToRemoteRepository();
-        } else {
-            LOGGER.info("No changes to commit — skipping push");
+        if (!status.tracking()) {
+            LOGGER.warn("Push aborted: file is not tracked by Git");
+            return;
+        }
+
+        switch (status.syncStatus()) {
+            case UP_TO_DATE -> {
+                boolean committed = gitHandler.createCommitOnCurrentBranch("Changes committed by JabRef", !AMEND);
+                if (committed) {
+                    gitHandler.pushCommitsToRemoteRepository();
+                } else {
+                    LOGGER.info("No changes to commit — skipping push");
+                }
+            }
+
+            case AHEAD -> {
+                gitHandler.pushCommitsToRemoteRepository();
+            }
+
+            case BEHIND -> {
+                LOGGER.warn("Push aborted: Local branch is behind remote. Please pull first.");
+            }
+
+            case DIVERGED -> {
+                try (Git git = gitHandler.open()) {
+                    GitRevisionLocator locator = new GitRevisionLocator();
+                    RevisionTriple triple = locator.locateMergeCommits(git);
+
+                    MergeResult mergeResult = performSemanticMerge(git, triple.base(), triple.local(), triple.remote(), bibFilePath);
+
+                    if (!mergeResult.isSuccessful()) {
+                        LOGGER.warn("Semantic merge failed — aborting push");
+                        return;
+                    }
+
+                    boolean committed = gitHandler.createCommitOnCurrentBranch("Merged changes", !AMEND);
+
+                    if (committed) {
+                        gitHandler.pushCommitsToRemoteRepository();
+                    } else {
+                        LOGGER.info("Nothing to commit after semantic merge — skipping push");
+                    }
+                }
+            }
+
+            case CONFLICT -> {
+                LOGGER.warn("Push aborted: Local repository has unresolved merge conflicts.");
+            }
+
+            case UNTRACKED, UNKNOWN -> {
+                LOGGER.warn("Push aborted: Untracked or unknown Git status.");
+            }
         }
     }
 }

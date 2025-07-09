@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import javafx.collections.FXCollections;
+
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -12,9 +14,11 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GitSemanticMergeExecutorTest {
 
@@ -40,7 +44,10 @@ public class GitSemanticMergeExecutorTest {
         local.getDatabase().insertEntry(localEntry);
         remote.getDatabase().insertEntry(remoteEntry);
 
-        preferences = mock(ImportFormatPreferences.class);
+        preferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(preferences.fieldPreferences().getNonWrappableFields())
+                .thenReturn(FXCollections.emptyObservableList());
+
         executor = new GitSemanticMergeExecutorImpl(preferences);
 
         tempFile = Files.createTempFile("merged", ".bib");

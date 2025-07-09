@@ -29,6 +29,10 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
+/**
+ * ViewModel responsible for coordinating UI-bound Git Pull workflow,
+ * including conflict resolution.
+ */
 public class GitPullViewModel extends AbstractViewModel {
     private final ImportFormatPreferences importFormatPreferences;
     private final GitConflictResolver conflictResolver;
