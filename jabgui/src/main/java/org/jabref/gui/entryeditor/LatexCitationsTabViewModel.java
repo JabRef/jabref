@@ -22,9 +22,9 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.push.GUIPushToApplication;
+import org.jabref.gui.push.GuiPushToApplication;
 import org.jabref.gui.push.GUIPushToApplications;
-import org.jabref.gui.push.GUIPushToTeXstudio;
+import org.jabref.gui.push.GuiPushToTeXstudio;
 import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.DirectoryMonitor;
@@ -98,11 +98,11 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedItem != null) {
             String applicationName = preferences.getPushToApplicationPreferences()
                                                 .getActiveApplicationName();
-            GUIPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
+            GuiPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
                                                                       applicationName,
                                                                       dialogService,
-                                                                      preferences)
-                                                                    .orElseGet(() -> new GUIPushToTeXstudio(dialogService, preferences));
+                                                                      preferences.getPushToApplicationPreferences())
+                                                                    .orElseGet(() -> new GuiPushToTeXstudio(dialogService, preferences.getPushToApplicationPreferences()));
             preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
             application.jumpToLine(selectedItem.path(), selectedItem.line(), selectedItem.colStart());
         }

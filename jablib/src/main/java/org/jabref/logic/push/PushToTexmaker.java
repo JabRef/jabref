@@ -2,7 +2,6 @@ package org.jabref.logic.push;
 
 import java.nio.file.Path;
 
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 
 /**
@@ -12,7 +11,7 @@ public class PushToTexmaker extends AbstractPushToApplication {
 
     public static final String NAME = "Texmaker";
 
-    public PushToTexmaker(NotificationService dialogService, CliPreferences preferences) {
+    public PushToTexmaker(NotificationService dialogService, PushToApplicationPreferences preferences) {
         super(dialogService, preferences);
     }
 

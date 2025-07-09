@@ -2,14 +2,13 @@ package org.jabref.logic.push;
 
 import java.nio.file.Path;
 
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 
 public class PushToTeXstudio extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.TEXSTUDIO;
 
-    public PushToTeXstudio(NotificationService dialogService, CliPreferences preferences) {
+    public PushToTeXstudio(NotificationService dialogService, PushToApplicationPreferences preferences) {
         super(dialogService, preferences);
     }
 

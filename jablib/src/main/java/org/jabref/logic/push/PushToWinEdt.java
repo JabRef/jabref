@@ -2,14 +2,13 @@ package org.jabref.logic.push;
 
 import java.nio.file.Path;
 
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 
 public class PushToWinEdt extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.WIN_EDT;
 
-    public PushToWinEdt(NotificationService notificationService, CliPreferences preferences) {
+    public PushToWinEdt(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
     }
 

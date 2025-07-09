@@ -41,7 +41,7 @@ public class GUIPushToApplicationCommand extends SimpleCommand {
     private final List<Object> reconfigurableControls = new ArrayList<>();
     private final TaskExecutor taskExecutor;
 
-    private GUIPushToApplication application;
+    private GuiPushToApplication application;
 
     public GUIPushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
@@ -73,11 +73,11 @@ public class GUIPushToApplicationCommand extends SimpleCommand {
 
     private void setApplication(String applicationName) {
         final ActionFactory factory = new ActionFactory();
-        GUIPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
+        GuiPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
                                                                   applicationName,
                                                                   dialogService,
-                                                                  preferences)
-                                                          .orElseGet(() -> new GUIPushToEmacs(dialogService, preferences));
+                                                                  preferences.getPushToApplicationPreferences())
+                                                                .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences()));
 
         preferences.getPushToApplicationPreferences().setActiveApplicationName(application.getDisplayName());
         this.application = Objects.requireNonNull(application);

@@ -18,10 +18,10 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.push.GUIPushToApplication;
+import org.jabref.gui.push.GuiPushToApplication;
 import org.jabref.gui.push.GUIPushToApplicationSettings;
 import org.jabref.gui.push.GUIPushToApplications;
-import org.jabref.gui.push.GUIPushToEmacs;
+import org.jabref.gui.push.GuiPushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
@@ -38,8 +38,8 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final StringProperty eMailReferenceSubjectProperty = new SimpleStringProperty("");
     private final BooleanProperty autoOpenAttachedFoldersProperty = new SimpleBooleanProperty();
-    private final ListProperty<GUIPushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
-    private final ObjectProperty<GUIPushToApplication> selectedPushToApplicationProperty = new SimpleObjectProperty<>();
+    private final ListProperty<GuiPushToApplication> pushToApplicationsListProperty = new SimpleListProperty<>();
+    private final ObjectProperty<GuiPushToApplication> selectedPushToApplicationProperty = new SimpleObjectProperty<>();
     private final StringProperty citeCommandProperty = new SimpleStringProperty("");
     private final BooleanProperty useCustomTerminalProperty = new SimpleBooleanProperty();
     private final StringProperty customTerminalCommandProperty = new SimpleStringProperty("");
@@ -96,10 +96,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
-                FXCollections.observableArrayList(GUIPushToApplications.getAllGUIApplications(dialogService, preferences)));
+                FXCollections.observableArrayList(GUIPushToApplications.getAllGUIApplications(dialogService, preferences.getPushToApplicationPreferences())));
         selectedPushToApplicationProperty.setValue(
-                GUIPushToApplications.getGUIApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences)
-                                  .orElseGet(() -> new GUIPushToEmacs(dialogService, preferences)));
+                GUIPushToApplications.getGUIApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences.getPushToApplicationPreferences())
+                                  .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences())));
 
         citeCommandProperty.setValue(initialPushToApplicationPreferences.getCiteCommand().toString());
 
@@ -159,8 +159,8 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
     }
 
     public void pushToApplicationSettings() {
-        GUIPushToApplication selectedApplication = selectedPushToApplicationProperty.getValue();
-        GUIPushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, workingPushToApplicationPreferences);
+        GuiPushToApplication selectedApplication = selectedPushToApplicationProperty.getValue();
+        GUIPushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, dialogService, preferences.getFilePreferences(), workingPushToApplicationPreferences);
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(settings.getSettingsPane());
@@ -203,11 +203,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     // Push-To-Application
 
-    public ListProperty<GUIPushToApplication> pushToApplicationsListProperty() {
+    public ListProperty<GuiPushToApplication> pushToApplicationsListProperty() {
         return this.pushToApplicationsListProperty;
     }
 
-    public ObjectProperty<GUIPushToApplication> selectedPushToApplication() {
+    public ObjectProperty<GuiPushToApplication> selectedPushToApplication() {
         return this.selectedPushToApplicationProperty;
     }
 

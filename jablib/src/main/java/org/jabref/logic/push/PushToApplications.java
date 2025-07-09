@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 
 public class PushToApplications {
@@ -26,7 +25,7 @@ public class PushToApplications {
     private PushToApplications() {
     }
 
-    public static List<PushToApplication> getAllApplications(NotificationService notificationService, CliPreferences preferences) {
+    public static List<PushToApplication> getAllApplications(NotificationService notificationService, PushToApplicationPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
             return Collections.unmodifiableList(APPLICATIONS);
         }
@@ -46,8 +45,8 @@ public class PushToApplications {
         return APPLICATIONS;
     }
 
-    public static Optional<PushToApplication> getApplicationByName(String applicationName, NotificationService dialogService, CliPreferences preferences) {
-        return getAllApplications(dialogService, preferences).stream()
+    public static Optional<PushToApplication> getApplicationByName(String applicationName, NotificationService notificationService, PushToApplicationPreferences preferences) {
+        return getAllApplications(notificationService, preferences).stream()
                                                              .filter(application -> application.getDisplayName().equals(applicationName))
                                                              .findAny();
     }

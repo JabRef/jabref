@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.StreamGobbler;
@@ -23,7 +22,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 
-    public PushToSublimeText(NotificationService notificationService, CliPreferences preferences) {
+    public PushToSublimeText(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
     }
 
@@ -38,7 +37,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {

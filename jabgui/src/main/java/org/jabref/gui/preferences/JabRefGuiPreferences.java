@@ -1,6 +1,5 @@
 package org.jabref.gui.preferences;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,9 +62,7 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.AutoCompleteFirstNameMode;
 import org.jabref.logic.preferences.JabRefCliPreferences;
 import org.jabref.logic.preview.PreviewLayout;
-import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
-import org.jabref.logic.push.PushToApplications;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.Field;
@@ -132,22 +129,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
     private static final String SEARCH_DIALOG_COLUMN_WIDTHS = "searchTableColumnWidths";
     private static final String SEARCH_DIALOG_COLUMN_SORT_TYPES = "searchDialogColumnSortTypes";
     private static final String SEARCH_DIALOG_COLUMN_SORT_ORDER = "searchDalogColumnSortOrder";
-    // endregion
-
-    // region Push to application preferences
-    private static final String PUSH_TO_APPLICATION = "pushToApplication";
-    private static final String PUSH_EMACS_PATH = "emacsPath";
-    private static final String PUSH_EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
-    private static final String PUSH_LYXPIPE = "lyxpipe";
-    private static final String PUSH_TEXSTUDIO_PATH = "TeXstudioPath";
-    private static final String PUSH_TEXWORKS_PATH = "TeXworksPath";
-    private static final String PUSH_WINEDT_PATH = "winEdtPath";
-    private static final String PUSH_TEXMAKER_PATH = "texmakerPath";
-    private static final String PUSH_VIM_SERVER = "vimServer";
-    private static final String PUSH_VIM = "vim";
-    private static final String PUSH_SUBLIME_TEXT_PATH = "sublimeTextPath";
-    private static final String PUSH_VSCODE_PATH = "VScodePath";
-    private static final String PUSH_CITE_COMMAND = "citeCommand";
     // endregion
 
     // region NameDisplayPreferences
@@ -371,30 +352,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
         defaults.put(ABBR_AUTHOR_NAMES, Boolean.TRUE); // "Abbreviate names"
         defaults.put(NAMES_LAST_ONLY, Boolean.TRUE); // "Show last names only"
-        // endregion
-
-        // region PushToApplicationPreferences
-        defaults.put(PUSH_TEXMAKER_PATH, OS.detectProgramPath("texmaker", "Texmaker"));
-        defaults.put(PUSH_WINEDT_PATH, OS.detectProgramPath("WinEdt", "WinEdt Team\\WinEdt"));
-        defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
-        defaults.put(PUSH_TEXSTUDIO_PATH, OS.detectProgramPath("texstudio", "TeXstudio"));
-        defaults.put(PUSH_TEXWORKS_PATH, OS.detectProgramPath("texworks", "TeXworks"));
-        defaults.put(PUSH_SUBLIME_TEXT_PATH, OS.detectProgramPath("subl", "Sublime"));
-        defaults.put(PUSH_LYXPIPE, USER_HOME + File.separator + ".lyx/lyxpipe");
-        defaults.put(PUSH_VIM, "vim");
-        defaults.put(PUSH_VIM_SERVER, "vim");
-        defaults.put(PUSH_EMACS_ADDITIONAL_PARAMETERS, "-n -e");
-        defaults.put(PUSH_VSCODE_PATH, OS.detectProgramPath("Code", "Microsoft VS Code"));
-        defaults.put(PUSH_CITE_COMMAND, "\\cite{key1,key2}");
-
-        if (OS.OS_X) {
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        } else if (OS.WINDOWS) {
-            defaults.put(PUSH_EMACS_PATH, "emacsclient.exe");
-        } else {
-            // Linux
-            defaults.put(PUSH_EMACS_PATH, "emacsclient");
-        }
         // endregion
 
         // region: Main table, main table column, and search dialog column preferences
@@ -968,72 +925,6 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
             return 0; // fallback if stored position is no longer valid
         }
     }
-    // endregion
-
-    // region PushToApplicationPreferences
-
-    public PushToApplicationPreferences getPushToApplicationPreferences() {
-        if (pushToApplicationPreferences != null) {
-            return pushToApplicationPreferences;
-        }
-
-        Map<String, String> applicationCommands = new HashMap<>();
-        // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
-        // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
-        applicationCommands.put(PushToApplications.EMACS, getEmptyIsDefault(PUSH_EMACS_PATH));
-        applicationCommands.put(PushToApplications.LYX, getEmptyIsDefault(PUSH_LYXPIPE));
-        applicationCommands.put(PushToApplications.TEXMAKER, getEmptyIsDefault(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushToApplications.TEXSTUDIO, getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushToApplications.TEXWORKS, getEmptyIsDefault(PUSH_TEXWORKS_PATH));
-        applicationCommands.put(PushToApplications.VIM, getEmptyIsDefault(PUSH_VIM));
-        applicationCommands.put(PushToApplications.WIN_EDT, getEmptyIsDefault(PUSH_WINEDT_PATH));
-        applicationCommands.put(PushToApplications.SUBLIME_TEXT, getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
-        applicationCommands.put(PushToApplications.VSCODE, getEmptyIsDefault(PUSH_VSCODE_PATH));
-
-        pushToApplicationPreferences = new PushToApplicationPreferences(
-                get(PUSH_TO_APPLICATION),
-                applicationCommands,
-                get(PUSH_EMACS_ADDITIONAL_PARAMETERS),
-                get(PUSH_VIM_SERVER),
-                CitationCommandString.from(get(PUSH_CITE_COMMAND)),
-                CitationCommandString.from((String) defaults.get(PUSH_CITE_COMMAND))
-        );
-
-        EasyBind.listen(pushToApplicationPreferences.activeApplicationNameProperty(), (obs, oldValue, newValue) -> put(PUSH_TO_APPLICATION, newValue));
-        pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
-        EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
-        EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
-        EasyBind.listen(pushToApplicationPreferences.citeCommandProperty(),
-                (obs, oldValue, newValue) -> put(PUSH_CITE_COMMAND, newValue.toString()));
-
-        return pushToApplicationPreferences;
-    }
-
-    private void storePushToApplicationPath(Map<String, String> commandPair) {
-        commandPair.forEach((key, value) -> {
-            switch (key) {
-                case PushToApplications.EMACS ->
-                        put(PUSH_EMACS_PATH, value);
-                case PushToApplications.LYX ->
-                        put(PUSH_LYXPIPE, value);
-                case PushToApplications.TEXMAKER ->
-                        put(PUSH_TEXMAKER_PATH, value);
-                case PushToApplications.TEXSTUDIO ->
-                        put(PUSH_TEXSTUDIO_PATH, value);
-                case PushToApplications.TEXWORKS ->
-                        put(PUSH_TEXWORKS_PATH, value);
-                case PushToApplications.VIM ->
-                        put(PUSH_VIM, value);
-                case PushToApplications.WIN_EDT ->
-                        put(PUSH_WINEDT_PATH, value);
-                case PushToApplications.SUBLIME_TEXT ->
-                        put(PUSH_SUBLIME_TEXT_PATH, value);
-                case PushToApplications.VSCODE ->
-                        put(PUSH_VSCODE_PATH, value);
-            }
-        });
-    }
-
     // endregion
 
     // region NameDisplayPreferences

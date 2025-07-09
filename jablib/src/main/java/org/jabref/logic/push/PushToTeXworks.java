@@ -2,7 +2,6 @@ package org.jabref.logic.push;
 
 import java.nio.file.Path;
 
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 
 public class PushToTeXworks extends AbstractPushToApplication {
@@ -15,7 +14,7 @@ public class PushToTeXworks extends AbstractPushToApplication {
      * @param notificationService The dialog service for displaying messages to the user.
      * @param preferences The service for accessing user preferences.
      */
-    public PushToTeXworks(NotificationService notificationService, CliPreferences preferences) {
+    public PushToTeXworks(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
     }
 

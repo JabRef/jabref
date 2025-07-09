@@ -93,4 +93,17 @@ public class PushToApplicationPreferences {
     public CitationCommandString getDefaultCiteCommand() {
         return defaultCiteCommand.getValue();
     }
+
+    /// Modifies the current instance to set a new default citation command
+    ///
+    /// @return a new independent instance with the updated default citation command
+    public PushToApplicationPreferences withCitationCommand(CitationCommandString config) {
+        return new PushToApplicationPreferences(
+                this.activeApplicationName.get(),
+                this.commandPaths.get(),
+                this.emacsArguments.get(),
+                this.vimServer.get(),
+                config,
+                this.defaultCiteCommand.get());
+    }
 }

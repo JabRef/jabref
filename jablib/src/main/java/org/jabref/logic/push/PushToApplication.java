@@ -30,8 +30,10 @@ public interface PushToApplication {
      */
     void onOperationCompleted();
 
+    /// Used to route to either the GUI or the CLI - dependent on the usage
     void sendErrorNotification(String title, String message);
 
+    /// Used to route to either the GUI or the CLI - dependent on the usage
     void sendErrorNotification(String message);
 
     /**

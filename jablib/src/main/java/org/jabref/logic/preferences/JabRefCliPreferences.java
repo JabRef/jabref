@@ -816,6 +816,9 @@ public class JabRefCliPreferences implements CliPreferences {
         pushToApplicationPreferences.getCommandPaths().addListener((obs, oldValue, newValue) -> storePushToApplicationPath(newValue));
         EasyBind.listen(pushToApplicationPreferences.emacsArgumentsProperty(), (obs, oldValue, newValue) -> put(PUSH_EMACS_ADDITIONAL_PARAMETERS, newValue));
         EasyBind.listen(pushToApplicationPreferences.vimServerProperty(), (obs, oldValue, newValue) -> put(PUSH_VIM_SERVER, newValue));
+        EasyBind.listen(pushToApplicationPreferences.citeCommandProperty(),
+                (obs, oldValue, newValue) -> put(PUSH_CITE_COMMAND, newValue.toString()));
+
         return pushToApplicationPreferences;
     }
 

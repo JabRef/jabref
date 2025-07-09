@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -26,7 +25,7 @@ public class PushToEmacs extends AbstractPushToApplication {
     /**
      * @param preferences getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
      */
-    public PushToEmacs(NotificationService notificationService, CliPreferences preferences) {
+    public PushToEmacs(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
     }
 
@@ -41,18 +40,16 @@ public class PushToEmacs extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        PushToApplicationPreferences pushToApplicationPreferences = preferences.getPushToApplicationPreferences();
-
-        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
             return;
         }
 
-        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
-        String[] addParams = pushToApplicationPreferences.getEmacsArguments().split(" ");
+        String[] addParams = preferences.getEmacsArguments().split(" ");
         try {
             String[] com = new String[addParams.length + 2];
             com[0] = commandPath;

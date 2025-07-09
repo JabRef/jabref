@@ -2,14 +2,13 @@ package org.jabref.logic.push;
 
 import java.nio.file.Path;
 
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 
 public class PushToVScode extends AbstractPushToApplication {
 
     public static final String NAME = PushToApplications.VSCODE;
 
-    public PushToVScode(NotificationService notificationService, CliPreferences preferences) {
+    public PushToVScode(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
     }
 
