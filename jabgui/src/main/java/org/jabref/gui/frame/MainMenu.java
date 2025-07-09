@@ -62,7 +62,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewControls;
-import org.jabref.gui.push.GUIPushToApplicationCommand;
+import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
@@ -98,7 +98,7 @@ public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
     private final FileHistoryMenu fileHistoryMenu;
     private final SidePane sidePane;
-    private final GUIPushToApplicationCommand GUIPushToApplicationCommand;
+    private final GuiPushToApplicationCommand GUIPushToApplicationCommand;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -115,7 +115,7 @@ public class MainMenu extends MenuBar {
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
                     SidePane sidePane,
-                    GUIPushToApplicationCommand GUIPushToApplicationCommand,
+                    GuiPushToApplicationCommand GUIPushToApplicationCommand,
                     GuiPreferences preferences,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,

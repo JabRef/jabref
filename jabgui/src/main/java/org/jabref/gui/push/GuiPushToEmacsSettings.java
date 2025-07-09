@@ -9,11 +9,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class GUIPushToEmacsSettings extends GUIPushToApplicationSettings {
+public class GuiPushToEmacsSettings extends GuiPushToApplicationSettings {
 
     private final TextField additionalParams = new TextField();
 
-    public GUIPushToEmacsSettings(PushToApplication application,
+    public GuiPushToEmacsSettings(PushToApplication application,
                                   DialogService dialogService,
                                   FilePreferences filePreferences,
                                   PushToApplicationPreferences preferences) {

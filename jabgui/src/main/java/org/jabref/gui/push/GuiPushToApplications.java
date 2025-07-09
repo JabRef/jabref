@@ -8,11 +8,11 @@ import java.util.Optional;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class GUIPushToApplications {
+public class GuiPushToApplications {
 
     private static final List<GuiPushToApplication> APPLICATIONS = new ArrayList<>();
 
-    private GUIPushToApplications() {
+    private GuiPushToApplications() {
     }
 
     public static List<GuiPushToApplication> getAllGUIApplications(DialogService dialogService, PushToApplicationPreferences preferences) {

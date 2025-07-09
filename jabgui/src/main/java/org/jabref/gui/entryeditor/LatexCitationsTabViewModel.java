@@ -23,7 +23,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.push.GuiPushToApplication;
-import org.jabref.gui.push.GUIPushToApplications;
+import org.jabref.gui.push.GuiPushToApplications;
 import org.jabref.gui.push.GuiPushToTeXstudio;
 import org.jabref.gui.texparser.CitationsDisplay;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
@@ -98,7 +98,7 @@ public class LatexCitationsTabViewModel extends AbstractViewModel {
         if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2 && selectedItem != null) {
             String applicationName = preferences.getPushToApplicationPreferences()
                                                 .getActiveApplicationName();
-            GuiPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
+            GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(
                                                                       applicationName,
                                                                       dialogService,
                                                                       preferences.getPushToApplicationPreferences())

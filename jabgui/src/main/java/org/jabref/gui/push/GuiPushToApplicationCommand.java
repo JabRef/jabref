@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 /**
  * An Action class representing the process of invoking a PushToApplication operation.
  */
-public class GUIPushToApplicationCommand extends SimpleCommand {
+public class GuiPushToApplicationCommand extends SimpleCommand {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(GUIPushToApplicationCommand.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuiPushToApplicationCommand.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;
@@ -43,7 +43,7 @@ public class GUIPushToApplicationCommand extends SimpleCommand {
 
     private GuiPushToApplication application;
 
-    public GUIPushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
+    public GuiPushToApplicationCommand(StateManager stateManager, DialogService dialogService, GuiPreferences preferences, TaskExecutor taskExecutor) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.preferences = preferences;
@@ -73,7 +73,7 @@ public class GUIPushToApplicationCommand extends SimpleCommand {
 
     private void setApplication(String applicationName) {
         final ActionFactory factory = new ActionFactory();
-        GuiPushToApplication application = GUIPushToApplications.getGUIApplicationByName(
+        GuiPushToApplication application = GuiPushToApplications.getGUIApplicationByName(
                                                                   applicationName,
                                                                   dialogService,
                                                                   preferences.getPushToApplicationPreferences())

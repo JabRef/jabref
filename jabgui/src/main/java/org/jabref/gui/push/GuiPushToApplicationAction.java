@@ -7,12 +7,12 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.logic.l10n.Localization;
 
-public class GUIPushToApplicationAction implements Action {
+public class GuiPushToApplicationAction implements Action {
 
     private final String displayName;
     private JabRefIcon applicationIcon;
 
-    public GUIPushToApplicationAction(String displayName, JabRefIcon applicationIcon) {
+    public GuiPushToApplicationAction(String displayName, JabRefIcon applicationIcon) {
         this.displayName = displayName;
         this.applicationIcon = applicationIcon;
     }

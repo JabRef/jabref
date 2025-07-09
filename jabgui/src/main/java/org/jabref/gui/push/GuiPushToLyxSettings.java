@@ -6,9 +6,9 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class GUIPushToLyxSettings extends GUIPushToApplicationSettings {
+public class GuiPushToLyxSettings extends GuiPushToApplicationSettings {
 
-    public GUIPushToLyxSettings(PushToApplication application,
+    public GuiPushToLyxSettings(PushToApplication application,
                                 DialogService dialogService,
                                 FilePreferences filePreferences,
                                 PushToApplicationPreferences preferences) {

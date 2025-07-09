@@ -21,8 +21,8 @@ public class GuiPushToEmacs extends PushToEmacs implements GuiPushToApplication 
     }
 
     @Override
-    public GUIPushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService, FilePreferences filePreferences, PushToApplicationPreferences pushToApplicationPreferences) {
-        return new GUIPushToEmacsSettings(application, dialogService, filePreferences, pushToApplicationPreferences);
+    public GuiPushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService, FilePreferences filePreferences, PushToApplicationPreferences pushToApplicationPreferences) {
+        return new GuiPushToEmacsSettings(application, dialogService, filePreferences, pushToApplicationPreferences);
     }
 
     @Override

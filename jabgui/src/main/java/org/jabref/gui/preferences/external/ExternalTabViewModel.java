@@ -19,8 +19,8 @@ import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.push.GuiPushToApplication;
-import org.jabref.gui.push.GUIPushToApplicationSettings;
-import org.jabref.gui.push.GUIPushToApplications;
+import org.jabref.gui.push.GuiPushToApplicationSettings;
+import org.jabref.gui.push.GuiPushToApplications;
 import org.jabref.gui.push.GuiPushToEmacs;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.l10n.Localization;
@@ -96,10 +96,10 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
-                FXCollections.observableArrayList(GUIPushToApplications.getAllGUIApplications(dialogService, preferences.getPushToApplicationPreferences())));
+                FXCollections.observableArrayList(GuiPushToApplications.getAllGUIApplications(dialogService, preferences.getPushToApplicationPreferences())));
         selectedPushToApplicationProperty.setValue(
-                GUIPushToApplications.getGUIApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences.getPushToApplicationPreferences())
-                                  .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences())));
+                GuiPushToApplications.getGUIApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences.getPushToApplicationPreferences())
+                                     .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences())));
 
         citeCommandProperty.setValue(initialPushToApplicationPreferences.getCiteCommand().toString());
 
@@ -160,7 +160,7 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     public void pushToApplicationSettings() {
         GuiPushToApplication selectedApplication = selectedPushToApplicationProperty.getValue();
-        GUIPushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, dialogService, preferences.getFilePreferences(), workingPushToApplicationPreferences);
+        GuiPushToApplicationSettings settings = selectedApplication.getSettings(selectedApplication, dialogService, preferences.getFilePreferences(), workingPushToApplicationPreferences);
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setContent(settings.getSettingsPane());

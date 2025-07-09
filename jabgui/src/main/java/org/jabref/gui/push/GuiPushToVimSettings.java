@@ -9,11 +9,11 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class GUIPushToVimSettings extends GUIPushToApplicationSettings {
+public class GuiPushToVimSettings extends GuiPushToApplicationSettings {
 
     private final TextField vimServer = new TextField();
 
-    public GUIPushToVimSettings(PushToApplication application,
+    public GuiPushToVimSettings(PushToApplication application,
                                 DialogService dialogService,
                                 FilePreferences filePreferences,
                                 PushToApplicationPreferences preferences) {

@@ -25,11 +25,11 @@ public interface GuiPushToApplication extends PushToApplication {
     JabRefIcon getApplicationIcon();
 
     default Action getAction() {
-        return new GUIPushToApplicationAction(getDisplayName(), getApplicationIcon());
+        return new GuiPushToApplicationAction(getDisplayName(), getApplicationIcon());
     }
 
-    default GUIPushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService, FilePreferences filePreferences, PushToApplicationPreferences pushToApplicationPreferences) {
-            return new GUIPushToApplicationSettings(application, dialogService, filePreferences, pushToApplicationPreferences);
+    default GuiPushToApplicationSettings getSettings(PushToApplication application, DialogService dialogService, FilePreferences filePreferences, PushToApplicationPreferences pushToApplicationPreferences) {
+            return new GuiPushToApplicationSettings(application, dialogService, filePreferences, pushToApplicationPreferences);
     }
 
     void sendErrorNotification(String title, String message);
