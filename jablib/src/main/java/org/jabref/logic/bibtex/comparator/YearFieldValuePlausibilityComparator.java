@@ -34,7 +34,9 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
             if (leftYearInRange) {
                 int diff = Math.abs(leftYear.get() - rightYear.get());
                 if (diff > 10) {
-                    return ComparisonResult.fromInt(Integer.compare(rightYear.get(), leftYear.get()));
+                    return rightYear.get() > leftYear.get()
+                            ? ComparisonResult.RIGHT_BETTER
+                            : ComparisonResult.LEFT_BETTER;
                 }
                 return ComparisonResult.UNDETERMINED; // years are close, undetermined
             }
@@ -42,6 +44,14 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
             }
         return ComparisonResult.RIGHT_BETTER;
     }
+
+    /**
+     * Extracts the first 4-digit number found in the string.
+     * Used to identify year-like values such as "About 2000" or "Published in 1999".
+     *
+     * @param value the input string possibly containing a year
+     * @return Optional containing the 4-digit year if found, otherwise Optional.empty()
+     */
 
     private Optional<Integer> extractYear(String value) {
         Matcher matcher = YEAR_PATTERN.matcher(value);

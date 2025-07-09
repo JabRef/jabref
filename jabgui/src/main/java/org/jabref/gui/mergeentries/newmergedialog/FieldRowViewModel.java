@@ -128,15 +128,15 @@ public class FieldRowViewModel {
         String leftValue = getLeftFieldValue();
         String rightValue = getRightFieldValue();
 
-        if (field.equals(StandardField.YEAR)) {
+        if (StandardField.YEAR == field) {
                 YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
                 ComparisonResult comparison = comparator.compare(leftValue, rightValue);
-                if (ComparisonResult.RIGHT_BETTER.equals(comparison)) {
+                if (ComparisonResult.RIGHT_BETTER == comparison) {
                     selectRightValue();
-                } else if (ComparisonResult.LEFT_BETTER.equals(comparison)) {
+                } else if (ComparisonResult.LEFT_BETTER == comparison) {
                     selectLeftValue();
                 }
-        } else if (field.equals(InternalField.TYPE_HEADER)) {
+        } else if (InternalField.TYPE_HEADER == field) {
             if (leftValue.equalsIgnoreCase(StandardEntryType.Misc.getName())) {
                 selectRightValue();
             }
