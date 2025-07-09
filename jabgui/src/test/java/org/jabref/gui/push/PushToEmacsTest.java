@@ -7,7 +7,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
@@ -21,12 +20,11 @@ import static org.mockito.Mockito.when;
 
 @Disabled("Needs running emacs daemon. Start emacs with --daemon")
 class PushToEmacsTest {
-    GUIPushToEmacs pushToEmacs;
+    GuiPushToEmacs pushToEmacs;
 
     @BeforeEach
     void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
-        GuiPreferences preferences = mock(GuiPreferences.class);
 
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
@@ -37,12 +35,9 @@ class PushToEmacsTest {
 
         when(pushToApplicationPreferences.getEmacsArguments()).thenReturn("-n -e");
 
-        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
-
         when(pushToApplicationPreferences.getCiteCommand().toString()).thenReturn("\\cite{key1,key2}");
-        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
-        pushToEmacs = new GUIPushToEmacs(dialogService, preferences);
+        pushToEmacs = new GuiPushToEmacs(dialogService, pushToApplicationPreferences);
     }
 
     @Test

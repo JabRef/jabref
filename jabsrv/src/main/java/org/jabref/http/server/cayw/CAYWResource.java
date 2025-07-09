@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 
@@ -28,6 +29,8 @@ import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.push.CitationCommandString;
+import org.jabref.logic.push.PushToApplications;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -117,6 +120,17 @@ public class CAYWResource {
             Clipboard systemClipboard = toolkit.getSystemClipboard();
             StringSelection strSel = new StringSelection(formattedResponse);
             systemClipboard.setContents(strSel, null);
+        }
+
+        // Push to TexStudio parameter handling
+        if (queryParams.isTexstudio()) {
+            CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand()).concat("{"), ",", "}");
+            String keyString = searchResults.stream()
+                                            .map(caywEntry -> caywEntry.bibEntry().getCitationKey().orElse(""))
+                                            .collect(Collectors.joining(","));
+
+            PushToApplications.getApplicationByName("TeXstudio", LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
+                              .ifPresent(application -> application.pushEntries(databaseContext, searchResults.stream().map(CAYWEntry::bibEntry).toList(), keyString));
         }
 
         return Response.ok(formattedResponse).type(formatter.getMediaType()).build();

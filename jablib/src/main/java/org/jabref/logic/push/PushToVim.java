@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,7 +22,7 @@ public class PushToVim extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
-    public PushToVim(NotificationService notificationService, CliPreferences preferences) {
+    public PushToVim(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
     }
 
@@ -40,7 +39,7 @@ public class PushToVim extends AbstractPushToApplication {
 
         try {
             String[] com = new String[]{commandPath, "--servername",
-                    preferences.getPushToApplicationPreferences().getVimServer(), "--remote-send",
+                    preferences.getVimServer(), "--remote-send",
                     "<C-\\><C-N>a" + getCitePrefix() + keys + getCiteSuffix()};
 
             LOGGER.atDebug()
@@ -136,7 +135,7 @@ public class PushToVim extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;

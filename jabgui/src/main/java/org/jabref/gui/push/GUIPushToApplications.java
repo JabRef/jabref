@@ -6,36 +6,36 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.push.PushToApplicationPreferences;
 
 public class GUIPushToApplications {
 
-    private static final List<GUIPushToApplication> APPLICATIONS = new ArrayList<>();
+    private static final List<GuiPushToApplication> APPLICATIONS = new ArrayList<>();
 
     private GUIPushToApplications() {
     }
 
-    public static List<GUIPushToApplication> getAllGUIApplications(DialogService dialogService, CliPreferences preferences) {
+    public static List<GuiPushToApplication> getAllGUIApplications(DialogService dialogService, PushToApplicationPreferences preferences) {
         if (!APPLICATIONS.isEmpty()) {
             return Collections.unmodifiableList(APPLICATIONS);
         }
 
         APPLICATIONS.addAll(List.of(
-                new GUIPushToEmacs(dialogService, preferences),
-                new GUIPushToLyx(dialogService, preferences),
-                new GUIPushToSublimeText(dialogService, preferences),
-                new GUIPushToTexmaker(dialogService, preferences),
-                new GUIPushToTeXstudio(dialogService, preferences),
-                new GUIPushToTeXworks(dialogService, preferences),
-                new GUIPushToVim(dialogService, preferences),
-                new GUIPushToWinEdt(dialogService, preferences),
-                new GUIPushToTexShop(dialogService, preferences),
-                new GUIPushToVScode(dialogService, preferences)));
+                new GuiPushToEmacs(dialogService, preferences),
+                new GuiPushToLyx(dialogService, preferences),
+                new GuiPushToSublimeText(dialogService, preferences),
+                new GuiPushToTexmaker(dialogService, preferences),
+                new GuiPushToTeXstudio(dialogService, preferences),
+                new GuiPushToTeXworks(dialogService, preferences),
+                new GuiPushToVim(dialogService, preferences),
+                new GuiPushToWinEdt(dialogService, preferences),
+                new GuiPushToTexShop(dialogService, preferences),
+                new GuiPushToVScode(dialogService, preferences)));
 
         return APPLICATIONS;
     }
 
-    public static Optional<GUIPushToApplication> getGUIApplicationByName(String applicationName, DialogService dialogService, CliPreferences preferences) {
+    public static Optional<GuiPushToApplication> getGUIApplicationByName(String applicationName, DialogService dialogService, PushToApplicationPreferences preferences) {
         return getAllGUIApplications(dialogService, preferences).stream()
                                                                 .filter(application -> application.getDisplayName().equals(applicationName))
                                                                 .findAny();

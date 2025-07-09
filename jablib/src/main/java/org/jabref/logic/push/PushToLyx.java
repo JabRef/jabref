@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
@@ -23,7 +22,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
-    public PushToLyx(NotificationService dialogService, CliPreferences preferences) {
+    public PushToLyx(NotificationService dialogService, PushToApplicationPreferences preferences) {
         super(dialogService, preferences);
     }
 
@@ -51,7 +50,7 @@ public class PushToLyx extends AbstractPushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;

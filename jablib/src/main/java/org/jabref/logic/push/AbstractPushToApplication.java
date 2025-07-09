@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -29,9 +28,9 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     protected String commandPath;
 
     protected final NotificationService notificationService;
-    protected final CliPreferences preferences;
+    protected final PushToApplicationPreferences preferences;
 
-    public AbstractPushToApplication(NotificationService notificationService, CliPreferences preferences) {
+    public AbstractPushToApplication(NotificationService notificationService, PushToApplicationPreferences preferences) {
         this.notificationService = notificationService;
         this.preferences = preferences;
     }
@@ -47,7 +46,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {
@@ -144,19 +143,19 @@ public abstract class AbstractPushToApplication implements PushToApplication {
     }
 
     protected String getCitePrefix() {
-        return preferences.getPushToApplicationPreferences().getCiteCommand().prefix();
+        return preferences.getCiteCommand().prefix();
     }
 
     public String getDelimiter() {
-        return preferences.getPushToApplicationPreferences().getCiteCommand().delimiter();
+        return preferences.getCiteCommand().delimiter();
     }
 
     protected String getCiteSuffix() {
-        return preferences.getPushToApplicationPreferences().getCiteCommand().suffix();
+        return preferences.getCiteCommand().suffix();
     }
 
     public void jumpToLine(Path fileName, int line, int column) {
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         if (StringUtil.isNullOrEmpty(commandPath)) {
             notDefined = true;

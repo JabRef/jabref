@@ -7,7 +7,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
 
@@ -26,29 +25,26 @@ class PushToTeXworksTest {
     private static final String TEXWORKS_CLIENT_PATH = "/usr/bin/texworks";
     private static final String DISPLAY_NAME = "TeXworks";
 
-    private GUIPushToTeXworks pushToTeXworks;
+    private GuiPushToTeXworks pushToTeXworks;
 
     @BeforeEach
     void setup() {
         DialogService dialogService = mock(DialogService.class, Answers.RETURNS_DEEP_STUBS);
-        GuiPreferences preferences = mock(GuiPreferences.class);
         PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
 
         // Mock the command path
         Map<String, String> commandPaths = Map.of(DISPLAY_NAME, TEXWORKS_CLIENT_PATH);
         ObservableMap<String, String> observableCommandPaths = FXCollections.observableMap(commandPaths);
         when(pushToApplicationPreferences.getCommandPaths()).thenReturn(new SimpleMapProperty<>(observableCommandPaths));
-        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         // Mock the return value for getCiteCommand()
         CitationCommandString mockCiteCommand = mock(CitationCommandString.class);
         when(mockCiteCommand.prefix()).thenReturn("");
         when(mockCiteCommand.suffix()).thenReturn("");
         when(pushToApplicationPreferences.getCiteCommand()).thenReturn(mockCiteCommand);
-        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
 
         // Create a new instance of PushToTeXworks
-        pushToTeXworks = new GUIPushToTeXworks(dialogService, preferences);
+        pushToTeXworks = new GuiPushToTeXworks(dialogService, pushToApplicationPreferences);
     }
 
     /**
