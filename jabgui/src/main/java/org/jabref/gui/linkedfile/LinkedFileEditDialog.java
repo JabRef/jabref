@@ -71,13 +71,6 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
                 return null;
             }
         });
-
-        this.setOnShown(event -> {
-            Platform.runLater(() -> link.requestFocus());
-            event.consume();
-        });
-
-        this.showAndWait();
     }
 
     @FXML
@@ -94,6 +87,11 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         link.textProperty().bindBidirectional(viewModel.linkProperty());
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
         sourceUrl.textProperty().bindBidirectional(viewModel.sourceUrlProperty());
+
+        this.setOnShown(e -> {
+            Platform.runLater(() -> link.requestFocus());
+            e.consume();
+        });
     }
 
     @FXML
