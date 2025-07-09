@@ -6,7 +6,7 @@ import org.jabref.logic.util.NotificationService;
 
 public class PushToVScode extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.VSCODE;
+    public static final Applications APPLICATION = Applications.VSCODE;
 
     public PushToVScode(NotificationService notificationService, PushToApplicationPreferences preferences) {
         super(notificationService, preferences);
@@ -14,7 +14,7 @@ public class PushToVScode extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToVim extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.VIM;
+    public static final Applications APPLICATION = Applications.VIM;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToVim.class);
 
@@ -27,7 +27,7 @@ public class PushToVim extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

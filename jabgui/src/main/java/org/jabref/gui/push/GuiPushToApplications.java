@@ -32,12 +32,12 @@ public class GuiPushToApplications {
                 new GuiPushToTexShop(dialogService, preferences),
                 new GuiPushToVScode(dialogService, preferences)));
 
-        return APPLICATIONS;
+        return Collections.unmodifiableList(APPLICATIONS);
     }
 
     public static Optional<GuiPushToApplication> getGUIApplicationByName(String applicationName, DialogService dialogService, PushToApplicationPreferences preferences) {
         return getAllGUIApplications(dialogService, preferences).stream()
-                                                                .filter(application -> application.getDisplayName().equals(applicationName))
+                                                                .filter(application -> application.getDisplayName().equalsIgnoreCase(applicationName))
                                                                 .findAny();
     }
 }

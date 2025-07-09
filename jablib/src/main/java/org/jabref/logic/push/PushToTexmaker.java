@@ -9,7 +9,7 @@ import org.jabref.logic.util.NotificationService;
  */
 public class PushToTexmaker extends AbstractPushToApplication {
 
-    public static final String NAME = "Texmaker";
+    public static final Applications APPLICATION = Applications.TEXMAKER;
 
     public PushToTexmaker(NotificationService dialogService, PushToApplicationPreferences preferences) {
         super(dialogService, preferences);
@@ -17,7 +17,7 @@ public class PushToTexmaker extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

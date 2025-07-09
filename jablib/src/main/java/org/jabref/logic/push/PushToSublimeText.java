@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToSublimeText extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.SUBLIME_TEXT;
+    public static final Applications APPLICATION = Applications.SUBLIME_TEXT;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 
@@ -27,7 +27,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

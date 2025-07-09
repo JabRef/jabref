@@ -1,53 +1,28 @@
 package org.jabref.logic.push;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.util.NotificationService;
 
 public class PushToApplications {
 
-    public static final String EMACS = "Emacs";
-    public static final String LYX = "LyX/Kile";
-    public static final String TEXMAKER = "Texmaker";
-    public static final String TEXSTUDIO = "TeXstudio";
-    public static final String TEXWORKS = "TeXworks";
-    public static final String VIM = "Vim";
-    public static final String WIN_EDT = "WinEdt";
-    public static final String SUBLIME_TEXT = "Sublime Text";
-    public static final String TEXSHOP = "TeXShop";
-    public static final String VSCODE = "VScode";
-
-    private static final List<PushToApplication> APPLICATIONS = new ArrayList<>();
-
     private PushToApplications() {
     }
 
-    public static List<PushToApplication> getAllApplications(NotificationService notificationService, PushToApplicationPreferences preferences) {
-        if (!APPLICATIONS.isEmpty()) {
-            return Collections.unmodifiableList(APPLICATIONS);
-        }
-
-        APPLICATIONS.addAll(List.of(
-                new PushToEmacs(notificationService, preferences),
-                new PushToLyx(notificationService, preferences),
-                new PushToSublimeText(notificationService, preferences),
-                new PushToTexmaker(notificationService, preferences),
-                new PushToTeXstudio(notificationService, preferences),
-                new PushToTeXworks(notificationService, preferences),
-                new PushToVim(notificationService, preferences),
-                new PushToWinEdt(notificationService, preferences),
-                new PushToTexShop(notificationService, preferences),
-                new PushToVScode(notificationService, preferences)));
-
-        return APPLICATIONS;
-    }
-
-    public static Optional<PushToApplication> getApplicationByName(String applicationName, NotificationService notificationService, PushToApplicationPreferences preferences) {
-        return getAllApplications(notificationService, preferences).stream()
-                                                             .filter(application -> application.getDisplayName().equals(applicationName))
-                                                             .findAny();
+    /// @param applicationId Used by the CLI to select the application to run. Example: `texstudio`
+    public static Optional<PushToApplication> getApplicationById(String applicationId, NotificationService notificationService, PushToApplicationPreferences preferences) {
+        return Applications.getApplicationById(applicationId)
+                           .map(application -> switch (application) {
+                               case EMACS -> new PushToEmacs(notificationService, preferences);
+                               case LYX -> new PushToLyx(notificationService, preferences);
+                               case SUBLIME_TEXT -> new PushToSublimeText(notificationService, preferences);
+                               case TEXMAKER -> new PushToTexmaker(notificationService, preferences);
+                               case TEXSTUDIO -> new PushToTeXstudio(notificationService, preferences);
+                               case TEXWORKS -> new PushToTeXworks(notificationService, preferences);
+                               case VIM -> new PushToVim(notificationService, preferences);
+                               case WIN_EDT -> new PushToWinEdt(notificationService, preferences);
+                               case TEXSHOP -> new PushToTexShop(notificationService, preferences);
+                               case VSCODE -> new PushToVScode(notificationService, preferences);
+                           });
     }
 }

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToLyx extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.LYX;
+    public static final Applications APPLICATION = Applications.LYX;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToLyx.class);
 
@@ -27,7 +27,7 @@ public class PushToLyx extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

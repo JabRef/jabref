@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToTexShop extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.TEXSHOP;
+    public static final Applications APPLICATION = Applications.TEXSHOP;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToTexShop.class);
 
@@ -25,7 +25,7 @@ public class PushToTexShop extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

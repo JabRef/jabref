@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.EMACS;
+    public static final Applications APPLICATION = Applications.EMACS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
@@ -30,7 +30,7 @@ public class PushToEmacs extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

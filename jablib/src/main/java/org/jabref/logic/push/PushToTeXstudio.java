@@ -6,7 +6,7 @@ import org.jabref.logic.util.NotificationService;
 
 public class PushToTeXstudio extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.TEXSTUDIO;
+    public static final Applications APPLICATION = Applications.TEXSTUDIO;
 
     public PushToTeXstudio(NotificationService dialogService, PushToApplicationPreferences preferences) {
         super(dialogService, preferences);
@@ -14,7 +14,7 @@ public class PushToTeXstudio extends AbstractPushToApplication {
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override

@@ -82,9 +82,9 @@ import org.jabref.logic.openoffice.style.OOStyle;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import org.jabref.logic.push.Applications;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
-import org.jabref.logic.push.PushToApplications;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
@@ -793,15 +793,15 @@ public class JabRefCliPreferences implements CliPreferences {
         Map<String, String> applicationCommands = new HashMap<>();
         // getEmptyIsDefault is used to ensure that an installation of a tool leads to the new path (instead of leaving the empty one)
         // Reason: empty string is returned by org.jabref.gui.desktop.os.Windows.detectProgramPath if program is not found. That path is stored in the preferences.
-        applicationCommands.put(PushToApplications.EMACS, getEmptyIsDefault(PUSH_EMACS_PATH));
-        applicationCommands.put(PushToApplications.LYX, getEmptyIsDefault(PUSH_LYXPIPE));
-        applicationCommands.put(PushToApplications.TEXMAKER, getEmptyIsDefault(PUSH_TEXMAKER_PATH));
-        applicationCommands.put(PushToApplications.TEXSTUDIO, getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
-        applicationCommands.put(PushToApplications.TEXWORKS, getEmptyIsDefault(PUSH_TEXWORKS_PATH));
-        applicationCommands.put(PushToApplications.VIM, getEmptyIsDefault(PUSH_VIM));
-        applicationCommands.put(PushToApplications.WIN_EDT, getEmptyIsDefault(PUSH_WINEDT_PATH));
-        applicationCommands.put(PushToApplications.SUBLIME_TEXT, getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
-        applicationCommands.put(PushToApplications.VSCODE, getEmptyIsDefault(PUSH_VSCODE_PATH));
+        applicationCommands.put(Applications.EMACS.getDisplayName(), getEmptyIsDefault(PUSH_EMACS_PATH));
+        applicationCommands.put(Applications.LYX.getDisplayName(), getEmptyIsDefault(PUSH_LYXPIPE));
+        applicationCommands.put(Applications.TEXMAKER.getDisplayName(), getEmptyIsDefault(PUSH_TEXMAKER_PATH));
+        applicationCommands.put(Applications.TEXSTUDIO.getDisplayName(), getEmptyIsDefault(PUSH_TEXSTUDIO_PATH));
+        applicationCommands.put(Applications.TEXWORKS.getDisplayName(), getEmptyIsDefault(PUSH_TEXWORKS_PATH));
+        applicationCommands.put(Applications.VIM.getDisplayName(), getEmptyIsDefault(PUSH_VIM));
+        applicationCommands.put(Applications.WIN_EDT.getDisplayName(), getEmptyIsDefault(PUSH_WINEDT_PATH));
+        applicationCommands.put(Applications.SUBLIME_TEXT.getDisplayName(), getEmptyIsDefault(PUSH_SUBLIME_TEXT_PATH));
+        applicationCommands.put(Applications.VSCODE.getDisplayName(), getEmptyIsDefault(PUSH_VSCODE_PATH));
 
         pushToApplicationPreferences = new PushToApplicationPreferences(
                 get(PUSH_TO_APPLICATION),
@@ -824,24 +824,25 @@ public class JabRefCliPreferences implements CliPreferences {
 
     private void storePushToApplicationPath(Map<String, String> commandPair) {
         commandPair.forEach((key, value) -> {
-            switch (key) {
-                case PushToApplications.EMACS ->
+            // is only for the preferences and therefore is okay to throw NoSuchElementException
+            switch (Applications.getApplicationByDisplayName(key).get()) {
+                case Applications.EMACS ->
                         put(PUSH_EMACS_PATH, value);
-                case PushToApplications.LYX ->
+                case Applications.LYX ->
                         put(PUSH_LYXPIPE, value);
-                case PushToApplications.TEXMAKER ->
+                case Applications.TEXMAKER ->
                         put(PUSH_TEXMAKER_PATH, value);
-                case PushToApplications.TEXSTUDIO ->
+                case Applications.TEXSTUDIO ->
                         put(PUSH_TEXSTUDIO_PATH, value);
-                case PushToApplications.TEXWORKS ->
+                case Applications.TEXWORKS ->
                         put(PUSH_TEXWORKS_PATH, value);
-                case PushToApplications.VIM ->
+                case Applications.VIM ->
                         put(PUSH_VIM, value);
-                case PushToApplications.WIN_EDT ->
+                case Applications.WIN_EDT ->
                         put(PUSH_WINEDT_PATH, value);
-                case PushToApplications.SUBLIME_TEXT ->
+                case Applications.SUBLIME_TEXT ->
                         put(PUSH_SUBLIME_TEXT_PATH, value);
-                case PushToApplications.VSCODE ->
+                case Applications.VSCODE ->
                         put(PUSH_VSCODE_PATH, value);
             }
         });

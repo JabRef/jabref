@@ -124,7 +124,7 @@ public class CAYWResource {
         // Push to TexStudio parameter handling
         if (queryParams.isTexstudio()) {
             CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand()).concat("{"), ",", "}");
-            PushToApplications.getApplicationByName("TeXstudio", LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
+            PushToApplications.getApplicationById("TeXstudio", LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }
 
