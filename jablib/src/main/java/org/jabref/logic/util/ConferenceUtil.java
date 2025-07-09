@@ -11,6 +11,5 @@ public class ConferenceUtil {
             return Optional.of(matcher.group(1));
         }
         return Optional.empty();
-
     }
 }

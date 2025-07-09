@@ -140,7 +140,7 @@ public enum StandardField implements Field {
     CREATIONDATE("creationdate", FieldProperty.DATE),
 
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE),
-    ICORANKING("icoranking");
+    ICORERANKING("icoreranking");
 
     public static final Set<Field> AUTOMATIC_FIELDS = Set.of(OWNER, TIMESTAMP, CREATIONDATE, MODIFICATIONDATE);
 

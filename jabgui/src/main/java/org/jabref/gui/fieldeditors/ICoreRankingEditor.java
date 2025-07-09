@@ -8,7 +8,9 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
@@ -33,67 +35,24 @@ public class ICoreRankingEditor extends HBox implements FieldEditorFX {
 
         this.textField.setPromptText("Enter or lookup ICORE rank");
 
-        Button lookupButton = new Button("Lookup Rank");
+//        Button lookupButton = new Button("Lookup Rank");
+        Button lookupButton = new Button();
+        lookupButton.getStyleClass().setAll("icon-button");
+        lookupButton.setGraphic(IconTheme.JabRefIcons.LOOKUP_IDENTIFIER.getGraphicNode());
+        lookupButton.setTooltip(new Tooltip("Look up Icore Rank"));
         lookupButton.setOnAction(event -> lookupRank());
-
         this.getChildren().addAll(textField, lookupButton);
         this.setSpacing(10);
+
+        lookupButton.setOnAction(event -> lookupRank());
     }
 
-    // Deprecated method it only shows rank by puttin the acronym in the text field
-//    private void lookupRank() {
-//        if (currentEntry == null) {
-////            System.out.println("No entry is currently bound.");
-//            return;
-//        }
-//
-//        // 1. Try icoreranking field first
-//        Optional<String> icoreField = currentEntry.getField(StandardField.ICORANKING);
-//        if (icoreField.isPresent()) {
-//            String raw = icoreField.get();
-////            System.out.println("Using ICORE field: " + raw);
-//
-//            Optional<String> acronymRank = repo.getRankingFor(raw.toLowerCase());
-//            String result = acronymRank.orElse("Not ranked");
-//            textField.setText(result);
-////            System.out.println("Lookup result from ICORE: " + result);
-//            return;
-//        }
-//
-//        // 2. Then fallback to booktitle
-//        Optional<String> bookTitle = currentEntry.getFieldOrAlias(StandardField.BOOKTITLE);
-//        // 3. Then fallback to journal
-//        if (bookTitle.isEmpty()) {
-//            bookTitle = currentEntry.getField(StandardField.JOURNAL);
-//        }
-//
-//        if (bookTitle.isEmpty()) {
-////            System.out.println("No usable field found.");
-//            textField.setText("Not ranked");
-//            return;
-//        }
-//
-//        String rawInput = bookTitle.get();
-////        System.out.println("Detected Title: '" + rawInput + "'");
-//
-//        Optional<String> acronym = ConferenceUtil.extractAcronym(rawInput);
-////        acronym.ifPresent(acr -> System.out.println("Extracted acronym: " + acr));
-//
-//        Optional<String> rank = acronym.flatMap(repo::getRankingFor)
-//                .or(() -> repo.getRankingFor(rawInput));
-//
-//        String result = rank.orElse("Not ranked");
-//        textField.setText(result);
-////        System.out.println("Lookup result: " + result);
-//    }
-
-// By providing the acronym fetches the data from csv
 private void lookupRank() {
     if (currentEntry == null) {
         return;
     }
 
-    Optional<String> icoreField = currentEntry.getField(StandardField.ICORANKING);
+    Optional<String> icoreField = currentEntry.getField(StandardField.ICORERANKING);
     Optional<String> bookTitle = currentEntry.getFieldOrAlias(StandardField.BOOKTITLE);
     if (bookTitle.isEmpty()) {
         bookTitle = currentEntry.getField(StandardField.JOURNAL);
@@ -104,8 +63,7 @@ private void lookupRank() {
 
     Optional<String> acronym = ConferenceUtil.extractAcronym(rawInput); // Extracting the acronym from our input field
     Optional<ConferenceRankingEntry> result = acronym.flatMap(repo::getFullEntry)
-            .or(() -> repo.getFullEntry(rawInput));  // Finding if any matching entry present in csv file
-// If present then print the info
+            .or(() -> repo.getFullEntry(rawInput));
 
     if (result.isPresent()) {
         ConferenceRankingEntry entry = result.get();
@@ -119,7 +77,7 @@ private void lookupRank() {
         alert.getDialogPane().setPrefSize(600, 400);
         alert.showAndWait();
 
-        textField.setText(entry.rank); // still show rank in the field
+        textField.setText(entry.rank()); // still show rank in the field
     } else {
         textField.setText("Not ranked");
     }
@@ -128,11 +86,6 @@ private void lookupRank() {
     @Override
     public void bindToEntry(BibEntry entry) {
         this.currentEntry = entry;
-
-//        System.out.println("ENTRY booktitle = " + entry.getField(StandardField.BOOKTITLE).orElse("none"));
-//        System.out.println("ENTRY journal = " + entry.getField(StandardField.JOURNAL).orElse("none"));
-//        System.out.println("ENTRY title = " + entry.getField(StandardField.TITLE).orElse("none"));
-
         entry.getField(field).ifPresent(textField::setText);
 
         textField.textProperty().addListener((obs, oldVal, newVal) -> {

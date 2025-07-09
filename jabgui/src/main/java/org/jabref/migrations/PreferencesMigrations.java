@@ -1,18 +1,13 @@
 package org.jabref.migrations;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.UnaryOperator;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 
+import com.github.javakeyring.Keyring;
 import javafx.scene.control.TableColumn;
-
 import org.jabref.gui.entryeditor.CommentsTab;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
@@ -29,16 +24,16 @@ import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.strings.StringUtil;
-
-import com.github.javakeyring.Keyring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PreferencesMigrations {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreferencesMigrations.class);
+    private JabRefGuiPreferences preferences;
 
-    private PreferencesMigrations() {
+    private PreferencesMigrations(JabRefGuiPreferences preferences) {
+        this.preferences = preferences;
     }
 
     /**
@@ -562,7 +557,21 @@ public class PreferencesMigrations {
      * The tab "Comments" is hard coded using {@link CommentsTab} since v5.10 (and thus hard-wired in {@link org.jabref.gui.entryeditor.EntryEditor#createTabs()}.
      * Thus, the configuration ih the preferences is obsolete
      */
+
     static void removeCommentsFromCustomEditorTabs(GuiPreferences preferences) {
         preferences.getEntryEditorPreferences().getEntryEditorTabs().remove("Comments");
     }
+
+    public void addICORERankingFieldToGeneralTab() {
+        String key = "entryEditorTabList";
+        String expectedValue = "General:doi;crossref;keywords;eprint;url;file;groups;owner;timestamp;printed;priority;qualityassured;ranking;readstatus;relevance";
+        String newValue = "General:doi;icoreranking;crossref;keywords;eprint;url;file;groups;owner;timestamp;printed;priority;qualityassured;ranking;readstatus;relevance";
+
+        String oldValue = preferences.get(key);
+
+        if (expectedValue.equals(oldValue)) {
+            preferences.put(key, newValue);
+        }
+    }
+
 }
