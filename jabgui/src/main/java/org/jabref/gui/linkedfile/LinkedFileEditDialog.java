@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogEvent;
 import javafx.scene.control.TextField;
 
 import org.jabref.gui.DialogService;
@@ -88,15 +89,17 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
         fileType.valueProperty().bindBidirectional(viewModel.selectedExternalFileTypeProperty());
         sourceUrl.textProperty().bindBidirectional(viewModel.sourceUrlProperty());
 
-        this.setOnShown(e -> {
-            Platform.runLater(() -> link.requestFocus());
-            e.consume();
-        });
+        this.setOnShown(this::onDialogShow);
     }
 
     @FXML
     private void openBrowseDialog(ActionEvent event) {
         viewModel.openBrowseDialog();
         link.requestFocus();
+    }
+
+    private void onDialogShow(DialogEvent e) {
+        Platform.runLater(() -> link.requestFocus());
+        e.consume();
     }
 }
