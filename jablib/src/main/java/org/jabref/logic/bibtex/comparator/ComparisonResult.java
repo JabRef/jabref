@@ -4,4 +4,4 @@ public enum ComparisonResult {
     LEFT_BETTER,
     RIGHT_BETTER,
     UNDETERMINED
-    }
+}
