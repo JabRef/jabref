@@ -3,7 +3,6 @@ package org.jabref.gui.push;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
@@ -19,7 +18,6 @@ import org.jabref.gui.util.BindingsHelper;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -95,26 +93,6 @@ public class GuiPushToApplicationCommand extends SimpleCommand {
         return application.getAction();
     }
 
-    private static String getKeyString(List<BibEntry> entries, String delimiter) {
-        StringBuilder result = new StringBuilder();
-        Optional<String> citeKey;
-        boolean first = true;
-        for (BibEntry bes : entries) {
-            citeKey = bes.getCitationKey();
-            if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
-                LOGGER.warn("Should never occur, because we made sure that all entries have keys");
-                continue;
-            }
-            if (first) {
-                result.append(citeKey.get());
-                first = false;
-            } else {
-                result.append(delimiter).append(citeKey.get());
-            }
-        }
-        return result.toString();
-    }
-
     @Override
     public void execute() {
         // If required, check that all entries have citation keys defined:
@@ -137,7 +115,6 @@ public class GuiPushToApplicationCommand extends SimpleCommand {
     }
 
     private void pushEntries() {
-        BibDatabaseContext database = stateManager.getActiveDatabase().orElseThrow(() -> new NullPointerException("Database null"));
-        application.pushEntries(database, stateManager.getSelectedEntries(), getKeyString(stateManager.getSelectedEntries(), application.getDelimiter()));
+        application.pushEntries(stateManager.getSelectedEntries());
     }
 }

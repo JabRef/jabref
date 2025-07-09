@@ -8,7 +8,6 @@ import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.StreamGobbler;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -30,7 +29,7 @@ public class PushToTexShop extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
+    public void pushEntries(List<BibEntry> entries) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -38,6 +37,7 @@ public class PushToTexShop extends AbstractPushToApplication {
         commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         try {
+            String keyString = this.getKeyString(entries, getDelimiter());
             LOGGER.debug("TexShop string: {}", String.join(" ", getCommandLine(keyString)));
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             processBuilder.inheritIO();

@@ -3,11 +3,11 @@ package org.jabref.logic.push;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.NotificationService;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -35,13 +35,32 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         this.preferences = preferences;
     }
 
-    @Override
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
-        pushEntries(database, entries, keyString, new ProcessBuilder());
+    protected String getKeyString(List<BibEntry> entries, String delimiter) {
+        StringBuilder result = new StringBuilder();
+        Optional<String> citeKey;
+        boolean first = true;
+        for (BibEntry bes : entries) {
+            citeKey = bes.getCitationKey();
+            if (citeKey.isEmpty() || citeKey.get().isEmpty()) {
+                LOGGER.warn("Should never occur, because we made sure that all entries have keys");
+                continue;
+            }
+            if (first) {
+                result.append(citeKey.get());
+                first = false;
+            } else {
+                result.append(delimiter).append(citeKey.get());
+            }
+        }
+        return result.toString();
+    }
+
+    public void pushEntries(List<BibEntry> entries) {
+        pushEntries(entries, new ProcessBuilder());
     }
 
     @VisibleForTesting
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString, ProcessBuilder processBuilder) {
+    public void pushEntries(List<BibEntry> entries, ProcessBuilder processBuilder) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -53,6 +72,8 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             notDefined = true;
             return;
         }
+
+        String keyString = this.getKeyString(entries, getDelimiter());
 
         // Execute command
         try {

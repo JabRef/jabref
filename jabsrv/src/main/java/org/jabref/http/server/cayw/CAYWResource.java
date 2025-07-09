@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 
@@ -125,12 +124,8 @@ public class CAYWResource {
         // Push to TexStudio parameter handling
         if (queryParams.isTexstudio()) {
             CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand()).concat("{"), ",", "}");
-            String keyString = searchResults.stream()
-                                            .map(caywEntry -> caywEntry.bibEntry().getCitationKey().orElse(""))
-                                            .collect(Collectors.joining(","));
-
             PushToApplications.getApplicationByName("TeXstudio", LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
-                              .ifPresent(application -> application.pushEntries(databaseContext, searchResults.stream().map(CAYWEntry::bibEntry).toList(), keyString));
+                              .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }
 
         return Response.ok(formattedResponse).type(formatter.getMediaType()).build();

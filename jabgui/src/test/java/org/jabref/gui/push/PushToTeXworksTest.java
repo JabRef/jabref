@@ -1,5 +1,6 @@
 package org.jabref.gui.push;
 
+import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.SimpleMapProperty;
@@ -9,6 +10,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.push.CitationCommandString;
 import org.jabref.logic.push.PushToApplicationPreferences;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +82,7 @@ class PushToTeXworksTest {
         String testKey = "TestKey";
         String[] expectedCommand = new String[] {TEXWORKS_CLIENT_PATH, "--insert-text", testKey};
 
-        pushToTeXworks.pushEntries(null, null, testKey, processBuilder);
+        pushToTeXworks.pushEntries(List.of(new BibEntry().withCitationKey(testKey)), processBuilder);
 
         verify(processBuilder).command(expectedCommand);
     }

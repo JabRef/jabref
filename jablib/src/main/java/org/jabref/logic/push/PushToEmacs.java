@@ -10,7 +10,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -35,7 +34,7 @@ public class PushToEmacs extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
+    public void pushEntries(List<BibEntry> entries) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -48,6 +47,8 @@ public class PushToEmacs extends AbstractPushToApplication {
         }
 
         commandPath = preferences.getCommandPaths().get(this.getDisplayName());
+
+        String keyString = getKeyString(entries, getDelimiter());
 
         String[] addParams = preferences.getEmacsArguments().split(" ");
         try {
@@ -67,7 +68,7 @@ public class PushToEmacs extends AbstractPushToApplication {
 
                 com[com.length - 1] = prefix.concat("\""
                                                     + getCitePrefix().replace("\\", "\\\\")
-                                                    + keys
+                                                    + keyString
                                                     + getCiteSuffix().replace("\\", "\\\\")
                                                     + "\"").concat(suffix)
                                             .replace("\"", "\\\"");
@@ -78,7 +79,7 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so emacs receives: (insert "\cite{Blah2001}")
                 com[com.length - 1] = prefix.concat("\""
                                                     + getCitePrefix().replace("\\", "\\\\")
-                                                    + keys
+                                                    + keyString
                                                     + getCiteSuffix().replace("\\", "\\\\")
                                                     + "\"").concat(suffix);
             }

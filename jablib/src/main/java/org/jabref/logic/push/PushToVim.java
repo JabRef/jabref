@@ -10,7 +10,6 @@ import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -32,15 +31,17 @@ public class PushToVim extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
+    public void pushEntries(List<BibEntry> entries) {
         if (!determineCommandPath()) {
             return;
         }
 
+        String keyString = this.getKeyString(entries, getDelimiter());
+
         try {
             String[] com = new String[]{commandPath, "--servername",
                     preferences.getVimServer(), "--remote-send",
-                    "<C-\\><C-N>a" + getCitePrefix() + keys + getCiteSuffix()};
+                    "<C-\\><C-N>a" + getCitePrefix() + keyString + getCiteSuffix()};
 
             LOGGER.atDebug()
                   .setMessage("Executing command {}")

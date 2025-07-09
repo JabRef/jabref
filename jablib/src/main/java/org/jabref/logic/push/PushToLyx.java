@@ -10,7 +10,6 @@ import java.util.List;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.HeadlessExecutorService;
 import org.jabref.logic.util.NotificationService;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -45,7 +44,7 @@ public class PushToLyx extends AbstractPushToApplication {
     }
 
     @Override
-    public void pushEntries(BibDatabaseContext database, final List<BibEntry> entries, final String keyString) {
+    public void pushEntries(List<BibEntry> entries) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
@@ -70,6 +69,7 @@ public class PushToLyx extends AbstractPushToApplication {
         final Path lyxPipe = lp;
 
         HeadlessExecutorService.INSTANCE.executeAndWait(() -> {
+            String keyString = this.getKeyString(entries, getDelimiter());
             try (BufferedWriter lyxOut = Files.newBufferedWriter(lyxPipe, StandardCharsets.UTF_8)) {
                 String citeStr = "LYXCMD:sampleclient:citation-insert:" + keyString;
                 lyxOut.write(citeStr + "\n");

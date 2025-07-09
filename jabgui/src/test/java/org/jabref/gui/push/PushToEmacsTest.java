@@ -1,5 +1,6 @@
 package org.jabref.gui.push;
 
+import java.util.List;
 import java.util.Map;
 
 import javafx.beans.property.SimpleMapProperty;
@@ -9,6 +10,7 @@ import javafx.collections.ObservableMap;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.push.PushToApplicationPreferences;
+import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -42,6 +44,10 @@ class PushToEmacsTest {
 
     @Test
     void pushEntries() {
-        pushToEmacs.pushEntries(null, null, "key1,key2");
+        pushToEmacs.pushEntries(
+                List.of(
+                        new BibEntry().withCitationKey("key1"),
+                        new BibEntry().withCitationKey("key2"))
+        );
     }
 }
