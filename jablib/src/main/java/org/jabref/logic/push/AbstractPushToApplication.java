@@ -3,6 +3,7 @@ package org.jabref.logic.push;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
                       .filter(Optional::isPresent)
                       .map(Optional::get)
                       .filter(key -> !key.isEmpty())
-                      .collect(Collectors.joining(delimiter));
+                      .collect(Collectors.joining(Objects.requireNonNullElse(delimiter, "")));
     }
 
     public void pushEntries(List<BibEntry> entries) {

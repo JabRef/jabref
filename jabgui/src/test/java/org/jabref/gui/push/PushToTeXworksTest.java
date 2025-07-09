@@ -42,6 +42,7 @@ class PushToTeXworksTest {
         // Mock the return value for getCiteCommand()
         CitationCommandString mockCiteCommand = mock(CitationCommandString.class);
         when(mockCiteCommand.prefix()).thenReturn("");
+        when(mockCiteCommand.delimiter()).thenReturn("");
         when(mockCiteCommand.suffix()).thenReturn("");
         when(pushToApplicationPreferences.getCiteCommand()).thenReturn(mockCiteCommand);
 
