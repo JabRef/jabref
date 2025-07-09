@@ -91,7 +91,7 @@ open module org.jabref {
     // region HTTP clients
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.jsoup;
-    requires com.konghq.unirest.java.core;
+    requires unirest.java.core;
     // requires unirest.modules.gson;
     // endregion
 
@@ -129,14 +129,14 @@ open module org.jabref {
     // requires org.apache.xmpbox;
     // requires com.ibm.icu;
 
-    requires com.vladsch.flexmark;
-    requires com.vladsch.flexmark.html2md.converter;
-    requires com.vladsch.flexmark.util.ast;
-    requires com.vladsch.flexmark.util.data;
+    requires flexmark;
+    requires flexmark.html2md.converter;
+    requires flexmark.util.ast;
+    requires flexmark.util.data;
 
     // requires com.h2database.mvstore;
 
-    requires com.github.java.keyring;
+    requires java.keyring;
     // requires org.freedesktop.dbus;
 
     requires org.jooq.jool;
@@ -147,7 +147,7 @@ open module org.jabref {
     // requires ai.djl.tokenizers;
     // requires jvm.openai;
     // requires langchain4j;
-    requires dev.langchain4j.core;
+    requires langchain4j.core;
     // requires langchain4j.google.ai.gemini;
     // requires langchain4j.hugging.face;
     // requires langchain4j.mistral.ai;

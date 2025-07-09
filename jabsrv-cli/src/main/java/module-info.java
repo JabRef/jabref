@@ -34,8 +34,8 @@ module org.jabref.jabsrv.cli {
     requires com.sun.jna;
     requires com.sun.jna.platform;
 
-    requires org.jbibtex;
-    requires de.undercouch.citeproc.java;
+    requires jbibtex;
+    requires citeproc.java;
 
     requires transitive org.jspecify;
     requires java.logging;
