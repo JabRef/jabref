@@ -339,12 +339,12 @@ extraJavaModuleInfo {
         requires("java.logging")
     }
     module("org.glassfish.jersey.containers:jersey-container-grizzly2-servlet", "jersey.container.grizzly2.servlet") {
-        // requires("org.glassfish.jersey.servlet")
+        // requires("jersey.servlet")
     }
     module("org.glassfish.jersey.containers:jersey-container-servlet", "jersey.container.servlet") {
         exportAllPackages()
         // requireAllDefinedDependencies()
-        requires("org.glassfish.jersey.container.servlet.core")
+        requires("jersey.container.servlet.core")
         requires("jakarta.servlet.api")
     }
     module("jakarta.servlet:jakarta.servlet-api", "jakarta.servlet.api") {
