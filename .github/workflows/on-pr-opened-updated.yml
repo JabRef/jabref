@@ -85,6 +85,7 @@ jobs:
           skip-if-not-in-project: true
   ensure_assignment:
     name: Ensure that contributor is assigned (fails if not commented on issue)
+    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-latest
