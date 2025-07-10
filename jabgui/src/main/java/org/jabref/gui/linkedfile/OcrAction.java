@@ -67,7 +67,8 @@ public class OcrAction extends SimpleCommand {
 
         BackgroundTask<OcrResult> task = BackgroundTask.wrap(() -> {
                                                            try {
-                                                               OcrService ocrService = new OcrService();
+                                                               // Pass filePreferences to OcrService
+                                                               OcrService ocrService = new OcrService(filePreferences);
                                                                return ocrService.performOcr(filePath.get());
                                                            } catch (OcrException e) {
                                                                // This is a bug in JabRef
