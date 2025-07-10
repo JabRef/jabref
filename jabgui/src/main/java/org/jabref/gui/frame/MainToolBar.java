@@ -47,7 +47,7 @@ import org.controlsfx.control.TaskProgressView;
 
 public class MainToolBar extends ToolBar {
     private final LibraryTabContainer frame;
-    private final GuiPushToApplicationCommand GUIPushToApplicationCommand;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final GlobalSearchBar globalSearchBar;
     private final DialogService dialogService;
     private final StateManager stateManager;
@@ -64,7 +64,7 @@ public class MainToolBar extends ToolBar {
     private Subscription taskProgressSubscription;
 
     public MainToolBar(LibraryTabContainer tabContainer,
-                       GuiPushToApplicationCommand GUIPushToApplicationCommand,
+                       GuiPushToApplicationCommand pushToApplicationCommand,
                        GlobalSearchBar globalSearchBar,
                        DialogService dialogService,
                        StateManager stateManager,
@@ -76,7 +76,7 @@ public class MainToolBar extends ToolBar {
                        ClipBoardManager clipBoardManager,
                        CountingUndoManager undoManager) {
         this.frame = tabContainer;
-        this.GUIPushToApplicationCommand = GUIPushToApplicationCommand;
+        this.pushToApplicationCommand = pushToApplicationCommand;
         this.globalSearchBar = globalSearchBar;
         this.dialogService = dialogService;
         this.stateManager = stateManager;
@@ -97,8 +97,8 @@ public class MainToolBar extends ToolBar {
         final Region leftSpacer = new Region();
         final Region rightSpacer = new Region();
 
-        final Button pushToApplicationButton = factory.createIconButton(GUIPushToApplicationCommand.getAction(), GUIPushToApplicationCommand);
-        GUIPushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
+        final Button pushToApplicationButton = factory.createIconButton(pushToApplicationCommand.getAction(), pushToApplicationCommand);
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationButton);
 
         // Setup Toolbar
 

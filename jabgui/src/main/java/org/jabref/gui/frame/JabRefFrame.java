@@ -104,7 +104,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final TaskExecutor taskExecutor;
 
     private final JabRefFrameViewModel viewModel;
-    private final GuiPushToApplicationCommand GUIPushToApplicationCommand;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final SplitPane horizontalSplit = new SplitPane();
     private final SidePane sidePane;
     private final SplitPane verticalSplit = new SplitPane();
@@ -188,7 +188,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 undoManager);
 
-        this.GUIPushToApplicationCommand = new GuiPushToApplicationCommand(
+        this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
                 dialogService,
                 this.preferences,
@@ -218,7 +218,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private void initLayout() {
         MainToolBar mainToolBar = new MainToolBar(
                 this,
-                GUIPushToApplicationCommand,
+                pushToApplicationCommand,
                 globalSearchBar,
                 dialogService,
                 stateManager,
@@ -234,7 +234,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 this,
                 fileHistory,
                 sidePane,
-                GUIPushToApplicationCommand,
+                pushToApplicationCommand,
                 preferences,
                 stateManager,
                 fileUpdateMonitor,

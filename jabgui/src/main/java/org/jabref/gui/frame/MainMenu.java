@@ -98,7 +98,7 @@ public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
     private final FileHistoryMenu fileHistoryMenu;
     private final SidePane sidePane;
-    private final GuiPushToApplicationCommand GUIPushToApplicationCommand;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -115,7 +115,7 @@ public class MainMenu extends MenuBar {
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
                     SidePane sidePane,
-                    GuiPushToApplicationCommand GUIPushToApplicationCommand,
+                    GuiPushToApplicationCommand pushToApplicationCommand,
                     GuiPreferences preferences,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
@@ -131,7 +131,7 @@ public class MainMenu extends MenuBar {
         this.frame = frame;
         this.fileHistoryMenu = fileHistoryMenu;
         this.sidePane = sidePane;
-        this.GUIPushToApplicationCommand = GUIPushToApplicationCommand;
+        this.pushToApplicationCommand = pushToApplicationCommand;
         this.preferences = preferences;
         this.stateManager = stateManager;
         this.fileUpdateMonitor = fileUpdateMonitor;
@@ -312,8 +312,8 @@ public class MainMenu extends MenuBar {
                 // endregion
         );
 
-        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(GUIPushToApplicationCommand.getAction(), GUIPushToApplicationCommand);
-        GUIPushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
+        final MenuItem pushToApplicationMenuItem = factory.createMenuItem(pushToApplicationCommand.getAction(), pushToApplicationCommand);
+        pushToApplicationCommand.registerReconfigurable(pushToApplicationMenuItem);
 
         tools.getItems().addAll(
                 factory.createMenuItem(StandardActions.PARSE_LATEX, new ParseLatexAction(stateManager)),
