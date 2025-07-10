@@ -63,7 +63,7 @@
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.7
 //DEPS org.bouncycastle:bcprov-jdk18on:1.81
-//DEPS com.konghq:unirest-modules-gson:4.4.7
+//DEPS com.konghq:unirest-modules-gson:4.4.12
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:3.1.10
 //DEPS org.glassfish.jersey.inject:jersey-hk2:3.1.10
@@ -75,7 +75,7 @@
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS org.hibernate.validator:hibernate-validator:9.0.1.Final
-//DEPS com.konghq:unirest-modules-gson:4.4.7
+//DEPS com.konghq:unirest-modules-gson:4.4.12
 //DEPS com.google.guava:guava:33.4.8-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.4.0
