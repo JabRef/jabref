@@ -442,6 +442,7 @@ extraJavaModuleInfo {
     }
     module("net.sourceforge.lept4j:lept4j", "net.sourceforge.lept4j") {
         exportAllPackages()
+        requireAllDefinedDependencies()
         requires("com.sun.jna")
     }
 
