@@ -95,9 +95,9 @@ public class RemotePreferences {
         return InetAddress.getByName("localhost");
     }
 
-    private boolean isUriValid(String protocol, String hostAddress, int port) {
+    private boolean isUriValid(String hostAddress, int port) {
         try {
-            URI uri = new URI(protocol, null, hostAddress, port, null, null, null);
+            URI uri = new URI("http", null, hostAddress, port, null, null, null);
             return true;
         } catch (URISyntaxException e) {
             return false;
@@ -106,7 +106,7 @@ public class RemotePreferences {
 
     public @NonNull URI getHttpServerUri() {
         try {
-            isUriValid("http", RemotePreferences.getIpAddress().getHostAddress(), getHttpPort());
+            isUriValid(RemotePreferences.getIpAddress().getHostAddress(), getHttpPort());
             return new URI("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":" + getHttpPort());
         } catch (UnknownHostException | URISyntaxException e) {
             LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
