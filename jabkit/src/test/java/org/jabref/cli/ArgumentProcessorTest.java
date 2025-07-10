@@ -135,6 +135,7 @@ class ArgumentProcessorTest {
 
     @Test
     void checkConsistency() throws URISyntaxException {
+
         Path testBib = Path.of(Objects.requireNonNull(ArgumentProcessorTest.class.getResource("origin.bib")).toURI());
         String testBibFile = testBib.toAbsolutePath().toString();
 
@@ -146,6 +147,7 @@ class ArgumentProcessorTest {
         int executionResult = commandLine.execute(args.toArray(String[]::new));
 
         String output = outContent.toString();
+
         assertTrue(output.contains("Checking consistency for entry type 1 of 1\n"));
         assertTrue(output.contains("Consistency check completed"));
         assertEquals(0, executionResult);
