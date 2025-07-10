@@ -178,8 +178,7 @@ public class LibraryResource {
 
     private java.nio.file.Path getJabMapDemoPath() {
         java.nio.file.Path result = java.nio.file.Path.of(System.getProperty("java.io.tmpdir")).resolve("demo.jmp");
-        // TODO: make this debug - and adapt "tinylog.properties" locally to use debug level
-        LOGGER.error("Using temporary file for demo jmp: {}", result);
+        LOGGER.debug("Using temporary file for demo jmp: {}", result);
         return result;
     }
 
@@ -371,7 +370,9 @@ public class LibraryResource {
         return annotationDTOs;
     }
 
-    /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
+    /**
+     * @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
+     */
     private @Nullable InputStream getChocolateBibAsStream() {
         return BibDatabase.class.getResourceAsStream("/Chocolate.bib");
     }

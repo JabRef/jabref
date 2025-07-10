@@ -1,6 +1,7 @@
 package org.jabref.http.dto;
 
 import org.jabref.model.pdf.FileAnnotationType;
+import org.jabref.model.strings.StringUtil;
 
 public record FileAnnotationDTO(
         String author,
@@ -8,10 +9,10 @@ public record FileAnnotationDTO(
         FileAnnotationType type
 ) {
     public FileAnnotationDTO {
-        if (author == null || author.isBlank()) {
+        if (StringUtil.isBlank(author)) {
             author = "(N/A)";
         }
-        if (content == null || content.isBlank()) {
+        if (StringUtil.isBlank(content)) {
             content = "(N/A)";
         }
         if (type == null) {

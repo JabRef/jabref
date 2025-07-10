@@ -16,14 +16,14 @@ public class PdfAnnotationDTO {
     private final LinkedPdfFileDTO parentPDFFile; // contains: title, path and parent BibEntry
     private final List<FileAnnotationDTO> fileAnnotations;
 
-    /// @param annotation The annotation to send.
-    /// @param pathToParentPDFFile The Path to the PDF file from which this annotation was extracted.
+    /// @param AnnotatedPDFFile The Path to the PDF file from which this annotation was extracted.
     /// @param parentBibEntry The BibEntry the parent PDF file is linked to.
-    public PdfAnnotationDTO(Path pathToParentPDFFile, BibEntry parentBibEntry, List<FileAnnotation> annotation) {
-        LinkedFile file = new LinkedFile("", pathToParentPDFFile, "PDF");
+    /// @param annotations The annotations to send.
+    public PdfAnnotationDTO(Path AnnotatedPDFFile, BibEntry parentBibEntry, List<FileAnnotation> annotations) {
+        LinkedFile file = new LinkedFile("", AnnotatedPDFFile, "PDF");
 
         this.parentPDFFile = new LinkedPdfFileDTO(parentBibEntry, file);
-        this.fileAnnotations = annotation.stream()
+        this.fileAnnotations = annotations.stream()
                 .map(fileAnnotation -> new FileAnnotationDTO(fileAnnotation.getAuthor(), fileAnnotation.getContent(), fileAnnotation.getAnnotationType()))
                 .toList();
     }
