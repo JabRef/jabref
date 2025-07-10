@@ -115,10 +115,22 @@ jobs:
           # Append the new assignee
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+          if echo "$LABELS" | grep -q "^good"; then
+            echo "✅ label good found"
+            SILENT=false
+          else
+            echo "🚫 Silent fail if not possible to add assignee"
+            SILENT=true
+          fi
+
           # Update issue with the new assignee list
           echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
-          gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
-
+          if [ "$SILENT" = true ]; then
+            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}") || true
+          else
+            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add label "📌 Pinned"
