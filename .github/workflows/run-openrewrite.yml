@@ -25,9 +25,9 @@ jobs:
 
       - name: Fetch PR branch
         run: |
-          PR_NUMBER=${{ inputs.pr_number }}
-          git fetch origin pull/$PR_NUMBER/head:pr-$PR_NUMBER
-          git checkout pr-$PR_NUMBER
+          gh pr checkout ${{ inputs.pr_number }}
+        env:
+          GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -47,5 +47,5 @@ jobs:
           else
             git add .
             git commit -m "Apply rewriteRun via workflow"
-            git push origin pr-${{ inputs.pr_number }}
+            git push
           fi
