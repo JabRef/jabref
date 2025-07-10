@@ -5,9 +5,6 @@ permissions:
   pull-requests: read
 
 on:
-  push:
-    branches:
-      - add-openrewrite
   workflow_dispatch:
     inputs:
       pr_number:
@@ -29,7 +26,7 @@ jobs:
 
       - name: Fetch PR branch
         run: |
-          gh pr checkout ${{ inputs.pr_number }}13524
+          gh pr checkout ${{ inputs.pr_number }}
         env:
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
 
