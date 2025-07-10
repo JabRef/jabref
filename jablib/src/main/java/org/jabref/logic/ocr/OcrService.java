@@ -98,7 +98,7 @@ public class OcrService {
             Path engData = tessdata.resolve("eng.traineddata");
 
             if (Files.exists(tessdata) && Files.exists(engData)) {
-                return pathStr;  // Return parent of tessdata
+                return engData.getParent().toString();  // Return parent of eng.traineddata
             }
         }
 
