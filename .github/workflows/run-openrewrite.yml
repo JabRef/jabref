@@ -1,6 +1,9 @@
 name: Run OpenRewrite
 
 on:
+  push:
+    branches:
+      - add-openrewrite
   workflow_dispatch:
     inputs:
       pr_number:
