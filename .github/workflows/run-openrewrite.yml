@@ -1,8 +1,8 @@
 name: Run OpenRewrite
 
 permissions:
-  contents: read
-  pull-requests: write
+  contents: write
+  pull-requests: read
 
 on:
   push:
