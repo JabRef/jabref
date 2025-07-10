@@ -67,6 +67,6 @@ jobs:
             echo "No changes to commit."
           else
             git add .
-            git commit -m "Apply rewriteRun via workflow"
+            git commit -m "Fix issues using OpenRewrite"
             git push
           fi
