@@ -1,6 +1,8 @@
 open module org.jabref {
     requires org.jabref.jablib;
 
+    requires org.jabref.jabsrv;
+
     // Swing
     requires java.desktop;
 
@@ -76,14 +78,11 @@ open module org.jabref {
     // endregion
 
     // region: data mapping
-    // requires jakarta.xml.bind;
     requires jdk.xml.dom;
     // requires com.google.gson;
     // requires com.fasterxml.jackson.databind;
     // requires com.fasterxml.jackson.dataformat.yaml;
     // requires com.fasterxml.jackson.datatype.jsr310;
-    // needs to be loaded here as it's otherwise not found at runtime
-    // requires org.glassfish.jaxb.runtime;
     // endregion
 
     // dependency injection using HK2
@@ -130,10 +129,10 @@ open module org.jabref {
     // requires org.apache.xmpbox;
     // requires com.ibm.icu;
 
-    // requires flexmark;
+    requires flexmark;
     requires flexmark.html2md.converter;
-    // requires flexmark.util.ast;
-    // requires flexmark.util.data;
+    requires flexmark.util.ast;
+    requires flexmark.util.data;
 
     // requires com.h2database.mvstore;
 
@@ -156,7 +155,7 @@ open module org.jabref {
     // uses ai.djl.engine.EngineProvider;
     // uses ai.djl.repository.RepositoryFactory;
     // uses ai.djl.repository.zoo.ZooProvider;
-    // uses dev.langchain4j.spi.prompt.PromptTemplateFactory;
+    // uses langchain4j.spi.prompt.PromptTemplateFactory;
     // requires velocity.engine.core;
     // endregion
 
@@ -183,6 +182,9 @@ open module org.jabref {
 
     // region: other libraries (alphabetically)
     // requires cuid;
+    requires com.dlsc.pdfviewfx;
+    requires com.pixelduke.fxthemes;
+    // requires com.sun.jna;
     // requires dd.plist;
     requires io.github.adr;
     // required by okhttp and some AI library
@@ -190,6 +192,5 @@ open module org.jabref {
     // requires mslinks;
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
-    requires com.dlsc.pdfviewfx;
     // endregion
 }

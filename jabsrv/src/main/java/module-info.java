@@ -1,9 +1,20 @@
 module org.jabref.jabsrv {
     exports org.jabref.http.server;
+    exports org.jabref.http.manager;
 
     exports org.jabref.http.dto to com.google.gson, org.glassfish.hk2.locator;
+    exports org.jabref.http.dto.cayw to com.google.gson;
 
     opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
+    exports org.jabref.http.server.cayw;
+    opens org.jabref.http.server.cayw to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
+
+    requires javafx.base;
+
+    // For CAYW feature
+    requires transitive javafx.graphics;
+    requires transitive javafx.controls;
+    requires afterburner.fx;
 
     // For ServiceLocatorUtilities.createAndPopulateServiceLocator()
     requires org.glassfish.hk2.locator;
@@ -20,13 +31,6 @@ module org.jabref.jabsrv {
 
     requires jakarta.annotation;
     requires jakarta.inject;
-
-    requires afterburner.fx;
-    provides com.airhacks.afterburner.views.ResourceLocator
-            with org.jabref.http.JabRefResourceLocator;
-
-    // needs to be loaded here as it's otherwise not found at runtime; XJC related maybe
-    // requires org.glassfish.jaxb.runtime;
 
     requires org.glassfish.grizzly;
     requires org.glassfish.grizzly.http;
