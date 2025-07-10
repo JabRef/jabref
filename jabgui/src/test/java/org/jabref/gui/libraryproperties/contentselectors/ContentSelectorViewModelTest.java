@@ -87,7 +87,7 @@ class ContentSelectorViewModelTest {
         addField(testField);
 
         ListProperty<Field> fields = viewModel.getFieldNamesBackingList();
-        boolean fieldsContainTestValue = fields.stream().anyMatch(field -> "Test".equals(field.getDisplayName()));
+        boolean fieldsContainTestValue = fields.stream().anyMatch(field -> field.getDisplayName().equals("Test"));
 
         assertTrue(fieldsContainTestValue);
     }
