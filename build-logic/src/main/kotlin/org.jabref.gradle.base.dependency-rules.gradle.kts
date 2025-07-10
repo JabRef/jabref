@@ -479,6 +479,7 @@ extraJavaModuleInfo {
     }
     module("com.github.jai-imageio:jai-imageio-core", "com.github.jaiimageio.core") {
         exportAllPackages()
+        requireAllDefinedDependencies()
         requires("java.desktop")
     }
     module("com.squareup.okio:okio-jvm", "okio") {
