@@ -7,6 +7,7 @@ import javafx.collections.ObservableList;
 import org.jabref.http.server.Server;
 import org.jabref.model.database.BibDatabaseContext;
 
+import jakarta.ws.rs.ProcessingException;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +34,25 @@ public class HttpServerThread extends Thread {
 
     @Override
     public void run() {
-        httpServer = this.server.run(contextsToServe, uri);
+        try {
+            httpServer = this.server.run(contextsToServe, uri);
+        } catch (ProcessingException e) {
+            LOGGER.error("Failed to start HTTP server thread: {}", e);
+        }
     }
 
     @Override
     public void interrupt() {
         LOGGER.debug("Interrupting {}", this.getName());
-        this.httpServer.shutdownNow();
+        if (this.httpServer == null) {
+            LOGGER.warn("HttpServer is null, cannot shutdown.");
+        } else {
+            this.httpServer.shutdownNow();
+        }
         super.interrupt();
+    }
+
+    public boolean started() {
+        return httpServer != null && httpServer.isStarted();
     }
 }

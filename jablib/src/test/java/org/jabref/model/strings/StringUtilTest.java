@@ -15,6 +15,7 @@ import org.jabref.logic.os.OS;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -294,20 +295,20 @@ class StringUtilTest {
         assertEquals(Optional.empty(), StringUtil.intValueOfOptional(""));
     }
 
-    @Test
-    void limitStringLengthShort() {
-        assertEquals("Test", StringUtil.limitStringLength("Test", 20));
+    @ParameterizedTest
+    @CsvSource({
+            "'Test', 'Test', 20",
+            "'...', 'Test', 3",
+            "'TestTes...', 'TestTestTestTestTest', 10",
+            "'', , 10"
+    })
+    void limitStringLength(String expected, String input, int maxLength) {
+        assertEquals(expected, StringUtil.limitStringLength(input, maxLength));
     }
 
     @Test
     void limitStringLengthLimiting() {
-        assertEquals("TestTes...", StringUtil.limitStringLength("TestTestTestTestTest", 10));
         assertEquals(10, StringUtil.limitStringLength("TestTestTestTestTest", 10).length());
-    }
-
-    @Test
-    void limitStringLengthNullInput() {
-        assertEquals("", StringUtil.limitStringLength(null, 10));
     }
 
     @Test

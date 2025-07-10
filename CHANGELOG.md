@@ -38,15 +38,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an "Open example library" button to Welcome Tab. [#13014](https://github.com/JabRef/jabref/issues/13014)
 - We added automatic detection and selection of the identifier type (e.g., DOI, ISBN, arXiv) based on clipboard content when opening the "New Entry" dialog [#13111](https://github.com/JabRef/jabref/pull/13111)
 - We added support for import of a Refer/BibIX file format. [#13069](https://github.com/JabRef/jabref/issues/13069)
+- We added markdown rendering and copy capabilities to AI chat responses. [#12234](https://github.com/JabRef/jabref/issues/12234)
 - We added a new `jabkit` command `pseudonymize` to pseudonymize the library. [#13109](https://github.com/JabRef/jabref/issues/13109)
 - We added functionality to focus running instance when trying to start a second instance. [#13129](https://github.com/JabRef/jabref/issues/13129)
 - We added a highlighted diff regarding changes to the Group Tree Structure of a bib file, made outside JabRef. [#11221](https://github.com/JabRef/jabref/issues/11221)
 - We added a new setting in the 'Entry Editor' preferences to hide the 'File Annotations' tab when no annotations are available. [#13143](https://github.com/JabRef/jabref/issues/13143)
 - We added support for multi-file import across different formats. [#13269](https://github.com/JabRef/jabref/issues/13269)
+- We improved the detection of DOIs on the first page of a PDF. [#13487](https://github.com/JabRef/jabref/pull/13487)
 - We added support for dark title bar on Windows. [#11457](https://github.com/JabRef/jabref/issues/11457)
-
-### Changed
-
 - We moved some functionality from the graphical application `jabref` with new command verbs `generate-citation-keys`, `check-consistency`, `fetch`, `search`, `convert`, `generate-bib-from-aux`, `preferences` and `pdf` to the new toolkit. [#13012](https://github.com/JabRef/jabref/pull/13012) [#110](https://github.com/JabRef/jabref/issues/110)
 - We merged the 'New Entry', 'Import by ID', and 'New Entry from Plain Text' tools into a single 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 - We renamed the "Body Text" CSL bibliography header format name to "Text body" as per internal LibreOffice conventions. [#13074](https://github.com/JabRef/jabref/pull/13074)
@@ -76,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where Document Viewer showed technical exceptions when opening entries with non-PDF files. [#13198](https://github.com/JabRef/jabref/issues/13198)
 - When creating a library, if you drag a PDF file containing only a single column, the dialog will now automatically close. [#13262](https://github.com/JabRef/jabref/issues/13262)
 - We fixed an issue where the tab showing the fulltext search results would appear blank after switching library. [#13241](https://github.com/JabRef/jabref/issues/13241)
+- Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)
 
 ### Removed
 

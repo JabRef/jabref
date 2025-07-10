@@ -18,12 +18,12 @@ javaModulePackaging {
     target("ubuntu-22.04") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.X86_64
-        packageTypes = listOf("app-image", "deb")
+        packageTypes = listOf("app-image", "deb", "rpm")
     }
     target("ubuntu-22.04-arm") {
         operatingSystem = OperatingSystemFamily.LINUX
         architecture = MachineArchitecture.ARM64
-        packageTypes = listOf("app-image", "deb")
+        packageTypes = listOf("app-image", "deb", "rpm")
     }
     target("macos-13") {
         operatingSystem = OperatingSystemFamily.MACOS

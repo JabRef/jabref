@@ -13,7 +13,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/JabRefResourceLocator.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/CAYWEntry.java
@@ -31,7 +30,9 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ContextsToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 
 // REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
 //REPOS mavencentral,mavencentralsnapshots=https://central.sonatype.com/repository/maven-snapshots/,s01oss=https://s01.oss.sonatype.org/content/repositories/snapshots/,oss=https://oss.sonatype.org/content/repositories,jitpack=https://jitpack.io,oss2=https://oss.sonatype.org/content/groups/public,ossrh=https://oss.sonatype.org/content/repositories/snapshots
@@ -59,7 +60,7 @@
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.7
 //DEPS org.bouncycastle:bcprov-jdk18on:1.81
-//DEPS com.konghq:unirest-modules-gson:4.4.7
+//DEPS com.konghq:unirest-modules-gson:4.4.12
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:3.1.10
 //DEPS org.glassfish.jersey.inject:jersey-hk2:3.1.10
@@ -71,7 +72,7 @@
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS org.hibernate.validator:hibernate-validator:9.0.1.Final
-//DEPS com.konghq:unirest-modules-gson:4.4.7
+//DEPS com.konghq:unirest-modules-gson:4.4.12
 //DEPS com.google.guava:guava:33.4.8-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.4.0
