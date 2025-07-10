@@ -81,7 +81,7 @@ public class OcrService {
             tesseract.setDatapath(systemPath);
             LOGGER.info("Using system tessdata at: {}", systemPath);
         } else {
-            throw new OcrException("Could not find tessdata directory. Please set TESSDATA_PREFIX environment variable.");
+            LOGGER.warn("Could not find tessdata directory. OCR will fail when attempted.");
         }
     }
 
