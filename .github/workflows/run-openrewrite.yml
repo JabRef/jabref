@@ -1,0 +1,44 @@
+name: Run OpenRewrite
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request number'
+        required: true
+        type: number
+
+jobs:
+  rewrite:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch PR branch
+        run: |
+          PR_NUMBER=${{ inputs.pr_number }}
+          git fetch origin pull/$PR_NUMBER/head:pr-$PR_NUMBER
+          git checkout pr-$PR_NUMBER
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24.0.1
+          distribution: 'zulu'
+
+      - name: Run rewrite
+        run: ./gradlew rewriteRun
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit."
+          else
+            git add .
+            git commit -m "Apply rewriteRun via workflow"
+            git push origin pr-${{ inputs.pr_number }}
+          fi
