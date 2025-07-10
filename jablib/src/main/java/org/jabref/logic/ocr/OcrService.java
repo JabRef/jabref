@@ -60,7 +60,7 @@ public class OcrService {
         String tessdataPath = System.getenv(TESSDATA_PREFIX);
 
         if (tessdataPath != null && !tessdataPath.isEmpty()) {
-            Path tessdataDir = Paths.get(tessdataPath);
+            Path tessdataDir = Path.of(tessdataPath);
             if (Files.exists(tessdataDir) && Files.isDirectory(tessdataDir)) {
                 // Tesseract expects the parent directory of tessdata
                 if (tessdataDir.getFileName().toString().equals("tessdata")) {
@@ -93,7 +93,7 @@ public class OcrService {
         };
 
         for (String pathStr : possiblePaths) {
-            Path path = Paths.get(pathStr);
+            Path path = Path.of(pathStr);
             Path tessdata = path.resolve("tessdata");
             Path engData = tessdata.resolve("eng.traineddata");
 
