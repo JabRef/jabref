@@ -635,19 +635,18 @@ public class StringUtil {
     }
 
     public static boolean isBlank(String string) {
-        return !isNotBlank(string);
+        return (string == null) || string.isBlank();
     }
 
     public static boolean isBlank(Optional<String> string) {
-        return !isNotBlank(string);
+        return !string.isPresent() || isBlank(string.get());
     }
 
     /**
      * Checks if a CharSequence is not empty (""), not null and not whitespace only.
      */
     public static boolean isNotBlank(String string) {
-        // No Guava equivalent existing
-        return StringUtils.isNotBlank(string);
+        return !isBlank(string);
     }
 
     public static boolean isNotBlank(Optional<String> string) {
