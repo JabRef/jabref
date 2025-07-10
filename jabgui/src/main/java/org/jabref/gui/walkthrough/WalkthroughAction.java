@@ -81,7 +81,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step5 = builder.createSaveStep(
-                Localization.lang("Great! Your entry table columns are now configured. These settings will be applied to all your libraries in JabRef."),
+                Localization.lang("Your entry table columns are now configured. These settings will be applied to all your libraries in JabRef."),
                 Localization.lang("You can find more information about customizing JabRef at https://docs.jabref.org/"),
                 150
         );
