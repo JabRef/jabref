@@ -1,6 +1,7 @@
 package org.jabref.gui.maintable;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -18,26 +19,33 @@ public class OpenSingleExternalFileAction extends SimpleCommand {
     private final BibEntry entry;
     private final LinkedFile linkedFile;
     private final TaskExecutor taskExecutor;
-    private final BibDatabaseContext databaseContext;
+    private final StateManager stateManager;
 
     public OpenSingleExternalFileAction(@NonNull DialogService dialogService,
                                         @NonNull GuiPreferences preferences,
                                         @NonNull BibEntry entry,
                                         @NonNull LinkedFile linkedFile,
                                         @NonNull TaskExecutor taskExecutor,
-                                        @NonNull BibDatabaseContext databaseContext) {
+                                        @NonNull StateManager stateManager) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.entry = entry;
         this.linkedFile = linkedFile;
         this.taskExecutor = taskExecutor;
-        this.databaseContext = databaseContext;
+        this.stateManager = stateManager;
 
         this.setExecutable(true);
     }
 
     @Override
     public void execute() {
+        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(null);
+
+        if (databaseContext == null) {
+            dialogService.showErrorDialogAndWait("Cannot open file", "No active database found.");
+            return;
+        }
+
         LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
                 linkedFile,
                 entry,

@@ -180,9 +180,8 @@ public class FulltextSearchResultsTab extends EntryEditorTab {
         ContextMenu fileContextMenu = new ContextMenu();
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
                 StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, entry, file, taskExecutor)));
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().get();
         fileContextMenu.getItems().add(actionFactory.createMenuItem(
-                StandardActions.OPEN_EXTERNAL_FILE, new OpenSingleExternalFileAction(dialogService, preferences, entry, file, taskExecutor, databaseContext)));
+                StandardActions.OPEN_EXTERNAL_FILE, new OpenSingleExternalFileAction(dialogService, preferences, entry, file, taskExecutor, stateManager)));
         return fileContextMenu;
     }
 

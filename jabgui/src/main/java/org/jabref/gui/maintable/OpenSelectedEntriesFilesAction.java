@@ -41,6 +41,8 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
             final List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
 
+            // Handle special case where a single entry with one linked file is selected.
+            // This is necessary because the right-click menu always uses OpenSelectedEntriesFilesAction.
             if (selectedEntries.size() == 1) {
                 BibEntry entry = selectedEntries.getFirst();
                 List<LinkedFile> files = entry.getFiles();
@@ -52,7 +54,7 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
                             entry,
                             files.getFirst(),
                             taskExecutor,
-                            databaseContext
+                            stateManager
                     ).execute();
                     return;
                 }
@@ -79,7 +81,7 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
                         Localization.lang("Opening large number of files"),
                         Localization.lang("You are about to open %0 files. Continue?", linkedFileViewModelList.size()),
                         Localization.lang("Open all files"),
-                        Localization.lang("Don't open")
+                        Localization.lang("Do not open")
                 );
                 if (!continueOpening) {
                     return;
