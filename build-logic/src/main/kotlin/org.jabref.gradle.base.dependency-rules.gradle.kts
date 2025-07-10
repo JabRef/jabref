@@ -147,7 +147,6 @@ extraJavaModuleInfo {
     }
     module("com.konghq:unirest-modules-gson", "unirest.modules.gson")
     module("com.squareup.okhttp3:okhttp", "okhttp3")
-
     module("com.squareup.okhttp3:okhttp-jvm", "okhttp3")
     module("com.squareup.okhttp3:okhttp-jvm-sse", "okhttp3.sse")
     module("com.squareup.okio:okio", "okio")
