@@ -435,6 +435,16 @@ extraJavaModuleInfo {
         requires("java.naming")
         requires("java.sql")
     }
+    module("net.sourceforge.tess4j:tess4j", "net.sourceforge.tess4j") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.desktop")
+    }
+    module("net.sourceforge.lept4j:lept4j", "net.sourceforge.lept4j") {
+        exportAllPackages()
+        requires("com.sun.jna")
+    }
+
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -444,6 +454,31 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.xml")
+    }
+
+    module("org.apache.pdfbox:pdfbox-tools", "org.apache.pdfbox.tools") {
+        requireAllDefinedDependencies()
+        exportAllPackages()
+        requires("java.desktop")
+    }
+    module("org.apache.pdfbox:pdfbox-debugger", "org.apache.pdfbox.debugger") {
+        requireAllDefinedDependencies()
+        exportAllPackages()
+    }
+    module("org.apache.pdfbox:jbig2-imageio",  "org.apache.pdfbox.jbig2") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.desktop")
+    }
+    module("org.jboss:jboss-vfs", "org.jboss.vfs") {
+        preserveExisting()
+    }
+    module("org.jboss.logging:jboss-logging", "org.jboss.logging") {
+        preserveExisting()
+    }
+    module("com.github.jai-imageio:jai-imageio-core", "com.github.jaiimageio.core") {
+        exportAllPackages()
+        requires("java.desktop")
     }
     module("com.squareup.okio:okio-jvm", "okio") {
         exportAllPackages()

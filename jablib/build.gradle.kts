@@ -65,9 +65,12 @@ dependencies {
 
     implementation("org.jabref:easybind")
 
+
     implementation ("org.apache.pdfbox:pdfbox")
     implementation ("org.apache.pdfbox:fontbox")
     implementation ("org.apache.pdfbox:xmpbox")
+
+    implementation("net.sourceforge.tess4j:tess4j")
 
     implementation("org.apache.lucene:lucene-core")
     implementation("org.apache.lucene:lucene-queryparser")
