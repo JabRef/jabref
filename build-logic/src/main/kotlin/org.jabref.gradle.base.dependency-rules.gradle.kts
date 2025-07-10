@@ -443,6 +443,7 @@ extraJavaModuleInfo {
     module("net.sourceforge.lept4j:lept4j", "net.sourceforge.lept4j") {
         exportAllPackages()
         requireAllDefinedDependencies()
+        requires("java.desktop")
     }
 
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
