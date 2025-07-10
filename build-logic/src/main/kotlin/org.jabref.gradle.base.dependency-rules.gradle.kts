@@ -444,6 +444,7 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.desktop")
+        requires("java.logging")
     }
 
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
