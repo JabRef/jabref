@@ -2,6 +2,8 @@ package org.jabref.http.server.cayw;
 
 import java.util.Optional;
 
+import org.jabref.logic.push.PushApplications;
+
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.QueryParam;
 
@@ -84,7 +86,10 @@ public class CAYWQueryParams {
         return Optional.ofNullable(libraryId);
     }
 
-    public Optional<String> getApplication() {
-        return Optional.ofNullable(application);
+    public Optional<PushApplications> getApplication() {
+        if (isTexstudio()) {
+            return Optional.of(PushApplications.TEXSTUDIO);
+        }
+        return PushApplications.getApplicationById(application);
     }
 }

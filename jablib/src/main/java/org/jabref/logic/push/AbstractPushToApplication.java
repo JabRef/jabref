@@ -3,7 +3,6 @@ package org.jabref.logic.push;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -14,6 +13,7 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +37,13 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         this.preferences = preferences;
     }
 
-    protected String getKeyString(List<BibEntry> entries, String delimiter) {
+    protected String getKeyString(List<BibEntry> entries, @NonNull String delimiter) {
         return entries.stream()
                       .map(BibEntry::getCitationKey)
                       .filter(Optional::isPresent)
                       .map(Optional::get)
                       .filter(key -> !key.isEmpty())
-                      .collect(Collectors.joining(Objects.requireNonNullElse(delimiter, "")));
+                      .collect(Collectors.joining(delimiter));
     }
 
     public void pushEntries(List<BibEntry> entries) {

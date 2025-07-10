@@ -9,10 +9,14 @@ public class PushToApplications {
     private PushToApplications() {
     }
 
-    /// @param applicationId Used by the CLI to select the application to run. Example: `texstudio`
-    public static Optional<PushToApplication> getApplicationById(String applicationId, NotificationService notificationService, PushToApplicationPreferences preferences) {
+    public static Optional<PushToApplication> getApplicationById(String applicationId, NotificationService notificationService, PushToApplicationPreferences pushToApplicationPreferences) {
         return PushApplications.getApplicationById(applicationId)
-                               .map(application -> switch (application) {
+                               .flatMap(application -> getApplication(application, notificationService, pushToApplicationPreferences));
+    }
+
+    /// @param application Used by the CLI to select the application to run.
+    public static Optional<PushToApplication> getApplication(PushApplications application, NotificationService notificationService, PushToApplicationPreferences preferences) {
+        return Optional.of(switch (application) {
                                case EMACS -> new PushToEmacs(notificationService, preferences);
                                case LYX -> new PushToLyx(notificationService, preferences);
                                case SUBLIME_TEXT -> new PushToSublimeText(notificationService, preferences);
@@ -23,6 +27,6 @@ public class PushToApplications {
                                case WIN_EDT -> new PushToWinEdt(notificationService, preferences);
                                case TEXSHOP -> new PushToTexShop(notificationService, preferences);
                                case VSCODE -> new PushToVScode(notificationService, preferences);
-                           });
+        });
     }
 }

@@ -99,11 +99,10 @@ public class CAYWResource {
             systemClipboard.setContents(strSel, null);
         }
 
-        // Push to TexStudio parameter handling
-        if (queryParams.isTexstudio() || queryParams.getApplication().isPresent()) {
-            String applicationId = queryParams.getApplication().orElse("texstudio");
+        // Push to Application parameter handling
+        if (queryParams.getApplication().isPresent()) {
             CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand()).concat("{"), ",", "}");
-            PushToApplications.getApplicationById(applicationId, LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
+            PushToApplications.getApplication(queryParams.getApplication().get(), LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
                               .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
         }
 
