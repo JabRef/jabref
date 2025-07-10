@@ -25,7 +25,7 @@ jobs:
 
       - name: Fetch PR branch
         run: |
-          gh pr checkout ${{ inputs.pr_number }}
+          gh pr checkout ${{ inputs.pr_number }}13524
         env:
           GH_TOKEN: ${{secrets.GH_TOKEN_JABREF_MACHINE_PR_APPROVE}}
 
