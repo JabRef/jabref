@@ -200,4 +200,10 @@ public class ThreeWayMergeView extends VBox {
     public void saveConfiguration() {
         toolbar.saveToolbarConfiguration();
     }
+
+    public void autoSelectBetterFields() {
+        for (FieldRowView row : fieldRows) {
+            row.autoSelectBetterValue();
+        }
+    }
 }
