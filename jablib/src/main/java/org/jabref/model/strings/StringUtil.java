@@ -639,7 +639,7 @@ public class StringUtil {
     }
 
     public static boolean isBlank(Optional<String> string) {
-        return !string.isPresent() || isBlank(string.get());
+        return string.isEmpty() || isBlank(string.get());
     }
 
     /**
