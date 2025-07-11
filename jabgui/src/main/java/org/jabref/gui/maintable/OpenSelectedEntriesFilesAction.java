@@ -1,6 +1,5 @@
 package org.jabref.gui.maintable;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.jabref.gui.DialogService;
@@ -11,8 +10,6 @@ import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
 
 public class OpenSelectedEntriesFilesAction extends SimpleCommand {
 
@@ -39,44 +36,17 @@ public class OpenSelectedEntriesFilesAction extends SimpleCommand {
     @Override
     public void execute() {
         stateManager.getActiveDatabase().ifPresent(databaseContext -> {
-            final List<BibEntry> selectedEntries = stateManager.getSelectedEntries();
-
-            // Special handling for the single-entry, single-file case.
-            // This fallback ensures the file opens immediately when triggered from the main table's right-click context menu,
-            // which always invokes OpenSelectedEntriesFilesAction regardless of the number of selected entries or files.
-            if (selectedEntries.size() == 1) {
-                BibEntry entry = selectedEntries.getFirst();
-                List<LinkedFile> files = entry.getFiles();
-
-                if (files.size() == 1) {
-                    new OpenSingleExternalFileAction(
-                            dialogService,
-                            preferences,
-                            entry,
-                            files.getFirst(),
-                            taskExecutor,
-                            stateManager
-                    ).execute();
-                    return;
-                }
-            }
-
-            List<LinkedFileViewModel> linkedFileViewModelList = new LinkedList<>();
-
-            for (BibEntry entry : selectedEntries) {
-                for (LinkedFile linkedFile : entry.getFiles()) {
-                    LinkedFileViewModel viewModel = new LinkedFileViewModel(
-                            linkedFile,
-                            entry,
-                            databaseContext,
-                            taskExecutor,
-                            dialogService,
-                            preferences);
-
-                    linkedFileViewModelList.add(viewModel);
-                }
-            }
-
+            List<LinkedFileViewModel> linkedFileViewModelList = stateManager
+                    .getSelectedEntries().stream()
+                    .flatMap(entry -> entry.getFiles().stream()
+                                           .map(linkedFile -> new LinkedFileViewModel(
+                                                   linkedFile,
+                                                   entry,
+                                                   databaseContext,
+                                                   taskExecutor,
+                                                   dialogService,
+                                                   preferences)))
+                    .toList();
             if (linkedFileViewModelList.size() > FILES_LIMIT) {
                 boolean continueOpening = dialogService.showConfirmationDialogAndWait(
                         Localization.lang("Opening large number of files"),
