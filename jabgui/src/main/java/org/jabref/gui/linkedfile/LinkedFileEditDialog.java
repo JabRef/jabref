@@ -95,7 +95,6 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
     @FXML
     private void openBrowseDialog(ActionEvent event) {
         viewModel.openBrowseDialog();
-        link.requestFocus();
     }
 
     private void onDialogShow(DialogEvent event) {
