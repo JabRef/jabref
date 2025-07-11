@@ -2869,7 +2869,7 @@ journalInfo .grid-cell-b {
 }
 
 /* Quick Settings: Help Button */
-.icon-button {
+.qs-icon-button {
     -fx-min-width: 28px;
     -fx-max-width: 28px;
     -fx-min-height: 28px;
@@ -2881,8 +2881,8 @@ journalInfo .grid-cell-b {
     -fx-border-width: 1px;
 }
 
-.icon-button .glyph-icon,
-.icon-button .ikonli-font-icon {
+.qs-icon-button .glyph-icon,
+.qs-icon-button .ikonli-font-icon {
     -fx-icon-size: 16px;
     -fx-icon-fill: -jr-theme-accent;
 }

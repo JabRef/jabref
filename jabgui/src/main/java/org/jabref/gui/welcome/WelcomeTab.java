@@ -59,9 +59,8 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.ColumnPreferences;
 import org.jabref.gui.maintable.MainTableColumnModel;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.push.PushToApplication;
-import org.jabref.gui.push.PushToApplicationPreferences;
-import org.jabref.gui.push.PushToApplications;
+import org.jabref.gui.push.GuiPushToApplication;
+import org.jabref.gui.push.GuiPushToApplications;
 import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.theme.Theme;
 import org.jabref.gui.theme.ThemeTypes;
@@ -80,6 +79,8 @@ import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.push.PushToApplication;
+import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -174,7 +175,7 @@ public class WelcomeTab extends Tab {
         return createQuickSettingsDialog(titleKey, headerKey, () -> true, List.of(), children);
     }
 
-    private boolean validateDialogSubmission(ListView<PushToApplication> applicationsList,
+    private boolean validateDialogSubmission(ListView<GuiPushToApplication> applicationsList,
                                              PathSelectionField pathSelector) {
         PushToApplication selectedApp = applicationsList.getSelectionModel().getSelectedItem();
         if (selectedApp == null) {
@@ -206,7 +207,7 @@ public class WelcomeTab extends Tab {
     private Button createHelpButton(String url) {
         Button helpButton = new Button();
         helpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
-        helpButton.getStyleClass().add("icon-button");
+        helpButton.getStyleClass().add("qs-icon-button");
         helpButton.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
         return helpButton;
     }
@@ -222,7 +223,7 @@ public class WelcomeTab extends Tab {
 
             browseButton = new Button();
             browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
-            browseButton.getStyleClass().addAll("icon-button");
+            browseButton.getStyleClass().addAll("qs-icon-button");
 
             setSpacing(4);
             getChildren().addAll(pathField, browseButton);
@@ -436,9 +437,12 @@ public class WelcomeTab extends Tab {
         radioContainer.getChildren().add(customBox);
 
         switch (currentTheme.getType()) {
-            case DEFAULT -> lightRadio.setSelected(true);
-            case EMBEDDED -> darkRadio.setSelected(true);
-            case CUSTOM -> customRadio.setSelected(true);
+            case DEFAULT ->
+                    lightRadio.setSelected(true);
+            case EMBEDDED ->
+                    darkRadio.setSelected(true);
+            case CUSTOM ->
+                    customRadio.setSelected(true);
         }
 
         PathSelectionField customThemePath = new PathSelectionField(Localization.lang("Custom theme file path"));
@@ -492,9 +496,12 @@ public class WelcomeTab extends Tab {
         if (selectedToggle != null) {
             ThemeTypes selectedTheme = (ThemeTypes) selectedToggle.getUserData();
             Theme newTheme = switch (selectedTheme) {
-                case LIGHT -> Theme.light();
-                case DARK -> Theme.dark();
-                case CUSTOM -> Theme.custom(customThemePath.getText().trim());
+                case LIGHT ->
+                        Theme.light();
+                case DARK ->
+                        Theme.dark();
+                case CUSTOM ->
+                        Theme.custom(customThemePath.getText().trim());
             };
             workspacePreferences.setTheme(newTheme);
         }
@@ -558,15 +565,15 @@ public class WelcomeTab extends Tab {
         explanationLabel.setWrapText(true);
         explanationLabel.setMaxWidth(400);
 
-        ListView<PushToApplication> applicationsList = new ListView<>();
+        ListView<GuiPushToApplication> applicationsList = new ListView<>();
         applicationsList.getStyleClass().add("applications-list");
 
-        List<PushToApplication> allApplications = PushToApplications.getAllApplications(dialogService, preferences);
+        PushToApplicationPreferences pushToApplicationPreferences = preferences.getPushToApplicationPreferences();
+        List<GuiPushToApplication> allApplications = GuiPushToApplications.getAllGUIApplications(dialogService, pushToApplicationPreferences);
 
         applicationsList.getItems().addAll(allApplications);
         applicationsList.setCellFactory(_ -> new PushApplicationListCell(Collections.emptySet()));
 
-        PushToApplicationPreferences pushToApplicationPreferences = preferences.getPushToApplicationPreferences();
         if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
             allApplications.stream()
                            .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
@@ -614,14 +621,14 @@ public class WelcomeTab extends Tab {
             }
         });
 
-        CompletableFuture<Map<PushToApplication, String>> detectionFuture =
+        CompletableFuture<Map<GuiPushToApplication, String>> detectionFuture =
                 detectApplicationPathsAsync(allApplications);
 
         detectionFuture.thenAccept(detectedPaths -> Platform.runLater(() -> {
             detectedApplicationPaths.putAll(detectedPaths);
             applicationsList.setCellFactory(_ -> new PushApplicationListCell(detectedPaths.keySet()));
 
-            List<PushToApplication> sortedApplications = new ArrayList<>(detectedPaths.keySet());
+            List<GuiPushToApplication> sortedApplications = new ArrayList<>(detectedPaths.keySet());
             allApplications.stream()
                            .filter(app -> !detectedPaths.containsKey(app))
                            .forEach(sortedApplications::add);
@@ -665,25 +672,25 @@ public class WelcomeTab extends Tab {
         pushToApplicationPreferences.setCommandPaths(commandPaths);
     }
 
-    private CompletableFuture<Map<PushToApplication, String>> detectApplicationPathsAsync(List<PushToApplication> allApplications) {
+    private CompletableFuture<Map<GuiPushToApplication, String>> detectApplicationPathsAsync(List<GuiPushToApplication> allApplications) {
         return CompletableFuture.supplyAsync(() ->
                 allApplications
-                        .parallelStream()
-                        .map(application -> {
-                            Optional<String> path = findApplicationPath(application);
-                            if (path.isPresent()) {
-                                LOGGER.debug("Detected application {}: {}", application.getDisplayName(), path.get());
-                                return Optional.of(Map.entry(application, path.get()));
-                            }
-                            return Optional.<Map.Entry<PushToApplication, String>>empty();
-                        })
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                    .parallelStream()
+                    .map(application -> {
+                        Optional<String> path = findApplicationPath(application);
+                        if (path.isPresent()) {
+                            LOGGER.debug("Detected application {}: {}", application.getDisplayName(), path.get());
+                            return Optional.of(Map.entry(application, path.get()));
+                        }
+                        return Optional.<Map.Entry<GuiPushToApplication, String>>empty();
+                    })
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         );
     }
 
-    private Optional<String> findApplicationPath(PushToApplication application) {
+    private Optional<String> findApplicationPath(GuiPushToApplication application) {
         String appName = application.getDisplayName();
         String[] possibleNames = getPossibleExecutableNames(appName);
 
@@ -800,18 +807,28 @@ public class WelcomeTab extends Tab {
 
     private String[] getPossibleExecutableNames(String appName) {
         return switch (appName) {
-            case PushToApplications.EMACS -> new String[] {"emacs", "emacsclient"};
-            case PushToApplications.LYX -> new String[] {"lyx", "kile"};
-            case PushToApplications.TEXMAKER -> new String[] {"texmaker"};
-            case PushToApplications.TEXSTUDIO -> new String[] {"texstudio"};
-            case PushToApplications.TEXWORKS -> new String[] {"texworks"};
-            case PushToApplications.VIM -> new String[] {"vim", "nvim", "gvim"};
-            case PushToApplications.WIN_EDT -> new String[] {"winedt"};
-            case PushToApplications.SUBLIME_TEXT ->
+            case "Emacs" ->
+                    new String[] {"emacs", "emacsclient"};
+            case "LyX/Kile" ->
+                    new String[] {"lyx", "kile"};
+            case "Taxmaker" ->
+                    new String[] {"texmaker"};
+            case "TeXstudio" ->
+                    new String[] {"texstudio"};
+            case "TeXworks" ->
+                    new String[] {"texworks"};
+            case "Vim" ->
+                    new String[] {"vim", "nvim", "gvim"};
+            case "WinEdt" ->
+                    new String[] {"winedt"};
+            case "Sublime Text" ->
                     new String[] {"subl", "sublime_text"};
-            case PushToApplications.TEXSHOP -> new String[] {"texshop"};
-            case PushToApplications.VSCODE -> new String[] {"code", "code-insiders"};
-            default -> new String[] {appName.replace(" ", "").toLowerCase()};
+            case "TeXShop" ->
+                    new String[] {"texshop"};
+            case "VScode" ->
+                    new String[] {"code", "code-insiders"};
+            default ->
+                    new String[] {appName.replace(" ", "").toLowerCase()};
         };
     }
 
@@ -846,16 +863,16 @@ public class WelcomeTab extends Tab {
         return Optional.empty();
     }
 
-    private static class PushApplicationListCell extends ListCell<PushToApplication> {
-        private final Set<PushToApplication> detectedApplications;
+    private static class PushApplicationListCell extends ListCell<GuiPushToApplication> {
+        private final Set<GuiPushToApplication> detectedApplications;
 
-        public PushApplicationListCell(Set<PushToApplication> detectedApplications) {
+        public PushApplicationListCell(Set<GuiPushToApplication> detectedApplications) {
             this.detectedApplications = detectedApplications;
             this.getStyleClass().add("application-item");
         }
 
         @Override
-        protected void updateItem(PushToApplication application, boolean empty) {
+        protected void updateItem(GuiPushToApplication application, boolean empty) {
             super.updateItem(application, empty);
 
             if (empty || application == null) {
@@ -1135,15 +1152,24 @@ public class WelcomeTab extends Tab {
         link.getStyleClass().add("welcome-community-link");
 
         String url = switch (action) {
-            case HELP -> URLs.HELP_URL;
-            case OPEN_FORUM -> URLs.FORUM_URL;
-            case OPEN_MASTODON -> URLs.MASTODON_URL;
-            case OPEN_LINKEDIN -> URLs.LINKEDIN_URL;
-            case DONATE -> URLs.DONATE_URL;
-            case OPEN_DEV_VERSION_LINK -> URLs.DEV_VERSION_LINK_URL;
-            case OPEN_CHANGELOG -> URLs.CHANGELOG_URL;
-            case OPEN_PRIVACY_POLICY -> URLs.PRIVACY_POLICY_URL;
-            default -> null;
+            case HELP ->
+                    URLs.HELP_URL;
+            case OPEN_FORUM ->
+                    URLs.FORUM_URL;
+            case OPEN_MASTODON ->
+                    URLs.MASTODON_URL;
+            case OPEN_LINKEDIN ->
+                    URLs.LINKEDIN_URL;
+            case DONATE ->
+                    URLs.DONATE_URL;
+            case OPEN_DEV_VERSION_LINK ->
+                    URLs.DEV_VERSION_LINK_URL;
+            case OPEN_CHANGELOG ->
+                    URLs.CHANGELOG_URL;
+            case OPEN_PRIVACY_POLICY ->
+                    URLs.PRIVACY_POLICY_URL;
+            default ->
+                    null;
         };
 
         if (url != null) {
