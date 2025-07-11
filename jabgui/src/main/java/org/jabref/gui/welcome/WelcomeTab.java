@@ -811,7 +811,7 @@ public class WelcomeTab extends Tab {
                     new String[] {"emacs", "emacsclient"};
             case "LyX/Kile" ->
                     new String[] {"lyx", "kile"};
-            case "Taxmaker" ->
+            case "Texmaker" ->
                     new String[] {"texmaker"};
             case "TeXstudio" ->
                     new String[] {"texstudio"};
