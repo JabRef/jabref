@@ -116,9 +116,13 @@ jobs:
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
           LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
-          if echo "$LABELS" | grep -q "^good"; then
-            echo "✅ label good found"
+
+          LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
+          if [ -n "$LABEL" ]; then
+            echo "✅ Found label: $LABEL"
             SILENT=false
+            # Apply label
+            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
           else
             echo "🚫 Silent fail if not possible to add assignee"
             SILENT=true
