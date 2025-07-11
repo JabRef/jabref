@@ -207,7 +207,7 @@ public class WelcomeTab extends Tab {
     private Button createHelpButton(String url) {
         Button helpButton = new Button();
         helpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
-        helpButton.getStyleClass().add("qs-icon-button");
+        helpButton.getStyleClass().add("icon-button");
         helpButton.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
         return helpButton;
     }
@@ -223,7 +223,7 @@ public class WelcomeTab extends Tab {
 
             browseButton = new Button();
             browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
-            browseButton.getStyleClass().addAll("qs-icon-button");
+            browseButton.getStyleClass().addAll("icon-button");
 
             setSpacing(4);
             getChildren().addAll(pathField, browseButton);

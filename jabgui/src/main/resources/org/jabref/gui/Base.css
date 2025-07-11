@@ -2785,25 +2785,6 @@ journalInfo .grid-cell-b {
     -fx-fill: -jr-theme-text;
 }
 
-/* Quick Settings: Help Button */
-.qs-icon-button {
-    -fx-min-width: 28px;
-    -fx-max-width: 28px;
-    -fx-min-height: 28px;
-    -fx-max-height: 28px;
-    -fx-padding: 4px;
-    -fx-background-radius: 4px;
-    -fx-border-radius: 4px;
-    -fx-border-color: -jr-gray-1;
-    -fx-border-width: 1px;
-}
-
-.qs-icon-button .glyph-icon,
-.qs-icon-button .ikonli-font-icon {
-    -fx-icon-size: 16px;
-    -fx-icon-fill: -jr-theme-accent;
-}
-
 /* Quick Settings: Online Fetchers */
 .fetchers-container {
     -fx-padding: 12px;
