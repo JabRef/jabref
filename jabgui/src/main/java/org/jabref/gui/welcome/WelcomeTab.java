@@ -3,11 +3,24 @@ package org.jabref.gui.welcome;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -26,7 +39,6 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -42,7 +54,6 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.importer.NewDatabaseAction;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.maintable.ColumnPreferences;
@@ -68,6 +79,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -138,7 +150,8 @@ public class WelcomeTab extends Tab {
         setContent(container);
     }
 
-    private Optional<ButtonType> createQuickSettingsDialog(String titleKey, String headerKey, Node... children) {
+    private Optional<ButtonType> createQuickSettingsDialog(String titleKey, String headerKey,
+                                                           BooleanSupplier validationSupplier, List<ObservableValue<?>> deps, Node... children) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(Localization.lang(titleKey));
         dialog.setHeaderText(Localization.lang(headerKey));
@@ -150,7 +163,27 @@ public class WelcomeTab extends Tab {
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
+        Button okButton = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        okButton.setDisable(!validationSupplier.getAsBoolean());
+        deps.forEach(obs -> obs.addListener((_, _, _) -> okButton.setDisable(!validationSupplier.getAsBoolean())));
+
         return dialogService.showCustomDialogAndWait(dialog);
+    }
+
+    private Optional<ButtonType> createQuickSettingsDialog(String titleKey, String headerKey, Node... children) {
+        return createQuickSettingsDialog(titleKey, headerKey, () -> true, List.of(), children);
+    }
+
+    private boolean validateDialogSubmission(ListView<PushToApplication> applicationsList,
+                                             PathSelectionField pathSelector) {
+        PushToApplication selectedApp = applicationsList.getSelectionModel().getSelectedItem();
+        if (selectedApp == null) {
+            return false;
+        }
+
+        String pathText = pathSelector.getText().trim();
+        Path path = Path.of(pathText);
+        return !pathText.isEmpty() && path.isAbsolute() && path.toFile().exists();
     }
 
     private Button createQuickSettingsButton(String text, IconTheme.JabRefIcons icon, Runnable action) {
@@ -173,9 +206,43 @@ public class WelcomeTab extends Tab {
     private Button createHelpButton(String url) {
         Button helpButton = new Button();
         helpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
-        helpButton.getStyleClass().add("help-button");
+        helpButton.getStyleClass().add("icon-button");
         helpButton.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
         return helpButton;
+    }
+
+    private static class PathSelectionField extends HBox {
+        private final TextField pathField;
+        private final Button browseButton;
+
+        public PathSelectionField(String promptText) {
+            pathField = new TextField();
+            pathField.setPromptText(promptText);
+            HBox.setHgrow(pathField, Priority.ALWAYS);
+
+            browseButton = new Button();
+            browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
+            browseButton.getStyleClass().addAll("icon-button");
+
+            setSpacing(4);
+            getChildren().addAll(pathField, browseButton);
+        }
+
+        public void setOnBrowseAction(Runnable action) {
+            browseButton.setOnAction(_ -> action.run());
+        }
+
+        public String getText() {
+            return pathField.getText();
+        }
+
+        public void setText(String text) {
+            pathField.setText(text);
+        }
+
+        public TextField getTextField() {
+            return pathField;
+        }
     }
 
     private VBox createTopTitles() {
@@ -316,41 +383,31 @@ public class WelcomeTab extends Tab {
     }
 
     private void showMainFileDirectoryDialog() {
-        TextField pathField = new TextField();
-        pathField.setPromptText(Localization.lang("Main file directory path"));
         FilePreferences filePreferences = preferences.getFilePreferences();
-        pathField.setText(filePreferences.getMainFileDirectory()
-                                         .map(Path::toString).orElse(""));
 
-        Button browseButton = new Button();
-        browseButton.setGraphic(IconTheme.JabRefIcons.OPEN.getGraphicNode());
-        browseButton.getStyleClass().addAll("icon-button", "narrow");
-        browseButton.setOnAction(_ -> {
+        PathSelectionField pathSelector = new PathSelectionField(Localization.lang("Main file directory path"));
+        pathSelector.setText(filePreferences.getMainFileDirectory()
+                                            .map(Path::toString)
+                                            .orElse(""));
+
+        pathSelector.setOnBrowseAction(() -> {
             DirectoryDialogConfiguration dirConfig = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(filePreferences.getWorkingDirectory())
                     .build();
             dialogService.showDirectorySelectionDialog(dirConfig)
-                         .ifPresent(selectedDir -> pathField.setText(selectedDir.toString()));
+                         .ifPresent(selectedDir -> pathSelector.setText(selectedDir.toString()));
         });
-
-        HBox pathContainer = new HBox(
-                new Label(Localization.lang("Directory path")),
-                pathField,
-                browseButton
-        );
 
         Optional<ButtonType> result = createQuickSettingsDialog(
                 "Set main file directory",
                 "Choose the default directory for storing attached files",
-                pathContainer
+                pathSelector
         );
 
-        if (result.isEmpty() || result.get() != ButtonType.OK) {
-            return;
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            filePreferences.setMainFileDirectory(pathSelector.getText());
+            filePreferences.setStoreFilesRelativeToBibFile(false);
         }
-
-        filePreferences.setMainFileDirectory(pathField.getText());
-        filePreferences.setStoreFilesRelativeToBibFile(false);
     }
 
     private void showThemeDialog() {
@@ -384,29 +441,10 @@ public class WelcomeTab extends Tab {
             case CUSTOM -> customRadio.setSelected(true);
         }
 
-        TextField customThemePath = new TextField();
-        customThemePath.setPromptText(Localization.lang("Custom theme file path"));
+        PathSelectionField customThemePath = new PathSelectionField(Localization.lang("Custom theme file path"));
         customThemePath.setText(currentTheme.getType() == Theme.Type.CUSTOM ? currentTheme.getName() : "");
 
-        Button browseButton = new Button();
-        browseButton.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.OPEN));
-        browseButton.setTooltip(new Tooltip(Localization.lang("Browse")));
-        browseButton.getStyleClass().addAll("icon-button", "narrow");
-        browseButton.setPrefHeight(20.0);
-        browseButton.setPrefWidth(20.0);
-
-        HBox customThemePathBox = new HBox(4.0, customThemePath, browseButton);
-        customThemePathBox.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(customThemePath, Priority.ALWAYS);
-
-        themeGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
-            boolean isCustom = newValue != null && newValue.getUserData() == ThemeTypes.CUSTOM;
-            customThemePathBox.setManaged(isCustom);
-            customThemePathBox.setVisible(isCustom);
-            customThemePathBox.getScene().getWindow().sizeToScene();
-        });
-
-        browseButton.setOnAction(_ -> {
+        customThemePath.setOnBrowseAction(() -> {
             String fileDir = customThemePath.getText().isEmpty() ?
                     preferences.getInternalPreferences().getLastPreferencesExportPath().toString() :
                     customThemePath.getText();
@@ -420,18 +458,32 @@ public class WelcomeTab extends Tab {
             dialogService.showFileOpenDialog(fileDialogConfiguration).ifPresent(file ->
                     customThemePath.setText(file.toAbsolutePath().toString()));
         });
+        customThemePath.setAlignment(Pos.CENTER_LEFT);
+
+        themeGroup.selectedToggleProperty().addListener((_, _, newValue) -> {
+            boolean isCustom = newValue != null && newValue.getUserData() == ThemeTypes.CUSTOM;
+            customThemePath.setManaged(isCustom);
+            customThemePath.setVisible(isCustom);
+            customThemePath.getScene().getWindow().sizeToScene();
+        });
 
         if (currentTheme.getType() != Theme.Type.CUSTOM) {
-            customThemePathBox.setVisible(false);
-            customThemePathBox.setManaged(false);
+            customThemePath.setVisible(false);
+            customThemePath.setManaged(false);
         }
 
         Optional<ButtonType> result = createQuickSettingsDialog(
                 "Change visual theme",
                 "Select your preferred theme for the application",
+                () -> Optional
+                        .ofNullable(themeGroup.getSelectedToggle())
+                        .map(toggle -> toggle.getUserData() != ThemeTypes.CUSTOM || Path.of(customThemePath.getText()).toFile().exists())
+                        .orElse(false),
+                List.of(customThemePath.pathField.textProperty(), themeGroup.selectedToggleProperty()),
                 radioContainer,
-                customThemePathBox
+                customThemePath
         );
+
         if (result.isEmpty() || result.get() != ButtonType.OK) {
             return;
         }
@@ -442,20 +494,9 @@ public class WelcomeTab extends Tab {
             Theme newTheme = switch (selectedTheme) {
                 case LIGHT -> Theme.light();
                 case DARK -> Theme.dark();
-                case CUSTOM -> {
-                    String customPath = customThemePath.getText().trim();
-                    if (customPath.isEmpty()) {
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("Error"),
-                                Localization.lang("Specify a custom theme file path"));
-                        yield null;
-                    }
-                    yield Theme.custom(customPath);
-                }
+                case CUSTOM -> Theme.custom(customThemePath.getText().trim());
             };
-            if (newTheme != null) {
-                workspacePreferences.setTheme(newTheme);
-            }
+            workspacePreferences.setTheme(newTheme);
         }
     }
 
@@ -513,7 +554,7 @@ public class WelcomeTab extends Tab {
     }
 
     private void showPushApplicationConfigurationDialog() {
-        Label explanationLabel = new Label(Localization.lang("Detected applications are highlighted"));
+        Label explanationLabel = new Label(Localization.lang("Detected applications are highlighted. Application that are not detected can be set manually by specifying the path to the executable."));
         explanationLabel.setWrapText(true);
         explanationLabel.setMaxWidth(400);
 
@@ -521,64 +562,215 @@ public class WelcomeTab extends Tab {
         applicationsList.getStyleClass().add("applications-list");
 
         List<PushToApplication> allApplications = PushToApplications.getAllApplications(dialogService, preferences);
-        List<PushToApplication> detectedApplications = detectAvailableApplications(allApplications);
 
-        List<PushToApplication> sortedApplications = new ArrayList<>(detectedApplications);
-        allApplications.stream()
-                       .filter(app -> !detectedApplications.contains(app))
-                       .forEach(sortedApplications::add);
-
-        applicationsList.getItems().addAll(sortedApplications);
-        applicationsList.setCellFactory(_ -> new PushApplicationListCell(detectedApplications));
+        applicationsList.getItems().addAll(allApplications);
+        applicationsList.setCellFactory(_ -> new PushApplicationListCell(Collections.emptySet()));
 
         PushToApplicationPreferences pushToApplicationPreferences = preferences.getPushToApplicationPreferences();
-        String currentAppName = pushToApplicationPreferences.getActiveApplicationName();
-        if (!currentAppName.isEmpty()) {
-            sortedApplications.stream()
-                              .filter(app -> app.getDisplayName().equals(currentAppName))
-                              .findFirst()
-                              .ifPresent(applicationsList.getSelectionModel()::select);
+        if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
+            allApplications.stream()
+                           .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
+                           .findFirst()
+                           .ifPresent(applicationsList.getSelectionModel()::select);
         }
+
+        PathSelectionField pathSelector = new PathSelectionField(Localization.lang("Path to application executable"));
+        pathSelector.setOnBrowseAction(() -> {
+            FileDialogConfiguration fileConfig = new FileDialogConfiguration.Builder()
+                    .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
+                    .build();
+            dialogService.showFileOpenDialog(fileConfig)
+                         .ifPresent(selectedFile -> pathSelector.setText(selectedFile.toString()));
+        });
+
+        Map<PushToApplication, String> detectedApplicationPaths = new ConcurrentHashMap<>();
+
+        TextField pathField = pathSelector.getTextField();
+        applicationsList.getSelectionModel().selectedItemProperty().addListener((_, _, selectedApp) -> {
+            if (selectedApp == null) {
+                pathSelector.setText("");
+                pathField.setPromptText(Localization.lang("Path to application executable"));
+                return;
+            }
+
+            String existingPath = pushToApplicationPreferences.getCommandPaths().get(selectedApp.getDisplayName());
+            pathSelector.setText(isValidAbsolutePath(existingPath) ?
+                    existingPath :
+                    Objects.requireNonNullElse(detectedApplicationPaths.get(selectedApp), ""));
+        });
+
+        pathField.textProperty().addListener((_, _, newText) -> {
+            if (newText == null || newText.trim().isEmpty()) {
+                pathField.getStyleClass().removeAll("invalid-path");
+                return;
+            }
+
+            if (isValidAbsolutePath(newText)) {
+                pathField.getStyleClass().removeAll("invalid-path");
+            } else {
+                if (!pathField.getStyleClass().contains("invalid-path")) {
+                    pathField.getStyleClass().add("invalid-path");
+                }
+            }
+        });
+
+        CompletableFuture<Map<PushToApplication, String>> detectionFuture =
+                detectApplicationPathsAsync(allApplications);
+
+        detectionFuture.thenAccept(detectedPaths -> Platform.runLater(() -> {
+            detectedApplicationPaths.putAll(detectedPaths);
+            applicationsList.setCellFactory(_ -> new PushApplicationListCell(detectedPaths.keySet()));
+
+            List<PushToApplication> sortedApplications = new ArrayList<>(detectedPaths.keySet());
+            allApplications.stream()
+                           .filter(app -> !detectedPaths.containsKey(app))
+                           .forEach(sortedApplications::add);
+
+            applicationsList.getItems().clear();
+            applicationsList.getItems().addAll(sortedApplications);
+
+            if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
+                sortedApplications.stream()
+                                  .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
+                                  .findFirst()
+                                  .ifPresent(applicationsList.getSelectionModel()::select);
+            }
+
+            LOGGER.info("Application detection completed. Found {} applications", detectedPaths.size());
+        })).exceptionally(throwable -> {
+            LOGGER.warn("Application detection failed", throwable);
+            return null;
+        });
 
         Optional<ButtonType> result = createQuickSettingsDialog(
                 "Configure push to applications",
                 "Select your text editor or LaTeX application for pushing citations",
+                () -> validateDialogSubmission(applicationsList, pathSelector),
+                List.of(pathSelector.pathField.textProperty()),
                 explanationLabel,
-                applicationsList
+                applicationsList,
+                pathSelector
         );
 
         if (result.isEmpty() || result.get() == ButtonType.CANCEL) {
+            detectionFuture.cancel(true);
             return;
         }
+
         PushToApplication selectedApp = applicationsList.getSelectionModel().getSelectedItem();
-        if (selectedApp != null) {
-            pushToApplicationPreferences.setActiveApplicationName(selectedApp.getDisplayName());
+        pushToApplicationPreferences.setActiveApplicationName(selectedApp.getDisplayName());
+
+        Map<String, String> commandPaths = new HashMap<>(pushToApplicationPreferences.getCommandPaths());
+        commandPaths.put(selectedApp.getDisplayName(), pathSelector.getText().trim());
+        pushToApplicationPreferences.setCommandPaths(commandPaths);
+    }
+
+    private CompletableFuture<Map<PushToApplication, String>> detectApplicationPathsAsync(List<PushToApplication> allApplications) {
+        return CompletableFuture.supplyAsync(() ->
+                allApplications
+                        .parallelStream()
+                        .map(application -> {
+                            Optional<String> path = findApplicationPath(application);
+                            if (path.isPresent()) {
+                                LOGGER.debug("Detected application {}: {}", application.getDisplayName(), path.get());
+                                return Optional.of(Map.entry(application, path.get()));
+                            }
+                            return Optional.<Map.Entry<PushToApplication, String>>empty();
+                        })
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+        );
+    }
+
+    private Optional<String> findApplicationPath(PushToApplication application) {
+        String appName = application.getDisplayName();
+        String[] possibleNames = getPossibleExecutableNames(appName);
+
+        for (String executable : possibleNames) {
+            Optional<String> pathInPath = findExecutableInPath(executable);
+            if (pathInPath.isPresent()) {
+                return pathInPath;
+            }
+        }
+
+        return findExecutableInCommonPaths(possibleNames);
+    }
+
+    private Optional<String> findExecutableInCommonPaths(String[] executableNames) {
+        List<Path> commonPaths = getCommonPaths();
+
+        for (Path basePath : commonPaths) {
+            try {
+                if (basePath.toFile().exists()) {
+                    Optional<String> result = findExecutableInDirectory(basePath, executableNames);
+                    if (result.isPresent()) {
+                        return result;
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.trace("Error checking path {}: {}", basePath, e.getMessage());
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private List<Path> getCommonPaths() {
+        List<Path> paths = new ArrayList<>();
+
+        if (OS.WINDOWS) {
+            paths.addAll(List.of(
+                    Path.of("C:/Program Files"),
+                    Path.of("C:/Program Files (x86)"),
+                    Path.of(System.getProperty("user.home"), "AppData/Local"),
+                    Path.of(System.getProperty("user.home"), "AppData/Roaming")
+            ));
+        } else if (OS.OS_X) {
+            paths.addAll(List.of(
+                    Path.of("/Applications"),
+                    Path.of("/usr/local/bin"),
+                    Path.of("/opt/homebrew/bin"),
+                    Path.of(System.getProperty("user.home"), "Applications"),
+                    Path.of("/usr/local/texlive"),
+                    Path.of("/Library/TeX/texbin")
+            ));
+        } else if (OS.LINUX) {
+            paths.addAll(List.of(
+                    Path.of("/usr/bin"),
+                    Path.of("/usr/local/bin"),
+                    Path.of("/opt"),
+                    Path.of("/snap/bin"),
+                    Path.of(System.getProperty("user.home"), ".local/bin"),
+                    Path.of("/usr/local/texlive")
+            ));
+        }
+
+        return paths;
+    }
+
+    private Optional<String> findExecutableInDirectory(Path directory, String[] executableNames) {
+        try (Stream<Path> pathStream = Files.walk(directory, 3)) {
+            return pathStream
+                    .filter(path -> isValidExecutable(path, executableNames))
+                    .map(Path::toAbsolutePath)
+                    .map(Path::toString)
+                    .findFirst();
+        } catch (IOException e) {
+            LOGGER.trace("Error searching directory {}: {}", directory, e.getMessage());
+            return Optional.empty();
         }
     }
 
-    private List<PushToApplication> detectAvailableApplications(List<PushToApplication> allApplications) {
-        return allApplications.stream().filter(this::isApplicationAvailable).toList();
-    }
+    private boolean isValidExecutable(Path path, String[] executableNames) {
+        if (!path.toFile().exists()) {
+            return false;
+        }
 
-    private boolean isApplicationAvailable(PushToApplication application) {
-        String appName = application.getDisplayName().toLowerCase();
+        String fileName = path.getFileName().toString().toLowerCase();
 
-        String[] possibleNames = switch (appName) {
-            case "emacs" -> new String[] {"emacs", "emacsclient"};
-            case "lyx/kile" -> new String[] {"lyx", "kile"};
-            case "texmaker" -> new String[] {"texmaker"};
-            case "texstudio" -> new String[] {"texstudio"};
-            case "texworks" -> new String[] {"texworks"};
-            case "vim" -> new String[] {"vim", "nvim", "gvim"};
-            case "winedt" -> new String[] {"winedt"};
-            case "sublime text" -> new String[] {"subl", "sublime_text"};
-            case "texshop" -> new String[] {"texshop"};
-            case "vscode" -> new String[] {"code", "code-insiders"};
-            default -> new String[] {appName.replace(" ", "").toLowerCase()};
-        };
-
-        for (String executable : possibleNames) {
-            if (isExecutableInPath(executable)) {
+        for (String execName : executableNames) {
+            if (isExecutableNameMatch(fileName, execName)) {
                 return true;
             }
         }
@@ -586,26 +778,78 @@ public class WelcomeTab extends Tab {
         return false;
     }
 
-    private boolean isExecutableInPath(String executable) {
-        try {
-            ProcessBuilder pb = new ProcessBuilder("which", executable);
-            Process process = pb.start();
-            return process.waitFor() == 0;
-        } catch (IOException | InterruptedException e) {
-            try {
-                ProcessBuilder pb = new ProcessBuilder("where", executable);
-                Process process = pb.start();
-                return process.waitFor() == 0;
-            } catch (IOException | InterruptedException ex) {
-                return false;
-            }
+    private boolean isExecutableNameMatch(String fileName, String executableName) {
+        if (OS.WINDOWS) {
+            return fileName.equals(executableName + ".exe") ||
+                    fileName.equals(executableName + ".bat") ||
+                    fileName.equals(executableName + ".cmd");
+        } else { // OSX or Linux
+            return fileName.equals(executableName) ||
+                    fileName.equals(executableName + ".sh") ||
+                    fileName.equals(executableName + ".app");
         }
     }
 
-    private static class PushApplicationListCell extends ListCell<PushToApplication> {
-        private final List<PushToApplication> detectedApplications;
+    private boolean isValidAbsolutePath(String pathStr) {
+        if (pathStr == null || pathStr.trim().isEmpty()) {
+            return false;
+        }
+        Path path = Path.of(pathStr);
+        return path.isAbsolute() && path.toFile().exists();
+    }
 
-        public PushApplicationListCell(List<PushToApplication> detectedApplications) {
+    private String[] getPossibleExecutableNames(String appName) {
+        return switch (appName) {
+            case PushToApplications.EMACS -> new String[] {"emacs", "emacsclient"};
+            case PushToApplications.LYX -> new String[] {"lyx", "kile"};
+            case PushToApplications.TEXMAKER -> new String[] {"texmaker"};
+            case PushToApplications.TEXSTUDIO -> new String[] {"texstudio"};
+            case PushToApplications.TEXWORKS -> new String[] {"texworks"};
+            case PushToApplications.VIM -> new String[] {"vim", "nvim", "gvim"};
+            case PushToApplications.WIN_EDT -> new String[] {"winedt"};
+            case PushToApplications.SUBLIME_TEXT ->
+                    new String[] {"subl", "sublime_text"};
+            case PushToApplications.TEXSHOP -> new String[] {"texshop"};
+            case PushToApplications.VSCODE -> new String[] {"code", "code-insiders"};
+            default -> new String[] {appName.replace(" ", "").toLowerCase()};
+        };
+    }
+
+    private Optional<String> findExecutableInPath(String executable) {
+        Optional<String> result = trySystemCommand("which", executable);
+        System.out.println("which " + executable + " result: " + result.orElse("Not found"));
+        if (result.isPresent()) {
+            return result;
+        }
+
+        return trySystemCommand("where", executable)
+                .map(output -> {
+                    String[] lines = output.split("\n");
+                    return lines.length > 0 && !lines[0].trim().isEmpty() ? lines[0].trim() : null;
+                })
+                .filter(Objects::nonNull);
+    }
+
+    private Optional<String> trySystemCommand(String command, String argument) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(command, argument);
+            Process process = pb.start();
+            if (process.waitFor() == 0) {
+                String result = new String(process.getInputStream().readAllBytes()).trim();
+                if (!result.isEmpty()) {
+                    return Optional.of(result);
+                }
+            }
+        } catch (IOException | InterruptedException e) {
+            LOGGER.trace("Failed to execute '{}' command: {}", command, e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    private static class PushApplicationListCell extends ListCell<PushToApplication> {
+        private final Set<PushToApplication> detectedApplications;
+
+        public PushApplicationListCell(Set<PushToApplication> detectedApplications) {
             this.detectedApplications = detectedApplications;
             this.getStyleClass().add("application-item");
         }

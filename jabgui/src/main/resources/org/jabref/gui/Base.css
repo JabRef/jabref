@@ -2869,7 +2869,7 @@ journalInfo .grid-cell-b {
 }
 
 /* Quick Settings: Help Button */
-.help-button {
+.icon-button {
     -fx-min-width: 28px;
     -fx-max-width: 28px;
     -fx-min-height: 28px;
@@ -2877,10 +2877,12 @@ journalInfo .grid-cell-b {
     -fx-padding: 4px;
     -fx-background-radius: 4px;
     -fx-border-radius: 4px;
+    -fx-border-color: -jr-gray-1;
+    -fx-border-width: 1px;
 }
 
-.help-button .glyph-icon,
-.help-button .ikonli-font-icon {
+.icon-button .glyph-icon,
+.icon-button .ikonli-font-icon {
     -fx-icon-size: 16px;
     -fx-icon-fill: -jr-theme-accent;
 }
@@ -3114,4 +3116,10 @@ journalInfo .grid-cell-b {
 
 .markdown-link:hover {
     -fx-text-fill: #004499;
+}
+
+.invalid-path {
+    -fx-background-color: rgba(238, 82, 83, 0.2);
+    -fx-border-color: -jr-error;
+    -fx-border-width: 1px;
 }
