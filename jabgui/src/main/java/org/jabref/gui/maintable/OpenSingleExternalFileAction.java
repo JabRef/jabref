@@ -1,5 +1,7 @@
 package org.jabref.gui.maintable;
 
+import java.util.Optional;
+
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -39,13 +41,11 @@ public class OpenSingleExternalFileAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        BibDatabaseContext databaseContext = stateManager.getActiveDatabase().orElse(null);
-
-        if (databaseContext == null) {
-            dialogService.showErrorDialogAndWait("Cannot open file", "No active database found.");
+        Optional<BibDatabaseContext> databaseContextOptional = stateManager.getActiveDatabase();
+        if (databaseContextOptional.isEmpty()) {
             return;
         }
-
+        BibDatabaseContext databaseContext = databaseContextOptional.get();
         LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
                 linkedFile,
                 entry,
