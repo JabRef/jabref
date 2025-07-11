@@ -95,15 +95,6 @@ public class RemotePreferences {
         return InetAddress.getByName("localhost");
     }
 
-    private boolean isUriValid(String hostAddress, int port) {
-        try {
-            new URI("http", null, hostAddress, port, null, null, null);
-            return true;
-        } catch (URISyntaxException e) {
-            return false;
-        }
-    }
-
     public @NonNull URI getHttpServerUri() {
         try {
             return new URI("http", null, RemotePreferences.getIpAddress().getHostAddress(), getHttpPort(), null, null, null);
