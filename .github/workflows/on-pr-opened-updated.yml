@@ -116,7 +116,6 @@ jobs:
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
           LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
-
           LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
           if [ -n "$LABEL" ]; then
             echo "✅ Found label: $LABEL"
