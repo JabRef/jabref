@@ -2647,197 +2647,114 @@ journalInfo .grid-cell-b {
 
 /* Wireframe base styles */
 .wireframe-container {
-    -fx-border-width: 1px;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
+    -fx-border-width: 0.0625em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
+    -fx-effect: dropshadow(three-pass-box , rgba(0,0,0,0.1) , 0.125em, 0.0 , 0 , 0.0625em );
+    -fx-border-color: -jr-wf-border-color;
 }
 
 .wireframe-menubar {
-    -fx-padding: 3px 1px;
+    -fx-padding: 0.1875em 0.0625em;
+    -fx-background-color: -jr-wf-menubar-bg;
 }
 
 .wireframe-menu-item {
-    -fx-border-radius: 1px;
-    -fx-background-radius: 1px;
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-menu-item-bg;
 }
 
 .wireframe-toolbar {
-    -fx-padding: 2px;
-    -fx-spacing: 6px;
+    -fx-padding: 0.125em;
+    -fx-spacing: 0.375em;
+    -fx-background-color: -jr-wf-toolbar-bg;
 }
 
 .wireframe-tool-item {
-    -fx-border-radius: 1px;
-    -fx-background-radius: 1px;
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-tool-item-bg;
 }
 
 .wireframe-search {
-    -fx-border-width: 0.5px;
-    -fx-border-radius: 2px;
-    -fx-background-radius: 2px;
+    -fx-border-width: 0.03125em;
+    -fx-border-radius: 0.125em;
+    -fx-background-radius: 0.125em;
+    -fx-background-color: -jr-wf-search-bg;
+    -fx-border-color: -jr-wf-search-border;
 }
 
 .wireframe-search-field {
-    -fx-border-radius: 1px;
-    -fx-background-radius: 1px;
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-search-field-bg;
 }
 
 .wireframe-sidebar {
-    -fx-padding: 4px 2px;
+    -fx-padding: 0.25em 0.125em;
+    -fx-background-color: -jr-wf-sidebar-bg;
 }
 
 .wireframe-sidebar-item {
-    -fx-border-radius: 1px;
-    -fx-background-radius: 1px;
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-sidebar-item-bg;
 }
 
 .wireframe-welcome-tab-area {
-    -fx-padding: 4px;
+    -fx-padding: 0.25em;
     -fx-alignment: center;
+    -fx-background-color: -jr-wf-welcome-area-bg;
 }
 
 .wireframe-welcome-tab-item {
-    -fx-border-radius: 1px;
-    -fx-background-radius: 1px;
+    -fx-border-radius: 0.0625em;
+    -fx-background-radius: 0.0625em;
+    -fx-background-color: -jr-wf-welcome-item-bg;
 }
 
-/* Wireframe light colors */
-.wireframe-light .wireframe-container {
-    -fx-border-color: #ccc;
+/* Other color scheme */
+.wireframe-light {
+    -jr-wf-menubar-bg: #f9f9f9;
+    -jr-wf-menu-item-bg: -jr-gray-1;
+    -jr-wf-toolbar-bg: #f9f9f9;
+    -jr-wf-tool-item-bg: -jr-theme;
+    -jr-wf-search-bg: -jr-white;
+    -jr-wf-search-border: #dddddd;
+    -jr-wf-search-field-bg: #f8f8f8;
+    -jr-wf-sidebar-bg: -jr-gray-1;
+    -jr-wf-sidebar-item-bg: -jr-theme;
+    -jr-wf-welcome-area-bg: #f3f3f3;
+    -jr-wf-welcome-item-bg: #dddddd;
 }
 
-.wireframe-light .wireframe-menubar {
-    -fx-background-color: #f9f9f9;
+.wireframe-dark {
+    -jr-wf-menubar-bg: #141824;
+    -jr-wf-menu-item-bg: #424758;
+    -jr-wf-toolbar-bg: #141824;
+    -jr-wf-tool-item-bg: #2c9490;
+    -jr-wf-search-bg: #2c2e3b;
+    -jr-wf-search-border: #424758;
+    -jr-wf-search-field-bg: #424758;
+    -jr-wf-sidebar-bg: #212330;
+    -jr-wf-sidebar-item-bg: #2c9490;
+    -jr-wf-welcome-area-bg: #272b38;
+    -jr-wf-welcome-item-bg: #7d8591;
 }
 
-.wireframe-light .wireframe-menu-item {
-    -fx-background-color: -jr-gray-1;
-}
-
-.wireframe-light .wireframe-toolbar {
-    -fx-background-color: #f9f9f9;
-}
-
-.wireframe-light .wireframe-tool-item {
-    -fx-background-color: #50618f;
-}
-
-.wireframe-light .wireframe-search {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #dddddd;
-}
-
-.wireframe-light .wireframe-search-field {
-    -fx-background-color: #f8f8f8;
-}
-
-.wireframe-light .wireframe-sidebar {
-    -fx-background-color: #dddddd;
-}
-
-.wireframe-light .wireframe-sidebar-item {
-    -fx-background-color: #50618f;
-}
-
-.wireframe-light .wireframe-welcome-tab-area {
-    -fx-background-color: #f3f3f3;
-}
-
-.wireframe-light .wireframe-welcome-tab-item {
-    -fx-background-color: #dddddd;
-}
-
-/* Wireframe dark colors */
-.wireframe-dark .wireframe-container {
-    -fx-border-color: #424758;
-}
-
-.wireframe-dark .wireframe-menubar {
-    -fx-background-color: #141824;
-}
-
-.wireframe-dark .wireframe-menu-item {
-    -fx-background-color: #424758;
-}
-
-.wireframe-dark .wireframe-toolbar {
-    -fx-background-color: #141824;
-}
-
-.wireframe-dark .wireframe-tool-item {
-    -fx-background-color: #2c9490;
-}
-
-.wireframe-dark .wireframe-search {
-    -fx-background-color: #2c2e3b;
-    -fx-border-color: #424758;
-}
-
-.wireframe-dark .wireframe-search-field {
-    -fx-background-color: #424758;
-}
-
-.wireframe-dark .wireframe-sidebar {
-    -fx-background-color: #212330;
-}
-
-.wireframe-dark .wireframe-sidebar-item {
-    -fx-background-color: #2c9490;
-}
-
-.wireframe-dark .wireframe-welcome-tab-area {
-    -fx-background-color: #272b38;
-}
-
-.wireframe-dark .wireframe-welcome-tab-item {
-    -fx-background-color: #7d8591;
-}
-
-/* Wireframe custom theme colors */
-.wireframe-custom .wireframe-container {
-    -fx-border-color: #50618F;
-}
-
-.wireframe-custom .wireframe-menubar {
-    -fx-background-color: #f5ffe5;
-}
-
-.wireframe-custom .wireframe-menu-item {
-    -fx-background-color: #346963;
-}
-
-.wireframe-custom .wireframe-toolbar {
-    -fx-background-color: #f5ffe5;
-}
-
-.wireframe-custom .wireframe-tool-item {
-    -fx-background-color: #2E838C;
-}
-
-.wireframe-custom .wireframe-search {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #2E838C;
-}
-
-.wireframe-custom .wireframe-search-field {
-    -fx-background-color: #f0f3ff;
-}
-
-.wireframe-custom .wireframe-sidebar {
-    -fx-background-color: #e1ebd1;
-}
-
-.wireframe-custom .wireframe-sidebar-item {
-    -fx-background-color: #2E838C;
-}
-
-.wireframe-custom .wireframe-welcome-tab-area {
-    -fx-background-color: #E8F2D8;
-}
-
-.wireframe-custom .wireframe-welcome-tab-item {
-    -fx-background-color: #2E838C;
+.wireframe-custom {
+    -jr-wf-menubar-bg: #f5ffe5;
+    -jr-wf-menu-item-bg: #346963;
+    -jr-wf-toolbar-bg: #f5ffe5;
+    -jr-wf-tool-item-bg: #2E838C;
+    -jr-wf-search-bg: -jr-white;
+    -jr-wf-search-border: #2E838C;
+    -jr-wf-search-field-bg: #f0f3ff;
+    -jr-wf-sidebar-bg: #e1ebd1;
+    -jr-wf-sidebar-item-bg: #2E838C;
+    -jr-wf-welcome-area-bg: #E8F2D8;
+    -jr-wf-welcome-item-bg: #2E838C;
 }
 
 /* Quick Settings: Push Application Configuration */
