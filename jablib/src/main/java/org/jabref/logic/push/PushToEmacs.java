@@ -1,4 +1,4 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,14 +6,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.util.NotificationService;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -21,45 +17,40 @@ import org.slf4j.LoggerFactory;
 
 public class PushToEmacs extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.EMACS;
+    public static final PushApplications APPLICATION = PushApplications.EMACS;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToEmacs.class);
 
     /**
      * @param preferences getPushToApplicationPreferences(), getExternalApplicationsPreferences(), and getFilePreferences() are used
      */
-    public PushToEmacs(DialogService dialogService, GuiPreferences preferences) {
-        super(dialogService, preferences);
+    public PushToEmacs(NotificationService notificationService, PushToApplicationPreferences preferences) {
+        super(notificationService, preferences);
     }
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_EMACS;
-    }
-
-    @Override
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keys) {
+    public void pushEntries(List<BibEntry> entries) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
-        PushToApplicationPreferences pushToApplicationPreferences = preferences.getPushToApplicationPreferences();
-
-        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         if ((commandPath == null) || commandPath.trim().isEmpty()) {
             notDefined = true;
             return;
         }
 
-        commandPath = pushToApplicationPreferences.getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
-        String[] addParams = pushToApplicationPreferences.getEmacsArguments().split(" ");
+        String keyString = getKeyString(entries, getDelimiter());
+
+        String[] addParams = preferences.getEmacsArguments().split(" ");
         try {
             String[] com = new String[addParams.length + 2];
             com[0] = commandPath;
@@ -77,7 +68,7 @@ public class PushToEmacs extends AbstractPushToApplication {
 
                 com[com.length - 1] = prefix.concat("\""
                                                     + getCitePrefix().replace("\\", "\\\\")
-                                                    + keys
+                                                    + keyString
                                                     + getCiteSuffix().replace("\\", "\\\\")
                                                     + "\"").concat(suffix)
                                             .replace("\"", "\\\"");
@@ -88,7 +79,7 @@ public class PushToEmacs extends AbstractPushToApplication {
                 // so emacs receives: (insert "\cite{Blah2001}")
                 com[com.length - 1] = prefix.concat("\""
                                                     + getCitePrefix().replace("\\", "\\\\")
-                                                    + keys
+                                                    + keyString
                                                     + getCiteSuffix().replace("\\", "\\\\")
                                                     + "\"").concat(suffix);
             }
@@ -129,10 +120,10 @@ public class PushToEmacs extends AbstractPushToApplication {
     @Override
     public void onOperationCompleted() {
         if (couldNotPush) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
+            this.sendErrorNotification(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not push to a running emacs daemon."));
         } else if (couldNotCall) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Error pushing entries"),
+            this.sendErrorNotification(Localization.lang("Error pushing entries"),
                     Localization.lang("Could not run the emacs client."));
         } else {
             super.onOperationCompleted();
@@ -140,13 +131,8 @@ public class PushToEmacs extends AbstractPushToApplication {
     }
 
     @Override
-    protected String getCommandName() {
+    public String getCommandName() {
         return "gnuclient " + Localization.lang("or") + " emacsclient";
-    }
-
-    @Override
-    public PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences preferences) {
-        return new PushToEmacsSettings(application, dialogService, this.preferences.getFilePreferences(), preferences);
     }
 
     @Override

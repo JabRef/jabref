@@ -13,7 +13,7 @@ class RemotePreferencesTest {
 
     @BeforeEach
     void setUp() {
-        preferences = new RemotePreferences(1000, true, false);
+        preferences = new RemotePreferences(1000, true, 3000, false);
     }
 
     @Test
@@ -22,9 +22,20 @@ class RemotePreferencesTest {
     }
 
     @Test
+    void getHttpPort() {
+        assertEquals(3000, preferences.getHttpPort());
+    }
+
+    @Test
     void setPort() {
         preferences.setPort(2000);
         assertEquals(2000, preferences.getPort());
+    }
+
+    @Test
+    void setHttpPort() {
+        preferences.setHttpPort(4000);
+        assertEquals(4000, preferences.getHttpPort());
     }
 
     @Test
@@ -44,7 +55,17 @@ class RemotePreferencesTest {
     }
 
     @Test
+    void isDifferentHttpPortTrue() {
+        assertTrue(preferences.isDifferentHttpPort(4000));
+    }
+
+    @Test
     void isDifferentPortFalse() {
         assertFalse(preferences.isDifferentPort(1000));
+    }
+
+    @Test
+    void isDifferentHttpPortFalse() {
+        assertFalse(preferences.isDifferentHttpPort(3000));
     }
 }
