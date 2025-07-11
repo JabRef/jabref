@@ -70,18 +70,18 @@ public class SciteTab extends EntryEditorTab {
                         sciteResultsPane.add(progressIndicator, 0, 0);
                 case FOUND ->{
                         viewModel.getCurrentResult().ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
-                        Separator separator = new Separator();
-                        separator.setOrientation(Orientation.HORIZONTAL);
-                        sciteResultsPane.add(separator,0,1);
                 }
                 case ERROR ->
                         sciteResultsPane.add(getErrorPane(), 0, 0);
             }
         });
 
+    }
 
-
-
+    private void setCitationCountPane(){
+        Separator separator = new Separator();
+        separator.setOrientation(Orientation.HORIZONTAL);
+        sciteResultsPane.add(separator,0,1);
     }
 
     @Override
