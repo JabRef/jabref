@@ -97,7 +97,7 @@ public class RemotePreferences {
 
     private boolean isUriValid(String hostAddress, int port) {
         try {
-            URI uri = new URI("http", null, hostAddress, port, null, null, null);
+            new URI("http", null, hostAddress, port, null, null, null);
             return true;
         } catch (URISyntaxException e) {
             return false;
@@ -106,8 +106,7 @@ public class RemotePreferences {
 
     public @NonNull URI getHttpServerUri() {
         try {
-            isUriValid(RemotePreferences.getIpAddress().getHostAddress(), getHttpPort());
-            return new URI("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":" + getHttpPort());
+            return new URI("http", null, RemotePreferences.getIpAddress().getHostAddress(), getHttpPort(), null, null, null);
         } catch (UnknownHostException | URISyntaxException e) {
             LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
             try {
