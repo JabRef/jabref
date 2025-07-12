@@ -112,7 +112,7 @@ public class CopyTo extends SimpleCommand {
 
         importHandler.importEntriesWithDuplicateCheck(targetDatabaseContext, entriesToAdd, tracker);
         tracker.setOnFinish(() -> LinkedFileTransferHelper
-          .adjustLinkedFilesForTarget(targetDatabaseContext, filePreferences)
+          .adjustLinkedFilesForTarget(sourceDatabaseContext, targetDatabaseContext, filePreferences)
         );
     }
 
