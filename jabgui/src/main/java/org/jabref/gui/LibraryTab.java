@@ -838,9 +838,11 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(entriesToAdd.size());
 
         importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
-        tracker.setOnFinish(() -> LinkedFileTransferHelper
-          .adjustLinkedFilesForTarget(bibDatabaseContext, preferences.getFilePreferences())
-        );
+        if (clipBoardManager.getSourceBibDatabaseContext().isPresent()) {
+            tracker.setOnFinish(() -> LinkedFileTransferHelper
+                    .adjustLinkedFilesForTarget(clipBoardManager.getSourceBibDatabaseContext().get(),
+                      bibDatabaseContext, preferences.getFilePreferences()));
+        }
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
