@@ -228,7 +228,6 @@ class SearchCitationsRelationsServiceTest {
 
         @Test
         void serviceShouldUpdateCitationCountWithEmptyPaperDetailsResponse(){
-
             int expectedResult = 0;
             BibEntry referencer = new BibEntry();
             Map<BibEntry, List<BibEntry>> referenceDatabase = new HashMap<>();

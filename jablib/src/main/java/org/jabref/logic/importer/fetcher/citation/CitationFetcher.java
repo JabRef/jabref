@@ -43,7 +43,7 @@ public interface CitationFetcher {
     List<BibEntry> searchCiting(BibEntry entry) throws FetcherException;
 
     /**
-     * get the  paper details that includes citation count field for a given {@link BibEntry}.
+     * Get the paper details that includes citation count field for a given {@link BibEntry}.
      *
      * @param entry entry to search citation count field
      * @return @link Optional<PaperDetails>, paper details that includes citation count field (may be empty)

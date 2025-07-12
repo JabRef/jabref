@@ -138,7 +138,7 @@ public enum StandardField implements Field {
     OWNER("owner"),
     TIMESTAMP("timestamp", FieldProperty.DATE),
     CREATIONDATE("creationdate", FieldProperty.DATE),
-    CITATIONCOUNT("Citation count", FieldProperty.CITATIONCOUNT),
+    CITATIONCOUNT("Citation count", FieldProperty.CITATION_COUNT),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE);
 
 
