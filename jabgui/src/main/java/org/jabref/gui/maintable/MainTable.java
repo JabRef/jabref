@@ -56,6 +56,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelTableRowFactory;
+import org.jabref.http.server.services.GuiHolder;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.WebFetchers;
@@ -270,6 +271,11 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
+
+        GuiHolder guiHolder = Injector.instantiateModelOrService(GuiHolder.class);
+        guiHolder.getSelectEntries().addListener((ListChangeListener<? super BibEntry>) change -> {
+            clearAndSelect(guiHolder.getSelectEntries());
+        });
     }
 
     /**
@@ -321,6 +327,26 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
                 getSelectionModel().select(entry);
                 scrollTo(entry);
             });
+        }
+    }
+
+    public void clearAndSelect(List<BibEntry> bibEntries) {
+        // check if entries merged from citation relations tab
+        if (citationMergeMode) {
+            // keep original entry selected and reset citation merge mode
+            this.citationMergeMode = false;
+        } else {
+            // select new entries
+            getSelectionModel().clearSelection();
+            List<BibEntryTableViewModel> entries = bibEntries.stream()
+                                                            .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().orElse(null)))
+                                                            .filter(Optional::isPresent)
+                                                            .map(Optional::get)
+                                                            .toList();
+            entries.forEach(entry -> getSelectionModel().select(entry));
+            if (!entries.isEmpty()) {
+                scrollTo(entries.getFirst());
+            }
         }
     }
 
@@ -569,6 +595,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
     private Optional<BibEntryTableViewModel> findEntry(BibEntry entry) {
         return model.getViewModelByIndex(database.getDatabase().indexOf(entry));
+    }
+
+    private Optional<BibEntryTableViewModel> findEntryByCitationKey(String citationKey) {
+        return model.getViewModelByCitationKey(citationKey);
     }
 
     public void setCitationMergeMode(boolean citationMerge) {

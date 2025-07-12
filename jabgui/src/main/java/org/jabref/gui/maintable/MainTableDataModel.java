@@ -220,6 +220,12 @@ public class MainTableDataModel {
         return Optional.of(entriesViewModel.get(index));
     }
 
+    public Optional<BibEntryTableViewModel> getViewModelByCitationKey(String citationKey) {
+        return entriesViewModel.stream()
+                .filter(viewModel -> citationKey.equals(viewModel.getEntry().getCitationKey().orElse(null)))
+                .findFirst();
+    }
+
     public void resetFieldFormatter() {
         this.fieldValueFormatter.setValue(new MainTableFieldValueFormatter(nameDisplayPreferences, bibDatabaseContext));
     }

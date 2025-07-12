@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import javafx.application.Platform;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.http.server.services.GuiHolder;
 import org.jabref.http.server.cayw.format.CAYWFormatter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
@@ -64,6 +65,9 @@ public class CAYWResource {
     @Inject
     private ContextsToServe contextsToServe;
 
+    @Inject
+    private GuiHolder guiHolder;
+
     @GET
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
@@ -76,15 +80,26 @@ public class CAYWResource {
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
 
         List<CAYWEntry> entries = databaseContext.getEntries()
-                                 .stream()
-                                 .map(this::createCAYWEntry)
-                                 .toList();
+                                                 .stream()
+                                                 .map(this::createCAYWEntry)
+                                                 .toList();
 
-        initializeGUI();
-        List<CAYWEntry> searchResults = openSearchGui(entries);
+        // Selected parameter handling
+        List<CAYWEntry> searchResults;
+        if (queryParams.isSelected()) {
+            searchResults = guiHolder.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
+        } else {
+            initializeGUI();
+            searchResults = openSearchGui(entries);
+        }
 
         if (searchResults.isEmpty()) {
             return Response.noContent().build();
+        }
+
+        // Select parameter handling
+        if (queryParams.isSelect()) {
+            guiHolder.setSelectEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList());
         }
 
         // Format parameter handling

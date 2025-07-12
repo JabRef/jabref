@@ -527,6 +527,10 @@ public class LibraryTab extends Tab {
         mainTable.clearAndSelect(bibEntry);
     }
 
+    public void clearAndSelect(final List<BibEntry> bibEntries) {
+        mainTable.clearAndSelect(bibEntries);
+    }
+
     public void selectPreviousEntry() {
         mainTable.getSelectionModel().clearAndSelect(mainTable.getSelectionModel().getSelectedIndex() - 1);
     }

@@ -7,16 +7,14 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
-import javafx.collections.ObservableList;
-
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.http.server.services.GuiHolder;
 import org.jabref.logic.os.OS;
-import org.jabref.model.database.BibDatabaseContext;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -74,15 +72,16 @@ public class Server {
     }
 
     ///  Entry point for the GUI
-    public HttpServer run(ObservableList<BibDatabaseContext> files, URI uri) {
+    public HttpServer run(GuiHolder guiHolder, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
         ContextsToServe contextsToServe = new ContextsToServe();
-        contextsToServe.setContextsToServe(files);
+        contextsToServe.setContextsToServe(guiHolder.getContextsToServe());
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, guiHolder);
 
         return startServer(serviceLocator, uri);
     }
@@ -94,6 +93,7 @@ public class Server {
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
+        resourceConfig.property("jersey.config.server.wadl.disableWadl", true);
         // TODO: Add SSL
         resourceConfig.register(RootResource.class);
         resourceConfig.register(LibrariesResource.class);
