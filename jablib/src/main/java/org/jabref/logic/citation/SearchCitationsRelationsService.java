@@ -87,7 +87,7 @@ public class SearchCitationsRelationsService {
 
     public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue){
 
-        Optional<PaperDetails> citationCountResult = null;
+        Optional<PaperDetails> citationCountResult = Optional.empty();
         boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(citationCounted)
                 || !actualFieldValue.isPresent();
         if (isFetchingAllowed) {
@@ -95,7 +95,7 @@ public class SearchCitationsRelationsService {
                 citationCountResult = citationFetcher.searchCitationCount(citationCounted);
             } catch (
                     FetcherException e) {
-                LOGGER.error("Error while fetching citiation count for entry", e);
+                LOGGER.error("Error while fetching citation count for entry", e);
             }
             return citationCountResult.map(PaperDetails::getCitationCount).orElse(0);
         }

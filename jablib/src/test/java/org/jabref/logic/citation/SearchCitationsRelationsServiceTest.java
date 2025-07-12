@@ -243,7 +243,7 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldCorrectlyFetchCitationCountFiled(){
+        void serviceShouldCorrectlyFetchCitationCountField(){
             int expectedResult = 3;
             BibEntry reference = new BibEntry();
             PaperDetails paperDetails = new PaperDetails();

@@ -43,10 +43,10 @@ public interface CitationFetcher {
     List<BibEntry> searchCiting(BibEntry entry) throws FetcherException;
 
     /**
-     * Looks for hits which are cited by the given {@link BibEntry}.
+     * get the  paper details that includes citation count field for a given {@link BibEntry}.
      *
-     * @param entry entry to search articles for
-     * @return @link BibEntry, which is matched by the query (may be empty)
+     * @param entry entry to search citation count field
+     * @return @link Optional<PaperDetails>, paper details that includes citation count field (may be empty)
      */
     Optional<PaperDetails> searchCitationCount(BibEntry entry) throws FetcherException;
 
