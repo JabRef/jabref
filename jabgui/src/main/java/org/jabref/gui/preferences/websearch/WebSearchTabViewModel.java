@@ -2,6 +2,7 @@ package org.jabref.gui.preferences.websearch;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -68,6 +69,8 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty apikeyPersistProperty = new SimpleBooleanProperty();
     private final BooleanProperty apikeyPersistAvailableProperty = new SimpleBooleanProperty();
 
+    private final ObservableList<SearchEngineItem> searchEngines = FXCollections.observableArrayList();
+
     private final DialogService dialogService;
     private final CliPreferences preferences;
     private final DOIPreferences doiPreferences;
@@ -92,6 +95,7 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         this.refAiEnabled = refAiEnabled;
 
         setupPlainCitationParsers(preferences);
+        setupSearchEngines();
     }
 
     private void setupPlainCitationParsers(CliPreferences preferences) {
@@ -132,6 +136,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         });
     }
 
+    private void setupSearchEngines() {
+        // Add default search engines
+        searchEngines.addAll(
+                new SearchEngineItem("Google Scholar", "https://scholar.google.com/scholar?q={title}"),
+                new SearchEngineItem("Short Science", "https://www.shortscience.org/internalsearch?q={title}")
+        );
+    }
+
     @Override
     public void setValues() {
         enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
@@ -164,6 +176,13 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
                                        return new StudyCatalogItem(name, enabled);
                                    })
                                    .toList());
+
+        // Load custom URL templates from preferences if they exist
+        Map<String, String> savedTemplates = preferences.getImporterPreferences().getSearchEngineUrlTemplates();
+        if (!savedTemplates.isEmpty()) {
+            searchEngines.clear();
+            savedTemplates.forEach((name, url) -> searchEngines.add(new SearchEngineItem(name, url)));
+        }
     }
 
     @Override
@@ -196,6 +215,14 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
         if (apikeyPersistAvailableProperty.get()) {
             preferences.getImporterPreferences().getApiKeys().addAll(apiKeys);
         }
+
+        // Save custom URL templates to preferences
+        Map<String, String> templates = searchEngines.stream()
+                                                     .collect(Collectors.toMap(
+                                                             SearchEngineItem::getName,
+                                                             SearchEngineItem::getUrlTemplate
+                                                     ));
+        preferences.getImporterPreferences().setSearchEngineUrlTemplates(templates);
     }
 
     public BooleanProperty enableWebSearchProperty() {
@@ -268,6 +295,10 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     public IntegerProperty citationsRelationsStoreTTLProperty() {
         return citationsRelationStoreTTL;
+    }
+
+    public ObservableList<SearchEngineItem> getSearchEngines() {
+        return searchEngines;
     }
 
     public void checkCustomApiKey() {
