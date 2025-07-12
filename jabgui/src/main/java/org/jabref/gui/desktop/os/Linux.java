@@ -47,10 +47,10 @@ public class Linux extends NativeDesktop {
                     String[] cmd = {"xdg-open", filePath};
                     Runtime.getRuntime().exec(cmd);
                 } catch (Exception e2) {
-                    LoggerFactory.getLogger(Linux.class).warn("Open operation not successful: ", e2);
+                    LoggerFactory.getLogger(Linux.class).warn("Open operation not isSuccessful: ", e2);
                 }
             } catch (IOException e) {
-                LoggerFactory.getLogger(Linux.class).warn("Native open operation not successful: ", e);
+                LoggerFactory.getLogger(Linux.class).warn("Native open operation not isSuccessful: ", e);
             }
         });
     }

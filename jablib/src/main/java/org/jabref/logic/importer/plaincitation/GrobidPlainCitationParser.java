@@ -35,7 +35,7 @@ public class GrobidPlainCitationParser implements PlainCitationParser {
      * Passes request to grobid server, using consolidateCitations option to improve result. Takes a while, since the
      * server has to look up the entry.
      *
-     * @return A BibTeX string if extraction is successful
+     * @return A BibTeX string if extraction is isSuccessful
      */
     @Override
     public Optional<BibEntry> parsePlainCitation(String text) throws FetcherException {

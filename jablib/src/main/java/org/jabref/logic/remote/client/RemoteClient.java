@@ -50,7 +50,7 @@ public class RemoteClient {
      * Attempt to send command line arguments to already running JabRef instance.
      *
      * @param args command line arguments.
-     * @return true if successful, false otherwise.
+     * @return true if isSuccessful, false otherwise.
      */
     public boolean sendCommandLineArguments(String[] args) {
         try (Protocol protocol = openNewConnection()) {
@@ -66,7 +66,7 @@ public class RemoteClient {
     /**
      * Attempt to send a focus command to already running JabRef instance.
      *
-     * @return true if successful, false otherwise.
+     * @return true if isSuccessful, false otherwise.
      */
     public boolean sendFocus() {
         try (Protocol protocol = openNewConnection()) {

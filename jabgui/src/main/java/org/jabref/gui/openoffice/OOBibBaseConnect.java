@@ -173,7 +173,7 @@ public class OOBibBaseConnect {
      * <p>
      * If there is a single document to choose from, selects that. If there are more than one, shows selection dialog. If there are none, throws NoDocumentFoundException
      * <p>
-     * After successful selection connects to the selected document and extracts some frequently used parts (starting points for managing its content).
+     * After isSuccessful selection connects to the selected document and extracts some frequently used parts (starting points for managing its content).
      * <p>
      * Finally initializes this.xTextDocument with the selected document and parts extracted.
      */
