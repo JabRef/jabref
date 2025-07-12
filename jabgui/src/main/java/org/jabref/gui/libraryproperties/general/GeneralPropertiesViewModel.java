@@ -98,21 +98,21 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         String librarySpecificFileDirectory = librarySpecificDirectoryProperty.getValue().trim();
         if (librarySpecificFileDirectory.isEmpty()) {
             newMetaData.clearLibrarySpecificFileDirectory();
-        } else {
+        } else if (librarySpecificFileDirectoryStatus().isValid()) {
             newMetaData.setLibrarySpecificFileDirectory(librarySpecificFileDirectory);
         }
 
         String userSpecificFileDirectory = userSpecificFileDirectoryProperty.getValue();
         if (userSpecificFileDirectory.isEmpty()) {
             newMetaData.clearUserFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else {
+        } else if (userSpecificFileDirectoryStatus().isValid()) {
             newMetaData.setUserFileDirectory(preferences.getFilePreferences().getUserAndHost(), userSpecificFileDirectory);
         }
 
         String latexFileDirectory = laTexFileDirectoryProperty.getValue();
         if (latexFileDirectory.isEmpty()) {
             newMetaData.clearLatexFileDirectory(preferences.getFilePreferences().getUserAndHost());
-        } else {
+        } else if (laTexFileDirectoryStatus().isValid()) {
             newMetaData.setLatexFileDirectory(preferences.getFilePreferences().getUserAndHost(), Path.of(latexFileDirectory));
         }
 
@@ -137,9 +137,9 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         ValidationStatus userSpecificFileDirectoryStatus = userSpecificFileDirectoryStatus();
         ValidationStatus laTexFileDirectoryStatus = laTexFileDirectoryStatus();
 
-        return validateAndShowError(librarySpecificFileDirectoryStatus) &&
-                validateAndShowError(userSpecificFileDirectoryStatus) &&
-                validateAndShowError(laTexFileDirectoryStatus);
+        return promptUserToConfirmAction(librarySpecificFileDirectoryStatus) &&
+                promptUserToConfirmAction(userSpecificFileDirectoryStatus) &&
+                promptUserToConfirmAction(laTexFileDirectoryStatus);
     }
 
     public void browseLibrarySpecificDir() {
@@ -231,7 +231,7 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
                         .map(Files::isDirectory)
                         .orElse(false)) {
                 return ValidationMessage.error(
-                        Localization.lang("File directory '%0' not found.\nCheck \"%1\" file directory path.", directoryPath, messageKey)
+                        Localization.lang("The file directory '%0' for the %1 file path is not found or is inaccessible.", directoryPath, messageKey)
                 );
             }
         } catch (InvalidPathException ex) {
@@ -243,11 +243,15 @@ public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
         return null;
     }
 
-    private boolean validateAndShowError(ValidationStatus status) {
+    private boolean promptUserToConfirmAction(ValidationStatus status) {
         if (!status.isValid()) {
-            status.getHighestMessage().ifPresent(message ->
-                    dialogService.showErrorDialogAndWait(message.getMessage()));
-            return false;
+            return status.getHighestMessage()
+                         .map(message -> dialogService.showConfirmationDialogAndWait(
+                                 Localization.lang("Action required: override default file directories"),
+                                 message.getMessage() + "\n" + Localization.lang("Would you like to save your other preferences?"),
+                                 Localization.lang("Save"),
+                                 Localization.lang("Return to Properties")))
+                         .orElse(false);
         }
         return true;
     }
