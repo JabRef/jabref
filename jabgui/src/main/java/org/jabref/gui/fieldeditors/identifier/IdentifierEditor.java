@@ -19,6 +19,7 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -46,6 +47,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
 
+    @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
+
     private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
@@ -64,7 +67,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
             case EPRINT ->
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
             case CITATIONCOUNT ->
-                    this.viewModel = new CitationCountEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager,stateManager);
+                    this.viewModel = new CitationCountEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager,stateManager,searchCitationsRelationsService);
 
             // TODO: Add support for PMID
             case null, default -> {

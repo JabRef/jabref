@@ -91,7 +91,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public Optional<BibEntry> searchCitationCount(BibEntry entry) throws FetcherException {
+    public Optional<PaperDetails> searchCitationCount(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return Optional.empty();
         }
@@ -103,12 +103,12 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
-        ReferenceDataItem referencesResponse = GSON.fromJson(urlDownload.asString(), ReferenceDataItem.class);
+        PaperDetails referencesResponse = GSON.fromJson(urlDownload.asString(), PaperDetails.class);
 
         if (referencesResponse == null) {
             return Optional.empty();
         }
-        return Optional.of(referencesResponse.getCitedPaper().toBibEntry());
+        return Optional.of(referencesResponse);
     }
 
     @Override

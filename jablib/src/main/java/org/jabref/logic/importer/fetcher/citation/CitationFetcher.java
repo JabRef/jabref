@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -47,7 +48,7 @@ public interface CitationFetcher {
      * @param entry entry to search articles for
      * @return @link BibEntry, which is matched by the query (may be empty)
      */
-    Optional<BibEntry> searchCitationCount(BibEntry entry) throws FetcherException;
+    Optional<PaperDetails> searchCitationCount(BibEntry entry) throws FetcherException;
 
     /**
      * Returns the localized name of this fetcher.
