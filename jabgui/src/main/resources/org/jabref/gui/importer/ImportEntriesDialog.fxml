@@ -20,6 +20,10 @@
         <VBox spacing="10.0">
             <Label text="%Select the entries to be imported:"/>
             <CheckListView fx:id="entriesListView" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10" alignment="CENTER">
+                <Button onAction="#onPrevPage" text="%Previous"/>
+                <Button onAction="#onNextPage" text="%Next"/>
+            </HBox>
             <HBox spacing="4">
                 <VBox spacing="10">
                     <HBox spacing="4">

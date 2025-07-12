@@ -6,6 +6,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -35,6 +36,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
@@ -114,6 +116,20 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
         entriesListView.setItems(viewModel.getEntries());
+        entriesListView.getCheckModel().getCheckedItems().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (BibEntry entry : change.getAddedSubList()) {
+                        viewModel.getCheckedEntries().add(entry);
+                    }
+                }
+                if (change.wasRemoved()) {
+                    for (BibEntry entry : change.getRemoved()) {
+                        viewModel.getCheckedEntries().remove(entry);
+                    }
+                }
+            }
+        });
 
         libraryListView.setEditable(false);
         libraryListView.getItems().addAll(stateManager.getOpenDatabases());
@@ -224,5 +240,25 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public void selectAllEntries() {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
+    }
+
+    @FXML
+    private void onPrevPage() {
+        viewModel.prevPage();
+        restoreCheckedEntries();
+    }
+
+    @FXML
+    private void onNextPage() {
+        viewModel.nextPage();
+        restoreCheckedEntries();
+    }
+
+    private void restoreCheckedEntries() {
+        for (BibEntry entry : viewModel.getEntries()) {
+            if (viewModel.getCheckedEntries().contains(entry)) {
+                entriesListView.getCheckModel().check(entry);
+            }
+        }
     }
 }

@@ -2,8 +2,10 @@ package org.jabref.gui.importer;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.undo.UndoManager;
 
@@ -13,6 +15,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -40,6 +43,7 @@ import org.slf4j.LoggerFactory;
 public class ImportEntriesViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
+    private static final int PAGE_SIZE = 20;
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -53,6 +57,11 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
+    private final ObservableList<BibEntry> pagedEntries = FXCollections.observableArrayList();
+    private final ObservableSet<BibEntry> checkedEntries = FXCollections.observableSet();
+    private List<BibEntry> allEntries = new ArrayList<>();
+
+    private int currentPage = 0;
 
     /**
      * @param databaseContext the database to import into
@@ -85,6 +94,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             this.parserResult = parserResult;
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
+            loadAllEntries(entries);
             if (entries.isEmpty()) {
                 task.updateMessage(Localization.lang("No entries corresponding to given query"));
             }
@@ -111,7 +121,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     }
 
     public ObservableList<BibEntry> getEntries() {
-        return entries;
+        return pagedEntries;
     }
 
     public boolean hasDuplicate(BibEntry entry) {
@@ -176,5 +186,43 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             }
         }
         return Optional.empty();
+    }
+
+    public Set<BibEntry> getCheckedEntries() {
+        return checkedEntries;
+    }
+
+    public void loadAllEntries(List<BibEntry> entries) {
+        this.allEntries = new ArrayList<>(entries);
+        this.currentPage = 0;
+        updatePagedEntries();
+    }
+
+    public void nextPage() {
+        if (hasNextPage()) {
+            currentPage++;
+            updatePagedEntries();
+        }
+    }
+
+    public void prevPage() {
+        if (hasPrevPage()) {
+            currentPage--;
+            updatePagedEntries();
+        }
+    }
+
+    public boolean hasNextPage() {
+        return (currentPage + 1) * PAGE_SIZE < allEntries.size();
+    }
+
+    public boolean hasPrevPage() {
+        return currentPage > 0;
+    }
+
+    private void updatePagedEntries() {
+        int fromIdx = currentPage * PAGE_SIZE;
+        int toIdx = Math.min(fromIdx + PAGE_SIZE, allEntries.size());
+        pagedEntries.setAll(allEntries.subList(fromIdx, toIdx));
     }
 }
