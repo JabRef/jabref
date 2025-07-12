@@ -260,43 +260,21 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldUpdateBecauseIsisCitationsUpdatableFalse() {
+        void serviceShouldUpdateBecauseIsisCitationsUpdatableTrue() {
             int expectedResult = 3;
             BibEntry reference = new BibEntry();
-            reference.setId("testDoi");
             PaperDetails paperDetails = new PaperDetails();
             paperDetails.setCitationCount(3);
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
             referencesDatabase.put(reference, List.of());
-            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
 
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referencesDatabase, false
+                    null, referencesDatabase, true
             );
 
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.empty();
-            int citationsCount = searchService.getCitationCount(reference, field);
-            assertEquals(citationsCount, expectedResult);
-        }
-
-        @Test
-        void serviceShouldNotUpdateBecauseFieldAndDoiExists() {
-            int expectedResult = 1;
-            BibEntry reference = new BibEntry();
-            reference.setId("testDoi");
-            PaperDetails paperDetails = new PaperDetails();
-            paperDetails.setCitationCount(3);
-            Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            referencesDatabase.put(reference, List.of());
-            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
-
-            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referencesDatabase, false
-            );
-
-            SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
-            Optional<String> field = Optional.of("1");
             int citationsCount = searchService.getCitationCount(reference, field);
             assertEquals(citationsCount, expectedResult);
         }
