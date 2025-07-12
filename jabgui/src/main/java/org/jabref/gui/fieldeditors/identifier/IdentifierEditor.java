@@ -30,10 +30,11 @@ import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
+import static org.jabref.model.entry.field.StandardField.CITATIONCOUNT;
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
-import static org.jabref.model.entry.field.StandardField.CITATIONCOUNT;
+
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML private BaseIdentifierEditorViewModel<?> viewModel;
@@ -67,7 +68,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
             case EPRINT ->
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
             case CITATIONCOUNT ->
-                    this.viewModel = new CitationCountEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager,stateManager,searchCitationsRelationsService);
+                    this.viewModel = new CitationCountEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, searchCitationsRelationsService);
 
             // TODO: Add support for PMID
             case null, default -> {

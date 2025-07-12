@@ -5,11 +5,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 import javafx.geometry.HPos;
-import javafx.geometry.Orientation;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Separator;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -74,8 +72,8 @@ public class SciteTab extends EntryEditorTab {
                         sciteResultsPane.add(getErrorPane(), 0, 0);
             }
         });
-
     }
+
     @Override
     public boolean shouldShow(BibEntry entry) {
         return viewModel.shouldShow();
