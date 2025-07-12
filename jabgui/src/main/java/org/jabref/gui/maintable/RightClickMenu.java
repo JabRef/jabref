@@ -96,7 +96,7 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences())),
                 factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences)),
                 factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor)),
-                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferences, taskExecutor)),
+                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor)),
                 extractFileReferencesOnline,
                 extractFileReferencesOffline,
 
