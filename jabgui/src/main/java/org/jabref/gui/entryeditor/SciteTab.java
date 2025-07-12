@@ -68,22 +68,14 @@ public class SciteTab extends EntryEditorTab {
             switch (status) {
                 case IN_PROGRESS ->
                         sciteResultsPane.add(progressIndicator, 0, 0);
-                case FOUND ->{
+                case FOUND ->
                         viewModel.getCurrentResult().ifPresent(result -> sciteResultsPane.add(getTalliesPane(result), 0, 0));
-                }
                 case ERROR ->
                         sciteResultsPane.add(getErrorPane(), 0, 0);
             }
         });
 
     }
-
-    private void setCitationCountPane(){
-        Separator separator = new Separator();
-        separator.setOrientation(Orientation.HORIZONTAL);
-        sciteResultsPane.add(separator,0,1);
-    }
-
     @Override
     public boolean shouldShow(BibEntry entry) {
         return viewModel.shouldShow();
