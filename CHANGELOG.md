@@ -10,6 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+
 - We added a new citationCount field on the General tab, in order to track this value for a given paper. [#13477](https://github.com/JabRef/jabref/issues/13477)
 - We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
