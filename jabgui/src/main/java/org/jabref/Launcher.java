@@ -55,28 +55,31 @@ public class Launcher {
         Injector.setModelOrService(BuildInfo.class, new BuildInfo());
 
         final JabRefGuiPreferences preferences = JabRefGuiPreferences.getInstance();
-        Injector.setModelOrService(CliPreferences.class, preferences);
-        Injector.setModelOrService(GuiPreferences.class, preferences);
-
-        // Early exit in case another instance is already running
-        MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());
-        if (instanceAction == MultipleInstanceAction.SHUTDOWN) {
-            systemExit();
-        } else if (instanceAction == MultipleInstanceAction.FOCUS) {
-            // Send focus command to running instance
-            RemotePreferences remotePreferences = preferences.getRemotePreferences();
-            RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
-            remoteClient.sendFocus();
-            systemExit();
-        }
-
-        configureProxy(preferences.getProxyPreferences());
-        configureSSL(preferences.getSSLPreferences());
 
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(
                 args,
                 ArgumentProcessor.Mode.INITIAL_START,
                 preferences);
+
+        if (!argumentProcessor.getGuiCli().usageHelpRequested) {
+            Injector.setModelOrService(CliPreferences.class, preferences);
+            Injector.setModelOrService(GuiPreferences.class, preferences);
+
+            // Early exit in case another instance is already running
+            MultipleInstanceAction instanceAction = handleMultipleAppInstances(args, preferences.getRemotePreferences());
+            if (instanceAction == MultipleInstanceAction.SHUTDOWN) {
+                systemExit();
+            } else if (instanceAction == MultipleInstanceAction.FOCUS) {
+                // Send focus command to running instance
+                RemotePreferences remotePreferences = preferences.getRemotePreferences();
+                RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());
+                remoteClient.sendFocus();
+                systemExit();
+            }
+
+            configureProxy(preferences.getProxyPreferences());
+            configureSSL(preferences.getSSLPreferences());
+        }
 
         List<UiCommand> uiCommands = argumentProcessor.processArguments();
         if (argumentProcessor.shouldShutDown()) {
@@ -146,6 +149,7 @@ public class Launcher {
      */
     private static MultipleInstanceAction handleMultipleAppInstances(String[] args, RemotePreferences remotePreferences) {
         LOGGER.trace("Checking for remote handling...");
+
         if (remotePreferences.useRemoteServer()) {
             // Try to contact already running JabRef
             RemoteClient remoteClient = new RemoteClient(remotePreferences.getPort());

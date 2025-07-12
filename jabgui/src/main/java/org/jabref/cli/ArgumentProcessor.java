@@ -102,4 +102,8 @@ public class ArgumentProcessor {
     public boolean shouldShutDown() {
         return !guiNeeded;
     }
+
+    public GuiCommandLine getGuiCli() {
+        return guiCli;
+    }
 }
