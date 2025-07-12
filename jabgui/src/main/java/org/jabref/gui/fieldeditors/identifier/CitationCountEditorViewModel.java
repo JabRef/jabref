@@ -1,5 +1,7 @@
 package org.jabref.gui.fieldeditors.identifier;
 
+import java.util.Optional;
+
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
@@ -43,8 +45,8 @@ public class CitationCountEditorViewModel extends BaseIdentifierEditorViewModel<
     }
     @Override
     public void lookupIdentifier(BibEntry bibEntry) {
-
-        BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(bibEntry))
+        Optional<String> fieldAux = entry.getField(field);
+        BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(bibEntry,fieldAux))
                       .onRunning(() -> identifierLookupInProgress.setValue(true))
                       .onFinished(() -> identifierLookupInProgress.setValue(false))
                       .onSuccess(identifier -> {

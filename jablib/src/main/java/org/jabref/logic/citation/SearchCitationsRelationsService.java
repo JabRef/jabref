@@ -85,15 +85,21 @@ public class SearchCitationsRelationsService {
         return relationsRepository.readCitations(cited);
     }
 
-    public int getCitationCount(BibEntry citationCounted){
-        Optional<PaperDetails> citationCountResult = null;
-        try {
-             citationCountResult = citationFetcher.searchCitationCount(citationCounted);
-        } catch (FetcherException e) {
-            LOGGER.error("Error while fetching citiation count for entry", e);
-        }
+    public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue){
 
-        return citationCountResult.map(PaperDetails::getCitationCount).orElse(0);
+        Optional<PaperDetails> citationCountResult = null;
+        boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(citationCounted)
+                || !actualFieldValue.isPresent();
+        if (isFetchingAllowed) {
+            try {
+                citationCountResult = citationFetcher.searchCitationCount(citationCounted);
+            } catch (
+                    FetcherException e) {
+                LOGGER.error("Error while fetching citiation count for entry", e);
+            }
+            return citationCountResult.map(PaperDetails::getCitationCount).orElse(0);
+        }
+        return  Integer.valueOf( actualFieldValue.get());
     }
 
     public void close() {
