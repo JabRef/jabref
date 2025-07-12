@@ -8,6 +8,7 @@ module org.jabref.jabsrv {
     opens org.jabref.http.server to org.glassfish.hk2.utilities, org.glassfish.hk2.locator;
     exports org.jabref.http.server.cayw;
     opens org.jabref.http.server.cayw to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities;
+    opens org.jabref.http.dto to com.google.gson;
 
     requires javafx.base;
 
