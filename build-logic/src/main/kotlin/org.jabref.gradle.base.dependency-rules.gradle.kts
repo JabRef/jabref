@@ -363,7 +363,7 @@ extraJavaModuleInfo {
         requires("java.xml")
         requires("jakarta.xml.bind")
     }
-    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "jersey.test.provider.grizzly2") {
+    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "jersey.test.framework.provider.grizzly2") {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
