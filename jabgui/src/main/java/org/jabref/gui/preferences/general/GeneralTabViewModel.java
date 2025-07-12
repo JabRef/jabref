@@ -111,6 +111,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final Validator remotePortValidator;
     private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
+    private final StringProperty httpPortProperty = new SimpleStringProperty("");
+    private final Validator httpPortValidator;
     private final TrustStoreManager trustStoreManager;
 
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -160,12 +162,26 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
-
+        httpPortValidator = new FunctionBasedValidator<>(
+                httpPortProperty,
+                input -> {
+                    try {
+                        int portNumber = Integer.parseInt(httpPortProperty().getValue());
+                        return RemoteUtil.isUserPort(portNumber);
+                    } catch (NumberFormatException ex) {
+                        return false;
+                    }
+                },
+                ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
         this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
 
     public ValidationStatus remotePortValidationStatus() {
         return remotePortValidator.getValidationStatus();
+    }
+
+    public ValidationStatus httpPortValidationStatus() {
+        return httpPortValidator.getValidationStatus();
     }
 
     @Override
@@ -210,6 +226,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
 
         enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());
+        httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpPort()));
     }
 
     @Override
@@ -276,6 +293,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             remoteListenerServerManager.stop();
         }
 
+        getPortAsInt(httpPortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentHttpPort(newPort)) {
+                remotePreferences.setHttpPort(newPort);
+            }
+        });
+
         HttpServerManager httpServerManager = Injector.instantiateModelOrService(HttpServerManager.class);
         // stop in all cases, because the port might have changed
         httpServerManager.stop();
@@ -306,6 +329,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             validator.addValidators(remotePortValidator);
+        }
+
+        if (enableHttpServerProperty.getValue()) {
+            validator.addValidators(httpPortValidator);
         }
 
         if (fontOverrideProperty.getValue()) {
@@ -440,6 +467,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableHttpServerProperty() {
         return enableHttpServerProperty;
+    }
+
+    public StringProperty httpPortProperty() {
+        return httpPortProperty;
     }
 
     public void openBrowser() {
