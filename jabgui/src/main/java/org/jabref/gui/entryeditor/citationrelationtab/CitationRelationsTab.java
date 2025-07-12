@@ -20,6 +20,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
@@ -199,24 +200,29 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
+        HBox citiesRelationsPlaceholder = createPlaceholder();
+        HBox citiedByRelationsPlaceholder = createPlaceholder();
+
         refreshCitingButton.setOnMouseClicked(_ -> {
             searchForRelations(
-                    entry, 
-                    citingListView, 
+                    entry,
+                    citingListView,
+                    citiesRelationsPlaceholder,
                     abortCitingButton,
-                    refreshCitingButton, 
-                    CitationFetcher.SearchType.CITES, 
-                    importCitingButton, 
+                    refreshCitingButton,
+                    CitationFetcher.SearchType.CITES,
+                    importCitingButton,
                     citingProgress);
         });
 
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(
-                entry, 
-                citedByListView, 
+                entry,
+                citedByListView,
+                citiedByRelationsPlaceholder,
                 abortCitedButton,
-                refreshCitedByButton, 
-                CitationFetcher.SearchType.CITED_BY, 
-                importCitedByButton, 
+                refreshCitedByButton,
+                CitationFetcher.SearchType.CITED_BY,
+                importCitedByButton,
                 citedByProgress));
 
         // Create SplitPane to hold all nodes above
@@ -225,24 +231,40 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citingListView);
 
         searchForRelations(
-                entry, 
-                citingListView, 
-                abortCitingButton, 
+                entry,
+                citingListView,
+                citiesRelationsPlaceholder,
+                abortCitingButton,
                 refreshCitingButton,
-                CitationFetcher.SearchType.CITES, 
-                importCitingButton, 
+                CitationFetcher.SearchType.CITES,
+                importCitingButton,
                 citingProgress);
 
         searchForRelations(
-                entry, 
-                citedByListView, 
-                abortCitedButton, 
+                entry,
+                citedByListView,
+                citiedByRelationsPlaceholder,
+                abortCitedButton,
                 refreshCitedByButton,
-                CitationFetcher.SearchType.CITED_BY, 
-                importCitedByButton, 
+                CitationFetcher.SearchType.CITED_BY,
+                importCitedByButton,
                 citedByProgress);
 
         return container;
+    }
+
+    private static HBox createPlaceholder() {
+        HBox placeholderHBox = new HBox();
+        Label placeholder = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
+        Hyperlink doiLookUpLink = new Hyperlink(Localization.lang("Look Up a DOI and try again."));
+
+        placeholderHBox.getChildren().add(placeholder);
+        placeholderHBox.getChildren().add(doiLookUpLink);
+        placeholderHBox.setSpacing(2d);
+        placeholderHBox.setStyle("-fx-alignment: center;");
+        placeholderHBox.setFillHeight(true);
+
+        return placeholderHBox;
     }
 
     /**
@@ -428,19 +450,19 @@ public class CitationRelationsTab extends EntryEditorTab {
      *
      * @param entry         BibEntry currently selected in Jabref Database
      * @param listView      ListView to use
+     * @param placeholder
      * @param abortButton   Button to stop the search
      * @param refreshButton refresh Button to use
      * @param searchType    type of search (CITING / CITEDBY)
      */
-    private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, Button abortButton,
+    private void searchForRelations(BibEntry entry, CheckListView<CitationRelationItem> listView, HBox placeholder, Button abortButton,
                                     Button refreshButton, CitationFetcher.SearchType searchType, Button importButton,
                                     ProgressIndicator progress) {
         if (entry.getDOI().isEmpty()) {
             hideNodes(abortButton, progress);
             showNodes(refreshButton);
             listView.getItems().clear();
-            listView.setPlaceholder(
-                    new Label(Localization.lang("The selected entry doesn't have a DOI linked to it. Lookup a DOI and try again.")));
+            listView.setPlaceholder(placeholder);
             return;
         }
 
