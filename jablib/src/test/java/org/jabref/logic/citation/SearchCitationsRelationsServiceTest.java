@@ -38,7 +38,7 @@ class SearchCitationsRelationsServiceTest {
                     return List.of();
                 },
                 entry -> {
-                    if (entry == targetEntry){
+                    if (entry == targetEntry) {
                         return paperDetailsReturn != null ? paperDetailsReturn : Optional.empty();
                     }
                     return Optional.empty();
@@ -83,7 +83,7 @@ class SearchCitationsRelationsServiceTest {
             BibEntry newCitations = new BibEntry();
             List<BibEntry> citationsToReturn = List.of(newCitations);
             Map<BibEntry, List<BibEntry>> citationsDatabase = HashMap.newHashMap(300);
-            CitationFetcher fetcher = createMockFetcher(cited, citationsToReturn, null,null);
+            CitationFetcher fetcher = createMockFetcher(cited, citationsToReturn, null, null);
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     _ -> citationsToReturn,
                     citationsDatabase::put,
@@ -109,8 +109,8 @@ class SearchCitationsRelationsServiceTest {
             BibEntry newCitations = new BibEntry();
             List<BibEntry> citationsToReturn = List.of(newCitations);
             Map<BibEntry, List<BibEntry>> citationsDatabase = HashMap.newHashMap(300);
-            CitationFetcher fetcher = createMockFetcher(cited, citationsToReturn, null,null);
-            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null,true);
+            CitationFetcher fetcher = createMockFetcher(cited, citationsToReturn, null, null);
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null, true);
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
@@ -127,7 +127,7 @@ class SearchCitationsRelationsServiceTest {
             BibEntry cited = new BibEntry();
             Map<BibEntry, List<BibEntry>> citationsDatabase = new HashMap<>();
             CitationFetcher fetcher = createEmptyMockFetcher();
-            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null,true);
+            BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(citationsDatabase, null, true);
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
@@ -166,7 +166,7 @@ class SearchCitationsRelationsServiceTest {
             BibEntry newReference = new BibEntry();
             List<BibEntry> referencesToReturn = List.of(newReference);
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            CitationFetcher fetcher = createMockFetcher(referencer, null, referencesToReturn,null);
+            CitationFetcher fetcher = createMockFetcher(referencer, null, referencesToReturn, null);
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     List::of,
                     (_, _) -> { },
@@ -192,9 +192,9 @@ class SearchCitationsRelationsServiceTest {
             BibEntry newCitations = new BibEntry();
             List<BibEntry> referencesToReturn = List.of(newCitations);
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            CitationFetcher fetcher = createMockFetcher(reference, null, referencesToReturn,null);
+            CitationFetcher fetcher = createMockFetcher(reference, null, referencesToReturn, null);
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referencesDatabase,true
+                    null, referencesDatabase, true
             );
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
@@ -213,7 +213,7 @@ class SearchCitationsRelationsServiceTest {
             Map<BibEntry, List<BibEntry>> referenceDatabase = new HashMap<>();
             CitationFetcher fetcher = createEmptyMockFetcher();
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referenceDatabase,true
+                    null, referenceDatabase, true
             );
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
@@ -227,81 +227,78 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldUpdateCitationCountWithEmptyPaperDetailsResponse(){
+        void serviceShouldUpdateCitationCountWithEmptyPaperDetailsResponse() {
             int expectedResult = 0;
             BibEntry referencer = new BibEntry();
             Map<BibEntry, List<BibEntry>> referenceDatabase = new HashMap<>();
             CitationFetcher fetcher = createEmptyMockFetcher();
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referenceDatabase,true
+                    null, referenceDatabase, true
             );
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.empty();
-            int citationsCount = searchService.getCitationCount(referencer,field);
-            assertEquals(citationsCount,expectedResult);
+            int citationsCount = searchService.getCitationCount(referencer, field);
+            assertEquals(citationsCount, expectedResult);
         }
 
         @Test
-        void serviceShouldCorrectlyFetchCitationCountField(){
+        void serviceShouldCorrectlyFetchCitationCountField() {
             int expectedResult = 3;
             BibEntry reference = new BibEntry();
             PaperDetails paperDetails = new PaperDetails();
             paperDetails.setCitationCount(3);
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            CitationFetcher fetcher = createMockFetcher(reference, null, null,Optional.of(paperDetails));
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
 
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referencesDatabase,true
+                    null, referencesDatabase, true
             );
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.empty();
-            int citationsCount = searchService.getCitationCount(reference,field);
-            assertEquals(citationsCount,expectedResult);
-
+            int citationsCount = searchService.getCitationCount(reference, field);
+            assertEquals(citationsCount, expectedResult);
         }
 
         @Test
-        void serviceShouldUpdateBecauseIsisCitationsUpdatableFalse(){
+        void serviceShouldUpdateBecauseIsisCitationsUpdatableFalse() {
             int expectedResult = 3;
             BibEntry reference = new BibEntry();
             reference.setId("testDoi");
             PaperDetails paperDetails = new PaperDetails();
             paperDetails.setCitationCount(3);
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            referencesDatabase.put(reference,List.of());
-            CitationFetcher fetcher = createMockFetcher(reference, null, null,Optional.of(paperDetails));
+            referencesDatabase.put(reference, List.of());
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
 
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referencesDatabase,false
+                    null, referencesDatabase, false
             );
 
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.empty();
-            int citationsCount = searchService.getCitationCount(reference,field);
-            assertEquals(citationsCount,expectedResult);
-
+            int citationsCount = searchService.getCitationCount(reference, field);
+            assertEquals(citationsCount, expectedResult);
         }
 
         @Test
-        void serviceShouldNotUpdateBecauseFieldAndDoiExists(){
+        void serviceShouldNotUpdateBecauseFieldAndDoiExists() {
             int expectedResult = 1;
             BibEntry reference = new BibEntry();
             reference.setId("testDoi");
             PaperDetails paperDetails = new PaperDetails();
             paperDetails.setCitationCount(3);
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            referencesDatabase.put(reference,List.of());
-            CitationFetcher fetcher = createMockFetcher(reference, null, null,Optional.of(paperDetails));
+            referencesDatabase.put(reference, List.of());
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
 
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
-                    null, referencesDatabase,false
+                    null, referencesDatabase, false
             );
 
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.of("1");
-            int citationsCount = searchService.getCitationCount(reference,field);
-            assertEquals(citationsCount,expectedResult);
-
+            int citationsCount = searchService.getCitationCount(reference, field);
+            assertEquals(citationsCount, expectedResult);
         }
     }
 }
