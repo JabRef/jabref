@@ -238,7 +238,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.empty();
             int citationsCount = searchService.getCitationCount(referencer,field);
-            assertEquals(expectedResult,citationsCount);
+            assertEquals(citationsCount,expectedResult);
         }
 
         @Test
@@ -256,7 +256,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.empty();
             int citationsCount = searchService.getCitationCount(reference,field);
-            assertEquals(expectedResult,citationsCount);
+            assertEquals(citationsCount,expectedResult);
 
         }
 
@@ -278,7 +278,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.empty();
             int citationsCount = searchService.getCitationCount(reference,field);
-            assertEquals(expectedResult,citationsCount);
+            assertEquals(citationsCount,expectedResult);
 
         }
 
@@ -300,7 +300,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
             Optional<String> field = Optional.of("1");
             int citationsCount = searchService.getCitationCount(reference,field);
-            assertEquals(expectedResult,citationsCount);
+            assertEquals(citationsCount,expectedResult);
 
         }
     }
