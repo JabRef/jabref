@@ -2,7 +2,13 @@ package org.jabref.gui.preferences.ai;
 
 import java.util.Optional;
 
+import java.io.File;
+
 import javafx.application.Platform;
+import javafx.scene.layout.GridPane;
+import javafx.stage.DirectoryChooser;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
@@ -13,7 +19,11 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -56,6 +66,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private IntegerInputField documentSplitterOverlapSizeTextField;
     @FXML private IntegerInputField ragMaxResultsCountTextField;
     @FXML private TextField ragMinScoreTextField;
+    @FXML private TextField tessdataPathField;
 
     @FXML private TabPane templatesTabPane;
     @FXML private Tab systemMessageForChattingTab;
@@ -91,6 +102,11 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferences);
 
+        GridPane layout = (GridPane) this.getChildren().get(0);
+        addOcrSettings(layout, /* insert at row: */ 30);
+
+        setValues();
+
         initializeEnableAi();
         initializeAiProvider();
         initializeChatModel();
@@ -106,6 +122,58 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_GENERAL_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), generalSettingsHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EXPERT_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), expertSettingsHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_TEMPLATES, dialogService, preferences.getExternalApplicationsPreferences()), templatesHelp);
+    }
+
+    private void addOcrSettings(GridPane builder, int currentRow) {
+        Separator ocrSeparator = new Separator();
+        ocrSeparator.setPadding(new Insets(20, 0, 20, 0));
+        builder.add(ocrSeparator, 0, currentRow++, 3, 1);
+
+        Label ocrSectionLabel = new Label(Localization.lang("OCR Settings"));
+        ocrSectionLabel.getStyleClass().add("sectionHeader");
+        builder.add(ocrSectionLabel, 0, currentRow++, 3, 1);
+
+        Label tessdataLabel = new Label(Localization.lang("Tessdata directory") + ":");
+        tessdataPathField = new TextField();
+        tessdataPathField.setPrefWidth(400);
+        tessdataPathField.setPromptText(Localization.lang("Path to tessdata directory (e.g., /usr/local/share/tessdata)"));
+
+        Button browseButton = new Button(Localization.lang("Browse"));
+        browseButton.setOnAction(event -> selectTessdataDirectory());
+
+        HBox tessdataBox = new HBox(10);
+        tessdataBox.setAlignment(Pos.CENTER_LEFT);
+        tessdataBox.getChildren().addAll(tessdataPathField, browseButton);
+
+        builder.add(tessdataLabel, 0, currentRow);
+        builder.add(tessdataBox, 1, currentRow++, 2, 1);
+
+        Text helpText = new Text(Localization.lang(
+                "Leave empty to use system default. You can also set TESSDATA_PREFIX environment variable."
+        ));
+        helpText.getStyleClass().add("help-text");
+        helpText.setWrappingWidth(600);
+        builder.add(helpText, 1, currentRow++, 2, 1);
+    }
+
+    private void selectTessdataDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle(Localization.lang("Select tessdata directory"));
+
+        String currentPath = tessdataPathField.getText().trim();
+        if (!currentPath.isEmpty()) {
+            File currentDir = new File(currentPath);
+            if (currentDir.exists() && currentDir.isDirectory()) {
+                directoryChooser.setInitialDirectory(
+                        currentDir.getName().equals("tessdata") ? currentDir.getParentFile() : currentDir
+                );
+            }
+        }
+
+        File selectedDirectory = directoryChooser.showDialog(tessdataPathField.getScene().getWindow());
+        if (selectedDirectory != null) {
+            tessdataPathField.setText(selectedDirectory.getAbsolutePath());
+        }
     }
 
     private void initializeTemplates() {
@@ -298,4 +366,21 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         return Optional.empty();
     }
+
+    @Override
+    public void setValues() {
+        // Load stored OCR path into the field
+        tessdataPathField.setText(preferences.getFilePreferences().getOcrTessdataPath());
+
+        // Optional: also load default AI values here if needed in the future
+    }
+
+    @Override
+    public void storeSettings() {
+        // Save OCR path to preferences
+        preferences.getFilePreferences().setOcrTessdataPath(tessdataPathField.getText().trim());
+
+        // Optional: also store other AI settings if you're not already doing so elsewhere
+    }
+
 }

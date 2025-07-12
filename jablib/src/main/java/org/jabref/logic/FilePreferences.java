@@ -35,6 +35,7 @@ public class FilePreferences {
     private final ObjectProperty<Path> lastUsedDirectory = new SimpleObjectProperty<>();
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
+    private final StringProperty ocrTessdataPath = new SimpleStringProperty();
 
     public FilePreferences(String userAndHost,
                            String mainFileDirectory,
@@ -51,7 +52,8 @@ public class FilePreferences {
                            boolean shouldKeepDownloadUrl,
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
-                           boolean openFileExplorerInLastUsedDirectory) {
+                           boolean openFileExplorerInLastUsedDirectory,
+                           String ocrTessdataPath) {
         this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
@@ -68,6 +70,7 @@ public class FilePreferences {
         this.lastUsedDirectory.setValue(lastUsedDirectory);
         this.openFileExplorerInFileDirectory.set(openFileExplorerInFileDirectory);
         this.openFileExplorerInLastUsedDirectory.set(openFileExplorerInLastUsedDirectory);
+        this.ocrTessdataPath.setValue(ocrTessdataPath);
     }
 
     public String getUserAndHost() {
@@ -261,4 +264,26 @@ public class FilePreferences {
     public void setOpenFileExplorerInLastUsedDirectory(boolean value) {
         this.openFileExplorerInLastUsedDirectory.set(value);
     }
+
+    public String getOcrTessdataPath() {
+        return ocrTessdataPath.get();
+    }
+
+    public void setOcrTessdataPath(String path) {
+        this.ocrTessdataPath.set(path);
+    }
+
+    /**
+     * Still TO-DO: Override those (in other file):
+     * @Override
+     * public String getOcrTessdataPath() {
+     *     return get(OCR_TESSDATA_PATH);  // Returns empty string if not set
+     * }
+     *
+     * @Override
+     * public void setOcrTessdataPath(String path) {
+     *     put(OCR_TESSDATA_PATH, path);
+     *
+     */
+
 }

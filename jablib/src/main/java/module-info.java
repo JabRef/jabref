@@ -106,6 +106,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git;
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
+    exports org.jabref.logic.ocr;
 
     requires java.base;
 
@@ -188,6 +189,7 @@ open module org.jabref.jablib {
     requires org.apache.pdfbox;
     requires org.apache.xmpbox;
     requires com.ibm.icu;
+    requires net.sourceforge.tess4j;
 
     requires flexmark;
     requires flexmark.html2md.converter;

@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
@@ -41,6 +42,7 @@ public class ContextMenuFactoryTest {
     private ContextMenuFactory factory;
     private ContextMenuFactory.SingleContextCommandFactory singleCommandFactory;
     private ContextMenuFactory.MultiContextCommandFactory multiCommandFactory;
+    private TaskExecutor taskExecutor;
 
     @BeforeAll
     public static void initToolkit() {
@@ -78,7 +80,8 @@ public class ContextMenuFactoryTest {
                 bibEntry,
                 viewModel,
                 singleCommandFactory,
-                multiCommandFactory
+                multiCommandFactory,
+                taskExecutor
         );
     }
 
