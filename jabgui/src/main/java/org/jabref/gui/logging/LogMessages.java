@@ -12,6 +12,9 @@ import org.tinylog.core.LogEntry;
 public class LogMessages {
 
     private static LogMessages instance = new LogMessages();
+    
+    // Maximum number of log messages to keep in memory
+    private static final int MAX_MESSAGES = 10000;
 
     private final ObservableList<LogEntry> messages = FXCollections.observableArrayList();
 
@@ -28,6 +31,11 @@ public class LogMessages {
 
     public void add(LogEntry event) {
         messages.add(event);
+        
+        // Keep only the last MAX_MESSAGES messages to prevent memory issues
+        if (messages.size() > MAX_MESSAGES) {
+            messages.remove(0, messages.size() - MAX_MESSAGES);
+        }
     }
 
     public void clear() {

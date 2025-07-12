@@ -144,6 +144,9 @@ public class JabRefGUI extends Application {
     }
 
     public void initialize() {
+        // Set JavaFX ListView cell count limit to handle large libraries
+        System.setProperty("javafx.scene.control.ListView.maxCellCount", "50000");
+        
         WebViewStore.init();
 
         DefaultFileUpdateMonitor fileUpdateMonitor = new DefaultFileUpdateMonitor();

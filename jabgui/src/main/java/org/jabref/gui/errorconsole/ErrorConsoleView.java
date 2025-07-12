@@ -70,12 +70,28 @@ public class ErrorConsoleView extends BaseDialog<Void> {
         viewModel = new ErrorConsoleViewModel(dialogService, preferences, clipBoardManager, buildInfo);
         messagesListView.setCellFactory(createCellFactory());
         messagesListView.itemsProperty().bind(viewModel.allMessagesDataProperty());
-        messagesListView.scrollTo(viewModel.allMessagesDataProperty().getSize() - 1);
+        
+        // Safe scrolling to last item
+        int initialSize = viewModel.allMessagesDataProperty().size();
+        if (initialSize > 0) {
+            try {
+                messagesListView.scrollTo(initialSize - 1);
+            } catch (Exception e) {
+                // Fallback: scroll to a safe position
+                messagesListView.scrollTo(Math.min(initialSize - 1, 1000));
+            }
+        }
+        
         messagesListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         viewModel.allMessagesDataProperty().addListener((ListChangeListener<LogEventViewModel>) (change -> {
             int size = viewModel.allMessagesDataProperty().size();
             if (size > 0) {
-                messagesListView.scrollTo(size - 1);
+                try {
+                    messagesListView.scrollTo(size - 1);
+                } catch (Exception e) {
+                    // Fallback: scroll to a safe position
+                    messagesListView.scrollTo(Math.min(size - 1, 1000));
+                }
             }
         }));
         descriptionLabel.setGraphic(IconTheme.JabRefIcons.CONSOLE.getGraphicNode());
