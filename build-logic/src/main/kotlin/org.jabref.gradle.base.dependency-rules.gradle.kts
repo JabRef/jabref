@@ -82,6 +82,7 @@ jvmDependencyConflicts.patch {
 
 extraJavaModuleInfo {
     failOnAutomaticModules = true
+    failOnModifiedDerivedModuleNames = true
     skipLocalJars = true
 
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
