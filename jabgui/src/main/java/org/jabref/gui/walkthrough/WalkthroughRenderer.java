@@ -85,11 +85,10 @@ public class WalkthroughRenderer {
 
     private void configurePanelSize(VBox panel, PanelStep step) {
         boolean isVertical = step.position() == PanelPosition.LEFT || step.position() == PanelPosition.RIGHT;
+        VBox.setVgrow(panel, Priority.ALWAYS);
 
         if (isVertical) {
             panel.getStyleClass().add("walkthrough-side-panel-vertical");
-            VBox.setVgrow(panel, Priority.ALWAYS);
-            panel.setMaxHeight(Double.MAX_VALUE);
             step.width().ifPresent(width -> {
                 panel.setPrefWidth(width);
                 panel.setMaxWidth(width);
@@ -97,8 +96,6 @@ public class WalkthroughRenderer {
             });
         } else if (step.position() == PanelPosition.TOP || step.position() == PanelPosition.BOTTOM) {
             panel.getStyleClass().add("walkthrough-side-panel-horizontal");
-            HBox.setHgrow(panel, Priority.ALWAYS);
-            panel.setMaxWidth(Double.MAX_VALUE);
             step.height().ifPresent(height -> {
                 panel.setPrefHeight(height);
                 panel.setMaxHeight(height);
@@ -114,6 +111,7 @@ public class WalkthroughRenderer {
     private Node render(TextBlock textBlock) {
         Label textLabel = new Label(Localization.lang(textBlock.text()));
         textLabel.getStyleClass().add("walkthrough-text-content");
+        textLabel.setWrapText(true);
         return textLabel;
     }
 
@@ -122,6 +120,7 @@ public class WalkthroughRenderer {
         infoContainer.getStyleClass().add("walkthrough-info-container");
         JabRefIconView icon = new JabRefIconView(IconTheme.JabRefIcons.INTEGRITY_INFO);
         Label infoLabel = new Label(Localization.lang(infoBlock.text()));
+        infoLabel.setWrapText(true);
         HBox.setHgrow(infoLabel, Priority.ALWAYS);
         infoContainer.getChildren().addAll(icon, infoLabel);
         return infoContainer;
