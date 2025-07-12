@@ -16,10 +16,14 @@ import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMerger;
 import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
+import org.jabref.logic.bibtex.comparator.ComparisonResult;
+import org.jabref.logic.bibtex.comparator.YearFieldValuePlausibilityComparator;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.InternalField;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.EntryTypeFactory;
+import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.strings.StringUtil;
 
 import com.tobiasdiez.easybind.EasyBind;
@@ -118,6 +122,25 @@ public class FieldRowViewModel {
         });
 
         EasyBind.subscribe(hasEqualLeftAndRightBinding(), this::setIsFieldsMerged);
+    }
+
+    public void autoSelectBetterValue() {
+        String leftValue = getLeftFieldValue();
+        String rightValue = getRightFieldValue();
+
+        if (StandardField.YEAR == field) {
+                YearFieldValuePlausibilityComparator comparator = new YearFieldValuePlausibilityComparator();
+                ComparisonResult comparison = comparator.compare(leftValue, rightValue);
+                if (ComparisonResult.RIGHT_BETTER == comparison) {
+                    selectRightValue();
+                } else if (ComparisonResult.LEFT_BETTER == comparison) {
+                    selectLeftValue();
+                }
+        } else if (InternalField.TYPE_HEADER == field) {
+            if (leftValue.equalsIgnoreCase(StandardEntryType.Misc.getName())) {
+                selectRightValue();
+            }
+        }
     }
 
     public void selectNonEmptyValue() {

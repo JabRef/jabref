@@ -38,17 +38,17 @@ module org.jabref.jabsrv {
     requires jakarta.validation;
     requires jakarta.ws.rs;
 
-    requires org.glassfish.jersey.common;
+    requires jersey.common;
 
     requires net.harawata.appdirs;
     requires com.sun.jna;
     requires com.sun.jna.platform;
 
-    requires org.jbibtex;
-    requires de.undercouch.citeproc.java;
+    requires jbibtex;
+    requires citeproc.java;
 
     requires transitive org.jspecify;
     requires java.logging;
-    requires org.glassfish.jersey.grizzly2.http;
-    requires org.glassfish.jersey.server;
+    requires jersey.container.grizzly2.http;
+    requires jersey.server;
 }

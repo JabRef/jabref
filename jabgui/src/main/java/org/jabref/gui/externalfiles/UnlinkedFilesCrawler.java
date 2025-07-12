@@ -19,15 +19,16 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.DateRange;
 import org.jabref.logic.externalfiles.ExternalFileSorter;
 import org.jabref.logic.util.BackgroundTask;
-import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Util class for searching files on the file system which are not linked to a provided {@link BibDatabase}.
- */
+/// Util class for searching files on the file system which are not linked to a provided {@link org.jabref.model.database.BibDatabase}.
+///
+/// The result is used to create *new* entries. The user has then to use the duplicate check to merge the entries.
+///
+/// Related: {@link org.jabref.gui.externalfiles.AutoSetFileLinksUtil#findAssociatedNotLinkedFiles}
 public class UnlinkedFilesCrawler extends BackgroundTask<FileNodeViewModel> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UnlinkedFilesCrawler.class);
