@@ -18,6 +18,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -37,6 +42,7 @@ import org.jabref.logic.FilePreferences;
 import org.jabref.logic.externalfiles.LinkedFileHandler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -268,20 +274,54 @@ public class LinkedFileViewModel extends AbstractViewModel {
         boolean overwriteFile = false;
 
         if (existingFile.isPresent()) {
-            overwriteFile = dialogService.showConfirmationDialogAndWait(
-                    Localization.lang("File exists"),
-                    Localization.lang("'%0' exists. Overwrite file?", targetFileName),
-                    Localization.lang("Overwrite"));
+            // Get existing file path and its directory
+            Path existingFilePath = existingFile.get();
+            Path targetDirectory = existingFilePath.getParent();
 
-            if (!overwriteFile) {
+            // Suggest a non-conflicting file name
+            String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, targetFileName);
+
+            // Define available dialog options
+            ButtonType Replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OTHER);
+            ButtonType keepBoth = new ButtonType(Localization.lang("Keep both"), ButtonBar.ButtonData.OTHER);
+            ButtonType provideAlternative = new ButtonType(Localization.lang("Provide alternative file name"), ButtonBar.ButtonData.OTHER);
+            ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.OTHER);
+
+            // Build the dialog window
+            Dialog<ButtonType> dialog = new Dialog<>();
+            dialog.setTitle(Localization.lang("File already exists"));
+            dialog.setContentText(Localization.lang("File name: \n'%0'", targetFileName));
+            dialog.getDialogPane().getButtonTypes().addAll(Replace, keepBoth, provideAlternative, cancel);
+
+            // Add tooltip to "Keep both" button with the suggested name
+            Button keepBothButton = (Button) dialog.getDialogPane().lookupButton(keepBoth);
+            if (keepBothButton != null) {
+                keepBothButton.setTooltip(new Tooltip(Localization.lang("New filename: %0", suggestedFileName)));
+            }
+
+            // Show dialog and handle user response
+            Optional<ButtonType> result = dialog.showAndWait();
+
+            if (result.isEmpty() || result.get() == cancel) {
+                return; // User canceled
+            } else if (result.get() == Replace) {
+                overwriteFile = true;
+            } else if (result.get() == keepBoth) {
+                targetFileName = suggestedFileName;
+            } else if (result.get() == provideAlternative) {
+                askForNameAndRename();
                 return;
             }
         }
 
         try {
+            // Attempt the rename operation
             linkedFileHandler.renameToName(targetFileName, overwriteFile);
         } catch (IOException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Rename failed"), Localization.lang("JabRef cannot access the file because it is being used by another process."));
+            // Display an error dialog if file is locked or inaccessible
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("Rename failed"),
+                    Localization.lang("JabRef cannot access the file because it is being used by another process."));
         }
     }
 
