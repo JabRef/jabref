@@ -1,8 +1,10 @@
 package org.jabref.logic.importer.fetcher.citation;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -39,6 +41,14 @@ public interface CitationFetcher {
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
     List<BibEntry> searchCiting(BibEntry entry) throws FetcherException;
+
+    /**
+     * get the  paper details that includes citation count field for a given {@link BibEntry}.
+     *
+     * @param entry entry to search citation count field
+     * @return @link Optional<PaperDetails>, paper details that includes citation count field (may be empty)
+     */
+    Optional<PaperDetails> searchCitationCount(BibEntry entry) throws FetcherException;
 
     /**
      * Returns the localized name of this fetcher.

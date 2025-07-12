@@ -1,6 +1,7 @@
 package org.jabref.logic.citation;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
@@ -9,6 +10,7 @@ import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.ImporterPreferences;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
+import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.logic.importer.fetcher.citation.semanticscholar.SemanticScholarCitationFetcher;
 import org.jabref.logic.util.Directories;
 import org.jabref.model.entry.BibEntry;
@@ -81,6 +83,23 @@ public class SearchCitationsRelationsService {
             }
         }
         return relationsRepository.readCitations(cited);
+    }
+
+    public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue){
+
+        Optional<PaperDetails> citationCountResult = Optional.empty();
+        boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(citationCounted)
+                || !actualFieldValue.isPresent();
+        if (isFetchingAllowed) {
+            try {
+                citationCountResult = citationFetcher.searchCitationCount(citationCounted);
+            } catch (
+                    FetcherException e) {
+                LOGGER.error("Error while fetching citation count for entry", e);
+            }
+            return citationCountResult.map(PaperDetails::getCitationCount).orElse(0);
+        }
+        return  Integer.valueOf( actualFieldValue.get());
     }
 
     public void close() {

@@ -72,10 +72,10 @@ public class FieldEditors {
             return new UrlEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
             return new JournalEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
-        } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
+        } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN || field == StandardField.CITATIONCOUNT ) {
             // Identifier editor does not support PMID, therefore excluded at the condition above
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
-        } else if (field == StandardField.ISSN) {
+        }else if (field == StandardField.ISSN) {
             return new ISSNEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (field == StandardField.OWNER) {
             return new OwnerEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
