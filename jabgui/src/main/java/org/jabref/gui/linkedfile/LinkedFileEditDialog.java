@@ -1,6 +1,5 @@
 package org.jabref.gui.linkedfile;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
@@ -13,6 +12,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
+import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.StandardFileType;
@@ -98,7 +98,6 @@ public class LinkedFileEditDialog extends BaseDialog<LinkedFile> {
     }
 
     private void onDialogShow(DialogEvent event) {
-        Platform.runLater(() -> link.requestFocus());
-        event.consume();
+        UiTaskExecutor.runInJavaFXThread(link::requestFocus);
     }
 }
