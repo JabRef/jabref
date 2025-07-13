@@ -19,7 +19,7 @@ import java.util.Set;
 
 public class LinkedFileTransferHelper {
 
-  private static record FileCopyContext(
+  private record FileCopyContext(
     BibDatabaseContext sourceContext,
     BibDatabaseContext targetContext,
     FilePreferences filePreferences
