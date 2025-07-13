@@ -30,3 +30,12 @@ javaModules {
     versions("versions")
     // include("jablib", "jabkit", "jabgui", "jabsrv", "jabsrv-cli", "test-support", "versions")
 }
+
+develocity {
+    buildScan {
+        publishing.onlyIf { !System.getenv("CI").isNullOrEmpty() }
+        termsOfUseUrl.set("https://gradle.com/help/legal-terms-of-use")
+        termsOfUseAgree.set("yes")
+        uploadInBackground.set( System.getenv("CI").isNullOrEmpty() )
+    }
+}
