@@ -139,7 +139,7 @@ public class CommonArchitectureTest {
         );
 
         ArchRuleDefinition.noClasses().should().accessClassesThat()
-                          .resideInAnyPackage(restrictedLoggingPackages.toArray(new String[0]))
+                          .resideInAnyPackage(restrictedLoggingPackages.toArray(String[]::new))
                           .because("slf4j should be used for logging")
                           .check(classes);
     }
