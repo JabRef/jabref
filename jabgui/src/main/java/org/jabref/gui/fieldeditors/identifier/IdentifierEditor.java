@@ -19,7 +19,6 @@ import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.TaskExecutor;
@@ -30,7 +29,6 @@ import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-import static org.jabref.model.entry.field.StandardField.CITATIONCOUNT;
 import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
@@ -47,9 +45,6 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private GuiPreferences preferences;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
-
-    @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
-
     private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
@@ -67,8 +62,6 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                     this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case EPRINT ->
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
-            case CITATIONCOUNT ->
-                    this.viewModel = new CitationCountEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager, searchCitationsRelationsService);
 
             // TODO: Add support for PMID
             case null, default -> {
