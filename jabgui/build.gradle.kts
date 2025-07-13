@@ -80,7 +80,7 @@ dependencies {
 
     implementation ("org.apache.pdfbox:pdfbox")
 
-    // implementation("net.java.dev.jna:jna")
+    implementation("net.java.dev.jna:jna-jpms")
     implementation("net.java.dev.jna:jna-platform")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit")
