@@ -27,8 +27,10 @@ public class ExternalLinkCreator {
                 // This should never be able to happen as it would require the field to be misconfigured.
                 throw new AssertionError("ShortScience URL is invalid.", e);
             }
+
             // Converting LaTeX-formatted titles (e.g., containing braces) to plain Unicode to ensure compatibility with ShortScience's search URL.
-            // LaTeX parsing failures are gracefully handled by falling back to a normalized version of the original title, avoiding malformed queries.
+            // LatexToUnicodeAdapter.format() is being used because it attempts to parse LaTeX, but gracefully degrades to a normalized title on failure.
+            // This avoids sending malformed or literal LaTeX syntax titles that would give the wrong result.
             String filteredTitle = LatexToUnicodeAdapter.format(title);
             // Direct the user to the search results for the title.
             uriBuilder.addParameter("q", filteredTitle.trim());

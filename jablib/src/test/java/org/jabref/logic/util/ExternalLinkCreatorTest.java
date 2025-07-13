@@ -73,9 +73,8 @@ class ExternalLinkCreatorTest {
         entry.withField(StandardField.TITLE, "{The Difference Between Graph-Based and Block-Structured Business Process Modelling Languages}");
 
         Optional<String> url = ExternalLinkCreator.getShortScienceSearchURL(entry);
-        assertTrue(url.isPresent(), "URL is empty");
 
         String expectedUrl = "https://www.shortscience.org/internalsearch?q=The%20Difference%20Between%20Graph-Based%20and%20Block-Structured%20Business%20Process%20Modelling%20Languages";
-        assertEquals(expectedUrl, url.get());
+        assertEquals(Optional.of(expectedUrl), url);
     }
 }
