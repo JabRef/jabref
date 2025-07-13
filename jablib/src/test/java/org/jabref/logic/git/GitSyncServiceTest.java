@@ -83,12 +83,11 @@ class GitSyncServiceTest {
             }
             """;
 
-
     /**
      * Creates a commit graph with a base commit, one modification by Alice and one modification by Bob
      * 1. Alice commit initial → push to remote
-     * 2. Bob clone remote -> update `b` → push
-     * 3. Alice update `a` → pull
+     * 2. Bob clone remote -> update b → push
+     * 3. Alice update a → pull
      */
     @BeforeEach
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
@@ -98,7 +97,11 @@ class GitSyncServiceTest {
 
         // create fake remote repo
         Path remoteDir = tempDir.resolve("remote.git");
-        Git remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
+        Git remoteGit = Git.init()
+                           .setBare(true)
+                           .setInitialBranch("main")
+                           .setDirectory(remoteDir.toFile())
+                           .call();
 
         // Alice clone remote -> local repository
         Path aliceDir = tempDir.resolve("alice");
@@ -120,7 +123,7 @@ class GitSyncServiceTest {
                         .setURI(remoteDir.toUri().toString())
                         .setDirectory(bobDir.toFile())
                         .setBranchesToClone(List.of("refs/heads/main"))
-                        .setBranch("refs/heads/main")
+                        .setBranch("main")
                         .call();
         Path bobLibrary = bobDir.resolve("library.bib");
         bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
@@ -184,7 +187,12 @@ class GitSyncServiceTest {
     void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution(@TempDir Path tempDir) throws Exception {
         // Setup remote bare repo
         Path remoteDir = tempDir.resolve("remote.git");
-        Git remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
+        Git remoteGit = Git.init()
+                           .setBare(true)
+                           .setInitialBranch("main")
+                           .setDirectory(remoteDir.toFile())
+                           .call();
+        Files.writeString(remoteDir.resolve("HEAD"), "ref: refs/heads/main");
 
         // Clone to local working directory
         Path localDir = tempDir.resolve("local");

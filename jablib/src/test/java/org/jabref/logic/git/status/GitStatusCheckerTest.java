@@ -3,10 +3,13 @@ package org.jabref.logic.git.status;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -63,6 +66,24 @@ class GitStatusCheckerTest {
         Path remoteDir = tempDir.resolve("remote.git");
         remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
 
+        Path seedDir = tempDir.resolve("seed");
+        Git seedGit = Git.init().setDirectory(seedDir.toFile()).call();
+        Path seedFile = seedDir.resolve("library.bib");
+        Files.writeString(seedFile, baseContent, StandardCharsets.UTF_8);
+
+        seedGit.add().addFilepattern("library.bib").call();
+        seedGit.commit().setAuthor(author).setMessage("Initial commit").call();
+        seedGit.branchCreate().setName("master").call();
+
+        seedGit.remoteAdd()
+               .setName("origin")
+               .setUri(new URIish(remoteDir.toUri().toString()))
+               .call();
+        seedGit.push()
+               .setRemote("origin")
+               .setRefSpecs(new RefSpec("refs/heads/master:refs/heads/main"))
+               .call();
+
         Path localDir = tempDir.resolve("local");
         localGit = Git.cloneRepository()
                       .setURI(remoteDir.toUri().toString())
@@ -71,12 +92,6 @@ class GitStatusCheckerTest {
                       .call();
 
         this.localLibrary = localDir.resolve("library.bib");
-
-        // Initial commit
-        commitFile(localGit, baseContent, "Initial commit");
-
-        // Push to remote
-        localGit.push().setRemote("origin").call();
     }
 
     @Test
@@ -100,10 +115,15 @@ class GitStatusCheckerTest {
         Git remoteClone = Git.cloneRepository()
                              .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
                              .setDirectory(remoteWork.toFile())
+                             .setBranchesToClone(List.of("refs/heads/main"))
+                             .setBranch("main")
                              .call();
         Path remoteFile = remoteWork.resolve("library.bib");
         commitFile(remoteClone, remoteUpdatedContent, "Remote update");
-        remoteClone.push().setRemote("origin").call();
+        remoteClone.push()
+                   .setRemote("origin")
+                   .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                   .call();
 
         localGit.fetch().setRemote("origin").call();
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);
@@ -125,10 +145,15 @@ class GitStatusCheckerTest {
         Git remoteClone = Git.cloneRepository()
                              .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
                              .setDirectory(remoteWork.toFile())
+                             .setBranchesToClone(List.of("refs/heads/main"))
+                             .setBranch("main")
                              .call();
         Path remoteFile = remoteWork.resolve("library.bib");
         commitFile(remoteClone, remoteUpdatedContent, "Remote update");
-        remoteClone.push().setRemote("origin").call();
+        remoteClone.push()
+                   .setRemote("origin")
+                   .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                   .call();
 
         localGit.fetch().setRemote("origin").call();
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);

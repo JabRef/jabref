@@ -57,6 +57,6 @@ class GitMergeUtilTest {
                 .withField(StandardField.TITLE, "New Title");
 
         BibDatabaseContext result = GitMergeUtil.replaceEntries(remote, List.of(resolved));
-        assertEquals("Original Title", result.getDatabase().getEntries().get(0).getField(StandardField.TITLE).orElse(""));
+        assertEquals("Original Title", result.getDatabase().getEntries().getFirst().getField(StandardField.TITLE).orElse(""));
     }
 }

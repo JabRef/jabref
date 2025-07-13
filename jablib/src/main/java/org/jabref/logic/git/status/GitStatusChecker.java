@@ -49,7 +49,7 @@ public class GitStatusChecker {
                     Optional.ofNullable(localHead).map(ObjectId::getName)
             );
         } catch (IOException | GitAPIException e) {
-            LOGGER.warn("Failed to check Git status: " + e.getMessage());
+            LOGGER.warn("Failed to check Git status: {}", e.getMessage(), e);
             return new GitStatusSnapshot(
                     true,
                     SyncStatus.UNKNOWN,

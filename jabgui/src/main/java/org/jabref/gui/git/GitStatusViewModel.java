@@ -18,11 +18,11 @@ import org.jabref.logic.git.status.SyncStatus;
 
 /**
  * ViewModel that holds current Git sync status for the open .bib database.
- * 统一维护当前路径绑定的 GitHandler 状态，包括：
- * - 是否是 Git 仓库
- * - 当前是否被 Git 跟踪
- * - 是否存在冲突
- * - 当前同步状态（UP_TO_DATE、DIVERGED 等）
+ * It maintains the state of the GitHandler bound to the current file path, including:
+ * - Whether the current file is inside a Git repository
+ * - Whether the file is tracked by Git
+ * - Whether there are unresolved merge conflicts
+ * - The current sync status (e.g., UP_TO_DATE, DIVERGED, etc.)
  */
 public class GitStatusViewModel extends AbstractViewModel {
     private final Path currentBibFile;
@@ -45,7 +45,7 @@ public class GitStatusViewModel extends AbstractViewModel {
     public void updateStatusFromPath(Path fileOrFolderInRepo) {
         Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(fileOrFolderInRepo);
 
-        if (!maybeHandler.isPresent()) {
+        if (maybeHandler.isEmpty()) {
             reset();
             return;
         }

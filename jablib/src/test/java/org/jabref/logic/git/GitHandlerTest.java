@@ -11,6 +11,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,11 +23,38 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GitHandlerTest {
     @TempDir
     Path repositoryPath;
+    Path remoteRepoPath;
     private GitHandler gitHandler;
 
     @BeforeEach
-    void setUpGitHandler() {
+    void setUpGitHandler() throws IOException, GitAPIException, URISyntaxException {
         gitHandler = new GitHandler(repositoryPath);
+
+        remoteRepoPath = Files.createTempDirectory("remote-repo");
+        try (Git remoteGit = Git.init()
+                                .setBare(true)
+                                .setDirectory(remoteRepoPath.toFile())
+                                .call()) {
+            // Remote repo initialized
+        }
+        Path testFile = repositoryPath.resolve("initial.txt");
+        Files.writeString(testFile, "init");
+
+        gitHandler.createCommitOnCurrentBranch("Initial commit", false);
+
+        try (Git localGit = Git.open(repositoryPath.toFile())) {
+            localGit.remoteAdd()
+                    .setName("origin")
+                    .setUri(new URIish(remoteRepoPath.toUri().toString()))
+                    .call();
+
+            localGit.push()
+                    .setRemote("origin")
+                    .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                    .call();
+        }
+
+        Files.writeString(remoteRepoPath.resolve("HEAD"), "ref: refs/heads/main");
     }
 
     @Test

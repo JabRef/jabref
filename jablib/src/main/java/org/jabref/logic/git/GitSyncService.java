@@ -120,13 +120,18 @@ public class GitSyncService {
         // 2. Conflict detection
         List<ThreeWayEntryConflict> conflicts = SemanticConflictDetector.detectConflicts(base, local, remote);
 
-        // 3. If there are conflicts, ask strategy to resolve
-        Optional<BibDatabaseContext> maybeRemote = gitConflictResolverStrategy.resolveConflicts(conflicts, remote);
-        if (maybeRemote.isEmpty()) {
-            LOGGER.warn("Merge aborted: Conflict resolution was canceled or denied.");
-            return MergeResult.failure();
+        BibDatabaseContext effectiveRemote;
+        if (conflicts.isEmpty()) {
+            effectiveRemote = remote;
+        } else {
+            // 3. If there are conflicts, ask strategy to resolve
+            Optional<BibDatabaseContext> maybeRemote = gitConflictResolverStrategy.resolveConflicts(conflicts, remote);
+            if (maybeRemote.isEmpty()) {
+                LOGGER.warn("Merge aborted: Conflict resolution was canceled or denied.");
+                return MergeResult.failure();
+            }
+            effectiveRemote = maybeRemote.get();
         }
-        BibDatabaseContext effectiveRemote = maybeRemote.get();
 
         //  4. Apply resolved remote (either original or conflict-resolved) to local
         MergePlan plan = SemanticConflictDetector.extractMergePlan(base, effectiveRemote);
