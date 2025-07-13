@@ -26,3 +26,8 @@ java {
 tasks.withType<JavaCompile>().configureEach {
     options.release = 24
 }
+
+configurations.all {
+    exclude(group = "net.java.dev.jna", module = "jna")
+    exclude(group = "net.java.dev.jna", module = "jna-platform")
+}

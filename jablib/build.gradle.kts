@@ -75,6 +75,9 @@ dependencies {
         exclude(group = "net.java.dev.jna", module = "jna-platform")
     }
 
+    implementation("net.java.dev.jna:jna-jpms")
+    implementation("net.java.dev.jna:jna-platform-jpms")
+
     implementation("org.apache.lucene:lucene-core")
     implementation("org.apache.lucene:lucene-queryparser")
     implementation("org.apache.lucene:lucene-queries")

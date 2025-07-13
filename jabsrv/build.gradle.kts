@@ -49,6 +49,8 @@ dependencies {
     implementation("org.openjfx:javafx-fxml")
 
     implementation("net.harawata:appdirs")
+    implementation("net.java.dev.jna:jna-jpms")
+    implementation("net.java.dev.jna:jna-platform-jpms")
 
     implementation("de.undercouch:citeproc-java")
 
