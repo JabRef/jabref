@@ -42,13 +42,13 @@ public class LinkedFileTransferHelper {
     FilePreferences filePreferences
   ) {
 
-    Set<BibEntry> modifiedEntries = Set.of();
+    Set<BibEntry> modifiedEntries = new HashSet<>();
 
     FileCopyContext context = new FileCopyContext(sourceContext, targetContext, filePreferences);
 
     for (BibEntry entry : targetContext.getEntries()) {
       boolean entryChanged = false;
-      List<LinkedFile> linkedFiles = List.of();
+      List<LinkedFile> linkedFiles = new ArrayList<>();
 
       for (LinkedFile linkedFile : entry.getFiles()) {
         if (linkedFile == null || linkedFile.getLink().isEmpty()) {
@@ -74,7 +74,7 @@ public class LinkedFileTransferHelper {
         if (isReachableFromPrimaryDirectory(relative)) {
           entryChanged = isPathAdjusted(linkedFile, relative, linkedFiles, entryChanged);
         } else {
-          entryChanged = isFileCopied(context, linkedFile, entryChanged, linkedFiles);
+          entryChanged = isFileCopied(context, linkedFile, linkedFiles, entryChanged);
         }
       }
       if (entryChanged) {
@@ -128,7 +128,7 @@ public class LinkedFileTransferHelper {
     return entryChanged;
   }
 
-  private static boolean isFileCopied(FileCopyContext context, LinkedFile linkedFile, boolean entryChanged, List<LinkedFile> linkedFiles) {
+  private static boolean isFileCopied(FileCopyContext context, LinkedFile linkedFile, List<LinkedFile> linkedFiles, boolean entryChanged) {
     boolean fileCopied = copyFileToTargetContext(
       linkedFile, context
     );
