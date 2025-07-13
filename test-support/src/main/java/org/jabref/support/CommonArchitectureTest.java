@@ -90,13 +90,18 @@ public class CommonArchitectureTest {
                           .check(classes);
     }
 
-    // TODO: no org.jabref.gui package may reside in org.jabref.logic
-
     @ArchTest
     public void doNotUseLogicInModel(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                           .and().areNotAnnotatedWith(AllowedToUseLogic.class)
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
+                          .check(classes);
+    }
+
+    @ArchTest
+    public void doNotUseGuiInLogic(JavaClasses classes) {
+        ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
+                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_GUI)
                           .check(classes);
     }
 
