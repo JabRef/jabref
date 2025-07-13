@@ -238,7 +238,7 @@ public class CitationRelationsTab extends EntryEditorTab {
     /**
      * Method to start search for relations and display them in the associated ListView
      *
-     * @param relationSearchComponents
+     * @param relationSearchComponents components used to properly display panel
      */
     private void searchForRelations(RelationSearchComponents relationSearchComponents) {
         if (relationSearchComponents.entry().getDOI().isEmpty()) {
