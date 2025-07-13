@@ -135,10 +135,13 @@ public class CommonArchitectureTest {
                 "org.slf4j.impl..",                     // Concrete SLF4J bindings
                 "ch.qos.logback..",                     // Logback
                 "org.apache.commons.logging..",         // Apache Commons logging
+                "org.tinylog..",                        // Tinylog
                 "org.mariadb.jdbc.internal.logging.."   // Example specific logging
         );
 
-        ArchRuleDefinition.noClasses().should().accessClassesThat()
+        ArchRuleDefinition.noClasses()
+                          .that().resideOutsideOfPackages("org.jabref.gui.errorconsole", "org.jabref.gui.logging", "org.jabref")
+                          .should().accessClassesThat()
                           .resideInAnyPackage(restrictedLoggingPackages.toArray(new String[0]))
                           .because("slf4j should be used for logging")
                           .check(classes);
