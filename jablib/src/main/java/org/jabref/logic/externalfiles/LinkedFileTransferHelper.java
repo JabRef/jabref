@@ -56,8 +56,8 @@ public class LinkedFileTransferHelper {
           continue;
         }
 
-        Optional<Path> sourcePathOpt = linkedFile.findIn(context.sourceContext(), context.filePreferences());
-        Optional<Path> targetPrimaryOpt = getPrimaryPath(context.targetContext(), context.filePreferences());
+        Optional<Path> sourcePathOpt = linkedFile.findIn(sourceContext, filePreferences);
+        Optional<Path> targetPrimaryOpt = getPrimaryPath(targetContext, filePreferences);
 
         if (sourcePathOpt.isEmpty() || targetPrimaryOpt.isEmpty()) {
           linkedFiles.add(linkedFile);
@@ -68,7 +68,6 @@ public class LinkedFileTransferHelper {
         if (sourcePathOpt.get().startsWith(targetPrimaryOpt.get())) {
             relative = targetPrimaryOpt.get().relativize(sourcePathOpt.get());
         } else {
-            // Fallback: mark as unreachable, so the file will be copied
             relative = Path.of("..").resolve(sourcePathOpt.get().getFileName());
         }
 
