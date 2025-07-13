@@ -282,7 +282,7 @@ extraJavaModuleInfo {
     module("net.javacrumbs.json-unit:json-unit-core", "net.javacrumbs.jsonunit.core")
     module("com.github.javaparser:javaparser-core", "com.github.javaparser.core")
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
-    module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
+    module("net.sf.jopt-simple:jopt-simple", "jopt.simple")
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
         exportAllPackages()
