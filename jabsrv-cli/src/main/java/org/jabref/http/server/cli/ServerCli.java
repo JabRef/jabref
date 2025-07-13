@@ -29,7 +29,7 @@ public class ServerCli implements Callable<Void> {
     private String host = "localhost";
 
     @CommandLine.Option(names = {"-p", "--port"}, description = "the port")
-    private Integer port = 6050;
+    private Integer port = 23119;
 
     /**
      * Starts an http server serving the last files opened in JabRef<br>

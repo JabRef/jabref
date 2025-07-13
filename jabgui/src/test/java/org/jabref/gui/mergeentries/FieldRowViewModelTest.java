@@ -178,7 +178,7 @@ public class FieldRowViewModelTest {
     }
 
     @Test
-    void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCanBeMerged() {
+    void mergeFieldsShouldThrowUnsupportedOperationExceptionIfTheGivenFieldCannotBeMerged() {
         FieldRowViewModel authorField = createViewModelForField(StandardField.AUTHOR);
         assertThrows(UnsupportedOperationException.class, authorField::mergeFields);
     }
@@ -212,6 +212,24 @@ public class FieldRowViewModelTest {
 
         assertEquals(oldLeftGroups, groupsField.getLeftFieldValue());
         assertEquals(oldRightGroups, groupsField.getRightFieldValue());
+    }
+
+    @Test
+    void newYearShouldBeSelectedForYearsWithLargeValueGap() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "1990");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "2020");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
+    }
+
+    @Test
+    void yearInRangeShouldBeSelected() {
+        BibEntry leftEntry = new BibEntry().withField(StandardField.YEAR, "1700");
+        BibEntry rightEntry = new BibEntry().withField(StandardField.YEAR, "2000");
+        FieldRowViewModel yearField = new FieldRowViewModel(StandardField.YEAR, leftEntry, rightEntry, mergedEntry, fieldMergerFactory);
+        yearField.autoSelectBetterValue();
+        assertEquals(FieldRowViewModel.Selection.RIGHT, yearField.getSelection());
     }
 
     public FieldRowViewModel createViewModelForField(Field field) {
