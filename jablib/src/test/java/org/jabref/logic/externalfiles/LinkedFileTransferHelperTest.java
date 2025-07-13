@@ -6,12 +6,10 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -63,7 +61,7 @@ class LinkedFileTransferHelperTest {
     }
 
     @Test
-    void pathDiffers_ShouldAdjustPath(@TempDir Path tempDir) {
+    void pathDiffers_ShouldAdjustPath() {
       var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
@@ -110,7 +108,7 @@ class LinkedFileTransferHelperTest {
     }
 
     @Test
-    void fileNotReachable_ShouldCopyFile(@TempDir Path tempDir) {
+    void fileNotReachable_ShouldCopyFile() {
       var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
