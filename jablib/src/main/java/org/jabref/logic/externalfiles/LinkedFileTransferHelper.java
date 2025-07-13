@@ -42,13 +42,13 @@ public class LinkedFileTransferHelper {
     FilePreferences filePreferences
   ) {
 
-    Set<BibEntry> modifiedEntries = new HashSet<>();
+    Set<BibEntry> modifiedEntries = Set.of();
 
     FileCopyContext context = new FileCopyContext(sourceContext, targetContext, filePreferences);
 
     for (BibEntry entry : targetContext.getEntries()) {
       boolean entryChanged = false;
-      List<LinkedFile> linkedFiles = new ArrayList<>();
+      List<LinkedFile> linkedFiles = List.of();
 
       for (LinkedFile linkedFile : entry.getFiles()) {
         if (linkedFile == null || linkedFile.getLink().isEmpty()) {
