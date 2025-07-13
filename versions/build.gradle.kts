@@ -9,6 +9,7 @@ javaPlatform {
 val javafx = "24.0.1"
 val lucene = "10.2.2"
 val pdfbox = "3.0.5"
+val jna = "5.17.0"
 
 dependencies {
     api(platform("ai.djl:bom:0.33.0"))
@@ -84,7 +85,8 @@ dependencies.constraints {
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     api("net.bytebuddy:byte-buddy:1.17.6")
     api("net.harawata:appdirs:1.4.0")
-    api("net.java.dev.jna:jna-platform:5.17.0")
+    api("net.java.dev.jna:jna-platform:$jna")
+    api("net.java.dev.jna:jna:$jna")
     api("net.sourceforge.tess4j:tess4j:5.16.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
