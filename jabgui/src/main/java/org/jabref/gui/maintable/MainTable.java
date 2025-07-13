@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.swing.undo.UndoManager;
 
 import javafx.collections.ListChangeListener;
+import javafx.collections.WeakListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -271,9 +272,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
 
         GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-        guiBridge.getSelectEntries().addListener((ListChangeListener<? super BibEntry>) change -> {
-            clearAndSelect(guiBridge.getSelectEntries());
-        });
+        guiBridge.getSelectEntries().addListener(new WeakListChangeListener<>(_ -> clearAndSelect(guiBridge.getSelectEntries())));
     }
 
     /**
