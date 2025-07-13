@@ -44,9 +44,7 @@ public class SearchShortScienceAction extends SimpleCommand {
             }
             ExternalLinkCreator.getShortScienceSearchURL(bibEntries.getFirst()).ifPresent(url -> {
                 try {
-
                     NativeDesktop.openExternalViewer(databaseContext, preferences, url, StandardField.URL, dialogService, bibEntries.getFirst());
-
                 } catch (IOException ex) {
                     dialogService.showErrorDialogAndWait(Localization.lang("Unable to open ShortScience."), ex);
                 }
