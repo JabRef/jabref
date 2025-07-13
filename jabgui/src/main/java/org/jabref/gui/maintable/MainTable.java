@@ -95,6 +95,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
+    private final ListChangeListener<BibEntry> guiBridgeSelectListener;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
@@ -272,7 +273,8 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
 
         GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-        guiBridge.getSelectEntries().addListener(new WeakListChangeListener<>(_ -> clearAndSelect(guiBridge.getSelectEntries())));
+        this.guiBridgeSelectListener = change -> clearAndSelect(guiBridge.getSelectEntries());
+        guiBridge.getSelectEntries().addListener(new WeakListChangeListener<>(this.guiBridgeSelectListener));
     }
 
     /**
