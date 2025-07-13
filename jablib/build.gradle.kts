@@ -6,6 +6,8 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import java.net.URI
 import java.util.*
 
+val jnaVersion = "5.17.0"
+
 plugins {
     id("org.jabref.gradle.module")
     id("java-library")
@@ -46,6 +48,15 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
 // See https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
 val mockitoAgent = configurations.create("mockitoAgent")
 
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "net.java.dev.jna") {
+            useVersion(jnaVersion)
+            because("pin all JNA modules to $jnaVersion on every configuration")
+        }
+    }
+}
+
 dependencies {
     // api(platform(project(":versions")))
 
@@ -70,7 +81,17 @@ dependencies {
     implementation ("org.apache.pdfbox:fontbox")
     implementation ("org.apache.pdfbox:xmpbox")
 
-    implementation("net.sourceforge.tess4j:tess4j")
+    implementation("net.sourceforge.tess4j:tess4j") {
+        exclude(group = "net.java.dev.jna", module = "jna")
+        exclude(group = "net.java.dev.jna", module = "jna-platform")
+    }
+
+    implementation(
+        "net.java.dev.jna:jna:${jnaVersion}"
+    )
+    implementation(
+        "net.java.dev.jna:jna-platform:${jnaVersion}"
+    )
 
     implementation("org.apache.lucene:lucene-core")
     implementation("org.apache.lucene:lucene-queryparser")
