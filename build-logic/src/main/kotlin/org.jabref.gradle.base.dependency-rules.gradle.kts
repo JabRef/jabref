@@ -1,3 +1,5 @@
+import org.gradlex.jvm.dependency.conflict.detection.rules.CapabilityDefinition
+
 plugins {
     id("org.gradlex.extra-java-module-info")
     id("org.gradlex.jvm-dependency-conflict-resolution")
@@ -15,11 +17,24 @@ jvmDependencyConflicts {
     consistentResolution {
         platform(":versions")
     }
+    conflictResolution {
+        // https://github.com/gradlex-org/jvm-dependency-conflict-resolution/pull/270/files
+        select(CapabilityDefinition.JNA, "net.java.dev.jna:jna-jpms")
+        select(CapabilityDefinition.JNA_PLATFORM, "net.java.dev.jna:jna-platform-jpms")
+    }
 }
 
 // Tell gradle which jar to use for which platform
 // Source: https://github.com/jjohannes/java-module-system/blob/be19f6c088dca511b6d9a7487dacf0b715dbadc1/gradle/plugins/src/main/kotlin/metadata-patch.gradle.kts#L14-L22
 jvmDependencyConflicts.patch {
+    // https://github.com/gradlex-org/jvm-dependency-conflict-resolution/pull/270/files
+    module("net.java.dev.jna:jna-jpms") {
+        addCapability(CapabilityDefinition.JNA)
+    }
+    module("net.java.dev.jna:jna-platform-jpms") {
+        addCapability(CapabilityDefinition.JNA_PLATFORM)
+    }
+
     listOf("base", "controls", "fxml", "graphics", "swing", "web", "media").forEach { jfxModule ->
         module("org.openjfx:javafx-$jfxModule") {
             addTargetPlatformVariant("", "none", "none") // matches the empty Jars: to get better errors
