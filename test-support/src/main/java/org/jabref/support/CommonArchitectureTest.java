@@ -136,13 +136,13 @@ public class CommonArchitectureTest {
                 "ch.qos.logback..",                     // Logback
                 "org.apache.commons.logging..",         // Apache Commons logging
                 "org.tinylog..",                        // Tinylog
-                "org.mariadb.jdbc.internal.logging.."   // Example specific logging
+                "org.mariadb.jdbc.internal.logging.."   // Mariadb logging
         );
 
         ArchRuleDefinition.noClasses()
                           .that().resideOutsideOfPackages("org.jabref.gui.errorconsole", "org.jabref.gui.logging", "org.jabref")
                           .should().accessClassesThat()
-                          .resideInAnyPackage(restrictedLoggingPackages.toArray(new String[0]))
+                          .resideInAnyPackage(restrictedLoggingPackages.toArray(String[]::new))
                           .because("slf4j should be used for logging")
                           .check(classes);
     }
