@@ -72,7 +72,7 @@ class LinkedFileTransferHelperTest {
       assertEquals("target/sourcefiles/test.pdf",
         targetContext.getEntries().getFirst().getFiles().getFirst().getLink());
       Path expectedFile = targetDir.resolve("test.pdf");
-      assertFalse(Files.exists(expectedFile), "File should not have been copied to target directory");
+      assertEquals(true, !Files.exists(expectedFile));
     }
   }
 
@@ -119,7 +119,7 @@ class LinkedFileTransferHelperTest {
       assertEquals("test.pdf",
         targetContext.getEntries().getFirst().getFiles().getFirst().getLink());
       Path expectedFile = targetDir.resolve("test.pdf");
-      assertTrue(Files.exists(expectedFile), "File should have been copied to target directory");
+      assertEquals(true, Files.exists(expectedFile));
     }
   }
 
@@ -166,7 +166,7 @@ class LinkedFileTransferHelperTest {
       assertEquals("sourcefiles/test.pdf",
         targetContext.getEntries().getFirst().getFiles().getFirst().getLink());
       Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
-      assertTrue(Files.exists(expectedFile), "File should have been copied to target directory");
+      assertEquals(true, Files.exists(expectedFile));
     }
   }
 }
