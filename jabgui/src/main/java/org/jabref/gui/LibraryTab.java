@@ -854,10 +854,8 @@ public class LibraryTab extends Tab {
       }
     });
 
-    // Import mit Duplikat-Check durchführen
     importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
 
-    // Linked Files anpassen falls Source-Context vorhanden
     if (clipBoardManager.getSourceBibDatabaseContext().isPresent()) {
       tracker.setOnFinish(() -> LinkedFileTransferHelper
         .adjustLinkedFilesForTarget(clipBoardManager.getSourceBibDatabaseContext().get(),
