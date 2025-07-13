@@ -33,7 +33,7 @@ class LinkedFileTransferHelperTest {
   class WhenFileIsReachable {
 
     @BeforeEach
-    void setup(@TempDir Path tempDir) throws IOException {
+    void setup(@TempDir Path tempDir) throws Exception {
       sourceDir = tempDir.resolve("source/target");
       targetDir = tempDir.resolve("source");
 
@@ -63,7 +63,7 @@ class LinkedFileTransferHelperTest {
     }
 
     @Test
-    void pathDiffers_ShouldAdjustPath(@TempDir Path tempDir) throws IOException {
+    void pathDiffers_ShouldAdjustPath(@TempDir Path tempDir) {
       var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
@@ -80,7 +80,7 @@ class LinkedFileTransferHelperTest {
   class WhenFileIsNotReachable {
 
     @BeforeEach
-    void setup(@TempDir Path tempDir) throws IOException {
+    void setup(@TempDir Path tempDir) throws Exception {
       sourceDir = tempDir.resolve("target/targetfiles");
       targetDir = tempDir.resolve("source/sourcefiles");
 
@@ -110,7 +110,7 @@ class LinkedFileTransferHelperTest {
     }
 
     @Test
-    void fileNotReachable_ShouldCopyFile(@TempDir Path tempDir) throws IOException {
+    void fileNotReachable_ShouldCopyFile(@TempDir Path tempDir) {
       var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
@@ -127,7 +127,7 @@ class LinkedFileTransferHelperTest {
   class WhenFileIsNotReachableAndPathsDiffer {
 
     @BeforeEach
-    void setup(@TempDir Path tempDir) throws IOException {
+    void setup(@TempDir Path tempDir) throws Exception {
       sourceDir = tempDir.resolve("source");
       targetDir = tempDir.resolve("target/targetfiles");
 
@@ -157,7 +157,7 @@ class LinkedFileTransferHelperTest {
     }
 
     @Test
-    void fileNotReachableAndPathsDiffer_ShouldCopyFileAndCreateDirectory() throws IOException {
+    void fileNotReachableAndPathsDiffer_ShouldCopyFileAndCreateDirectory() {
       var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
