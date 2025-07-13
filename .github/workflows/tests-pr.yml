@@ -39,9 +39,14 @@ jobs:
           if echo "$TITLE" | grep -Eiq '^Fix for issue #?[0-9]+'; then
             echo "❌ Title starts with 'Fix for issue <number>' — not allowed."
             exit 1
-          else
-            echo "✅ Title format OK"
           fi
+
+          if echo "$TITLE" | grep -Eiq '^Fixed the issue'; then
+            echo "❌ Title starts with 'Fixed the issue' — not allowed."
+            exit 1
+          fi
+
+          echo "✅ Title format OK"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
