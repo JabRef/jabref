@@ -30,7 +30,6 @@ class LinkedFileTransferHelperTest {
   private FilePreferences filePreferences = mock(FilePreferences.class);
 
   @Nested
-  @DisplayName("When the linked file is reachable in the new context")
   class WhenFileIsReachable {
 
     @BeforeEach
@@ -78,7 +77,6 @@ class LinkedFileTransferHelperTest {
   }
 
   @Nested
-  @DisplayName("When the linked file is NOT reachable, but the paths do NOT differ")
   class WhenFileIsNotReachable {
 
     @BeforeEach
@@ -126,7 +124,6 @@ class LinkedFileTransferHelperTest {
   }
 
   @Nested
-  @DisplayName("When the linked file is NOT reachable, and a nested structure needs to be created")
   class WhenFileIsNotReachableAndPathsDiffer {
 
     @BeforeEach
