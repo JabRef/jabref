@@ -8,13 +8,14 @@ import javafx.collections.ObservableList;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public class GuiHolder {
+public class GuiBridge {
 
-    private ObservableList<BibDatabaseContext> contextsToServe;
-    private ObservableList<BibEntry> selectedEntries;
+    private ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
+    private ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableList<BibEntry> selectEntries = FXCollections.observableArrayList();
+    private boolean runningInCli = false;
 
-    public GuiHolder() {
+    public GuiBridge() {
     }
 
     public void setSelectedEntries(ObservableList<BibEntry> selectedEntries) {
@@ -33,11 +34,19 @@ public class GuiHolder {
         return selectEntries;
     }
 
-    public void setContextsToServe(ObservableList<BibDatabaseContext> contextsToServe) {
-        this.contextsToServe = contextsToServe;
+    public void setOpenDatabases(ObservableList<BibDatabaseContext> openDatabases) {
+        this.openDatabases = openDatabases;
     }
 
-    public ObservableList<BibDatabaseContext> getContextsToServe() {
-        return contextsToServe;
+    public ObservableList<BibDatabaseContext> getOpenDatabases() {
+        return openDatabases;
+    }
+
+    public boolean isRunningInCli() {
+        return runningInCli;
+    }
+
+    public void setRunningInCli(boolean runningInCli) {
+        this.runningInCli = runningInCli;
     }
 }

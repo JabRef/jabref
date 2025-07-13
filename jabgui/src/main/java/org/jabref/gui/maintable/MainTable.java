@@ -56,7 +56,7 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.http.server.services.GuiHolder;
+import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.WebFetchers;
@@ -270,9 +270,9 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
 
-        GuiHolder guiHolder = Injector.instantiateModelOrService(GuiHolder.class);
-        guiHolder.getSelectEntries().addListener((ListChangeListener<? super BibEntry>) change -> {
-            clearAndSelect(guiHolder.getSelectEntries());
+        GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
+        guiBridge.getSelectEntries().addListener((ListChangeListener<? super BibEntry>) change -> {
+            clearAndSelect(guiBridge.getSelectEntries());
         });
     }
 

@@ -11,9 +11,8 @@ import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
-import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
-import org.jabref.http.server.services.GuiHolder;
+import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.os.OS;
 
 import net.harawata.appdirs.AppDirsFactory;
@@ -49,11 +48,12 @@ public class Server {
         FilesToServe filesToServe = new FilesToServe();
         filesToServe.setFilesToServe(filesToServeList);
 
-        ContextsToServe contextsToServe = new ContextsToServe();
+        GuiBridge guiBridge = new GuiBridge();
+        guiBridge.setRunningInCli(true);
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, guiBridge);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -72,16 +72,12 @@ public class Server {
     }
 
     ///  Entry point for the GUI
-    public HttpServer run(GuiHolder guiHolder, URI uri) {
+    public HttpServer run(GuiBridge guiBridge, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
-
-        ContextsToServe contextsToServe = new ContextsToServe();
-        contextsToServe.setContextsToServe(guiHolder.getContextsToServe());
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, contextsToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, guiHolder);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, guiBridge);
 
         return startServer(serviceLocator, uri);
     }

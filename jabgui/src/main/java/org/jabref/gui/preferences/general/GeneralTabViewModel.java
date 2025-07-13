@@ -34,7 +34,7 @@ import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.http.manager.HttpServerManager;
-import org.jabref.http.server.services.GuiHolder;
+import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
 import org.jabref.logic.l10n.Language;
@@ -308,11 +308,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             ObservableList<BibDatabaseContext> openDatabases = Injector.instantiateModelOrService(StateManager.class).getOpenDatabases();
             URI uri = remotePreferences.getHttpServerUri();
 
-            GuiHolder guiHolder = Injector.instantiateModelOrService(GuiHolder.class);
-            guiHolder.setSelectedEntries(Injector.instantiateModelOrService(StateManager.class).getSelectedEntries());
-            guiHolder.setContextsToServe(Injector.instantiateModelOrService(StateManager.class).getOpenDatabases());
+            GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
+            guiBridge.setSelectedEntries(Injector.instantiateModelOrService(StateManager.class).getSelectedEntries());
+            guiBridge.setOpenDatabases(Injector.instantiateModelOrService(StateManager.class).getOpenDatabases());
 
-            httpServerManager.start(guiHolder, uri);
+            httpServerManager.start(guiBridge, uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();

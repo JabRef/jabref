@@ -32,7 +32,7 @@ import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
-import org.jabref.http.server.services.GuiHolder;
+import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
@@ -415,10 +415,10 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            GuiHolder guiHolder = Injector.instantiateModelOrService(GuiHolder.class);
-            guiHolder.setContextsToServe(stateManager.getOpenDatabases());
-            guiHolder.setSelectedEntries(stateManager.getSelectedEntries());
-            httpServerManager.start(guiHolder, remotePreferences.getHttpServerUri());
+            GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
+            guiBridge.setOpenDatabases(stateManager.getOpenDatabases());
+            guiBridge.setSelectedEntries(stateManager.getSelectedEntries());
+            httpServerManager.start(guiBridge, remotePreferences.getHttpServerUri());
         }
     }
 

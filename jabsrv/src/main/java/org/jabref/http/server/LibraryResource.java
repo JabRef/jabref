@@ -8,8 +8,8 @@ import java.util.Objects;
 
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
-import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.http.server.services.GuiBridge;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.preferences.CliPreferences;
@@ -40,7 +40,7 @@ public class LibraryResource {
     CliPreferences preferences;
 
     @Inject
-    ContextsToServe contextsToServe;
+    GuiBridge guiBridge;
 
     @Inject
     FilesToServe filesToServe;
@@ -85,7 +85,7 @@ public class LibraryResource {
                            .build();
         }
 
-        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, contextsToServe);
+        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, guiBridge);
         String libraryAsString;
         try {
             libraryAsString = Files.readString(library);
@@ -101,7 +101,7 @@ public class LibraryResource {
 
     /// @param id - also "demo" for the Chocolate.bib file
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
-        return ServerUtils.getBibDatabaseContext(id, filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+        return ServerUtils.getBibDatabaseContext(id, filesToServe, guiBridge, preferences.getImportFormatPreferences());
     }
 
     /// @return a stream to the Chocolate.bib file in the classpath (is null only if the file was moved or there are issues with the classpath)
