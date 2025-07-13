@@ -55,7 +55,7 @@ public class GitPullAction extends SimpleCommand {
         try {
             GitPullViewModel viewModel = new GitPullViewModel(
                     guiPreferences.getImportFormatPreferences(),
-                    new GitConflictResolverViaDialog(dialogService, guiPreferences),
+                    new GitConflictResolverDialog(dialogService, guiPreferences),
                     dialogService
             );
             MergeResult result = viewModel.pull(bibFilePath);

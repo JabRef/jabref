@@ -4,10 +4,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
+import org.jabref.logic.git.conflicts.GitConflictResolver;
+import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
@@ -19,13 +24,16 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class GitSyncServiceTest {
     private Git git;
     private Path library;
     private ImportFormatPreferences importFormatPreferences;
+    private GitConflictResolver gitConflictResolver;
 
     // These are setup by alieBobSetting
     private RevCommit baseCommit;
@@ -83,6 +91,7 @@ class GitSyncServiceTest {
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+        gitConflictResolver = mock(GitConflictResolver.class);
 
         // create fake remote repo
         Path remoteDir = tempDir.resolve("remote.git");
@@ -125,7 +134,7 @@ class GitSyncServiceTest {
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
         GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolver);
         MergeResult result = syncService.fetchAndMerge(library);
 
         assertTrue(result.isSuccessful());
@@ -149,7 +158,7 @@ class GitSyncServiceTest {
     @Test
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
         GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolver);
         syncService.push(library);
 
         String pushedContent = GitFileReader.readFileFromCommit(git, git.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"));
@@ -166,6 +175,86 @@ class GitSyncServiceTest {
         """;
 
         assertEquals(normalize(expected), normalize(pushedContent));
+    }
+
+    @Test
+    void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution(@TempDir Path tempDir) throws Exception {
+        // === Setup remote bare repo ===
+        Path remoteDir = tempDir.resolve("remote.git");
+        Git remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
+
+        // === Clone to local working directory ===
+        Path localDir = tempDir.resolve("local");
+        Git localGit = Git.cloneRepository()
+                          .setURI(remoteDir.toUri().toString())
+                          .setDirectory(localDir.toFile())
+                          .setBranch("main")
+                          .call();
+        Path bibFile = localDir.resolve("library.bib");
+
+        PersonIdent user = new PersonIdent("User", "user@example.com");
+
+        String baseContent = """
+        @article{a,
+          author = {unknown},
+          doi = {xya},
+        }
+        """;
+
+        writeAndCommit(baseContent, "Initial commit", user, bibFile, localGit);
+        localGit.push().setRemote("origin").call();
+
+        // === Clone again to simulate "remote user" making conflicting change ===
+        Path remoteUserDir = tempDir.resolve("remoteUser");
+        Git remoteUserGit = Git.cloneRepository()
+                               .setURI(remoteDir.toUri().toString())
+                               .setDirectory(remoteUserDir.toFile())
+                               .setBranch("main")
+                               .call();
+        Path remoteUserFile = remoteUserDir.resolve("library.bib");
+
+        String remoteContent = """
+        @article{a,
+          author = {remote-author},
+          doi = {xya},
+        }
+        """;
+
+        writeAndCommit(remoteContent, "Remote change", user, remoteUserFile, remoteUserGit);
+        remoteUserGit.push().setRemote("origin").call();
+
+        // === Back to local, make conflicting change ===
+        String localContent = """
+        @article{a,
+          author = {local-author},
+          doi = {xya},
+        }
+        """;
+        writeAndCommit(localContent, "Local change", user, bibFile, localGit);
+        localGit.fetch().setRemote("origin").call();
+
+        // === Setup GitSyncService ===
+        GitConflictResolver resolver = mock(GitConflictResolver.class);
+        when(resolver.resolveConflict(any())).thenAnswer(invocation -> {
+            ThreeWayEntryConflict conflict = invocation.getArgument(0);
+            BibEntry merged = (BibEntry) conflict.base().clone();
+            merged.setField(StandardField.AUTHOR, "merged-author");
+            return Optional.of(merged);
+        });
+
+        GitHandler handler = new GitHandler(localDir);
+        ImportFormatPreferences prefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
+        when(prefs.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
+        GitSyncService service = new GitSyncService(prefs, handler, resolver);
+
+        // === Trigger semantic merge ===
+        MergeResult result = service.fetchAndMerge(bibFile);
+
+        assertTrue(result.isSuccessful());
+        String finalContent = Files.readString(bibFile);
+        assertTrue(finalContent.contains("merged-author"));
+        verify(resolver).resolveConflict(any());
     }
 
     @Test

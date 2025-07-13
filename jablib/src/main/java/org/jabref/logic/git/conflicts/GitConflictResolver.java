@@ -1,8 +1,7 @@
-package org.jabref.gui.git;
+package org.jabref.logic.git.conflicts;
 
 import java.util.Optional;
 
-import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.model.entry.BibEntry;
 
 public interface GitConflictResolver {

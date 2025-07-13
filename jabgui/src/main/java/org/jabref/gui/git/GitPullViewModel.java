@@ -9,7 +9,9 @@ import java.util.Optional;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.git.GitConflictResolver;
 import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.conflicts.GitConflictResolver;
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitBibParser;
@@ -29,31 +31,30 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.revwalk.RevCommit;
 
-/**
- * ViewModel responsible for coordinating UI-bound Git Pull workflow,
- * including conflict resolution.
- */
 public class GitPullViewModel extends AbstractViewModel {
     private final ImportFormatPreferences importFormatPreferences;
     private final GitConflictResolver conflictResolver;
     private final DialogService dialogService;
+    private final GitHandler gitHandler;
+    private final GitStatusViewModel gitStatusViewModel;
+    private final Path bibFilePath;
 
     public GitPullViewModel(ImportFormatPreferences importFormatPreferences,
-                             GitConflictResolver conflictResolver,
-                             DialogService dialogService) {
+                            GitConflictResolver conflictResolver,
+                            DialogService dialogService,
+                            GitHandler gitHandler,
+                            GitStatusViewModel gitStatusViewModel) {
         this.importFormatPreferences = importFormatPreferences;
         this.conflictResolver = conflictResolver;
         this.dialogService = dialogService;
+        this.gitHandler = gitHandler;
+        this.gitStatusViewModel = gitStatusViewModel;
+        this.bibFilePath = gitStatusViewModel.getCurrentBibFile();
     }
 
-    public MergeResult pull(Path bibFilePath) throws IOException, GitAPIException, JabRefException {
+    public MergeResult pull() throws IOException, GitAPIException, JabRefException {
         // Open the Git repository from the parent folder of the .bib file
-        Git git = Git.open(bibFilePath.getParent().toFile());
-
-        // Fetch latest changes from remote
-        // TODO: Temporary — GitHandler should be injected from GitStatusViewModel once centralized git status is implemented.
-        GitHandler gitHandler = GitHandler.fromAnyPath(bibFilePath)
-                                          .orElseThrow(() -> new IllegalStateException("Not inside a Git repository"));
+        Git git = Git.open(gitHandler.getRepositoryPathAsFile());
 
         gitHandler.fetchOnCurrentBranch();
 
@@ -66,12 +67,12 @@ public class GitPullViewModel extends AbstractViewModel {
         RevCommit remoteCommit = triple.remote();
 
         // Ensure file is inside the Git working tree
-        Path bibPath = bibFilePath.toRealPath();
-        Path workTree = git.getRepository().getWorkTree().toPath().toRealPath();
-        if (!bibPath.startsWith(workTree)) {
-            throw new IllegalStateException("Given .bib file is not inside repository");
+        Path repoRoot = gitHandler.getRepositoryPathAsFile().toPath().toRealPath();
+        Path resolvedBibPath = bibFilePath.toRealPath();
+        if (!resolvedBibPath.startsWith(repoRoot)) {
+            throw new JabRefException("The provided .bib file is not inside the Git repository.");
         }
-        Path relativePath = workTree.relativize(bibPath);
+        Path relativePath = repoRoot.relativize(resolvedBibPath);
 
         // 1. Load three versions
         String baseContent = GitFileReader.readFileFromCommit(git, baseCommit, relativePath);
@@ -112,6 +113,8 @@ public class GitPullViewModel extends AbstractViewModel {
 
         // Create Git commit for the merged result
         gitHandler.createCommitOnCurrentBranch("Auto-merged by JabRef", true);
+
+        gitStatusViewModel.updateStatusFromPath(bibFilePath);
         return MergeResult.success();
     }
 }

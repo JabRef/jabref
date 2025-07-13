@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.git.conflicts.GitConflictResolver;
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitBibParser;
@@ -13,6 +15,7 @@ import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
+import org.jabref.logic.git.merge.GitMergeUtil;
 import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.logic.git.merge.SemanticMerger;
 import org.jabref.logic.git.model.MergeResult;
@@ -54,10 +57,12 @@ public class GitSyncService {
     private static final boolean AMEND = true;
     private final ImportFormatPreferences importFormatPreferences;
     private final GitHandler gitHandler;
+    private final GitConflictResolver gitConflictResolver;
 
-    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler) {
+    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler, GitConflictResolver gitConflictResolver) {
         this.importFormatPreferences = importFormatPreferences;
         this.gitHandler = gitHandler;
+        this.gitConflictResolver = gitConflictResolver;
     }
 
     /**
@@ -134,14 +139,15 @@ public class GitSyncService {
         BibDatabaseContext effectiveRemote = remote;
         if (!conflicts.isEmpty()) {
             List<BibEntry> resolvedRemoteEntries = new ArrayList<>();
-
-//            for (ThreeWayEntryConflict conflict : conflicts) {
-//                // Uses a GUI dialog to let the user merge entries interactively
-//                BibEntry resolvedEntry = this.conflictResolver.resolveConflict(conflict, prefs, dialogService);
-//                resolvedRemoteEntries.add(resolvedEntry);
-//            }
-//            // Replace conflicted entries in remote with user-resolved ones
-//            effectiveRemote = GitMergeUtil.replaceEntries(remote, resolvedRemoteEntries);
+            for (ThreeWayEntryConflict conflict : conflicts) {
+                Optional<BibEntry> maybeResolved = gitConflictResolver.resolveConflict(conflict);
+                if (maybeResolved.isEmpty()) {
+                    LOGGER.warn("User canceled conflict resolution.");
+                    return MergeResult.failure();
+                }
+                resolvedRemoteEntries.add(maybeResolved.get());
+            }
+            effectiveRemote = GitMergeUtil.replaceEntries(remote, resolvedRemoteEntries);
         }
 
         //  4. Apply resolved remote (either original or conflict-resolved) to local
