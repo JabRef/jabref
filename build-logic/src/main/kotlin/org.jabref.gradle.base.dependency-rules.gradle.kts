@@ -583,5 +583,5 @@ extraJavaModuleInfo {
     module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")
     module("org.openjdk.jmh:jmh-generator-bytecode", "jmh.generator.bytecode")
     module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
-    module("org.apache.commons:commons-math3", "org.apache.commons.math3")
+    module("org.apache.commons:commons-math3", "commons.math3")
 }
