@@ -25,7 +25,10 @@ dependencies {
 
     implementation(project(":jabsrv"))
 
-    implementation("com.pixelduke:fxthemes")
+    implementation("com.pixelduke:fxthemes") {
+        exclude(group = "net.java.dev.jna", module = "jna")
+        exclude(group = "net.java.dev.jna", module = "jna-platform")
+    }
 
     // From JavaFX25 onwards
     implementation("org.openjfx:jdk-jsobject")
@@ -81,7 +84,7 @@ dependencies {
     implementation ("org.apache.pdfbox:pdfbox")
 
     implementation("net.java.dev.jna:jna-jpms")
-    implementation("net.java.dev.jna:jna-platform")
+    implementation("net.java.dev.jna:jna-platform-jpms")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit")
 
@@ -96,7 +99,10 @@ dependencies {
     implementation("org.libreoffice:unoloader")
     implementation("org.libreoffice:libreoffice")
 
-    implementation("com.github.javakeyring:java-keyring")
+    implementation("com.github.javakeyring:java-keyring") {
+        exclude(group = "net.java.dev.jna", module = "jna")
+        exclude(group = "net.java.dev.jna", module = "jna-platform")
+    }
 
     implementation("info.picocli:picocli")
     annotationProcessor("info.picocli:picocli-codegen")

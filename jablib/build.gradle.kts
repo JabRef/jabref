@@ -70,7 +70,10 @@ dependencies {
     implementation ("org.apache.pdfbox:fontbox")
     implementation ("org.apache.pdfbox:xmpbox")
 
-    implementation("net.sourceforge.tess4j:tess4j")
+    implementation("net.sourceforge.tess4j:tess4j") {
+        exclude(group = "net.java.dev.jna", module = "jna")
+        exclude(group = "net.java.dev.jna", module = "jna-platform")
+    }
 
     implementation("org.apache.lucene:lucene-core")
     implementation("org.apache.lucene:lucene-queryparser")
@@ -98,7 +101,10 @@ dependencies {
     implementation("io.github.java-diff-utils:java-diff-utils")
     implementation("info.debatty:java-string-similarity")
 
-    implementation("com.github.javakeyring:java-keyring")
+    implementation("com.github.javakeyring:java-keyring") {
+        exclude(group = "net.java.dev.jna", module = "jna")
+        exclude(group = "net.java.dev.jna", module = "jna-platform")
+    }
 
     implementation("org.eclipse.jgit:org.eclipse.jgit")
 
@@ -143,7 +149,10 @@ dependencies {
     implementation("com.vladsch.flexmark:flexmark")
     implementation("com.vladsch.flexmark:flexmark-html2md-converter")
 
-    implementation("net.harawata:appdirs")
+    implementation("net.harawata:appdirs") {
+        exclude(group = "net.java.dev.jna", module = "jna")
+        exclude(group = "net.java.dev.jna", module = "jna-platform")
+    }
 
     implementation("org.jooq:jool")
 
@@ -168,7 +177,10 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-hugging-face")
 
     implementation("org.apache.velocity:velocity-engine-core")
-    implementation("ai.djl:api")
+    implementation("ai.djl:api") {
+        exclude(group = "net.java.dev.jna", module = "jna")
+        exclude(group = "net.java.dev.jna", module = "jna-platform")
+    }
     implementation("ai.djl.huggingface:tokenizers")
     implementation("ai.djl.pytorch:pytorch-model-zoo")
     implementation("io.github.stefanbratanov:jvm-openai")
