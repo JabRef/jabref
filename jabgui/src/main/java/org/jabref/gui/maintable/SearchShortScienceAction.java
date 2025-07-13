@@ -23,7 +23,6 @@ public class SearchShortScienceAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences preferences;
 
-
     public SearchShortScienceAction(DialogService dialogService, StateManager stateManager, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
