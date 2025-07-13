@@ -135,7 +135,7 @@ public class CommonArchitectureTest {
                 "org.slf4j.impl..",                     // Concrete SLF4J bindings
                 "ch.qos.logback..",                     // Logback
                 "org.apache.commons.logging..",         // Apache Commons logging
-                "org.mariadb.jdbc.internal.logging.."   // Example specific logging
+                "org.mariadb.jdbc.internal.logging.."   // Mariadb logging
         );
 
         ArchRuleDefinition.noClasses().should().accessClassesThat()
