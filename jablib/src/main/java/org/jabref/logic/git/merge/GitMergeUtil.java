@@ -17,7 +17,6 @@ public class GitMergeUtil {
      * @param resolvedEntries list of entries that the user has manually resolved via GUI
      * @return a new BibDatabaseContext with resolved entries replacing original ones
      */
-    // TODO: unit test
     public static BibDatabaseContext replaceEntries(BibDatabaseContext remote, List<BibEntry> resolvedEntries) {
         // 1. make a copy of the remote database
         BibDatabase newDatabase = new BibDatabase();
@@ -25,7 +24,7 @@ public class GitMergeUtil {
         Map<String, BibEntry> resolvedMap = resolvedEntries.stream()
                                                            .filter(entry -> entry.getCitationKey().isPresent())
                                                            .collect(Collectors.toMap(
-                                                                   entry -> String.valueOf(entry.getCitationKey()),
+                                                                   entry -> entry.getCitationKey().get(),
                                                                    Function.identity()));
 
         // 3. Iterate original remote entries

@@ -8,7 +8,6 @@ import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
 import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.logic.git.conflicts.GitConflictResolver;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.model.entry.BibEntry;
 
@@ -16,7 +15,7 @@ import org.jabref.model.entry.BibEntry;
  * UI wrapper
  * Receives a semantic conflict (ThreeWayEntryConflict), pops up an interactive GUI (belonging to mergeentries), and returns a user-confirmed BibEntry merge result.
  */
-public class GitConflictResolverDialog implements GitConflictResolver {
+public class GitConflictResolverDialog {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
 
@@ -25,7 +24,6 @@ public class GitConflictResolverDialog implements GitConflictResolver {
         this.preferences = preferences;
     }
 
-    @Override
     public Optional<BibEntry> resolveConflict(ThreeWayEntryConflict conflict) {
         BibEntry base = conflict.base();
         BibEntry local = conflict.local();

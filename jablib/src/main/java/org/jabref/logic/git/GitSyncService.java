@@ -2,12 +2,11 @@ package org.jabref.logic.git;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.conflicts.GitConflictResolver;
+import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitBibParser;
@@ -15,7 +14,6 @@ import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
-import org.jabref.logic.git.merge.GitMergeUtil;
 import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.logic.git.merge.SemanticMerger;
 import org.jabref.logic.git.model.MergeResult;
@@ -24,7 +22,6 @@ import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.status.SyncStatus;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -38,18 +35,6 @@ import org.slf4j.LoggerFactory;
  *     → UI merge;
  * else
  *     → autoMerge := local + remoteDiff
- *
- * NOTICE：
- * - TODO：This class will be **deprecated** in the near future to avoid architecture violation (logic → gui)!
- * - The underlying business logic will not change significantly.
- * - Only the coordination responsibilities will shift to GUI/ViewModel layer.
- *
- * PLAN:
- * - All orchestration logic (pull/push, merge, resolve, commit)
- *   will be **moved into corresponding ViewModels**, such as:
- *     - GitPullViewModel
- *     - GitPushViewModel
- *     - GitStatusViewModel
  */
 public class GitSyncService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitSyncService.class);
@@ -57,12 +42,12 @@ public class GitSyncService {
     private static final boolean AMEND = true;
     private final ImportFormatPreferences importFormatPreferences;
     private final GitHandler gitHandler;
-    private final GitConflictResolver gitConflictResolver;
+    private final GitConflictResolverStrategy gitConflictResolverStrategy;
 
-    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler, GitConflictResolver gitConflictResolver) {
+    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler, GitConflictResolverStrategy gitConflictResolverStrategy) {
         this.importFormatPreferences = importFormatPreferences;
         this.gitHandler = gitHandler;
-        this.gitConflictResolver = gitConflictResolver;
+        this.gitConflictResolverStrategy = gitConflictResolverStrategy;
     }
 
     /**
@@ -135,20 +120,13 @@ public class GitSyncService {
         // 2. Conflict detection
         List<ThreeWayEntryConflict> conflicts = SemanticConflictDetector.detectConflicts(base, local, remote);
 
-        // 3. If there are conflicts, prompt user to resolve them via GUI
-        BibDatabaseContext effectiveRemote = remote;
-        if (!conflicts.isEmpty()) {
-            List<BibEntry> resolvedRemoteEntries = new ArrayList<>();
-            for (ThreeWayEntryConflict conflict : conflicts) {
-                Optional<BibEntry> maybeResolved = gitConflictResolver.resolveConflict(conflict);
-                if (maybeResolved.isEmpty()) {
-                    LOGGER.warn("User canceled conflict resolution.");
-                    return MergeResult.failure();
-                }
-                resolvedRemoteEntries.add(maybeResolved.get());
-            }
-            effectiveRemote = GitMergeUtil.replaceEntries(remote, resolvedRemoteEntries);
+        // 3. If there are conflicts, ask strategy to resolve
+        Optional<BibDatabaseContext> maybeRemote = gitConflictResolverStrategy.resolveConflicts(conflicts, remote);
+        if (maybeRemote.isEmpty()) {
+            LOGGER.warn("Merge aborted: Conflict resolution was canceled or denied.");
+            return MergeResult.failure();
         }
+        BibDatabaseContext effectiveRemote = maybeRemote.get();
 
         //  4. Apply resolved remote (either original or conflict-resolved) to local
         MergePlan plan = SemanticConflictDetector.extractMergePlan(base, effectiveRemote);

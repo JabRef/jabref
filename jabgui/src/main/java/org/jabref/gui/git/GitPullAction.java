@@ -10,6 +10,9 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.JabRefException;
+import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.GitSyncService;
+import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.model.database.BibDatabaseContext;
 
@@ -53,12 +56,15 @@ public class GitPullAction extends SimpleCommand {
 
         Path bibFilePath = database.getDatabasePath().get();
         try {
-            GitPullViewModel viewModel = new GitPullViewModel(
-                    guiPreferences.getImportFormatPreferences(),
-                    new GitConflictResolverDialog(dialogService, guiPreferences),
-                    dialogService
-            );
-            MergeResult result = viewModel.pull(bibFilePath);
+            GitHandler handler = new GitHandler(bibFilePath.getParent());
+            GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
+            GitConflictResolverStrategy resolver = new GuiConflictResolverStrategy(dialog);
+
+            GitSyncService syncService = new GitSyncService(guiPreferences.getImportFormatPreferences(), handler, resolver);
+            GitStatusViewModel statusViewModel = new GitStatusViewModel(bibFilePath);
+
+            GitPullViewModel viewModel = new GitPullViewModel(syncService, statusViewModel);
+            MergeResult result = viewModel.pull();
 
             if (result.isSuccessful()) {
                 dialogService.showInformationDialogAndWait("Git Pull", "Successfully merged and updated.");

@@ -110,6 +110,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.git.merge;
     exports org.jabref.logic.git.io;
     exports org.jabref.logic.git.model;
+    exports org.jabref.logic.git.status;
 
     requires java.base;
 
