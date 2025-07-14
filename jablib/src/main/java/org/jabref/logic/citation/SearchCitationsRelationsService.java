@@ -97,6 +97,7 @@ public class SearchCitationsRelationsService {
             }
             return citationCountResult.orElse(0);
         }
+        assert !actualFieldValue.isEmpty();
         return Integer.parseInt(actualFieldValue.get());
     }
 
