@@ -40,11 +40,6 @@ Accept: application/x-bibtex
 GET http://localhost:23119/libraries/demo/entries/pdffiles
 Accept: application/json
 
-### Get annotations from pdf files in Chocolate.bib
-
-GET http://localhost:23119/libraries/demo/entries/pdffiles/annotations
-Accept: application/json
-
 ### Get CSL JSON of Chocolate.bib
 
 GET http://localhost:23119/libraries/demo

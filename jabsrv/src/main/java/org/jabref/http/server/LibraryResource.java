@@ -5,19 +5,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.http.dto.LinkedPdfFileDTO;
-import org.jabref.http.dto.PdfAnnotationDTO;
 import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
-import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
-import org.jabref.logic.pdf.FileAnnotationCache;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
@@ -25,7 +21,6 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.model.entry.field.StandardField;
-import org.jabref.model.pdf.FileAnnotation;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.gson.Gson;
@@ -337,56 +332,6 @@ public class LibraryResource {
             }
         }
         return gson.toJson(response);
-    }
-
-    /**
-     * At http://localhost:23119/libraries/{id}/entries/pdffiles/annotations <br><br>
-     *
-     * Loops through all entries in the specified library and uses FileAnnotationCache to extract the annotations.
-     * Then, groups them by their "parent" PDF file, represented in this list as a LinkedPDFFileDTO.
-     * Lastly, serialises the list.
-     *
-     * @param id The Name of the specified library
-     * @return A JSON serialised list of FileAnnotationDTOs grouped by their parent PDF files
-     * @throws IOException
-     */
-    @GET
-    @Path("entries/pdffiles/annotations")
-    @Produces(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-    public String getPDFAnnotationsAsList(@PathParam("id") String id) throws IOException {
-        // Get BibEntries
-        BibDatabaseContext databaseContext = getDatabaseContext(id);
-        FilePreferences filePreferences = preferences.getFilePreferences();
-        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
-
-        if (entries.isEmpty()) {
-            throw new NotFoundException("No entries found for library: " + id);
-        }
-
-        FileAnnotationCache annoCache = new FileAnnotationCache(databaseContext, filePreferences);
-        List<PdfAnnotationDTO> response = new ArrayList<>();
-
-        // loop through all entries to extract annotations
-        for (BibEntry bibEntry : entries) {
-            response.addAll(extractAnnotationsFromEntry(bibEntry, annoCache));
-        }
-
-        return gson.toJson(response);
-    }
-
-    /**
-     * Extracts all FileAnnotations from PDF files attached to the given BibEntry and returns them as a list.
-     *
-     * @param entry The BibEntry whose attached PDF files' annotations will be extracted
-     * @param cache A FileAnnotationCache instance which will do the extractions
-     * @return A List of PdfAnnotationDTO
-     */
-    private List<PdfAnnotationDTO> extractAnnotationsFromEntry(BibEntry entry, FileAnnotationCache cache) {
-        List<PdfAnnotationDTO> annotationDTOs = new ArrayList<>();
-        Map<java.nio.file.Path, List<FileAnnotation>> cacheResult = cache.getFromCache(entry);
-        cacheResult.forEach((path, fileAnnotations) -> annotationDTOs.add(new PdfAnnotationDTO(path, entry, fileAnnotations)));
-
-        return annotationDTOs;
     }
 
     /**
