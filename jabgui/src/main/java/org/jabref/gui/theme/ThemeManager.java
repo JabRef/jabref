@@ -73,7 +73,13 @@ public class ThemeManager {
         this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
-        this.themeWindowManager = ThemeWindowManagerFactory.create();
+        ThemeWindowManager tempThemeWindowManager = null;
+        try {
+            tempThemeWindowManager = ThemeWindowManagerFactory.create();
+        } catch (UnsatisfiedLinkError | RuntimeException e) {
+            LOGGER.error("Failed to create ThemeWindowManager (likely due to native library compatibility issues on ARM64)", e);
+        }
+        this.themeWindowManager = tempThemeWindowManager;
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
         this.theme = workspacePreferences.getTheme();
@@ -121,10 +127,12 @@ public class ThemeManager {
             return;
         }
 
-        try {
-            themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
-        } catch (UnsatisfiedLinkError | RuntimeException e) {
-            LOGGER.error("Failed to set dark mode for window frame (likely due to native library compatibility issues on ARM64)", e);
+        if (themeWindowManager != null) {
+            try {
+                themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
+            } catch (UnsatisfiedLinkError | RuntimeException e) {
+                LOGGER.error("Failed to set dark mode for window frame (likely due to native library compatibility issues on ARM64)", e);
+            }
         }
         LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
     }
