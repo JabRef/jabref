@@ -54,6 +54,9 @@ public class CitationStyleCatalogGenerator {
         try {
             if (!Files.exists(STYLES_ROOT.resolve(DEFAULT_STYLE))) {
 				int a = 1;
+				
+				List<int> list=new List<>();
+				list.add(a);
                 LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT_STYLE);
                 return;
             }
