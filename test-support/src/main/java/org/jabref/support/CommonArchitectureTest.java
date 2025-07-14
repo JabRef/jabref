@@ -2,6 +2,7 @@ package org.jabref.support;
 
 import java.net.URI;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
 import org.jabref.architecture.AllowedToUseAwt;
@@ -89,13 +90,18 @@ public class CommonArchitectureTest {
                           .check(classes);
     }
 
-    // TODO: no org.jabref.gui package may reside in org.jabref.logic
-
     @ArchTest
     public void doNotUseLogicInModel(JavaClasses classes) {
         ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_MODEL)
                           .and().areNotAnnotatedWith(AllowedToUseLogic.class)
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
+                          .check(classes);
+    }
+
+    @ArchTest
+    public void doNotUseGuiInLogic(JavaClasses classes) {
+        ArchRuleDefinition.noClasses().that().resideInAPackage(PACKAGE_ORG_JABREF_LOGIC)
+                          .should().dependOnClassesThat().resideInAPackage(PACKAGE_ORG_JABREF_GUI)
                           .check(classes);
     }
 
@@ -117,6 +123,27 @@ public class CommonArchitectureTest {
                           .and().areNotAnnotatedWith(AllowedToUseSwing.class)
                           .and().areNotAssignableFrom("org.jabref.logic.search.DatabaseSearcherWithBibFilesTest")
                           .should().dependOnClassesThat().resideInAPackage(PACKAGE_JAVAX_SWING)
+                          .check(classes);
+    }
+
+    @ArchTest
+    public void restrictToSlf4jLogger(JavaClasses classes) {
+        List<String> restrictedLoggingPackages = List.of(
+                "java.util.logging..",                  // Java's built-in logging
+                "org.apache.log4j..",                   // Log4j 1.x
+                "org.apache.logging.log4j..",           // Log4j 2.x
+                "org.slf4j.impl..",                     // Concrete SLF4J bindings
+                "ch.qos.logback..",                     // Logback
+                "org.apache.commons.logging..",         // Apache Commons logging
+                "org.tinylog..",                        // Tinylog
+                "org.mariadb.jdbc.internal.logging.."   // Mariadb logging
+        );
+
+        ArchRuleDefinition.noClasses()
+                          .that().resideOutsideOfPackages("org.jabref.gui.errorconsole", "org.jabref.gui.logging", "org.jabref")
+                          .should().accessClassesThat()
+                          .resideInAnyPackage(restrictedLoggingPackages.toArray(String[]::new))
+                          .because("slf4j should be used for logging")
                           .check(classes);
     }
 

@@ -1,18 +1,14 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.strings.StringUtil;
 
@@ -21,31 +17,26 @@ import org.slf4j.LoggerFactory;
 
 public class PushToSublimeText extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.SUBLIME_TEXT;
+    public static final PushApplications APPLICATION = PushApplications.SUBLIME_TEXT;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToSublimeText.class);
 
-    public PushToSublimeText(DialogService dialogService, GuiPreferences preferences) {
-        super(dialogService, preferences);
+    public PushToSublimeText(NotificationService notificationService, PushToApplicationPreferences preferences) {
+        super(notificationService, preferences);
     }
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_SUBLIMETEXT;
-    }
-
-    @Override
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
+    public void pushEntries(List<BibEntry> entries) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         // Check if a path to the command has been specified
         if (StringUtil.isNullOrEmpty(commandPath)) {
@@ -53,6 +44,7 @@ public class PushToSublimeText extends AbstractPushToApplication {
             return;
         }
         try {
+            String keyString = this.getKeyString(entries, getDelimiter());
             LOGGER.debug("Sublime string: {}", String.join(" ", getCommandLine(keyString)));
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             processBuilder.inheritIO();

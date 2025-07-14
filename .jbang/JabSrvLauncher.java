@@ -59,7 +59,7 @@
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.0
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.1
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.7
 //DEPS org.bouncycastle:bcprov-jdk18on:1.81
