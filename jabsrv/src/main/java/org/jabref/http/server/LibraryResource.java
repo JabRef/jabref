@@ -306,7 +306,7 @@ public class LibraryResource {
             if (!pathsToFiles.isEmpty()) {
                 for (LinkedFile file : pathsToFiles) {
                     // ignore all non pdf files and online references
-                    if (!file.getFileType().equals("PDF") || LinkedFile.isOnlineLink(file.getLink())) {
+                    if (!"PDF".equals(file.getFileType()) || LinkedFile.isOnlineLink(file.getLink())) {
                         continue;
                     }
                     // add file to response body
@@ -362,9 +362,7 @@ public class LibraryResource {
      */
     private List<PdfAnnotationDTO> extractAnnotationsFromEntry(BibEntry entry, FileAnnotationCache cache) {
         List<PdfAnnotationDTO> annotationDTOs = new ArrayList<>();
-        // get the Cache result
         Map<java.nio.file.Path, List<FileAnnotation>> cacheResult = cache.getFromCache(entry);
-        // create a new PdfAnnotationDTO for each extracted annotation and add it to the list
         cacheResult.forEach((path, fileAnnotations) -> annotationDTOs.add(new PdfAnnotationDTO(path, entry, fileAnnotations)));
 
         return annotationDTOs;
