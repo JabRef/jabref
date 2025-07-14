@@ -23,10 +23,10 @@ import org.jabref.gui.util.ViewModelTableRowFactory;
 import org.jabref.logic.importer.plaincitation.PlainCitationParserChoice;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.FetcherApiKey;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import org.apache.logging.log4j.util.Strings;
 
 public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewModel> implements PreferencesTab {
 
@@ -99,7 +99,7 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
         citationsRelationStoreTTL
                 .textProperty()
                 .addListener((_, _, newValue) -> {
-                    if (Strings.isBlank(newValue)) {
+                    if (StringUtil.isBlank(newValue)) {
                         return;
                     }
                     if (!newValue.matches("\\d*")) {
