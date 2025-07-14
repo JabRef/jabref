@@ -85,7 +85,7 @@ public class SearchCitationsRelationsService {
     }
 
     public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue) throws FetcherException {
-        Optional<Integer> citationCountResult = Optional.empty();
+        Optional<Integer> citationCountResult;
         boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(citationCounted)
                 || actualFieldValue.isEmpty();
         if (isFetchingAllowed) {
