@@ -53,6 +53,7 @@ public class CitationStyleCatalogGenerator {
     public static void generateCitationStyleCatalog() {
         try {
             if (!Files.exists(STYLES_ROOT.resolve(DEFAULT_STYLE))) {
+				int a = 1;
                 LOGGER.error("Could not find any citation style. Tried with {}.", DEFAULT_STYLE);
                 return;
             }
