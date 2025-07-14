@@ -75,6 +75,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When creating a library, if you drag a PDF file containing only a single column, the dialog will now automatically close. [#13262](https://github.com/JabRef/jabref/issues/13262)
 - We fixed an issue where the tab showing the fulltext search results would appear blank after switching library. [#13241](https://github.com/JabRef/jabref/issues/13241)
 - Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)
+- We fixed an issue where JabRef crashed on startup on Apple Silicon Macs due to native library compatibility issues in the theme manager. [#13536](https://github.com/JabRef/jabref/issues/13536)
 
 ### Removed
 
@@ -197,7 +198,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where libraries would sometimes be hidden when closing tabs with the Welcome tab open. [#12894](https://github.com/JabRef/jabref/issues/12894)
 - We fixed an issue with deleting entries in large libraries that caused it to take a long time. [#8976](https://github.com/JabRef/jabref/issues/8976)
 - We fixed an issue where "Reveal in file explorer" option was disabled for newly saved libraries until reopening the file. [#12722](https://github.com/JabRef/jabref/issues/12722)
-- We fixed an issue where JabRef crashed on startup on Apple Silicon Macs due to native library compatibility issues in the theme manager. [#13536](https://github.com/JabRef/jabref/issues/13536)
 
 ### Removed
 
