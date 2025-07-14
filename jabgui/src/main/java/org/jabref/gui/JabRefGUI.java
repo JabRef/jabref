@@ -418,6 +418,7 @@ public class JabRefGUI extends Application {
             GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
             guiBridge.setOpenDatabases(stateManager.getOpenDatabases());
             guiBridge.setSelectedEntries(stateManager.getSelectedEntries());
+            stateManager.activeDatabaseProperty().addListener((_, _, newValue) -> guiBridge.setActiveDatabase(newValue.orElse(null)));
             httpServerManager.start(guiBridge, remotePreferences.getHttpServerUri());
         }
     }

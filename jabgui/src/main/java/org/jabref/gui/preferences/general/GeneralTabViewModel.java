@@ -307,11 +307,11 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             remotePreferences.setEnableHttpServer(true);
             ObservableList<BibDatabaseContext> openDatabases = Injector.instantiateModelOrService(StateManager.class).getOpenDatabases();
             URI uri = remotePreferences.getHttpServerUri();
-
+            StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-            guiBridge.setSelectedEntries(Injector.instantiateModelOrService(StateManager.class).getSelectedEntries());
-            guiBridge.setOpenDatabases(Injector.instantiateModelOrService(StateManager.class).getOpenDatabases());
-
+            guiBridge.setSelectedEntries(stateManager.getSelectedEntries());
+            guiBridge.setOpenDatabases(stateManager.getOpenDatabases());
+            stateManager.activeDatabaseProperty().addListener((observableValue, oldValue, newValue) -> guiBridge.setActiveDatabase(newValue.orElse(null)));
             httpServerManager.start(guiBridge, uri);
         } else {
             remotePreferences.setEnableHttpServer(false);

@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 
@@ -74,11 +75,12 @@ public class CAYWResource {
         }
         
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
+        databaseContext.getEntries().forEach(bibEntry -> System.out.println(bibEntry.getId()));
 
         List<CAYWEntry> entries = databaseContext.getEntries()
                                                  .stream()
                                                  .map(this::createCAYWEntry)
-                                                 .toList();
+                                                 .collect(Collectors.toList());
 
         // Selected parameter handling
         List<CAYWEntry> searchResults;
@@ -102,7 +104,7 @@ public class CAYWResource {
         if (queryParams.isSelect() && guiBridge.isRunningInCli()) {
             LOGGER.error("The 'select' parameter is not supported in CLI mode. Please use the GUI to select entries.");
         } else if (queryParams.isSelect()) {
-            guiBridge.setSelectEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList());
+            guiBridge.setSelectEntries(searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
         }
 
         // Format parameter handling
@@ -157,9 +159,6 @@ public class CAYWResource {
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
         Optional<String> libraryId = queryParams.getLibraryId();
         if (libraryId.isPresent()) {
-            if ("demo".equals(libraryId.get())) {
-                return ServerUtils.getBibDatabaseContext("demo", filesToServe, guiBridge, preferences.getImportFormatPreferences());
-            }
             return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, guiBridge, preferences.getImportFormatPreferences());
         }
 
@@ -172,6 +171,10 @@ public class CAYWResource {
             assert !"demo".equalsIgnoreCase(libraryPath.get());
             InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(libraryPath.get()));
             return getDatabaseContextFromStream(inputStream);
+        }
+
+        if (guiBridge.getActiveDatabase().isPresent()) {
+            return guiBridge.getActiveDatabase().get();
         }
 
         return getDatabaseContextFromStream(getLatestDatabaseStream());

@@ -1,6 +1,7 @@
 package org.jabref.http.server.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,10 +14,8 @@ public class GuiBridge {
     private ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableList<BibEntry> selectEntries = FXCollections.observableArrayList();
+    private BibDatabaseContext activeDatabase;
     private boolean runningInCli = false;
-
-    public GuiBridge() {
-    }
 
     public void setSelectedEntries(ObservableList<BibEntry> selectedEntries) {
         this.selectedEntries = selectedEntries;
@@ -48,5 +47,13 @@ public class GuiBridge {
 
     public void setRunningInCli(boolean runningInCli) {
         this.runningInCli = runningInCli;
+    }
+
+    public Optional<BibDatabaseContext> getActiveDatabase() {
+        return Optional.ofNullable(activeDatabase);
+    }
+
+    public void setActiveDatabase(BibDatabaseContext activeDatabase) {
+        this.activeDatabase = activeDatabase;
     }
 }
