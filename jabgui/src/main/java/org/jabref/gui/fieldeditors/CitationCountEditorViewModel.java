@@ -59,7 +59,8 @@ public class CitationCountEditorViewModel extends AbstractEditorViewModel {
         BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(bibEntry, fieldAux))
                       .onRunning(() -> fetchCitationCountInProgress.setValue(true))
                       .onFinished(() -> fetchCitationCountInProgress.setValue(false))
-                      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Error in getting Citation count"), e))
+                      .onFailure(e ->
+                          dialogService.showErrorDialogAndWait(Localization.lang("Error Occurred")))
                       .onSuccess(identifier -> {
                           entry.setField(field, String.valueOf(identifier));
                       }).executeWith(taskExecutor);
