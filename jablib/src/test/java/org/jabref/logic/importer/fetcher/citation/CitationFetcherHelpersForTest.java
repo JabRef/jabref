@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.jabref.logic.importer.FetcherException;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 
 public class CitationFetcherHelpersForTest {
@@ -13,7 +12,7 @@ public class CitationFetcherHelpersForTest {
         public static CitationFetcher from(
             Function<BibEntry, List<BibEntry>> retrieveCitedBy,
             Function<BibEntry, List<BibEntry>> retrieveCiting,
-            Function<BibEntry, Optional<PaperDetails>> retrieveCitationCount
+            Function<BibEntry, Optional<Integer>> retrieveCitationCount
         ) {
             return new CitationFetcher() {
                 @Override
@@ -27,7 +26,7 @@ public class CitationFetcherHelpersForTest {
                 }
 
                 @Override
-                public Optional<PaperDetails> searchCitationCount(BibEntry entry) throws FetcherException {
+                public Optional<Integer> searchCitationCount(BibEntry entry) throws FetcherException {
                     return retrieveCitationCount.apply(entry);
                 }
 

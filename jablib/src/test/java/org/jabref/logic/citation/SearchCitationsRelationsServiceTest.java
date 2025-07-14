@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
 import org.jabref.logic.citation.repository.BibEntryRelationsRepositoryTestHelpers;
+import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherHelpersForTest;
-import org.jabref.logic.importer.fetcher.citation.semanticscholar.PaperDetails;
 import org.jabref.model.entry.BibEntry;
 
 import org.junit.jupiter.api.Nested;
@@ -23,7 +23,7 @@ class SearchCitationsRelationsServiceTest {
     /**
      * Creates a mock CitationFetcher that returns specific results for citations and references
      */
-    private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn, Optional<PaperDetails> paperDetailsReturn) {
+    private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn, Optional<Integer> citationCount) {
         return CitationFetcherHelpersForTest.Mocks.from(
                 entry -> {
                     if (entry == targetEntry) {
@@ -39,7 +39,7 @@ class SearchCitationsRelationsServiceTest {
                 },
                 entry -> {
                     if (entry == targetEntry) {
-                        return paperDetailsReturn != null ? paperDetailsReturn : Optional.empty();
+                        return citationCount != null ? citationCount : Optional.empty();
                     }
                     return Optional.empty();
                 }
@@ -227,7 +227,7 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldUpdateCitationCountWithEmptyPaperDetailsResponse() {
+        void serviceShouldUpdateCitationCountWithEmptyPaperDetailsResponse() throws FetcherException {
             int expectedResult = 0;
             BibEntry referencer = new BibEntry();
             Map<BibEntry, List<BibEntry>> referenceDatabase = new HashMap<>();
@@ -242,13 +242,12 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldCorrectlyFetchCitationCountField() {
+        void serviceShouldCorrectlyFetchCitationCountField() throws FetcherException {
             int expectedResult = 3;
             BibEntry reference = new BibEntry();
-            PaperDetails paperDetails = new PaperDetails();
-            paperDetails.setCitationCount(3);
+            Integer citationCount = 3;
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(citationCount));
 
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     null, referencesDatabase, true
@@ -260,15 +259,14 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldUpdateBecauseIsisCitationsUpdatableTrue() {
+        void serviceShouldUpdateBecauseIsisCitationsUpdatableTrue() throws FetcherException {
             int expectedResult = 3;
             BibEntry reference = new BibEntry();
-            PaperDetails paperDetails = new PaperDetails();
-            paperDetails.setCitationCount(3);
+            Integer citationCount = 3;
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
             referencesDatabase.put(reference, List.of());
 
-            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(paperDetails));
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(citationCount));
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     null, referencesDatabase, true
             );

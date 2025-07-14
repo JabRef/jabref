@@ -48,7 +48,7 @@ public interface CitationFetcher {
      * @param entry entry to search citation count field
      * @return returns a {@link PaperDetails}, that includes citation count field (may be empty)
      */
-    Optional<PaperDetails> searchCitationCount(BibEntry entry) throws FetcherException;
+    Optional<Integer> searchCitationCount(BibEntry entry) throws FetcherException;
 
     /**
      * Returns the localized name of this fetcher.

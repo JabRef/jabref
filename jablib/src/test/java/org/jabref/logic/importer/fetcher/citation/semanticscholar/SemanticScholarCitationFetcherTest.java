@@ -65,8 +65,8 @@ class SemanticScholarCitationFetcherTest {
                 .withField(StandardField.ISSN, "0195-6663")
                 .withField(StandardField.PUBLISHER, "Elsevier BV");
 
-        Optional<PaperDetails> result = fetcher.searchCitationCount(entry);
+        Optional<Integer> result = fetcher.searchCitationCount(entry);
         assertNotNull(result.get());
-        assertThat(result.get().getCitationCount(), greaterThan(0));
+        assertThat(result.get(), greaterThan(0));
     }
 }

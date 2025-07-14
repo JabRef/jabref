@@ -34,9 +34,9 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
                 + "&limit=1000";
     }
 
-    public String getAPIUrl(BibEntry entry) {
+    public String getUrlForCitationCount(BibEntry entry) {
         return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
-                + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
+                + "?fields=" + "citationCount"
                 + "&limit=1000";
     }
 
@@ -92,13 +92,13 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     }
 
     @Override
-    public Optional<PaperDetails> searchCitationCount(BibEntry entry) throws FetcherException {
+    public Optional<Integer> searchCitationCount(BibEntry entry) throws FetcherException {
         if (entry.getDOI().isEmpty()) {
             return Optional.empty();
         }
         URL referencesUrl;
         try {
-            referencesUrl = URLUtil.create(getAPIUrl(entry));
+            referencesUrl = URLUtil.create(getUrlForCitationCount(entry));
         } catch (MalformedURLException e) {
             throw new FetcherException("Malformed URL", e);
         }
@@ -109,7 +109,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         if (referencesResponse == null) {
             return Optional.empty();
         }
-        return Optional.of(referencesResponse);
+        return Optional.of(referencesResponse.getCitationCount());
     }
 
     @Override

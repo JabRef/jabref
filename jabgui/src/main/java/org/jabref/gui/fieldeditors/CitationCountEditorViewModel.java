@@ -13,6 +13,7 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
 import org.jabref.logic.integrity.FieldCheckers;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
@@ -58,6 +59,7 @@ public class CitationCountEditorViewModel extends AbstractEditorViewModel {
         BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(bibEntry, fieldAux))
                       .onRunning(() -> fetchCitationCountInProgress.setValue(true))
                       .onFinished(() -> fetchCitationCountInProgress.setValue(false))
+                      .onFailure(e -> dialogService.showErrorDialogAndWait(Localization.lang("Error in getting Citation count"), e))
                       .onSuccess(identifier -> {
                           entry.setField(field, String.valueOf(identifier));
                       }).executeWith(taskExecutor);

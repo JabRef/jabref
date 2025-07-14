@@ -35,7 +35,5 @@ public enum FieldProperty {
 
     // Field content should be treated as data
     VERBATIM,
-    CITATION_COUNT,
-
     YES_NO
 }
