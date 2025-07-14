@@ -286,7 +286,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
             ButtonType replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OTHER);
             ButtonType keepBoth = new ButtonType(Localization.lang("Keep both"), ButtonBar.ButtonData.OTHER);
             ButtonType provideAlternative = new ButtonType(Localization.lang("Provide alternative file name"), ButtonBar.ButtonData.OTHER);
-            ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.OTHER);
+            ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.CANCEL_CLOSE);
 
             // Define tooltips for dialog buttons
             Map<ButtonType, String> tooltips = new HashMap<>();
