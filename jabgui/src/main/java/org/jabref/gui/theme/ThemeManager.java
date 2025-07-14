@@ -121,8 +121,12 @@ public class ThemeManager {
             return;
         }
 
-        themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
-        LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
+        try {
+            themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
+            LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
+        } catch (RuntimeException e) {
+            LOGGER.error("Failed to set dark mode for window frame (likely due to native library compatibility issues on ARM64)", e);
+        }
     }
 
     private void applyDarkModeToAllWindows(boolean darkMode) {
