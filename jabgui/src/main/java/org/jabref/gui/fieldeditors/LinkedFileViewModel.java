@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
@@ -18,6 +20,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -269,7 +272,8 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    private void performRenameWithConflictCheck(String targetFileName) {
+    public void performRenameWithConflictCheck(String targetFileName) {
+        // Check if a file with the same name already exists
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         boolean overwriteFile = false;
 
@@ -282,29 +286,28 @@ public class LinkedFileViewModel extends AbstractViewModel {
             String suggestedFileName = FileNameUniqueness.getNonOverWritingFileName(targetDirectory, targetFileName);
 
             // Define available dialog options
-            ButtonType Replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OTHER);
+            ButtonType replace = new ButtonType(Localization.lang("Replace"), ButtonBar.ButtonData.OTHER);
             ButtonType keepBoth = new ButtonType(Localization.lang("Keep both"), ButtonBar.ButtonData.OTHER);
             ButtonType provideAlternative = new ButtonType(Localization.lang("Provide alternative file name"), ButtonBar.ButtonData.OTHER);
             ButtonType cancel = new ButtonType(Localization.lang("Cancel"), ButtonBar.ButtonData.OTHER);
 
-            // Build the dialog window
-            Dialog<ButtonType> dialog = new Dialog<>();
-            dialog.setTitle(Localization.lang("File already exists"));
-            dialog.setContentText(Localization.lang("File name: \n'%0'", targetFileName));
-            dialog.getDialogPane().getButtonTypes().addAll(Replace, keepBoth, provideAlternative, cancel);
+            // Define tooltips for dialog buttons
+            Map<ButtonType, String> tooltips = new HashMap<>();
+            tooltips.put(keepBoth, Localization.lang("New filename: %0", suggestedFileName));
 
-            // Add tooltip to "Keep both" button with the suggested name
-            Button keepBothButton = (Button) dialog.getDialogPane().lookupButton(keepBoth);
-            if (keepBothButton != null) {
-                keepBothButton.setTooltip(new Tooltip(Localization.lang("New filename: %0", suggestedFileName)));
-            }
+            // Use JabRefDialogService to show a custom dialog with tooltips
+            Optional<ButtonType> result = dialogService.showCustomButtonDialogWithTooltipsAndWait(
+                    Alert.AlertType.CONFIRMATION,
+                    Localization.lang("File already exists"),
+                    Localization.lang("File name: \n'%0'", targetFileName),
+                    tooltips,
+                    replace, keepBoth, provideAlternative, cancel
+            );
 
             // Show dialog and handle user response
-            Optional<ButtonType> result = dialog.showAndWait();
-
             if (result.isEmpty() || result.get() == cancel) {
                 return; // User canceled
-            } else if (result.get() == Replace) {
+            } else if (result.get() == replace) {
                 overwriteFile = true;
             } else if (result.get() == keepBoth) {
                 targetFileName = suggestedFileName;
