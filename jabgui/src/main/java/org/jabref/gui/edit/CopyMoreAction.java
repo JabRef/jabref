@@ -294,7 +294,6 @@ public class CopyMoreAction extends SimpleCommand {
         clipBoardManager.setContent(copiedContent);
 
         if (fieldValues.size() == selectedBibEntries.size()) {
-            // All entries had the field.
             dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
                     JabRefDialogService.shortenDialogMessage(copiedContent)));
         } else {
