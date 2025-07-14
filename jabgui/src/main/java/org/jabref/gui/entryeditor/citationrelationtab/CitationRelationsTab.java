@@ -201,56 +201,51 @@ public class CitationRelationsTab extends EntryEditorTab {
         citingVBox.getChildren().addAll(citingHBox, citingListView);
         citedByVBox.getChildren().addAll(citedByHBox, citedByListView);
 
-        RelationSearchComponents citingRelationSearchComponents = new RelationSearchComponents(
+        CitationComponents citingComponents = new CitationComponents(
                 entry,
                 citingListView,
-                citedByListView,
                 abortCitingButton,
                 refreshCitingButton,
                 CitationFetcher.SearchType.CITES,
                 importCitingButton,
                 citingProgress);
 
-        RelationSearchComponents citedByRelationSearchComponents = new RelationSearchComponents(
+        CitationComponents citedByComponents = new CitationComponents(
                 entry,
                 citedByListView,
-                citingListView,
                 abortCitedButton,
                 refreshCitedByButton,
                 CitationFetcher.SearchType.CITED_BY,
                 importCitedByButton,
                 citedByProgress);
 
-        refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingRelationSearchComponents));
-        refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByRelationSearchComponents));
+        refreshCitingButton.setOnMouseClicked(_ -> searchForRelations(citingComponents, citedByComponents));
+        refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(citedByComponents, citingComponents));
 
         // Create SplitPane to hold all nodes above
         SplitPane container = new SplitPane(citingVBox, citedByVBox);
         styleFetchedListView(citedByListView);
         styleFetchedListView(citingListView);
 
-        searchForRelations(citingRelationSearchComponents);
-        searchForRelations(citedByRelationSearchComponents);
+        searchForRelations(citingComponents, citedByComponents);
+        searchForRelations(citedByComponents, citingComponents);
 
         return container;
     }
 
-    /**
-     * Method to start search for relations and display them in the associated ListView
-     *
-     * @param relationSearchComponents components used to properly display panel
-     */
-    private void searchForRelations(RelationSearchComponents relationSearchComponents) {
-        if (relationSearchComponents.entry().getDOI().isEmpty()) {
-            setUpEmptyPanel(relationSearchComponents);
+    private void searchForRelations(CitationComponents citationComponents,
+                                    CitationComponents otherCitationComponents) {
+        if (citationComponents.entry().getDOI().isEmpty()) {
+            setUpEmptyPanel(citationComponents, otherCitationComponents);
             return;
         }
-        executeSearch(relationSearchComponents);
+        executeSearch(citationComponents);
     }
 
-    private void setUpEmptyPanel(RelationSearchComponents relationSearchComponents) {
-        hideNodes(relationSearchComponents.abortButton(), relationSearchComponents.progress());
-        showNodes(relationSearchComponents.refreshButton());
+    private void setUpEmptyPanel(CitationComponents citationComponents,
+                                 CitationComponents otherCitationComponents) {
+        hideNodes(citationComponents.abortButton(), citationComponents.progress());
+        showNodes(citationComponents.refreshButton());
 
         HBox hBox = new HBox();
         Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
@@ -259,27 +254,26 @@ public class CitationRelationsTab extends EntryEditorTab {
         link.setOnAction(e -> {
             CrossRef doiFetcher = new CrossRef();
 
-            BackgroundTask.wrap(() -> doiFetcher.findIdentifier(relationSearchComponents.entry()))
+            BackgroundTask.wrap(() -> doiFetcher.findIdentifier(citationComponents.entry()))
                           .onRunning(() -> {
-                              setLabelOn(relationSearchComponents.listView(), "Looking Up DOI...");
-                              setLabelOn(relationSearchComponents.otherListView(), "Looking Up DOI...");
+                              showNodes(citationComponents.progress(), otherCitationComponents.progress());
+                              setLabelOn(citationComponents.listView(), "Looking Up DOI...");
+                              setLabelOn(otherCitationComponents.listView(), "Looking Up DOI...");
                           })
                           .onSuccess(identifier -> {
                               if (identifier.isPresent()) {
-                                  relationSearchComponents.entry().setField(StandardField.DOI, identifier.get().asString());
-//                                  setLabelOn(relationSearchComponents.listView(), "Found DOI");
-//                                  setLabelOn(relationSearchComponents.otherListView(), "Found DOI");
-                                  executeSearch(relationSearchComponents);
-                                  // fetch data separately
+                                  citationComponents.entry().setField(StandardField.DOI, identifier.get().asString());
+                                  executeSearch(citationComponents);
+                                  executeSearch(otherCitationComponents);
                               } else {
-                                  // not found
-                                  // just invoke setUpEmptyPanel on both relationSearch
-                                  setLabelOn(relationSearchComponents.listView(), "No DOI Found");
-                                  setLabelOn(relationSearchComponents.otherListView(), "No DOI Found");
+                                  dialogService.notify("No DOI found");
+                                  setUpEmptyPanel(citationComponents, otherCitationComponents);
+                                  setUpEmptyPanel(otherCitationComponents, citationComponents);
                               }
                           }).onFailure(ex -> {
-                              setLabelOn(relationSearchComponents.listView(), "Error " + ex.getMessage());
-                              setLabelOn(relationSearchComponents.otherListView(), "Error " + ex.getMessage());
+                              hideNodes(citationComponents.progress(), otherCitationComponents.progress());
+                              setLabelOn(citationComponents.listView(), "Error " + ex.getMessage());
+                              setLabelOn(otherCitationComponents.listView(), "Error " + ex.getMessage());
                           }).executeWith(taskExecutor);
         });
 
@@ -289,55 +283,55 @@ public class CitationRelationsTab extends EntryEditorTab {
         hBox.setStyle("-fx-alignment: center;");
         hBox.setFillHeight(true);
 
-        relationSearchComponents.listView().getItems().clear();
-        relationSearchComponents.listView().setPlaceholder(hBox);
+        citationComponents.listView().getItems().clear();
+        citationComponents.listView().setPlaceholder(hBox);
     }
 
-    private void executeSearch(RelationSearchComponents relationSearchComponents) {
+    private void executeSearch(CitationComponents citationComponents) {
         ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
-        relationSearchComponents.listView().setItems(observableList);
+        citationComponents.listView().setItems(observableList);
 
         // TODO: It should not be possible to cancel a search task that is already running for same tab
-        if (citingTask != null && !citingTask.isCancelled() && relationSearchComponents.searchType() == CitationFetcher.SearchType.CITES) {
+        if (citingTask != null && !citingTask.isCancelled() && citationComponents.searchType() == CitationFetcher.SearchType.CITES) {
             citingTask.cancel();
-        } else if (citedByTask != null && !citedByTask.isCancelled() && relationSearchComponents.searchType() == CitationFetcher.SearchType.CITED_BY) {
+        } else if (citedByTask != null && !citedByTask.isCancelled() && citationComponents.searchType() == CitationFetcher.SearchType.CITED_BY) {
             citedByTask.cancel();
         }
 
-        this.createBackgroundTask(relationSearchComponents.entry(), relationSearchComponents.searchType())
-            .consumeOnRunning(task -> prepareToSearchForRelations(relationSearchComponents, task))
-            .onSuccess(fetchedList -> onSearchForRelationsSucceed(relationSearchComponents,
+        this.createBackgroundTask(citationComponents.entry(), citationComponents.searchType())
+            .consumeOnRunning(task -> prepareToSearchForRelations(citationComponents, task))
+            .onSuccess(fetchedList -> onSearchForRelationsSucceed(citationComponents,
                     fetchedList,
                     observableList
             ))
             .onFailure(exception -> {
                 LOGGER.error("Error while fetching citing Articles", exception);
-                hideNodes(relationSearchComponents.abortButton(), relationSearchComponents.progress(), relationSearchComponents.importButton());
-                relationSearchComponents.listView().setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
+                hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
+                citationComponents.listView().setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
                         exception.getMessage())));
-                relationSearchComponents.refreshButton().setVisible(true);
+                citationComponents.refreshButton().setVisible(true);
                 dialogService.notify(exception.getMessage());
             })
             .executeWith(taskExecutor);
     }
 
-    private void prepareToSearchForRelations(RelationSearchComponents relationSearchComponents, BackgroundTask<List<BibEntry>> task) {
-        showNodes(relationSearchComponents.abortButton(), relationSearchComponents.progress());
-        hideNodes(relationSearchComponents.refreshButton(), relationSearchComponents.importButton());
+    private void prepareToSearchForRelations(CitationComponents citationComponents, BackgroundTask<List<BibEntry>> task) {
+        showNodes(citationComponents.abortButton(), citationComponents.progress());
+        hideNodes(citationComponents.refreshButton(), citationComponents.importButton());
 
-        relationSearchComponents.abortButton().setOnAction(event -> {
-            hideNodes(relationSearchComponents.abortButton(), relationSearchComponents.progress(), relationSearchComponents.importButton());
-            showNodes(relationSearchComponents.refreshButton());
+        citationComponents.abortButton().setOnAction(event -> {
+            hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
+            showNodes(citationComponents.refreshButton());
             task.cancel();
             dialogService.notify(Localization.lang("Search aborted!"));
         });
     }
 
-    private void onSearchForRelationsSucceed(RelationSearchComponents relationSearchComponents,
+    private void onSearchForRelationsSucceed(CitationComponents citationComponents,
                                              List<BibEntry> fetchedList,
                                              ObservableList<CitationRelationItem> observableList) {
 
-        hideNodes(relationSearchComponents.abortButton(), relationSearchComponents.progress());
+        hideNodes(citationComponents.abortButton(), citationComponents.progress());
 
         BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase).orElse(new BibDatabase());
         observableList.setAll(
@@ -352,15 +346,15 @@ public class CitationRelationsTab extends EntryEditorTab {
         );
 
         if (!observableList.isEmpty()) {
-            relationSearchComponents.listView().refresh();
+            citationComponents.listView().refresh();
         } else {
             Label placeholder = new Label(Localization.lang("No articles found"));
-            relationSearchComponents.listView().setPlaceholder(placeholder);
+            citationComponents.listView().setPlaceholder(placeholder);
         }
-        BooleanBinding booleanBind = Bindings.isEmpty(relationSearchComponents.listView().getCheckModel().getCheckedItems());
-        relationSearchComponents.importButton().disableProperty().bind(booleanBind);
-        relationSearchComponents.importButton().setOnMouseClicked(event -> importEntries(relationSearchComponents.listView().getCheckModel().getCheckedItems(), relationSearchComponents.searchType(), relationSearchComponents.entry()));
-        showNodes(relationSearchComponents.refreshButton(), relationSearchComponents.importButton());
+        BooleanBinding booleanBind = Bindings.isEmpty(citationComponents.listView().getCheckModel().getCheckedItems());
+        citationComponents.importButton().disableProperty().bind(booleanBind);
+        citationComponents.importButton().setOnMouseClicked(event -> importEntries(citationComponents.listView().getCheckModel().getCheckedItems(), citationComponents.searchType(), citationComponents.entry()));
+        showNodes(citationComponents.refreshButton(), citationComponents.importButton());
     }
 
     private void jumpToEntry(CitationRelationItem entry) {

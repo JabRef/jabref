@@ -8,10 +8,9 @@ import org.jabref.model.entry.BibEntry;
 
 import org.controlsfx.control.CheckListView;
 
-public record RelationSearchComponents(
+public record CitationComponents(
         BibEntry entry,
         CheckListView<CitationRelationItem> listView,
-        CheckListView<CitationRelationItem> otherListView,
         Button abortButton,
         Button refreshButton,
         CitationFetcher.SearchType searchType,
