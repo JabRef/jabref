@@ -23,6 +23,7 @@ import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +93,7 @@ public class CopyMoreAction extends SimpleCommand {
 
         List<String> titles = selectedBibEntries.stream()
                                                 .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                                                .map(bibEntry -> bibEntry.getTitle().get())
+                                                .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getTitle().get()))
                                                 .collect(Collectors.toList());
 
         if (titles.isEmpty()) {
@@ -280,7 +281,7 @@ public class CopyMoreAction extends SimpleCommand {
 
         List<String> fieldValues = selectedBibEntries.stream()
                                                      .filter(bibEntry -> bibEntry.getFieldOrAlias(field).isPresent())
-                                                     .map(bibEntry -> bibEntry.getFieldOrAlias(field).orElse(""))
+                                                     .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getFieldOrAlias(field).orElse("")))
                                                      .filter(value -> !value.isEmpty())
                                                      .collect(Collectors.toList());
 
