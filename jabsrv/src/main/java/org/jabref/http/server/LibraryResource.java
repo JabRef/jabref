@@ -61,6 +61,13 @@ public class LibraryResource {
     @Inject
     Gson gson;
 
+    /**
+     * At http://localhost:23119/libraries/{id}
+     *
+     * @param id The specified library
+     * @return specified library in JSON format
+     * @throws IOException
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson(@PathParam("id") String id) throws IOException {
@@ -74,10 +81,12 @@ public class LibraryResource {
     }
 
     /**
-     * Looks for the .jmp file in the directory of the given library ({id}.bib file)
+     * At http://localhost:23119/libraries/{id}/map <br><br>
+     *
+     * Looks for the .jmp file in the directory of the given library ({id}.bib file).
      *
      * @param id The given library
-     * @return A JSON String containing the mindmap data. If no {id}.jmp file could was found, returns the standard mindmap.
+     * @return A JSON String containing the mindmap data. If no {id}.jmp file was found, returns the standard mindmap
      * @throws IOException
      */
     @GET
@@ -117,6 +126,15 @@ public class LibraryResource {
         return Files.readString(jabMapPath);
     }
 
+    /**
+     * At http://localhost:23119/libraries/{id}/map <br><br>
+     *
+     * Saves the mindmap next to its associated library.
+     *
+     * @param id The given library
+     *
+     * @throws IOException
+     */
     @PUT
     @Path("map")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -190,18 +208,20 @@ public class LibraryResource {
     }
 
     /**
+     * At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
+     *
      * Combines attributes of a given BibEntry into a basic entry preview for as plain text.
      *
      * @param id The name of the library
      * @param entryId The CitationKey of the BibEntry
      * @return a basic entry preview as plain text
      * @throws IOException
+     * @throws NotFoundException
      */
     @GET
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_PLAIN + ";charset=UTF-8")
     public String getPlainRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
-        // get entry with given citationkey (entryId)
         BibDatabaseContext databaseContext = getDatabaseContext(id);
         List<BibEntry> entriesByCitationKey = databaseContext.getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
@@ -237,6 +257,8 @@ public class LibraryResource {
     }
 
     /**
+     * At http://localhost:23119/libraries/{id}/entries/{entryId} <br><br>
+     *
      * Combines attributes of a given BibEntry into a basic entry preview for as HTML text.
      *
      * @param id The name of the library
@@ -248,7 +270,6 @@ public class LibraryResource {
     @Path("entries/{entryId}")
     @Produces(MediaType.TEXT_HTML + ";charset=UTF-8")
     public String getHTMLRepresentation(@PathParam("id") String id, @PathParam("entryId") String entryId) throws IOException {
-        // get entry with given citationkey (entryId)
         List<BibEntry> entriesByCitationKey = getDatabaseContext(id).getDatabase().getEntriesByCitationKey(entryId);
         if (entriesByCitationKey.isEmpty()) {
             throw new NotFoundException("Entry with citation key '" + entryId + "' not found in library " + id);
@@ -283,7 +304,7 @@ public class LibraryResource {
     }
 
     /**
-     * At libraries/{id}/entries/pdffiles <br><br>
+     * At http://localhost:23119/libraries/{id}/entries/pdffiles <br><br>
      *
      * Loops through all entries in the specified library and adds attached files of type "PDF" to
      * a list and JSON serialises it.
@@ -319,14 +340,14 @@ public class LibraryResource {
     }
 
     /**
-     * At libraries/{id}/entries/pdffiles/annotations <br><br>
+     * At http://localhost:23119/libraries/{id}/entries/pdffiles/annotations <br><br>
      *
      * Loops through all entries in the specified library and uses FileAnnotationCache to extract the annotations.
      * Then, groups them by their "parent" PDF file, represented in this list as a LinkedPDFFileDTO.
      * Lastly, serialises the list.
      *
      * @param id The Name of the specified library
-     * @return A JSON serialised list of FileAnnotationDTOs grouped by their parent PDF files.
+     * @return A JSON serialised list of FileAnnotationDTOs grouped by their parent PDF files
      * @throws IOException
      */
     @GET
