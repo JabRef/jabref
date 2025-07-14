@@ -21,11 +21,8 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Tooltip;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -272,7 +269,7 @@ public class LinkedFileViewModel extends AbstractViewModel {
         }
     }
 
-    public void performRenameWithConflictCheck(String targetFileName) {
+    private void performRenameWithConflictCheck(String targetFileName) {
         // Check if a file with the same name already exists
         Optional<Path> existingFile = linkedFileHandler.findExistingFile(linkedFile, entry, targetFileName);
         boolean overwriteFile = false;
