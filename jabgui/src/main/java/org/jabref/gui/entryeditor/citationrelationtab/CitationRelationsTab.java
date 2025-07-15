@@ -519,7 +519,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         hideNodes(abortButton, progress);
 
         // TODO: This could be a wrong database, because the user might have switched to another library
-        //       If we were on fixing this, we would need to a) associate a BibEntry with a dababase or b) pass the database at "bindToEntry"
+        //       If we were on fixing this, we would need to a) associate a BibEntry with a database or b) pass the database at "bindToEntry"
         BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase)
                                            .orElse(new BibDatabase());
         observableList.setAll(
