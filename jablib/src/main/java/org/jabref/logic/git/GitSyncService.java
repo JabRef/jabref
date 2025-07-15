@@ -54,6 +54,12 @@ public class GitSyncService {
      * Called when user clicks Pull
      */
     public MergeResult fetchAndMerge(Path bibFilePath) throws GitAPIException, IOException, JabRefException {
+        Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(bibFilePath);
+        if (maybeHandler.isEmpty()) {
+            LOGGER.warn("Pull aborted: The file is not inside a Git repository.");
+            return MergeResult.failure();
+        }
+
         GitStatusSnapshot status = GitStatusChecker.checkStatus(bibFilePath);
 
         if (!status.tracking()) {
@@ -102,7 +108,6 @@ public class GitSyncService {
         Path workTree = git.getRepository().getWorkTree().toPath().toRealPath();
         Path relativePath;
 
-        // TODO: Validate that the .bib file is inside the Git repository earlier in the workflow.
         if (!bibPath.startsWith(workTree)) {
             throw new IllegalStateException("Given .bib file is not inside repository");
         }

@@ -117,6 +117,8 @@ class GitSyncServiceTest {
         baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
         git.push().setRemote("origin").call();
 
+        Files.writeString(remoteDir.resolve("HEAD"), "ref: refs/heads/main");
+
         // Bob clone remote
         Path bobDir = tempDir.resolve("bob");
         Git bobGit = Git.cloneRepository()

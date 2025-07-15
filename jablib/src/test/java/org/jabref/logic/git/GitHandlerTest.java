@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -23,7 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class GitHandlerTest {
     @TempDir
     Path repositoryPath;
+    @TempDir
     Path remoteRepoPath;
+    @TempDir
+    Path clonePath;
     private GitHandler gitHandler;
 
     @BeforeEach
@@ -31,12 +35,10 @@ class GitHandlerTest {
         gitHandler = new GitHandler(repositoryPath);
 
         remoteRepoPath = Files.createTempDirectory("remote-repo");
-        try (Git remoteGit = Git.init()
-                                .setBare(true)
-                                .setDirectory(remoteRepoPath.toFile())
-                                .call()) {
-            // Remote repo initialized
-        }
+        Git remoteGit = Git.init()
+                           .setBare(true)
+                           .setDirectory(remoteRepoPath.toFile())
+                           .call();
         Path testFile = repositoryPath.resolve("initial.txt");
         Files.writeString(testFile, "init");
 
@@ -89,7 +91,8 @@ class GitHandlerTest {
 
     @Test
     void fetchOnCurrentBranch() throws IOException, GitAPIException, URISyntaxException {
-        Path clonePath = Files.createTempDirectory("clone-of-remote");
+        clonePath = Files.createTempDirectory("clone-of-remote");
+
         try (Git cloneGit = Git.cloneRepository()
                                .setURI(remoteRepoPath.toUri().toString())
                                .setDirectory(clonePath.toFile())
@@ -110,12 +113,10 @@ class GitHandlerTest {
 
     @Test
     void fromAnyPathFindsGitRootFromNestedPath() throws IOException {
-        // Arrange: create a nested directory structure inside the temp Git repo
         Path nested = repositoryPath.resolve("src/org/jabref");
         Files.createDirectories(nested);
 
-        // Act: attempt to construct GitHandler from nested path
-        var handlerOpt = GitHandler.fromAnyPath(nested);
+        Optional<GitHandler> handlerOpt = GitHandler.fromAnyPath(nested);
 
         assertTrue(handlerOpt.isPresent(), "Expected GitHandler to be created");
         assertEquals(repositoryPath.toRealPath(), handlerOpt.get().repositoryPath.toRealPath(),

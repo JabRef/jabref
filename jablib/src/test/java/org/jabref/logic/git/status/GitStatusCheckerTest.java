@@ -67,13 +67,15 @@ class GitStatusCheckerTest {
         remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
 
         Path seedDir = tempDir.resolve("seed");
-        Git seedGit = Git.init().setDirectory(seedDir.toFile()).call();
+        Git seedGit = Git.init()
+                         .setInitialBranch("main")
+                         .setDirectory(seedDir.toFile())
+                         .call();
         Path seedFile = seedDir.resolve("library.bib");
         Files.writeString(seedFile, baseContent, StandardCharsets.UTF_8);
 
         seedGit.add().addFilepattern("library.bib").call();
         seedGit.commit().setAuthor(author).setMessage("Initial commit").call();
-        seedGit.branchCreate().setName("master").call();
 
         seedGit.remoteAdd()
                .setName("origin")
@@ -81,8 +83,9 @@ class GitStatusCheckerTest {
                .call();
         seedGit.push()
                .setRemote("origin")
-               .setRefSpecs(new RefSpec("refs/heads/master:refs/heads/main"))
+               .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
                .call();
+        Files.writeString(remoteDir.resolve("HEAD"), "ref: refs/heads/main");
 
         Path localDir = tempDir.resolve("local");
         localGit = Git.cloneRepository()
