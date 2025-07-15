@@ -12,6 +12,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We added a field for fhe citation count field on the General tab. [#13477](https://github.com/JabRef/jabref/issues/13477)
+- We added focus on the field Link in the "Add file link" dialog. [#13486](https://github.com/JabRef/jabref/issues/13486)
 - We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
 - When adding an entry to a library, a warning is displayed if said entry already exists in an active library. [#13261](https://github.com/JabRef/jabref/issues/13261)
@@ -60,6 +61,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where the "Search ShortScience" action did not convert LaTeX-formatted titles to Unicode.[#13418](https://github.com/JabRef/jabref/issues/13418)
 - We added a fallback for the "Convert to biblatex" cleanup when it failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). [#11868](https://github.com/JabRef/jabref/issues/11868)
 - We fixed an issue where directory check for relative path was not handled properly under library properties. [#13017](https://github.com/JabRef/jabref/issues/13017)
 - We fixed an exception on tab dragging. [#12921](https://github.com/JabRef/jabref/issues/12921)
