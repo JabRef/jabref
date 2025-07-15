@@ -109,23 +109,17 @@ class GitSyncServiceTest {
         Git aliceGit = Git.cloneRepository()
                           .setURI(remoteDir.toUri().toString())
                           .setDirectory(aliceDir.toFile())
-                          .setBranch("main")
                           .call();
         this.git = aliceGit;
         this.library = aliceDir.resolve("library.bib");
 
         // Alice: initial commit
         baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
-        git.checkout()
-           .setName("main")
-           .call();
 
         git.push()
            .setRemote("origin")
            .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
            .call();
-
-        Files.writeString(remoteDir.resolve("HEAD"), "ref: refs/heads/main");
 
         // Bob clone remote
         Path bobDir = tempDir.resolve("bob");
@@ -205,14 +199,12 @@ class GitSyncServiceTest {
                            .setInitialBranch("main")
                            .setDirectory(remoteDir.toFile())
                            .call();
-        Files.writeString(remoteDir.resolve("HEAD"), "ref: refs/heads/main");
 
         // Clone to local working directory
         Path localDir = tempDir.resolve("local");
         Git localGit = Git.cloneRepository()
                           .setURI(remoteDir.toUri().toString())
                           .setDirectory(localDir.toFile())
-                          .setBranch("main")
                           .call();
         Path bibFile = localDir.resolve("library.bib");
 
@@ -226,10 +218,6 @@ class GitSyncServiceTest {
         """;
 
         writeAndCommit(baseContent, "Initial commit", user, bibFile, localGit);
-
-        localGit.checkout()
-           .setName("main")
-           .call();
 
         localGit.push()
                 .setRemote("origin")
