@@ -34,7 +34,6 @@ class GitHandlerTest {
     void setUpGitHandler() throws IOException, GitAPIException, URISyntaxException {
         gitHandler = new GitHandler(repositoryPath);
 
-        remoteRepoPath = Files.createTempDirectory("remote-repo");
         Git remoteGit = Git.init()
                            .setBare(true)
                            .setDirectory(remoteRepoPath.toFile())
@@ -91,8 +90,6 @@ class GitHandlerTest {
 
     @Test
     void fetchOnCurrentBranch() throws IOException, GitAPIException, URISyntaxException {
-        clonePath = Files.createTempDirectory("clone-of-remote");
-
         try (Git cloneGit = Git.cloneRepository()
                                .setURI(remoteRepoPath.toUri().toString())
                                .setDirectory(clonePath.toFile())

@@ -19,6 +19,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.RefSpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -115,7 +116,10 @@ class GitSyncServiceTest {
 
         // Alice: initial commit
         baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
-        git.push().setRemote("origin").call();
+        git.push()
+           .setRemote("origin")
+           .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+           .call();
 
         Files.writeString(remoteDir.resolve("HEAD"), "ref: refs/heads/main");
 
@@ -129,7 +133,10 @@ class GitSyncServiceTest {
                         .call();
         Path bobLibrary = bobDir.resolve("library.bib");
         bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
-        bobGit.push().setRemote("origin").call();
+        bobGit.push()
+              .setRemote("origin")
+              .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+              .call();
 
         // back to Alice's branch, fetch remote
         aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);
@@ -215,7 +222,10 @@ class GitSyncServiceTest {
         """;
 
         writeAndCommit(baseContent, "Initial commit", user, bibFile, localGit);
-        localGit.push().setRemote("origin").call();
+        localGit.push()
+                .setRemote("origin")
+                .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                .call();
 
         // Clone again to simulate "remote user" making conflicting change
         Path remoteUserDir = tempDir.resolve("remoteUser");
@@ -234,7 +244,10 @@ class GitSyncServiceTest {
         """;
 
         writeAndCommit(remoteContent, "Remote change", user, remoteUserFile, remoteUserGit);
-        remoteUserGit.push().setRemote("origin").call();
+        remoteUserGit.push()
+                     .setRemote("origin")
+                     .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                     .call();
 
         // Back to local, make conflicting change
         String localContent = """

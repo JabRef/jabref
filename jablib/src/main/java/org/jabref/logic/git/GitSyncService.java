@@ -50,9 +50,6 @@ public class GitSyncService {
         this.gitConflictResolverStrategy = gitConflictResolverStrategy;
     }
 
-    /**
-     * Called when user clicks Pull
-     */
     public MergeResult fetchAndMerge(Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(bibFilePath);
         if (maybeHandler.isEmpty()) {
