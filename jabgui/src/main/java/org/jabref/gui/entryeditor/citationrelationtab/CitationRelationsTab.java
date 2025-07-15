@@ -201,22 +201,22 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         refreshCitingButton.setOnMouseClicked(_ -> {
             searchForRelations(
-                    entry, 
-                    citingListView, 
+                    entry,
+                    citingListView,
                     abortCitingButton,
-                    refreshCitingButton, 
-                    CitationFetcher.SearchType.CITES, 
-                    importCitingButton, 
+                    refreshCitingButton,
+                    CitationFetcher.SearchType.CITES,
+                    importCitingButton,
                     citingProgress);
         });
 
         refreshCitedByButton.setOnMouseClicked(_ -> searchForRelations(
-                entry, 
-                citedByListView, 
+                entry,
+                citedByListView,
                 abortCitedButton,
-                refreshCitedByButton, 
-                CitationFetcher.SearchType.CITED_BY, 
-                importCitedByButton, 
+                refreshCitedByButton,
+                CitationFetcher.SearchType.CITED_BY,
+                importCitedByButton,
                 citedByProgress));
 
         // Create SplitPane to hold all nodes above
@@ -225,21 +225,21 @@ public class CitationRelationsTab extends EntryEditorTab {
         styleFetchedListView(citingListView);
 
         searchForRelations(
-                entry, 
-                citingListView, 
-                abortCitingButton, 
+                entry,
+                citingListView,
+                abortCitingButton,
                 refreshCitingButton,
-                CitationFetcher.SearchType.CITES, 
-                importCitingButton, 
+                CitationFetcher.SearchType.CITES,
+                importCitingButton,
                 citingProgress);
 
         searchForRelations(
-                entry, 
-                citedByListView, 
-                abortCitedButton, 
+                entry,
+                citedByListView,
+                abortCitedButton,
                 refreshCitedByButton,
-                CitationFetcher.SearchType.CITED_BY, 
-                importCitedByButton, 
+                CitationFetcher.SearchType.CITED_BY,
+                importCitedByButton,
                 citedByProgress);
 
         return container;
@@ -444,14 +444,13 @@ public class CitationRelationsTab extends EntryEditorTab {
             return;
         }
 
-        ObservableList<CitationRelationItem> observableList = FXCollections.observableArrayList();
-
-        listView.setItems(observableList);
+        ObservableList<CitationRelationItem> resultList = FXCollections.observableArrayList();
+        listView.setItems(resultList);
 
         // TODO: It should not be possible to cancel a search task that is already running for same tab
-        if (citingTask != null && !citingTask.isCancelled() && searchType == CitationFetcher.SearchType.CITES) {
+        if (searchType == CitationFetcher.SearchType.CITES && citingTask != null && !citingTask.isCancelled()) {
             citingTask.cancel();
-        } else if (citedByTask != null && !citedByTask.isCancelled() && searchType == CitationFetcher.SearchType.CITED_BY) {
+        } else if (searchType == CitationFetcher.SearchType.CITED_BY && citedByTask != null && !citedByTask.isCancelled()) {
             citedByTask.cancel();
         }
 
@@ -468,13 +467,22 @@ public class CitationRelationsTab extends EntryEditorTab {
                 importButton,
                 progress,
                 fetchedList,
-                observableList
+                resultList
             ))
             .onFailure(exception -> {
-                LOGGER.error("Error while fetching citing Articles", exception);
+                LOGGER.error("Error while fetching {} papers",
+                        searchType == CitationFetcher.SearchType.CITES ? "cited" : "citing",
+                        exception);
                 hideNodes(abortButton, progress, importButton);
-                listView.setPlaceholder(new Label(Localization.lang("Error while fetching citing entries: %0",
-                        exception.getMessage())));
+                String labelText;
+                if (searchType == CitationFetcher.SearchType.CITES) {
+                    labelText = Localization.lang("Error while fetching cited entries: %0", exception.getMessage());
+                } else {
+                    labelText = Localization.lang("Error while fetching citing entries: %0", exception.getMessage());
+                }
+                Label placeholder = new Label(labelText);
+                placeholder.setWrapText(true);
+                listView.setPlaceholder(placeholder);
                 refreshButton.setVisible(true);
                 dialogService.notify(exception.getMessage());
             })
@@ -490,13 +498,13 @@ public class CitationRelationsTab extends EntryEditorTab {
         return switch (searchType) {
             case CitationFetcher.SearchType.CITES -> {
                 citingTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchReferences(entry)
+                    () -> this.searchCitationsRelationsService.searchCites(entry)
                 );
                 yield citingTask;
             }
             case CitationFetcher.SearchType.CITED_BY -> {
                 citedByTask = BackgroundTask.wrap(
-                    () -> this.searchCitationsRelationsService.searchCitations(entry)
+                    () -> this.searchCitationsRelationsService.searchCitedBy(entry)
                 );
                 yield citedByTask;
             }
@@ -510,6 +518,8 @@ public class CitationRelationsTab extends EntryEditorTab {
                                              ObservableList<CitationRelationItem> observableList) {
         hideNodes(abortButton, progress);
 
+        // TODO: This could be a wrong database, because the user might have switched to another library
+        //       If we were on fixing this, we would need to a) associate a BibEntry with a dababase or b) pass the database at "bindToEntry"
         BibDatabase database = stateManager.getActiveDatabase().map(BibDatabaseContext::getDatabase)
                                            .orElse(new BibDatabase());
         observableList.setAll(
@@ -523,15 +533,15 @@ public class CitationRelationsTab extends EntryEditorTab {
                            .toList()
         );
 
-        if (!observableList.isEmpty()) {
-            listView.refresh();
-        } else {
+        if (observableList.isEmpty()) {
             Label placeholder = new Label(Localization.lang("No articles found"));
             listView.setPlaceholder(placeholder);
+        } else {
+            listView.refresh();
         }
         BooleanBinding booleanBind = Bindings.isEmpty(listView.getCheckModel().getCheckedItems());
         importButton.disableProperty().bind(booleanBind);
-        importButton.setOnMouseClicked(event -> importEntries(listView.getCheckModel().getCheckedItems(), searchType, entry));
+        importButton.setOnMouseClicked(_ -> importEntries(listView.getCheckModel().getCheckedItems(), searchType, entry));
         showNodes(refreshButton, importButton);
     }
 
@@ -540,7 +550,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         showNodes(abortButton, progress);
         hideNodes(refreshButton, importButton);
 
-        abortButton.setOnAction(event -> {
+        abortButton.setOnAction(_ -> {
             hideNodes(abortButton, progress, importButton);
             showNodes(refreshButton);
             task.cancel();
