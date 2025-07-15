@@ -25,7 +25,7 @@ public class TesseractOcrProvider implements OcrProvider {
     // Default tessdata paths for different operating systems
     private static final String DEFAULT_WIN_TESSDATA_PATH = "C:\\Program Files\\Tesseract-OCR\\tessdata";
     private static final String DEFAULT_WIN_TESSDATA_PATH_X86 = "C:\\Program Files (x86)\\Tesseract-OCR\\tessdata";
-    private static final String DEFAULT_OSX_TESSDATA_PATH = "/usr/local/share";
+    private static final String DEFAULT_OSX_TESSDATA_PATH = "/usr/local/share/tessdata";
     private static final String DEFAULT_OSX_HOMEBREW_ARM_PATH = "/opt/homebrew/share/tessdata";
     private static final String DEFAULT_LINUX_TESSDATA_PATH = "/usr/share/tesseract-ocr/4.00/tessdata";
     private static final String DEFAULT_LINUX_TESSDATA_PATH_ALT = "/usr/share/tessdata";
