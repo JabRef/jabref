@@ -16,8 +16,11 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.push.AbstractPushToApplication;
+import org.jabref.logic.push.PushToApplication;
+import org.jabref.logic.push.PushToApplicationPreferences;
 
-public class PushToApplicationSettings {
+public class GuiPushToApplicationSettings {
 
     protected final Label commandLabel;
     protected final TextField path;
@@ -25,10 +28,10 @@ public class PushToApplicationSettings {
     protected final PushToApplicationPreferences preferences;
     protected final AbstractPushToApplication application;
 
-    public PushToApplicationSettings(PushToApplication application,
-                                     DialogService dialogService,
-                                     FilePreferences filePreferences,
-                                     PushToApplicationPreferences preferences) {
+    public GuiPushToApplicationSettings(PushToApplication application,
+                                        DialogService dialogService,
+                                        FilePreferences filePreferences,
+                                        PushToApplicationPreferences preferences) {
         this.application = (AbstractPushToApplication) application;
         this.preferences = preferences;
 

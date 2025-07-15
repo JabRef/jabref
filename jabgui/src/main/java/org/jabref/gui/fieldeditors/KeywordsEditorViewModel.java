@@ -18,9 +18,12 @@ import org.jabref.model.entry.Keyword;
 import org.jabref.model.entry.KeywordList;
 import org.jabref.model.entry.field.Field;
 
-import org.tinylog.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class KeywordsEditorViewModel extends AbstractEditorViewModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeywordsEditorViewModel.class);
 
     private final ListProperty<Keyword> keywordListProperty;
     private final Character keywordSeparator;
@@ -62,7 +65,7 @@ public class KeywordsEditorViewModel extends AbstractEditorViewModel {
             @Override
             public String toString(Keyword keyword) {
                 if (keyword == null) {
-                    Logger.debug("Keyword is null");
+                    LOGGER.debug("Keyword is null");
                     return "";
                 }
                 return keyword.get();
