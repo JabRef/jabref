@@ -37,7 +37,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
     public String getUrlForCitationCount(BibEntry entry) {
         return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
                 + "?fields=" + "citationCount"
-                + "&limit=1000";
+                + "&limit=1";
     }
 
     @Override

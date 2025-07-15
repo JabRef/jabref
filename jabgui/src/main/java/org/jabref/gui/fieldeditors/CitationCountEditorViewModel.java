@@ -54,9 +54,9 @@ public class CitationCountEditorViewModel extends AbstractEditorViewModel {
         return fetchCitationCountInProgress.get();
     }
 
-    public void getCitationCount(BibEntry bibEntry) {
+    public void getCitationCount() {
         Optional<String> fieldAux = entry.getField(field);
-        BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(bibEntry, fieldAux))
+        BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(this.entry, fieldAux))
                       .onRunning(() -> fetchCitationCountInProgress.setValue(true))
                       .onFinished(() -> fetchCitationCountInProgress.setValue(false))
                       .onFailure(e ->

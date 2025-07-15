@@ -38,7 +38,6 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
     @Inject private StateManager stateManager;
     @Inject private SearchCitationsRelationsService searchCitationsRelationsService;
 
-    private Optional<BibEntry> entry = Optional.empty();
     public CitationCountEditor(Field field,
                              SuggestionProvider<?> suggestionProvider,
                              FieldCheckers fieldCheckers) {
@@ -68,7 +67,7 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void fetchCitationCount() {
-        this.entry.ifPresent(viewModel::getCitationCount);
+        viewModel.getCitationCount();
     }
 
     public CitationCountEditorViewModel getViewModel() {
@@ -77,7 +76,6 @@ public class CitationCountEditor extends HBox implements FieldEditorFX {
 
     @Override
     public void bindToEntry(BibEntry entry) {
-        this.entry = Optional.of(entry);
         viewModel.bindToEntry(entry);
     }
 

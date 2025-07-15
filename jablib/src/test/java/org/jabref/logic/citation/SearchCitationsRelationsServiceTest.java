@@ -12,6 +12,7 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherHelpersForTest;
 import org.jabref.model.entry.BibEntry;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class SearchCitationsRelationsServiceTest {
     /**
      * Creates a mock CitationFetcher that returns specific results for citations and references
      */
-    private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn, Optional<Integer> citationCount) {
+    private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn, @NotNull Integer citationCount) {
         return CitationFetcherHelpersForTest.Mocks.from(
                 entry -> {
                     if (entry == targetEntry) {
@@ -39,7 +40,7 @@ class SearchCitationsRelationsServiceTest {
                 },
                 entry -> {
                     if (entry == targetEntry) {
-                        return citationCount != null ? citationCount : Optional.empty();
+                        return Optional.of(citationCount);
                     }
                     return Optional.empty();
                 }
@@ -247,7 +248,7 @@ class SearchCitationsRelationsServiceTest {
             BibEntry reference = new BibEntry();
             Integer citationCount = 3;
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
-            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(citationCount));
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, citationCount);
 
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     null, referencesDatabase, true
@@ -266,7 +267,7 @@ class SearchCitationsRelationsServiceTest {
             Map<BibEntry, List<BibEntry>> referencesDatabase = new HashMap<>();
             referencesDatabase.put(reference, List.of());
 
-            CitationFetcher fetcher = createMockFetcher(reference, null, null, Optional.of(citationCount));
+            CitationFetcher fetcher = createMockFetcher(reference, null, null, citationCount);
             BibEntryCitationsAndReferencesRepository repository = BibEntryRelationsRepositoryTestHelpers.Mocks.from(
                     null, referencesDatabase, true
             );
