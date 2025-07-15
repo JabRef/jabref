@@ -45,6 +45,10 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
     @FXML private CheckBox grobidEnabled;
     @FXML private TextField grobidURL;
 
+    @FXML private TableView<SearchEngineItem> searchEngineTable;
+    @FXML private TableColumn<SearchEngineItem, String> searchEngineName;
+    @FXML private TableColumn<SearchEngineItem, String> searchEngineUrlTemplate;
+
     @FXML private TableView<FetcherApiKey> apiKeySelectorTable;
     @FXML private TableColumn<FetcherApiKey, String> apiKeyName;
     @FXML private TableColumn<FetcherApiKey, String> customApiKey;
@@ -74,6 +78,16 @@ public class WebSearchTab extends AbstractPreferenceTabView<WebSearchTabViewMode
 
     public void initialize() {
         this.viewModel = new WebSearchTabViewModel(preferences, dialogService, refAiEnabled);
+
+        searchEngineName.setCellValueFactory(param -> param.getValue().nameProperty());
+        searchEngineName.setCellFactory(TextFieldTableCell.forTableColumn());
+        searchEngineName.setEditable(false);
+
+        searchEngineUrlTemplate.setCellValueFactory(param -> param.getValue().urlTemplateProperty());
+        searchEngineUrlTemplate.setCellFactory(TextFieldTableCell.forTableColumn());
+        searchEngineUrlTemplate.setEditable(true);
+
+        searchEngineTable.setItems(viewModel.getSearchEngines());
 
         enableWebSearch.selectedProperty().bindBidirectional(viewModel.enableWebSearchProperty());
         warnAboutDuplicatesOnImport.selectedProperty().bindBidirectional(viewModel.warnAboutDuplicatesOnImportProperty());
