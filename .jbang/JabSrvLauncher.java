@@ -12,6 +12,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
