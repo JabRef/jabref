@@ -1,7 +1,5 @@
 package org.jabref.gui.fieldeditors;
 
-import java.util.Optional;
-
 import javax.swing.undo.UndoManager;
 
 import javafx.fxml.FXML;
