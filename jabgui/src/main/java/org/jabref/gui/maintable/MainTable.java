@@ -10,8 +10,9 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
-import javafx.collections.WeakListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -30,6 +31,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.util.Pair;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.ClipBoardManager;
@@ -272,8 +274,12 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
 
         GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-        ListChangeListener<BibEntry> guiBridgeSelectListener = change -> clearAndSelect(guiBridge.getSelectEntries());
-        guiBridge.getSelectEntries().addListener(new WeakListChangeListener<>(guiBridgeSelectListener));
+        ChangeListener<Pair<BibDatabaseContext, List<BibEntry>>> guiBridgeSelectListener = (_, _, newValue) -> {
+            if (database.equals(newValue.getKey())) {
+                clearAndSelect(newValue.getValue());
+            }
+        };
+        guiBridge.getSelectEntries().addListener(new WeakChangeListener<>(guiBridgeSelectListener));
     }
 
     /**

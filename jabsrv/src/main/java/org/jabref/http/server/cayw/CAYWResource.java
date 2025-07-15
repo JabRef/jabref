@@ -77,11 +77,6 @@ public class CAYWResource {
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
         databaseContext.getEntries().forEach(bibEntry -> System.out.println(bibEntry.getId()));
 
-        List<CAYWEntry> entries = databaseContext.getEntries()
-                                                 .stream()
-                                                 .map(this::createCAYWEntry)
-                                                 .collect(Collectors.toList());
-
         // Selected parameter handling
         List<CAYWEntry> searchResults;
         if (queryParams.isSelected() && guiBridge.isRunningInCli()) {
@@ -92,6 +87,10 @@ public class CAYWResource {
         } else if (queryParams.isSelected()) {
             searchResults = guiBridge.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
         } else {
+            List<CAYWEntry> entries = databaseContext.getEntries()
+                                                     .stream()
+                                                     .map(this::createCAYWEntry)
+                                                     .collect(Collectors.toList());
             initializeGUI();
             searchResults = openSearchGui(entries);
         }
@@ -104,7 +103,7 @@ public class CAYWResource {
         if (queryParams.isSelect() && guiBridge.isRunningInCli()) {
             LOGGER.error("The 'select' parameter is not supported in CLI mode. Please use the GUI to select entries.");
         } else if (queryParams.isSelect()) {
-            guiBridge.setSelectEntries(searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
+            guiBridge.setSelectEntries(databaseContext, searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
         }
 
         // Format parameter handling

@@ -3,8 +3,12 @@ package org.jabref.http.server.services;
 import java.util.List;
 import java.util.Optional;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Pair;
 
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -13,7 +17,7 @@ public class GuiBridge {
 
     private ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     private ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
-    private final ObservableList<BibEntry> selectEntries = FXCollections.observableArrayList();
+    private final ObjectProperty<Pair<BibDatabaseContext, List<BibEntry>>> selectEntries = new SimpleObjectProperty<>();
     private BibDatabaseContext activeDatabase;
     private boolean runningInCli = false;
 
@@ -25,11 +29,11 @@ public class GuiBridge {
         return selectedEntries;
     }
 
-    public void setSelectEntries(List<BibEntry> selectEntries) {
-        this.selectEntries.setAll(selectEntries);
+    public void setSelectEntries(BibDatabaseContext context, List<BibEntry> selectEntries) {
+        this.selectEntries.setValue(new Pair<>(context, selectEntries));
     }
 
-    public ObservableList<BibEntry> getSelectEntries() {
+    public ObservableObjectValue<Pair<BibDatabaseContext, List<BibEntry>>> getSelectEntries() {
         return selectEntries;
     }
 

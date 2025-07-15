@@ -1,0 +1,16 @@
+#### Serve the latest opened library
+
+POST  http://localhost:23119/commands
+Content-Type: application/json
+Accept: application/json
+
+{
+  "commandId":"selectentries",
+  "citateionKeys":[
+    "citeKey2"
+  ],
+  "entryeIds":[
+    "entryId2"
+  ]
+}
+

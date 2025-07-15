@@ -11,6 +11,7 @@ import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
+import org.jabref.http.server.command.CommandResource;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.os.OS;
@@ -94,6 +95,7 @@ public class Server {
         resourceConfig.register(LibrariesResource.class);
         resourceConfig.register(LibraryResource.class);
         resourceConfig.register(CAYWResource.class);
+        resourceConfig.register(CommandResource.class);
         resourceConfig.register(CORSFilter.class);
         resourceConfig.register(GlobalExceptionMapper.class);
 
