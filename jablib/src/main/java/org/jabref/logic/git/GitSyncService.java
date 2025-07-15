@@ -74,7 +74,6 @@ public class GitSyncService {
             return MergeResult.success();
         }
 
-        // Status is BEHIND or DIVERGED
         try (Git git = gitHandler.open()) {
             // 1. Fetch latest remote branch
             gitHandler.fetchOnCurrentBranch();

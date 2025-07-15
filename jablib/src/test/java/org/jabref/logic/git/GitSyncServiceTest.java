@@ -116,6 +116,10 @@ class GitSyncServiceTest {
 
         // Alice: initial commit
         baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
+        git.checkout()
+           .setName("main")
+           .call();
+
         git.push()
            .setRemote("origin")
            .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
@@ -222,6 +226,11 @@ class GitSyncServiceTest {
         """;
 
         writeAndCommit(baseContent, "Initial commit", user, bibFile, localGit);
+
+        localGit.checkout()
+           .setName("main")
+           .call();
+
         localGit.push()
                 .setRemote("origin")
                 .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
