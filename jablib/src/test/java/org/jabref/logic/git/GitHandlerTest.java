@@ -89,42 +89,22 @@ class GitHandlerTest {
 
     @Test
     void fetchOnCurrentBranch() throws IOException, GitAPIException, URISyntaxException {
-        Path remoteRepoPath = Files.createTempDirectory("remote-repo");
-        try (Git remoteGit = Git.init()
-                                .setDirectory(remoteRepoPath.toFile())
-                                .setBare(true)
-                                .call()) {
-            try (Git localGit = Git.open(repositoryPath.toFile())) {
-                localGit.remoteAdd()
-                        .setName("origin")
-                        .setUri(new URIish(remoteRepoPath.toUri().toString()))
-                        .call();
-            }
+        Path clonePath = Files.createTempDirectory("clone-of-remote");
+        try (Git cloneGit = Git.cloneRepository()
+                               .setURI(remoteRepoPath.toUri().toString())
+                               .setDirectory(clonePath.toFile())
+                               .call()) {
+            Files.writeString(clonePath.resolve("another.txt"), "world");
+            cloneGit.add().addFilepattern("another.txt").call();
+            cloneGit.commit().setMessage("Second commit").call();
+            cloneGit.push().call();
+        }
 
-            Path testFile = repositoryPath.resolve("test.txt");
-            Files.writeString(testFile, "hello");
-            gitHandler.createCommitOnCurrentBranch("First commit", false);
-            try (Git localGit = Git.open(repositoryPath.toFile())) {
-                localGit.push().setRemote("origin").call();
-            }
+        gitHandler.fetchOnCurrentBranch();
 
-            Path clonePath = Files.createTempDirectory("clone-of-remote");
-            try (Git cloneGit = Git.cloneRepository()
-                                   .setURI(remoteRepoPath.toUri().toString())
-                                   .setDirectory(clonePath.toFile())
-                                   .call()) {
-                Files.writeString(clonePath.resolve("another.txt"), "world");
-                cloneGit.add().addFilepattern("another.txt").call();
-                cloneGit.commit().setMessage("Second commit").call();
-                cloneGit.push().call();
-            }
-
-            gitHandler.fetchOnCurrentBranch();
-
-            try (Git git = Git.open(repositoryPath.toFile())) {
-                assertTrue(git.getRepository().getRefDatabase().hasRefs());
-                assertTrue(git.getRepository().exactRef("refs/remotes/origin/main") != null);
-            }
+        try (Git git = Git.open(repositoryPath.toFile())) {
+            assertTrue(git.getRepository().getRefDatabase().hasRefs());
+            assertTrue(git.getRepository().exactRef("refs/remotes/origin/main") != null);
         }
     }
 
