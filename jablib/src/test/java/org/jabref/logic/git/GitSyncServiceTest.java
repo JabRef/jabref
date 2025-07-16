@@ -20,6 +20,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.RefSpec;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,6 +37,11 @@ import static org.mockito.Mockito.when;
 class GitSyncServiceTest {
     private Git git;
     private Path library;
+    private Path remoteDir;
+    private Path aliceDir;
+    private Path bobDir;
+    private Git aliceGit;
+    private Git bobGit;
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
 
@@ -97,44 +103,38 @@ class GitSyncServiceTest {
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
 
         // create fake remote repo
-        Path remoteDir = tempDir.resolve("remote.git");
+        remoteDir = tempDir.resolve("remote.git");
         Git remoteGit = Git.init()
                            .setBare(true)
                            .setInitialBranch("main")
                            .setDirectory(remoteDir.toFile())
                            .call();
+        remoteGit.close();
 
         // Alice clone remote -> local repository
-        Path aliceDir = tempDir.resolve("alice");
-        Git aliceGit = Git.cloneRepository()
+        aliceDir = tempDir.resolve("alice");
+        aliceGit = Git.cloneRepository()
                           .setURI(remoteDir.toUri().toString())
                           .setDirectory(aliceDir.toFile())
                           .call();
+
         this.git = aliceGit;
         this.library = aliceDir.resolve("library.bib");
+        // Initial commit
+        baseCommit = writeAndCommit(initialContent, "Initial commit", alice, library, aliceGit);
 
-        // Alice: initial commit
-        baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
+        git.push()
+           .setRemote("origin")
+           .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+           .call();
 
-        try {
-            git.push()
-               .setRemote("origin")
-               .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-               .call();
-        } catch (Exception e) {
-            System.err.println(">>> GIT PUSH FAILED in @BeforeEach <<<");
-            e.printStackTrace();
-            Throwable cause = e.getCause();
-            while (cause != null) {
-                System.err.println("Cause: " + cause.getClass().getName() + ": " + cause.getMessage());
-                cause = cause.getCause();
-            }
-            throw e;
-        }
+        aliceGit.checkout()
+                .setName("main")
+                .call();
 
         // Bob clone remote
-        Path bobDir = tempDir.resolve("bob");
-        Git bobGit = Git.cloneRepository()
+        bobDir = tempDir.resolve("bob");
+        bobGit = Git.cloneRepository()
                         .setURI(remoteDir.toUri().toString())
                         .setDirectory(bobDir.toFile())
                         .setBranchesToClone(List.of("refs/heads/main"))
@@ -142,22 +142,10 @@ class GitSyncServiceTest {
                         .call();
         Path bobLibrary = bobDir.resolve("library.bib");
         bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
-
-        try {
-            bobGit.push()
-                  .setRemote("origin")
-                  .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-                  .call();
-        } catch (Exception e) {
-            System.err.println(">>> GIT PUSH FAILED in @BeforeEach <<<");
-            e.printStackTrace();
-            Throwable cause = e.getCause();
-            while (cause != null) {
-                System.err.println("Cause: " + cause.getClass().getName() + ": " + cause.getMessage());
-                cause = cause.getCause();
-            }
-            throw e;
-        }
+        bobGit.push()
+              .setRemote("origin")
+              .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+              .call();
 
         // back to Alice's branch, fetch remote
         aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);
@@ -195,18 +183,7 @@ class GitSyncServiceTest {
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
         GitHandler gitHandler = new GitHandler(library.getParent());
         GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy);
-        try {
-            syncService.push(library);
-        } catch (Exception e) {
-            System.err.println(">>> GIT PUSH FAILED in pushTriggersMergeAndPushWhenNoConflicts <<<");
-            e.printStackTrace();
-            Throwable cause = e.getCause();
-            while (cause != null) {
-                System.err.println("Cause: " + cause.getClass().getName() + ": " + cause.getMessage());
-                cause = cause.getCause();
-            }
-            throw e;
-        }
+        syncService.push(library);
 
         String pushedContent = GitFileReader.readFileFromCommit(git, git.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"));
         String expected = """
@@ -226,95 +203,65 @@ class GitSyncServiceTest {
 
     @Test
     void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution(@TempDir Path tempDir) throws Exception {
-        // Setup remote bare repo
-        Path remoteDir = tempDir.resolve("remote.git");
-        Git remoteGit = Git.init()
-                           .setBare(true)
-                           .setInitialBranch("main")
-                           .setDirectory(remoteDir.toFile())
-                           .call();
-
-        // Clone to local working directory
-        Path localDir = tempDir.resolve("local");
-        Git localGit = Git.cloneRepository()
-                          .setURI(remoteDir.toUri().toString())
-                          .setDirectory(localDir.toFile())
-                          .call();
-        Path bibFile = localDir.resolve("library.bib");
-
-        PersonIdent user = new PersonIdent("User", "user@example.com");
-
-        String baseContent = """
-        @article{a,
-          author = {unknown},
-          doi = {xya},
-        }
+        // Bob adds entry c
+        Path bobLibrary = bobDir.resolve("library.bib");
+        String bobEntry = """
+            @article{b,
+              author = {author-b},
+              doi = {xyz},
+            }
+            @article{a,
+              author = {author-a},
+              doi = {xya},
+            }
+            @article{c,
+              author = {bob-c},
+              title = {Title C},
+            }
+            """;
+        writeAndCommit(bobEntry, "Bob adds article-c", bob, bobLibrary, bobGit);
+        bobGit.push().setRemote("origin").call();
+        // Alice adds conflicting version of c
+        String aliceEntry = """
+            @article{b,
+              author = {author-b},
+              doi = {xyz},
+            }
+            @article{a,
+              author = {author-a},
+              doi = {xya},
+            }
+            @article{c,
+                author = {alice-c},
+                title = {Title C},
+            }
         """;
+        writeAndCommit(aliceEntry, "Alice adds conflicting article-c", alice, library, aliceGit);
+        git.fetch().setRemote("origin").call();
 
-        writeAndCommit(baseContent, "Initial commit", user, bibFile, localGit);
-
-        localGit.push()
-                .setRemote("origin")
-                .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-                .call();
-
-        // Clone again to simulate "remote user" making conflicting change
-        Path remoteUserDir = tempDir.resolve("remoteUser");
-        Git remoteUserGit = Git.cloneRepository()
-                               .setURI(remoteDir.toUri().toString())
-                               .setDirectory(remoteUserDir.toFile())
-                               .setBranch("main")
-                               .call();
-        Path remoteUserFile = remoteUserDir.resolve("library.bib");
-
-        String remoteContent = """
-        @article{a,
-          author = {remote-author},
-          doi = {xya},
-        }
-        """;
-
-        writeAndCommit(remoteContent, "Remote change", user, remoteUserFile, remoteUserGit);
-        remoteUserGit.push()
-                     .setRemote("origin")
-                     .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-                     .call();
-
-        // Back to local, make conflicting change
-        String localContent = """
-        @article{a,
-          author = {local-author},
-          doi = {xya},
-        }
-        """;
-        writeAndCommit(localContent, "Local change", user, bibFile, localGit);
-        localGit.fetch().setRemote("origin").call();
-
-        // Setup GitSyncService
+        // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
         when(resolver.resolveConflicts(anyList(), any())).thenAnswer(invocation -> {
             List<ThreeWayEntryConflict> conflicts = invocation.getArgument(0);
             BibDatabaseContext remote = invocation.getArgument(1);
 
-            BibEntry resolved = (BibEntry) conflicts.getFirst().base().clone();
-            resolved.setField(StandardField.AUTHOR, "merged-author");
+            ThreeWayEntryConflict conflict = ((List<ThreeWayEntryConflict>) invocation.getArgument(0)).getFirst();
+            // In this test, both Alice and Bob independently added a new entry 'c', so the base is null.
+            // We simulate conflict resolution by choosing the remote version and modifying the author field.
+            BibEntry resolved = ((BibEntry) conflict.remote().clone());
+            resolved.setField(StandardField.AUTHOR, "alice-c + bob-c");
 
             BibDatabaseContext merged = GitMergeUtil.replaceEntries(remote, List.of(resolved));
             return Optional.of(merged);
         });
 
-        GitHandler handler = new GitHandler(localDir);
-        ImportFormatPreferences prefs = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
-        when(prefs.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
-
-        GitSyncService service = new GitSyncService(prefs, handler, resolver);
-
-        // Trigger semantic merge
-        MergeResult result = service.fetchAndMerge(bibFile);
+        GitHandler handler = new GitHandler(aliceDir);
+        GitSyncService service = new GitSyncService(importFormatPreferences, handler, resolver);
+        MergeResult result = service.fetchAndMerge(library);
 
         assertTrue(result.isSuccessful());
-        String finalContent = Files.readString(bibFile);
-        assertTrue(finalContent.contains("merged-author"));
+        String content = Files.readString(library);
+        assertTrue(content.contains("alice-c + bob-c"));
         verify(resolver).resolveConflicts(anyList(), any());
     }
 
@@ -327,6 +274,19 @@ class GitSyncServiceTest {
         assertEquals(initialContent, base);
         assertEquals(aliceUpdatedContent, local);
         assertEquals(bobUpdatedContent, remote);
+    }
+
+    @AfterEach
+    void cleanup() {
+        if (git != null) {
+            git.close();
+        }
+        if (aliceGit != null && aliceGit != git) {
+            aliceGit.close();
+        }
+        if (bobGit != null) {
+            bobGit.close();
+        }
     }
 
     private RevCommit writeAndCommit(String content, String message, PersonIdent author, Path library, Git git) throws Exception {
