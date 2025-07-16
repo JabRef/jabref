@@ -7,8 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jabref.model.strings.StringUtil;
 
@@ -17,6 +15,7 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import mslinks.ShellLink;
 import mslinks.ShellLinkException;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -87,11 +86,10 @@ public class OS {
                 try {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
-                } catch (IOException
-                         | ShellLinkException e) {
+                } catch (IOException | ShellLinkException e) {
                     // Static logger instance cannot be used. See the class comment.
-                    Logger logger = Logger.getLogger(OS.class.getName());
-                    logger.log(Level.WARNING, "Had an error while reading .lnk file for TeXworks", e);
+                    Logger logger = LoggerFactory.getLogger(OS.class);
+                    logger.warn("Error while reading .lnk file for TeXworks", e);
                 }
             }
         }
