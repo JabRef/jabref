@@ -2,8 +2,6 @@ package org.jabref.logic.ocr;
 
 import java.nio.file.Path;
 
-//Note: Intentially made very extensive javadoc for now. Will change later if needed.
-
 /**
  * Interface for OCR providers.
  * This abstraction allows JabRef to support multiple OCR engines in the future.
