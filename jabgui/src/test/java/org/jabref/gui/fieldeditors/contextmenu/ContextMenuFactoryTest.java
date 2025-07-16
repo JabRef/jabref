@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.ocr.OcrService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -43,6 +44,7 @@ public class ContextMenuFactoryTest {
     private ContextMenuFactory.SingleContextCommandFactory singleCommandFactory;
     private ContextMenuFactory.MultiContextCommandFactory multiCommandFactory;
     private TaskExecutor taskExecutor;
+    private OcrService ocrService;
 
     @BeforeAll
     public static void initToolkit() {
@@ -62,6 +64,8 @@ public class ContextMenuFactoryTest {
         guiPreferences = mock(GuiPreferences.class);
         databaseContext = mock(BibDatabaseContext.class);
         viewModel = mock(LinkedFilesEditorViewModel.class);
+        taskExecutor = mock(TaskExecutor.class);
+        ocrService = mock(OcrService.class);
 
         SimpleObjectProperty<BibEntry> bibEntryProperty = new SimpleObjectProperty<>();
         bibEntry = EasyBind.wrapNullable(bibEntryProperty);
@@ -81,7 +85,8 @@ public class ContextMenuFactoryTest {
                 viewModel,
                 singleCommandFactory,
                 multiCommandFactory,
-                taskExecutor
+                taskExecutor,
+                ocrService
         );
     }
 
