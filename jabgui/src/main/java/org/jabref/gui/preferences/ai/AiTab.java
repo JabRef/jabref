@@ -371,16 +371,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void setValues() {
         // Load stored OCR path into the field
         tessdataPathField.setText(preferences.getFilePreferences().getOcrTessdataPath());
-
-        // Optional: also load default AI values here if needed in the future
     }
 
     @Override
     public void storeSettings() {
         // Save OCR path to preferences
         preferences.getFilePreferences().setOcrTessdataPath(tessdataPathField.getText().trim());
-
-        // Optional: also store other AI settings if you're not already doing so elsewhere
     }
 
 }
