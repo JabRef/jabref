@@ -257,8 +257,8 @@ public class CitationRelationsTab extends EntryEditorTab {
             BackgroundTask.wrap(() -> doiFetcher.findIdentifier(citationComponents.entry()))
                           .onRunning(() -> {
                               showNodes(citationComponents.progress(), otherCitationComponents.progress());
-                              setLabelOn(citationComponents.listView(), "Looking Up DOI...");
-                              setLabelOn(otherCitationComponents.listView(), "Looking Up DOI...");
+                              setLabelOn(citationComponents.listView(), Localization.lang("Looking Up DOI..."));
+                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Looking Up DOI..."));
                           })
                           .onSuccess(identifier -> {
                               if (identifier.isPresent()) {
@@ -266,7 +266,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                   executeSearch(citationComponents);
                                   executeSearch(otherCitationComponents);
                               } else {
-                                  dialogService.notify("No DOI found");
+                                  dialogService.notify(Localization.lang("No DOI found"));
                                   setUpEmptyPanel(citationComponents, otherCitationComponents);
                                   setUpEmptyPanel(otherCitationComponents, citationComponents);
                               }
