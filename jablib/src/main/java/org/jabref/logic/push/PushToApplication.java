@@ -1,11 +1,8 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.nio.file.Path;
 import java.util.List;
 
-import org.jabref.gui.actions.Action;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 /**
@@ -22,27 +19,21 @@ public interface PushToApplication {
     String getDisplayName();
 
     /**
-     * Gets a tooltip for the push operation.
-     */
-    String getTooltip();
-
-    /**
-     * Gets the icon associated with the application.
-     *
-     * @return The icon for the application.
-     */
-    JabRefIcon getApplicationIcon();
-
-    /**
      * The actual operation. This method will not be called on the event dispatch thread, so it should not do GUI
      * operations without utilizing invokeLater().
      */
-    void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString);
+    void pushEntries(List<BibEntry> entries);
 
     /**
      * Reporting etc., this method is called on the event dispatch thread after pushEntries() returns.
      */
     void onOperationCompleted();
+
+    /// Used to route to either the GUI or the CLI - dependent on the usage
+    void sendErrorNotification(String title, String message);
+
+    /// Used to route to either the GUI or the CLI - dependent on the usage
+    void sendErrorNotification(String message);
 
     /**
      * Check whether this operation requires citation keys to be set for the entries. If true is returned an error message
@@ -52,10 +43,11 @@ public interface PushToApplication {
      */
     boolean requiresCitationKeys();
 
-    Action getAction();
-
-    PushToApplicationSettings getSettings(PushToApplication application, PushToApplicationPreferences pushToApplicationPreferences);
-
+    /**
+     * Get the delimiter used to separate citation keys.
+     *
+     * @return The delimiter as a String.
+     */
     String getDelimiter();
 
     void jumpToLine(Path fileName, int line, int column);

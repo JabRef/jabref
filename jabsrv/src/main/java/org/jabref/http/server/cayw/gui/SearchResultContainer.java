@@ -81,9 +81,9 @@ public class SearchResultContainer extends ListView<CAYWEntry> {
                 setGraphic(null);
                 setTooltip(null);
             } else {
-                labelText.setText(item.getLabel());
+                labelText.setText(item.label());
 
-                String fullDescription = item.getDescription();
+                String fullDescription = item.description();
                 String truncatedDescription = truncateToThreeLines(fullDescription);
 
                 descriptionText.setText(truncatedDescription);
