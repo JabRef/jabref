@@ -323,7 +323,7 @@ public class CitationRelationsTab extends EntryEditorTab {
             hideNodes(citationComponents.abortButton(), citationComponents.progress(), citationComponents.importButton());
             showNodes(citationComponents.refreshButton());
             task.cancel();
-            dialogService.notify(Localization.lang("Search aborted!"));
+            dialogService.notify(Localization.lang("Search aborted."));
         });
     }
 
