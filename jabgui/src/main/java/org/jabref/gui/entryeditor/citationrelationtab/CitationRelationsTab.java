@@ -249,7 +249,7 @@ public class CitationRelationsTab extends EntryEditorTab {
 
         HBox hBox = new HBox();
         Label label = new Label(Localization.lang("The selected entry doesn't have a DOI linked to it."));
-        Hyperlink link = new Hyperlink(Localization.lang("Look Up a DOI and try again."));
+        Hyperlink link = new Hyperlink(Localization.lang("Look up a DOI and try again."));
 
         link.setOnAction(e -> {
             CrossRef doiFetcher = new CrossRef();
@@ -257,8 +257,8 @@ public class CitationRelationsTab extends EntryEditorTab {
             BackgroundTask.wrap(() -> doiFetcher.findIdentifier(citationComponents.entry()))
                           .onRunning(() -> {
                               showNodes(citationComponents.progress(), otherCitationComponents.progress());
-                              setLabelOn(citationComponents.listView(), Localization.lang("Looking Up DOI..."));
-                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Looking Up DOI..."));
+                              setLabelOn(citationComponents.listView(), Localization.lang("Looking up DOI..."));
+                              setLabelOn(otherCitationComponents.listView(), Localization.lang("Looking up DOI..."));
                           })
                           .onSuccess(identifier -> {
                               if (identifier.isPresent()) {
