@@ -94,6 +94,7 @@ public class Server {
 
         // see https://stackoverflow.com/a/33794265/873282
         final ResourceConfig resourceConfig = new ResourceConfig();
+        resourceConfig.property("jersey.config.server.wadl.disableWadl", true);
         // TODO: Add SSL
         resourceConfig.register(RootResource.class);
         resourceConfig.register(LibrariesResource.class);
