@@ -39,7 +39,7 @@ class GitSyncServiceTest {
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
 
-    // These are setup by alieBobSetting
+    // These are setup by aliceBobSetting
     private RevCommit baseCommit;
     private RevCommit aliceCommit;
     private RevCommit bobCommit;
@@ -116,10 +116,21 @@ class GitSyncServiceTest {
         // Alice: initial commit
         baseCommit = writeAndCommit(initialContent, "Inital commit", alice, library, aliceGit);
 
-        git.push()
-           .setRemote("origin")
-           .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-           .call();
+        try {
+            git.push()
+               .setRemote("origin")
+               .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+               .call();
+        } catch (Exception e) {
+            System.err.println(">>> GIT PUSH FAILED in @BeforeEach <<<");
+            e.printStackTrace();
+            Throwable cause = e.getCause();
+            while (cause != null) {
+                System.err.println("Cause: " + cause.getClass().getName() + ": " + cause.getMessage());
+                cause = cause.getCause();
+            }
+            throw e;
+        }
 
         // Bob clone remote
         Path bobDir = tempDir.resolve("bob");
@@ -131,10 +142,22 @@ class GitSyncServiceTest {
                         .call();
         Path bobLibrary = bobDir.resolve("library.bib");
         bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
-        bobGit.push()
-              .setRemote("origin")
-              .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-              .call();
+
+        try {
+            bobGit.push()
+                  .setRemote("origin")
+                  .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                  .call();
+        } catch (Exception e) {
+            System.err.println(">>> GIT PUSH FAILED in @BeforeEach <<<");
+            e.printStackTrace();
+            Throwable cause = e.getCause();
+            while (cause != null) {
+                System.err.println("Cause: " + cause.getClass().getName() + ": " + cause.getMessage());
+                cause = cause.getCause();
+            }
+            throw e;
+        }
 
         // back to Alice's branch, fetch remote
         aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);
@@ -172,7 +195,18 @@ class GitSyncServiceTest {
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
         GitHandler gitHandler = new GitHandler(library.getParent());
         GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy);
-        syncService.push(library);
+        try {
+            syncService.push(library);
+        } catch (Exception e) {
+            System.err.println(">>> GIT PUSH FAILED in pushTriggersMergeAndPushWhenNoConflicts <<<");
+            e.printStackTrace();
+            Throwable cause = e.getCause();
+            while (cause != null) {
+                System.err.println("Cause: " + cause.getClass().getName() + ": " + cause.getMessage());
+                cause = cause.getCause();
+            }
+            throw e;
+        }
 
         String pushedContent = GitFileReader.readFileFromCommit(git, git.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"));
         String expected = """
