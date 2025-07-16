@@ -32,12 +32,14 @@ public class OcrAction extends SimpleCommand {
     private final DialogService dialogService;
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
+    private final OcrService ocrService;
 
     public OcrAction(LinkedFile linkedFile,
                      BibDatabaseContext databaseContext,
                      DialogService dialogService,
                      FilePreferences filePreferences,
-                     TaskExecutor taskExecutor) {
+                     TaskExecutor taskExecutor,
+                     OcrService ocrService) {
         this.linkedFile = linkedFile;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
@@ -49,6 +51,7 @@ public class OcrAction extends SimpleCommand {
                 linkedFile.getFileType().equalsIgnoreCase("pdf") &&
                         linkedFile.findIn(databaseContext, filePreferences).isPresent()
         );
+        this.ocrService = ocrService;
     }
 
     @Override
@@ -66,15 +69,7 @@ public class OcrAction extends SimpleCommand {
         dialogService.notify(Localization.lang("Performing OCR..."));
 
         BackgroundTask<OcrResult> task = BackgroundTask.wrap(() -> {
-                                                           try {
-                                                               // Pass filePreferences to OcrService
-                                                               OcrService ocrService = new OcrService(filePreferences);
-                                                               return ocrService.performOcr(filePath.get());
-                                                           } catch (OcrException e) {
-                                                               // This is a bug in JabRef
-                                                               LOGGER.error("Failed to initialize OCR service", e);
-                                                               return OcrResult.failure("OCR service initialization failed: " + e.getMessage());
-                                                           }
+                                                           return ocrService.performOcr(filePath.get());
                                                        })
                                                        .showToUser(true)  // Show in task list
                                                        .withInitialMessage(Localization.lang("Performing OCR on %0", linkedFile.getLink()));

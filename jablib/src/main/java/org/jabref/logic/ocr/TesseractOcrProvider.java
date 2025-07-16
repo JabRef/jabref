@@ -158,20 +158,29 @@ public class TesseractOcrProvider implements OcrProvider {
         try {
             Path path = Path.of(pathStr);
 
+            // Resolve symbolic links to get the real path
+            Path realPath = path.toRealPath();
+            LOGGER.debug("Original path: {}, Real path: {}", path, realPath);
+
             // Check if this is the tessdata directory itself
-            if (path.getFileName() != null && path.getFileName().toString().equals("tessdata")) {
-                Path engData = path.resolve("eng.traineddata");
-                if (Files.exists(path) && Files.isDirectory(path) && Files.exists(engData)) {
+            if (realPath.getFileName() != null && realPath.getFileName().toString().equals("tessdata")) {
+                Path engData = realPath.resolve("eng.traineddata");
+                LOGGER.debug("Checking for eng.traineddata at: {}", engData);
+                if (Files.exists(realPath) && Files.isDirectory(realPath) && Files.exists(engData)) {
                     // Tesseract expects the parent of tessdata
-                    tesseract.setDatapath(path.getParent().toString());
+                    String parentPath = realPath.getParent().toString();
+                    LOGGER.debug("Setting datapath to parent: {}", parentPath);
+                    tesseract.setDatapath(parentPath);
                     return true;
                 }
             } else {
                 // Check if this is the parent of tessdata
-                Path tessdata = path.resolve("tessdata");
+                Path tessdata = realPath.resolve("tessdata");
                 Path engData = tessdata.resolve("eng.traineddata");
+                LOGGER.debug("Checking tessdata at: {} and eng.traineddata at: {}", tessdata, engData);
                 if (Files.exists(tessdata) && Files.isDirectory(tessdata) && Files.exists(engData)) {
-                    tesseract.setDatapath(path.toString());
+                    LOGGER.debug("Setting datapath to: {}", realPath);
+                    tesseract.setDatapath(realPath.toString());
                     return true;
                 }
             }

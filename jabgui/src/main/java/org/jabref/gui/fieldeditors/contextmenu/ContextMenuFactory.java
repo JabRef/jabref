@@ -14,6 +14,7 @@ import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.linkedfile.OcrAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ocr.OcrService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -30,6 +31,7 @@ public class ContextMenuFactory {
     private final SingleContextCommandFactory singleCommandFactory;
     private final MultiContextCommandFactory multiCommandFactory;
     private final TaskExecutor taskExecutor;
+    private final OcrService ocrService;
 
     public ContextMenuFactory(DialogService dialogService,
                               GuiPreferences preferences,
@@ -38,7 +40,8 @@ public class ContextMenuFactory {
                               LinkedFilesEditorViewModel viewModel,
                               SingleContextCommandFactory singleCommandFactory,
                               MultiContextCommandFactory multiCommandFactory,
-                              TaskExecutor taskExecutor) {
+                              TaskExecutor taskExecutor,
+                              OcrService ocrService) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
@@ -47,6 +50,7 @@ public class ContextMenuFactory {
         this.singleCommandFactory = singleCommandFactory;
         this.multiCommandFactory = multiCommandFactory;
         this.taskExecutor = taskExecutor;
+        this.ocrService = ocrService;
     }
 
     public ContextMenu createForSelection(ObservableList<LinkedFileViewModel> selectedFiles) {
@@ -120,7 +124,8 @@ public class ContextMenuFactory {
                 databaseContext,
                 dialogService,
                 preferences.getFilePreferences(),
-                taskExecutor
+                taskExecutor,
+                ocrService
         );
 
         // Set the action to execute when clicked

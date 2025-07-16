@@ -51,6 +51,7 @@ import org.jabref.gui.util.uithreadaware.UiThreadObservableList;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ocr.OcrService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -80,6 +81,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
     @Inject private JournalAbbreviationRepository abbreviationRepository;
     @Inject private TaskExecutor taskExecutor;
     @Inject private UndoManager undoManager;
+    @Inject private OcrService ocrService;
+
 
     private LinkedFilesEditorViewModel viewModel;
 
@@ -326,7 +329,8 @@ public class LinkedFilesEditor extends HBox implements FieldEditorFX {
                     viewModel,
                     contextCommandFactory,
                     multiContextCommandFactory,
-                    taskExecutor
+                    taskExecutor,
+                    ocrService
             );
 
             ContextMenu contextMenu = contextMenuFactory.createForSelection(listView.getSelectionModel().getSelectedItems());
