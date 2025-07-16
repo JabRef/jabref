@@ -272,18 +272,4 @@ public class FilePreferences {
     public void setOcrTessdataPath(String path) {
         this.ocrTessdataPath.set(path);
     }
-
-    /**
-     * Still TO-DO: Override those (in other file):
-     * @Override
-     * public String getOcrTessdataPath() {
-     *     return get(OCR_TESSDATA_PATH);  // Returns empty string if not set
-     * }
-     *
-     * @Override
-     * public void setOcrTessdataPath(String path) {
-     *     put(OCR_TESSDATA_PATH, path);
-     *
-     */
-
 }
