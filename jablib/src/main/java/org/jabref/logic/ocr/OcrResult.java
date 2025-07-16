@@ -1,6 +1,7 @@
 package org.jabref.logic.ocr;
 
 import org.jabref.model.strings.StringUtil;
+import org.jspecify.annotations.NonNull;
 
 /**
  * Represents the result of an OCR operation.
@@ -11,13 +12,9 @@ public sealed interface OcrResult {
     /**
      * Represents a successful OCR operation with extracted text.
      */
-    record Success(String text) implements OcrResult {
-        public Success {
-            // Convert null to empty string instead of throwing exception
-            if (text == null) {
-                text = "";
-            }
-        }
+    record Success(@NonNull String text) implements OcrResult {
+        // Remove the custom constructor entirely
+        // The record's compact constructor will handle validation automatically
     }
 
     /**
@@ -49,7 +46,7 @@ public sealed interface OcrResult {
     /**
      * Factory method for creating a success result.
      */
-    static OcrResult success(String text) {
+    static OcrResult success(@NonNull String text) {
         return new Success(text);
     }
 
