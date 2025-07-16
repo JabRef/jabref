@@ -1,5 +1,7 @@
 package org.jabref.logic.ocr;
 
+import org.jabref.model.strings.StringUtil;
+
 /**
  * Represents the result of an OCR operation.
  * Uses sealed classes to ensure type safety and avoid null parameters.
@@ -24,7 +26,7 @@ public sealed interface OcrResult {
     record Failure(String errorMessage) implements OcrResult {
         public Failure {
             // Provide default message instead of throwing exception
-            if (errorMessage == null || errorMessage.isBlank()) {
+            if (StringUtil.isBlank(errorMessage)) {
                 errorMessage = "Unknown error occurred";
             }
         }
