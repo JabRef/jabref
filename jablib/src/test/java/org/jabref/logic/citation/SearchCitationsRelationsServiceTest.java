@@ -12,7 +12,6 @@ import org.jabref.logic.importer.fetcher.citation.CitationFetcher;
 import org.jabref.logic.importer.fetcher.citation.CitationFetcherHelpersForTest;
 import org.jabref.model.entry.BibEntry;
 
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +23,7 @@ class SearchCitationsRelationsServiceTest {
     /**
      * Creates a mock CitationFetcher that returns specific results for citations and references
      */
-    private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn, @NotNull Integer citationCount) {
+    private CitationFetcher createMockFetcher(BibEntry targetEntry, List<BibEntry> citationsToReturn, List<BibEntry> referencesToReturn, Integer citationCount) {
         return CitationFetcherHelpersForTest.Mocks.from(
                 entry -> {
                     if (entry == targetEntry) {

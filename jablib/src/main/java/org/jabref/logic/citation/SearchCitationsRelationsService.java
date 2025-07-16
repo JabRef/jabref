@@ -85,16 +85,10 @@ public class SearchCitationsRelationsService {
     }
 
     public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue) throws FetcherException {
-        Optional<Integer> citationCountResult;
-        boolean isFetchingAllowed = relationsRepository.isCitationsUpdatable(citationCounted)
-                || actualFieldValue.isEmpty();
+        boolean isFetchingAllowed = actualFieldValue.isEmpty() ||
+                relationsRepository.isCitationsUpdatable(citationCounted);
         if (isFetchingAllowed) {
-            try {
-                citationCountResult = citationFetcher.searchCitationCount(citationCounted);
-            } catch (FetcherException e) {
-                LOGGER.error("Error while fetching citation count for entry", e);
-                throw e;
-            }
+            Optional<Integer> citationCountResult = citationFetcher.searchCitationCount(citationCounted);
             return citationCountResult.orElse(0);
         }
         assert actualFieldValue.isPresent();

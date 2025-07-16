@@ -104,12 +104,12 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
-        PaperDetails referencesResponse = GSON.fromJson(urlDownload.asString(), PaperDetails.class);
+        PaperDetails paperDetails = GSON.fromJson(urlDownload.asString(), PaperDetails.class);
 
-        if (referencesResponse == null) {
+        if (paperDetails == null) {
             return Optional.empty();
         }
-        return Optional.of(referencesResponse.getCitationCount());
+        return Optional.of(paperDetails.getCitationCount());
     }
 
     @Override
