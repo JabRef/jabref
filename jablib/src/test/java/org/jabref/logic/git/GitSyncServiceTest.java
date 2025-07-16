@@ -20,6 +20,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -113,24 +114,26 @@ class GitSyncServiceTest {
 
         // Alice clone remote -> local repository
         aliceDir = tempDir.resolve("alice");
-        aliceGit = Git.cloneRepository()
-                          .setURI(remoteDir.toUri().toString())
-                          .setDirectory(aliceDir.toFile())
-                          .call();
+        aliceGit = Git.init()
+                      .setInitialBranch("main")
+                      .setDirectory(aliceDir.toFile())
+                      .call();
 
         this.git = aliceGit;
         this.library = aliceDir.resolve("library.bib");
+
         // Initial commit
         baseCommit = writeAndCommit(initialContent, "Initial commit", alice, library, aliceGit);
+        // Add remote and push to create refs/heads/main in remote
+        aliceGit.remoteAdd()
+                .setName("origin")
+                .setUri(new URIish(remoteDir.toUri().toString()))
+                .call();
 
         git.push()
            .setRemote("origin")
            .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
            .call();
-
-        aliceGit.checkout()
-                .setName("main")
-                .call();
 
         // Bob clone remote
         bobDir = tempDir.resolve("bob");
@@ -140,6 +143,7 @@ class GitSyncServiceTest {
                         .setBranchesToClone(List.of("refs/heads/main"))
                         .setBranch("main")
                         .call();
+
         Path bobLibrary = bobDir.resolve("library.bib");
         bobCommit = writeAndCommit(bobUpdatedContent, "Exchange a with b", bob, bobLibrary, bobGit);
         bobGit.push()
@@ -248,7 +252,7 @@ class GitSyncServiceTest {
             ThreeWayEntryConflict conflict = ((List<ThreeWayEntryConflict>) invocation.getArgument(0)).getFirst();
             // In this test, both Alice and Bob independently added a new entry 'c', so the base is null.
             // We simulate conflict resolution by choosing the remote version and modifying the author field.
-            BibEntry resolved = ((BibEntry) conflict.remote().clone());
+            BibEntry resolved = (BibEntry) conflict.remote().clone();
             resolved.setField(StandardField.AUTHOR, "alice-c + bob-c");
 
             BibDatabaseContext merged = GitMergeUtil.replaceEntries(remote, List.of(resolved));
