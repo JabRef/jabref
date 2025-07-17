@@ -36,7 +36,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class GitSyncServiceTest {
-    private Git git;
     private Path library;
     private Path remoteDir;
     private Path aliceDir;
@@ -112,14 +111,13 @@ class GitSyncServiceTest {
                            .call();
         remoteGit.close();
 
-        // Alice clone remote -> local repository
+        // Alice init local repository
         aliceDir = tempDir.resolve("alice");
         aliceGit = Git.init()
                       .setInitialBranch("main")
                       .setDirectory(aliceDir.toFile())
                       .call();
 
-        this.git = aliceGit;
         this.library = aliceDir.resolve("library.bib");
 
         // Initial commit
@@ -130,7 +128,7 @@ class GitSyncServiceTest {
                 .setUri(new URIish(remoteDir.toUri().toString()))
                 .call();
 
-        git.push()
+        aliceGit.push()
            .setRemote("origin")
            .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
            .call();
@@ -153,7 +151,7 @@ class GitSyncServiceTest {
 
         // back to Alice's branch, fetch remote
         aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);
-        git.fetch().setRemote("origin").call();
+        aliceGit.fetch().setRemote("origin").call();
 
         // Debug hint: Show the created git graph on the command line
         //   git log --graph --oneline --decorate --all --reflog
@@ -189,7 +187,7 @@ class GitSyncServiceTest {
         GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy);
         syncService.push(library);
 
-        String pushedContent = GitFileReader.readFileFromCommit(git, git.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"));
+        String pushedContent = GitFileReader.readFileFromCommit(aliceGit, aliceGit.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"));
         String expected = """
         @article{a,
           author = {author-a},
@@ -241,7 +239,7 @@ class GitSyncServiceTest {
             }
         """;
         writeAndCommit(aliceEntry, "Alice adds conflicting article-c", alice, library, aliceGit);
-        git.fetch().setRemote("origin").call();
+        aliceGit.fetch().setRemote("origin").call();
 
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
@@ -271,9 +269,9 @@ class GitSyncServiceTest {
 
     @Test
     void readFromCommits() throws Exception {
-        String base = GitFileReader.readFileFromCommit(git, baseCommit, Path.of("library.bib"));
-        String local = GitFileReader.readFileFromCommit(git, aliceCommit, Path.of("library.bib"));
-        String remote = GitFileReader.readFileFromCommit(git, bobCommit, Path.of("library.bib"));
+        String base = GitFileReader.readFileFromCommit(aliceGit, baseCommit, Path.of("library.bib"));
+        String local = GitFileReader.readFileFromCommit(aliceGit, aliceCommit, Path.of("library.bib"));
+        String remote = GitFileReader.readFileFromCommit(aliceGit, bobCommit, Path.of("library.bib"));
 
         assertEquals(initialContent, base);
         assertEquals(aliceUpdatedContent, local);
@@ -282,10 +280,7 @@ class GitSyncServiceTest {
 
     @AfterEach
     void cleanup() {
-        if (git != null) {
-            git.close();
-        }
-        if (aliceGit != null && aliceGit != git) {
+        if (aliceGit != null) {
             aliceGit.close();
         }
         if (bobGit != null) {
