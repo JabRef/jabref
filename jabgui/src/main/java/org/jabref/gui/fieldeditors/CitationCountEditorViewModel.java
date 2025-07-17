@@ -18,7 +18,12 @@ import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.Field;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CitationCountEditorViewModel extends AbstractEditorViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CitationCountEditorViewModel.class);
+
     protected final BooleanProperty fetchCitationCountInProgress = new SimpleBooleanProperty(false);
     private final TaskExecutor taskExecutor;
     private final DialogService dialogService;
@@ -54,12 +59,14 @@ public class CitationCountEditorViewModel extends AbstractEditorViewModel {
     }
 
     public void getCitationCount() {
-        Optional<String> fieldAux = entry.getField(field);
-        BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(this.entry, fieldAux))
+        Optional<String> fieldContent = entry.getField(field);
+        BackgroundTask.wrap(() -> searchCitationsRelationsService.getCitationCount(this.entry, fieldContent))
                       .onRunning(() -> fetchCitationCountInProgress.setValue(true))
                       .onFinished(() -> fetchCitationCountInProgress.setValue(false))
-                      .onFailure(e ->
-                          dialogService.showErrorDialogAndWait(Localization.lang("Error Occurred")))
+                      .onFailure(e -> {
+                          dialogService.notify(Localization.lang("Error occurred when getting citation count, please try again or check the identifier."));
+                          LOGGER.error("Error while fetching citation count", e);
+                      })
                       .onSuccess(identifier -> {
                           entry.setField(field, String.valueOf(identifier));
                       }).executeWith(taskExecutor);

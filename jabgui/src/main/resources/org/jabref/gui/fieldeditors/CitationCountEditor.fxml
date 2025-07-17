@@ -14,7 +14,7 @@
         <graphic>
             <StackPane>
                 <JabRefIconView glyph="LOOKUP_IDENTIFIER"
-                                visible="${controller.viewModel.fetchCitationCountInProgress == false}"/>
+                                visible="${!controller.viewModel.fetchCitationCountInProgress}"/>
                 <ProgressIndicator maxHeight="12.0" maxWidth="12.0"
                                    visible="${controller.viewModel.fetchCitationCountInProgress}"/>
             </StackPane>
