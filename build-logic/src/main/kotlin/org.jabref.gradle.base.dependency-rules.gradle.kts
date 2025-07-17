@@ -441,12 +441,14 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.desktop")
+        overrideModuleName()
     }
     module("net.sourceforge.lept4j:lept4j", "net.sourceforge.lept4j") {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.desktop")
         requires("java.logging")
+        overrideModuleName()
     }
 
     module("org.apache.pdfbox:pdfbox", "org.apache.pdfbox") {
@@ -473,17 +475,21 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.desktop")
+        overrideModuleName()
     }
     module("org.jboss:jboss-vfs", "org.jboss.vfs") {
         preserveExisting()
+        overrideModuleName()
     }
     module("org.jboss.logging:jboss-logging", "org.jboss.logging") {
         preserveExisting()
+        overrideModuleName()
     }
     module("com.github.jai-imageio:jai-imageio-core", "com.github.jaiimageio.core") {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.desktop")
+        overrideModuleName()
     }
     module("com.squareup.okio:okio-jvm", "okio") {
         exportAllPackages()
