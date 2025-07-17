@@ -383,13 +383,13 @@
                     <text:p>Owner</text:p>
                 </table:table-cell>
                 <table:table-cell>
+                    <text:p>Citation count</text:p>
+                </table:table-cell>
+                <table:table-cell>
                     <text:p>Timestamp</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Creationdate</text:p>
-                </table:table-cell>
-                <table:table-cell>
-                    <text:p>Citation count</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Modificationdate</text:p>
