@@ -82,6 +82,7 @@ jvmDependencyConflicts.patch {
 
 extraJavaModuleInfo {
     failOnAutomaticModules = true
+    failOnModifiedDerivedModuleNames = true
     skipLocalJars = true
 
     knownModule("com.github.hypfvieh:dbus-java-core", "org.freedesktop.dbus")
@@ -281,7 +282,7 @@ extraJavaModuleInfo {
     module("net.javacrumbs.json-unit:json-unit-core", "net.javacrumbs.jsonunit.core")
     module("com.github.javaparser:javaparser-core", "com.github.javaparser.core")
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
-    module("net.sf.jopt-simple:jopt-simple", "net.sf.jopt.simple")
+    module("net.sf.jopt-simple:jopt-simple", "jopt.simple")
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
         exportAllPackages()
@@ -362,7 +363,7 @@ extraJavaModuleInfo {
         requires("java.xml")
         requires("jakarta.xml.bind")
     }
-    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "jersey.test.provider.grizzly2") {
+    module("org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2", "jersey.test.framework.provider.grizzly2") {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
@@ -620,5 +621,5 @@ extraJavaModuleInfo {
     module("org.openjdk.jmh:jmh-generator-asm", "jmh.generator.asm")
     module("org.openjdk.jmh:jmh-generator-bytecode", "jmh.generator.bytecode")
     module("org.openjdk.jmh:jmh-generator-reflection", "jmh.generator.reflection")
-    module("org.apache.commons:commons-math3", "org.apache.commons.math3")
+    module("org.apache.commons:commons-math3", "commons.math3")
 }
