@@ -36,6 +36,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.unitfx.IntegerInputField;
@@ -90,6 +91,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Button generalSettingsHelp;
     @FXML private Button expertSettingsHelp;
     @FXML private Button templatesHelp;
+    @FXML private Button tessdataBrowseButton;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -102,9 +104,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferences);
 
-        GridPane layout = (GridPane) this.getChildren().get(0);
-        addOcrSettings(layout, /* insert at row: */ 30);
-
         setValues();
 
         initializeEnableAi();
@@ -114,6 +113,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         initializeExpertSettings();
         initializeValidations();
         initializeTemplates();
+        initializeOcr();
         initializeHelp();
     }
 
@@ -124,44 +124,13 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_TEMPLATES, dialogService, preferences.getExternalApplicationsPreferences()), templatesHelp);
     }
 
-    private void addOcrSettings(GridPane builder, int currentRow) {
-        Separator ocrSeparator = new Separator();
-        ocrSeparator.setPadding(new Insets(20, 0, 20, 0));
-        builder.add(ocrSeparator, 0, currentRow++, 3, 1);
-
-        Label ocrSectionLabel = new Label(Localization.lang("OCR Settings"));
-        ocrSectionLabel.getStyleClass().add("sectionHeader");
-        builder.add(ocrSectionLabel, 0, currentRow++, 3, 1);
-
-        Label tessdataLabel = new Label(Localization.lang("Tessdata directory") + ":");
-        tessdataPathField = new TextField();
-        tessdataPathField.setPrefWidth(400);
-        tessdataPathField.setPromptText(Localization.lang("Path to tessdata directory (e.g., /usr/local/share/tessdata)"));
-
-        Button browseButton = new Button(Localization.lang("Browse"));
-        browseButton.setOnAction(event -> selectTessdataDirectory());
-
-        HBox tessdataBox = new HBox(10);
-        tessdataBox.setAlignment(Pos.CENTER_LEFT);
-        tessdataBox.getChildren().addAll(tessdataPathField, browseButton);
-
-        builder.add(tessdataLabel, 0, currentRow);
-        builder.add(tessdataBox, 1, currentRow++, 2, 1);
-
-        Text helpText = new Text(Localization.lang(
-                "Leave empty to use system default. You can also set TESSDATA_PREFIX environment variable."
-        ));
-        helpText.getStyleClass().add("help-text");
-        helpText.setWrappingWidth(600);
-        builder.add(helpText, 1, currentRow++, 2, 1);
-    }
-
+    @FXML
     private void selectTessdataDirectory() {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle(Localization.lang("Select tessdata directory"));
 
-        String currentPath = tessdataPathField.getText().trim();
-        if (!currentPath.isEmpty()) {
+        String currentPath = viewModel.tessdataPathProperty().get();
+        if (!StringUtil.isBlank(currentPath)) {
             File currentDir = new File(currentPath);
             if (currentDir.exists() && currentDir.isDirectory()) {
                 directoryChooser.setInitialDirectory(
@@ -172,7 +141,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         File selectedDirectory = directoryChooser.showDialog(tessdataPathField.getScene().getWindow());
         if (selectedDirectory != null) {
-            tessdataPathField.setText(selectedDirectory.getAbsolutePath());
+            viewModel.tessdataPathProperty().set(selectedDirectory.getAbsolutePath());
         }
     }
 
@@ -320,6 +289,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         autoGenerateEmbeddings.disableProperty().bind(viewModel.disableAutoGenerateEmbeddings());
     }
 
+    private void initializeOcr() {
+        tessdataPathField.textProperty().bindBidirectional(viewModel.tessdataPathProperty());
+        tessdataPathField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+        tessdataBrowseButton.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+    }
+
     @Override
     public String getTabName() {
         return Localization.lang("AI");
@@ -365,18 +340,6 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         }
 
         return Optional.empty();
-    }
-
-    @Override
-    public void setValues() {
-        // Load stored OCR path into the field
-        tessdataPathField.setText(preferences.getFilePreferences().getOcrTessdataPath());
-    }
-
-    @Override
-    public void storeSettings() {
-        // Save OCR path to preferences
-        preferences.getFilePreferences().setOcrTessdataPath(tessdataPathField.getText().trim());
     }
 
 }
