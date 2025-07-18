@@ -10,7 +10,9 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -46,11 +48,11 @@ import org.slf4j.LoggerFactory;
 
 public class WebImportEntriesViewModel extends AbstractViewModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebImportEntriesViewModel.class);
     private static final int PAGE_SIZE = 20;
 
     public int currentPage = 0;
-    public List<BibEntry> allEntries = new ArrayList<>();
+    public ObservableList<BibEntry> allEntries = FXCollections.observableArrayList();
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -64,10 +66,13 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
+    private final IntegerProperty currentPageProperty = new SimpleIntegerProperty(0);
+    private final IntegerProperty totalPagesProperty = new SimpleIntegerProperty(0);
     private final ObservableList<BibEntry> pagedEntries = FXCollections.observableArrayList();
     private final ObservableSet<BibEntry> checkedEntries = FXCollections.observableSet();
     private final SearchBasedFetcher fetcher;
     private final String query;
+    private boolean fetchingInProcess;
 
     /**
      * @param databaseContext the database to import into
@@ -98,6 +103,7 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         this.selectedDb = new SimpleObjectProperty<>();
         this.fetcher = fetcher;
         this.query = query;
+        fetchingInProcess = false;
 
         task.onSuccess(parserResult -> {
             // store the complete parser result (to import groups, ... later on)
@@ -107,6 +113,7 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
             try {
                 loadAllEntries(entries);
                 updatePagedEntries();
+                updateTotalPages();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -207,23 +214,44 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         return checkedEntries;
     }
 
+    public ObservableList<BibEntry> getAllEntries() {
+        return allEntries;
+    }
+
     public void loadAllEntries(List<BibEntry> entries) {
-        this.allEntries = new ArrayList<>(entries);
+        this.allEntries = FXCollections.observableArrayList(entries);
         this.currentPage = 0;
     }
 
     public void nextPage() {
         if (hasNextPage()) {
+            currentPageProperty.set(currentPageProperty.get() + 1);
             currentPage++;
             updatePagedEntries();
+            updateTotalPages();
         }
     }
 
     public void prevPage() {
         if (hasPrevPage()) {
+            currentPageProperty.set(currentPageProperty.get() - 1);
             currentPage--;
             updatePagedEntries();
+            updateTotalPages();
         }
+    }
+
+    public void updateTotalPages() {
+        int total = (int) Math.ceil((double) allEntries.size() / PAGE_SIZE);
+        totalPagesProperty.set(total);
+    }
+
+    public IntegerProperty currentPageProperty() {
+        return currentPageProperty;
+    }
+
+    public IntegerProperty totalPagesProperty() {
+        return totalPagesProperty;
     }
 
     public boolean hasNextPage() {
@@ -235,7 +263,8 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
     }
 
     private void updatePagedEntries() {
-        if (fetcher.getName().equals("ArXiv") && (currentPage + 1) * PAGE_SIZE >= allEntries.size()) {
+        if (!fetchingInProcess && fetcher.getName().equals("ArXiv") && (currentPage + 1) * PAGE_SIZE >= allEntries.size()) {
+            fetchingInProcess = true;
             fetchMoreEntries();
         }
 
@@ -259,8 +288,10 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
                     List<BibEntry> newEntries = get();
                     if (newEntries != null && !newEntries.isEmpty()) {
                         allEntries.addAll(newEntries);
+                        updateTotalPages();
+                        fetchingInProcess = false;
                     } else {
-                        LOGGER.warn("No new entries fetched for page {}", currentPage + 1);
+                        LOGGER.warn("No new entries fetched for page {}", currentPage + 2);
                     }
                 } catch (InterruptedException | ExecutionException ex) {
                     showErrorDialog(ex);

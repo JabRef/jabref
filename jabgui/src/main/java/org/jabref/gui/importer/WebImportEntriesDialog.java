@@ -206,7 +206,25 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
         initBibTeX();
-        pageNumberLabel.setText("Loading...");
+        updatePageUI();
+    }
+
+    private void updatePageUI() {
+        pageNumberLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+            int totalPages = viewModel.totalPagesProperty().get();
+            int currentPage = viewModel.currentPageProperty().get() + 1;
+            if (totalPages != 0) {
+                return "Page " + currentPage + " of " + totalPages;
+            }
+            return "";
+        }, viewModel.currentPageProperty(), viewModel.totalPagesProperty()));
+        viewModel.getAllEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasAdded() || change.wasRemoved()) {
+                    viewModel.updateTotalPages();
+                }
+            }
+        });
     }
 
     private void displayBibTeX(BibEntry entry, String bibTeX) {
@@ -252,14 +270,12 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
     @FXML
     private void onPrevPage() {
         viewModel.prevPage();
-        updatePageNumberLabel();
         restoreCheckedEntries();
     }
 
     @FXML
     private void onNextPage() {
         viewModel.nextPage();
-        updatePageNumberLabel();
         restoreCheckedEntries();
     }
 
@@ -269,10 +285,5 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
                 entriesListView.getCheckModel().check(entry);
             }
         }
-    }
-
-    private void updatePageNumberLabel() {
-        int total = (int) Math.ceil((double) viewModel.allEntries.size() / 20);
-        pageNumberLabel.setText("Page " + (viewModel.currentPage + 1) + " of " + total);
     }
 }
