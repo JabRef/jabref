@@ -574,7 +574,7 @@ public class WelcomeTab extends Tab {
         List<GuiPushToApplication> allApplications = GuiPushToApplications.getAllGUIApplications(dialogService, pushToApplicationPreferences);
 
         applicationsList.getItems().addAll(allApplications);
-        applicationsList.setCellFactory(_ -> new PushApplicationListCell(Collections.emptySet()));
+        applicationsList.setCellFactory(_ -> new PushApplicationListCell(Set.of()));
 
         if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
             allApplications.stream()
