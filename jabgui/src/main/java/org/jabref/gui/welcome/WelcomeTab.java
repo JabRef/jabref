@@ -6,7 +6,6 @@ import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -677,18 +676,18 @@ public class WelcomeTab extends Tab {
     private CompletableFuture<Map<GuiPushToApplication, String>> detectApplicationPathsAsync(List<GuiPushToApplication> allApplications) {
         return CompletableFuture.supplyAsync(() ->
                 allApplications
-                    .parallelStream()
-                    .map(application -> {
-                        Optional<String> path = findApplicationPath(application);
-                        if (path.isPresent()) {
-                            LOGGER.debug("Detected application {}: {}", application.getDisplayName(), path.get());
-                            return Optional.of(Map.entry(application, path.get()));
-                        }
-                        return Optional.<Map.Entry<GuiPushToApplication, String>>empty();
-                    })
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
+                        .parallelStream()
+                        .map(application -> {
+                            Optional<String> path = findApplicationPath(application);
+                            if (path.isPresent()) {
+                                LOGGER.debug("Detected application {}: {}", application.getDisplayName(), path.get());
+                                return Optional.of(Map.entry(application, path.get()));
+                            }
+                            return Optional.<Map.Entry<GuiPushToApplication, String>>empty();
+                        })
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
         );
     }
 
