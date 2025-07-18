@@ -20,7 +20,7 @@ public class CommandResource {
     @POST
     @Consumes({MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_JSON})
-    public Response dispatchCommand(String jsonCommand) throws JsonProcessingException {
+    public Response dispatchCommand(String jsonCommand) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             Command command = objectMapper.readValue(jsonCommand, Command.class);

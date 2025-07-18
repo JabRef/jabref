@@ -8,7 +8,9 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.google.common.collect.Lists;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.hk2.api.ServiceLocator;
 
@@ -18,11 +20,12 @@ public class SelectEntriesCommand implements Command {
     @JsonIgnore
     private ServiceLocator serviceLocator;
 
+    @JsonProperty(required = true)
     private String libraryId;
-    @JsonIgnore
-    private List<String> citationKeys;
-    @JsonIgnore
-    private List<String> entryIds;
+    @JsonProperty
+    private List<String> citationKeys = Lists.newArrayList();
+    @JsonProperty
+    private List<String> entryIds = Lists.newArrayList();
 
     public SelectEntriesCommand() {
     }
@@ -30,14 +33,14 @@ public class SelectEntriesCommand implements Command {
     @Override
     public Response execute() {
         if (getGuiBridge().isRunningInCli()) {
-            return Response.status(Response.Status.NOT_IMPLEMENTED)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("This command is not supported in CLI mode.")
                            .build();
         }
 
         List<BibDatabaseContext> contexts = getGuiBridge().getOpenDatabases().stream()
                                                           .filter(context -> context.getDatabasePath().isPresent())
-                                                          .filter(context -> getLibraryId(context).equals(libraryId))
+                                                          .filter(context -> libraryId.equals(getLibraryIdFromContext(context)))
                                                           .collect(Collectors.toList());
 
         if (contexts.isEmpty()) {
@@ -48,14 +51,14 @@ public class SelectEntriesCommand implements Command {
 
         List<BibEntry> entries = contexts.stream()
                                                           .flatMap(context -> context.getDatabase().getEntries().stream())
-                                                          .filter(entry -> citationKeys.contains(entry.getCitationKey()) || entryIds.contains(entry.getId()))
+                                         .filter(entry -> citationKeys.contains(entry.getCitationKey().orElse(null)) || entryIds.contains(entry.getId()))
                                                           .collect(Collectors.toList());
 
         contexts.forEach(context -> getGuiBridge().setSelectEntries(context, entries));
         return Response.ok().build();
     }
 
-    private String getLibraryId(BibDatabaseContext bibDatabaseContext) {
+    private String getLibraryIdFromContext(BibDatabaseContext bibDatabaseContext) {
         return bibDatabaseContext.getDatabasePath()
                                  .map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
                                  .orElse(null);
@@ -71,12 +74,20 @@ public class SelectEntriesCommand implements Command {
         return this.serviceLocator;
     }
 
+    public String getLibraryId() {
+        return libraryId;
+    }
+
     public List<String> getCitationKeys() {
         return citationKeys;
     }
 
     public List<String> getEntryIds() {
         return entryIds;
+    }
+
+    public void setLibraryId(String libraryId) {
+        this.libraryId = libraryId;
     }
 
     public void setCitationKeys(List<String> citationKeys) {

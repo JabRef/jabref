@@ -75,7 +75,6 @@ public class CAYWResource {
         }
         
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
-        databaseContext.getEntries().forEach(bibEntry -> System.out.println(bibEntry.getId()));
 
         // Selected parameter handling
         List<CAYWEntry> searchResults;
