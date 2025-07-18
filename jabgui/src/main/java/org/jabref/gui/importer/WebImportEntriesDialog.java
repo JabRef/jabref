@@ -6,6 +6,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -36,6 +37,7 @@ import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
@@ -52,8 +54,9 @@ import jakarta.inject.Inject;
 import org.controlsfx.control.CheckListView;
 import org.fxmisc.richtext.CodeArea;
 
-public class ImportEntriesDialog extends BaseDialog<Boolean> {
+public class WebImportEntriesDialog extends BaseDialog<Boolean> {
 
+    @FXML private Label pageNumberLabel;
     @FXML private CheckListView<BibEntry> entriesListView;
     @FXML private ComboBox<BibDatabaseContext> libraryListView;
     @FXML private ButtonType importButton;
@@ -67,7 +70,9 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     private final BackgroundTask<ParserResult> task;
     private final BibDatabaseContext database;
-    private ImportEntriesViewModel viewModel;
+    private WebImportEntriesViewModel viewModel;
+    private final SearchBasedFetcher searchBasedFetcher;
+    private final String query;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -83,9 +88,12 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * @param database the database to import into
      * @param task     the task executed for parsing the selected files(s).
      */
-    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
+    public WebImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
         this.task = task;
+        this.searchBasedFetcher = fetcher;
+        this.query = query;
+
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
@@ -109,11 +117,25 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor);
+        viewModel = new WebImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
         entriesListView.setItems(viewModel.getEntries());
+        entriesListView.getCheckModel().getCheckedItems().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (BibEntry entry : change.getAddedSubList()) {
+                        viewModel.getCheckedEntries().add(entry);
+                    }
+                }
+                if (change.wasRemoved()) {
+                    for (BibEntry entry : change.getRemoved()) {
+                        viewModel.getCheckedEntries().remove(entry);
+                    }
+                }
+            }
+        });
 
         libraryListView.setEditable(false);
         libraryListView.getItems().addAll(stateManager.getOpenDatabases());
@@ -184,6 +206,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
         initBibTeX();
+        pageNumberLabel.setText("Loading...");
     }
 
     private void displayBibTeX(BibEntry entry, String bibTeX) {
@@ -224,5 +247,32 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public void selectAllEntries() {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
+    }
+
+    @FXML
+    private void onPrevPage() {
+        viewModel.prevPage();
+        updatePageNumberLabel();
+        restoreCheckedEntries();
+    }
+
+    @FXML
+    private void onNextPage() {
+        viewModel.nextPage();
+        updatePageNumberLabel();
+        restoreCheckedEntries();
+    }
+
+    private void restoreCheckedEntries() {
+        for (BibEntry entry : viewModel.getEntries()) {
+            if (viewModel.getCheckedEntries().contains(entry)) {
+                entriesListView.getCheckModel().check(entry);
+            }
+        }
+    }
+
+    private void updatePageNumberLabel() {
+        int total = (int) Math.ceil((double) viewModel.allEntries.size() / 20);
+        pageNumberLabel.setText("Page " + (viewModel.currentPage + 1) + " of " + total);
     }
 }

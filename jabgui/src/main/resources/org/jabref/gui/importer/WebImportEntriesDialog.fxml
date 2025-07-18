@@ -14,12 +14,17 @@
 <?import org.controlsfx.control.CheckListView?>
 <?import org.fxmisc.richtext.CodeArea?>
 <DialogPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.ImportEntriesDialog"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.jabref.gui.importer.WebImportEntriesDialog"
             id="importEntriesDialog">
     <content>
         <VBox spacing="10.0">
             <Label text="%Select the entries to be imported:"/>
             <CheckListView fx:id="entriesListView" VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10" alignment="CENTER">
+                <Button onAction="#onPrevPage" text="%Previous"/>
+                <Label fx:id="pageNumberLabel" text=" " />
+                <Button onAction="#onNextPage" text="%Next"/>
+            </HBox>
             <HBox spacing="4">
                 <VBox spacing="10">
                     <HBox spacing="4">
