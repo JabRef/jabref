@@ -1,5 +1,6 @@
 package org.jabref.http.server.command;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,7 +11,6 @@ import org.jabref.model.entry.BibEntry;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.google.common.collect.Lists;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.hk2.api.ServiceLocator;
 
@@ -23,9 +23,9 @@ public class SelectEntriesCommand implements Command {
     @JsonProperty(required = true)
     private String libraryId;
     @JsonProperty
-    private List<String> citationKeys = Lists.newArrayList();
+    private List<String> citationKeys = new ArrayList<>();
     @JsonProperty
-    private List<String> entryIds = Lists.newArrayList();
+    private List<String> entryIds = new ArrayList<>();
 
     public SelectEntriesCommand() {
     }
