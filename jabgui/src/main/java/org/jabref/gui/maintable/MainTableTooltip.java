@@ -1,10 +1,8 @@
 package org.jabref.gui.maintable;
 
-import javafx.animation.PauseTransition;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
-import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -33,10 +31,7 @@ public class MainTableTooltip extends Tooltip {
             preview.setLayout(preferences.getPreviewPreferences().getSelectedPreviewLayout());
             preview.setDatabaseContext(databaseContext);
             preview.setEntry(entry);
-//            this.setGraphic(tooltipContent);
-            PauseTransition delay = new PauseTransition(Duration.millis(150)); // Tune this value if needed
-            delay.setOnFinished(e -> this.setGraphic(tooltipContent));
-            delay.play();
+            this.setGraphic(tooltipContent);
         } else {
             this.setGraphic(fieldValueLabel);
         }
