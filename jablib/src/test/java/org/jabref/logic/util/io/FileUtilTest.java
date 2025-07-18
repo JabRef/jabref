@@ -448,6 +448,32 @@ class FileUtilTest {
         }
     }
 
+    @Test
+    void relativizeHandlesSymlinks(@TempDir Path tempDir) throws IOException {
+        assertTrue(!OS.WINDOWS);
+
+        Path realDir = tempDir.resolve("real");
+        Files.createDirectory(realDir);
+
+        Path symlinkDir = tempDir.resolve("symlinked");
+        Files.createSymbolicLink(symlinkDir, realDir);
+
+        Path fileInRealDir = realDir.resolve("paper.pdf");
+        Files.write(fileInRealDir, "dummy".getBytes(StandardCharsets.UTF_8));
+
+        Path rel = FileUtil.relativize(fileInRealDir, List.of(symlinkDir));
+        assertEquals(Path.of("paper.pdf"), rel, "Should resolve to simple filename when accessed through symlink");
+        Path fileViaSymlink = symlinkDir.resolve("paper.pdf");
+
+        Path rel2 = FileUtil.relativize(fileViaSymlink, List.of(symlinkDir));
+        assertEquals(Path.of("paper.pdf"), rel2, "Should resolve to simple filename for file via symlink-path");
+        Path outsideFile = tempDir.resolve("elsewhere.pdf");
+        Files.write(outsideFile, "foo".getBytes(StandardCharsets.UTF_8));
+
+        Path rel3 = FileUtil.relativize(outsideFile, List.of(symlinkDir));
+        assertEquals(outsideFile, rel3, "Unrelated files should not relativize");
+    }
+
     /**
      * @implNote Tests inspired by {@link org.jabref.model.database.BibDatabaseContextTest#getFileDirectoriesWithRelativeMetadata}
      */

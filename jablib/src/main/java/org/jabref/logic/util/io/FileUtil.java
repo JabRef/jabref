@@ -257,12 +257,40 @@ public class FileUtil {
             return file;
         }
 
+        // Try "real path" matching to support symlinks
+        Optional<Path> realFileOpt = tryRealPath(file);
+
         for (Path directory : directories) {
+            // Try real path comparison
+            Optional<Path> realDirOpt = tryRealPath(directory);
+
+            if (realFileOpt.isPresent() && realDirOpt.isPresent()) {
+                Path realFile = realFileOpt.get();
+                Path realDir = realDirOpt.get();
+                if (realFile.startsWith(realDir)) {
+                    // Figure out offset in original path structure, so the returned path is user-friendly and symlinks are preserved if possible
+                    // Compute number of elements to drop from file, starting from directory length
+                    int nameCountToDrop = realDir.getNameCount();
+                    Path relativePart = realFile.subpath(nameCountToDrop, realFile.getNameCount());
+                    return relativePart;
+                }
+            }
+
+            // Fallback: original logic as before, for non-symlinked directories
             if (file.startsWith(directory)) {
                 return directory.relativize(file);
             }
         }
         return file;
+    }
+
+    private static Optional<Path> tryRealPath(Path path) {
+        try {
+            return Optional.of(path.toRealPath());
+        } catch (IOException e) {
+            // maybe the file does not exist yet? fallback to absolute path.
+            return Optional.of(path.toAbsolutePath());
+        }
     }
 
     /**
