@@ -30,7 +30,8 @@ concurrency:
 jobs:
   publish:
     name: jablib
-    runs-on: ubuntu-22.04
+    if: github.repository == 'JabRef/jabref'
+    runs-on: ubuntu-latest
     steps:
       - name: Fetch all history for all tags and branches
         uses: actions/checkout@v4

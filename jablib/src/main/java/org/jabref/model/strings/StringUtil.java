@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import javafx.util.Pair;
 
 import org.jabref.architecture.AllowedToUseApacheCommonsLang3;
+import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.os.OS;
 
@@ -23,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 @SuppressWarnings("checkstyle:NoMultipleClosingBracesAtEndOfLine")
 @AllowedToUseApacheCommonsLang3("There is no equivalent in Google's Guava")
+@AllowedToUseLogic("OS.NewLine is most basic")
 public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
@@ -567,16 +569,21 @@ public class StringUtil {
         return list;
     }
 
+    /// Limits the length of a string to a maximum length.
+    ///
+    /// Note the implementation is different from [StringUtils.substring](https://commons.apache.org/proper/commons-lang/javadocs/api-2.6/org/apache/commons/lang/StringUtils.html#substring%28java.lang.String,%20int,%20int%29), because it accepts parameters smaller than 4.
+    ///
+    /// @param maxLength the maximum length of the string - <= 0 means no limit
     public static String limitStringLength(String s, int maxLength) {
         if (s == null) {
             return "";
         }
 
-        if (s.length() <= maxLength) {
+        if (maxLength <= 0 || s.length() <= maxLength) {
             return s;
         }
 
-        return s.substring(0, maxLength - 3) + "...";
+        return s.substring(0, Math.max(0, maxLength - 3)) + "...";
     }
 
     /**
@@ -628,19 +635,18 @@ public class StringUtil {
     }
 
     public static boolean isBlank(String string) {
-        return !isNotBlank(string);
+        return (string == null) || string.isBlank();
     }
 
     public static boolean isBlank(Optional<String> string) {
-        return !isNotBlank(string);
+        return string.isEmpty() || isBlank(string.get());
     }
 
     /**
      * Checks if a CharSequence is not empty (""), not null and not whitespace only.
      */
     public static boolean isNotBlank(String string) {
-        // No Guava equivalent existing
-        return StringUtils.isNotBlank(string);
+        return !isBlank(string);
     }
 
     public static boolean isNotBlank(Optional<String> string) {

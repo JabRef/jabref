@@ -62,6 +62,9 @@
     -js-summary-text-color: derive(-fx-light-text-color, 70%);
     -js-summary-text-color-selected: derive( -fx-dark-text-color, 70%);
 
+    -jr-ai-message-user: derive(-jr-theme, -50%);
+    -jr-ai-message-ai: derive(-jr-theme, -75%);
+
     -jr-match-1-odd: -jr-row-odd-background;
     -jr-match-1-even: -jr-row-even-background;
     -jr-match-1-text-color: -fx-mid-text-color;

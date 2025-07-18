@@ -64,9 +64,9 @@ import static org.mockito.Mockito.when;
 /**
  * Tests for reading can be found at {@link org.jabref.logic.importer.fileformat.BibtexImporterTest}
  */
-class BibtexDatabaseWriterTest {
+class BibDatabaseWriterTest {
 
-    private BibtexDatabaseWriter databaseWriter;
+    private BibDatabaseWriter databaseWriter;
     private BibDatabase database;
     private MetaData metaData;
     private BibDatabaseContext bibtexContext;
@@ -95,7 +95,7 @@ class BibtexDatabaseWriterTest {
     }
 
     private void initializeDatabaseWriter() {
-        databaseWriter = new BibtexDatabaseWriter(
+        databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
@@ -461,7 +461,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws IOException, URISyntaxException {
-        Path testFile = Path.of(BibtexDatabaseWriterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
+        Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -471,7 +471,7 @@ class BibtexDatabaseWriterTest {
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     fieldPreferences,
@@ -485,7 +485,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws URISyntaxException, IOException {
-        Path testFile = Path.of(BibtexDatabaseWriterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
+        Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -495,7 +495,7 @@ class BibtexDatabaseWriterTest {
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     fieldPreferences,
@@ -509,7 +509,7 @@ class BibtexDatabaseWriterTest {
 
     @Test
     void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws URISyntaxException, IOException {
-        Path testFile = Path.of(BibtexDatabaseWriterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
+        Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
@@ -519,7 +519,7 @@ class BibtexDatabaseWriterTest {
 
         try (BufferedWriter fileWriter = Files.newBufferedWriter(file, charset)) {
             BibWriter bibWriter = new BibWriter(fileWriter, context.getDatabase().getNewLineSeparator());
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+            BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                     bibWriter,
                     saveConfiguration,
                     fieldPreferences,
@@ -540,7 +540,7 @@ class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
 
         BibWriter bibWriter = new BibWriter(stringWriter, context.getDatabase().getNewLineSeparator());
-        BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(
+        BibDatabaseWriter databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
@@ -587,7 +587,7 @@ class BibtexDatabaseWriterTest {
 
         // we need a new writer because "\n" instead of "OS.NEWLINE"
         bibWriter = new BibWriter(stringWriter, "\n");
-        databaseWriter = new BibtexDatabaseWriter(
+        databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
@@ -620,7 +620,7 @@ class BibtexDatabaseWriterTest {
 
         // we need a new writer because "\n" instead of "OS.NEWLINE"
         bibWriter = new BibWriter(stringWriter, "\n");
-        databaseWriter = new BibtexDatabaseWriter(
+        databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
@@ -1001,7 +1001,7 @@ class BibtexDatabaseWriterTest {
         // write a second time
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        databaseWriter = new BibtexDatabaseWriter(
+        databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
@@ -1080,7 +1080,7 @@ class BibtexDatabaseWriterTest {
         // write a second time
         stringWriter = new StringWriter();
         bibWriter = new BibWriter(stringWriter, OS.NEWLINE);
-        databaseWriter = new BibtexDatabaseWriter(
+        databaseWriter = new BibDatabaseWriter(
                 bibWriter,
                 saveConfiguration,
                 fieldPreferences,
