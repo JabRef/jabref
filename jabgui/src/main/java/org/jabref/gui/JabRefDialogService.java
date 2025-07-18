@@ -7,9 +7,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
 import javafx.print.PrinterJob;
@@ -27,6 +29,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -300,6 +303,33 @@ public class JabRefDialogService implements DialogService {
                                                               ButtonType... buttonTypes) {
         FXDialog alert = createDialog(type, title, content);
         alert.getButtonTypes().setAll(buttonTypes);
+        return alert.showAndWait();
+    }
+
+    @Override
+    public Optional<ButtonType> showCustomButtonDialogWithTooltipsAndWait(AlertType type,
+                                                                          String title,
+                                                                          String content,
+                                                                          Map<ButtonType, String> tooltips,
+                                                                          ButtonType... buttonTypes) {
+        // Use a non-editable Label instead of raw text to prevent editing
+        FXDialog alert = createDialog(type, title, "");
+        Label contentLabel = new Label(content);
+        contentLabel.setWrapText(true);
+        alert.getDialogPane().setContent(contentLabel);
+
+        alert.getDialogPane().getButtonTypes().setAll(buttonTypes);
+
+        // Attach tooltips to buttons
+        Platform.runLater(() -> {
+            for (Map.Entry<ButtonType, String> entry : tooltips.entrySet()) {
+                Button button = (Button) alert.getDialogPane().lookupButton(entry.getKey());
+                if (button != null) {
+                    button.setTooltip(new Tooltip(entry.getValue()));
+                }
+            }
+        });
+
         return alert.showAndWait();
     }
 
