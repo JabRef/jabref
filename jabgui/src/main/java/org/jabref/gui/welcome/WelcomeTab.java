@@ -208,6 +208,8 @@ public class WelcomeTab extends Tab {
         Button helpButton = new Button();
         helpButton.setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
         helpButton.getStyleClass().add("icon-button");
+        helpButton.setPrefSize(28, 28);
+        helpButton.setMinSize(28, 28);
         helpButton.setOnAction(_ -> new OpenBrowserAction(url, dialogService, preferences.getExternalApplicationsPreferences()).execute());
         return helpButton;
     }
@@ -508,7 +510,7 @@ public class WelcomeTab extends Tab {
     }
 
     private void showLargeLibraryOptimizationDialog() {
-        Label performanceOptimizationLabel = new Label(Localization.lang("Select performance optimizations to apply"));
+        Label performanceOptimizationLabel = new Label(Localization.lang("Select features to disable. Disabling these features can significantly improve performance when working with large libraries, but may reduce functionality"));
         performanceOptimizationLabel.setWrapText(true);
         performanceOptimizationLabel.setMaxWidth(400);
 

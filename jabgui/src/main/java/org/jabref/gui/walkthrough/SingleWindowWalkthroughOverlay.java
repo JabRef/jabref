@@ -146,7 +146,7 @@ public class SingleWindowWalkthroughOverlay {
             }
             popover.show(targetNode);
         };
-        updater.setupScrollContainerListeners(targetNode, showPopover);
+        updater.setupNodeListeners(targetNode, showPopover);
     }
 
     private void displayPanelStep(Node content, PanelStep step) {
