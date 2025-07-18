@@ -25,14 +25,17 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchField.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SearchResultContainer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/gui/SelectedItemsContainer.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/Command.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/RootResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/Server.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ContextsToServe.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/FilesToServe.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/GuiBridge.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/services/ServerUtils.java
 
 // REPOS mavencentral,snapshots=https://central.sonatype.com/repository/maven-snapshots/
