@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,21 +20,19 @@ import org.slf4j.LoggerFactory;
 public class PushToApplicationDetector {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToApplicationDetector.class);
 
-    public static CompletableFuture<Map<GuiPushToApplication, String>> detectApplicationPaths(List<GuiPushToApplication> apps) {
-        return CompletableFuture.supplyAsync(() ->
-                apps.parallelStream()
-                    .map(app -> {
-                        String path = findApplicationPath(app);
-                        if (path != null) {
-                            LOGGER.debug("Detected application {}: {}", app.getDisplayName(), path);
-                            return Optional.of(Map.entry(app, path));
-                        }
-                        return Optional.<Map.Entry<GuiPushToApplication, String>>empty();
-                    })
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-        );
+    public static Map<GuiPushToApplication, String> detectApplicationPaths(List<GuiPushToApplication> apps) {
+        return apps.parallelStream()
+                   .map(app -> {
+                       String path = findApplicationPath(app);
+                       if (path != null) {
+                           LOGGER.debug("Detected application {}: {}", app.getDisplayName(), path);
+                           return Optional.of(Map.entry(app, path));
+                       }
+                       return Optional.<Map.Entry<GuiPushToApplication, String>>empty();
+                   })
+                   .filter(Optional::isPresent)
+                   .map(Optional::get)
+                   .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public static boolean isValidAbsolutePath(String path) {

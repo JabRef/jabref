@@ -8,10 +8,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
-import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -54,7 +53,9 @@ import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
 import org.jabref.logic.push.PushToApplicationPreferences;
+import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.field.InternalField;
 
 import org.slf4j.Logger;
@@ -66,16 +67,18 @@ public class QuickSettings extends VBox {
 
     private final GuiPreferences preferences;
     private final DialogService dialogService;
+    private final TaskExecutor taskExecutor;
 
-    public QuickSettings(GuiPreferences preferences, DialogService dialogService) {
+    public QuickSettings(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
 
         initializeComponent();
     }
 
     private void initializeComponent() {
-        Label header = new Label(Localization.lang("Quick Settings"));
+        Label header = new Label(Localization.lang("Quick settings"));
         header.getStyleClass().add("welcome-header-label");
 
         VBox actions = new VBox();
@@ -379,29 +382,27 @@ public class QuickSettings extends VBox {
             }
         });
 
-        CompletableFuture<Map<GuiPushToApplication, String>> detectionFuture =
-                PushToApplicationDetector.detectApplicationPaths(allApplications);
-
-        detectionFuture.thenAccept(detectedPaths -> Platform.runLater(() -> {
-            detectedApplicationPaths.putAll(detectedPaths);
-            applicationsList.setCellFactory(_ -> new PushToApplicationCell(detectedPaths.keySet()));
-            List<GuiPushToApplication> sortedApplications = new ArrayList<>(detectedPaths.keySet());
-            allApplications.stream()
-                           .filter(app -> !detectedPaths.containsKey(app))
-                           .forEach(sortedApplications::add);
-            applicationsList.getItems().clear();
-            applicationsList.getItems().addAll(sortedApplications);
-            if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
-                sortedApplications.stream()
-                                  .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
-                                  .findFirst()
-                                  .ifPresent(applicationsList.getSelectionModel()::select);
-            }
-            LOGGER.info("Application detection completed. Found {} applications", detectedPaths.size());
-        })).exceptionally(throwable -> {
-            LOGGER.warn("Application detection failed", throwable);
-            return null;
-        });
+        Future<Map<GuiPushToApplication, String>> detectionFuture = BackgroundTask
+                .wrap(() -> PushToApplicationDetector.detectApplicationPaths(allApplications))
+                .onSuccess(detectedPaths -> {
+                    detectedApplicationPaths.putAll(detectedPaths);
+                    applicationsList.setCellFactory(_ -> new PushToApplicationCell(detectedPaths.keySet()));
+                    List<GuiPushToApplication> sortedApplications = new ArrayList<>(detectedPaths.keySet());
+                    allApplications.stream()
+                                   .filter(app -> !detectedPaths.containsKey(app))
+                                   .forEach(sortedApplications::add);
+                    applicationsList.getItems().clear();
+                    applicationsList.getItems().addAll(sortedApplications);
+                    if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
+                        sortedApplications.stream()
+                                          .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
+                                          .findFirst()
+                                          .ifPresent(applicationsList.getSelectionModel()::select);
+                    }
+                    LOGGER.info("Application detection completed. Found {} applications", detectedPaths.size());
+                })
+                .onFailure(throwable -> LOGGER.warn("Application detection failed", throwable))
+                .executeWith(taskExecutor);
 
         Optional<ButtonType> result = QuickSettingsDialog
                 .create()

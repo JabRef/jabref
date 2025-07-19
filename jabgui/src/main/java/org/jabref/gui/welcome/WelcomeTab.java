@@ -147,7 +147,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createRightColumn() {
-        VBox rightColumn = new VBox(new QuickSettings(preferences, dialogService), createWalkthroughBox());
+        VBox rightColumn = new VBox(new QuickSettings(preferences, dialogService, taskExecutor), createWalkthroughBox());
         rightColumn.getStyleClass().add("welcome-content-column");
         return rightColumn;
     }
