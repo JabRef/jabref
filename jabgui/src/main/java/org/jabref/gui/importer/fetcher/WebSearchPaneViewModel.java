@@ -14,7 +14,7 @@ import javafx.collections.ObservableList;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.frame.SidePanePreferences;
-import org.jabref.gui.importer.ImportEntriesDialog;
+import org.jabref.gui.importer.WebImportEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.CompositeIdFetcher;
 import org.jabref.logic.importer.ParserResult;
@@ -162,7 +162,7 @@ public class WebSearchPaneViewModel {
                                                           .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
-        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
+        WebImportEntriesDialog dialog = new WebImportEntriesDialog(stateManager.getActiveDatabase().get(), task, activeFetcher, query);
         dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }
