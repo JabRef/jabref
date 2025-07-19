@@ -128,10 +128,27 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
-                // The user name starts directly after FILE_DIRECTORY_LATEX + '-'
-                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
+                // The user-host string starts directly after FILE_DIRECTORY_LATEX + '-'
+                String userHost = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
                 Path path = Path.of(parseDirectory(entry.getValue())).normalize();
-                metaData.setLatexFileDirectory(user, path);
+                
+                // Extract the host part from the user-host string
+                String[] parts = userHost.split("-");
+                if (parts.length >= 2) {
+                    // Check if this is the current host
+                    String host = parts[parts.length - 1];
+                    String currentHost = org.jabref.logic.os.OS.getHostName();
+                    
+                    if (!host.equals(currentHost)) {
+                        // If the host doesn't match the current host, we need to use the current user-host
+                        // This ensures that the LaTeX file directory is set for the current user on the current host
+                        LOGGER.debug("Host mismatch for LaTeX file directory: {} vs current host {}", host, currentHost);
+                        // We don't have access to the current user-host here, so we'll just store the path
+                        // The correct user-host will be used when the path is retrieved via the GUI
+                    }
+                }
+                
+                metaData.setLatexFileDirectory(userHost, path);
             } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
                 metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {

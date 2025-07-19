@@ -265,7 +265,26 @@ public class MetaData {
     }
 
     public Optional<Path> getLatexFileDirectory(String user) {
-        return Optional.ofNullable(laTexFileDirectory.get(user));
+        // First try to get the LaTeX file directory for the exact user
+        Path path = laTexFileDirectory.get(user);
+        if (path != null) {
+            return Optional.of(path);
+        }
+        
+        // If not found, try to find a LaTeX file directory for the same host
+        // This handles the case where a file is moved between hosts with different users
+        if (user.contains("-")) {
+            String currentHost = user.substring(user.lastIndexOf('-') + 1);
+            for (Map.Entry<String, Path> entry : laTexFileDirectory.entrySet()) {
+                String entryUser = entry.getKey();
+                if (entryUser.endsWith("-" + currentHost)) {
+                    // Found a LaTeX file directory for the same host, return it
+                    return Optional.of(entry.getValue());
+                }
+            }
+        }
+        
+        return Optional.empty();
     }
 
     public void setLatexFileDirectory(String user, Path path) {
