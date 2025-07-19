@@ -72,7 +72,7 @@ public class PushToApplicationDetector {
                     }
                 }
             } catch (Exception e) {
-                LOGGER.trace("Error checking path {}: {}", base, e.getMessage());
+                LOGGER.trace("Error checking path {}: {}", base, e.getMessage(), e);
             }
         }
 
@@ -120,7 +120,7 @@ public class PushToApplicationDetector {
                     .map(Path::toString)
                     .findFirst().orElse(null);
         } catch (IOException e) {
-            LOGGER.trace("Error searching directory {}: {}", dir, e.getMessage());
+            LOGGER.trace("Error searching directory {}: {}", dir, e.getMessage(), e);
             return null;
         }
     }
@@ -195,7 +195,7 @@ public class PushToApplicationDetector {
                 }
             }
         } catch (IOException | InterruptedException e) {
-            LOGGER.trace("Failed to execute '{}' command: {}", cmd, e.getMessage());
+            LOGGER.trace("Failed to execute '{}' command: {}", cmd, e.getMessage(), e);
         }
         return null;
     }
