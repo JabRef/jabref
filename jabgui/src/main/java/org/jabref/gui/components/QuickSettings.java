@@ -61,7 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class QuickSettings extends VBox {
-    public static final int SCROLL_PANE_HEIGHT = 172;
+    public static final int SCROLL_PANE_HEIGHT = 35 * 4 + 8 * 3; // Scroll pane show exactly 4 items, item-height * 4 + gap * 3
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickSettings.class);
 
     private final GuiPreferences preferences;
@@ -130,7 +130,7 @@ public class QuickSettings extends VBox {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setPrefHeight(SCROLL_PANE_HEIGHT); // Scroll pane show exactly 4 times, item-height * 4 + gap * 3 = 35 * 4 + 8 * 3
+        scrollPane.setPrefHeight(SCROLL_PANE_HEIGHT);
         scrollPane.setMinHeight(SCROLL_PANE_HEIGHT);
         scrollPane.setMaxHeight(SCROLL_PANE_HEIGHT);
 
