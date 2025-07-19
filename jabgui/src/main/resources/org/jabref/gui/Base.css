@@ -2757,6 +2757,12 @@ journalInfo .grid-cell-b {
     -jr-wf-welcome-item-bg: #2E838C;
 }
 
+/* Quick Settings: Optimization Checkboxes */
+.optimization-checkboxes {
+    -fx-padding: 0 0 0 1em;
+    -fx-spacing: 1.333em;
+}
+
 /* Quick Settings: Push Application Configuration */
 .applications-list {
     -fx-pref-height: 200px;

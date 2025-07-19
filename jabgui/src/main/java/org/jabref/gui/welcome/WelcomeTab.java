@@ -213,6 +213,13 @@ public class WelcomeTab extends Tab {
         return helpButton;
     }
 
+    private HBox createHeaderWithHelp(String localizationKey, String helpUrl, Object... params) {
+        Label headerLabel = new Label(Localization.lang(localizationKey, params));
+        headerLabel.setWrapText(true);
+        Button helpButton = createHelpButton(helpUrl);
+        return new HBox(headerLabel, helpButton);
+    }
+
     private static class PathSelectionField extends HBox {
         private final TextField pathField;
         private final Button browseButton;
@@ -387,6 +394,11 @@ public class WelcomeTab extends Tab {
     private void showMainFileDirectoryDialog() {
         FilePreferences filePreferences = preferences.getFilePreferences();
 
+        HBox mainFileDirHeader = createHeaderWithHelp(
+                "Set the default directory for storing attached files. Files will be stored relative to this directory unless specified otherwise.",
+                "https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks"
+        );
+
         PathSelectionField pathSelector = new PathSelectionField(Localization.lang("Main file directory path"));
         pathSelector.setText(filePreferences.getMainFileDirectory()
                                             .map(Path::toString)
@@ -403,6 +415,7 @@ public class WelcomeTab extends Tab {
         Optional<ButtonType> result = createQuickSettingsDialog(
                 "Set main file directory",
                 "Choose the default directory for storing attached files",
+                mainFileDirHeader,
                 pathSelector
         );
 
@@ -413,6 +426,11 @@ public class WelcomeTab extends Tab {
     }
 
     private void showThemeDialog() {
+        HBox themeHeader = createHeaderWithHelp(
+                "Choose between light, dark, or custom themes to personalize your JabRef experience.",
+                "https://docs.jabref.org/advanced/custom-themes"
+        );
+
         ToggleGroup themeGroup = new ToggleGroup();
         HBox radioContainer = new HBox();
 
@@ -485,6 +503,7 @@ public class WelcomeTab extends Tab {
                         .map(toggle -> toggle.getUserData() != ThemeTypes.CUSTOM || Path.of(customThemePath.getText()).toFile().exists())
                         .orElse(false),
                 List.of(customThemePath.pathField.textProperty(), themeGroup.selectedToggleProperty()),
+                themeHeader,
                 radioContainer,
                 customThemePath
         );
@@ -509,36 +528,40 @@ public class WelcomeTab extends Tab {
     }
 
     private void showLargeLibraryOptimizationDialog() {
-        Label performanceOptimizationLabel = new Label(Localization.lang("Select features to disable. Disabling these features can significantly improve performance when working with large libraries, but may reduce functionality"));
-        performanceOptimizationLabel.setWrapText(true);
-        performanceOptimizationLabel.setMaxWidth(400);
+        HBox performanceOptimizationHeader = createHeaderWithHelp(
+                "Select features to disable. Disabling these features can significantly improve performance when working with large libraries.",
+                "https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues"
+        );
 
-        HBox performanceOptimizationHeader = new HBox(performanceOptimizationLabel, createHelpButton("https://docs.jabref.org/faq#q-i-have-a-huge-library.-what-can-i-do-to-mitigate-performance-issues"));
-
-        CheckBox disableFulltextIndexing = new CheckBox(Localization.lang("Disable fulltext indexing"));
+        CheckBox disableFulltextIndexing = new CheckBox(Localization.lang("Fulltext indexing"));
         disableFulltextIndexing.setSelected(true);
 
-        CheckBox disableCreationDate = new CheckBox(Localization.lang("Disable creation date timestamps"));
+        CheckBox disableCreationDate = new CheckBox(Localization.lang("Creation date timestamps"));
         disableCreationDate.setSelected(true);
 
-        CheckBox disableModificationDate = new CheckBox(Localization.lang("Disable modification date timestamps"));
+        CheckBox disableModificationDate = new CheckBox(Localization.lang("Modification date timestamps"));
         disableModificationDate.setSelected(true);
 
-        CheckBox disableAutosave = new CheckBox(Localization.lang("Disable automatic saving"));
+        CheckBox disableAutosave = new CheckBox(Localization.lang("Automatic saving"));
         disableAutosave.setSelected(true);
 
-        CheckBox disableGroupCount = new CheckBox(Localization.lang("Disable group entry counts"));
+        CheckBox disableGroupCount = new CheckBox(Localization.lang("Group entry counts"));
         disableGroupCount.setSelected(true);
 
-        Optional<ButtonType> result = createQuickSettingsDialog(
-                "Optimize for large libraries",
-                "Improve performance when working with libraries containing many entries",
-                performanceOptimizationHeader,
+        VBox checkboxes = new VBox(
                 disableFulltextIndexing,
                 disableCreationDate,
                 disableModificationDate,
                 disableAutosave,
                 disableGroupCount
+        );
+        checkboxes.getStyleClass().add("optimization-checkboxes");
+
+        Optional<ButtonType> result = createQuickSettingsDialog(
+                "Optimize for large libraries",
+                "Improve performance when working with libraries containing many entries",
+                performanceOptimizationHeader,
+                checkboxes
         );
 
         if (result.isEmpty() || result.get() != ButtonType.OK) {
@@ -562,9 +585,10 @@ public class WelcomeTab extends Tab {
     }
 
     private void showPushApplicationConfigurationDialog() {
-        Label explanationLabel = new Label(Localization.lang("Detected applications are highlighted. Application that are not detected can be set manually by specifying the path to the executable."));
-        explanationLabel.setWrapText(true);
-        explanationLabel.setMaxWidth(400);
+        HBox pushApplicationHeader = createHeaderWithHelp(
+                "Configure external applications to push citations to. Detected applications are highlighted. Applications that are not detected can be set manually by specifying the path to the executable.",
+                "https://docs.jabref.org/cite/pushtoapplications"
+        );
 
         ListView<GuiPushToApplication> applicationsList = new ListView<>();
         applicationsList.getStyleClass().add("applications-list");
@@ -655,7 +679,7 @@ public class WelcomeTab extends Tab {
                 "Select your text editor or LaTeX application for pushing citations",
                 () -> validateDialogSubmission(applicationsList, pathSelector),
                 List.of(pathSelector.pathField.textProperty()),
-                explanationLabel,
+                pushApplicationHeader,
                 applicationsList,
                 pathSelector
         );
@@ -897,6 +921,11 @@ public class WelcomeTab extends Tab {
     }
 
     private void showOnlineServicesConfigurationDialog() {
+        HBox onlineServicesHeader = createHeaderWithHelp(
+                "Configure online databases and services for importing entries. Enable web search, update checking, and metadata extraction services.",
+                "https://docs.jabref.org/collect/import-using-online-bibliographic-database"
+        );
+
         CheckBox versionCheckBox = new CheckBox(Localization.lang("Check for updates at startup"));
         versionCheckBox.setSelected(preferences.getInternalPreferences().isVersionCheckEnabled());
 
@@ -957,6 +986,7 @@ public class WelcomeTab extends Tab {
         Optional<ButtonType> result = createQuickSettingsDialog(
                 "Configure web search services",
                 "Enable and configure online databases and services for importing entries",
+                onlineServicesHeader,
                 versionCheckBox,
                 webSearchBox,
                 grobidCheckBox,
@@ -984,6 +1014,11 @@ public class WelcomeTab extends Tab {
     }
 
     private void showEntryTableConfigurationDialog() {
+        HBox entryTableHeader = createHeaderWithHelp(
+                "Configure which columns are displayed in the entry table. The citation key column can be toggled to show or hide reference keys.",
+                "https://docs.jabref.org/advanced/main-window"
+        );
+
         CheckBox showCitationKeyBox = new CheckBox(Localization.lang("Show citation key column"));
 
         ColumnPreferences columnPreferences = preferences.getMainTablePreferences()
@@ -999,6 +1034,7 @@ public class WelcomeTab extends Tab {
         Optional<ButtonType> result = createQuickSettingsDialog(
                 "Customize entry table",
                 "Configure which columns are displayed in the entry table",
+                entryTableHeader,
                 showCitationKeyBox
         );
 
