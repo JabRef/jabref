@@ -106,7 +106,7 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
 
         setResultConverter(button -> {
             if (button == importButton) {
-                viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems(), downloadLinkedOnlineFiles.isSelected());
+                viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
@@ -202,8 +202,8 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
 
-        selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
-        totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
+        selectedItems.textProperty().bind(Bindings.size(viewModel.getCheckedEntries()).asString());
+        totalItems.textProperty().bind(Bindings.size(viewModel.getAllEntries()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
         initBibTeX();
         updatePageUI();
@@ -228,7 +228,7 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
     }
 
     private void displayBibTeX(BibEntry entry, String bibTeX) {
-        if (entriesListView.getCheckModel().isChecked(entry)) {
+        if (viewModel.getCheckedEntries().contains(entry)) {
             bibTeXData.clear();
             bibTeXData.appendText(bibTeX);
             bibTeXData.moveTo(0);
@@ -249,14 +249,18 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
     }
 
     public void unselectAll() {
-        entriesListView.getCheckModel().clearChecks();
+        viewModel.getCheckedEntries().clear();
+        for (int i = 0; i < entriesListView.getItems().size(); i++) {
+            entriesListView.getCheckModel().clearCheck(i);
+        }
     }
 
     public void selectAllNewEntries() {
         unselectAll();
-        for (BibEntry entry : entriesListView.getItems()) {
+        for (BibEntry entry : viewModel.getAllEntries()) {
             if (!viewModel.hasDuplicate(entry)) {
                 entriesListView.getCheckModel().check(entry);
+                viewModel.getCheckedEntries().add(entry);
                 displayBibTeX(entry, viewModel.getSourceString(entry));
             }
         }
@@ -265,6 +269,7 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
     public void selectAllEntries() {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
+        viewModel.getCheckedEntries().addAll(viewModel.getAllEntries());
     }
 
     @FXML

@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import javax.swing.undo.UndoManager;
 
@@ -19,7 +17,6 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
-import javafx.concurrent.Task;
 
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.DialogService;
@@ -103,7 +100,7 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         this.selectedDb = new SimpleObjectProperty<>();
         this.fetcher = fetcher;
         this.query = query;
-        fetchingInProcess = false;
+        this.fetchingInProcess = false;
 
         task.onSuccess(parserResult -> {
             // store the complete parser result (to import groups, ... later on)
@@ -210,7 +207,7 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         return Optional.empty();
     }
 
-    public Set<BibEntry> getCheckedEntries() {
+    public ObservableSet<BibEntry> getCheckedEntries() {
         return checkedEntries;
     }
 
@@ -219,7 +216,7 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
     }
 
     public void loadAllEntries(List<BibEntry> entries) {
-        this.allEntries = FXCollections.observableArrayList(entries);
+        allEntries.addAll(entries);
         this.currentPage = 0;
     }
 
@@ -274,43 +271,25 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
     }
 
     private void fetchMoreEntries() {
-        Task<List<BibEntry>> fetchTask = new Task<List<BibEntry>>() {
-            @Override
-            protected List<BibEntry> call() throws Exception {
+        BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
+            .wrap(() -> {
                 ArXivFetcher arXivFetcher = new ArXivFetcher(preferences.getImportFormatPreferences());
                 LOGGER.info("Fetching ArXiv entries for page {}", currentPage + 2);
                 return new ArrayList<>(arXivFetcher.performSearchPaged(query, currentPage + 1).getContent());
-            }
-
-            @Override
-            protected void succeeded() {
-                try {
-                    List<BibEntry> newEntries = get();
-                    if (newEntries != null && !newEntries.isEmpty()) {
-                        allEntries.addAll(newEntries);
-                        updateTotalPages();
-                        fetchingInProcess = false;
-                    } else {
-                        LOGGER.warn("No new entries fetched for page {}", currentPage + 2);
-                    }
-                } catch (InterruptedException | ExecutionException ex) {
-                    showErrorDialog(ex);
+            })
+            .onSuccess(newEntries -> {
+                if (newEntries != null && !newEntries.isEmpty()) {
+                    allEntries.addAll(newEntries);
+                    updateTotalPages();
+                    fetchingInProcess = false;
+                } else {
+                    LOGGER.warn("No new entries fetched for page {}", currentPage + 2);
                 }
-            }
+            }).onFailure(exception -> dialogService.showErrorDialogAndWait(
+                    Localization.lang("Error fetching entries"),
+                    Localization.lang("An error occurred while fetching entries from ArXiv: ") + exception.getMessage()
+            ));
 
-            @Override
-            protected void failed() {
-                showErrorDialog(getException());
-            }
-        };
-
-        new Thread(fetchTask).start();
-    }
-
-    private void showErrorDialog(Throwable e) {
-        dialogService.showErrorDialogAndWait(
-                Localization.lang("Error fetching entries"),
-                Localization.lang("An error occurred while fetching entries from ArXiv: ") + e.getMessage()
-        );
+        fetchTask.executeWith(taskExecutor);
     }
 }
