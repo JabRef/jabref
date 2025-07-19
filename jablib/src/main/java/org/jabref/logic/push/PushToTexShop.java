@@ -1,17 +1,13 @@
-package org.jabref.gui.push;
+package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.jabref.gui.DialogService;
-import org.jabref.gui.icon.IconTheme;
-import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.util.StreamGobbler;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.HeadlessExecutorService;
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.logic.util.NotificationService;
+import org.jabref.logic.util.StreamGobbler;
 import org.jabref.model.entry.BibEntry;
 
 import org.slf4j.Logger;
@@ -19,33 +15,29 @@ import org.slf4j.LoggerFactory;
 
 public class PushToTexShop extends AbstractPushToApplication {
 
-    public static final String NAME = PushToApplications.TEXSHOP;
+    public static final PushApplications APPLICATION = PushApplications.TEXSHOP;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToTexShop.class);
 
-    public PushToTexShop(DialogService dialogService, GuiPreferences preferences) {
-        super(dialogService, preferences);
+    public PushToTexShop(NotificationService notificationService, PushToApplicationPreferences preferences) {
+        super(notificationService, preferences);
     }
 
     @Override
     public String getDisplayName() {
-        return NAME;
+        return APPLICATION.getDisplayName();
     }
 
     @Override
-    public JabRefIcon getApplicationIcon() {
-        return IconTheme.JabRefIcons.APPLICATION_TEXSHOP;
-    }
-
-    @Override
-    public void pushEntries(BibDatabaseContext database, List<BibEntry> entries, String keyString) {
+    public void pushEntries(List<BibEntry> entries) {
         couldNotPush = false;
         couldNotCall = false;
         notDefined = false;
 
-        commandPath = preferences.getPushToApplicationPreferences().getCommandPaths().get(this.getDisplayName());
+        commandPath = preferences.getCommandPaths().get(this.getDisplayName());
 
         try {
+            String keyString = this.getKeyString(entries, getDelimiter());
             LOGGER.debug("TexShop string: {}", String.join(" ", getCommandLine(keyString)));
             ProcessBuilder processBuilder = new ProcessBuilder(getCommandLine(keyString));
             processBuilder.inheritIO();
@@ -82,7 +74,7 @@ public class PushToTexShop extends AbstractPushToApplication {
         if (OS.OS_X) {
             return new String[] {"sh", "-c", osascriptTexShop};
         } else {
-            dialogService.showInformationDialogAndWait(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
+            sendErrorNotification(Localization.lang("Push to application"), Localization.lang("Pushing citations to TeXShop is only possible on macOS!"));
             return new String[] {};
         }
     }
