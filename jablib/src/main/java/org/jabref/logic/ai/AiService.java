@@ -19,6 +19,8 @@ import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
 import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.ocr.OcrException;
+import org.jabref.logic.ocr.OcrService;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
@@ -60,13 +62,14 @@ public class AiService implements AutoCloseable {
     private final AiChatService aiChatService;
     private final IngestionService ingestionService;
     private final SummariesService summariesService;
+    private final OcrService ocrService;
 
     public AiService(AiPreferences aiPreferences,
                      FilePreferences filePreferences,
                      CitationKeyPatternPreferences citationKeyPatternPreferences,
                      NotificationService notificationService,
                      TaskExecutor taskExecutor
-    ) {
+    ) throws OcrException {
 
         this.mvStoreChatHistoryStorage = new MVStoreChatHistoryStorage(Directories.getAiFilesDirectory().resolve(CHAT_HISTORY_FILE_NAME), notificationService);
         this.mvStoreEmbeddingStore = new MVStoreEmbeddingStore(Directories.getAiFilesDirectory().resolve(EMBEDDINGS_FILE_NAME), notificationService);
@@ -99,6 +102,8 @@ public class AiService implements AutoCloseable {
                 filePreferences,
                 taskExecutor
         );
+
+        this.ocrService = new OcrService(filePreferences);
     }
 
     public JabRefChatLanguageModel getChatLanguageModel() {
@@ -127,6 +132,10 @@ public class AiService implements AutoCloseable {
 
     public AiTemplatesService getTemplatesService() {
         return templatesService;
+    }
+
+    public OcrService getOcrService() {
+        return ocrService;
     }
 
     public void setupDatabase(BibDatabaseContext context) {

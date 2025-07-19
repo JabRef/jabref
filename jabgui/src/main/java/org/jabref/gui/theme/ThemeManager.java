@@ -121,7 +121,7 @@ public class ThemeManager {
             return;
         }
 
-        themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
+        // themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
         LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
     }
 

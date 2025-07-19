@@ -330,4 +330,33 @@
               text="%Automatically generate summaries for new entries"
               HBox.hgrow="ALWAYS"
               maxWidth="Infinity"/>
+
+    <Spacer/>
+
+    <Label styleClass="sectionHeader"
+           text="%OCR Settings"
+           maxWidth="Infinity"
+           HBox.hgrow="ALWAYS"/>
+
+    <HBox alignment="CENTER_LEFT"
+          spacing="10.0">
+        <Label alignment="BASELINE_CENTER"
+               text="%Tessdata directory:"/>
+        <TextField
+                fx:id="tessdataPathField"
+                promptText="%Path to tessdata directory (e.g., /usr/local/share/tessdata)"
+                maxWidth="1.7976931348623157E308"
+                HBox.hgrow="ALWAYS"/>
+        <Button fx:id="tessdataBrowseButton"
+                text="%Browse"
+                onAction="#selectTessdataDirectory"/>
+    </HBox>
+
+    <Label text="%Leave empty to use system default. You can also set TESSDATA_PREFIX environment variable."
+           style="-fx-font-style: italic;"
+           wrapText="true">
+        <padding>
+            <Insets left="20.0"/>
+        </padding>
+    </Label>
 </fx:root>
