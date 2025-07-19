@@ -6,7 +6,7 @@
         type="javafx.scene.layout.VBox"
         xmlns="http://javafx.com/javafx/17.0.2-ea"
         xmlns:fx="http://javafx.com/fxml/1"
-        fx:controller="org.jabref.gui.welcome.ThemeWireFrameComponent"
+        fx:controller="org.jabref.gui.welcome.components.ThemeWireFrame"
         maxHeight="96.0"
         maxWidth="160.0"
         minHeight="96.0"

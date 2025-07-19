@@ -1,4 +1,4 @@
-package org.jabref.gui.welcome;
+package org.jabref.gui.welcome.components;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -7,11 +7,11 @@ import javafx.scene.layout.VBox;
 
 import com.airhacks.afterburner.views.ViewLoader;
 
-public class ThemeWireFrameComponent extends VBox {
+public class ThemeWireFrame extends VBox {
 
     private final StringProperty themeType = new SimpleStringProperty();
 
-    public ThemeWireFrameComponent() {
+    public ThemeWireFrame() {
         ViewLoader.view(this)
                   .root(this)
                   .load();
@@ -23,7 +23,7 @@ public class ThemeWireFrameComponent extends VBox {
         });
     }
 
-    public ThemeWireFrameComponent(String themeType) {
+    public ThemeWireFrame(String themeType) {
         this();
         setThemeType(themeType);
     }
