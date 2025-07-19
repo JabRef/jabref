@@ -136,6 +136,7 @@ public enum StandardField implements Field {
     // JabRef-specific fields
     GROUPS("groups"),
     OWNER("owner"),
+    CITATIONCOUNT("Citation count"),
     TIMESTAMP("timestamp", FieldProperty.DATE),
     CREATIONDATE("creationdate", FieldProperty.DATE),
     MODIFICATIONDATE("modificationdate", FieldProperty.DATE);

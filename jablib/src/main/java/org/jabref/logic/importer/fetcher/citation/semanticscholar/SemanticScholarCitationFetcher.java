@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -31,6 +32,12 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString() + "/" + entry_point
                 + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
                 + "&limit=1000";
+    }
+
+    public String getUrlForCitationCount(BibEntry entry) {
+        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
+                + "?fields=" + "citationCount"
+                + "&limit=1";
     }
 
     @Override
@@ -82,6 +89,27 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
                                  .stream()
                                  .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
                                  .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
+    }
+
+    @Override
+    public Optional<Integer> searchCitationCount(BibEntry entry) throws FetcherException {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
+        URL referencesUrl;
+        try {
+            referencesUrl = URLUtil.create(getUrlForCitationCount(entry));
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Malformed URL", e);
+        }
+        URLDownload urlDownload = new URLDownload(referencesUrl);
+        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+        PaperDetails paperDetails = GSON.fromJson(urlDownload.asString(), PaperDetails.class);
+
+        if (paperDetails == null) {
+            return Optional.empty();
+        }
+        return Optional.of(paperDetails.getCitationCount());
     }
 
     @Override
