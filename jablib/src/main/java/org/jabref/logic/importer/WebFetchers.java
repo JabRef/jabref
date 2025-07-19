@@ -47,6 +47,7 @@ import org.jabref.logic.importer.fetcher.SemanticScholar;
 import org.jabref.logic.importer.fetcher.SpringerFetcher;
 import org.jabref.logic.importer.fetcher.SpringerLink;
 import org.jabref.logic.importer.fetcher.TitleFetcher;
+import org.jabref.logic.importer.fetcher.WillyFetcher;
 import org.jabref.logic.importer.fetcher.ZbMATH;
 import org.jabref.logic.importer.fetcher.isbntobibtex.IsbnFetcher;
 import org.jabref.logic.importer.fileformat.PdfMergeMetadataImporter;
@@ -215,6 +216,7 @@ public class WebFetchers {
         fetchers.add(new IEEE(importFormatPreferences, importerPreferences));
         fetchers.add(new ApsFetcher());
         fetchers.add(new IacrEprintFetcher(importFormatPreferences));
+        fetchers.add(new WillyFetcher());
 
         // Meta search
         // fetchers.add(new JstorFetcher(importFormatPreferences));
