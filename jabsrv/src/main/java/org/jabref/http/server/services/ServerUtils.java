@@ -31,8 +31,8 @@ public class ServerUtils {
                           .orElseThrow(NotFoundException::new);
     }
 
-    private static java.nio.file.Path getLibraryPath(String id, ContextsToServe contextsToServe) {
-        return contextsToServe.getContextsToServe()
+    private static java.nio.file.Path getLibraryPath(String id, GuiBridge guiBridge) {
+        return guiBridge.getOpenDatabases()
                           .stream()
                           .filter(context -> context.getDatabasePath().isPresent())
                           .map(context -> context.getDatabasePath().get())
@@ -42,9 +42,9 @@ public class ServerUtils {
     }
 
     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
-    public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, ContextsToServe contextsToServe) {
+    public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, GuiBridge guiBridge) {
         if (filesToServe.isEmpty()) {
-            return getLibraryPath(id, contextsToServe);
+            return getLibraryPath(id, guiBridge);
         } else {
             return getLibraryPath(id, filesToServe);
         }
@@ -52,7 +52,7 @@ public class ServerUtils {
 
     /// @param id - also "demo" for the demo library
     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
-    public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, ContextsToServe contextsToServe, ImportFormatPreferences importFormatPreferences) throws IOException {
+    public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, GuiBridge guiBridge, ImportFormatPreferences importFormatPreferences) throws IOException {
         BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
         if ("demo".equals(id)) {
             try (InputStream chocolateBibInputStream = BibDatabase.class.getResourceAsStream("/Chocolate.bib")) {
@@ -62,7 +62,7 @@ public class ServerUtils {
         }
 
         if (filesToServe.isEmpty()) {
-            return contextsToServe.getContextsToServe().stream()
+            return guiBridge.getOpenDatabases().stream()
                                   .filter(context -> context.getDatabasePath().isPresent())
                                   .filter(context -> {
                                       Path p = context.getDatabasePath().get();

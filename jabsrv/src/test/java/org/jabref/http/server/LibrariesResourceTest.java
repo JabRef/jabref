@@ -14,7 +14,7 @@ class LibrariesResourceTest extends ServerTest {
     protected Application configure() {
         ResourceConfig resourceConfig = new ResourceConfig(LibrariesResource.class);
         addFilesToServeToResourceConfig(resourceConfig);
-        addContextsToServeToResourceConfig(resourceConfig);
+        addGuiBridgeToResourceConfig(resourceConfig);
         addGsonToResourceConfig(resourceConfig);
         addGlobalExceptionMapperToResourceConfig(resourceConfig);
         return resourceConfig.getApplication();

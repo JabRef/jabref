@@ -10,8 +10,8 @@ import java.util.Objects;
 import org.jabref.http.JabrefMediaType;
 import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.http.dto.LinkedPdfFileDTO;
-import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.http.server.services.GuiBridge;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.citationstyle.JabRefItemDataProvider;
 import org.jabref.logic.preferences.CliPreferences;
@@ -48,7 +48,7 @@ public class LibraryResource {
     CliPreferences preferences;
 
     @Inject
-    ContextsToServe contextsToServe;
+    GuiBridge guiBridge;
 
     @Inject
     FilesToServe filesToServe;
@@ -169,7 +169,7 @@ public class LibraryResource {
                            .build();
         }
 
-        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, contextsToServe);
+        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, guiBridge);
         String libraryAsString;
         try {
             libraryAsString = Files.readString(library);
@@ -184,7 +184,7 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getJabMapPath(String id) {
-        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, filesToServe, contextsToServe);
+        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, filesToServe, guiBridge);
         String newName = libraryPath.getFileName().toString().replaceFirst("\\.bib$", ".jmp");
         return libraryPath.getParent().resolve(newName);
     }
@@ -199,7 +199,7 @@ public class LibraryResource {
      * @param id - also "demo" for the Chocolate.bib file
      */
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
-        return ServerUtils.getBibDatabaseContext(id, filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+        return ServerUtils.getBibDatabaseContext(id, filesToServe, guiBridge, preferences.getImportFormatPreferences());
     }
 
     /**

@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
-import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -61,11 +61,11 @@ abstract class ServerTest extends JerseyTest {
         });
     }
 
-    protected void addContextsToServeToResourceConfig(ResourceConfig resourceConfig) {
+    protected void addGuiBridgeToResourceConfig(ResourceConfig resourceConfig) {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new ContextsToServe()).to(ContextsToServe.class);
+                bind(new GuiBridge()).to(GuiBridge.class);
             }
         });
     }
