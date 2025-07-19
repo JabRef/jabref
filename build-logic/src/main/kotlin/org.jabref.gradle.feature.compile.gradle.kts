@@ -6,6 +6,7 @@ java {
     toolchain {
         // If this is updated, also update
         // - build.gradle -> jacoco -> toolVersion (because JaCoCo does not support newest JDK out of the box. Check versions at https://www.jacoco.org/jacoco/trunk/doc/changes.html)
+        // - jitpack.yml
         // - .devcontainer/devcontainer.json#L34 and
         // - .moderne/moderne.yml
         // - .github/workflows/binaries*.yml

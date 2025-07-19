@@ -12,7 +12,7 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.help.HelpAction;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
-import org.jabref.gui.push.PushToApplication;
+import org.jabref.gui.push.GuiPushToApplication;
 import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.gui.util.ViewModelListCellFactory;
 import org.jabref.logic.help.HelpFile;
@@ -25,7 +25,7 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
 
     @FXML private TextField eMailReferenceSubject;
     @FXML private CheckBox autoOpenAttachedFolders;
-    @FXML private ComboBox<PushToApplication> pushToApplicationCombo;
+    @FXML private ComboBox<GuiPushToApplication> pushToApplicationCombo;
     @FXML private TextField citeCommand;
     @FXML private Button autolinkExternalHelp;
 
@@ -53,9 +53,9 @@ public class ExternalTab extends AbstractPreferenceTabView<ExternalTabViewModel>
     public void initialize() {
         this.viewModel = new ExternalTabViewModel(dialogService, preferences);
 
-        new ViewModelListCellFactory<PushToApplication>()
-                .withText(PushToApplication::getDisplayName)
-                .withIcon(PushToApplication::getApplicationIcon)
+        new ViewModelListCellFactory<GuiPushToApplication>()
+                .withText(GuiPushToApplication::getDisplayName)
+                .withIcon(GuiPushToApplication::getApplicationIcon)
                 .install(pushToApplicationCombo);
 
         eMailReferenceSubject.textProperty().bindBidirectional(viewModel.eMailReferenceSubjectProperty());

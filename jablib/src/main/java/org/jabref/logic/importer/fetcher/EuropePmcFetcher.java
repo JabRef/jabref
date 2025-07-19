@@ -26,12 +26,15 @@ import org.jabref.model.entry.types.StandardEntryType;
 import kong.unirest.core.json.JSONArray;
 import kong.unirest.core.json.JSONException;
 import kong.unirest.core.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EuropePmcFetcher implements IdBasedParserFetcher {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EuropePmcFetcher.class);
 
     @Override
     public URL getUrlForIdentifier(String identifier) throws URISyntaxException, MalformedURLException {
-        return URI.create("https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=" + identifier + "&resultType=core&format=json").toURL();
+        return new URI("https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=" + identifier + "&resultType=core&format=json").toURL();
     }
 
     @Override
@@ -49,7 +52,7 @@ public class EuropePmcFetcher implements IdBasedParserFetcher {
         try {
             JSONObject result = item.getJSONObject("resultList").getJSONArray("result").getJSONObject(0);
 
-            System.out.println(result.toString(2));
+            LOGGER.debug(result.toString(2));
 
             EntryType entryType = StandardEntryType.Article;
             if (result.has("pubTypeList")) {
