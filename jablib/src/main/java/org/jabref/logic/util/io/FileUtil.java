@@ -256,12 +256,9 @@ public class FileUtil {
         if (!file.isAbsolute()) {
             return file;
         }
-
-        // Try "real path" matching to support symlinks
         Optional<Path> realFileOpt = tryRealPath(file);
 
         for (Path directory : directories) {
-            // Try real path comparison
             Optional<Path> realDirOpt = tryRealPath(directory);
 
             if (realFileOpt.isPresent() && realDirOpt.isPresent()) {

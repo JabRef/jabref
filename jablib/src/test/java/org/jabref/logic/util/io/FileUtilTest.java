@@ -450,7 +450,7 @@ class FileUtilTest {
 
     @Test
     void relativizeHandlesSymlinks(@TempDir Path tempDir) throws IOException {
-        assertTrue(!OS.WINDOWS);
+        assertFalse(OS.WINDOWS);
 
         Path realDir = tempDir.resolve("real");
         Files.createDirectory(realDir);
