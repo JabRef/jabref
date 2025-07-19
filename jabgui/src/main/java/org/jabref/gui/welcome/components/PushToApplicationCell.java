@@ -7,6 +7,7 @@ import javafx.scene.control.ListCell;
 import org.jabref.gui.push.GuiPushToApplication;
 
 public class PushToApplicationCell extends ListCell<GuiPushToApplication> {
+    public static final String DETECTED_APPLICATION_STYLE_CLASS = "detected-application";
     private final Set<GuiPushToApplication> detectedApplications;
 
     public PushToApplicationCell(Set<GuiPushToApplication> detectedApplications) {
@@ -20,17 +21,17 @@ public class PushToApplicationCell extends ListCell<GuiPushToApplication> {
         if (empty || application == null) {
             setText(null);
             setGraphic(null);
-            getStyleClass().removeAll("detected-application");
+            getStyleClass().removeAll(DETECTED_APPLICATION_STYLE_CLASS);
             return;
         }
         setText(application.getDisplayName());
         setGraphic(application.getApplicationIcon().getGraphicNode());
         if (detectedApplications.contains(application)) {
-            if (!getStyleClass().contains("detected-application")) {
-                getStyleClass().add("detected-application");
+            if (!getStyleClass().contains(DETECTED_APPLICATION_STYLE_CLASS)) {
+                getStyleClass().add(DETECTED_APPLICATION_STYLE_CLASS);
             }
         } else {
-            getStyleClass().removeAll("detected-application");
+            getStyleClass().removeAll(DETECTED_APPLICATION_STYLE_CLASS);
         }
     }
 }

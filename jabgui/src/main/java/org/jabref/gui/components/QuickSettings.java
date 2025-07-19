@@ -189,19 +189,19 @@ public class QuickSettings extends VBox {
         RadioButton lightRadio = new RadioButton(ThemeTypes.LIGHT.getDisplayName());
         lightRadio.setToggleGroup(themeGroup);
         lightRadio.setUserData(ThemeTypes.LIGHT);
-        VBox lightBox = createThemeOption(lightRadio, new ThemeWireFrame("light"));
+        VBox lightBox = createThemeOption(lightRadio, new ThemeWireFrame(ThemeTypes.LIGHT));
         radioContainer.getChildren().add(lightBox);
 
         RadioButton darkRadio = new RadioButton(ThemeTypes.DARK.getDisplayName());
         darkRadio.setToggleGroup(themeGroup);
         darkRadio.setUserData(ThemeTypes.DARK);
-        VBox darkBox = createThemeOption(darkRadio, new ThemeWireFrame("dark"));
+        VBox darkBox = createThemeOption(darkRadio, new ThemeWireFrame(ThemeTypes.DARK));
         radioContainer.getChildren().add(darkBox);
 
         RadioButton customRadio = new RadioButton(ThemeTypes.CUSTOM.getDisplayName());
         customRadio.setToggleGroup(themeGroup);
         customRadio.setUserData(ThemeTypes.CUSTOM);
-        VBox customBox = createThemeOption(customRadio, new ThemeWireFrame("custom"));
+        VBox customBox = createThemeOption(customRadio, new ThemeWireFrame(ThemeTypes.CUSTOM));
         radioContainer.getChildren().add(customBox);
 
         switch (currentTheme.getType()) {
