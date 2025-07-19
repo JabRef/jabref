@@ -125,6 +125,12 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 return;
             }
 
+            Object height = previewView.getEngine().executeScript("document.getElementById('content').scrollHeight");
+            if (height instanceof java.lang.Number) {
+                double actualHeight = ((java.lang.Number) height).doubleValue();
+                previewView.setPrefHeight(actualHeight + 10);
+            }
+
             // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
             NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
             for (int i = 0; i < anchorList.getLength(); i++) {
