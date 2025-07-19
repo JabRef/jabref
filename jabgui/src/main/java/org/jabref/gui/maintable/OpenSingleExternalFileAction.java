@@ -1,14 +1,11 @@
 package org.jabref.gui.maintable;
 
-import java.util.Optional;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.util.TaskExecutor;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 
@@ -41,18 +38,9 @@ public class OpenSingleExternalFileAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        Optional<BibDatabaseContext> databaseContextOptional = stateManager.getActiveDatabase();
-        if (databaseContextOptional.isEmpty()) {
-            return;
-        }
-        BibDatabaseContext databaseContext = databaseContextOptional.get();
-        LinkedFileViewModel linkedFileViewModel = new LinkedFileViewModel(
-                linkedFile,
-                entry,
-                databaseContext,
-                taskExecutor,
-                dialogService,
-                preferences);
-        linkedFileViewModel.open();
+        stateManager.getActiveDatabase()
+                    .ifPresent(databaseContext -> new LinkedFileViewModel(
+                            linkedFile, entry, databaseContext, taskExecutor, dialogService, preferences)
+                            .open());
     }
 }
