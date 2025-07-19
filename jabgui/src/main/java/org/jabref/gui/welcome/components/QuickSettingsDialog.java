@@ -19,23 +19,24 @@ import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 
 public class QuickSettingsDialog {
     private final Dialog<ButtonType> dialog;
     private final VBox content;
     private BooleanSupplier validationSupplier = () -> true;
     private List<ObservableValue<?>> dependencies = List.of();
+    private final DialogService dialogService;
+    private final ThemeManager themeManager;
 
-    private QuickSettingsDialog() {
+    public QuickSettingsDialog() {
         this.dialog = new Dialog<>();
         this.content = new VBox();
+        this.dialogService = Injector.instantiateModelOrService(DialogService.class);
+        this.themeManager = Injector.instantiateModelOrService(ThemeManager.class);
         content.getStyleClass().add("quick-settings-dialog-container");
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-    }
-
-    public static QuickSettingsDialog create() {
-        return new QuickSettingsDialog();
     }
 
     public QuickSettingsDialog title(String titleKey) {
@@ -53,7 +54,7 @@ public class QuickSettingsDialog {
         return this;
     }
 
-    public QuickSettingsDialog depend(List<ObservableValue<?>> dependencies) {
+    public QuickSettingsDialog depend(@NonNull List<ObservableValue<?>> dependencies) {
         this.dependencies = dependencies;
         return this;
     }
@@ -68,9 +69,7 @@ public class QuickSettingsDialog {
         okButton.setDisable(!validationSupplier.getAsBoolean());
         dependencies.forEach(obs -> obs.addListener((_, _, _) -> okButton.setDisable(!validationSupplier.getAsBoolean())));
 
-        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        ThemeManager manager = Injector.instantiateModelOrService(ThemeManager.class);
-        manager.updateFontStyle(dialog.getDialogPane().getScene());
+        themeManager.updateFontStyle(dialog.getDialogPane().getScene());
         return dialogService.showCustomDialogAndWait(dialog);
     }
 

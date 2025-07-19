@@ -164,8 +164,7 @@ public class QuickSettings extends VBox {
             dialogService.showDirectorySelectionDialog(dirConfig)
                          .ifPresent(selectedDir -> pathSelector.setText(selectedDir.toString()));
         });
-        Optional<ButtonType> result = QuickSettingsDialog
-                .create()
+        Optional<ButtonType> result = new QuickSettingsDialog()
                 .title("Set main file directory")
                 .header("Choose the default directory for storing attached files")
                 .content(mainFileDirHeader, pathSelector)
@@ -238,8 +237,7 @@ public class QuickSettings extends VBox {
             customThemePath.setManaged(false);
         }
 
-        Optional<ButtonType> result = QuickSettingsDialog
-                .create()
+        Optional<ButtonType> result = new QuickSettingsDialog()
                 .title("Change visual theme")
                 .header("Select your preferred theme for the application")
                 .validate(() -> Optional
@@ -292,8 +290,7 @@ public class QuickSettings extends VBox {
         );
         checkboxes.getStyleClass().add("optimization-checkboxes");
 
-        Optional<ButtonType> result = QuickSettingsDialog
-                .create()
+        Optional<ButtonType> result = new QuickSettingsDialog()
                 .title("Optimize for large libraries")
                 .header("Improve performance when working with libraries containing many entries")
                 .content(performanceOptimizationHeader, checkboxes)
@@ -401,9 +398,7 @@ public class QuickSettings extends VBox {
                 .onFailure(throwable -> LOGGER.warn("Application detection failed", throwable))
                 .executeWith(taskExecutor);
 
-        Optional<ButtonType> result = QuickSettingsDialog
-                .create()
-                .title("Configure push to applications")
+        Optional<ButtonType> result = new QuickSettingsDialog()
                 .header("Select your text editor or LaTeX application for pushing citations")
                 .validate(() -> validateDialogSubmission(applicationsList, pathSelector))
                 .depend(List.of(pathSelector.getTextField().textProperty()))
@@ -483,8 +478,7 @@ public class QuickSettings extends VBox {
         fetchersScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         fetchersScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
 
-        Optional<ButtonType> result = QuickSettingsDialog
-                .create()
+        Optional<ButtonType> result = new QuickSettingsDialog()
                 .title("Configure web search services")
                 .header("Enable and configure online databases and services for importing entries")
                 .content(
@@ -532,8 +526,7 @@ public class QuickSettings extends VBox {
                         && InternalField.KEY_FIELD.getName().equals(column.getQualifier()));
         showCitationKeyBox.setSelected(isCitationKeyVisible);
 
-        Optional<ButtonType> result = QuickSettingsDialog
-                .create()
+        Optional<ButtonType> result = new QuickSettingsDialog()
                 .title("Customize entry table")
                 .header("Configure which columns are displayed in the entry table")
                 .content(entryTableHeader, showCitationKeyBox)
