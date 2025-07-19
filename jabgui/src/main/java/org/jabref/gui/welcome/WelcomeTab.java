@@ -140,7 +140,7 @@ public class WelcomeTab extends Tab {
         this.recentLibrariesBox = new VBox();
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
-        VBox mainContainer = new VBox(createColumnsContainer());
+        VBox mainContainer = new VBox(createTopTitles(), createColumnsContainer(), createCommunityBox());
         mainContainer.getStyleClass().add("welcome-main-container");
 
         VBox container = new VBox();
@@ -197,7 +197,7 @@ public class WelcomeTab extends Tab {
 
     private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
         return createQuickSettingsButton(
-                Localization.lang("Walkthrough") + ": " + Localization.lang(text),
+                Localization.lang(text),
                 icon,
                 () -> new WalkthroughAction(walkthroughId).execute()
         );
@@ -287,7 +287,6 @@ public class WelcomeTab extends Tab {
 
     private VBox createLeftColumn() {
         VBox leftColumn = new VBox(
-                createTopTitles(),
                 createWelcomeStartBox(),
                 createWelcomeRecentBox()
         );
@@ -296,7 +295,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createRightColumn() {
-        VBox rightColumn = new VBox(createQuickSettingsBox(), createCommunityBox());
+        VBox rightColumn = new VBox(createQuickSettingsBox(), createWalkthroughBox());
         rightColumn.getStyleClass().add("welcome-content-column");
         return rightColumn;
     }
@@ -306,18 +305,12 @@ public class WelcomeTab extends Tab {
         header.getStyleClass().add("welcome-header-label");
 
         VBox actions = new VBox();
-        actions.getStyleClass().add("quick-settings-content");
+        actions.getStyleClass().add("quick-settings-container");
 
         Button mainFileDirButton = createQuickSettingsButton(
                 Localization.lang("Set main file directory"),
                 IconTheme.JabRefIcons.FOLDER,
                 this::showMainFileDirectoryDialog
-        );
-
-        Button walkthroughMainFileDirButton = createWalkthroughButton(
-                "Set main file directory",
-                IconTheme.JabRefIcons.FOLDER,
-                "mainFileDirectory"
         );
 
         Button themeButton = createQuickSettingsButton(
@@ -350,21 +343,13 @@ public class WelcomeTab extends Tab {
                 this::showEntryTableConfigurationDialog
         );
 
-        Button walkthroughEntryTableButton = createWalkthroughButton(
-                "Customize entry table",
-                IconTheme.JabRefIcons.TOGGLE_GROUPS,
-                "customizeEntryTable"
-        );
-
         actions.getChildren().addAll(
                 mainFileDirButton,
-                walkthroughMainFileDirButton,
                 themeButton,
                 largeLibraryButton,
                 pushApplicationButton,
                 onlineServicesButton,
-                entryTableButton,
-                walkthroughEntryTableButton
+                entryTableButton
         );
 
         ScrollPane scrollPane = new ScrollPane(actions);
@@ -374,6 +359,30 @@ public class WelcomeTab extends Tab {
         scrollPane.setMaxHeight(172); // Scroll pane show exactly 4 times, item-height * 4 + gap * 3 = 35 * 4 + 8 * 3
 
         return createVBoxContainer(header, scrollPane);
+    }
+
+    private VBox createWalkthroughBox() {
+        Label header = new Label(Localization.lang("Walkthroughs"));
+        header.getStyleClass().add("welcome-header-label");
+
+        VBox walkthroughsContainer = new VBox();
+        walkthroughsContainer.getStyleClass().add("walkthroughs-container");
+
+        Button mainFileDirWalkthroughButton = createWalkthroughButton(
+                "Set main file directory",
+                IconTheme.JabRefIcons.FOLDER,
+                "mainFileDirectory"
+        );
+
+        Button entryTableWalkthroughButton = createWalkthroughButton(
+                "Customize entry table",
+                IconTheme.JabRefIcons.TOGGLE_GROUPS,
+                "customizeEntryTable"
+        );
+
+        walkthroughsContainer.getChildren().addAll(mainFileDirWalkthroughButton, entryTableWalkthroughButton);
+
+        return createVBoxContainer(header, walkthroughsContainer);
     }
 
     private VBox createCommunityBox() {
@@ -401,15 +410,15 @@ public class WelcomeTab extends Tab {
 
         PathSelectionField pathSelector = new PathSelectionField(Localization.lang("Main file directory path"));
         pathSelector.setText(filePreferences.getMainFileDirectory()
-                                            .map(Path::toString)
-                                            .orElse(""));
+                .map(Path::toString)
+                .orElse(""));
 
         pathSelector.setOnBrowseAction(() -> {
             DirectoryDialogConfiguration dirConfig = new DirectoryDialogConfiguration.Builder()
                     .withInitialDirectory(filePreferences.getWorkingDirectory())
                     .build();
             dialogService.showDirectorySelectionDialog(dirConfig)
-                         .ifPresent(selectedDir -> pathSelector.setText(selectedDir.toString()));
+                    .ifPresent(selectedDir -> pathSelector.setText(selectedDir.toString()));
         });
 
         Optional<ButtonType> result = createQuickSettingsDialog(
@@ -456,12 +465,9 @@ public class WelcomeTab extends Tab {
         radioContainer.getChildren().add(customBox);
 
         switch (currentTheme.getType()) {
-            case DEFAULT ->
-                    lightRadio.setSelected(true);
-            case EMBEDDED ->
-                    darkRadio.setSelected(true);
-            case CUSTOM ->
-                    customRadio.setSelected(true);
+            case DEFAULT -> lightRadio.setSelected(true);
+            case EMBEDDED -> darkRadio.setSelected(true);
+            case CUSTOM -> customRadio.setSelected(true);
         }
 
         PathSelectionField customThemePath = new PathSelectionField(Localization.lang("Custom theme file path"));
@@ -516,12 +522,9 @@ public class WelcomeTab extends Tab {
         if (selectedToggle != null) {
             ThemeTypes selectedTheme = (ThemeTypes) selectedToggle.getUserData();
             Theme newTheme = switch (selectedTheme) {
-                case LIGHT ->
-                        Theme.light();
-                case DARK ->
-                        Theme.dark();
-                case CUSTOM ->
-                        Theme.custom(customThemePath.getText().trim());
+                case LIGHT -> Theme.light();
+                case DARK -> Theme.dark();
+                case CUSTOM -> Theme.custom(customThemePath.getText().trim());
             };
             workspacePreferences.setTheme(newTheme);
         }
@@ -601,9 +604,9 @@ public class WelcomeTab extends Tab {
 
         if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
             allApplications.stream()
-                           .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
-                           .findFirst()
-                           .ifPresent(applicationsList.getSelectionModel()::select);
+                    .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
+                    .findFirst()
+                    .ifPresent(applicationsList.getSelectionModel()::select);
         }
 
         PathSelectionField pathSelector = new PathSelectionField(Localization.lang("Path to application executable"));
@@ -612,7 +615,7 @@ public class WelcomeTab extends Tab {
                     .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                     .build();
             dialogService.showFileOpenDialog(fileConfig)
-                         .ifPresent(selectedFile -> pathSelector.setText(selectedFile.toString()));
+                    .ifPresent(selectedFile -> pathSelector.setText(selectedFile.toString()));
         });
 
         Map<PushToApplication, String> detectedApplicationPaths = new ConcurrentHashMap<>();
@@ -655,17 +658,17 @@ public class WelcomeTab extends Tab {
 
             List<GuiPushToApplication> sortedApplications = new ArrayList<>(detectedPaths.keySet());
             allApplications.stream()
-                           .filter(app -> !detectedPaths.containsKey(app))
-                           .forEach(sortedApplications::add);
+                    .filter(app -> !detectedPaths.containsKey(app))
+                    .forEach(sortedApplications::add);
 
             applicationsList.getItems().clear();
             applicationsList.getItems().addAll(sortedApplications);
 
             if (!pushToApplicationPreferences.getActiveApplicationName().isEmpty()) {
                 sortedApplications.stream()
-                                  .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
-                                  .findFirst()
-                                  .ifPresent(applicationsList.getSelectionModel()::select);
+                        .filter(app -> app.getDisplayName().equals(pushToApplicationPreferences.getActiveApplicationName()))
+                        .findFirst()
+                        .ifPresent(applicationsList.getSelectionModel()::select);
             }
 
             LOGGER.info("Application detection completed. Found {} applications", detectedPaths.size());
@@ -832,28 +835,17 @@ public class WelcomeTab extends Tab {
 
     private String[] getPossibleExecutableNames(String appName) {
         return switch (appName) {
-            case "Emacs" ->
-                    new String[] {"emacs", "emacsclient"};
-            case "LyX/Kile" ->
-                    new String[] {"lyx", "kile"};
-            case "Texmaker" ->
-                    new String[] {"texmaker"};
-            case "TeXstudio" ->
-                    new String[] {"texstudio"};
-            case "TeXworks" ->
-                    new String[] {"texworks"};
-            case "Vim" ->
-                    new String[] {"vim", "nvim", "gvim"};
-            case "WinEdt" ->
-                    new String[] {"winedt"};
-            case "Sublime Text" ->
-                    new String[] {"subl", "sublime_text"};
-            case "TeXShop" ->
-                    new String[] {"texshop"};
-            case "VScode" ->
-                    new String[] {"code", "code-insiders"};
-            default ->
-                    new String[] {appName.replace(" ", "").toLowerCase()};
+            case "Emacs" -> new String[]{"emacs", "emacsclient"};
+            case "LyX/Kile" -> new String[]{"lyx", "kile"};
+            case "Texmaker" -> new String[]{"texmaker"};
+            case "TeXstudio" -> new String[]{"texstudio"};
+            case "TeXworks" -> new String[]{"texworks"};
+            case "Vim" -> new String[]{"vim", "nvim", "gvim"};
+            case "WinEdt" -> new String[]{"winedt"};
+            case "Sublime Text" -> new String[]{"subl", "sublime_text"};
+            case "TeXShop" -> new String[]{"texshop"};
+            case "VScode" -> new String[]{"code", "code-insiders"};
+            default -> new String[]{appName.replace(" ", "").toLowerCase()};
         };
     }
 
@@ -1022,7 +1014,7 @@ public class WelcomeTab extends Tab {
         CheckBox showCitationKeyBox = new CheckBox(Localization.lang("Show citation key column"));
 
         ColumnPreferences columnPreferences = preferences.getMainTablePreferences()
-                                                         .getColumnPreferences();
+                .getColumnPreferences();
         boolean isCitationKeyVisible = columnPreferences
                 .getColumns()
                 .stream()
@@ -1189,24 +1181,15 @@ public class WelcomeTab extends Tab {
         link.getStyleClass().add("welcome-community-link");
 
         String url = switch (action) {
-            case HELP ->
-                    URLs.HELP_URL;
-            case OPEN_FORUM ->
-                    URLs.FORUM_URL;
-            case OPEN_MASTODON ->
-                    URLs.MASTODON_URL;
-            case OPEN_LINKEDIN ->
-                    URLs.LINKEDIN_URL;
-            case DONATE ->
-                    URLs.DONATE_URL;
-            case OPEN_DEV_VERSION_LINK ->
-                    URLs.DEV_VERSION_LINK_URL;
-            case OPEN_CHANGELOG ->
-                    URLs.CHANGELOG_URL;
-            case OPEN_PRIVACY_POLICY ->
-                    URLs.PRIVACY_POLICY_URL;
-            default ->
-                    null;
+            case HELP -> URLs.HELP_URL;
+            case OPEN_FORUM -> URLs.FORUM_URL;
+            case OPEN_MASTODON -> URLs.MASTODON_URL;
+            case OPEN_LINKEDIN -> URLs.LINKEDIN_URL;
+            case DONATE -> URLs.DONATE_URL;
+            case OPEN_DEV_VERSION_LINK -> URLs.DEV_VERSION_LINK_URL;
+            case OPEN_CHANGELOG -> URLs.CHANGELOG_URL;
+            case OPEN_PRIVACY_POLICY -> URLs.PRIVACY_POLICY_URL;
+            default -> null;
         };
 
         if (url != null) {

@@ -1812,7 +1812,6 @@ We want to have a look that matches our icons in the tool-bar */
 
 
 /* Welcome Community  */
-
 .welcome-community-content {
     -fx-spacing: 12px;
     -fx-alignment: top-left;
@@ -2584,9 +2583,10 @@ journalInfo .grid-cell-b {
 
 
 /* Quick Settings */
-.quick-settings-content {
+.quick-settings-container,
+.walkthroughs-container {
     -fx-spacing: 8px;
-    -fx-alignment: top-center;
+    -fx-alignment: top-left;
 }
 
 .quick-settings-button {
@@ -2595,7 +2595,7 @@ journalInfo .grid-cell-b {
     -fx-border-width: 1px;
     -fx-border-radius: 4px;
     -fx-background-radius: 4px;
-    -fx-padding: 8px 12px;
+    -fx-padding: 10px 14px;
     -fx-alignment: center-left;
     -fx-graphic-text-gap: 8px;
     -fx-font-size: 1.0em;
