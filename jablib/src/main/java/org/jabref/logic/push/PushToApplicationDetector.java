@@ -1,4 +1,4 @@
-package org.jabref.gui.welcome.components;
+package org.jabref.logic.push;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.jabref.gui.push.GuiPushToApplication;
 import org.jabref.logic.os.OS;
 
 import org.jspecify.annotations.Nullable;
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class PushToApplicationDetector {
     private static final Logger LOGGER = LoggerFactory.getLogger(PushToApplicationDetector.class);
 
-    public static Map<GuiPushToApplication, String> detectApplicationPaths(List<GuiPushToApplication> apps) {
+    public static <T extends PushToApplication> Map<T, String> detectApplicationPaths(List<T> apps) {
         return apps.parallelStream()
                    .map(app -> {
                        String path = findApplicationPath(app);
@@ -28,7 +27,7 @@ public class PushToApplicationDetector {
                            LOGGER.debug("Detected application {}: {}", app.getDisplayName(), path);
                            return Optional.of(Map.entry(app, path));
                        }
-                       return Optional.<Map.Entry<GuiPushToApplication, String>>empty();
+                       return Optional.<Map.Entry<T, String>>empty();
                    })
                    .filter(Optional::isPresent)
                    .map(Optional::get)
@@ -43,7 +42,7 @@ public class PushToApplicationDetector {
         return p.isAbsolute() && p.toFile().exists();
     }
 
-    private static @Nullable String findApplicationPath(GuiPushToApplication app) {
+    private static @Nullable String findApplicationPath(PushToApplication app) {
         String name = app.getDisplayName();
         String[] names = getPossibleExecutableNames(name);
 

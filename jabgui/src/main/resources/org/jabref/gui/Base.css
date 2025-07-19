@@ -1391,6 +1391,7 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 .dialog-pane {
+    -fx-font-size: 1em;
     -fx-background-color: -fx-control-inner-background;
 }
 
@@ -1771,20 +1772,20 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* Welcome Tab Layout Styles */
 .welcome-main-container {
-    -fx-max-width: 768px;
-    -fx-spacing: 28px;
+    -fx-max-width: 64em;
+    -fx-spacing: 2.333em;
     -fx-alignment: center;
-    -fx-padding: 32px 24px;
+    -fx-padding: 2.667em 2em;
 }
 
 .welcome-top-titles {
-    -fx-spacing: 10px;
+    -fx-spacing: 0.833em;
     -fx-alignment: left;
-    -fx-padding: 0 0 20px 0;
+    -fx-padding: 0 0 1.667em 0;
 }
 
 .welcome-columns-container {
-    -fx-spacing: 40px;
+    -fx-spacing: 3.333em;
     -fx-alignment: top-center;
 }
 
@@ -1792,39 +1793,39 @@ We want to have a look that matches our icons in the tool-bar */
 .welcome-right-column {
     -fx-min-width: 0;
     -fx-pref-width: 50%;
-    -fx-max-width: 600px;
+    -fx-max-width: 50em;
 }
 
 .welcome-content-column {
-    -fx-spacing: 25px;
+    -fx-spacing: 2.083em;
     -fx-alignment: top-left;
 }
 
 .welcome-section {
-    -fx-spacing: 12px;
+    -fx-spacing: 1em;
     -fx-alignment: top-left;
 }
 
 .welcome-links-content {
-    -fx-spacing: 8px;
+    -fx-spacing: 0.667em;
     -fx-alignment: top-left;
 }
 
 
 /* Welcome Community  */
 .welcome-community-content {
-    -fx-spacing: 12px;
+    -fx-spacing: 1em;
     -fx-alignment: top-left;
 }
 
 .welcome-community-icons {
-    -fx-hgap: 12px;
-    -fx-vgap: 8px;
+    -fx-hgap: 1em;
+    -fx-vgap: 0.667em;
     -fx-alignment: center-left;
 }
 
 .welcome-community-links {
-    -fx-spacing: 15px;
+    -fx-spacing: 1.25em;
     -fx-alignment: center-left;
 }
 
@@ -1841,7 +1842,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .welcome-community-version {
     -fx-alignment: center-left;
-    -fx-padding: 5px 0 0 0;
+    -fx-padding: 0.417em 0 0 0;
 }
 
 .welcome-community-version-text {
@@ -2583,21 +2584,28 @@ journalInfo .grid-cell-b {
 
 
 /* Quick Settings */
+
 .quick-settings-container,
 .walkthroughs-container {
-    -fx-spacing: 8px;
+    -fx-spacing: 0.6667em;
     -fx-alignment: top-left;
+}
+
+.quick-settings-scroll-pane {
+    -fx-max-height: 13.333em; /* item-size * 4 + gap * 3 = (0.0833 * 2 + 0.833 * 2 + 1) * 4 + 0.667 * 3 */
+    -fx-min-height: 13.333em;
+    -fx-pref-height: 13.333em;
 }
 
 .quick-settings-button {
     -fx-background-color: derive(-jr-base, 10%);
     -fx-border-color: -jr-gray-1;
-    -fx-border-width: 1px;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
-    -fx-padding: 10px 14px;
+    -fx-border-width: 0.08333em;
+    -fx-border-radius: 0.333em;
+    -fx-background-radius: 0.333em;
+    -fx-padding: 0.833em 1.167em;
     -fx-alignment: center-left;
-    -fx-graphic-text-gap: 8px;
+    -fx-graphic-text-gap: 0.667em;
     -fx-font-size: 1.0em;
     -fx-text-fill: -fx-text-base-color;
     -fx-cursor: hand;
@@ -2616,28 +2624,29 @@ journalInfo .grid-cell-b {
 }
 
 .quick-settings-dialog-container {
-    -fx-padding: 16px;
-    -fx-spacing: 16px;
-    -fx-pref-width: 512px;
+    -fx-padding: 1.333em;
+    -fx-spacing: 1.333em;
+    -fx-pref-width: 42.667em;
+    -fx-font-size: 1em;
 }
 
 .quick-settings-dialog-container > HBox {
     -fx-alignment: center-left;
-    -fx-spacing: 8px;
+    -fx-spacing: 0.667em;
 }
 
 .quick-settings-dialog-container > ScrollPane {
-    -fx-border-width: 1px;
+    -fx-border-width: 0.083em;
     -fx-border-color: derive(-fx-base, -20%);
-    -fx-border-radius: 4px;
+    -fx-border-radius: 0.333em;
 }
 
 /* Quick Settings: Theme Selection */
 .theme-option {
-    -fx-padding: 8px;
-    -fx-border-radius: 4px;
-    -fx-background-radius: 4px;
-    -fx-spacing: 12px;
+    -fx-padding: 0.667em;
+    -fx-border-radius: 0.333em;
+    -fx-background-radius: 0.333em;
+    -fx-spacing: 1em;
     -fx-alignment: center-left;
 }
 
@@ -2765,13 +2774,13 @@ journalInfo .grid-cell-b {
 
 /* Quick Settings: Push Application Configuration */
 .applications-list {
-    -fx-pref-height: 200px;
-    -fx-pref-width: 400px;
+    -fx-pref-height: 16.667em;
+    -fx-pref-width: 33.333em;
 }
 
 .application-item {
-    -fx-padding: 8px;
-    -fx-border-radius: 4px;
+    -fx-padding: 0.667em;
+    -fx-border-radius: 0.333em;
     -fx-background-color: transparent;
 }
 
@@ -2793,8 +2802,41 @@ journalInfo .grid-cell-b {
 
 /* Quick Settings: Online Fetchers */
 .fetchers-container {
-    -fx-padding: 12px;
-    -fx-spacing: 12px;
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
+}
+
+.applications-list {
+    -fx-pref-height: 16.667em;
+    -fx-pref-width: 33.333em;
+}
+
+.application-item {
+    -fx-padding: 0.667em;
+    -fx-border-radius: 0.333em;
+    -fx-background-color: transparent;
+}
+
+.detected-application {
+    -fx-background-color: derive(-jr-accent, 80%);
+    -fx-font-weight: bold;
+}
+
+.application-item:filled:selected {
+    -fx-background-color: -jr-accent;
+    -fx-text-fill: white;
+}
+
+.detected-application .glyph-icon,
+.detected-application .ikonli-font-icon {
+    -fx-icon-color: -jr-theme-text;
+    -fx-fill: -jr-theme-text;
+}
+
+/* Quick Settings: Online Fetchers */
+.fetchers-container {
+    -fx-padding: 1em;
+    -fx-spacing: 1em;
 }
 
 /* Walkthrough Styles */

@@ -43,7 +43,6 @@ import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.gui.welcome.components.PathSelectionField;
 import org.jabref.gui.welcome.components.PushToApplicationCell;
-import org.jabref.gui.welcome.components.PushToApplicationDetector;
 import org.jabref.gui.welcome.components.QuickSettingsDialog;
 import org.jabref.gui.welcome.components.ThemeWireFrame;
 import org.jabref.logic.FilePreferences;
@@ -52,6 +51,7 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplication;
+import org.jabref.logic.push.PushToApplicationDetector;
 import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
@@ -62,7 +62,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class QuickSettings extends VBox {
-    public static final int SCROLL_PANE_HEIGHT = 35 * 4 + 8 * 3; // Scroll pane show exactly 4 items, item-height * 4 + gap * 3
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickSettings.class);
 
     private final GuiPreferences preferences;
@@ -133,9 +132,7 @@ public class QuickSettings extends VBox {
         scrollPane.setFitToWidth(true);
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-        scrollPane.setPrefHeight(SCROLL_PANE_HEIGHT);
-        scrollPane.setMinHeight(SCROLL_PANE_HEIGHT);
-        scrollPane.setMaxHeight(SCROLL_PANE_HEIGHT);
+        scrollPane.getStyleClass().add("quick-settings-scroll-pane");
 
         this.getChildren().addAll(header, scrollPane);
         this.getStyleClass().add("welcome-content-column");

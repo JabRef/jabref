@@ -14,6 +14,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.logic.l10n.Localization;
 
@@ -68,6 +69,8 @@ public class QuickSettingsDialog {
         dependencies.forEach(obs -> obs.addListener((_, _, _) -> okButton.setDisable(!validationSupplier.getAsBoolean())));
 
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        ThemeManager manager = Injector.instantiateModelOrService(ThemeManager.class);
+        manager.updateFontStyle(dialog.getDialogPane().getScene());
         return dialogService.showCustomDialogAndWait(dialog);
     }
 
