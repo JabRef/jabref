@@ -23,6 +23,7 @@ import org.jabref.logic.push.CitationCommandString;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
+import org.jabref.model.strings.LatexToUnicodeAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +73,16 @@ public class CopyMoreAction extends SimpleCommand {
                     copyKeyAndLink();
             case COPY_DOI, COPY_DOI_URL ->
                     copyDoi();
+            case COPY_FIELD_AUTHOR ->
+                    copyField(StandardField.AUTHOR, Localization.lang("Author"));
+            case COPY_FIELD_JOURNAL ->
+                    copyField(StandardField.JOURNAL, Localization.lang("Journal"));
+            case COPY_FIELD_DATE ->
+                    copyField(StandardField.DATE, Localization.lang("Date"));
+            case COPY_FIELD_KEYWORDS ->
+                    copyField(StandardField.KEYWORDS, Localization.lang("Keywords"));
+            case COPY_FIELD_ABSTRACT ->
+                    copyField(StandardField.ABSTRACT, Localization.lang("Abstract"));
             default ->
                     LOGGER.info("Unknown copy command.");
         }
@@ -82,7 +93,7 @@ public class CopyMoreAction extends SimpleCommand {
 
         List<String> titles = selectedBibEntries.stream()
                                                 .filter(bibEntry -> bibEntry.getTitle().isPresent())
-                                                .map(bibEntry -> bibEntry.getTitle().get())
+                                                .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getTitle().get()))
                                                 .collect(Collectors.toList());
 
         if (titles.isEmpty()) {
@@ -262,6 +273,34 @@ public class CopyMoreAction extends SimpleCommand {
         } else {
             dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined citation key.",
                     Long.toString(entries.size() - entriesWithKey.size()), Integer.toString(entries.size())));
+        }
+    }
+
+    private void copyField(StandardField field, String fieldDisplayName) {
+        List<BibEntry> selectedBibEntries = stateManager.getSelectedEntries();
+
+        List<String> fieldValues = selectedBibEntries.stream()
+                                                     .filter(bibEntry -> bibEntry.getFieldOrAlias(field).isPresent())
+                                                     .map(bibEntry -> LatexToUnicodeAdapter.format(bibEntry.getFieldOrAlias(field).orElse("")))
+                                                     .filter(value -> !value.isEmpty())
+                                                     .collect(Collectors.toList());
+
+        if (fieldValues.isEmpty()) {
+            dialogService.notify(Localization.lang("None of the selected entries have %0.", fieldDisplayName));
+            return;
+        }
+
+        final String copiedContent = fieldValues.stream().collect(Collectors.joining("\n"));
+        clipBoardManager.setContent(copiedContent);
+
+        if (fieldValues.size() == selectedBibEntries.size()) {
+            dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
+                    JabRefDialogService.shortenDialogMessage(copiedContent)));
+        } else {
+            dialogService.notify(Localization.lang("Warning: %0 out of %1 entries have undefined %2.",
+                    Integer.toString(selectedBibEntries.size() - fieldValues.size()),
+                    Integer.toString(selectedBibEntries.size()),
+                    fieldDisplayName));
         }
     }
 }
