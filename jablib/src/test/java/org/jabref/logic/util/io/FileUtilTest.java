@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,11 +53,11 @@ class FileUtilTest {
 
         existingTestFile = subDir.resolve("existingTestFile.txt");
         Files.createFile(existingTestFile);
-        Files.write(existingTestFile, "existingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+        Files.writeString(existingTestFile, "existingTestFile.txt");
 
         otherExistingTestFile = subDir.resolve("otherExistingTestFile.txt");
         Files.createFile(otherExistingTestFile);
-        Files.write(otherExistingTestFile, "otherExistingTestFile.txt".getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+        Files.writeString(otherExistingTestFile, "otherExistingTestFile.txt");
     }
 
     @Test
@@ -448,30 +447,44 @@ class FileUtilTest {
         }
     }
 
-    @Test
-    void relativizeHandlesSymlinks(@TempDir Path tempDir) throws IOException {
-        assertFalse(OS.WINDOWS);
+    @ParameterizedTest(name = "{3}")
+    @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
+    @MethodSource("symlinkRelativizeScenarios")
+    void relativizeSymlinkAdvanced(Path file, List<Path> directories, Path expected, String message) {
+        Path result = FileUtil.relativize(file, directories);
+        assertEquals(expected, result, message);
+    }
 
-        Path realDir = tempDir.resolve("real");
-        Files.createDirectory(realDir);
-
-        Path symlinkDir = tempDir.resolve("symlinked");
+    static Stream<Arguments> symlinkRelativizeScenarios() throws IOException {
+        Path tempDir = Files.createTempDirectory("symlinktest-");
+        Path realDir = tempDir.resolve("realDir");
+        Files.createDirectories(realDir);
+        Path symlinkDir = tempDir.resolve("symlinkDir");
         Files.createSymbolicLink(symlinkDir, realDir);
+        Path simpleFile = Files.createFile(realDir.resolve("simple.pdf"));
 
-        Path fileInRealDir = realDir.resolve("paper.pdf");
-        Files.write(fileInRealDir, "dummy".getBytes(StandardCharsets.UTF_8));
+        Path chainReal = tempDir.resolve("chainReal");
+        Files.createDirectories(chainReal);
+        Path chainLink2 = tempDir.resolve("chainLink2");
+        Path chainLink1 = tempDir.resolve("chainLink1");
+        Files.createSymbolicLink(chainLink2, chainReal);
+        Files.createSymbolicLink(chainLink1, chainLink2);
+        Path chainedFile = Files.createFile(chainReal.resolve("chained.pdf"));
 
-        Path rel = FileUtil.relativize(fileInRealDir, List.of(symlinkDir));
-        assertEquals(Path.of("paper.pdf"), rel, "Should resolve to simple filename when accessed through symlink");
-        Path fileViaSymlink = symlinkDir.resolve("paper.pdf");
+        Path nestedDir = realDir.resolve("nested");
+        Files.createDirectories(nestedDir);
+        Path nestedSymlink = realDir.resolve("nestedLink");
+        Files.createSymbolicLink(nestedSymlink, nestedDir);
+        Path nestedFile = Files.createFile((nestedDir.resolve("nested.pdf")));
 
-        Path rel2 = FileUtil.relativize(fileViaSymlink, List.of(symlinkDir));
-        assertEquals(Path.of("paper.pdf"), rel2, "Should resolve to simple filename for file via symlink-path");
-        Path outsideFile = tempDir.resolve("elsewhere.pdf");
-        Files.write(outsideFile, "foo".getBytes(StandardCharsets.UTF_8));
+        Path outsideFile = Files.createFile(tempDir.resolve("outside.pdf"));
 
-        Path rel3 = FileUtil.relativize(outsideFile, List.of(symlinkDir));
-        assertEquals(outsideFile, rel3, "Unrelated files should not relativize");
+        return Stream.of(
+                Arguments.of(simpleFile, List.of(symlinkDir), Path.of("simple.pdf"), "Simple symlink resolves to relative"),
+                Arguments.of(chainedFile, List.of(chainLink1), Path.of("chained.pdf"), "Chained symlink resolves to relative"),
+                Arguments.of(nestedFile, List.of(nestedSymlink), Path.of("nested.pdf"), "Nested symlink resolves to relative"),
+                Arguments.of(outsideFile, List.of(symlinkDir), outsideFile, "Unrelated file remains absolute")
+        );
     }
 
     /**
