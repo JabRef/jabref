@@ -447,7 +447,7 @@ class FileUtilTest {
         }
     }
 
-    @ParameterizedTest(name = "{3}")
+    @ParameterizedTest
     @DisabledOnOs(value = org.junit.jupiter.api.condition.OS.WINDOWS, disabledReason = "Symlink behavior unreliable on windows")
     @MethodSource("symlinkRelativizeScenarios")
     void relativizeSymlinkAdvanced(Path file, List<Path> directories, Path expected, String message) {
@@ -456,17 +456,16 @@ class FileUtilTest {
     }
 
     static Stream<Arguments> symlinkRelativizeScenarios() throws IOException {
-        Path tempDir = Files.createTempDirectory("symlinktest-");
-        Path realDir = tempDir.resolve("realDir");
+        Path realDir = bibTempDir.resolve("realDir");
         Files.createDirectories(realDir);
-        Path symlinkDir = tempDir.resolve("symlinkDir");
+        Path symlinkDir = bibTempDir.resolve("symlinkDir");
         Files.createSymbolicLink(symlinkDir, realDir);
         Path simpleFile = Files.createFile(realDir.resolve("simple.pdf"));
 
-        Path chainReal = tempDir.resolve("chainReal");
+        Path chainReal = bibTempDir.resolve("chainReal");
         Files.createDirectories(chainReal);
-        Path chainLink2 = tempDir.resolve("chainLink2");
-        Path chainLink1 = tempDir.resolve("chainLink1");
+        Path chainLink2 = bibTempDir.resolve("chainLink2");
+        Path chainLink1 = bibTempDir.resolve("chainLink1");
         Files.createSymbolicLink(chainLink2, chainReal);
         Files.createSymbolicLink(chainLink1, chainLink2);
         Path chainedFile = Files.createFile(chainReal.resolve("chained.pdf"));
@@ -475,9 +474,9 @@ class FileUtilTest {
         Files.createDirectories(nestedDir);
         Path nestedSymlink = realDir.resolve("nestedLink");
         Files.createSymbolicLink(nestedSymlink, nestedDir);
-        Path nestedFile = Files.createFile((nestedDir.resolve("nested.pdf")));
+        Path nestedFile = Files.createFile(nestedDir.resolve("nested.pdf"));
 
-        Path outsideFile = Files.createFile(tempDir.resolve("outside.pdf"));
+        Path outsideFile = Files.createFile(bibTempDir.resolve("outside.pdf"));
 
         return Stream.of(
                 Arguments.of(simpleFile, List.of(symlinkDir), Path.of("simple.pdf"), "Simple symlink resolves to relative"),
