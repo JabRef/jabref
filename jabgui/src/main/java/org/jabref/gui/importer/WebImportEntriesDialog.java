@@ -36,6 +36,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
@@ -213,8 +214,11 @@ public class WebImportEntriesDialog extends BaseDialog<Boolean> {
         pageNumberLabel.textProperty().bind(Bindings.createStringBinding(() -> {
             int totalPages = viewModel.totalPagesProperty().get();
             int currentPage = viewModel.currentPageProperty().get() + 1;
+            if (searchBasedFetcher instanceof PagedSearchBasedFetcher && currentPage == totalPages) {
+                return Localization.lang("Fetching...");
+            }
             if (totalPages != 0) {
-                return "Page " + currentPage + " of " + totalPages;
+                return currentPage + " " + Localization.lang("of") + " " + totalPages;
             }
             return "";
         }, viewModel.currentPageProperty(), viewModel.totalPagesProperty()));

@@ -8,8 +8,10 @@ import java.util.Optional;
 
 import javax.swing.undo.UndoManager;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -28,9 +30,9 @@ import org.jabref.logic.bibtex.FieldWriter;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.database.DuplicateCheck;
 import org.jabref.logic.exporter.BibWriter;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
 import org.jabref.logic.importer.SearchBasedFetcher;
-import org.jabref.logic.importer.fetcher.ArXivFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.util.BackgroundTask;
@@ -47,9 +49,7 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebImportEntriesViewModel.class);
     private static final int PAGE_SIZE = 20;
-
-    public int currentPage = 0;
-    public ObservableList<BibEntry> allEntries = FXCollections.observableArrayList();
+    private int CURRENT_PAGE = 0;
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -63,13 +63,15 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
     private final GuiPreferences preferences;
     private final BibEntryTypesManager entryTypesManager;
     private final ObjectProperty<BibDatabaseContext> selectedDb;
+
     private final IntegerProperty currentPageProperty = new SimpleIntegerProperty(0);
     private final IntegerProperty totalPagesProperty = new SimpleIntegerProperty(0);
+    private final BooleanProperty loading = new SimpleBooleanProperty(false);
     private final ObservableList<BibEntry> pagedEntries = FXCollections.observableArrayList();
     private final ObservableSet<BibEntry> checkedEntries = FXCollections.observableSet();
+    private final ObservableList<BibEntry> allEntries = FXCollections.observableArrayList();
     private final SearchBasedFetcher fetcher;
     private final String query;
-    private boolean fetchingInProcess;
 
     /**
      * @param databaseContext the database to import into
@@ -100,20 +102,15 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         this.selectedDb = new SimpleObjectProperty<>();
         this.fetcher = fetcher;
         this.query = query;
-        this.fetchingInProcess = false;
 
         task.onSuccess(parserResult -> {
             // store the complete parser result (to import groups, ... later on)
             this.parserResult = parserResult;
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
-            try {
-                loadAllEntries(entries);
-                updatePagedEntries();
-                updateTotalPages();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            loadAllEntries(entries);
+            updatePagedEntries();
+            updateTotalPages();
             if (entries.isEmpty()) {
                 task.updateMessage(Localization.lang("No entries corresponding to given query"));
             }
@@ -139,14 +136,49 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         return selectedDb.get();
     }
 
+    public BooleanProperty loadingProperty() {
+        return loading;
+    }
+
     public ObservableList<BibEntry> getEntries() {
         return pagedEntries;
+    }
+
+    public ObservableSet<BibEntry> getCheckedEntries() {
+        return checkedEntries;
+    }
+
+    public ObservableList<BibEntry> getAllEntries() {
+        return allEntries;
+    }
+
+    public void loadAllEntries(List<BibEntry> entries) {
+        allEntries.addAll(entries);
+        this.CURRENT_PAGE = 0;
     }
 
     public boolean hasDuplicate(BibEntry entry) {
         return findInternalDuplicate(entry).isPresent() ||
                 new DuplicateCheck(entryTypesManager)
                         .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
+    }
+
+    /**
+     * Checks if there are duplicates to the given entry in the list of entries to be imported.
+     *
+     * @param entry The entry to search for duplicates of.
+     * @return A possible duplicate, if any, or null if none were found.
+     */
+    private Optional<BibEntry> findInternalDuplicate(BibEntry entry) {
+        for (BibEntry othEntry : entries) {
+            if (othEntry.equals(entry)) {
+                continue; // Don't compare the entry to itself
+            }
+            if (new DuplicateCheck(entryTypesManager).isDuplicate(entry, othEntry, databaseContext.getMode())) {
+                return Optional.of(othEntry);
+            }
+        }
+        return Optional.empty();
     }
 
     public String getSourceString(BibEntry entry) {
@@ -189,58 +221,30 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         importHandler.importEntriesWithDuplicateCheck(selectedDb.getValue(), entriesToImport);
     }
 
-    /**
-     * Checks if there are duplicates to the given entry in the list of entries to be imported.
-     *
-     * @param entry The entry to search for duplicates of.
-     * @return A possible duplicate, if any, or null if none were found.
-     */
-    private Optional<BibEntry> findInternalDuplicate(BibEntry entry) {
-        for (BibEntry othEntry : entries) {
-            if (othEntry.equals(entry)) {
-                continue; // Don't compare the entry to itself
-            }
-            if (new DuplicateCheck(entryTypesManager).isDuplicate(entry, othEntry, databaseContext.getMode())) {
-                return Optional.of(othEntry);
-            }
+    public void prevPage() {
+        if (hasPrevPage()) {
+            currentPageProperty.set(currentPageProperty.get() - 1);
+            CURRENT_PAGE--;
+            updatePagedEntries();
+            updateTotalPages();
         }
-        return Optional.empty();
-    }
-
-    public ObservableSet<BibEntry> getCheckedEntries() {
-        return checkedEntries;
-    }
-
-    public ObservableList<BibEntry> getAllEntries() {
-        return allEntries;
-    }
-
-    public void loadAllEntries(List<BibEntry> entries) {
-        allEntries.addAll(entries);
-        this.currentPage = 0;
     }
 
     public void nextPage() {
         if (hasNextPage()) {
             currentPageProperty.set(currentPageProperty.get() + 1);
-            currentPage++;
+            CURRENT_PAGE++;
             updatePagedEntries();
             updateTotalPages();
         }
     }
 
-    public void prevPage() {
-        if (hasPrevPage()) {
-            currentPageProperty.set(currentPageProperty.get() - 1);
-            currentPage--;
-            updatePagedEntries();
-            updateTotalPages();
-        }
+    public boolean hasNextPage() {
+        return (CURRENT_PAGE + 1) * PAGE_SIZE < allEntries.size();
     }
 
-    public void updateTotalPages() {
-        int total = (int) Math.ceil((double) allEntries.size() / PAGE_SIZE);
-        totalPagesProperty.set(total);
+    public boolean hasPrevPage() {
+        return CURRENT_PAGE > 0;
     }
 
     public IntegerProperty currentPageProperty() {
@@ -251,44 +255,45 @@ public class WebImportEntriesViewModel extends AbstractViewModel {
         return totalPagesProperty;
     }
 
-    public boolean hasNextPage() {
-        return (currentPage + 1) * PAGE_SIZE < allEntries.size();
-    }
-
-    public boolean hasPrevPage() {
-        return currentPage > 0;
+    public void updateTotalPages() {
+        int total = (int) Math.ceil((double) allEntries.size() / PAGE_SIZE);
+        totalPagesProperty.set(total);
     }
 
     private void updatePagedEntries() {
-        if (!fetchingInProcess && fetcher.getName().equals("ArXiv") && (currentPage + 1) * PAGE_SIZE >= allEntries.size()) {
-            fetchingInProcess = true;
-            fetchMoreEntries();
+        if (!loadingProperty().get() && fetcher instanceof PagedSearchBasedFetcher pagedFetcher && (CURRENT_PAGE + 1) * PAGE_SIZE >= allEntries.size()) {
+            loading.set(true);
+            fetchMoreEntries(pagedFetcher);
         }
 
-        int fromIdx = currentPage * PAGE_SIZE;
+        int fromIdx = CURRENT_PAGE * PAGE_SIZE;
         int toIdx = Math.min(fromIdx + PAGE_SIZE, allEntries.size());
         pagedEntries.setAll(allEntries.subList(fromIdx, toIdx));
     }
 
-    private void fetchMoreEntries() {
+    private void fetchMoreEntries(PagedSearchBasedFetcher pagedFetcher) {
         BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
-            .wrap(() -> {
-                ArXivFetcher arXivFetcher = new ArXivFetcher(preferences.getImportFormatPreferences());
-                LOGGER.info("Fetching ArXiv entries for page {}", currentPage + 2);
-                return new ArrayList<>(arXivFetcher.performSearchPaged(query, currentPage + 1).getContent());
-            })
-            .onSuccess(newEntries -> {
-                if (newEntries != null && !newEntries.isEmpty()) {
-                    allEntries.addAll(newEntries);
-                    updateTotalPages();
-                    fetchingInProcess = false;
-                } else {
-                    LOGGER.warn("No new entries fetched for page {}", currentPage + 2);
-                }
-            }).onFailure(exception -> dialogService.showErrorDialogAndWait(
-                    Localization.lang("Error fetching entries"),
-                    Localization.lang("An error occurred while fetching entries from ArXiv: ") + exception.getMessage()
-            ));
+                .wrap(() -> {
+                    LOGGER.info("Fetching entries from {} for page {}", fetcher.getName(), CURRENT_PAGE + 2);
+                    return new ArrayList<>(pagedFetcher.performSearchPaged(query, CURRENT_PAGE + 1).getContent());
+                })
+                .onSuccess(newEntries -> {
+                    if (newEntries != null && !newEntries.isEmpty()) {
+                        allEntries.addAll(newEntries);
+                        updateTotalPages();
+                    } else {
+                        LOGGER.warn("No new entries fetched from {} for page {}", fetcher.getName(), CURRENT_PAGE + 2);
+                    }
+                    loading.set(false);
+                })
+                .onFailure(exception -> {
+                    loading.set(false);
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("Error fetching entries"),
+                            Localization.lang("An error occurred while fetching entries from {0}: {1}",
+                                    fetcher.getName(), exception.getMessage())
+                    );
+                });
 
         fetchTask.executeWith(taskExecutor);
     }
