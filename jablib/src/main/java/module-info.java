@@ -1,4 +1,5 @@
 open module org.jabref.jablib {
+    exports org.jabref.logic.icore;
     exports org.jabref.model;
     exports org.jabref.logic;
 
