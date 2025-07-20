@@ -33,8 +33,8 @@ import org.jabref.logic.util.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PushApplicationConfigurationDialogViewModel extends AbstractViewModel {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PushApplicationConfigurationDialogViewModel.class);
+public class PushApplicationDialogViewModel extends AbstractViewModel {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PushApplicationDialogViewModel.class);
 
     private final ListProperty<GuiPushToApplication> applicationsProperty =
             new SimpleListProperty<>(FXCollections.observableArrayList());
@@ -50,7 +50,7 @@ public class PushApplicationConfigurationDialogViewModel extends AbstractViewMod
     private final Map<PushToApplication, String> detectedApplicationPaths = new ConcurrentHashMap<>();
     private Future<?> detectionFuture;
 
-    public PushApplicationConfigurationDialogViewModel(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
+    public PushApplicationDialogViewModel(GuiPreferences preferences, DialogService dialogService, TaskExecutor taskExecutor) {
         this.preferences = preferences;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;

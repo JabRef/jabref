@@ -18,7 +18,10 @@ import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 
-public class OnlineServicesConfigurationDialogViewModel extends AbstractViewModel {
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+public class OnlineServicesDialogViewModel extends AbstractViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
     private final BooleanProperty webSearchProperty = new SimpleBooleanProperty();
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
@@ -29,7 +32,7 @@ public class OnlineServicesConfigurationDialogViewModel extends AbstractViewMode
 
     private final GuiPreferences preferences;
 
-    public OnlineServicesConfigurationDialogViewModel(GuiPreferences preferences) {
+    public OnlineServicesDialogViewModel(GuiPreferences preferences) {
         this.preferences = preferences;
 
         initializeSettings();
@@ -86,7 +89,7 @@ public class OnlineServicesConfigurationDialogViewModel extends AbstractViewMode
         return grobidUrlProperty;
     }
 
-    public String getGrobidUrl() {
+    public @NonNull String getGrobidUrl() {
         return grobidUrlProperty.get();
     }
 

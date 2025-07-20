@@ -13,7 +13,7 @@ import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
 import org.jabref.gui.welcome.components.PushToApplicationCell;
-import org.jabref.gui.welcome.quicksettings.viewmodel.PushApplicationConfigurationDialogViewModel;
+import org.jabref.gui.welcome.quicksettings.viewmodel.PushApplicationDialogViewModel;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.PushToApplicationDetector;
 import org.jabref.logic.util.TaskExecutor;
@@ -26,7 +26,7 @@ public class PushApplicationDialog extends FXDialog {
     @FXML private TextField pathField;
     @FXML private HelpButton helpButton;
 
-    private PushApplicationConfigurationDialogViewModel viewModel;
+    private PushApplicationDialogViewModel viewModel;
     private final GuiPreferences preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
@@ -57,7 +57,7 @@ public class PushApplicationDialog extends FXDialog {
 
     @FXML
     private void initialize() {
-        viewModel = new PushApplicationConfigurationDialogViewModel(preferences, dialogService, taskExecutor);
+        viewModel = new PushApplicationDialogViewModel(preferences, dialogService, taskExecutor);
 
         applicationsList.itemsProperty().bind(viewModel.applicationsProperty());
         applicationsList.setCellFactory(_ -> new PushToApplicationCell(viewModel.detectedApplications()));

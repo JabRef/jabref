@@ -13,7 +13,7 @@ import org.jabref.gui.slr.StudyCatalogItem;
 import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.component.HelpButton;
-import org.jabref.gui.welcome.quicksettings.viewmodel.OnlineServicesConfigurationDialogViewModel;
+import org.jabref.gui.welcome.quicksettings.viewmodel.OnlineServicesDialogViewModel;
 import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
@@ -30,7 +30,7 @@ public class OnlineServicesDialog extends FXDialog {
     @FXML private HelpButton grobidHelpButton;
     @FXML private HelpButton fetchersHelpButton;
 
-    private OnlineServicesConfigurationDialogViewModel viewModel;
+    private OnlineServicesDialogViewModel viewModel;
     private final GuiPreferences preferences;
 
     public OnlineServicesDialog(GuiPreferences preferences, ThemeManager themeManager) {
@@ -55,7 +55,7 @@ public class OnlineServicesDialog extends FXDialog {
 
     @FXML
     private void initialize() {
-        viewModel = new OnlineServicesConfigurationDialogViewModel(preferences);
+        viewModel = new OnlineServicesDialogViewModel(preferences);
 
         versionCheckBox.selectedProperty().bindBidirectional(viewModel.versionCheckProperty());
         webSearchBox.selectedProperty().bindBidirectional(viewModel.webSearchProperty());
