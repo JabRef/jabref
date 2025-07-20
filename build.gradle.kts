@@ -1,7 +1,7 @@
 plugins {
     id("org.jabref.gradle.base.repositories")
     id("org.jabref.gradle.feature.compile") // for openrewrite
-    id("org.openrewrite.rewrite") version "7.6.1"
+    id("org.openrewrite.rewrite") version "7.11.0"
     id("org.itsallcode.openfasttrace") version "3.0.1"
 }
 
@@ -9,7 +9,7 @@ plugins {
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
 dependencies {
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.8.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.11.1"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")

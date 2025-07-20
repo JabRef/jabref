@@ -44,7 +44,7 @@ import org.jabref.gui.importer.actions.OpenDatabaseAction;
 import org.jabref.gui.keyboard.KeyBinding;
 import org.jabref.gui.libraryproperties.LibraryPropertiesAction;
 import org.jabref.gui.preferences.GuiPreferences;
-import org.jabref.gui.push.PushToApplicationCommand;
+import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePane;
@@ -105,7 +105,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
     private final TaskExecutor taskExecutor;
 
     private final JabRefFrameViewModel viewModel;
-    private final PushToApplicationCommand pushToApplicationCommand;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final SplitPane horizontalSplit = new SplitPane();
     private final SidePane sidePane;
     private final SplitPane verticalSplit = new SplitPane();
@@ -189,7 +189,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                 clipBoardManager,
                 undoManager);
 
-        this.pushToApplicationCommand = new PushToApplicationCommand(
+        this.pushToApplicationCommand = new GuiPushToApplicationCommand(
                 stateManager,
                 dialogService,
                 this.preferences,
@@ -435,7 +435,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                                   .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext().getUid().equals(activeUID));
                     if (wasClosed) {
                         tabbedPane.getSelectionModel().selectNext();
-                        return;
                     }
                 }
 
@@ -619,6 +618,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Trigger org.jabref.gui.LibraryTab.onClosed
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
+        // Force group update in the GroupTreeViewModel when all the libraries are closed
+        if (tabbedPane.getTabs().isEmpty()) {
+            stateManager.setActiveDatabase(null);
+        }
         return true;
     }
 
@@ -654,6 +657,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
         getOpenDatabaseAction().openFiles(lastFiles);
     }
 
+    @Deprecated
     public Stage getMainStage() {
         return mainStage;
     }
@@ -745,6 +749,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         @Override
         public void execute() {
+            tabbedPane.getTabs().removeIf(t -> t instanceof WelcomeTab);
             for (Tab tab : tabbedPane.getTabs()) {
                 Platform.runLater(() -> closeTab((LibraryTab) tab));
             }
