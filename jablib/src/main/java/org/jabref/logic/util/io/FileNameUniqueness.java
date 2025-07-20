@@ -27,7 +27,19 @@ public class FileNameUniqueness {
      * @return a file name such that it does not match any existing files in targetDirectory
      */
     public static String getNonOverWritingFileName(Path targetDirectory, String fileName) {
-        Optional<String> extensionOptional = FileUtil.getFileExtension(fileName);
+        return generateUniqueFileName(targetDirectory, fileName, null);
+    }
+
+    /**
+     * Generates a unique filename in the target directory while taking into account existing files that may be already
+     * linked to the same bibliography entry.
+     *
+     * @apiNote When auto-renaming files due to bibliography entry changes, this method prevents unnecessary incrementing
+     * of duplicate markers. For example, if "paper (1).pdf" is already linked to the entry and is the correct format,
+     * the method will return "paper (1).pdf" instead of generating "paper (2).pdf".
+     */
+    public static String generateUniqueFileName(Path targetDirectory, String proposedName, String fileAlreadyInUse) {
+        Optional<String> extensionOptional = FileUtil.getFileExtension(proposedName);
 
         // the suffix include the '.' , if extension is present Eg: ".pdf"
         String extensionSuffix;
@@ -35,16 +47,17 @@ public class FileNameUniqueness {
 
         if (extensionOptional.isPresent()) {
             extensionSuffix = '.' + extensionOptional.get();
-            fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+            fileNameWithoutExtension = proposedName.substring(0, proposedName.lastIndexOf('.'));
         } else {
             extensionSuffix = "";
-            fileNameWithoutExtension = fileName;
+            fileNameWithoutExtension = proposedName;
         }
 
-        String newFileName = fileName;
+        String newFileName = proposedName;
 
         int counter = 1;
-        while (Files.exists(targetDirectory.resolve(newFileName))) {
+        while (Files.exists(targetDirectory.resolve(newFileName)) &&
+                (fileAlreadyInUse == null || !newFileName.equals(fileAlreadyInUse))) {
             newFileName = fileNameWithoutExtension +
                     " (" + counter + ")" +
                     extensionSuffix;

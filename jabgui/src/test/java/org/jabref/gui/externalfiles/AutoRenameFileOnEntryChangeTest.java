@@ -147,4 +147,21 @@ class AutoRenameFileOnEntryChangeTest {
         assertTrue(Files.exists(tempDir.resolve("newKey2082.doc")));
         assertTrue(Files.exists(tempDir.resolve("newKey2082.docx")));
     }
+
+    @Test
+    void shouldHandleFileNameConflicts() throws IOException {
+        // files that may or may not be linked to another entry
+        Files.createFile(tempDir.resolve("newKey2081.pdf"));
+        Files.createFile(tempDir.resolve("newKey2081 (1).pdf"));
+
+        Files.createFile(tempDir.resolve("oldKey2081.pdf"));
+        entry.setFiles(List.of(new LinkedFile("", "oldKey2081.pdf", "PDF")));
+        when(filePreferences.shouldAutoRenameFilesOnChange()).thenReturn(true);
+
+        entry.setField(StandardField.AUTHOR, "newKey");
+        assertTrue(Files.exists(tempDir.resolve("newKey2081.pdf")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081 (1).pdf")));
+        assertTrue(Files.exists(tempDir.resolve("newKey2081 (2).pdf")));
+        assertEquals("newKey2081 (2).pdf", entry.getFiles().getFirst().getLink());
+    }
 }
