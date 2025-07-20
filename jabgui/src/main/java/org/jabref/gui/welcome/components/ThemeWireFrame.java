@@ -15,16 +15,11 @@ public class ThemeWireFrame extends VBox {
                   .load();
     }
 
-    public ThemeWireFrame(ThemeTypes themeType) {
-        this();
-        updateTheme(themeType);
-    }
-
     @FXML
     private void initialize() {
     }
 
-    private void updateTheme(@NonNull ThemeTypes themeType) {
+    public void setThemeType(@NonNull ThemeTypes themeType) {
         getStyleClass().removeIf(styleClass ->
                 styleClass.startsWith("wireframe-light") ||
                         styleClass.startsWith("wireframe-dark") ||

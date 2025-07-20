@@ -11,15 +11,24 @@ import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 
 public class HelpButton extends Button {
-
-    public HelpButton(@NonNull String url) {
+    public HelpButton() {
         setGraphic(IconTheme.JabRefIcons.HELP.getGraphicNode());
         getStyleClass().add("icon-button");
         setPrefSize(28, 28);
         setMinSize(28, 28);
-        setOnAction(_ -> new OpenBrowserAction(url,
-                Injector.instantiateModelOrService(DialogService.class),
-                Injector.instantiateModelOrService(GuiPreferences.class).getExternalApplicationsPreferences()
-        ).execute());
+    }
+
+    public HelpButton(@NonNull String url) {
+        this();
+        setHelpPage(url);
+    }
+
+    public void setHelpPage(@NonNull String helpDocumentationUrl) {
+        setOnAction(
+                _ -> new OpenBrowserAction(helpDocumentationUrl,
+                        Injector.instantiateModelOrService(DialogService.class),
+                        Injector.instantiateModelOrService(GuiPreferences.class).getExternalApplicationsPreferences()
+                ).execute()
+        );
     }
 }

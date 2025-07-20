@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?> <?import javafx.scene.layout.HBox?> <?import javafx.scene.layout.VBox?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
 <fx:root type="javafx.scene.layout.VBox" xmlns="http://javafx.com/javafx/17.0.2-ea"
          xmlns:fx="http://javafx.com/fxml/1"
          fx:controller="org.jabref.gui.welcome.components.ThemeWireFrame" maxHeight="96.0"

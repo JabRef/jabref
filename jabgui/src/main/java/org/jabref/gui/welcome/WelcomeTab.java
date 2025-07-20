@@ -23,7 +23,6 @@ import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.components.QuickSettings;
 import org.jabref.gui.edit.OpenBrowserAction;
 import org.jabref.gui.frame.FileHistoryMenu;
 import org.jabref.gui.icon.IconTheme;
@@ -33,6 +32,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.WalkthroughAction;
+import org.jabref.gui.welcome.components.QuickSettings;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
@@ -147,7 +147,7 @@ public class WelcomeTab extends Tab {
     }
 
     private VBox createRightColumn() {
-        VBox rightColumn = new VBox(new QuickSettings(preferences, dialogService, taskExecutor), createWalkthroughBox());
+        VBox rightColumn = new VBox(new QuickSettings(), createWalkthroughBox());
         rightColumn.getStyleClass().add("welcome-content-column");
         return rightColumn;
     }
