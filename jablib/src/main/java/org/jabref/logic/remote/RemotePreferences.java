@@ -24,11 +24,13 @@ public class RemotePreferences {
     private final IntegerProperty port;
     private final BooleanProperty useRemoteServer;
 
+    private final IntegerProperty httpPort;
     private final BooleanProperty enableHttpServer;
 
-    public RemotePreferences(int port, boolean useRemoteServer, boolean enableHttpServer) {
+    public RemotePreferences(int port, boolean useRemoteServer, int httpPort, boolean enableHttpServer) {
         this.port = new SimpleIntegerProperty(port);
         this.useRemoteServer = new SimpleBooleanProperty(useRemoteServer);
+        this.httpPort = new SimpleIntegerProperty(httpPort);
         this.enableHttpServer = new SimpleBooleanProperty(enableHttpServer);
     }
 
@@ -60,6 +62,22 @@ public class RemotePreferences {
         this.useRemoteServer.setValue(useRemoteServer);
     }
 
+    public int getHttpPort() {
+        return httpPort.getValue();
+    }
+
+    public IntegerProperty httpPortProperty() {
+        return httpPort;
+    }
+
+    public void setHttpPort(int httpPort) {
+        this.httpPort.setValue(httpPort);
+    }
+
+    public boolean isDifferentHttpPort(int otherHttpPort) {
+        return getHttpPort() != otherHttpPort;
+    }
+
     public boolean enableHttpServer() {
         return enableHttpServer.getValue();
     }
@@ -79,7 +97,7 @@ public class RemotePreferences {
 
     public @NonNull URI getHttpServerUri() {
         try {
-            return new URI("http://" + RemotePreferences.getIpAddress().getHostAddress() + ":23119");
+            return new URI("http", null, RemotePreferences.getIpAddress().getHostAddress(), getHttpPort(), null, null, null);
         } catch (UnknownHostException | URISyntaxException e) {
             LOGGER.error("Could not create HTTP server URI. Falling back to default.", e);
             try {

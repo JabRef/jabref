@@ -12,6 +12,7 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/cayw/SimpleJson.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GlobalExceptionMapper.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/GsonFactory.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/dto/LinkedPdfFileDTO.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/JabrefMediaType.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/cayw/CAYWQueryParams.java
@@ -56,11 +57,11 @@
 //DEPS org.tinylog:slf4j-tinylog:2.7.0
 //DEPS org.tinylog:tinylog-impl:2.7.0
 //DEPS org.slf4j:jul-to-slf4j:2.0.17
-//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.0
+//DEPS org.apache.logging.log4j:log4j-to-slf4j:2.25.1
 //DEPS info.picocli:picocli:4.7.7
 //DEPS org.postgresql:postgresql:42.7.7
 //DEPS org.bouncycastle:bcprov-jdk18on:1.81
-//DEPS com.konghq:unirest-modules-gson:4.4.7
+//DEPS com.konghq:unirest-modules-gson:4.5.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
 //DEPS org.glassfish.jersey.core:jersey-server:3.1.10
 //DEPS org.glassfish.jersey.inject:jersey-hk2:3.1.10
@@ -72,7 +73,7 @@
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
 //DEPS org.hibernate.validator:hibernate-validator:9.0.1.Final
-//DEPS com.konghq:unirest-modules-gson:4.4.7
+//DEPS com.konghq:unirest-modules-gson:4.5.0
 //DEPS com.google.guava:guava:33.4.8-jre
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.4.0
