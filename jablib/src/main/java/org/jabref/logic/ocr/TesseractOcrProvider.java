@@ -35,7 +35,7 @@ public class TesseractOcrProvider implements OcrProvider {
     private final FilePreferences filePreferences;
 
     private boolean isAvailable;
-    private String configurationError = "";
+    private Exception configurationError = null;
 
     public TesseractOcrProvider(FilePreferences filePreferences) {
         this.filePreferences = filePreferences;
@@ -48,7 +48,7 @@ public class TesseractOcrProvider implements OcrProvider {
             this.isAvailable = true;
             LOGGER.debug("Initialized TesseractOcrProvider successfully");
         } catch (Exception e) {
-            this.configurationError = e.getMessage();
+            this.configurationError = e;
             LOGGER.error("Failed to initialize TesseractOcrProvider", e);
         }
     }
@@ -56,6 +56,7 @@ public class TesseractOcrProvider implements OcrProvider {
     @Override
     public OcrResult performOcr(Path pdfPath) {
         if (!isAvailable) {
+            String errorDetails = configurationError != null ? configurationError.getMessage() : "Unknown configuration error";
             return OcrResult.failure("Tesseract OCR is not available: " + configurationError);
         }
 
@@ -102,7 +103,10 @@ public class TesseractOcrProvider implements OcrProvider {
 
     @Override
     public String getConfigurationError() {
-        return configurationError;
+        if (configurationError == null) {
+            return "";
+        }
+        return configurationError.getMessage() != null ? configurationError.getMessage() : "Unknown error";
     }
 
     private void configureLibraryPath() {
@@ -146,7 +150,7 @@ public class TesseractOcrProvider implements OcrProvider {
 
         // Could not find tessdata
         LOGGER.warn("Could not find tessdata directory. OCR will fail when attempted.");
-        this.configurationError = "Could not find tessdata directory. Please configure in preferences or install Tesseract.";
+        this.configurationError = new IllegalStateException("Could not find tessdata directory. Please configure in preferences or install Tesseract.");
     }
 
     /**
