@@ -159,7 +159,7 @@ public class TesseractOcrProvider implements OcrProvider {
             Path path = Path.of(pathStr).toRealPath();
             LOGGER.debug("Original path: {}, Real path: {}", pathStr, path);
 
-            // ─── Case1: caller already gave the tessdata folder ────────────────────
+            // Case1: caller already gave the tessdata folder
             if ("tessdata".equals(path.getFileName().toString())) {
                 Path engData = path.resolve("eng.traineddata");
                 LOGGER.debug("Looking for eng.traineddata at {}", engData);
@@ -169,7 +169,7 @@ public class TesseractOcrProvider implements OcrProvider {
                 }
             }
 
-            // ─── Case2: caller gave parent directory ──────────────────────────────
+            // Case2: caller gave parent directory
             Path tessdata = path.resolve("tessdata");
             Path engData   = tessdata.resolve("eng.traineddata");
             LOGGER.debug("Looking for tessdata at {}, eng.traineddata at {}", tessdata, engData);
