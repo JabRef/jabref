@@ -3,10 +3,11 @@ package org.jabref.http.server;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.jabref.http.CliStateManager;
+import org.jabref.http.JabRefCliStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.services.FilesToServe;
-import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.preferences.CliPreferences;
@@ -65,7 +66,7 @@ abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new GuiBridge()).to(GuiBridge.class);
+                bind(new JabRefCliStateManager()).to(CliStateManager.class);
             }
         });
     }
