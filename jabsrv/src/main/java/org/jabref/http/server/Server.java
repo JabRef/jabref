@@ -51,7 +51,6 @@ public class Server {
         filesToServe.setFilesToServe(filesToServeList);
 
         SrvStateManager srvStateManager = new JabRefSrvStateManager();
-        System.out.println("Using CLI state manager: " + (srvStateManager instanceof JabRefSrvStateManager));
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
@@ -77,7 +76,6 @@ public class Server {
     public HttpServer run(SrvStateManager srvStateManager, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
-        System.out.println("Using CLI state manager: " + (srvStateManager instanceof JabRefSrvStateManager));
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager);
