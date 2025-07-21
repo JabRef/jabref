@@ -77,7 +77,7 @@ public class OpenOfficeDocumentCreatorTest {
         // Files.copy(contentXmlPath, xmlFile.resolveSibling("test.xml"), StandardCopyOption.REPLACE_EXISTING);
 
         try (InputStream xmlFileInputStream = Files.newInputStream(xmlFile);
-             InputStream contentXmlInputStream = Files.newInputStream(contentXmlPath);
+             InputStream contentXmlInputStream = Files.newInputStream(contentXmlPath)
         ) {
             Input.Builder control = Input.from(xmlFileInputStream);
             Input.Builder test = Input.from(contentXmlInputStream);
