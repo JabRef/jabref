@@ -94,6 +94,7 @@ public class BibtexParser implements Parser {
     private static final String BIB_DESK_ROOT_GROUP_NAME = "BibDeskGroups";
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
     private static final int INDEX_RELATIVE_PATH_IN_PLIST = 4;
+    private static final Set<Character> COMMENT_CHARS = Set.of('%', '-', '#', '*', '/');
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
     private final ImportFormatPreferences importFormatPreferences;
     private PushbackReader pushbackReader;
@@ -206,11 +207,14 @@ public class BibtexParser implements Parser {
     }
 
     private void parseDatabaseID() throws IOException {
+        boolean commentLine = false;
         while (!eof) {
-            skipWhitespace();
             char c = (char) read();
-
-            if (c == '%') {
+            if (isEOFCharacter(c)) {
+                eof = true;
+                return;
+            } else if (COMMENT_CHARS.contains(c)) {
+                commentLine = true;
                 skipWhitespace();
                 String label = parseTextToken().trim();
 
@@ -218,7 +222,9 @@ public class BibtexParser implements Parser {
                     skipWhitespace();
                     database.setSharedDatabaseID(parseTextToken().trim());
                 }
-            } else if (c == '@') {
+            } else if (c == '\n') {
+                commentLine = false;
+            } else if (!commentLine && c == '@') {
                 unread(c);
                 break;
             }
