@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
+import java.util.SequencedSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -14,11 +15,16 @@ import java.util.stream.Collectors;
 import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
@@ -62,7 +68,7 @@ public class BibliographyConsistencyCheck {
      *
      * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
      */
-    public Result check(List<BibEntry> entries, BiConsumer<Integer, Integer> entriesGroupingProgress) {
+    public Result check(BibDatabaseContext bibContext, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
         // collects fields existing in all entries, scoped by entry type
@@ -70,7 +76,7 @@ public class BibliographyConsistencyCheck {
         // collects entries of the same type
         Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new HashMap<>();
 
-        collectEntriesIntoMaps(entries, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
+        collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
         Map<EntryType, EntryTypeResult> resultMap = new HashMap<>();
 
@@ -105,7 +111,19 @@ public class BibliographyConsistencyCheck {
         return new Result(resultMap);
     }
 
-    private static void collectEntriesIntoMaps(List<BibEntry> entries, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
+    private static void collectEntriesIntoMaps(BibDatabaseContext bibContext, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
+        BibEntryType onlineType = BiblatexEntryTypeDefinitions.ALL.stream().filter(e -> e.getType().getDisplayName().equalsIgnoreCase("Online")).findFirst().orElseThrow(IllegalArgumentException::new);
+        BibDatabaseMode mode = bibContext.getMode();
+
+        if (mode == BibDatabaseMode.BIBLATEX) {
+            // do something
+        } else if (mode == BibDatabaseMode.BIBTEX) {
+            // do something else
+        }
+
+        SequencedSet<OrFields> fields = onlineType.getRequiredFields();
+
+        //old entries way
         for (BibEntry entry : entries) {
             EntryType entryType = entry.getType();
 
