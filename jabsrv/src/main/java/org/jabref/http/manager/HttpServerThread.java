@@ -2,8 +2,8 @@ package org.jabref.http.manager;
 
 import java.net.URI;
 
+import org.jabref.http.CliStateManager;
 import org.jabref.http.server.Server;
-import org.jabref.http.server.services.GuiBridge;
 
 import jakarta.ws.rs.ProcessingException;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -18,13 +18,13 @@ public class HttpServerThread extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerThread.class);
 
     private final Server server;
-    private final GuiBridge guiBridge;
+    private final CliStateManager cliStateManager;
     private final URI uri;
 
     private HttpServer httpServer;
 
-    public HttpServerThread(GuiBridge guiBridge, URI uri) {
-        this.guiBridge = guiBridge;
+    public HttpServerThread(CliStateManager cliStateManager, URI uri) {
+        this.cliStateManager = cliStateManager;
         this.uri = uri;
         this.server = new Server();
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
@@ -33,7 +33,7 @@ public class HttpServerThread extends Thread {
     @Override
     public void run() {
         try {
-            httpServer = this.server.run(guiBridge, uri);
+            httpServer = this.server.run(cliStateManager, uri);
         } catch (ProcessingException e) {
             LOGGER.error("Failed to start HTTP server thread: {}", e);
         }

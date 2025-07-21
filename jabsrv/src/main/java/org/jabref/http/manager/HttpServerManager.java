@@ -2,7 +2,7 @@ package org.jabref.http.manager;
 
 import java.net.URI;
 
-import org.jabref.http.server.services.GuiBridge;
+import org.jabref.http.CliStateManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +19,13 @@ public class HttpServerManager implements AutoCloseable {
 
     private HttpServerThread httpServerThread;
 
-    public synchronized void start(GuiBridge guiBridge, URI uri) {
+    public synchronized void start(CliStateManager cliStateManager, URI uri) {
         if (httpServerThread != null) {
             LOGGER.warn("HTTP server manager already started, cannot start again.");
             return;
         }
 
-        httpServerThread = new HttpServerThread(guiBridge, uri);
+        httpServerThread = new HttpServerThread(cliStateManager, uri);
         // This enqueues the thread to run in the background
         // The JVM will take care of running it at some point in time in the future
         // Thus, we cannot check directly if it really runs

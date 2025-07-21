@@ -7,13 +7,14 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
+import org.jabref.http.CliStateManager;
+import org.jabref.http.JabRefCliStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
 import org.jabref.http.server.services.FilesToServe;
-import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.os.OS;
 
 import net.harawata.appdirs.AppDirsFactory;
@@ -49,12 +50,11 @@ public class Server {
         FilesToServe filesToServe = new FilesToServe();
         filesToServe.setFilesToServe(filesToServeList);
 
-        GuiBridge guiBridge = new GuiBridge();
-        guiBridge.setRunningInCli(true);
+        CliStateManager cliStateManager = new JabRefCliStateManager();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, guiBridge);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, cliStateManager);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -73,12 +73,12 @@ public class Server {
     }
 
     ///  Entry point for the GUI
-    public HttpServer run(GuiBridge guiBridge, URI uri) {
+    public HttpServer run(CliStateManager cliStateManager, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, guiBridge);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, cliStateManager);
 
         return startServer(serviceLocator, uri);
     }

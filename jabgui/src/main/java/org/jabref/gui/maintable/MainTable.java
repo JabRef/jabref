@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.undo.UndoManager;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.geometry.Pos;
@@ -31,7 +29,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.util.Pair;
 
 import org.jabref.architecture.AllowedToUseClassGetResource;
 import org.jabref.gui.ClipBoardManager;
@@ -59,7 +56,6 @@ import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DragDrop;
 import org.jabref.gui.util.ViewModelTableRowFactory;
-import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.importer.WebFetchers;
@@ -273,13 +269,13 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
 
-        GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-        ChangeListener<Pair<BibDatabaseContext, List<BibEntry>>> guiBridgeSelectListener = (_, _, newValue) -> {
-            if (database.equals(newValue.getKey())) {
-                clearAndSelect(newValue.getValue());
-            }
-        };
-        guiBridge.getSelectEntries().addListener(new WeakChangeListener<>(guiBridgeSelectListener));
+//        GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
+//        ChangeListener<Pair<BibDatabaseContext, List<BibEntry>>> guiBridgeSelectListener = (_, _, newValue) -> {
+//            if (database.equals(newValue.getKey())) {
+//                clearAndSelect(newValue.getValue());
+//            }
+//        };
+//        guiBridge.getSelectEntries().addListener(new WeakChangeListener<>(guiBridgeSelectListener));
     }
 
     /**

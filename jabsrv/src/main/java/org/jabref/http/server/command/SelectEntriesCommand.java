@@ -32,13 +32,13 @@ public class SelectEntriesCommand implements Command {
 
     @Override
     public Response execute() {
-        if (getGuiBridge().isRunningInCli()) {
+        if (getCliStateManager().isRunningInCli()) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("This command is not supported in CLI mode.")
                            .build();
         }
 
-        List<BibDatabaseContext> contexts = getGuiBridge().getOpenDatabases().stream()
+        List<BibDatabaseContext> contexts = getCliStateManager().getOpenDatabases().stream()
                                                           .filter(context -> context.getDatabasePath().isPresent())
                                                           .filter(context -> libraryId.equals(getLibraryIdFromContext(context)))
                                                           .collect(Collectors.toList());
@@ -54,7 +54,7 @@ public class SelectEntriesCommand implements Command {
                                          .filter(entry -> citationKeys.contains(entry.getCitationKey().orElse(null)) || entryIds.contains(entry.getId()))
                                                           .collect(Collectors.toList());
 
-        contexts.forEach(context -> getGuiBridge().setSelectEntries(context, entries));
+        // contexts.forEach(context -> getCliStateManager().setSelectEntries(context, entries));
         return Response.ok().build();
     }
 

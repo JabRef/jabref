@@ -32,7 +32,6 @@ import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
-import org.jabref.http.server.services.GuiBridge;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
@@ -168,7 +167,7 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
-        JabRefGUI.stateManager = new StateManager();
+        JabRefGUI.stateManager = new JabRefGuiStateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
 
         Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
@@ -415,11 +414,8 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-            guiBridge.setOpenDatabases(stateManager.getOpenDatabases());
-            guiBridge.setSelectedEntries(stateManager.getSelectedEntries());
-            stateManager.activeDatabaseProperty().addListener((_, _, newValue) -> guiBridge.setActiveDatabase(newValue.orElse(null)));
-            httpServerManager.start(guiBridge, remotePreferences.getHttpServerUri());
+            // stateManager.activeDatabaseProperty().addListener((_, _, newValue) -> guiBridge.setActiveDatabase(newValue.orElse(null)));
+            httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
         }
     }
 

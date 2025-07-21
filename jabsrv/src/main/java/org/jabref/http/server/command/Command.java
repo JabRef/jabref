@@ -1,6 +1,6 @@
 package org.jabref.http.server.command;
 
-import org.jabref.http.server.services.GuiBridge;
+import org.jabref.http.CliStateManager;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -23,7 +23,7 @@ public interface Command {
 
     ServiceLocator getServiceLocator();
 
-    default GuiBridge getGuiBridge() {
-        return getServiceLocator().getService(GuiBridge.class);
+    default CliStateManager getCliStateManager() {
+        return getServiceLocator().getService(CliStateManager.class);
     }
 }

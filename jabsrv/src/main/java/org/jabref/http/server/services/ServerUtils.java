@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.jabref.http.CliStateManager;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.util.io.BackupFileUtil;
@@ -31,8 +32,8 @@ public class ServerUtils {
                           .orElseThrow(NotFoundException::new);
     }
 
-    private static java.nio.file.Path getLibraryPath(String id, GuiBridge guiBridge) {
-        return guiBridge.getOpenDatabases()
+    private static java.nio.file.Path getLibraryPath(String id, CliStateManager cliStateManager) {
+        return cliStateManager.getOpenDatabases()
                           .stream()
                           .filter(context -> context.getDatabasePath().isPresent())
                           .map(context -> context.getDatabasePath().get())
@@ -42,9 +43,9 @@ public class ServerUtils {
     }
 
     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
-    public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, GuiBridge guiBridge) {
+    public static @NonNull Path getLibraryPath(String id, FilesToServe filesToServe, CliStateManager cliStateManager) {
         if (filesToServe.isEmpty()) {
-            return getLibraryPath(id, guiBridge);
+            return getLibraryPath(id, cliStateManager);
         } else {
             return getLibraryPath(id, filesToServe);
         }
@@ -52,7 +53,7 @@ public class ServerUtils {
 
     /// @param id - also "demo" for the demo library
     /// @throws NotFoundException if no file with the given id is found in either filesToServe or contextsToServe
-    public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, GuiBridge guiBridge, ImportFormatPreferences importFormatPreferences) throws IOException {
+    public static @NonNull BibDatabaseContext getBibDatabaseContext(String id, FilesToServe filesToServe, CliStateManager cliStateManager, ImportFormatPreferences importFormatPreferences) throws IOException {
         BibtexImporter bibtexImporter = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor());
         if ("demo".equals(id)) {
             try (InputStream chocolateBibInputStream = BibDatabase.class.getResourceAsStream("/Chocolate.bib")) {
@@ -62,7 +63,7 @@ public class ServerUtils {
         }
 
         if (filesToServe.isEmpty()) {
-            return guiBridge.getOpenDatabases().stream()
+            return cliStateManager.getOpenDatabases().stream()
                                   .filter(context -> context.getDatabasePath().isPresent())
                                   .filter(context -> {
                                       Path p = context.getDatabasePath().get();

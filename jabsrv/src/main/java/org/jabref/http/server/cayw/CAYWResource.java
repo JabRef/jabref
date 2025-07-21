@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.http.CliStateManager;
 import org.jabref.http.server.cayw.format.CAYWFormatter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
 import org.jabref.http.server.services.FilesToServe;
-import org.jabref.http.server.services.GuiBridge;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
@@ -63,7 +63,7 @@ public class CAYWResource {
     private FilesToServe filesToServe;
 
     @Inject
-    private GuiBridge guiBridge;
+    private CliStateManager cliStateManager;
 
     @GET
     public Response getCitation(
@@ -78,13 +78,13 @@ public class CAYWResource {
 
         // Selected parameter handling
         List<CAYWEntry> searchResults;
-        if (queryParams.isSelected() && guiBridge.isRunningInCli()) {
+        if (queryParams.isSelected() && cliStateManager.isRunningInCli()) {
             LOGGER.error("The 'selected' parameter is not supported in CLI mode. Please use the GUI to select entries.");
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("The 'selected' parameter is not supported in CLI mode. Please use the GUI to select entries.")
                            .build();
         } else if (queryParams.isSelected()) {
-            searchResults = guiBridge.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
+            searchResults = cliStateManager.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
         } else {
             List<CAYWEntry> entries = databaseContext.getEntries()
                                                      .stream()
@@ -99,10 +99,10 @@ public class CAYWResource {
         }
 
         // Select parameter handling
-        if (queryParams.isSelect() && guiBridge.isRunningInCli()) {
+        if (queryParams.isSelect() && cliStateManager.isRunningInCli()) {
             LOGGER.error("The 'select' parameter is not supported in CLI mode. Please use the GUI to select entries.");
         } else if (queryParams.isSelect()) {
-            guiBridge.setSelectEntries(databaseContext, searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
+            // cliStateManager.setSelectEntries(databaseContext, searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
         }
 
         // Format parameter handling
@@ -157,12 +157,12 @@ public class CAYWResource {
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
         Optional<String> libraryId = queryParams.getLibraryId();
         if (libraryId.isPresent()) {
-            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, guiBridge, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, cliStateManager, preferences.getImportFormatPreferences());
         }
 
         Optional<String> libraryPath = queryParams.getLibraryPath();
         if (libraryPath.isPresent() && "demo".equals(libraryPath.get())) {
-            return ServerUtils.getBibDatabaseContext("demo", filesToServe, guiBridge, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext("demo", filesToServe, cliStateManager, preferences.getImportFormatPreferences());
         }
 
         if (libraryPath.isPresent()) {
@@ -171,8 +171,8 @@ public class CAYWResource {
             return getDatabaseContextFromStream(inputStream);
         }
 
-        if (guiBridge.getActiveDatabase().isPresent()) {
-            return guiBridge.getActiveDatabase().get();
+        if (cliStateManager.getActiveDatabase().isPresent()) {
+            return cliStateManager.getActiveDatabase().get();
         }
 
         return getDatabaseContextFromStream(getLatestDatabaseStream());
@@ -217,7 +217,7 @@ public class CAYWResource {
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
         if (!initialized) {
-            if (!guiBridge.isRunningInCli()) {
+            if (!cliStateManager.isRunningInCli()) {
                 LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
                 initialized = true;
                 return;
