@@ -76,7 +76,7 @@ public class ThemeManager {
         try {
             this.themeWindowManager = ThemeWindowManagerFactory.create();
         } catch (UnsatisfiedLinkError | RuntimeException e) {
-            LOGGER.error("Failed to create ThemeWindowManager (likely due to native library compatibility issues on ARM64)", e);
+            LOGGER.debug("Failed to create ThemeWindowManager (likely due to native library compatibility issues on intel)", e);
             this.themeWindowManager = null;
         }
 
@@ -130,7 +130,7 @@ public class ThemeManager {
             try {
                 themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
             } catch (UnsatisfiedLinkError | RuntimeException e) {
-                LOGGER.error("Failed to set dark mode for window frame (likely due to native library compatibility issues on ARM64)", e);
+                LOGGER.debug("Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)", e);
             }
         }
         LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
