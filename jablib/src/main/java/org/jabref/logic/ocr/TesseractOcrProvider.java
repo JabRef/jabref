@@ -21,6 +21,7 @@ public class TesseractOcrProvider implements OcrProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(TesseractOcrProvider.class);
     private static final String JNA_LIBRARY_PATH = "jna.library.path";
     private static final String TESSDATA_PREFIX = "TESSDATA_PREFIX";
+    private static final String TESSDATA_FOLDER_NAME = "tessdata";
 
     // Default tessdata paths for different operating systems
     private static final String DEFAULT_WIN_TESSDATA_PATH = "C:\\Program Files\\Tesseract-OCR\\tessdata";
@@ -160,7 +161,7 @@ public class TesseractOcrProvider implements OcrProvider {
             LOGGER.debug("Original path: {}, Real path: {}", pathStr, path);
 
             // Case1: caller already gave the tessdata folder
-            if ("tessdata".equals(path.getFileName().toString())) {
+            if (TESSDATA_FOLDER_NAME.equals(path.getFileName().toString())) {
                 Path engData = path.resolve("eng.traineddata");
                 LOGGER.debug("Looking for eng.traineddata at {}", engData);
                 if (Files.isRegularFile(engData)) {
@@ -170,7 +171,7 @@ public class TesseractOcrProvider implements OcrProvider {
             }
 
             // Case2: caller gave parent directory
-            Path tessdata = path.resolve("tessdata");
+            Path tessdata = path.resolve(TESSDATA_FOLDER_NAME);
             Path engData   = tessdata.resolve("eng.traineddata");
             LOGGER.debug("Looking for tessdata at {}, eng.traineddata at {}", tessdata, engData);
             if (Files.isDirectory(tessdata) && Files.isRegularFile(engData)) {
