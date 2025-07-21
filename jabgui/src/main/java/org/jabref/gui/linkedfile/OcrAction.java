@@ -64,11 +64,7 @@ public class OcrAction extends SimpleCommand {
 
         dialogService.notify(Localization.lang("Performing OCR..."));
 
-        BackgroundTask<OcrResult> task = BackgroundTask.wrap(() -> {
-                                                           return ocrService.performOcr(filePath.get());
-                                                       })
-                                                       .showToUser(true)  // Show in task list
-                                                       .withInitialMessage(Localization.lang("Performing OCR on %0", linkedFile.getLink()));
+        OcrBackgroundTask task = new OcrBackgroundTask(ocrService, filePath.get(), linkedFile);
 
         task.onSuccess(result -> {
                 // Use pattern matching with the sealed class
