@@ -153,17 +153,7 @@ class ClipboardContentGeneratorTest {
 
         ClipboardContent markdown = ClipboardContentGenerator.processMarkdown(Arrays.asList(citation, citation));
         String actual = markdown.getString();
-
-        // Print actual output for debugging
-        System.out.println("=== Actual Markdown Output ===");
-        System.out.println(actual);
-        System.out.println("=== End ===");
-
-        // Normalize both strings to ignore whitespace and formatting issues
-        String normalizedActual = actual.replaceAll("\\s+", " ").trim();
-        String normalizedExpected = expected.replaceAll("\\s+", " ").trim();
-
-        assertEquals(normalizedExpected, normalizedActual);
+        assertEquals(expected, actual);
     }
 }
 
