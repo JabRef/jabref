@@ -11,6 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a field for the citation count field on the General tab. [#13477](https://github.com/JabRef/jabref/issues/13477)
 - We added automatic lookup of DOI at citation relations [#13234](https://github.com/JabRef/jabref/issues/13234)
 - We added focus on the field Link in the "Add file link" dialog. [#13486](https://github.com/JabRef/jabref/issues/13486)
 - We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
