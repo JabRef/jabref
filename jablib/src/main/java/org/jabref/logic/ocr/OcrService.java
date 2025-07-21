@@ -20,7 +20,7 @@ public class OcrService {
      * Constructs a new OcrService with the default provider (Tesseract).
      * Uses system defaults for configuration.
      */
-    public OcrService() throws OcrException {
+    public OcrService() {
         this(null);
     }
 
@@ -29,17 +29,18 @@ public class OcrService {
      *
      * @param filePreferences The file preferences containing OCR settings (can be null)
      */
-    public OcrService(FilePreferences filePreferences) throws OcrException {
+    public OcrService(FilePreferences filePreferences) {
         // In the future, we could check preferences to determine which provider to use
         // For now, always use Tesseract
         this.ocrProvider = new TesseractOcrProvider(filePreferences);
 
-        if (!ocrProvider.isAvailable()) {
-            throw new OcrException("OCR provider '" + ocrProvider.getName() +
-                    "' is not available: " + ocrProvider.getConfigurationError());
+        if (ocrProvider.isAvailable()) {
+            LOGGER.info("Initialized OcrService with provider: {}", ocrProvider.getName());
+        } else {
+            LOGGER.warn("OCR provider '{}' is not available: {}",
+                    ocrProvider.getName(),
+                    ocrProvider.getConfigurationError());
         }
-
-        LOGGER.info("Initialized OcrService with provider: {}", ocrProvider.getName());
     }
 
     /**
@@ -49,6 +50,10 @@ public class OcrService {
      * @return The extracted text result
      */
     public OcrResult performOcr(Path pdfPath) {
+        if (!ocrProvider.isAvailable()) {
+            return OcrResult.failure("OCR provider '" + ocrProvider.getName() +
+                    "' is not available: " + ocrProvider.getConfigurationError());
+        }
         return ocrProvider.performOcr(pdfPath);
     }
 

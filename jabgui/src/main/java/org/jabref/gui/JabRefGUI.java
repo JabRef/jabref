@@ -39,7 +39,6 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ProxyRegisterer;
-import org.jabref.logic.ocr.OcrException;
 import org.jabref.logic.os.OS;
 import org.jabref.logic.protectedterms.ProtectedTermsLoader;
 import org.jabref.logic.remote.RemotePreferences;
@@ -193,24 +192,13 @@ public class JabRefGUI extends Application {
         JabRefGUI.clipBoardManager = new ClipBoardManager();
         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
 
-        try {
-            JabRefGUI.aiService = new AiService(
-                    preferences.getAiPreferences(),
-                    preferences.getFilePreferences(),
-                    preferences.getCitationKeyPatternPreferences(),
-                    dialogService,
-                    taskExecutor);
-            Injector.setModelOrService(AiService.class, aiService);
-        } catch (OcrException e) {
-            LOGGER.error("Failed to initialize AI service due to OCR error", e);
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("AI Service Initialization Error"),
-                    Localization.lang("Failed to initialize AI service. OCR functionality will be unavailable.") + "\n\n" +
-                            Localization.lang("Error details: ") + e.getMessage());
-            // Set aiService to null - the application can continue without AI features
-            JabRefGUI.aiService = null;
-            // Note: We're not setting it in the Injector if it's null
-        }
+        JabRefGUI.aiService = new AiService(
+                preferences.getAiPreferences(),
+                preferences.getFilePreferences(),
+                preferences.getCitationKeyPatternPreferences(),
+                dialogService,
+                taskExecutor);
+        Injector.setModelOrService(AiService.class, aiService);
 
         JabRefGUI.citationsAndRelationsSearchService = new SearchCitationsRelationsService(
                 preferences.getImporterPreferences(),

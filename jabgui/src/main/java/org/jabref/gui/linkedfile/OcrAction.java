@@ -1,16 +1,12 @@
 package org.jabref.gui.linkedfile;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.StateManager;
-import org.jabref.gui.actions.Action;
-import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrService;
 import org.jabref.logic.ocr.OcrResult;
-import org.jabref.logic.ocr.OcrException;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.logic.FilePreferences;
