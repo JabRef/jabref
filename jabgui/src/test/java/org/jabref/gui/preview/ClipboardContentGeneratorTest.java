@@ -151,7 +151,7 @@ class ClipboardContentGeneratorTest {
                 "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>" + OS.NEWLINE +
                 "  </div>" + OS.NEWLINE;
 
-        ClipboardContent markdown = ClipboardContentGenerator.processMarkdown(Arrays.asList(citation, citation));
+        ClipboardContent markdown = ClipboardContentGenerator.processMarkdown(List.of(citation, citation));
         String actual = markdown.getString();
         assertEquals(expected, actual);
     }
