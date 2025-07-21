@@ -272,4 +272,8 @@ public class FilePreferences {
     public void setOcrTessdataPath(String path) {
         this.ocrTessdataPath.set(path);
     }
+
+    public StringProperty ocrTessdataPathProperty() {
+        return ocrTessdataPath;
+    }
 }
