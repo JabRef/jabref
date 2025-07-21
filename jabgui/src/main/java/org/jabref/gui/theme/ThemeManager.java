@@ -58,7 +58,7 @@ public class ThemeManager {
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
-    private final ThemeWindowManager themeWindowManager;
+    private ThemeWindowManager themeWindowManager;
 
     private final StyleSheet baseStyleSheet;
     private Theme theme;
@@ -73,13 +73,12 @@ public class ThemeManager {
         this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
-        ThemeWindowManager tempThemeWindowManager = null;
         try {
-            tempThemeWindowManager = ThemeWindowManagerFactory.create();
+            this.themeWindowManager = ThemeWindowManagerFactory.create();
         } catch (UnsatisfiedLinkError | RuntimeException e) {
             LOGGER.error("Failed to create ThemeWindowManager (likely due to native library compatibility issues on ARM64)", e);
+            this.themeWindowManager = null;
         }
-        this.themeWindowManager = tempThemeWindowManager;
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
         this.theme = workspacePreferences.getTheme();
