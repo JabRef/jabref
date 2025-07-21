@@ -64,7 +64,7 @@ public class CitationCountEditorViewModel extends AbstractEditorViewModel {
                       .onRunning(() -> fetchCitationCountInProgress.setValue(true))
                       .onFinished(() -> fetchCitationCountInProgress.setValue(false))
                       .onFailure(e -> {
-                          dialogService.notify(Localization.lang("Error occurred when getting citation count, please try again or check the identifier."));
+                          dialogService.notify(Localization.lang("Error occurred when getting citation count, please try again or check the identifier.\n\n%0", e.getLocalizedMessage()));
                           LOGGER.error("Error while fetching citation count", e);
                       })
                       .onSuccess(identifier -> {

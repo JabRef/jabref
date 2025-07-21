@@ -14,6 +14,8 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
+import kong.unirest.core.json.JSONObject;
+import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
 
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
@@ -104,7 +106,21 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         }
         URLDownload urlDownload = new URLDownload(referencesUrl);
         importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
-        PaperDetails paperDetails = GSON.fromJson(urlDownload.asString(), PaperDetails.class);
+        String result;
+        try {
+            result = urlDownload.asString();
+        } catch (FetcherException e) {
+            e.getHttpResponse().ifPresent(Unchecked.consumer(response -> {
+                Optional.ofNullable(response.responseBody())
+                        .map(JSONObject::new)
+                        .flatMap(json -> Optional.ofNullable(json.getString("error"))
+                                                 .map(Unchecked.function(error -> {
+                                                     throw new FetcherException(referencesUrl, error, e);
+                                                 })));
+            }));
+            throw e;
+        }
+        PaperDetails paperDetails = GSON.fromJson(result, PaperDetails.class);
 
         if (paperDetails == null) {
             return Optional.empty();
