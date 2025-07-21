@@ -383,7 +383,7 @@
                     <text:p>Owner</text:p>
                 </table:table-cell>
                 <table:table-cell>
-                    <text:p>Citation count</text:p>
+                    <text:p>Citationcount</text:p>
                 </table:table-cell>
                 <table:table-cell>
                     <text:p>Timestamp</text:p>
