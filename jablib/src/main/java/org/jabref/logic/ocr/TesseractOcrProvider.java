@@ -156,39 +156,34 @@ public class TesseractOcrProvider implements OcrProvider {
      */
     private boolean setTessdataPath(String pathStr) {
         try {
-            Path path = Path.of(pathStr);
+            Path path = Path.of(pathStr).toRealPath();
+            LOGGER.debug("Original path: {}, Real path: {}", pathStr, path);
 
-            // Resolve symbolic links to get the real path
-            Path realPath = path.toRealPath();
-            LOGGER.debug("Original path: {}, Real path: {}", path, realPath);
-
-            // Check if this is the tessdata directory itself
-            if (realPath.getFileName() != null && realPath.getFileName().toString().equals("tessdata")) {
-                Path engData = realPath.resolve("eng.traineddata");
-                LOGGER.debug("Checking for eng.traineddata at: {}", engData);
-                if (Files.exists(realPath) && Files.isDirectory(realPath) && Files.exists(engData)) {
-                    // Tesseract expects the parent of tessdata
-                    String parentPath = realPath.getParent().toString();
-                    LOGGER.debug("Setting datapath to parent: {}", parentPath);
-                    tesseract.setDatapath(parentPath);
-                    return true;
-                }
-            } else {
-                // Check if this is the parent of tessdata
-                Path tessdata = realPath.resolve("tessdata");
-                Path engData = tessdata.resolve("eng.traineddata");
-                LOGGER.debug("Checking tessdata at: {} and eng.traineddata at: {}", tessdata, engData);
-                if (Files.exists(tessdata) && Files.isDirectory(tessdata) && Files.exists(engData)) {
-                    LOGGER.debug("Setting datapath to: {}", realPath);
-                    tesseract.setDatapath(realPath.toString());
+            // ─── Case1: caller already gave the tessdata folder ────────────────────
+            if ("tessdata".equals(path.getFileName().toString())) {
+                Path engData = path.resolve("eng.traineddata");
+                LOGGER.debug("Looking for eng.traineddata at {}", engData);
+                if (Files.isRegularFile(engData)) {
+                    tesseract.setDatapath(path.toString());
                     return true;
                 }
             }
+
+            // ─── Case2: caller gave parent directory ──────────────────────────────
+            Path tessdata = path.resolve("tessdata");
+            Path engData   = tessdata.resolve("eng.traineddata");
+            LOGGER.debug("Looking for tessdata at {}, eng.traineddata at {}", tessdata, engData);
+            if (Files.isDirectory(tessdata) && Files.isRegularFile(engData)) {
+                tesseract.setDatapath(tessdata.toString());
+                return true;
+            }
+
         } catch (Exception e) {
-            LOGGER.debug("Invalid path: {}", pathStr, e);
+            LOGGER.debug("Invalid tessdata path: {}", pathStr, e);
         }
-        return false;
+        return false;   // nothing usable found
     }
+
 
     /**
      * Gets the list of default tessdata paths based on the operating system.
