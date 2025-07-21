@@ -33,6 +33,7 @@ public class TesseractOcrProvider implements OcrProvider {
 
     private final Tesseract tesseract = new Tesseract();
     private final FilePreferences filePreferences;
+
     private boolean isAvailable;
     private String configurationError = "";
 
