@@ -1,6 +1,6 @@
 package org.jabref.http.server.command;
 
-import org.jabref.http.CliStateManager;
+import org.jabref.http.SrvStateManager;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -23,7 +23,7 @@ public interface Command {
 
     ServiceLocator getServiceLocator();
 
-    default CliStateManager getCliStateManager() {
-        return getServiceLocator().getService(CliStateManager.class);
+    default SrvStateManager getCliStateManager() {
+        return getServiceLocator().getService(SrvStateManager.class);
     }
 }

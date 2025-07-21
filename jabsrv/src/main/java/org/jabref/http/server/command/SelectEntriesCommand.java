@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jabref.http.JabRefSrvStateManager;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -32,7 +33,7 @@ public class SelectEntriesCommand implements Command {
 
     @Override
     public Response execute() {
-        if (getCliStateManager().isRunningInCli()) {
+        if (getCliStateManager() instanceof JabRefSrvStateManager) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("This command is not supported in CLI mode.")
                            .build();

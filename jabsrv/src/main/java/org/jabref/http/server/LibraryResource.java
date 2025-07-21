@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.jabref.http.CliStateManager;
 import org.jabref.http.JabrefMediaType;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.BibEntryDTO;
 import org.jabref.http.dto.LinkedPdfFileDTO;
 import org.jabref.http.server.services.FilesToServe;
@@ -48,7 +48,7 @@ public class LibraryResource {
     CliPreferences preferences;
 
     @Inject
-    CliStateManager cliStateManager;
+    SrvStateManager srvStateManager;
 
     @Inject
     FilesToServe filesToServe;
@@ -169,7 +169,7 @@ public class LibraryResource {
                            .build();
         }
 
-        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, cliStateManager);
+        java.nio.file.Path library = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);
         String libraryAsString;
         try {
             libraryAsString = Files.readString(library);
@@ -184,7 +184,7 @@ public class LibraryResource {
     }
 
     private java.nio.file.Path getJabMapPath(String id) {
-        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, filesToServe, cliStateManager);
+        java.nio.file.Path libraryPath = ServerUtils.getLibraryPath(id, filesToServe, srvStateManager);
         String newName = libraryPath.getFileName().toString().replaceFirst("\\.bib$", ".jmp");
         return libraryPath.getParent().resolve(newName);
     }
@@ -199,7 +199,7 @@ public class LibraryResource {
      * @param id - also "demo" for the Chocolate.bib file
      */
     private BibDatabaseContext getDatabaseContext(String id) throws IOException {
-        return ServerUtils.getBibDatabaseContext(id, filesToServe, cliStateManager, preferences.getImportFormatPreferences());
+        return ServerUtils.getBibDatabaseContext(id, filesToServe, srvStateManager, preferences.getImportFormatPreferences());
     }
 
     /**

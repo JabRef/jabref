@@ -10,7 +10,7 @@ import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-public interface CliStateManager {
+public interface SrvStateManager {
 
     ObservableList<BibDatabaseContext> getOpenDatabases();
 
@@ -23,6 +23,4 @@ public interface CliStateManager {
     Optional<BibDatabaseContext> getActiveDatabase();
 
     List<String> collectAllDatabasePaths();
-
-    boolean isRunningInCli();
 }

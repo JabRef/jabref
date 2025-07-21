@@ -30,7 +30,6 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
-import org.jabref.http.JabRefCliStateManager;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -57,12 +56,16 @@ import org.slf4j.LoggerFactory;
  *   <li>opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})</li>
  * </ul>
  */
-public class JabRefGuiStateManager extends JabRefCliStateManager implements StateManager {
+public class JabRefGuiStateManager implements StateManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JabRefGuiStateManager.class);
     private final CustomLocalDragboard localDragboard = new CustomLocalDragboard();
+    private final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
+    private final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<LibraryTab> activeTab = OptionalObjectProperty.empty();
+    private final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
     private final ObservableMap<String, ObservableList<GroupTreeNode>> selectedGroups = FXCollections.observableHashMap();
+    private final ObservableMap<String, IndexManager> indexManagers = FXCollections.observableHashMap();
     private final OptionalObjectProperty<SearchQuery> activeSearchQuery = OptionalObjectProperty.empty();
     private final OptionalObjectProperty<SearchQuery> activeGlobalSearchQuery = OptionalObjectProperty.empty();
     private final StringProperty searchQueryProperty = new SimpleStringProperty();
@@ -93,6 +96,16 @@ public class JabRefGuiStateManager extends JabRefCliStateManager implements Stat
     }
 
     @Override
+    public ObservableList<BibDatabaseContext> getOpenDatabases() {
+        return openDatabases;
+    }
+
+    @Override
+    public OptionalObjectProperty<BibDatabaseContext> activeDatabaseProperty() {
+        return activeDatabase;
+    }
+
+    @Override
     public OptionalObjectProperty<LibraryTab> activeTabProperty() {
         return activeTab;
     }
@@ -110,6 +123,11 @@ public class JabRefGuiStateManager extends JabRefCliStateManager implements Stat
     @Override
     public IntegerProperty searchResultSize(SearchType type) {
         return type == SearchType.NORMAL_SEARCH ? searchResultSize : globalSearchResultSize;
+    }
+
+    @Override
+    public ObservableList<BibEntry> getSelectedEntries() {
+        return selectedEntries;
     }
 
     @Override
@@ -136,6 +154,16 @@ public class JabRefGuiStateManager extends JabRefCliStateManager implements Stat
     @Override
     public void setIndexManager(BibDatabaseContext database, IndexManager indexManager) {
         indexManagers.put(database.getUid(), indexManager);
+    }
+
+    @Override
+    public Optional<IndexManager> getIndexManager(BibDatabaseContext database) {
+        return Optional.ofNullable(indexManagers.get(database.getUid()));
+    }
+
+    @Override
+    public Optional<BibDatabaseContext> getActiveDatabase() {
+        return activeDatabase.get();
     }
 
     @Override
@@ -209,6 +237,17 @@ public class JabRefGuiStateManager extends JabRefCliStateManager implements Stat
     }
 
     @Override
+    public List<String> collectAllDatabasePaths() {
+        List<String> list = new ArrayList<>();
+        getOpenDatabases().stream()
+                          .map(BibDatabaseContext::getDatabasePath)
+                          .forEachOrdered(pathOptional -> pathOptional.ifPresentOrElse(
+                                  path -> list.add(path.toAbsolutePath().toString()),
+                                  () -> list.add("")));
+        return list;
+    }
+
+    @Override
     public void addSearchHistory(String search) {
         searchHistory.remove(search);
         searchHistory.add(search);
@@ -241,10 +280,5 @@ public class JabRefGuiStateManager extends JabRefCliStateManager implements Stat
     @Override
     public BooleanProperty getEditorShowing() {
         return editorShowing;
-    }
-
-    @Override
-    public boolean isRunningInCli() {
-        return false;
     }
 }

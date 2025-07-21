@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 import javafx.application.Platform;
 
 import org.jabref.architecture.AllowedToUseAwt;
-import org.jabref.http.CliStateManager;
+import org.jabref.http.JabRefSrvStateManager;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.cayw.format.CAYWFormatter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
@@ -63,7 +64,7 @@ public class CAYWResource {
     private FilesToServe filesToServe;
 
     @Inject
-    private CliStateManager cliStateManager;
+    private SrvStateManager srvStateManager;
 
     @GET
     public Response getCitation(
@@ -78,13 +79,13 @@ public class CAYWResource {
 
         // Selected parameter handling
         List<CAYWEntry> searchResults;
-        if (queryParams.isSelected() && cliStateManager.isRunningInCli()) {
+        if (queryParams.isSelected() && srvStateManager instanceof JabRefSrvStateManager) {
             LOGGER.error("The 'selected' parameter is not supported in CLI mode. Please use the GUI to select entries.");
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("The 'selected' parameter is not supported in CLI mode. Please use the GUI to select entries.")
                            .build();
         } else if (queryParams.isSelected()) {
-            searchResults = cliStateManager.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
+            searchResults = srvStateManager.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
         } else {
             List<CAYWEntry> entries = databaseContext.getEntries()
                                                      .stream()
@@ -99,7 +100,7 @@ public class CAYWResource {
         }
 
         // Select parameter handling
-        if (queryParams.isSelect() && cliStateManager.isRunningInCli()) {
+        if (queryParams.isSelect() && srvStateManager instanceof JabRefSrvStateManager) {
             LOGGER.error("The 'select' parameter is not supported in CLI mode. Please use the GUI to select entries.");
         } else if (queryParams.isSelect()) {
             // cliStateManager.setSelectEntries(databaseContext, searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
@@ -157,12 +158,12 @@ public class CAYWResource {
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
         Optional<String> libraryId = queryParams.getLibraryId();
         if (libraryId.isPresent()) {
-            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, cliStateManager, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, srvStateManager, preferences.getImportFormatPreferences());
         }
 
         Optional<String> libraryPath = queryParams.getLibraryPath();
         if (libraryPath.isPresent() && "demo".equals(libraryPath.get())) {
-            return ServerUtils.getBibDatabaseContext("demo", filesToServe, cliStateManager, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext("demo", filesToServe, srvStateManager, preferences.getImportFormatPreferences());
         }
 
         if (libraryPath.isPresent()) {
@@ -171,8 +172,8 @@ public class CAYWResource {
             return getDatabaseContextFromStream(inputStream);
         }
 
-        if (cliStateManager.getActiveDatabase().isPresent()) {
-            return cliStateManager.getActiveDatabase().get();
+        if (srvStateManager.getActiveDatabase().isPresent()) {
+            return srvStateManager.getActiveDatabase().get();
         }
 
         return getDatabaseContextFromStream(getLatestDatabaseStream());
@@ -217,7 +218,7 @@ public class CAYWResource {
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
         if (!initialized) {
-            if (!cliStateManager.isRunningInCli()) {
+            if (!(srvStateManager instanceof JabRefSrvStateManager)) {
                 LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
                 initialized = true;
                 return;

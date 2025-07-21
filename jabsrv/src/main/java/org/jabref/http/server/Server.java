@@ -7,8 +7,8 @@ import java.util.List;
 
 import javax.net.ssl.SSLContext;
 
-import org.jabref.http.CliStateManager;
-import org.jabref.http.JabRefCliStateManager;
+import org.jabref.http.JabRefSrvStateManager;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
@@ -50,11 +50,12 @@ public class Server {
         FilesToServe filesToServe = new FilesToServe();
         filesToServe.setFilesToServe(filesToServeList);
 
-        CliStateManager cliStateManager = new JabRefCliStateManager();
+        SrvStateManager srvStateManager = new JabRefSrvStateManager();
+        System.out.println("Using CLI state manager: " + (srvStateManager instanceof JabRefSrvStateManager));
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, cliStateManager);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -73,12 +74,13 @@ public class Server {
     }
 
     ///  Entry point for the GUI
-    public HttpServer run(CliStateManager cliStateManager, URI uri) {
+    public HttpServer run(SrvStateManager srvStateManager, URI uri) {
         FilesToServe filesToServe = new FilesToServe();
 
+        System.out.println("Using CLI state manager: " + (srvStateManager instanceof JabRefSrvStateManager));
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, cliStateManager);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager);
 
         return startServer(serviceLocator, uri);
     }

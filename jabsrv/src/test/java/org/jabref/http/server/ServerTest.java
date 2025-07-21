@@ -3,8 +3,8 @@ package org.jabref.http.server;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.jabref.http.CliStateManager;
-import org.jabref.http.JabRefCliStateManager;
+import org.jabref.http.JabRefSrvStateManager;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.services.FilesToServe;
@@ -66,7 +66,7 @@ abstract class ServerTest extends JerseyTest {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new JabRefCliStateManager()).to(CliStateManager.class);
+                bind(new JabRefSrvStateManager()).to(SrvStateManager.class);
             }
         });
     }

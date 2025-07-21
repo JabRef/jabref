@@ -2,7 +2,7 @@ package org.jabref.http.manager;
 
 import java.net.URI;
 
-import org.jabref.http.CliStateManager;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.Server;
 
 import jakarta.ws.rs.ProcessingException;
@@ -18,13 +18,13 @@ public class HttpServerThread extends Thread {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServerThread.class);
 
     private final Server server;
-    private final CliStateManager cliStateManager;
+    private final SrvStateManager srvStateManager;
     private final URI uri;
 
     private HttpServer httpServer;
 
-    public HttpServerThread(CliStateManager cliStateManager, URI uri) {
-        this.cliStateManager = cliStateManager;
+    public HttpServerThread(SrvStateManager srvStateManager, URI uri) {
+        this.srvStateManager = srvStateManager;
         this.uri = uri;
         this.server = new Server();
         this.setName("JabSrv - JabRef HTTP Server on " + uri.getHost() + ":" + uri.getPort());
@@ -33,7 +33,7 @@ public class HttpServerThread extends Thread {
     @Override
     public void run() {
         try {
-            httpServer = this.server.run(cliStateManager, uri);
+            httpServer = this.server.run(srvStateManager, uri);
         } catch (ProcessingException e) {
             LOGGER.error("Failed to start HTTP server thread: {}", e);
         }

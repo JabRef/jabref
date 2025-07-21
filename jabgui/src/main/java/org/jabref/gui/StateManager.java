@@ -18,7 +18,7 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
-import org.jabref.http.CliStateManager;
+import org.jabref.http.SrvStateManager;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -42,7 +42,7 @@ import com.tobiasdiez.easybind.EasyBinding;
  *   <li>opened AI chat window (controlled by {@link org.jabref.logic.ai.AiService})</li>
  * </ul>
  */
-public interface StateManager extends CliStateManager {
+public interface StateManager extends SrvStateManager {
 
     ObservableList<SidePaneType> getVisibleSidePaneComponents();
 

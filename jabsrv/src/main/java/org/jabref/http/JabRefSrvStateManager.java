@@ -16,9 +16,9 @@ import org.jabref.model.entry.BibEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JabRefCliStateManager implements CliStateManager {
+public class JabRefSrvStateManager implements SrvStateManager {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefCliStateManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(JabRefSrvStateManager.class);
     protected final ObservableList<BibDatabaseContext> openDatabases = FXCollections.observableArrayList();
     protected final OptionalObjectProperty<BibDatabaseContext> activeDatabase = OptionalObjectProperty.empty();
     protected final ObservableList<BibEntry> selectedEntries = FXCollections.observableArrayList();
@@ -58,10 +58,5 @@ public class JabRefCliStateManager implements CliStateManager {
                                   path -> list.add(path.toAbsolutePath().toString()),
                                   () -> list.add("")));
         return list;
-    }
-
-    @Override
-    public boolean isRunningInCli() {
-        return true;
     }
 }
