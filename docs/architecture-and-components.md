@@ -1,3 +1,7 @@
+---
+layout: default
+title: Architecture and Components
+---
 # Architecture and Components
 
 This page discusses JabRef's main architecture and components.

@@ -52,4 +52,4 @@ Other branches are used for working on and discussing improvements with the help
 
 ## Next reading
 
-Please head to [Architecture and Components](architecture-and-components.md) to read on the high-level architecture and JabRef's (logical) components.
+Please head to [Architecture and Components](architecture-and-components) to read on the high-level architecture and JabRef's (logical) components.
