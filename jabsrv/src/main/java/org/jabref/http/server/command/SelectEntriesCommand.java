@@ -2,9 +2,11 @@ package org.jabref.http.server.command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.jabref.http.JabRefSrvStateManager;
+import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.util.io.BackupFileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -21,8 +23,8 @@ public class SelectEntriesCommand implements Command {
     @JsonIgnore
     private ServiceLocator serviceLocator;
 
-    @JsonProperty(required = true)
-    private String libraryId;
+    @JsonProperty
+    private String libraryId = "";
     @JsonProperty
     private List<String> citationKeys = new ArrayList<>();
     @JsonProperty
@@ -33,36 +35,40 @@ public class SelectEntriesCommand implements Command {
 
     @Override
     public Response execute() {
-        if (getCliStateManager() instanceof JabRefSrvStateManager) {
+        if (getSrvStateManager() instanceof JabRefSrvStateManager) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("This command is not supported in CLI mode.")
                            .build();
         }
 
-        List<BibDatabaseContext> contexts = getCliStateManager().getOpenDatabases().stream()
-                                                          .filter(context -> context.getDatabasePath().isPresent())
-                                                          .filter(context -> libraryId.equals(getLibraryIdFromContext(context)))
-                                                          .collect(Collectors.toList());
-
-        if (contexts.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND)
-                           .entity("No open database found with libraryId: " + libraryId)
+        Optional<CommandSelectionTab> activeTab = getSrvStateManager().getActiveSelectionTabProperty().getValue();
+        if (activeTab.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("This command cannot be executed because no library is opened.")
                            .build();
         }
 
-        List<BibEntry> entries = contexts.stream()
-                                                          .flatMap(context -> context.getDatabase().getEntries().stream())
-                                         .filter(entry -> citationKeys.contains(entry.getCitationKey().orElse(null)) || entryIds.contains(entry.getId()))
-                                                          .collect(Collectors.toList());
+        CommandSelectionTab commandSelectionTab = activeTab.get();
 
-        // contexts.forEach(context -> getCliStateManager().setSelectEntries(context, entries));
+        if (!getLibraryIdFromContext(commandSelectionTab.getBibDatabaseContext()).equals(libraryId)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("This command cannot be executed because the libraryId does not match the active selection tab.")
+                           .build();
+        }
+
+        List<BibEntry> entries = commandSelectionTab.getBibDatabaseContext().getEntries().stream()
+                                                    .filter(entry -> citationKeys.contains(entry.getCitationKey().orElse(null)) || entryIds.contains(entry.getId()))
+                                                    .collect(Collectors.toList());
+
+        commandSelectionTab.clearAndSelect(entries);
+
         return Response.ok().build();
     }
 
     private String getLibraryIdFromContext(BibDatabaseContext bibDatabaseContext) {
         return bibDatabaseContext.getDatabasePath()
                                  .map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
-                                 .orElse(null);
+                                 .orElse("");
     }
 
     @Override

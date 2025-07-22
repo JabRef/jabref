@@ -59,6 +59,7 @@ import org.jabref.gui.undo.UndoableRemoveEntries;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
+import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -103,7 +104,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents the ui area where the notifier pane, the library table and the entry editor are shown.
  */
-public class LibraryTab extends Tab {
+public class LibraryTab extends Tab implements CommandSelectionTab {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibraryTab.class);
     private final LibraryTabContainer tabContainer;
     private final CountingUndoManager undoManager;
@@ -527,6 +528,7 @@ public class LibraryTab extends Tab {
         mainTable.clearAndSelect(bibEntry);
     }
 
+    @Override
     public void clearAndSelect(final List<BibEntry> bibEntries) {
         mainTable.clearAndSelect(bibEntries);
     }
@@ -719,6 +721,7 @@ public class LibraryTab extends Tab {
         return mainTable.getSelectedEntries();
     }
 
+    @Override
     public BibDatabaseContext getBibDatabaseContext() {
         return this.bibDatabaseContext;
     }

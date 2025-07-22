@@ -54,7 +54,7 @@ public class Server {
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
         // Required for CLI only
@@ -78,7 +78,7 @@ public class Server {
 
         ServiceLocator serviceLocator = ServiceLocatorUtilities.createAndPopulateServiceLocator();
         ServiceLocatorUtilities.addOneConstant(serviceLocator, filesToServe);
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager);
+        ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
 
         return startServer(serviceLocator, uri);
     }

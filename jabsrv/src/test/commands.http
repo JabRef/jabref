@@ -6,13 +6,13 @@ Accept: application/json
 
 {
   "commandId": "selectentries",
-  "libraryId": "Chocolate.bib-6a732609",
+  "libraryId": "Chocolate.bib-670214c9",
   "citationKeys":[
     "Corti_2009",
     "Keen_2001"
   ],
   "entryIds":[
-    "00000013"
+    "00000010"
   ]
 }
 

@@ -23,7 +23,7 @@ public interface Command {
 
     ServiceLocator getServiceLocator();
 
-    default SrvStateManager getCliStateManager() {
+    default SrvStateManager getSrvStateManager() {
         return getServiceLocator().getService(SrvStateManager.class);
     }
 }

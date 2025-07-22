@@ -8,6 +8,7 @@ import java.util.Optional;
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
@@ -30,6 +31,7 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
+import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.OptionalObjectProperty;
@@ -40,6 +42,7 @@ import org.jabref.model.search.query.SearchQuery;
 
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.EasyBinding;
+import com.tobiasdiez.easybind.PreboundBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -245,6 +248,16 @@ public class JabRefGuiStateManager implements StateManager {
                                   path -> list.add(path.toAbsolutePath().toString()),
                                   () -> list.add("")));
         return list;
+    }
+
+    @Override
+    public ObjectBinding<Optional<CommandSelectionTab>> getActiveSelectionTabProperty() {
+        return new PreboundBinding<>(activeTab) {
+            @Override
+            protected Optional<CommandSelectionTab> computeValue() {
+                return activeTab.getValue().map(currentTab -> currentTab);
+            }
+        };
     }
 
     @Override

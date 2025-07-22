@@ -103,7 +103,9 @@ public class CAYWResource {
         if (queryParams.isSelect() && srvStateManager instanceof JabRefSrvStateManager) {
             LOGGER.error("The 'select' parameter is not supported in CLI mode. Please use the GUI to select entries.");
         } else if (queryParams.isSelect()) {
-            // cliStateManager.setSelectEntries(databaseContext, searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
+            srvStateManager.getActiveSelectionTabProperty().get().ifPresent(selectionTab -> {
+                selectionTab.clearAndSelect(searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
+            });
         }
 
         // Format parameter handling
