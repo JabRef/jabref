@@ -114,18 +114,19 @@ public class BibliographyConsistencyCheck {
         BibDatabaseMode mode = bibContext.getMode();
         List<BibEntry> entries = bibContext.getEntries();
 
-       
-        Set<EntryType> biblatexSet = new HashSet<>();
-        Set<EntryType> bibtexSet = new HashSet<>();
+        Set<EntryType> biblatexSet = Set.of();
+        Set<EntryType> bibtexSet = Set.of();
 
         if (mode == BibDatabaseMode.BIBLATEX) {
-            for (BibEntryType biblatexEntryType : BiblatexEntryTypeDefinitions.ALL) {
-                biblatexSet.add(biblatexEntryType.getType());
-            }
+            biblatexSet = BiblatexEntryTypeDefinitions.ALL
+                .stream()
+                .map(BibEntryType::getType)
+                .collect(Collectors.toSet());
         } else if (mode == BibDatabaseMode.BIBTEX) {
-            for (BibEntryType bibtexEntryType : BibtexEntryTypeDefinitions.ALL) {
-                bibtexSet.add(bibtexEntryType.getType());
-            }
+            bibtexSet = BibtexEntryTypeDefinitions.ALL
+                .stream()
+                .map(BibEntryType::getType)
+                .collect(Collectors.toSet());
         }
 
         for (BibEntry entry : entries) {
