@@ -113,35 +113,24 @@ public class BibliographyConsistencyCheck {
     private static void collectEntriesIntoMaps(BibDatabaseContext bibContext, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
         BibDatabaseMode mode = bibContext.getMode();
         List<BibEntry> entries = bibContext.getEntries();
-        
-        Set<EntryType> entryTypes = new HashSet<>();
 
-        for (BibEntry entry : entries) {
-            entryTypes.add(entry.getType());
-        }
-
-
+       
+        Set<EntryType> biblatexSet = new HashSet<>();
+        Set<EntryType> bibtexSet = new HashSet<>();
 
         if (mode == BibDatabaseMode.BIBLATEX) {
-            List<BibEntryType> biblatexEntryTypes = BiblatexEntryTypeDefinitions.ALL;
-            for (BibEntryType biblatexEntryType : biblatexEntryTypes) {
-                if (entryTypes.contains(biblatexEntryType.getType())) {
-                    System.out.println("all good");
-                }
+            for (BibEntryType biblatexEntryType : BiblatexEntryTypeDefinitions.ALL) {
+                biblatexSet.add(biblatexEntryType.getType());
             }
         } else if (mode == BibDatabaseMode.BIBTEX) {
-            List<BibEntryType> bibtextEntryTypes = BibtexEntryTypeDefinitions.ALL;
-            for (BibEntryType bibtexEntryType : bibtextEntryTypes) {
-                if (entryTypes.contains(bibtexEntryType.getType())) {
-                    System.out.println("all good");
-                }
+            for (BibEntryType bibtexEntryType : BibtexEntryTypeDefinitions.ALL) {
+                bibtexSet.add(bibtexEntryType.getType());
             }
         }
 
-
         for (BibEntry entry : entries) {
-            EntryType entryType = entry.getType();
-
+            if (mode == BibDatabaseMode.BIBLATEX && biblatexSet.contains(entry.getType())) {
+                EntryType entryType = entry.getType();
             entryTypeToFieldsInAnyEntryMap
                     .computeIfAbsent(entryType, _ -> new HashSet<>())
                     .addAll(filterExcludedFields(entry.getFields()));
@@ -153,6 +142,21 @@ public class BibliographyConsistencyCheck {
             entryTypeToEntriesMap
                     .computeIfAbsent(entryType, _ -> new HashSet<>())
                     .add(entry);
-        }
+                } else if (mode == BibDatabaseMode.BIBTEX && bibtexSet.contains(entry.getType())) {
+                    EntryType entryType = entry.getType();
+            entryTypeToFieldsInAnyEntryMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .addAll(filterExcludedFields(entry.getFields()));
+
+            entryTypeToFieldsInAllEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>(filterExcludedFields(entry.getFields())))
+                    .retainAll(filterExcludedFields(entry.getFields()));
+
+            entryTypeToEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .add(entry);
+                }
+            }
+
     }
 }
