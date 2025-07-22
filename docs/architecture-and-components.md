@@ -1,5 +1,4 @@
 ---
-layout: default
 title: Architecture and Components
 ---
 # Architecture and Components
