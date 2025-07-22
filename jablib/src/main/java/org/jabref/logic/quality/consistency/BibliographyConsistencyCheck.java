@@ -139,8 +139,6 @@ public class BibliographyConsistencyCheck {
         }
 
 
-
-        //old entries way
         for (BibEntry entry : entries) {
             EntryType entryType = entry.getType();
 
