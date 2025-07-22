@@ -18,7 +18,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
@@ -43,7 +42,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -304,12 +302,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         httpServerManager.stop();
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
-            ObservableList<BibDatabaseContext> openDatabases = Injector.instantiateModelOrService(StateManager.class).getOpenDatabases();
             URI uri = remotePreferences.getHttpServerUri();
-//            GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-//            guiBridge.setSelectedEntries(stateManager.getSelectedEntries());
-//            guiBridge.setOpenDatabases(stateManager.getOpenDatabases());
-//            stateManager.activeDatabaseProperty().addListener((observableValue, oldValue, newValue) -> guiBridge.setActiveDatabase(newValue.orElse(null)));
             httpServerManager.start(Injector.instantiateModelOrService(StateManager.class), uri);
         } else {
             remotePreferences.setEnableHttpServer(false);

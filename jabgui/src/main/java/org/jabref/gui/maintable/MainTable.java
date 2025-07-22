@@ -268,14 +268,6 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
 
         // Enable the header right-click menu.
         new MainTableHeaderContextMenu(this, mainTableColumnFactory, tabContainer, dialogService).show(true);
-
-//        GuiBridge guiBridge = Injector.instantiateModelOrService(GuiBridge.class);
-//        ChangeListener<Pair<BibDatabaseContext, List<BibEntry>>> guiBridgeSelectListener = (_, _, newValue) -> {
-//            if (database.equals(newValue.getKey())) {
-//                clearAndSelect(newValue.getValue());
-//            }
-//        };
-//        guiBridge.getSelectEntries().addListener(new WeakChangeListener<>(guiBridgeSelectListener));
     }
 
     /**

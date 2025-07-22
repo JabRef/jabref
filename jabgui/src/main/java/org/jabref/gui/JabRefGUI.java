@@ -414,7 +414,6 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            // stateManager.activeDatabaseProperty().addListener((_, _, newValue) -> guiBridge.setActiveDatabase(newValue.orElse(null)));
             httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
         }
     }
