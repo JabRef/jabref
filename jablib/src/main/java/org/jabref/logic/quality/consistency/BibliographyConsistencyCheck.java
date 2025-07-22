@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
-import java.util.SequencedSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -20,11 +19,11 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
-import org.jabref.model.entry.field.OrFields;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
@@ -112,16 +111,34 @@ public class BibliographyConsistencyCheck {
     }
 
     private static void collectEntriesIntoMaps(BibDatabaseContext bibContext, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
-        BibEntryType onlineType = BiblatexEntryTypeDefinitions.ALL.stream().filter(e -> e.getType().getDisplayName().equalsIgnoreCase("Online")).findFirst().orElseThrow(IllegalArgumentException::new);
         BibDatabaseMode mode = bibContext.getMode();
+        List<BibEntry> entries = bibContext.getEntries();
+        
+        Set<EntryType> entryTypes = new HashSet<>();
 
-        if (mode == BibDatabaseMode.BIBLATEX) {
-            // do something
-        } else if (mode == BibDatabaseMode.BIBTEX) {
-            // do something else
+        for (BibEntry entry : entries) {
+            entryTypes.add(entry.getType());
         }
 
-        SequencedSet<OrFields> fields = onlineType.getRequiredFields();
+
+
+        if (mode == BibDatabaseMode.BIBLATEX) {
+            List<BibEntryType> biblatexEntryTypes = BiblatexEntryTypeDefinitions.ALL;
+            for (BibEntryType biblatexEntryType : biblatexEntryTypes) {
+                if (entryTypes.contains(biblatexEntryType.getType())) {
+                    System.out.println("all good");
+                }
+            }
+        } else if (mode == BibDatabaseMode.BIBTEX) {
+            List<BibEntryType> bibtextEntryTypes = BibtexEntryTypeDefinitions.ALL;
+            for (BibEntryType bibtexEntryType : bibtextEntryTypes) {
+                if (entryTypes.contains(bibtexEntryType.getType())) {
+                    System.out.println("all good");
+                }
+            }
+        }
+
+
 
         //old entries way
         for (BibEntry entry : entries) {
