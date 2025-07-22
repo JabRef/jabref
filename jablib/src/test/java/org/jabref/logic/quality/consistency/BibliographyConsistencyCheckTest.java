@@ -12,7 +12,7 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.StandardEntryType;
 
-import org.junit.jupiter.api.Disabled;
+/* import org.junit.jupiter.api.Disabled; */
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -133,7 +133,7 @@ class BibliographyConsistencyCheckTest {
     }
 
     @Test
-    @Disabled("Fixed when https://github.com/JabRef/jabref/issues/13467 is resolved")
+    // @Disabled("Fixed when https://github.com/JabRef/jabref/issues/13467 is resolved")
     void unsetFieldsReported() {
         BibEntry withDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withDate")
