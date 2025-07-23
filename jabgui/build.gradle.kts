@@ -190,6 +190,7 @@ javaModulePackaging {
     }
     targetsWithOs("macos") {
         options.addAll(
+            "--icon", "$projectDir/src/main/resources/icons/jabref.icns",
             "--mac-package-identifier", "JabRef",
             "--mac-package-name", "JabRef",
             "--file-associations", "$projectDir/buildres/macos/bibtexAssociations.properties",
