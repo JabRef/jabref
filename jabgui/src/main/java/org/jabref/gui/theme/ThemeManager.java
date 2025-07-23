@@ -128,7 +128,7 @@ public class ThemeManager {
         } catch (NoClassDefFoundError | UnsatisfiedLinkError e) {
             // We need to handle these exceptions because the native library may not be available on all platforms (e.g., x86).
             // See https://github.com/dukke/FXThemes/issues/13 for details.
-            LOGGER.info("Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)", e);
+            LOGGER.debug("Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)", e);
         }
     }
 
