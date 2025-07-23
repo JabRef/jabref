@@ -50,7 +50,7 @@ Vagrant.configure("2") do |config|
     git clone --recurse-submodules https://github.com/JabRef/jabref.git
     cd jabref
     sdk use java 21.0.4-tem
-    ./gradlew jar
+    ./gradlew :jabgui:assemble
   SHELL
 
   config.vm.provision "shell", inline: "sudo reboot"
