@@ -44,10 +44,12 @@ Vagrant.configure("2") do |config|
 
     # Install mise, clone JabRef's source code, and do an initial build
     curl https://mise.run | sh
-    ~/.local/bin/mise settings add idiomatic_version_file_enable_tools java
+    echo "eval \"\$(/home/vagrant/.local/bin/mise activate bash)\"" >> ~/.bashrc
+    /home/vagrant/.local/bin/mise activate bash
+    mise settings add idiomatic_version_file_enable_tools java
     git clone --recurse-submodules https://github.com/JabRef/jabref.git
     cd jabref
-    ~/.local/bin/mise exec -- ./gradlew :jabgui:assemble
+    mise exec -- ./gradlew :jabgui:assemble
   SHELL
 
   config.vm.provision "shell", inline: <<-SHELL
