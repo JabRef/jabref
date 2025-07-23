@@ -434,7 +434,11 @@ public class JabRefGUI extends Application {
             executor.submit(() -> {
                 LOGGER.trace("Closing AI service");
                 try {
-                    aiService.close();
+                    if (aiService != null) {
+                        aiService.close();
+                    } else {
+                        LOGGER.trace("AI service was not initialized, skipping shutdown");
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Unable to close AI service", e);
                 }

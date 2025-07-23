@@ -1692,7 +1692,9 @@ public class JabRefCliPreferences implements CliPreferences {
                 getBoolean(KEEP_DOWNLOAD_URL),
                 getPath(LAST_USED_DIRECTORY, getDefaultPath()),
                 getBoolean(OPEN_FILE_EXPLORER_IN_FILE_DIRECTORY),
-                getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY));
+                getBoolean(OPEN_FILE_EXPLORER_IN_LAST_USED_DIRECTORY),
+                // TODO: replace placeholder once real source tag / persistence is implemented
+                "");
 
         EasyBind.listen(getInternalPreferences().getUserAndHostProperty(), (_, _, newValue) -> filePreferences.getUserAndHostProperty().setValue(newValue));
         EasyBind.listen(filePreferences.mainFileDirectoryProperty(), (_, _, newValue) -> put(MAIN_FILE_DIRECTORY, newValue));

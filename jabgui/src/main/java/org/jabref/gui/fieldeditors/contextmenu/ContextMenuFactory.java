@@ -2,6 +2,7 @@ package org.jabref.gui.fieldeditors.contextmenu;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 
 import org.jabref.gui.DialogService;
@@ -10,7 +11,11 @@ import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.copyfiles.CopySingleFileAction;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
+import org.jabref.gui.linkedfile.OcrAction;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.ocr.OcrService;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
@@ -25,6 +30,8 @@ public class ContextMenuFactory {
     private final LinkedFilesEditorViewModel viewModel;
     private final SingleContextCommandFactory singleCommandFactory;
     private final MultiContextCommandFactory multiCommandFactory;
+    private final TaskExecutor taskExecutor;
+    private final OcrService ocrService;
 
     public ContextMenuFactory(DialogService dialogService,
                               GuiPreferences preferences,
@@ -32,7 +39,9 @@ public class ContextMenuFactory {
                               ObservableOptionalValue<BibEntry> bibEntry,
                               LinkedFilesEditorViewModel viewModel,
                               SingleContextCommandFactory singleCommandFactory,
-                              MultiContextCommandFactory multiCommandFactory) {
+                              MultiContextCommandFactory multiCommandFactory,
+                              TaskExecutor taskExecutor,
+                              OcrService ocrService) {
         this.dialogService = dialogService;
         this.preferences = preferences;
         this.databaseContext = databaseContext;
@@ -40,6 +49,8 @@ public class ContextMenuFactory {
         this.viewModel = viewModel;
         this.singleCommandFactory = singleCommandFactory;
         this.multiCommandFactory = multiCommandFactory;
+        this.taskExecutor = taskExecutor;
+        this.ocrService = ocrService;
     }
 
     public ContextMenu createForSelection(ObservableList<LinkedFileViewModel> selectedFiles) {
@@ -86,7 +97,44 @@ public class ContextMenuFactory {
                 factory.createMenuItem(StandardActions.DELETE_FILE, singleCommandFactory.build(StandardActions.DELETE_FILE, linkedFile))
         );
 
+        // Add OCR menu item for PDF files
+        if (linkedFile.getFile().getFileType().equalsIgnoreCase("pdf")) {
+            menu.getItems().add(new SeparatorMenuItem());
+
+            MenuItem ocrItem = createOcrMenuItem(linkedFile);
+            menu.getItems().add(ocrItem);
+        }
+
         return menu;
+    }
+
+    /**
+     * Creates the OCR menu item for a PDF file.
+     * The menu item is only enabled if the PDF file exists on disk.
+     *
+     * @param linkedFile The linked PDF file
+     * @return MenuItem configured for OCR action
+     */
+    private MenuItem createOcrMenuItem(LinkedFileViewModel linkedFile) {
+        MenuItem ocrItem = new MenuItem(Localization.lang("Extract text (OCR)"));
+
+        // Create the OCR action
+        OcrAction ocrAction = new OcrAction(
+                linkedFile.getFile(),
+                databaseContext,
+                dialogService,
+                preferences.getFilePreferences(),
+                taskExecutor,
+                ocrService
+        );
+
+        // Set the action to execute when clicked
+        ocrItem.setOnAction(event -> ocrAction.execute());
+
+        // Disable if the action is not executable (file doesn't exist)
+        ocrItem.disableProperty().bind(ocrAction.executableProperty().not());
+
+        return ocrItem;
     }
 
     @FunctionalInterface

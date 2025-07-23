@@ -21,6 +21,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.util.OptionalObjectProperty;
+import org.jabref.logic.FilePreferences;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplate;
@@ -67,6 +68,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
     private final StringProperty geminiAiApiKey = new SimpleStringProperty();
     private final StringProperty huggingFaceApiKey = new SimpleStringProperty();
     private final StringProperty gpt4AllApiKey = new SimpleStringProperty();
+
+    private final StringProperty tessdataPath = new SimpleStringProperty();
+    private final FilePreferences filePreferences;
 
     private final BooleanProperty customizeExpertSettings = new SimpleBooleanProperty();
 
@@ -125,6 +129,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         this.oldLocale = Locale.getDefault();
 
         this.aiPreferences = preferences.getAiPreferences();
+
+        this.filePreferences = preferences.getFilePreferences();
 
         this.enableAi.addListener((_, _, newValue) -> {
             disableBasicSettings.set(!newValue);
@@ -342,6 +348,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         documentSplitterOverlapSize.setValue(aiPreferences.getDocumentSplitterOverlapSize());
         ragMaxResultsCount.setValue(aiPreferences.getRagMaxResultsCount());
         ragMinScore.setValue(LocalizedNumbers.doubleToString(aiPreferences.getRagMinScore()));
+
+        tessdataPath.setValue(filePreferences.getOcrTessdataPath());
     }
 
     @Override
@@ -386,6 +394,8 @@ public class AiTabViewModel implements PreferenceTabViewModel {
         aiPreferences.setDocumentSplitterOverlapSize(documentSplitterOverlapSize.get());
         aiPreferences.setRagMaxResultsCount(ragMaxResultsCount.get());
         aiPreferences.setRagMinScore(LocalizedNumbers.stringToDouble(oldLocale, ragMinScore.get()).get());
+
+        filePreferences.setOcrTessdataPath(tessdataPath.get() == null ? "" : tessdataPath.get().trim());
     }
 
     public void resetExpertSettings() {
@@ -598,5 +608,9 @@ public class AiTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus getRagMinScoreRangeValidationStatus() {
         return ragMinScoreRangeValidator.getValidationStatus();
+    }
+
+    public StringProperty tessdataPathProperty() {
+        return tessdataPath;
     }
 }

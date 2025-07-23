@@ -19,12 +19,15 @@ import org.jabref.logic.ai.summarization.SummariesService;
 import org.jabref.logic.ai.summarization.storages.MVStoreSummariesStorage;
 import org.jabref.logic.ai.templates.AiTemplatesService;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
+import org.jabref.logic.ocr.OcrService;
 import org.jabref.logic.util.Directories;
 import org.jabref.logic.util.NotificationService;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *  The main class for the AI functionality.
@@ -32,6 +35,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  *  Holds all the AI components: LLM and embedding model, chat history and embeddings cache.
  */
 public class AiService implements AutoCloseable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AiService.class);
+
     public static final String VERSION = "1";
 
     private static final String EMBEDDINGS_FILE_NAME = "embeddings.mv";
@@ -60,6 +65,7 @@ public class AiService implements AutoCloseable {
     private final AiChatService aiChatService;
     private final IngestionService ingestionService;
     private final SummariesService summariesService;
+    private final OcrService ocrService;
 
     public AiService(AiPreferences aiPreferences,
                      FilePreferences filePreferences,
@@ -99,6 +105,13 @@ public class AiService implements AutoCloseable {
                 filePreferences,
                 taskExecutor
         );
+
+        this.ocrService = new OcrService(filePreferences);
+
+        // Log if OCR is not available but don't fail
+        if (!this.ocrService.isAvailable()) {
+            LOGGER.warn("OCR service is not available. OCR functionality will be disabled.");
+        }
     }
 
     public JabRefChatLanguageModel getChatLanguageModel() {
@@ -127,6 +140,10 @@ public class AiService implements AutoCloseable {
 
     public AiTemplatesService getTemplatesService() {
         return templatesService;
+    }
+
+    public OcrService getOcrService() {
+        return ocrService;
     }
 
     public void setupDatabase(BibDatabaseContext context) {

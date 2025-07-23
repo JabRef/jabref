@@ -2,7 +2,13 @@ package org.jabref.gui.preferences.ai;
 
 import java.util.Optional;
 
+import java.io.File;
+
 import javafx.application.Platform;
+import javafx.scene.layout.GridPane;
+import javafx.stage.DirectoryChooser;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.fxml.FXML;
@@ -13,7 +19,11 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.StandardActions;
@@ -26,6 +36,7 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
+import org.jabref.model.strings.StringUtil;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.dlsc.unitfx.IntegerInputField;
@@ -56,6 +67,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private IntegerInputField documentSplitterOverlapSizeTextField;
     @FXML private IntegerInputField ragMaxResultsCountTextField;
     @FXML private TextField ragMinScoreTextField;
+    @FXML private TextField tessdataPathField;
 
     @FXML private TabPane templatesTabPane;
     @FXML private Tab systemMessageForChattingTab;
@@ -79,6 +91,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     @FXML private Button generalSettingsHelp;
     @FXML private Button expertSettingsHelp;
     @FXML private Button templatesHelp;
+    @FXML private Button tessdataBrowseButton;
 
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
@@ -91,6 +104,8 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
     public void initialize() {
         this.viewModel = new AiTabViewModel(preferences);
 
+        setValues();
+
         initializeEnableAi();
         initializeAiProvider();
         initializeChatModel();
@@ -98,6 +113,7 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         initializeExpertSettings();
         initializeValidations();
         initializeTemplates();
+        initializeOcr();
         initializeHelp();
     }
 
@@ -106,6 +122,27 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_GENERAL_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), generalSettingsHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_EXPERT_SETTINGS, dialogService, preferences.getExternalApplicationsPreferences()), expertSettingsHelp);
         actionFactory.configureIconButton(StandardActions.HELP, new HelpAction(HelpFile.AI_TEMPLATES, dialogService, preferences.getExternalApplicationsPreferences()), templatesHelp);
+    }
+
+    @FXML
+    private void selectTessdataDirectory() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle(Localization.lang("Select tessdata directory"));
+
+        String currentPath = viewModel.tessdataPathProperty().get();
+        if (!StringUtil.isBlank(currentPath)) {
+            File currentDir = new File(currentPath);
+            if (currentDir.exists() && currentDir.isDirectory()) {
+                directoryChooser.setInitialDirectory(
+                        currentDir.getName().equals("tessdata") ? currentDir.getParentFile() : currentDir
+                );
+            }
+        }
+
+        File selectedDirectory = directoryChooser.showDialog(tessdataPathField.getScene().getWindow());
+        if (selectedDirectory != null) {
+            viewModel.tessdataPathProperty().set(selectedDirectory.getAbsolutePath());
+        }
     }
 
     private void initializeTemplates() {
@@ -252,6 +289,12 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
         autoGenerateEmbeddings.disableProperty().bind(viewModel.disableAutoGenerateEmbeddings());
     }
 
+    private void initializeOcr() {
+        tessdataPathField.textProperty().bindBidirectional(viewModel.tessdataPathProperty());
+        tessdataPathField.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+        tessdataBrowseButton.disableProperty().bind(viewModel.disableBasicSettingsProperty());
+    }
+
     @Override
     public String getTabName() {
         return Localization.lang("AI");
@@ -298,4 +341,5 @@ public class AiTab extends AbstractPreferenceTabView<AiTabViewModel> implements 
 
         return Optional.empty();
     }
+
 }
