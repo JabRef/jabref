@@ -69,7 +69,7 @@ public class FromAuxDialogViewModel {
     public String getDatabaseName(BibDatabaseContext databaseContext) {
         Optional<String> dbOpt = Optional.empty();
         if (databaseContext.getDatabasePath().isPresent()) {
-            dbOpt = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), databaseContext.getDatabasePath().get());
+            dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), databaseContext.getDatabasePath().get());
         }
         if (databaseContext.getLocation() == DatabaseLocation.SHARED) {
             return databaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";

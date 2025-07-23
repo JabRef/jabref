@@ -3,9 +3,10 @@ package org.jabref.http.server;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.jabref.http.JabRefSrvStateManager;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.dto.GlobalExceptionMapper;
 import org.jabref.http.dto.GsonFactory;
-import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -61,11 +62,11 @@ abstract class ServerTest extends JerseyTest {
         });
     }
 
-    protected void addContextsToServeToResourceConfig(ResourceConfig resourceConfig) {
+    protected void addGuiBridgeToResourceConfig(ResourceConfig resourceConfig) {
         resourceConfig.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bind(new ContextsToServe()).to(ContextsToServe.class);
+                bind(new JabRefSrvStateManager()).to(SrvStateManager.class);
             }
         });
     }

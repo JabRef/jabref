@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -52,7 +53,7 @@ public class GlobalSearchBarTest {
         when(keyBindingRepository.matches(any(), any())).thenReturn(false);
         when(preferences.getKeyBindingRepository()).thenReturn(keyBindingRepository);
 
-        stateManager = new StateManager();
+        stateManager = new JabRefGuiStateManager();
         // Need for active database, otherwise the searchField will be disabled
         stateManager.setActiveDatabase(new BibDatabaseContext());
 
