@@ -111,5 +111,5 @@ jobs:
           else
             tagbuild="false"
           fi
-          echo ./gradlew -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
+          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
       # endregion
