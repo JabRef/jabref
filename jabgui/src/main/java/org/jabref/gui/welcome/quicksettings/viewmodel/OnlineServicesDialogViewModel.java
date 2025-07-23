@@ -2,6 +2,7 @@ package org.jabref.gui.welcome.quicksettings.viewmodel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -19,7 +20,6 @@ import org.jabref.logic.importer.WebFetchers;
 import org.jabref.logic.importer.fetcher.CompositeSearchBasedFetcher;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 public class OnlineServicesDialogViewModel extends AbstractViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
@@ -90,7 +90,7 @@ public class OnlineServicesDialogViewModel extends AbstractViewModel {
     }
 
     public @NonNull String getGrobidUrl() {
-        return grobidUrlProperty.get();
+        return Objects.requireNonNull(grobidUrlProperty.get()); // In every sensible use case (unless someone intentionally set this property to null), this should not be null.
     }
 
     public ListProperty<StudyCatalogItem> fetchersProperty() {

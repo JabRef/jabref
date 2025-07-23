@@ -69,10 +69,6 @@ public class PushApplicationDialog extends FXDialog {
     }
 
     private void updatePathValidation(String newText) {
-        if (newText == null || newText.trim().isEmpty()) {
-            pathField.getStyleClass().removeAll("invalid-path");
-            return;
-        }
         if (PushToApplicationDetector.isValidAbsolutePath(newText)) {
             pathField.getStyleClass().removeAll("invalid-path");
         } else {
