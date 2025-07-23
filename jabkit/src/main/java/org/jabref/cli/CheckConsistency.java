@@ -3,7 +3,6 @@ package org.jabref.cli;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 
@@ -14,15 +13,13 @@ import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultCs
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultTxtWriter;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheckResultWriter;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static picocli.CommandLine.Command;
-import static picocli.CommandLine.Mixin;
-import static picocli.CommandLine.Option;
-import static picocli.CommandLine.ParentCommand;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Mixin;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.ParentCommand;
 
 @Command(name = "check-consistency", description = "Check consistency of the library.")
 class CheckConsistency implements Callable<Integer> {
@@ -63,10 +60,10 @@ class CheckConsistency implements Callable<Integer> {
         }
 
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
-        List<BibEntry> entries = databaseContext.getDatabase().getEntries();
+        BibDatabaseContext bibContext = databaseContext;
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(entries, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibContext, (count, total) -> {
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
             }
