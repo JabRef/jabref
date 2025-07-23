@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javafx.beans.Observable;
 import javafx.beans.binding.Bindings;
@@ -255,7 +256,7 @@ public class JabRefGuiStateManager implements StateManager {
         return new PreboundBinding<>(activeTab) {
             @Override
             protected Optional<CommandSelectionTab> computeValue() {
-                return activeTab.getValue().map(currentTab -> currentTab);
+                return activeTab.getValue().map(Function.identity());
             }
         };
     }
