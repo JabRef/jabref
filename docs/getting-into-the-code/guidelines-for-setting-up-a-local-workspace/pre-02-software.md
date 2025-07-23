@@ -26,7 +26,7 @@ It is strongly recommended that you have git installed.
   * Activate the option "Use Git and optional Unix tools from the Windows Command Prompt".
   * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation. Aim: Store password for GitHub permanently for `https` repository locations
   * [Configure using Visual Studio Code as editor](https://code.visualstudio.com/docs/sourcecontrol/overview#_vs-code-as-git-editor) for any git prompts (commit messages at merge, ...)
-* We recommend using [Windows Terminal](https://aka.ms/terminal), [configured to start Git Bash].
+* We recommend using [Windows Terminal](https://aka.ms/terminal), [configured to start Git Bash](https://www.timschaeps.be/post/adding-git-bash-to-windows-terminal/).
 * Install [WixToolSet](https://github.com/wixtoolset/wix).
 
 {: note}
