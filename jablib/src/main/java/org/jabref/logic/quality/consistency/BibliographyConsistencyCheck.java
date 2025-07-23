@@ -50,7 +50,7 @@ public class BibliographyConsistencyCheck {
                      .collect(Collectors.toSet());
     }
 
-    public record Result(Map<EntryType, EntryTypeResult  > entryTypeToResultMap) {
+    public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
     }
 
     public record EntryTypeResult(Collection<Field> fields, SequencedCollection<BibEntry> sortedEntries) {
@@ -158,6 +158,5 @@ public class BibliographyConsistencyCheck {
                     .add(entry);
                 }
             }
-
     }
 }
