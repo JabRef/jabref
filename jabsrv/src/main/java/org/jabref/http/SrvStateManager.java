@@ -24,7 +24,7 @@ public interface SrvStateManager {
 
     Optional<BibDatabaseContext> getActiveDatabase();
 
-    List<String> collectAllDatabasePaths();
+    List<String> getAllDatabasePaths();
 
     ObjectBinding<Optional<CommandSelectionTab>> getActiveSelectionTabProperty();
 }

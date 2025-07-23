@@ -240,7 +240,7 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public List<String> collectAllDatabasePaths() {
+    public List<String> getAllDatabasePaths() {
         List<String> list = new ArrayList<>();
         getOpenDatabases().stream()
                           .map(BibDatabaseContext::getDatabasePath)

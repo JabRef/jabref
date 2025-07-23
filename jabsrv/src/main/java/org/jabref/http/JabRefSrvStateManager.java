@@ -41,7 +41,7 @@ public class JabRefSrvStateManager implements SrvStateManager {
     }
 
     @Override
-    public List<String> collectAllDatabasePaths() {
+    public List<String> getAllDatabasePaths() {
         return List.of();
     }
 

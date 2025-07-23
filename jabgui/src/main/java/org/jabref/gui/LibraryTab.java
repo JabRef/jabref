@@ -408,7 +408,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             }
 
             // Unique path fragment
-            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.collectAllDatabasePaths(), databasePath);
+            Optional<String> uniquePathPart = FileUtil.getUniquePathDirectory(stateManager.getAllDatabasePaths(), databasePath);
             uniquePathPart.ifPresent(part -> tabTitle.append(" \u2013 ").append(part));
         } else {
             if (databaseLocation == DatabaseLocation.LOCAL) {

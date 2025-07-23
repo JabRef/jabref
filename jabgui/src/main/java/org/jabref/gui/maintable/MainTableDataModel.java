@@ -222,7 +222,7 @@ public class MainTableDataModel {
 
     public Optional<BibEntryTableViewModel> getViewModelByCitationKey(String citationKey) {
         return entriesViewModel.stream()
-                .filter(viewModel -> citationKey.equals(viewModel.getEntry().getCitationKey().orElse(null)))
+                .filter(viewModel -> citationKey.equals(viewModel.getEntry().getCitationKey().orElse("")))
                 .findFirst();
     }
 
