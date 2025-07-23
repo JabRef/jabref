@@ -58,7 +58,7 @@ public class ThemeManager {
     private final WorkspacePreferences workspacePreferences;
     private final FileUpdateMonitor fileUpdateMonitor;
     private final Consumer<Runnable> updateRunner;
-    private ThemeWindowManager themeWindowManager;
+    private final ThemeWindowManager themeWindowManager;
 
     private final StyleSheet baseStyleSheet;
     private Theme theme;
@@ -73,12 +73,8 @@ public class ThemeManager {
         this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
-        try {
-            this.themeWindowManager = ThemeWindowManagerFactory.create();
-        } catch (UnsatisfiedLinkError | RuntimeException e) {
-            LOGGER.debug("Failed to create ThemeWindowManager (likely due to native library compatibility issues on intel)", e);
-            this.themeWindowManager = null;
-        }
+        // Always returns something even if the native library is not available - see https://github.com/dukke/FXThemes/issues/15
+        this.themeWindowManager = ThemeWindowManagerFactory.create();
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
         this.theme = workspacePreferences.getTheme();
@@ -126,12 +122,12 @@ public class ThemeManager {
             return;
         }
 
-        if (themeWindowManager != null) {
-            try {
-                themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
-            } catch (UnsatisfiedLinkError | RuntimeException e) {
-                LOGGER.debug("Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)", e);
-            }
+        try {
+            themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
+        } catch (UnsatisfiedLinkError | RuntimeException e) {
+            // We need to handle these exceptions because the native library may not be available on all platforms (e.g., x86)
+            // See https://github.com/dukke/FXThemes/issues/13 for details
+            LOGGER.debug("Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)", e);
         }
         LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
     }
