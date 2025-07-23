@@ -45,7 +45,7 @@ Vagrant.configure("2") do |config|
     # Install mise, clone JabRef's source code, and do an initial build
     curl https://mise.run | sh
     echo "eval \"\$(/home/vagrant/.local/bin/mise activate bash)\"" >> ~/.bashrc
-    /home/vagrant/.local/bin/mise activate bash
+    . .bashrc
     mise settings add idiomatic_version_file_enable_tools java
     git clone --recurse-submodules https://github.com/JabRef/jabref.git
     cd jabref
