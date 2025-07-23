@@ -97,5 +97,6 @@ jobs:
           file ${{ steps.secring.outputs.filePath }}
           md5sum ${{ steps.secring.outputs.filePath }}
       - name: publishAllPublicationsToMavenCentralRepository
-        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ steps.istagbuild.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
+        # different version at maven centrl: 6.0-SNAPSHOT - and not 6.0.23234-SNAPSHOT
+        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ steps.istagbuild.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
       # endregion
