@@ -332,7 +332,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             getSelectionModel().clearSelection();
             List<BibEntryTableViewModel> entries = bibEntries.stream()
                                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                                            .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().orElse(null)))
+                                                            .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
                                                             .filter(Optional::isPresent)
                                                             .map(Optional::get)
                                                             .toList();
