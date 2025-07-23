@@ -45,7 +45,6 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private GuiPreferences preferences;
     @Inject private UndoManager undoManager;
     @Inject private StateManager stateManager;
-
     private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
@@ -63,6 +62,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                     this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case EPRINT ->
                     this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
+
             // TODO: Add support for PMID
             case null, default -> {
                 assert field != null;
