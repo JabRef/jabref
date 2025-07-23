@@ -60,10 +60,9 @@ class CheckConsistency implements Callable<Integer> {
         }
 
         BibDatabaseContext databaseContext = parserResult.get().getDatabaseContext();
-        BibDatabaseContext bibContext = databaseContext;
 
         BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-        BibliographyConsistencyCheck.Result result = consistencyCheck.check(bibContext, (count, total) -> {
+        BibliographyConsistencyCheck.Result result = consistencyCheck.check(databaseContext, (count, total) -> {
             if (!sharedOptions.porcelain) {
                 System.out.println(Localization.lang("Checking consistency for entry type %0 of %1", count + 1, total));
             }
