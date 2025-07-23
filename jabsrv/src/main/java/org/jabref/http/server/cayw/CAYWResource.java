@@ -84,7 +84,7 @@ public class CAYWResource {
                 LOGGER.error("The 'selected' parameter is not supported in CLI mode. Please use the GUI to use the selected entries.");
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity("The 'selected' parameter is not supported in CLI mode. Please use the GUI to use the selected entries.")
-                           .build();
+                               .build();
             }
             searchResults = srvStateManager.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
         } else {

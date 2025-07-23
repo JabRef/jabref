@@ -332,10 +332,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
             getSelectionModel().clearSelection();
             List<BibEntryTableViewModel> entries = bibEntries.stream()
                                                              .filter(bibEntry -> bibEntry.getCitationKey().isPresent())
-                                                            .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
-                                                            .filter(Optional::isPresent)
-                                                            .map(Optional::get)
-                                                            .toList();
+                                                             .map(bibEntry -> findEntryByCitationKey(bibEntry.getCitationKey().get()))
+                                                             .filter(Optional::isPresent)
+                                                             .map(Optional::get)
+                                                             .toList();
             entries.forEach(entry -> getSelectionModel().select(entry));
             if (!entries.isEmpty()) {
                 scrollTo(entries.getFirst());
