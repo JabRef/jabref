@@ -247,9 +247,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        List<BibEntry> bibEntryList = List.of(first, second);
+        List<BibEntry> bibEntriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibEntryList);
+        bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });

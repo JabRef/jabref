@@ -109,9 +109,9 @@ class BibliographyConsistencyCheckTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        List<BibEntry> bibentryList = List.of(first, second);
+        List<BibEntry> bibentriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibentryList);
+        bibDatabase.insertEntries(bibentriesList);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
@@ -132,9 +132,9 @@ class BibliographyConsistencyCheckTest {
                 .withField(StandardField.COMMENT, "another note")
                 .withField(StandardField.PDF, "other.pdf");
 
-        List<BibEntry> bibEntryList = List.of(a, b);
+        List<BibEntry> bibEntriesList = List.of(a, b);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibEntryList);
+        bibDatabase.insertEntries(bibEntriesList);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
