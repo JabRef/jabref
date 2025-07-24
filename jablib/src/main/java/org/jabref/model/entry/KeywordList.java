@@ -64,11 +64,9 @@ public class KeywordList implements Iterable<Keyword> {
             } else if (currentChar == '\\') {
                 isEscaping = true;
             } else if (currentChar == hierarchicalDelimiter) {
-                // Hierarchical delimiter reached: push current token as sublevel
                 hierarchy.add(currentToken.toString().trim());
                 currentToken.setLength(0);
             } else if (currentChar == delimiter) {
-                // Keyword delimiter reached: push current token and then flush full hierarchy as keyword
                 hierarchy.add(currentToken.toString().trim());
                 currentToken.setLength(0);
                 keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
