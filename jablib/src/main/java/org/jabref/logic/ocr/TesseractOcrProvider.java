@@ -137,6 +137,59 @@ public class TesseractOcrProvider implements OcrProvider {
         }
     }
 
+    @Override
+    public OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath, OcrMethod method) {
+        switch (method) {
+            case OCRMYPDF:
+                if (!isMethodAvailable(OcrMethod.OCRMYPDF)) {
+                    return OcrResult.failure("ocrmypdf is not available. Please install it using: pip install ocrmypdf");
+                }
+                LOGGER.info("Using ocrmypdf for creating searchable PDF");
+                return OcrMyPdfWrapper.createSearchablePdf(
+                        inputPdfPath,
+                        outputPdfPath,
+                        OcrMyPdfWrapper.OcrMyPdfOptions.defaults()
+                );
+
+            case PDFBOX:
+                LOGGER.info("Using PDFBox for creating searchable PDF");
+                // First, perform regular OCR to get the text
+                OcrResult textResult = performOcr(inputPdfPath);
+
+                if (textResult.isFailure()) {
+                    return textResult;
+                }
+
+                String extractedText = ((OcrResult.Success) textResult).text();
+
+                // Create searchable PDF using the extracted text
+                SearchablePdfCreator pdfCreator = new SearchablePdfCreator();
+                boolean success = pdfCreator.createSearchablePdf(inputPdfPath, outputPdfPath, extractedText);
+
+                if (success) {
+                    return OcrResult.success(extractedText, outputPdfPath);
+                } else {
+                    return OcrResult.failure("Failed to create searchable PDF with PDFBox");
+                }
+
+            default:
+                return OcrResult.failure("Unknown OCR method: " + method);
+        }
+    }
+
+    @Override
+    public boolean isMethodAvailable(OcrMethod method) {
+        switch (method) {
+            case PDFBOX:
+                // PDFBox is always available as it's built-in
+                return isAvailable();
+            case OCRMYPDF:
+                return isAvailable() && OcrMyPdfWrapper.isAvailable();
+            default:
+                return false;
+        }
+    }
+
     private void configureLibraryPath() {
         if (Platform.isMac()) {
             String originalPath = System.getProperty(JNA_LIBRARY_PATH, "");

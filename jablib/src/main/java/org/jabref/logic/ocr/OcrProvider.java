@@ -42,7 +42,16 @@ public interface OcrProvider {
      *
      * @param inputPdfPath Path to the input PDF
      * @param outputPdfPath Path where the searchable PDF will be saved
+     * @param method The method to use for creating searchable PDF
      * @return OcrResult containing the extracted text and output file path on success
      */
-    OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath);
+    OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath, OcrMethod method);
+
+    /**
+     * Checks if a specific OCR method is available.
+     *
+     * @param method The OCR method to check
+     * @return true if the method is available
+     */
+    boolean isMethodAvailable(OcrMethod method);
 }

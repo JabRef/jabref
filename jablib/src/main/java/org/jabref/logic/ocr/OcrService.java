@@ -1,6 +1,8 @@
 package org.jabref.logic.ocr;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jabref.logic.FilePreferences;
 
@@ -76,14 +78,34 @@ public class OcrService {
      *
      * @param inputPdfPath Path to the input PDF
      * @param outputPdfPath Path where the searchable PDF will be saved
+     * @param method The method to use for creating the searchable PDF
      * @return The result of the operation
      */
-    public OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath) {
+    public OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath, OcrMethod method) {
         if (!ocrProvider.isAvailable()) {
             return OcrResult.failure("OCR provider '" + ocrProvider.getName() +
                     "' is not available: " + ocrProvider.getConfigurationError());
         }
 
-        return ocrProvider.createSearchablePdf(inputPdfPath, outputPdfPath);
+        if (!ocrProvider.isMethodAvailable(method)) {
+            return OcrResult.failure("OCR method '" + method.getDisplayName() + "' is not available");
+        }
+
+        return ocrProvider.createSearchablePdf(inputPdfPath, outputPdfPath, method);
+    }
+
+    /**
+     * Gets the available OCR methods.
+     *
+     * @return List of available OCR methods
+     */
+    public List<OcrMethod> getAvailableMethods() {
+        List<OcrMethod> methods = new ArrayList<>();
+        for (OcrMethod method : OcrMethod.values()) {
+            if (ocrProvider.isMethodAvailable(method)) {
+                methods.add(method);
+            }
+        }
+        return methods;
     }
 }
