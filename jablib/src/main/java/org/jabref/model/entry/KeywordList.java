@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,13 +51,40 @@ public class KeywordList implements Iterable<Keyword> {
         Objects.requireNonNull(hierarchicalDelimiter);
 
         KeywordList keywordList = new KeywordList();
+        List<String> hierarchy = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean isEscaping = false;
 
-        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
-        while (tok.hasMoreTokens()) {
-            String chain = tok.nextToken();
-            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
-            keywordList.add(chainRoot);
+        for (int i = 0; i < keywordString.length(); i++) {
+            char currentChar = keywordString.charAt(i);
+
+            if (isEscaping) {
+                currentToken.append(currentChar);
+                isEscaping = false;
+            } else if (currentChar == '\\') {
+                // Escape next character (i)
+                isEscaping = true;
+            } else if (currentChar == hierarchicalDelimiter) {
+                // Hierarchical delimiter reached: push current token as sublevel
+                hierarchy.add(currentToken.toString().trim());
+                currentToken.setLength(0);
+            } else if (currentChar == delimiter) {
+                // Keyword delimiter reached: push current token and then flush full hierarchy as keyword
+                hierarchy.add(currentToken.toString().trim());
+                currentToken.setLength(0);
+                keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
+                hierarchy.clear();
+            } else {
+                currentToken.append(currentChar);
+            }
         }
+
+        // Handle the final token
+        if (!currentToken.isEmpty() || !hierarchy.isEmpty()) {
+            hierarchy.add(currentToken.toString().trim());
+            keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
+        }
+
         return keywordList;
     }
 
