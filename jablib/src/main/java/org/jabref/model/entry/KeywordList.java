@@ -51,7 +51,7 @@ public class KeywordList implements Iterable<Keyword> {
         Objects.requireNonNull(hierarchicalDelimiter);
 
         KeywordList keywordList = new KeywordList();
-        List<String> hierarchy = new ArrayList<>();
+        List<String> hierarchy = new ArrayList<>(List.of());
         StringBuilder currentToken = new StringBuilder();
         boolean isEscaping = false;
 
