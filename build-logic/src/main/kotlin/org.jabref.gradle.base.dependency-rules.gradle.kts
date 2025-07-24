@@ -274,8 +274,9 @@ extraJavaModuleInfo {
     module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers") {
         exportAllPackages()
         requires("java.logging")
-        requires("org.xmlunit")
+        requires("java.xml")
         requires("org.hamcrest")
+        requires("org.xmlunit")
     }
     module("org.xmlunit:xmlunit-placeholders", "org.xmlunit.placeholder")
 

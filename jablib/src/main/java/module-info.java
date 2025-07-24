@@ -107,6 +107,7 @@ open module org.jabref.jablib {
     exports org.jabref.logic.pseudonymization;
     exports org.jabref.logic.citation.repository;
     exports org.jabref.model.paging;
+    exports org.jabref.logic.command;
 
     requires java.base;
 
