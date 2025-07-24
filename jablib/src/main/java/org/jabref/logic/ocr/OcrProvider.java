@@ -36,4 +36,13 @@ public interface OcrProvider {
      * @return Configuration error message, or empty string if properly configured
      */
     String getConfigurationError();
+
+    /**
+     * Creates a searchable PDF by performing OCR and embedding the text.
+     *
+     * @param inputPdfPath Path to the input PDF
+     * @param outputPdfPath Path where the searchable PDF will be saved
+     * @return OcrResult containing the extracted text and output file path on success
+     */
+    OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath);
 }

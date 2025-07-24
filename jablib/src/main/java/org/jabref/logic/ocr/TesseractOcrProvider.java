@@ -109,6 +109,34 @@ public class TesseractOcrProvider implements OcrProvider {
         return configurationError.getMessage() != null ? configurationError.getMessage() : "Unknown error";
     }
 
+    /**
+     * Creates a searchable PDF by performing OCR and overlaying the text invisibly.
+     *
+     * @param inputPdfPath Path to the input PDF
+     * @param outputPdfPath Path where the searchable PDF will be saved
+     * @return OcrResult indicating success with the output path or failure
+     */
+    public OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath) {
+        // First, perform regular OCR to get the text
+        OcrResult textResult = performOcr(inputPdfPath);
+
+        if (textResult.isFailure()) {
+            return textResult;
+        }
+
+        String extractedText = ((OcrResult.Success) textResult).text();
+
+        // Create searchable PDF using the extracted text
+        SearchablePdfCreator pdfCreator = new SearchablePdfCreator();
+        boolean success = pdfCreator.createSearchablePdf(inputPdfPath, outputPdfPath, extractedText);
+
+        if (success) {
+            return OcrResult.success(extractedText, outputPdfPath);
+        } else {
+            return OcrResult.failure("Failed to create searchable PDF");
+        }
+    }
+
     private void configureLibraryPath() {
         if (Platform.isMac()) {
             String originalPath = System.getProperty(JNA_LIBRARY_PATH, "");

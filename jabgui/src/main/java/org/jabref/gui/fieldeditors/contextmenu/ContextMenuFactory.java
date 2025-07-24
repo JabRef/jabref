@@ -121,6 +121,7 @@ public class ContextMenuFactory {
         // Create the OCR action
         OcrAction ocrAction = new OcrAction(
                 linkedFile.getFile(),
+                bibEntry.getValue().get(),
                 databaseContext,
                 dialogService,
                 preferences.getFilePreferences(),

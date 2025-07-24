@@ -1,5 +1,8 @@
 package org.jabref.logic.ocr;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.jabref.model.strings.StringUtil;
 import org.jspecify.annotations.NonNull;
 
@@ -8,13 +11,13 @@ import org.jspecify.annotations.NonNull;
  * Uses sealed classes to ensure type safety and avoid null parameters.
  */
 public sealed interface OcrResult {
-
     /**
-     * Represents a successful OCR operation with extracted text.
+     * Represents a successful OCR operation with extracted text and optional output file.
      */
-    record Success(@NonNull String text) implements OcrResult {
-        // Remove the custom constructor entirely
-        // The record's compact constructor will handle validation automatically
+    record Success(@NonNull String text, Optional<Path> outputFile) implements OcrResult {
+        public Success(@NonNull String text) {
+            this(text, Optional.empty());
+        }
     }
 
     /**
@@ -44,10 +47,17 @@ public sealed interface OcrResult {
     }
 
     /**
-     * Factory method for creating a success result.
+     * Factory method for creating a success result with text only.
      */
     static OcrResult success(@NonNull String text) {
         return new Success(text);
+    }
+
+    /**
+     * Factory method for creating a success result with text and output file.
+     */
+    static OcrResult success(@NonNull String text, Path outputFile) {
+        return new Success(text, Optional.of(outputFile));
     }
 
     /**

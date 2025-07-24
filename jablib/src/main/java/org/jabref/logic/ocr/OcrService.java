@@ -70,4 +70,20 @@ public class OcrService {
     public boolean isAvailable() {
         return ocrProvider.isAvailable();
     }
+
+    /**
+     * Creates a searchable PDF by performing OCR and embedding the text invisibly.
+     *
+     * @param inputPdfPath Path to the input PDF
+     * @param outputPdfPath Path where the searchable PDF will be saved
+     * @return The result of the operation
+     */
+    public OcrResult createSearchablePdf(Path inputPdfPath, Path outputPdfPath) {
+        if (!ocrProvider.isAvailable()) {
+            return OcrResult.failure("OCR provider '" + ocrProvider.getName() +
+                    "' is not available: " + ocrProvider.getConfigurationError());
+        }
+
+        return ocrProvider.createSearchablePdf(inputPdfPath, outputPdfPath);
+    }
 }

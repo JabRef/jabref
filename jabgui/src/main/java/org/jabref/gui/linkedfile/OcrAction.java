@@ -7,7 +7,9 @@ import org.jabref.logic.util.TaskExecutor;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.ocr.OcrService;
 import org.jabref.logic.ocr.OcrResult;
+import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
 import org.jabref.logic.FilePreferences;
 
@@ -29,25 +31,28 @@ public class OcrAction extends SimpleCommand {
     private final FilePreferences filePreferences;
     private final TaskExecutor taskExecutor;
     private final OcrService ocrService;
+    private final BibEntry entry;
 
     public OcrAction(LinkedFile linkedFile,
+                     BibEntry entry,
                      BibDatabaseContext databaseContext,
                      DialogService dialogService,
                      FilePreferences filePreferences,
                      TaskExecutor taskExecutor,
                      OcrService ocrService) {
         this.linkedFile = linkedFile;
+        this.entry = entry;
         this.databaseContext = databaseContext;
         this.dialogService = dialogService;
         this.filePreferences = filePreferences;
         this.taskExecutor = taskExecutor;
+        this.ocrService = ocrService;
 
         // Only executable for existing PDF files
         this.executable.set(
                 linkedFile.getFileType().equalsIgnoreCase("pdf") &&
                         linkedFile.findIn(databaseContext, filePreferences).isPresent()
         );
-        this.ocrService = ocrService;
     }
 
     @Override
@@ -62,46 +67,72 @@ public class OcrAction extends SimpleCommand {
             return;
         }
 
+        // Generate output filename
+        Path inputPath = filePath.get();
+        String baseName = FileUtil.getBaseName(inputPath);
+        Path outputPath = inputPath.resolveSibling(baseName + "_ocr.pdf");
+
         dialogService.notify(Localization.lang("Performing OCR..."));
 
-        OcrBackgroundTask task = new OcrBackgroundTask(ocrService, filePath.get(), linkedFile);
+        BackgroundTask<OcrResult> task = BackgroundTask.wrap(() ->
+                ocrService.createSearchablePdf(inputPath, outputPath)
+        );
 
         task.onSuccess(result -> {
-                // Use pattern matching with the sealed class
-                switch (result) {
-                    case OcrResult.Success success -> {
-                        String extractedText = success.text();
-                        if (extractedText.isEmpty()) {
-                            dialogService.showInformationDialogAndWait(
-                                    Localization.lang("OCR Complete"),
-                                    Localization.lang("No text was found in the PDF.")
-                            );
-                        } else {
-                            // Show preview
-                            String preview = extractedText.length() > 1000
-                                    ? extractedText.substring(0, 1000) + "..."
-                                    : extractedText;
+                    // Use pattern matching with the sealed class
+                    switch (result) {
+                        case OcrResult.Success success -> {
+                            String extractedText = success.text();
+                            Optional<Path> createdFile = success.outputFile();
 
-                            dialogService.showInformationDialogAndWait(
-                                    Localization.lang("OCR Result"),
-                                    preview
+                            if (createdFile.isPresent()) {
+                                // Ask user if they want to use the new searchable PDF
+                                boolean useNewFile = dialogService.showConfirmationDialogAndWait(
+                                        Localization.lang("OCR Complete"),
+                                        Localization.lang("Searchable PDF created successfully. Do you want to link the new searchable PDF to this entry?")
+                                );
+
+                                if (useNewFile) {
+                                    // Create new LinkedFile for the searchable PDF
+                                    LinkedFile newLinkedFile = new LinkedFile(
+                                            linkedFile.getDescription().isEmpty() ? "OCR Version" : linkedFile.getDescription() + " (OCR)",
+                                            createdFile.get().toString(),
+                                            linkedFile.getFileType()
+                                    );
+
+                                    // Add the new file to the entry
+                                    entry.addFile(newLinkedFile);
+
+                                    dialogService.notify(Localization.lang("Searchable PDF linked to entry"));
+                                }
+                            }
+
+                            // Show preview of extracted text
+                            if (!extractedText.isEmpty()) {
+                                String preview = extractedText.length() > 500
+                                        ? extractedText.substring(0, 500) + "..."
+                                        : extractedText;
+
+                                dialogService.showInformationDialogAndWait(
+                                        Localization.lang("OCR Text Preview"),
+                                        preview
+                                );
+                            }
+                        }
+                        case OcrResult.Failure failure -> {
+                            dialogService.showErrorDialogAndWait(
+                                    Localization.lang("OCR failed"),
+                                    failure.errorMessage()
                             );
                         }
                     }
-                    case OcrResult.Failure failure -> {
-                        dialogService.showErrorDialogAndWait(
-                                Localization.lang("OCR failed"),
-                                failure.errorMessage()
-                        );
-                    }
-                }
-            })
-            .onFailure(exception -> {
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("OCR failed"),
-                        exception.getMessage()
-                );
-            })
-            .executeWith(taskExecutor);
+                })
+                .onFailure(exception -> {
+                    dialogService.showErrorDialogAndWait(
+                            Localization.lang("OCR failed"),
+                            exception.getMessage()
+                    );
+                })
+                .executeWith(taskExecutor);
     }
 }
