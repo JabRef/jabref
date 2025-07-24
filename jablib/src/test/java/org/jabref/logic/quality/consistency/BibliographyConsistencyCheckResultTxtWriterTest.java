@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
+import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -35,7 +36,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PUBLISHER, "publisher");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
+        BibDatabase database = new BibDatabase();
+        database.insertEntry(first);
+        database.insertEntry(second);
+
+        BibDatabaseContext bibContext = new BibDatabaseContext(database);
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
@@ -69,8 +75,14 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withCitationKey("withoutDate")
                 .withField(StandardField.URLDATE, "urldate");
 
+        List<BibEntry> bibEntryList = List.of(withDate, withoutDate);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntries(bibEntryList);
+
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
-                .check(List.of(withDate, withoutDate), (_, _) -> {
+                .check(bibContext, (_, _) -> {
                 });
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
@@ -104,7 +116,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
+        List<BibEntry> bibEntryList = List.of(first, second);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntries(bibEntryList);
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
 
         Path txtFile = tempDir.resolve("checkDifferentOutputSymbols-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
@@ -137,7 +154,11 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
+        List<BibEntry> bibEntryList = List.of(first, second);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntries(bibEntryList);
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
 
         Path txtFile = tempDir.resolve("checkDifferentOutputSymbols-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
@@ -186,8 +207,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibEntry sixth = new BibEntry(StandardEntryType.InProceedings, "sixth")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
+        List<BibEntry> bibEntryList = List.of(first, second, third, fourth, fifth, sixth);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntries(bibEntryList);
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second, third, fourth, fifth, sixth), (_, _) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
@@ -222,7 +247,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
+        List<BibEntry> bibEntryList = List.of(first, second);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntries(bibEntryList);
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
 
         Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
@@ -244,7 +274,12 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(List.of(first, second), (_, _) -> { });
+        List<BibEntry> bibEntryList = List.of(first, second);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntries(bibEntryList);
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
 
         Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
@@ -260,7 +295,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         Path file = Path.of("C:\\TEMP\\JabRef\\biblio-anon.bib");
         Path txtFile = file.resolveSibling("biblio-cited.txt");
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
-        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext.getEntries(), (_, _) -> { });
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext, (_, _) -> { });
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
              BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
