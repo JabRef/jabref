@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import org.jabref.http.server.services.ContextsToServe;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.logic.util.io.BackupFileUtil;
 
@@ -17,8 +17,9 @@ import jakarta.ws.rs.core.MediaType;
 
 @Path("libraries")
 public class LibrariesResource {
+
     @Inject
-    private ContextsToServe contextsToServe;
+    private SrvStateManager srvStateManager;
 
     @Inject
     private FilesToServe filesToServe;
@@ -33,9 +34,9 @@ public class LibrariesResource {
         if (!filesToServe.isEmpty()) {
             pathStream = filesToServe.getFilesToServe().stream();
         } else {
-            pathStream = contextsToServe.getContextsToServe().stream()
-                                                       .filter(context -> context.getDatabasePath().isPresent())
-                                                       .map(context -> context.getDatabasePath().get());
+            pathStream = srvStateManager.getOpenDatabases().stream()
+                                        .filter(context -> context.getDatabasePath().isPresent())
+                                        .map(context -> context.getDatabasePath().get());
         }
         List<String> fileNamesWithUniqueSuffix = pathStream.map(path -> path.getFileName() + "-" + BackupFileUtil.getUniqueFilePrefix(path))
                                                            .toList();

@@ -3,6 +3,7 @@ package org.jabref.logic.importer.fetcher.citation.semanticscholar;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.ImporterPreferences;
@@ -13,6 +14,8 @@ import org.jabref.logic.util.URLUtil;
 import org.jabref.model.entry.BibEntry;
 
 import com.google.gson.Gson;
+import kong.unirest.core.json.JSONObject;
+import org.jooq.lambda.Unchecked;
 import org.jspecify.annotations.NonNull;
 
 public class SemanticScholarCitationFetcher implements CitationFetcher, CustomizableKeyFetcher {
@@ -31,6 +34,12 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString() + "/" + entry_point
                 + "?fields=" + "title,authors,year,citationCount,referenceCount,externalIds,publicationTypes,abstract,url"
                 + "&limit=1000";
+    }
+
+    public String getUrlForCitationCount(BibEntry entry) {
+        return SEMANTIC_SCHOLAR_API + "paper/" + "DOI:" + entry.getDOI().orElseThrow().asString()
+                + "?fields=" + "citationCount"
+                + "&limit=1";
     }
 
     @Override
@@ -82,6 +91,41 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
                                  .stream()
                                  .filter(citationDataItem -> citationDataItem.getCitedPaper() != null)
                                  .map(referenceDataItem -> referenceDataItem.getCitedPaper().toBibEntry()).toList();
+    }
+
+    @Override
+    public Optional<Integer> searchCitationCount(BibEntry entry) throws FetcherException {
+        if (entry.getDOI().isEmpty()) {
+            return Optional.empty();
+        }
+        URL referencesUrl;
+        try {
+            referencesUrl = URLUtil.create(getUrlForCitationCount(entry));
+        } catch (MalformedURLException e) {
+            throw new FetcherException("Malformed URL", e);
+        }
+        URLDownload urlDownload = new URLDownload(referencesUrl);
+        importerPreferences.getApiKey(getName()).ifPresent(apiKey -> urlDownload.addHeader("x-api-key", apiKey));
+        String result;
+        try {
+            result = urlDownload.asString();
+        } catch (FetcherException e) {
+            e.getHttpResponse().ifPresent(Unchecked.consumer(response -> {
+                Optional.ofNullable(response.responseBody())
+                        .map(JSONObject::new)
+                        .flatMap(json -> Optional.ofNullable(json.getString("error"))
+                                                 .map(Unchecked.function(error -> {
+                                                     throw new FetcherException(referencesUrl, error, e);
+                                                 })));
+            }));
+            throw e;
+        }
+        PaperDetails paperDetails = GSON.fromJson(result, PaperDetails.class);
+
+        if (paperDetails == null) {
+            return Optional.empty();
+        }
+        return Optional.of(paperDetails.getCitationCount());
     }
 
     @Override
