@@ -75,9 +75,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withCitationKey("withoutDate")
                 .withField(StandardField.URLDATE, "urldate");
 
-        List<BibEntry> bibEntryList = List.of(withDate, withoutDate);
+        List<BibEntry> bibEntriesList = List.of(withDate, withoutDate);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibEntryList);
+        bibDatabase.insertEntries(bibEntriesList);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
@@ -116,9 +116,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        List<BibEntry> bibEntryList = List.of(first, second);
+        List<BibEntry> bibEntriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibEntryList);
+        bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
@@ -154,9 +154,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withField(customField, "custom"); // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
-        List<BibEntry> bibEntryList = List.of(first, second);
+        List<BibEntry> bibEntriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibEntryList);
+        bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
 
@@ -207,9 +207,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibEntry sixth = new BibEntry(StandardEntryType.InProceedings, "sixth")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024");
-        List<BibEntry> bibEntryList = List.of(first, second, third, fourth, fifth, sixth);
+        List<BibEntry> bibEntriesList = List.of(first, second, third, fourth, fifth, sixth);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibEntryList);
+        bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
@@ -274,9 +274,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        List<BibEntry> bibEntryList = List.of(first, second);
+        List<BibEntry> bibEntriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibEntryList);
+        bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
