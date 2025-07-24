@@ -76,7 +76,7 @@ public class BibEntryRelationsRepositoryTestHelpers {
         }
 
         public static BibEntryCitationsAndReferencesRepository from(
-            Map<BibEntry, List<BibEntry>> citationsDB, Map<BibEntry, List<BibEntry>> referencesDB
+            Map<BibEntry, List<BibEntry>> citationsDB, Map<BibEntry, List<BibEntry>> referencesDB, boolean isCitationsUpdatable
         ) {
             return new BibEntryCitationsAndReferencesRepository() {
                 @Override
@@ -96,7 +96,7 @@ public class BibEntryRelationsRepositoryTestHelpers {
 
                 @Override
                 public boolean isCitationsUpdatable(BibEntry entry) {
-                    return true;
+                    return isCitationsUpdatable;
                 }
 
                 @Override

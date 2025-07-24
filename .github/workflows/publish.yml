@@ -13,6 +13,12 @@ on:
     # run on each Monday
     - cron: '2 3 * * 1'
   workflow_dispatch:
+    inputs:
+      tagbuild:
+        description: 'Trigger a full maven central release'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: write
@@ -97,5 +103,13 @@ jobs:
           file ${{ steps.secring.outputs.filePath }}
           md5sum ${{ steps.secring.outputs.filePath }}
       - name: publishAllPublicationsToMavenCentralRepository
-        run: ./gradlew -PprojVersion="${{ steps.gitversion.outputs.AssemblySemVer }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="${{ steps.istagbuild.outputs.tagbuild }}" :jablib:publishAllPublicationsToMavenCentralRepository
+        # Different version at maven centrl: 6.0-SNAPSHOT - and not 6.0.23234-SNAPSHOT
+        # We need to manually trigger a full maven central release - to avoid 6.0-alpha3 being published as 6.0 on maven central.
+        run: |
+          if [[ "${{ github.event.inputs.tagbuild }}" == "true" ]]; then
+            tagbuild="true"
+          else
+            tagbuild="false"
+          fi
+          ./gradlew -PprojVersion="${{ steps.gitversion.outputs.Major }}.${{ steps.gitversion.outputs.Minor }}" -PprojVersionInfo="${{ steps.gitversion.outputs.InformationalVersion }}" -Ptagbuild="$tagbuild" :jablib:publishAllPublicationsToMavenCentralRepository
       # endregion

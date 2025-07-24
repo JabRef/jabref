@@ -11,6 +11,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added a field for the citation count field on the General tab. [#13477](https://github.com/JabRef/jabref/issues/13477)
+- We added automatic lookup of DOI at citation relations [#13234](https://github.com/JabRef/jabref/issues/13234)
 - We added focus on the field Link in the "Add file link" dialog. [#13486](https://github.com/JabRef/jabref/issues/13486)
 - We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
@@ -78,6 +80,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where Document Viewer showed technical exceptions when opening entries with non-PDF files. [#13198](https://github.com/JabRef/jabref/issues/13198)
 - When creating a library, if you drag a PDF file containing only a single column, the dialog will now automatically close. [#13262](https://github.com/JabRef/jabref/issues/13262)
 - We fixed an issue where the tab showing the fulltext search results would appear blank after switching library. [#13241](https://github.com/JabRef/jabref/issues/13241)
+- We fixed an issue where the groups were still displayed after closing all libraries. [#13382](https://github.com/JabRef/jabref/issues/13382)
 - Enhanced field selection logic in the Merge Entries dialog when fetching from DOI to prefer valid years and entry types. [#12549](https://github.com/JabRef/jabref/issues/12549)
 
 ### Removed
