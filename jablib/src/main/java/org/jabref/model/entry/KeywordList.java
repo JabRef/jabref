@@ -62,7 +62,6 @@ public class KeywordList implements Iterable<Keyword> {
                 currentToken.append(currentChar);
                 isEscaping = false;
             } else if (currentChar == '\\') {
-                // Escape next character (i)
                 isEscaping = true;
             } else if (currentChar == hierarchicalDelimiter) {
                 // Hierarchical delimiter reached: push current token as sublevel

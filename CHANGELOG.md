@@ -11,7 +11,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
-- We added escaping characters `\ ,`for KeywordList.parse(). [#12810](https://github.com/JabRef/jabref/issues/12810)
+- We implemented escaping characters `\ ,` when parsing KeywordLists [#12810](https://github.com/JabRef/jabref/issues/12810)
 - We added focus on the field Link in the "Add file link" dialog. [#13486](https://github.com/JabRef/jabref/issues/13486)
 - We introduced a settings parameter to manage citations' relations local storage time-to-live with a default value set to 30 days. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We distribute arm64 images for Linux. [#10842](https://github.com/JabRef/jabref/issues/10842)
