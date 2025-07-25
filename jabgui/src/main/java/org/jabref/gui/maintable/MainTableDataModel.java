@@ -18,10 +18,10 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.search.MatchCategory;
 import org.jabref.gui.util.BindingsHelper;
 import org.jabref.gui.util.FilteredListProxy;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -218,6 +218,12 @@ public class MainTableDataModel {
             return Optional.empty();
         }
         return Optional.of(entriesViewModel.get(index));
+    }
+
+    public Optional<BibEntryTableViewModel> getViewModelByCitationKey(String citationKey) {
+        return entriesViewModel.stream()
+                .filter(viewModel -> citationKey.equals(viewModel.getEntry().getCitationKey().orElse("")))
+                .findFirst();
     }
 
     public void resetFieldFormatter() {
