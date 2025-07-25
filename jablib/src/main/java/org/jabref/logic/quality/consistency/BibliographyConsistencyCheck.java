@@ -14,11 +14,16 @@ import java.util.stream.Collectors;
 import org.jabref.logic.bibtex.comparator.BibEntryByCitationKeyComparator;
 import org.jabref.logic.bibtex.comparator.BibEntryByFieldsComparator;
 import org.jabref.logic.bibtex.comparator.FieldComparatorStack;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
+import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
+import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
@@ -62,7 +67,7 @@ public class BibliographyConsistencyCheck {
      *
      * @implNote This class does not implement {@link org.jabref.logic.integrity.DatabaseChecker}, because it returns a list of {@link org.jabref.logic.integrity.IntegrityMessage}, which are too fine-grained.
      */
-    public Result check(List<BibEntry> entries, BiConsumer<Integer, Integer> entriesGroupingProgress) {
+    public Result check(BibDatabaseContext bibContext, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
         Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
         // collects fields existing in all entries, scoped by entry type
@@ -70,7 +75,7 @@ public class BibliographyConsistencyCheck {
         // collects entries of the same type
         Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new HashMap<>();
 
-        collectEntriesIntoMaps(entries, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
+        collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
         Map<EntryType, EntryTypeResult> resultMap = new HashMap<>();
 
@@ -105,10 +110,28 @@ public class BibliographyConsistencyCheck {
         return new Result(resultMap);
     }
 
-    private static void collectEntriesIntoMaps(List<BibEntry> entries, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
-        for (BibEntry entry : entries) {
-            EntryType entryType = entry.getType();
+    private static void collectEntriesIntoMaps(BibDatabaseContext bibContext, Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap, Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap, Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap) {
+        BibDatabaseMode mode = bibContext.getMode();
+        List<BibEntry> entries = bibContext.getEntries();
 
+        Set<EntryType> biblatexSet = Set.of();
+        Set<EntryType> bibtexSet = Set.of();
+
+        if (mode == BibDatabaseMode.BIBLATEX) {
+            biblatexSet = BiblatexEntryTypeDefinitions.ALL
+                .stream()
+                .map(BibEntryType::getType)
+                .collect(Collectors.toSet());
+        } else if (mode == BibDatabaseMode.BIBTEX) {
+            bibtexSet = BibtexEntryTypeDefinitions.ALL
+                .stream()
+                .map(BibEntryType::getType)
+                .collect(Collectors.toSet());
+        }
+
+        for (BibEntry entry : entries) {
+            if (mode == BibDatabaseMode.BIBLATEX && biblatexSet.contains(entry.getType())) {
+                EntryType entryType = entry.getType();
             entryTypeToFieldsInAnyEntryMap
                     .computeIfAbsent(entryType, _ -> new HashSet<>())
                     .addAll(filterExcludedFields(entry.getFields()));
@@ -120,6 +143,20 @@ public class BibliographyConsistencyCheck {
             entryTypeToEntriesMap
                     .computeIfAbsent(entryType, _ -> new HashSet<>())
                     .add(entry);
-        }
+                } else if (mode == BibDatabaseMode.BIBTEX && bibtexSet.contains(entry.getType())) {
+                    EntryType entryType = entry.getType();
+            entryTypeToFieldsInAnyEntryMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .addAll(filterExcludedFields(entry.getFields()));
+
+            entryTypeToFieldsInAllEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>(filterExcludedFields(entry.getFields())))
+                    .retainAll(filterExcludedFields(entry.getFields()));
+
+            entryTypeToEntriesMap
+                    .computeIfAbsent(entryType, _ -> new HashSet<>())
+                    .add(entry);
+                }
+            }
     }
 }
