@@ -6,4 +6,5 @@ public record GitStatusSnapshot(
     boolean tracking,
     SyncStatus syncStatus,
     boolean conflict,
+    boolean uncommittedChanges,
     Optional<String> lastPulledCommit) { }

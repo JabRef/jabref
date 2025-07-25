@@ -57,7 +57,7 @@ class GitBibParserTest {
 
     @Test
     void parsesBibContentFromCommit() throws Exception {
-        String rawBib = GitFileReader.readFileFromCommit(git, commit, Path.of("library.bib"));
+        String rawBib = GitFileReader.readFileFromCommit(git, commit, Path.of("library.bib")).orElse("");
 
         BibDatabaseContext context = GitBibParser.parseBibFromGit(rawBib, importFormatPreferences);
 

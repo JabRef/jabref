@@ -75,7 +75,7 @@ class SemanticConflictDetectorTest {
     }
 
     private BibDatabaseContext parse(RevCommit commit) throws Exception {
-        String content = GitFileReader.readFileFromCommit(git, commit, Path.of("library.bib"));
+        String content = GitFileReader.readFileFromCommit(git, commit, Path.of("library.bib")).orElse("");
         return GitBibParser.parseBibFromGit(content, importFormatPreferences);
     }
 

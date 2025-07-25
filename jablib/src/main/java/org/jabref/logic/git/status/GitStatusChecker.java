@@ -29,7 +29,13 @@ public class GitStatusChecker {
         Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(anyPathInsideRepo);
 
         if (maybeHandler.isEmpty()) {
-            return new GitStatusSnapshot(false, SyncStatus.UNTRACKED, false, Optional.empty());
+            return new GitStatusSnapshot(
+                    false,
+                    SyncStatus.UNTRACKED,
+                    false,
+                    false,
+                    Optional.empty()
+            );
         }
         GitHandler handler = maybeHandler.get();
 
@@ -37,6 +43,7 @@ public class GitStatusChecker {
             Repository repo = git.getRepository();
             Status status = git.status().call();
             boolean hasConflict = !status.getConflicting().isEmpty();
+            boolean hasUncommittedChanges = !status.isClean();
 
             ObjectId localHead = repo.resolve("HEAD");
             ObjectId remoteHead = repo.resolve("refs/remotes/origin/main");
@@ -46,6 +53,7 @@ public class GitStatusChecker {
                     true,
                     syncStatus,
                     hasConflict,
+                    hasUncommittedChanges,
                     Optional.ofNullable(localHead).map(ObjectId::getName)
             );
         } catch (IOException | GitAPIException e) {
@@ -53,6 +61,7 @@ public class GitStatusChecker {
             return new GitStatusSnapshot(
                     true,
                     SyncStatus.UNKNOWN,
+                    false,
                     false,
                     Optional.empty()
             );

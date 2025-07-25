@@ -11,11 +11,9 @@ import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitBibParser;
 import org.jabref.logic.git.io.GitFileReader;
-import org.jabref.logic.git.io.GitFileWriter;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
-import org.jabref.logic.git.merge.MergePlan;
-import org.jabref.logic.git.merge.SemanticMerger;
+import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
@@ -43,14 +41,16 @@ public class GitSyncService {
     private final ImportFormatPreferences importFormatPreferences;
     private final GitHandler gitHandler;
     private final GitConflictResolverStrategy gitConflictResolverStrategy;
+    private final GitSemanticMergeExecutor mergeExecutor;
 
-    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler, GitConflictResolverStrategy gitConflictResolverStrategy) {
+    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler, GitConflictResolverStrategy gitConflictResolverStrategy, GitSemanticMergeExecutor mergeExecutor) {
         this.importFormatPreferences = importFormatPreferences;
         this.gitHandler = gitHandler;
         this.gitConflictResolverStrategy = gitConflictResolverStrategy;
+        this.mergeExecutor = mergeExecutor;
     }
 
-    public MergeResult fetchAndMerge(Path bibFilePath) throws GitAPIException, IOException, JabRefException {
+    public MergeResult fetchAndMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(bibFilePath);
         if (maybeHandler.isEmpty()) {
             LOGGER.warn("Pull aborted: The file is not inside a Git repository.");
@@ -69,6 +69,11 @@ public class GitSyncService {
             return MergeResult.failure();
         }
 
+        if (status.uncommittedChanges()) {
+            LOGGER.warn("Pull aborted: Local changes have not been committed.");
+            return MergeResult.failure();
+        }
+
         if (status.syncStatus() == SyncStatus.UP_TO_DATE || status.syncStatus() == SyncStatus.AHEAD) {
             LOGGER.info("Pull skipped: Local branch is already up to date with remote.");
             return MergeResult.success();
@@ -83,7 +88,7 @@ public class GitSyncService {
             RevisionTriple triple = locator.locateMergeCommits(git);
 
             // 3. Perform semantic merge
-            MergeResult result = performSemanticMerge(git, triple.base(), triple.local(), triple.remote(), bibFilePath);
+            MergeResult result = performSemanticMerge(git, triple.base(), triple.remote(), localDatabaseContext, bibFilePath);
 
             // 4. Auto-commit merge result if successful
             if (result.isSuccessful()) {
@@ -96,8 +101,8 @@ public class GitSyncService {
 
     public MergeResult performSemanticMerge(Git git,
                                             RevCommit baseCommit,
-                                            RevCommit localCommit,
                                             RevCommit remoteCommit,
+                                            BibDatabaseContext localDatabaseContext,
                                             Path bibFilePath) throws IOException, JabRefException {
 
         Path bibPath = bibFilePath.toRealPath();
@@ -110,13 +115,12 @@ public class GitSyncService {
         relativePath = workTree.relativize(bibPath);
 
         // 1. Load three versions
-        String baseContent = GitFileReader.readFileFromCommit(git, baseCommit, relativePath);
-        String localContent = GitFileReader.readFileFromCommit(git, localCommit, relativePath);
-        String remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
+        Optional<String> baseContent = GitFileReader.readFileFromCommit(git, baseCommit, relativePath);
+        Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
 
         BibDatabaseContext base = GitBibParser.parseBibFromGit(baseContent, importFormatPreferences);
-        BibDatabaseContext local = GitBibParser.parseBibFromGit(localContent, importFormatPreferences);
         BibDatabaseContext remote = GitBibParser.parseBibFromGit(remoteContent, importFormatPreferences);
+        BibDatabaseContext local = localDatabaseContext;
 
         // 2. Conflict detection
         List<ThreeWayEntryConflict> conflicts = SemanticConflictDetector.detectConflicts(base, local, remote);
@@ -135,20 +139,21 @@ public class GitSyncService {
         }
 
         //  4. Apply resolved remote (either original or conflict-resolved) to local
-        MergePlan plan = SemanticConflictDetector.extractMergePlan(base, effectiveRemote);
-        SemanticMerger.applyMergePlan(local, plan);
+        MergeResult result = mergeExecutor.merge(base, local, effectiveRemote, bibFilePath);
 
-        // 5. Write back merged result
-        GitFileWriter.write(bibFilePath, local, importFormatPreferences);
-
-        return MergeResult.success();
+        return result;
     }
 
-    public void push(Path bibFilePath) throws GitAPIException, IOException, JabRefException {
+    public void push(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         GitStatusSnapshot status = GitStatusChecker.checkStatus(bibFilePath);
 
         if (!status.tracking()) {
             LOGGER.warn("Push aborted: file is not tracked by Git");
+            return;
+        }
+
+        if (status.uncommittedChanges()) {
+            LOGGER.warn("Pull aborted: Local changes have not been committed.");
             return;
         }
 
@@ -175,7 +180,7 @@ public class GitSyncService {
                     GitRevisionLocator locator = new GitRevisionLocator();
                     RevisionTriple triple = locator.locateMergeCommits(git);
 
-                    MergeResult mergeResult = performSemanticMerge(git, triple.base(), triple.local(), triple.remote(), bibFilePath);
+                    MergeResult mergeResult = performSemanticMerge(git, triple.base(), triple.remote(), localDatabaseContext, bibFilePath);
 
                     if (!mergeResult.isSuccessful()) {
                         LOGGER.warn("Semantic merge failed — aborting push");

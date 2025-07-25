@@ -27,9 +27,7 @@ public class SemanticConflictDetector {
     public static List<ThreeWayEntryConflict> detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         // 1. get diffs between base and remote
         List<BibEntryDiff> remoteDiffs = BibDatabaseDiff.compare(base, remote).getEntryDifferences();
-        if (remoteDiffs == null) {
-            return List.of();
-        }
+
         // 2. map citation key to entry for local/remote diffs
         Map<String, BibEntry> baseEntries = toEntryMap(base);
         Map<String, BibEntry> localEntries = toEntryMap(local);
@@ -48,12 +46,12 @@ public class SemanticConflictDetector {
             BibEntry localEntry = localEntries.get(citationKey);
             BibEntry remoteEntry = remoteDiff.newEntry();
 
-            // Conflict 1: if the entry exists in all 3 versions
+            // Case 1: if the entry exists in all 3 versions
             if (baseEntry != null && localEntry != null && remoteEntry != null) {
                 if (hasConflictingFields(baseEntry, localEntry, remoteEntry)) {
                     conflicts.add(new ThreeWayEntryConflict(baseEntry, localEntry, remoteEntry));
                 }
-            // Conflict 2: base missing, but local + remote both added same citation key with different content
+            // Case 2: base missing, but local + remote both added same citation key with different content
             } else if (baseEntry == null && localEntry != null && remoteEntry != null) {
                 if (!Objects.equals(localEntry, remoteEntry)) {
                     conflicts.add(new ThreeWayEntryConflict(null, localEntry, remoteEntry));
@@ -126,7 +124,6 @@ public class SemanticConflictDetector {
             BibEntry baseEntry = baseMap.get(key);
 
             if (baseEntry == null) {
-                // New entry (not in base)
                 newEntries.add(remoteEntry);
             } else {
                 Map<Field, String> patch = computeFieldPatch(baseEntry, remoteEntry);

@@ -24,11 +24,12 @@ public class GitRevisionLocator {
 
     public RevisionTriple locateMergeCommits(Git git) throws GitAPIException, IOException, JabRefException {
         Repository repo = git.getRepository();
-        // assumes the remote branch is 'origin/main'
         ObjectId headId = repo.resolve(HEAD);
-        // and uses the default remote tracking reference
-        // does not support multiple remotes or custom remote branch names so far
         ObjectId remoteId = repo.resolve(REMOTE);
+
+        if (headId == null) {
+            throw new IllegalStateException("Local HEAD commit is missing.");
+        }
         if (remoteId == null) {
             throw new IllegalStateException("Remote branch missing origin/main.");
         }
@@ -37,6 +38,10 @@ public class GitRevisionLocator {
             RevCommit local = walk.parseCommit(headId);
             RevCommit remote = walk.parseCommit(remoteId);
             RevCommit base = findMergeBase(repo, local, remote);
+
+            if (base == null) {
+                throw new IllegalStateException("Could not determine merge base between local and remote.");
+            }
 
             return new RevisionTriple(base, local, remote);
         }

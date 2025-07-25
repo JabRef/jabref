@@ -13,7 +13,10 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
-import org.jabref.logic.git.model.MergeResult;
+import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
+import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -29,20 +32,22 @@ public class GitPullAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences guiPreferences;
     private final UndoManager undoManager;
+    private final TaskExecutor taskExecutor;
 
     public GitPullAction(DialogService dialogService,
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
-                         UndoManager undoManager) {
+                         UndoManager undoManager,
+                         TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
         this.undoManager = undoManager;
+        this.taskExecutor = taskExecutor;
     }
 
     @Override
     public void execute() {
-        // TODO: reconsider error handling
         if (stateManager.getActiveDatabase().isEmpty()) {
             dialogService.showErrorDialogAndWait("No database open", "Please open a database before pulling.");
             return;
@@ -55,29 +60,35 @@ public class GitPullAction extends SimpleCommand {
         }
 
         Path bibFilePath = database.getDatabasePath().get();
-        try {
-            GitHandler handler = new GitHandler(bibFilePath.getParent());
-            GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
-            GitConflictResolverStrategy resolver = new GuiConflictResolverStrategy(dialog);
+        GitHandler handler = new GitHandler(bibFilePath.getParent());
+        GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
+        GitConflictResolverStrategy resolver = new GuiConflictResolverStrategy(dialog);
+        GitSemanticMergeExecutor mergeExecutor = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
 
-            GitSyncService syncService = new GitSyncService(guiPreferences.getImportFormatPreferences(), handler, resolver);
-            GitStatusViewModel statusViewModel = new GitStatusViewModel(bibFilePath);
+        GitSyncService syncService = new GitSyncService(guiPreferences.getImportFormatPreferences(), handler, resolver, mergeExecutor);
+        GitStatusViewModel statusViewModel = new GitStatusViewModel(stateManager, bibFilePath);
+        GitPullViewModel viewModel = new GitPullViewModel(syncService, statusViewModel);
 
-            GitPullViewModel viewModel = new GitPullViewModel(syncService, statusViewModel);
-            MergeResult result = viewModel.pull();
-
-            if (result.isSuccessful()) {
-                dialogService.showInformationDialogAndWait("Git Pull", "Successfully merged and updated.");
-            } else {
-                dialogService.showWarningDialogAndWait("Git Pull", "Merge completed with conflicts.");
-            }
-        } catch (JabRefException e) {
-            dialogService.showErrorDialogAndWait("Git Pull Failed", e);
-            // TODO: error handling
-        } catch (GitAPIException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        BackgroundTask
+                .wrap(() -> viewModel.pull())
+                .onSuccess(result -> {
+                    if (result.isSuccessful()) {
+                        dialogService.showInformationDialogAndWait("Git Pull", "Successfully merged and updated.");
+                    } else {
+                        dialogService.showWarningDialogAndWait("Git Pull", "Merge completed with conflicts.");
+                    }
+                })
+                .onFailure(ex -> {
+                    if (ex instanceof JabRefException e) {
+                        dialogService.showErrorDialogAndWait("Git Pull Failed", e.getLocalizedMessage());
+                    } else if (ex instanceof GitAPIException e) {
+                        dialogService.showErrorDialogAndWait("Git Pull Failed", "An unexpected Git error occurred: " + e.getLocalizedMessage());
+                    } else if (ex instanceof IOException e) {
+                        dialogService.showErrorDialogAndWait("Git Pull Failed", "I/O error: " + e.getLocalizedMessage());
+                    } else {
+                        dialogService.showErrorDialogAndWait("Git Pull Failed", "Unexpected error: " + ex.getLocalizedMessage());
+                    }
+                })
+                .executeWith(taskExecutor);
     }
 }

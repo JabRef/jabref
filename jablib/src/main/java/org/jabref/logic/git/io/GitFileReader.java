@@ -3,6 +3,7 @@ package org.jabref.logic.git.io;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
 
@@ -18,8 +19,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.jspecify.annotations.NonNull;
 
 public class GitFileReader {
-    // Unit test is in the GitSyncServiceTest
-    public static String readFileFromCommit(Git git, RevCommit commit, @NonNull Path relativePath) throws JabRefException {
+    public static Optional<String> readFileFromCommit(Git git, RevCommit commit, @NonNull Path relativePath) throws JabRefException {
         // ref: https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/api/ReadFileFromCommit.java
         // 1. get commit-pointing tree
         Repository repository = git.getRepository();
@@ -28,12 +28,12 @@ public class GitFileReader {
         // 2. setup TreeWalk + to the target file
         try (TreeWalk treeWalk = TreeWalk.forPath(repository, relativePath.toString(), commitTree)) {
             if (treeWalk == null) {
-                throw new JabRefException("File '" + relativePath + "' not found in commit " + commit.getName());
+                return Optional.empty();
             }
             // 3. load blob object
             ObjectId objectId = treeWalk.getObjectId(0);
             ObjectLoader loader = repository.open(objectId);
-            return new String(loader.getBytes(), StandardCharsets.UTF_8);
+            return Optional.of(new String(loader.getBytes(), StandardCharsets.UTF_8));
         } catch (MissingObjectException | IncorrectObjectTypeException e) {
             throw new JabRefException("Git object missing or incorrect when reading file: " + relativePath, e);
         } catch (IOException e) {

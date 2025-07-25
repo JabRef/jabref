@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.model.database.BibDatabaseContext;
 
+import org.jspecify.annotations.NonNull;
+
 public interface GitSemanticMergeExecutor {
 
     /**
@@ -18,5 +20,8 @@ public interface GitSemanticMergeExecutor {
      * @param bibFilePath The path to the target bib file (used for write-back)
      * @return MergeResult object containing merge status
      */
-    MergeResult merge(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote, Path bibFilePath) throws IOException;
+    MergeResult merge(BibDatabaseContext base,
+                      @NonNull BibDatabaseContext local,
+                      @NonNull BibDatabaseContext remote,
+                      @NonNull Path bibFilePath) throws IOException;
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
 
 public record MergeResult(boolean isSuccessful, List<BibEntryDiff> conflicts) {
-    private static boolean SUCCESS = true;
+    private final static boolean SUCCESS = true;
     public static MergeResult withConflicts(List<BibEntryDiff> conflicts) {
         return new MergeResult(!SUCCESS, conflicts);
     }

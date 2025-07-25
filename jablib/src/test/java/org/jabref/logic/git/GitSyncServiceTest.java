@@ -1,5 +1,6 @@
 package org.jabref.logic.git;
 
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,8 +11,12 @@ import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.merge.GitMergeUtil;
+import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
+import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
@@ -44,6 +49,8 @@ class GitSyncServiceTest {
     private Git bobGit;
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
+    private GitSemanticMergeExecutor mergeExecutor;
+    private BibDatabaseContext context;
 
     // These are setup by aliceBobSetting
     private RevCommit baseCommit;
@@ -100,7 +107,9 @@ class GitSyncServiceTest {
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
+
         gitConflictResolverStrategy = mock(GitConflictResolverStrategy.class);
+        mergeExecutor = new GitSemanticMergeExecutorImpl(importFormatPreferences);
 
         // create fake remote repo
         remoteDir = tempDir.resolve("remote.git");
@@ -153,6 +162,11 @@ class GitSyncServiceTest {
         aliceCommit = writeAndCommit(aliceUpdatedContent, "Fix author of a", alice, library, aliceGit);
         aliceGit.fetch().setRemote("origin").call();
 
+        String actualContent = Files.readString(library);
+        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(new StringReader(actualContent));
+        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
+        context.setDatabasePath(library);
+
         // Debug hint: Show the created git graph on the command line
         //   git log --graph --oneline --decorate --all --reflog
     }
@@ -160,8 +174,8 @@ class GitSyncServiceTest {
     @Test
     void pullTriggersSemanticMergeWhenNoConflicts() throws Exception {
         GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy);
-        MergeResult result = syncService.fetchAndMerge(library);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy, mergeExecutor);
+        MergeResult result = syncService.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());
         String merged = Files.readString(library);
@@ -184,10 +198,12 @@ class GitSyncServiceTest {
     @Test
     void pushTriggersMergeAndPushWhenNoConflicts() throws Exception {
         GitHandler gitHandler = new GitHandler(library.getParent());
-        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy);
-        syncService.push(library);
+        GitSyncService syncService = new GitSyncService(importFormatPreferences, gitHandler, gitConflictResolverStrategy, mergeExecutor);
+        syncService.push(context, library);
 
-        String pushedContent = GitFileReader.readFileFromCommit(aliceGit, aliceGit.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"));
+        String pushedContent = GitFileReader
+                .readFileFromCommit(aliceGit, aliceGit.log().setMaxCount(1).call().iterator().next(), Path.of("library.bib"))
+                .orElseThrow(() -> new IllegalStateException("Expected file 'library.bib' not found in commit"));
         String expected = """
         @article{a,
           author = {author-a},
@@ -205,41 +221,48 @@ class GitSyncServiceTest {
 
     @Test
     void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution(@TempDir Path tempDir) throws Exception {
-        // Bob adds entry c
         Path bobLibrary = bobDir.resolve("library.bib");
         String bobEntry = """
-            @article{b,
+              @article{b,
               author = {author-b},
               doi = {xyz},
             }
+
             @article{a,
-              author = {author-a},
+              author = {don't know the author},
               doi = {xya},
             }
+
             @article{c,
               author = {bob-c},
               title = {Title C},
             }
-            """;
+        """;
         writeAndCommit(bobEntry, "Bob adds article-c", bob, bobLibrary, bobGit);
         bobGit.push().setRemote("origin").call();
-        // Alice adds conflicting version of c
         String aliceEntry = """
-            @article{b,
-              author = {author-b},
-              doi = {xyz},
-            }
             @article{a,
               author = {author-a},
               doi = {xya},
             }
+
+            @article{b,
+              author = {don't know the author},
+              doi = {xyz},
+            }
+
             @article{c,
-                author = {alice-c},
-                title = {Title C},
+              author = {alice-c},
+              title = {Title C},
             }
         """;
         writeAndCommit(aliceEntry, "Alice adds conflicting article-c", alice, library, aliceGit);
         aliceGit.fetch().setRemote("origin").call();
+
+        String actualContent = Files.readString(library);
+        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(new StringReader(actualContent));
+        context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
+        context.setDatabasePath(library);
 
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
@@ -258,8 +281,8 @@ class GitSyncServiceTest {
         });
 
         GitHandler handler = new GitHandler(aliceDir);
-        GitSyncService service = new GitSyncService(importFormatPreferences, handler, resolver);
-        MergeResult result = service.fetchAndMerge(library);
+        GitSyncService service = new GitSyncService(importFormatPreferences, handler, resolver, mergeExecutor);
+        MergeResult result = service.fetchAndMerge(context, library);
 
         assertTrue(result.isSuccessful());
         String content = Files.readString(library);
@@ -269,9 +292,17 @@ class GitSyncServiceTest {
 
     @Test
     void readFromCommits() throws Exception {
-        String base = GitFileReader.readFileFromCommit(aliceGit, baseCommit, Path.of("library.bib"));
-        String local = GitFileReader.readFileFromCommit(aliceGit, aliceCommit, Path.of("library.bib"));
-        String remote = GitFileReader.readFileFromCommit(aliceGit, bobCommit, Path.of("library.bib"));
+        String base = GitFileReader
+                .readFileFromCommit(aliceGit, baseCommit, Path.of("library.bib"))
+                .orElseThrow(() -> new IllegalStateException("Base version of library.bib not found"));
+
+        String local = GitFileReader
+                .readFileFromCommit(aliceGit, aliceCommit, Path.of("library.bib"))
+                .orElseThrow(() -> new IllegalStateException("Local version of library.bib not found"));
+
+        String remote = GitFileReader
+                .readFileFromCommit(aliceGit, bobCommit, Path.of("library.bib"))
+                .orElseThrow(() -> new IllegalStateException("Remote version of library.bib not found"));
 
         assertEquals(initialContent, base);
         assertEquals(aliceUpdatedContent, local);

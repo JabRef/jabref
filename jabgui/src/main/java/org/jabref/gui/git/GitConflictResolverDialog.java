@@ -29,7 +29,6 @@ public class GitConflictResolverDialog {
         BibEntry local = conflict.local();
         BibEntry remote = conflict.remote();
 
-        // Create Dialog + Set Title + Configure Diff Highlighting
         MergeEntriesDialog dialog = new MergeEntriesDialog(local, remote, preferences);
         dialog.setLeftHeaderText("Local");
         dialog.setRightHeaderText("Remote");

@@ -11,10 +11,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
+import org.jabref.gui.StateManager;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.status.SyncStatus;
+import org.jabref.model.database.BibDatabaseContext;
 
 /**
  * ViewModel that holds current Git sync status for the open .bib database.
@@ -25,36 +27,48 @@ import org.jabref.logic.git.status.SyncStatus;
  * - The current sync status (e.g., UP_TO_DATE, DIVERGED, etc.)
  */
 public class GitStatusViewModel extends AbstractViewModel {
-    private final Path currentBibFile;
+    private final StateManager stateManager;
+    private final ObjectProperty<BibDatabaseContext> databaseContext = new SimpleObjectProperty<>();
     private final ObjectProperty<SyncStatus> syncStatus = new SimpleObjectProperty<>(SyncStatus.UNTRACKED);
     private final BooleanProperty isTracking = new SimpleBooleanProperty(false);
     private final BooleanProperty conflictDetected = new SimpleBooleanProperty(false);
     private final StringProperty lastPulledCommit = new SimpleStringProperty("");
     private GitHandler activeHandler = null;
 
-    public GitStatusViewModel(Path bibFilePath) {
-        this.currentBibFile = bibFilePath;
-        updateStatusFromPath(bibFilePath);
+    public GitStatusViewModel(StateManager stateManager, Path bibFilePath) {
+        this.stateManager = stateManager;
+        stateManager.activeDatabaseProperty().addListener((obs, oldDb, newDb) -> {
+            if (newDb != null && newDb.isPresent() && newDb.get().getDatabasePath().isPresent()) {
+                BibDatabaseContext ctx = newDb.get();
+                databaseContext.set(ctx);
+                updateStatusFromContext(ctx);
+            } else {
+                reset();
+            }
+        });
+
+        stateManager.getActiveDatabase().ifPresent(ctx -> {
+            databaseContext.set(ctx);
+            updateStatusFromContext(ctx);
+        });
     }
 
-    /**
-     * Try to detect Git repository status from the given file or folder path.
-     *
-     * @param fileOrFolderInRepo Any path (file or folder) assumed to be inside a Git repository
-     */
-    public void updateStatusFromPath(Path fileOrFolderInRepo) {
-        Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(fileOrFolderInRepo);
+    protected void updateStatusFromContext(BibDatabaseContext context) {
+        Path path = context.getDatabasePath().orElse(null);
+        if (path == null) {
+            reset();
+            return;
+        }
 
+        Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(path);
         if (maybeHandler.isEmpty()) {
             reset();
             return;
         }
 
-        GitHandler handler = maybeHandler.get();
-        this.activeHandler = handler;
+        this.activeHandler = maybeHandler.get();
 
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(fileOrFolderInRepo);
-
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(path);
         setTracking(snapshot.tracking());
         setSyncStatus(snapshot.syncStatus());
         setConflictDetected(snapshot.conflict());
@@ -70,6 +84,16 @@ public class GitStatusViewModel extends AbstractViewModel {
         setTracking(false);
         setConflictDetected(false);
         setLastPulledCommit("");
+    }
+
+    public Optional<BibDatabaseContext> getDatabaseContext() {
+        return Optional.ofNullable(databaseContext.get());
+    }
+
+    public Path getCurrentBibFile() {
+        return getDatabaseContext()
+                .flatMap(BibDatabaseContext::getDatabasePath)
+                .orElse(null);
     }
 
     public ObjectProperty<SyncStatus> syncStatusProperty() {
@@ -122,9 +146,5 @@ public class GitStatusViewModel extends AbstractViewModel {
 
     public Optional<GitHandler> getActiveHandler() {
         return Optional.ofNullable(activeHandler);
-    }
-
-    public Path getCurrentBibFile() {
-        return currentBibFile;
     }
 }
