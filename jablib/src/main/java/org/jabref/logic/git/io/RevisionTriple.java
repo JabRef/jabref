@@ -2,6 +2,7 @@ package org.jabref.logic.git.io;
 
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Holds the three relevant commits involved in a semantic three-way merge,
@@ -11,7 +12,7 @@ import org.jspecify.annotations.NonNull;
  * @param local the current local branch tip
  * @param remote the tip of the remote tracking branch (typically origin/main)
  */
-public record RevisionTriple(RevCommit base,
+public record RevisionTriple(@Nullable RevCommit base,
                              @NonNull RevCommit local,
                              @NonNull RevCommit remote) {
     public RevisionTriple {

@@ -33,7 +33,7 @@ public class GitStatusViewModel extends AbstractViewModel {
     private final BooleanProperty isTracking = new SimpleBooleanProperty(false);
     private final BooleanProperty conflictDetected = new SimpleBooleanProperty(false);
     private final StringProperty lastPulledCommit = new SimpleStringProperty("");
-    private Optional<GitHandler> activeHandler = Optional.empty();
+    private GitHandler activeHandler = null;
 
     public GitStatusViewModel(StateManager stateManager, Path bibFilePath) {
         this.stateManager = stateManager;
@@ -60,13 +60,13 @@ public class GitStatusViewModel extends AbstractViewModel {
             return;
         }
 
-        Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(path);
-        if (maybeHandler.isEmpty()) {
+        GitHandler handler = GitHandler.fromAnyPath(path).orElse(null);
+        if (handler == null) {
             reset();
             return;
         }
 
-        this.activeHandler = maybeHandler;
+        this.activeHandler = handler;
 
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(path);
         setTracking(snapshot.tracking());
@@ -80,6 +80,7 @@ public class GitStatusViewModel extends AbstractViewModel {
      * Should be called when switching projects or Git context is lost
      */
     public void reset() {
+        activeHandler = null;
         setSyncStatus(SyncStatus.UNTRACKED);
         setTracking(false);
         setConflictDetected(false);
@@ -144,6 +145,6 @@ public class GitStatusViewModel extends AbstractViewModel {
     }
 
     public Optional<GitHandler> getActiveHandler() {
-        return activeHandler;
+        return Optional.ofNullable(activeHandler);
     }
 }

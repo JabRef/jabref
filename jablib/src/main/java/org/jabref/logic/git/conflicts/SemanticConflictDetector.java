@@ -17,11 +17,17 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
+/**
+ * Detects semantic merge conflicts between base, local, and remote.
+ *
+ * Strategy:
+ * Instead of computing full diffs from base to local/remote, we simulate a Git-style merge
+ * by applying the diff between base and remote onto local (`result := local + remoteDiff`).
+ *
+ * Caveats:
+ * Entries without citation keys are ignored (cannot be matched).
+ */
 public class SemanticConflictDetector {
-    /**
-     * result := local + remoteDiff
-     * and then create merge commit having result as file content and local and remote branch as parent
-     */
     public static List<ThreeWayEntryConflict> detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         // 1. get diffs between base and remote
         List<BibEntryDiff> remoteDiffs = BibDatabaseDiff.compare(base, remote).getEntryDifferences();
