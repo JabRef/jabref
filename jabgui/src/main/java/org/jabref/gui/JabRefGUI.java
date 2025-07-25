@@ -505,5 +505,8 @@ public class JabRefGUI extends Application {
         }
 
         LOGGER.trace("Finished stop");
+
+        // Just to be sure that we do not leave any threads running
+        System.exit(0);
     }
 }
