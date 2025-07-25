@@ -102,7 +102,7 @@ public class GitSyncService {
     }
 
     public MergeResult performSemanticMerge(Git git,
-                                            RevCommit baseCommit,
+                                            Optional<RevCommit> maybeBaseCommit,
                                             RevCommit remoteCommit,
                                             BibDatabaseContext localDatabaseContext,
                                             Path bibFilePath) throws IOException, JabRefException {
@@ -117,11 +117,17 @@ public class GitSyncService {
         relativePath = workTree.relativize(bibPath);
 
         // 1. Load three versions
-        Optional<String> baseContent = GitFileReader.readFileFromCommit(git, baseCommit, relativePath);
-        Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
+        BibDatabaseContext base;
+        if (maybeBaseCommit.isPresent()) {
+            Optional<String> baseContent = GitFileReader.readFileFromCommit(git, maybeBaseCommit.get(), relativePath);
+            base = GitBibParser.parseBibFromGit(baseContent, importFormatPreferences);
+        } else {
+            base = new BibDatabaseContext();
+        }
 
-        BibDatabaseContext base = GitBibParser.parseBibFromGit(baseContent, importFormatPreferences);
+        Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
         BibDatabaseContext remote = GitBibParser.parseBibFromGit(remoteContent, importFormatPreferences);
+
         BibDatabaseContext local = localDatabaseContext;
 
         // 2. Conflict detection

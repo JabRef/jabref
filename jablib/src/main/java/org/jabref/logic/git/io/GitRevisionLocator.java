@@ -1,6 +1,7 @@
 package org.jabref.logic.git.io;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.jabref.logic.JabRefException;
 
@@ -43,7 +44,7 @@ public class GitRevisionLocator {
                 throw new IllegalStateException("Could not determine merge base between local and remote.");
             }
 
-            return new RevisionTriple(base, local, remote);
+            return new RevisionTriple(Optional.ofNullable(base), local, remote);
         }
     }
 

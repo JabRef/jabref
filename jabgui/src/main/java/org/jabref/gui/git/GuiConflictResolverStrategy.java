@@ -19,11 +19,9 @@ public class GuiConflictResolverStrategy implements GitConflictResolverStrategy 
     public Optional<List<BibEntry>> resolveConflicts(List<ThreeWayEntryConflict> conflicts) {
         List<BibEntry> resolved = new ArrayList<>();
         for (ThreeWayEntryConflict conflict : conflicts) {
-            Optional<BibEntry> maybeConflict = dialog.resolveConflict(conflict);
-            if (maybeConflict.isEmpty()) {
-                return Optional.empty();
-            }
-            resolved.add(maybeConflict.get());
+            BibEntry entry = dialog.resolveConflict(conflict)
+                                   .orElseThrow(() -> new IllegalStateException("Conflict resolution was cancelled"));
+            resolved.add(entry);
         }
         return Optional.of(resolved);
     }

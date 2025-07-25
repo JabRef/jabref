@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class GitRevisionLocatorTest {
     @Test
@@ -46,7 +47,8 @@ class GitRevisionLocatorTest {
         GitRevisionLocator locator = new GitRevisionLocator();
         RevisionTriple triple = locator.locateMergeCommits(git);
 
-        assertEquals(base.getId(), triple.base().getId());
+        assertTrue(triple.base().isPresent());
+        assertEquals(base.getId(), triple.base().get().getId());
         assertEquals(local.getId(), triple.local().getId());
         assertEquals(remote.getId(), triple.remote().getId());
     }
