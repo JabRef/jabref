@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.io.FileNameUniqueness;
 import org.jabref.logic.util.io.FileUtil;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -151,7 +152,27 @@ public class LinkedFileHandler {
     }
 
     public boolean renameToSuggestedName() throws IOException {
-        return renameToName(getSuggestedFileName(), false);
+        Optional<Path> oldFilePath = linkedFile.findIn(databaseContext, filePreferences);
+        if (oldFilePath.isEmpty()) {
+            return false;
+        }
+
+        Path targetDirectory = oldFilePath.get().getParent();
+        String currentFileName = oldFilePath.get().getFileName().toString();
+        String suggestedFileName = getSuggestedFileName();
+
+        if (suggestedFileName.equals(currentFileName)) {
+            return false;
+        }
+
+        String uniqueFileName = FileNameUniqueness.generateUniqueFileName(targetDirectory, suggestedFileName, currentFileName);
+
+        // If after ensuring uniqueness we got the same name, no need to rename
+        if (uniqueFileName.equals(currentFileName)) {
+            return false;
+        }
+
+        return renameToName(uniqueFileName, false);
     }
 
     public boolean renameToName(String targetFileName, boolean overwriteExistingFile) throws IOException {
