@@ -1,6 +1,6 @@
 package org.jabref.logic.git;
 
-import java.io.StringReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -163,7 +163,7 @@ class GitSyncServiceTest {
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(new StringReader(actualContent));
+        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
         context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
         context.setDatabasePath(library);
 
@@ -260,7 +260,7 @@ class GitSyncServiceTest {
         aliceGit.fetch().setRemote("origin").call();
 
         String actualContent = Files.readString(library);
-        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(new StringReader(actualContent));
+        ParserResult parsed = new BibtexParser(importFormatPreferences).parse(Reader.of(actualContent));
         context = new BibDatabaseContext(parsed.getDatabase(), parsed.getMetaData());
         context.setDatabasePath(library);
 
