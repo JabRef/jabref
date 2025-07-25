@@ -5,7 +5,7 @@ plugins {
 
     // id("org.itsallcode.openfasttrace") version "3.0.1"
     // Workaround for https://github.com/itsallcode/openfasttrace-gradle/issues/50
-    id("com.github.koppor.openfasttrace-gradle") version "patch-1-SNAPSHOT"
+    id("com.github.koppor:openfasttrace-gradle") version "patch-1-SNAPSHOT"
 }
 
 // OpenRewrite should rewrite all sources
