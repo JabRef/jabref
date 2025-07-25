@@ -1,3 +1,5 @@
+---
+---
 # Architecture and Components
 
 This page discusses JabRef's main architecture and components.
@@ -5,15 +7,15 @@ Note that components are seen as "logical" components and summarize features and
 
 ## High-level architecture
 
-In JabRef's code structure,
+JabRef's code is structured into these packages:
 
-The `model` package encompasses the most important data structures (`BibDatases`, `BibEntries`, `Events`, and related aspects) and has minimal logic attached.
-The `logic` package is responsible for business logic such as reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use.
-Only the `gui` knows the user and their preferences and can interact with them to help them solving tasks.
-For each layer, we form packages according to their responsibility, i.e., vertical structuring.
-The `model` classes should have no dependencies to other classes of JabRef and the `logic` classes should only depend on `model` classes.
-The `cli` package bundles classes that are responsible for JabRef's command line interface.
-The `preferences` package represents all information customizable by a user for their personal needs.
+- The `model` package encompasses the most important data structures (`BibDatases`, `BibEntries`, `Events`, and related aspects) and has minimal logic attached.
+- The `logic` package is responsible for business logic such as reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use.
+- Only the `gui` knows the user and their preferences and can interact with them to help them solving tasks.
+- For each layer, we form packages according to their responsibility, i.e., vertical structuring.
+- The `model` classes should have no dependencies to other classes of JabRef and the `logic` classes should only depend on `model` classes.
+- The `cli` package bundles classes that are responsible for JabRef's command line interface.
+- The `preferences` package represents all information customizable by a user for their personal needs.
 
 We use an event bus to publish events from the `model` to the other layers.
 This allows us to keep the architecture but still react upon changes within the core in the outer layers.
