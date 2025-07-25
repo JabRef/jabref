@@ -33,7 +33,7 @@ public class GitStatusViewModel extends AbstractViewModel {
     private final BooleanProperty isTracking = new SimpleBooleanProperty(false);
     private final BooleanProperty conflictDetected = new SimpleBooleanProperty(false);
     private final StringProperty lastPulledCommit = new SimpleStringProperty("");
-    private GitHandler activeHandler = null;
+    private Optional<GitHandler> activeHandler = Optional.empty();
 
     public GitStatusViewModel(StateManager stateManager, Path bibFilePath) {
         this.stateManager = stateManager;
@@ -66,7 +66,7 @@ public class GitStatusViewModel extends AbstractViewModel {
             return;
         }
 
-        this.activeHandler = maybeHandler.get();
+        this.activeHandler = maybeHandler;
 
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(path);
         setTracking(snapshot.tracking());
@@ -90,10 +90,9 @@ public class GitStatusViewModel extends AbstractViewModel {
         return Optional.ofNullable(databaseContext.get());
     }
 
-    public Path getCurrentBibFile() {
+    public Optional<Path> getCurrentBibFile() {
         return getDatabaseContext()
-                .flatMap(BibDatabaseContext::getDatabasePath)
-                .orElse(null);
+                .flatMap(BibDatabaseContext::getDatabasePath);
     }
 
     public ObjectProperty<SyncStatus> syncStatusProperty() {
@@ -145,6 +144,6 @@ public class GitStatusViewModel extends AbstractViewModel {
     }
 
     public Optional<GitHandler> getActiveHandler() {
-        return Optional.ofNullable(activeHandler);
+        return activeHandler;
     }
 }

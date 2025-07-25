@@ -13,6 +13,7 @@ import org.jabref.logic.git.io.GitBibParser;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
+import org.jabref.logic.git.merge.GitMergeUtil;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.git.status.GitStatusChecker;
@@ -20,6 +21,7 @@ import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.status.SyncStatus;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -130,12 +132,12 @@ public class GitSyncService {
             effectiveRemote = remote;
         } else {
             // 3. If there are conflicts, ask strategy to resolve
-            Optional<BibDatabaseContext> maybeRemote = gitConflictResolverStrategy.resolveConflicts(conflicts, remote);
-            if (maybeRemote.isEmpty()) {
+            Optional<List<BibEntry>> maybeResolved = gitConflictResolverStrategy.resolveConflicts(conflicts);
+            if (maybeResolved.isEmpty()) {
                 LOGGER.warn("Merge aborted: Conflict resolution was canceled or denied.");
                 return MergeResult.failure();
             }
-            effectiveRemote = maybeRemote.get();
+            effectiveRemote = GitMergeUtil.replaceEntries(remote, maybeResolved.get());
         }
 
         //  4. Apply resolved remote (either original or conflict-resolved) to local

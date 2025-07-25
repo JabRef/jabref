@@ -10,7 +10,6 @@ import java.util.Optional;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.git.io.GitFileReader;
-import org.jabref.logic.git.merge.GitMergeUtil;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
 import org.jabref.logic.git.model.MergeResult;
@@ -34,7 +33,6 @@ import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -266,18 +264,14 @@ class GitSyncServiceTest {
 
         // Setup mock conflict resolver
         GitConflictResolverStrategy resolver = mock(GitConflictResolverStrategy.class);
-        when(resolver.resolveConflicts(anyList(), any())).thenAnswer(invocation -> {
+        when(resolver.resolveConflicts(anyList())).thenAnswer(invocation -> {
             List<ThreeWayEntryConflict> conflicts = invocation.getArgument(0);
-            BibDatabaseContext remote = invocation.getArgument(1);
-
-            ThreeWayEntryConflict conflict = ((List<ThreeWayEntryConflict>) invocation.getArgument(0)).getFirst();
+            ThreeWayEntryConflict conflict = conflicts.getFirst();
             // In this test, both Alice and Bob independently added a new entry 'c', so the base is null.
             // We simulate conflict resolution by choosing the remote version and modifying the author field.
             BibEntry resolved = (BibEntry) conflict.remote().clone();
             resolved.setField(StandardField.AUTHOR, "alice-c + bob-c");
-
-            BibDatabaseContext merged = GitMergeUtil.replaceEntries(remote, List.of(resolved));
-            return Optional.of(merged);
+            return Optional.of(List.of(resolved));
         });
 
         GitHandler handler = new GitHandler(aliceDir);
@@ -287,7 +281,7 @@ class GitSyncServiceTest {
         assertTrue(result.isSuccessful());
         String content = Files.readString(library);
         assertTrue(content.contains("alice-c + bob-c"));
-        verify(resolver).resolveConflicts(anyList(), any());
+        verify(resolver).resolveConflicts(anyList());
     }
 
     @Test

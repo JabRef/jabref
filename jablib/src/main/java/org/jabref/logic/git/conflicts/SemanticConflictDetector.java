@@ -1,16 +1,14 @@
 package org.jabref.logic.git.conflicts;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jabref.logic.bibtex.comparator.BibDatabaseDiff;
 import org.jabref.logic.bibtex.comparator.BibEntryDiff;
@@ -81,25 +79,19 @@ public class SemanticConflictDetector {
     }
 
     private static boolean hasConflictingFields(BibEntry base, BibEntry local, BibEntry remote) {
-        // Go through union of all fields
-        Set<Field> fields = new HashSet<>();
-        fields.addAll(base.getFields());
-        fields.addAll(local.getFields());
-        fields.addAll(remote.getFields());
+        return Stream.of(base, local, remote)
+                     .flatMap(entry -> entry.getFields().stream())
+                     .distinct()
+                     .anyMatch(field -> {
+                         String baseVal = base.getField(field).orElse(null);
+                         String localVal = local.getField(field).orElse(null);
+                         String remoteVal = remote.getField(field).orElse(null);
 
-        for (Field field : fields) {
-            String baseVal = base.getField(field).orElse(null);
-            String localVal = local.getField(field).orElse(null);
-            String remoteVal = remote.getField(field).orElse(null);
+                         boolean localChanged = !Objects.equals(baseVal, localVal);
+                         boolean remoteChanged = !Objects.equals(baseVal, remoteVal);
 
-            boolean localChanged = !Objects.equals(baseVal, localVal);
-            boolean remoteChanged = !Objects.equals(baseVal, remoteVal);
-
-            if (localChanged && remoteChanged && !Objects.equals(localVal, remoteVal)) {
-                return true;
-            }
-        }
-        return false;
+                         return localChanged && remoteChanged && !Objects.equals(localVal, remoteVal);
+                     });
     }
 
     /**
@@ -138,23 +130,24 @@ public class SemanticConflictDetector {
 
     /**
      * Compares base and remote and constructs a patch at the field level. null == the field is deleted.
+     *
+     * @param base base version
+     * @param remote remote version
+     * @return A map from field to new value
      */
     private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry remote) {
-        Map<Field, String> patch = new LinkedHashMap<>();
-
-        Set<Field> allFields = new LinkedHashSet<>();
-        allFields.addAll(base.getFields());
-        allFields.addAll(remote.getFields());
-
-        for (Field field : allFields) {
-            String baseValue = base.getField(field).orElse(null);
-            String remoteValue = remote.getField(field).orElse(null);
-
-            if (!Objects.equals(baseValue, remoteValue)) {
-                patch.put(field, remoteValue);
-            }
-        }
-
-        return patch;
+        return Stream.concat(base.getFields().stream(), remote.getFields().stream())
+                     .distinct()
+                     .filter(field -> {
+                         String baseValue = base.getField(field).orElse(null);
+                         String remoteValue = remote.getField(field).orElse(null);
+                         return !Objects.equals(baseValue, remoteValue);
+                     })
+                     .collect(Collectors.toMap(
+                             field -> field,
+                             field -> remote.getField(field).orElse(null),
+                             (existing, replacement) -> replacement,
+                             LinkedHashMap::new
+                             ));
     }
 }

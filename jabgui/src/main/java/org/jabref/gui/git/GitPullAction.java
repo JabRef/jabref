@@ -3,8 +3,6 @@ package org.jabref.gui.git;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import javax.swing.undo.UndoManager;
-
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
@@ -21,28 +19,20 @@ import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 
-/**
- * - Check if Git is enabled
- * - Verify activeDatabase is not null
- * - Call GitPullViewModel.pull()
- */
 public class GitPullAction extends SimpleCommand {
 
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final GuiPreferences guiPreferences;
-    private final UndoManager undoManager;
     private final TaskExecutor taskExecutor;
 
     public GitPullAction(DialogService dialogService,
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
-                         UndoManager undoManager,
                          TaskExecutor taskExecutor) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
-        this.undoManager = undoManager;
         this.taskExecutor = taskExecutor;
     }
 

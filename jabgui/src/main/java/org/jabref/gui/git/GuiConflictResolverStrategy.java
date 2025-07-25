@@ -6,8 +6,6 @@ import java.util.Optional;
 
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
-import org.jabref.logic.git.merge.GitMergeUtil;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
 public class GuiConflictResolverStrategy implements GitConflictResolverStrategy {
@@ -18,7 +16,7 @@ public class GuiConflictResolverStrategy implements GitConflictResolverStrategy 
     }
 
     @Override
-    public Optional<BibDatabaseContext> resolveConflicts(List<ThreeWayEntryConflict> conflicts, BibDatabaseContext remote) {
+    public Optional<List<BibEntry>> resolveConflicts(List<ThreeWayEntryConflict> conflicts) {
         List<BibEntry> resolved = new ArrayList<>();
         for (ThreeWayEntryConflict conflict : conflicts) {
             Optional<BibEntry> maybeConflict = dialog.resolveConflict(conflict);
@@ -27,6 +25,6 @@ public class GuiConflictResolverStrategy implements GitConflictResolverStrategy 
             }
             resolved.add(maybeConflict.get());
         }
-        return Optional.of(GitMergeUtil.replaceEntries(remote, resolved));
+        return Optional.of(resolved);
     }
 }

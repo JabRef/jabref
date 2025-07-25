@@ -30,7 +30,7 @@ public class GitBibParser {
         if (maybeContent.isEmpty()) {
             BibDatabase emptyDatabase = new BibDatabase();
             MetaData emptyMetaData = new MetaData();
-            return new BibDatabaseContext(emptyDatabase, emptyMetaData, null);
+            return new BibDatabaseContext(emptyDatabase, emptyMetaData);
         }
         return parseBibFromGit(maybeContent.get(), prefs);
     }
