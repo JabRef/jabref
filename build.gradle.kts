@@ -2,7 +2,10 @@ plugins {
     id("org.jabref.gradle.base.repositories")
     id("org.jabref.gradle.feature.compile") // for openrewrite
     id("org.openrewrite.rewrite") version "7.11.0"
-    id("org.itsallcode.openfasttrace") version "3.0.1"
+
+    // id("org.itsallcode.openfasttrace") version "3.0.1"
+    // Workaround for https://github.com/itsallcode/openfasttrace-gradle/issues/50
+    id("com.github.koppor.openfasttrace-gradle") version "patch-1-SNAPSHOT"
 }
 
 // OpenRewrite should rewrite all sources
