@@ -41,6 +41,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private Tooltip libSpecificFileDirSwitchTooltip;
     @FXML private Tooltip userSpecificFileDirSwitchTooltip;
     @FXML private Tooltip laTexSpecificFileDirSwitchTooltip;
+    @FXML private Tooltip userSpecificFileDirectoryTooltip;
+    @FXML private Tooltip laTexFileDirectoryTooltip;
 
     private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
@@ -100,13 +102,16 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             userSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
+            //TODO- add tooltip to userSpecificFileDirectory: user: {username}, host: {hostname}.
         });
 
         laTexFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
+            //TODO- add tooltip to laTexFileDirectory: default LaTeX directory??
         });
+        //TODO- Add changes on .fxml
 
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
