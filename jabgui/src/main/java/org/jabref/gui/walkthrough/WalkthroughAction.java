@@ -49,7 +49,7 @@ public class WalkthroughAction extends SimpleCommand {
                     .computeIfAbsent(key, _ -> createMainFileDirectoryWalkthrough(mainStage));
             default ->
                     throw new IllegalArgumentException("Unknown walkthrough name: " + name);
-                    // This will not crash application. If a new walkthrough is added and the developer tried the walkthrough that was added at least once, any mismatch will be caught here.
+            // This will not crash application. If a new walkthrough is added and the developer tried the walkthrough that was added at least once, any mismatch will be caught here.
         };
         walkthrough.start(mainStage);
     }
@@ -156,7 +156,7 @@ public class WalkthroughAction extends SimpleCommand {
 
         public WalkthroughStep createTabSelectionStep(String tabName, String description) {
             return TooltipStep
-                    .builder(Localization.lang("Select the \"" + tabName + "\" tab"))
+                    .builder(Localization.lang("Select the \"%0\" tab", tabName))
                     .content(new TextBlock(description))
                     .width(400)
                     .resolver(NodeResolver.predicate(node ->
