@@ -15,8 +15,6 @@ public class ReferenceMark {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceMark.class);
 
-    // Enable UNICODE_CHARACTER_CLASS to properly match citation keys containing non-ASCII (e.g. Cyrillic, Chinese) characters.
-    // We Keep the pattern visually unchanged while broadening the definition of \w to the full Unicode range (letters, digits, underscore).
     private static final Pattern REFERENCE_MARK_FORMAT = Pattern.compile(
             "^(JABREF_[\\w-:./]+ CID_\\d+(?:, JABREF_[\\w-:./]+ CID_\\d+)*) (\\w+)$",
             Pattern.UNICODE_CHARACTER_CLASS);
