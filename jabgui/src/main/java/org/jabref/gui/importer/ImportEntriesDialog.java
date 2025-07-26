@@ -121,7 +121,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 .withText(database -> {
                     Optional<String> dbOpt = Optional.empty();
                     if (database.getDatabasePath().isPresent()) {
-                        dbOpt = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), database.getDatabasePath().get());
+                        dbOpt = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), database.getDatabasePath().get());
                     }
                     if (database.getLocation() == DatabaseLocation.SHARED) {
                         return database.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]";

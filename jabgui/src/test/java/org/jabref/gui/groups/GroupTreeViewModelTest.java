@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.JabRefGuiStateManager;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.entryeditor.AdaptVisibleTabs;
 import org.jabref.gui.preferences.GuiPreferences;
@@ -44,7 +45,7 @@ class GroupTreeViewModelTest {
     @BeforeEach
     void setUp() {
         databaseContext = new BibDatabaseContext();
-        stateManager = new StateManager();
+        stateManager = new JabRefGuiStateManager();
         stateManager.activeDatabaseProperty().setValue(Optional.of(databaseContext));
         taskExecutor = new CurrentThreadTaskExecutor();
         preferences = mock(GuiPreferences.class);
