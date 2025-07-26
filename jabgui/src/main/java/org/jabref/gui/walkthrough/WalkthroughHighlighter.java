@@ -18,24 +18,26 @@ import org.jabref.gui.walkthrough.effects.PulseAnimateIndicator;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Manages highlight effects across multiple windows for walkthrough steps.
- */
+/// Manages highlight effects across multiple windows for walkthrough steps.
 public class WalkthroughHighlighter {
     // backdropHighlights, pulseIndicators, and fullScreenDarkens represents the current state of walkthrough GUI effects
     private final Map<Window, BackdropHighlight> backdropHighlights = new HashMap<>();
     private final Map<Window, PulseAnimateIndicator> pulseIndicators = new HashMap<>();
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
+    private @Nullable Runnable onBackgroundClickHandler;
 
-    /**
-     * Applies the specified highlight configuration.
-     *
-     * @param config         The highlight configuration to apply. Default to
-     *                       BackdropHighlight on the primary windows if null.
-     * @param fallbackWindow The primary scene to apply the highlight to.
-     * @param fallbackTarget The fallback target node to use if no highlight
-     *                       configuration is provided.
-     */
+    /// Sets a handler to be called when the user clicks on backdrop or darkened areas.
+    public void setOnBackgroundClick(@Nullable Runnable handler) {
+        this.onBackgroundClickHandler = handler;
+    }
+
+    /// Applies the specified highlight configuration.
+    ///
+    /// @param config         The highlight configuration to apply. Default to
+    ///                       BackdropHighlight on the primary windows if null.
+    /// @param fallbackWindow The primary scene to apply the highlight to.
+    /// @param fallbackTarget The fallback target node to use if no highlight
+    ///                       configuration is provided.
     public void applyHighlight(@Nullable MultiWindowHighlight config, @NonNull Scene fallbackWindow,
                                @Nullable Node fallbackTarget) {
         detachAll();
@@ -78,9 +80,7 @@ public class WalkthroughHighlighter {
         });
     }
 
-    /**
-     * Detaches all active highlight effects.
-     */
+    /// Detaches all active highlight effects.
     public void detachAll() {
         backdropHighlights.values().forEach(BackdropHighlight::detach);
         backdropHighlights.clear();
@@ -116,6 +116,7 @@ public class WalkthroughHighlighter {
         }
 
         BackdropHighlight backdrop = backdropHighlights.computeIfAbsent(window, _ -> new BackdropHighlight(pane));
+        backdrop.setOnClick(onBackgroundClickHandler);
         backdrop.attach(targetNode);
     }
 
@@ -136,6 +137,7 @@ public class WalkthroughHighlighter {
         }
 
         FullScreenDarken fullDarken = fullScreenDarkens.computeIfAbsent(window, _ -> new FullScreenDarken(pane));
+        fullDarken.setOnClick(onBackgroundClickHandler);
         fullDarken.attach();
     }
 }

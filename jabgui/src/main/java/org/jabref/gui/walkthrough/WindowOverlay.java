@@ -4,25 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
+import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
-import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
+import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
@@ -33,36 +31,27 @@ import org.slf4j.LoggerFactory;
 /// Manages the overlay for displaying walkthrough steps in a single window.
 public class WindowOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WindowOverlay.class);
-
     private final Window window;
-    private final GridPane overlayPane;
-    private final Pane originalRoot;
+    private final Parent original;
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
     private final Walkthrough walkthrough;
     private final List<Runnable> cleanupTasks = new ArrayList<>();
+
+    private @Nullable Button quitButton;
+    private @Nullable Node currentContentNode;
 
     public WindowOverlay(Window window, Walkthrough walkthrough) {
         this.window = window;
         this.renderer = new WalkthroughRenderer();
         this.walkthrough = walkthrough;
 
-        overlayPane = new GridPane();
-        overlayPane.getStyleClass().add("walkthrough-overlay");
-        overlayPane.setPickOnBounds(false);
-        overlayPane.setMaxWidth(Double.MAX_VALUE);
-        overlayPane.setMaxHeight(Double.MAX_VALUE);
-
         Scene scene = window.getScene();
-        // This basically never happens, so only a development time check is needed
-        assert scene != null;
+        assert scene != null; // NOTE: This should never happen.
 
-        originalRoot = (Pane) scene.getRoot();
+        original = scene.getRoot();
         stackPane = new StackPane();
-
-        stackPane.getChildren().add(originalRoot);
-        stackPane.getChildren().add(overlayPane);
-
+        stackPane.getChildren().add(original);
         scene.setRoot(stackPane);
     }
 
@@ -82,10 +71,9 @@ public class WindowOverlay {
     /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
     public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
-
         Node content = renderer.render(step, walkthrough, beforeNavigate);
         PopOver popover = new PopOver();
-        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets()); // FIXME: walkaround to prevent popover from not properly inheriting styles
+        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets());
         popover.setContentNode(content);
         popover.setDetachable(false);
         popover.setCloseButtonEnabled(false);
@@ -93,9 +81,10 @@ public class WindowOverlay {
         mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
         popover.setAutoHide(false);
         popover.setAutoFix(true);
+        popover.setConsumeAutoHidingEvents(false);
 
         cleanupTasks.add(popover::hide);
-        overlayPane.setVisible(false);
+        addQuitButton(step);
 
         if (node == null) {
             popover.show(window);
@@ -135,49 +124,46 @@ public class WindowOverlay {
     /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
     public void showPanel(PanelStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
-
-        overlayPane.setVisible(true);
-
         Node content = renderer.render(step, walkthrough, beforeNavigate);
-        overlayPane.getChildren().clear();
-        overlayPane.getRowConstraints().clear();
-        overlayPane.getColumnConstraints().clear();
-
-        configurePanelLayout(step.position());
-
-        overlayPane.getChildren().add(content);
-        GridPane.setHgrow(content, Priority.NEVER);
-        GridPane.setVgrow(content, Priority.NEVER);
-
+        content.setMouseTransparent(false);
+        currentContentNode = content;
+        // Position content directly in StackPane
         switch (step.position()) {
             case LEFT -> {
-                overlayPane.setAlignment(Pos.CENTER_LEFT);
-                GridPane.setVgrow(content, Priority.ALWAYS);
-                GridPane.setFillHeight(content, true);
+                StackPane.setAlignment(content, Pos.CENTER_LEFT);
+                StackPane.setMargin(content, new Insets(0, 0, 0, 0));
+                if (content instanceof VBox vbox) {
+                    vbox.setMaxHeight(Double.MAX_VALUE);
+                }
             }
             case RIGHT -> {
-                overlayPane.setAlignment(Pos.CENTER_RIGHT);
-                GridPane.setVgrow(content, Priority.ALWAYS);
-                GridPane.setFillHeight(content, true);
+                StackPane.setAlignment(content, Pos.CENTER_RIGHT);
+                StackPane.setMargin(content, new Insets(0, 0, 0, 0));
+                if (content instanceof VBox vbox) {
+                    vbox.setMaxHeight(Double.MAX_VALUE);
+                }
             }
             case TOP -> {
-                overlayPane.setAlignment(Pos.TOP_CENTER);
-                GridPane.setHgrow(content, Priority.ALWAYS);
-                GridPane.setFillWidth(content, true);
+                StackPane.setAlignment(content, Pos.TOP_CENTER);
+                StackPane.setMargin(content, new Insets(0, 0, 0, 0));
+                if (content instanceof VBox vbox) {
+                    vbox.setMaxWidth(Double.MAX_VALUE);
+                }
             }
             case BOTTOM -> {
-                overlayPane.setAlignment(Pos.BOTTOM_CENTER);
-                GridPane.setHgrow(content, Priority.ALWAYS);
-                GridPane.setFillWidth(content, true);
+                StackPane.setAlignment(content, Pos.BOTTOM_CENTER);
+                StackPane.setMargin(content, new Insets(0, 0, 0, 0));
+                if (content instanceof VBox vbox) {
+                    vbox.setMaxWidth(Double.MAX_VALUE);
+                }
             }
             default -> {
                 LOGGER.warn("Unsupported position for panel step: {}", step.position());
-                overlayPane.setAlignment(Pos.CENTER);
+                StackPane.setAlignment(content, Pos.CENTER);
             }
         }
-        setupClipping(content);
-        overlayPane.toFront();
-
+        stackPane.getChildren().add(content);
+        addQuitButton(step);
         if (node != null) {
             step.navigationPredicate().ifPresent(predicate ->
                     cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
@@ -186,54 +172,26 @@ public class WindowOverlay {
 
     /// Hide the overlay and clean up any resources.
     public void hide() {
-        overlayPane.getChildren().clear();
-        overlayPane.setClip(null);
-        overlayPane.setVisible(false);
+        removeQuitButton();
+        if (currentContentNode != null) {
+            stackPane.getChildren().remove(currentContentNode);
+            currentContentNode = null;
+        }
         cleanupTasks.forEach(Runnable::run);
         cleanupTasks.clear();
     }
 
-    /// Detaches the overlay and restores the original scene root.
+    /// Detaches the overlay and restores the original scene root. Once this method is
+    /// called, the overlay is no longer active and subsequent calls to showTooltip or
+    /// showPanel will **not** work.
     public void detach() {
         hide();
-
         Scene scene = window.getScene();
-        if (scene != null && originalRoot != null) {
-            stackPane.getChildren().remove(originalRoot);
-            scene.setRoot(originalRoot);
-            LOGGER.debug("Restored original scene root: {}", originalRoot.getClass().getName());
+        if (scene != null && original != null) {
+            stackPane.getChildren().remove(original);
+            scene.setRoot(original);
+            LOGGER.debug("Restored original scene root: {}", original.getClass().getName());
         }
-    }
-
-    private void configurePanelLayout(PanelPosition position) {
-        overlayPane.getRowConstraints().add(switch (position) {
-            case LEFT,
-                 RIGHT -> {
-                RowConstraints rowConstraints = new RowConstraints();
-                rowConstraints.setVgrow(Priority.ALWAYS);
-                yield rowConstraints;
-            }
-            case TOP,
-                 BOTTOM -> {
-                RowConstraints rowConstraints = new RowConstraints();
-                rowConstraints.setVgrow(Priority.NEVER);
-                yield rowConstraints;
-            }
-        });
-        overlayPane.getColumnConstraints().add(switch (position) {
-            case LEFT,
-                 RIGHT -> {
-                ColumnConstraints columnConstraints = new ColumnConstraints();
-                columnConstraints.setHgrow(Priority.NEVER);
-                yield columnConstraints;
-            }
-            case TOP,
-                 BOTTOM -> {
-                ColumnConstraints columnConstraints = new ColumnConstraints();
-                columnConstraints.setHgrow(Priority.ALWAYS);
-                yield columnConstraints;
-            }
-        });
     }
 
     private Optional<PopOver.ArrowLocation> mapToArrowLocation(TooltipPosition position) {
@@ -246,17 +204,68 @@ public class WindowOverlay {
         });
     }
 
-    private void setupClipping(Node node) {
-        ChangeListener<Bounds> listener = (_, _, bounds) -> {
-            if (bounds != null && bounds.getWidth() > 0 && bounds.getHeight() > 0) {
-                Rectangle clip = new Rectangle(bounds.getMinX(), bounds.getMinY(),
-                        bounds.getWidth(), bounds.getHeight());
-                overlayPane.setClip(clip);
+    private void addQuitButton(WalkthroughStep step) {
+        if (!step.showQuitButton()) {
+            removeQuitButton();
+            return;
+        }
+        removeQuitButton();
+        quitButton = createQuitButton();
+        quitButton.setMouseTransparent(false);
+        QuitButtonPosition position = resolveQuitButtonPosition(step);
+        positionQuitButton(quitButton, position);
+        stackPane.getChildren().add(quitButton);
+        quitButton.toFront();
+    }
+
+    private Button createQuitButton() {
+        Button button = new Button();
+        button.setGraphic(new JabRefIconView(IconTheme.JabRefIcons.CLOSE));
+        button.getStyleClass().addAll("icon-button", "walkthrough-quit-button");
+        button.setOnAction(_ -> walkthrough.showQuitConfirmationAndQuit());
+        button.setMinSize(32, 32);
+        button.setMaxSize(32, 32);
+        button.setPrefSize(32, 32);
+        return button;
+    }
+
+    private QuitButtonPosition resolveQuitButtonPosition(WalkthroughStep step) {
+        QuitButtonPosition position = step.quitButtonPosition();
+        if (position == QuitButtonPosition.AUTO && step instanceof PanelStep panelStep) {
+            return switch (panelStep.position()) {
+                case LEFT, BOTTOM -> QuitButtonPosition.TOP_RIGHT;
+                case RIGHT -> QuitButtonPosition.TOP_LEFT;
+                case TOP -> QuitButtonPosition.BOTTOM_RIGHT;
+            };
+        }
+        return position == QuitButtonPosition.AUTO ? QuitButtonPosition.BOTTOM_RIGHT : position;
+    }
+
+    private void positionQuitButton(Button button, QuitButtonPosition position) {
+        switch (position) {
+            case TOP_LEFT -> {
+                StackPane.setAlignment(button, Pos.TOP_LEFT);
+                StackPane.setMargin(button, new Insets(12, 0, 0, 12));
             }
-        };
-        ObservableValue<Bounds> property = node.boundsInLocalProperty();
-        property.addListener(listener);
-        cleanupTasks.add(() -> property.removeListener(listener));
-        listener.changed(null, null, node.getBoundsInParent());
+            case TOP_RIGHT -> {
+                StackPane.setAlignment(button, Pos.TOP_RIGHT);
+                StackPane.setMargin(button, new Insets(12, 12, 0, 0));
+            }
+            case BOTTOM_LEFT -> {
+                StackPane.setAlignment(button, Pos.BOTTOM_LEFT);
+                StackPane.setMargin(button, new Insets(0, 0, 12, 12));
+            }
+            case BOTTOM_RIGHT -> {
+                StackPane.setAlignment(button, Pos.BOTTOM_RIGHT);
+                StackPane.setMargin(button, new Insets(0, 12, 12, 0));
+            }
+        }
+    }
+
+    private void removeQuitButton() {
+        if (quitButton != null) {
+            stackPane.getChildren().remove(quitButton);
+            quitButton = null;
+        }
     }
 }

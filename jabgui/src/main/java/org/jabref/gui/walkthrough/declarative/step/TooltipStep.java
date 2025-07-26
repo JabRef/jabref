@@ -27,7 +27,9 @@ public record TooltipStep(
         @Nullable Double widthValue,
         @Nullable Double heightValue,
         @Nullable MultiWindowHighlight highlightValue,
-        @Nullable WindowResolver activeWindowResolverValue
+        @Nullable WindowResolver activeWindowResolverValue,
+        boolean showQuitButtonValue,
+        @NonNull QuitButtonPosition quitButtonPositionValue
 ) implements WalkthroughStep {
 
     @Override
@@ -75,6 +77,16 @@ public record TooltipStep(
         return Optional.ofNullable(activeWindowResolverValue);
     }
 
+    @Override
+    public boolean showQuitButton() {
+        return showQuitButtonValue;
+    }
+
+    @Override
+    public QuitButtonPosition quitButtonPosition() {
+        return quitButtonPositionValue;
+    }
+
     public static Builder builder(@NonNull String title) {
         return new Builder(title);
     }
@@ -92,6 +104,8 @@ public record TooltipStep(
         private @Nullable Double height;
         private @Nullable MultiWindowHighlight highlight;
         private @Nullable WindowResolver activeWindowResolver;
+        private boolean showQuitButton = true;
+        private QuitButtonPosition quitButtonPosition = QuitButtonPosition.AUTO;
 
         private Builder(@NonNull String title) {
             this.title = title;
@@ -165,6 +179,16 @@ public record TooltipStep(
             return this;
         }
 
+        public Builder showQuitButton(boolean showQuitButton) {
+            this.showQuitButton = showQuitButton;
+            return this;
+        }
+
+        public Builder quitButtonPosition(@NonNull QuitButtonPosition quitButtonPosition) {
+            this.quitButtonPosition = quitButtonPosition;
+            return this;
+        }
+
         public TooltipStep build() {
             if (resolver == null) {
                 throw new IllegalStateException("Node resolver is required for TooltipStep");
@@ -180,7 +204,9 @@ public record TooltipStep(
                     width,
                     height,
                     highlight,
-                    activeWindowResolver);
+                    activeWindowResolver,
+                    showQuitButton,
+                    quitButtonPosition);
         }
     }
 }

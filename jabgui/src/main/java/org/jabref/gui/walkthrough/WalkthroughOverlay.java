@@ -3,6 +3,7 @@ package org.jabref.gui.walkthrough;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
@@ -10,13 +11,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
+import org.jabref.gui.DialogService;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
+import org.jabref.logic.l10n.Localization;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -25,6 +30,7 @@ import org.slf4j.LoggerFactory;
 /// Multi-window overlay for displaying walkthrough steps
 public class WalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
+    private static final long RESOLUTION_TIMEOUT_MS = 2500;
 
     private final Map<Window, WindowOverlay> overlays = new HashMap<>();
     private final Stage stage;
@@ -48,11 +54,13 @@ public class WalkthroughOverlay {
 
     private @Nullable Window resolvedWindow;
     private @Nullable Node resolvedNode;
+    private @Nullable PauseTransition timeoutTransition;
 
     public WalkthroughOverlay(Stage stage, Walkthrough walkthrough) {
         this.stage = stage;
         this.walkthrough = walkthrough;
         this.walkthroughHighlighter = new WalkthroughHighlighter();
+        this.walkthroughHighlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
     }
 
     public void show(@NonNull WalkthroughStep step) {
@@ -73,8 +81,26 @@ public class WalkthroughOverlay {
         overlays.clear();
     }
 
+    /// Shows a confirmation dialog and quits the walkthrough if confirmed.
+    public void showQuitConfirmationAndQuit() {
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        boolean shouldQuit = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Quit walkthrough"),
+                Localization.lang("Are you sure you want to quit the walkthrough?"),
+                Localization.lang("Quit"),
+                Localization.lang("Continue walkthrough")
+        );
+
+        if (shouldQuit) {
+            walkthrough.quit();
+        }
+    }
+
     private void cleanUp() {
         LOGGER.debug("Cleaning up all listeners");
+
+        cancelTimeout();
+
         if (windowListListener != null) {
             Window.getWindows().removeListener(windowListListener);
             windowListListener = null;
@@ -137,8 +163,19 @@ public class WalkthroughOverlay {
     }
 
     private void resolveWindow(WalkthroughStep step, WindowResolver resolver) {
+        startTimeout(() -> {
+            if (resolvedWindow == null) {
+                LOGGER.warn("Timeout reached while waiting for window resolution for step '{}'. Reverting.", step.title());
+                cleanUp();
+                revertToPreviousStep();
+            }
+        });
+
         resolver.resolve().ifPresentOrElse(
-                window -> handleWindowResolved(step, window),
+                window -> {
+                    cancelTimeout();
+                    handleWindowResolved(step, window);
+                },
                 () -> {
                     LOGGER.debug("Window for step '{}' not found. Listening for new windows.", step.title());
                     windowListListener = change -> {
@@ -146,6 +183,7 @@ public class WalkthroughOverlay {
                             if (change.wasAdded()) {
                                 resolver.resolve().ifPresent(newWindow -> {
                                     LOGGER.debug("Dynamically resolved window for step '{}'", step.title());
+                                    cancelTimeout();
                                     if (windowListListener != null) {
                                         Window.getWindows().removeListener(windowListListener);
                                         windowListListener = null;
@@ -178,6 +216,14 @@ public class WalkthroughOverlay {
     }
 
     private void resolveNode(WalkthroughStep step, Window window, NodeResolver resolver) {
+        startTimeout(() -> {
+            if (resolvedNode == null) {
+                LOGGER.warn("Timeout reached while waiting for node resolution for step '{}'. Reverting.", step.title());
+                cleanUp();
+                revertToPreviousStep();
+            }
+        });
+
         Scene scene = window.getScene();
         if (scene != null) {
             attemptNodeResolutionOnScene(step, window, scene, resolver);
@@ -203,11 +249,9 @@ public class WalkthroughOverlay {
                 () -> {
                     LOGGER.debug("Node for step '{}' not found. Listening for scene changes.", step.title());
 
-                    Runnable searchCleanup = () -> removeSceneRootListener(scene);
-
                     childrenListener = _ -> resolver.resolve(scene).ifPresent(foundNode -> {
                         LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
-                        searchCleanup.run();
+                        removeSceneRootListener(scene);
                         handleNodeResolved(step, window, foundNode);
                     });
 
@@ -219,7 +263,8 @@ public class WalkthroughOverlay {
                             resolver.resolve(scene).ifPresentOrElse(
                                     foundNode -> {
                                         LOGGER.debug("Node found via sceneRootListener for step '{}'", step.title());
-                                        searchCleanup.run();
+                                        cancelTimeout();
+                                        removeSceneRootListener(scene);
                                         handleNodeResolved(step, window, foundNode);
                                     },
                                     () -> addChildrenListener(newRoot));
@@ -235,18 +280,20 @@ public class WalkthroughOverlay {
     }
 
     private void handleNodeResolved(WalkthroughStep step, Window window, @Nullable Node node) {
-        this.resolvedNode = node;
-        if (node != null) {
-            LOGGER.debug("Node resolved for step '{}': {}", step.title(), node);
-            nodeVisibleListener = (_, wasVisible, isVisible) -> {
-                if (wasVisible && !isVisible) {
-                    LOGGER.debug("Node for step '{}' is no longer visible. Reverting.", step.title());
-                    revertToPreviousStep();
-                }
-            };
-            node.visibleProperty().addListener(nodeVisibleListener);
-        }
+        cancelTimeout();
 
+        this.resolvedNode = node;
+        if (node == null) {
+            return;
+        }
+        LOGGER.debug("Node resolved for step '{}': {}", step.title(), node);
+        nodeVisibleListener = (_, wasVisible, isVisible) -> {
+            if (wasVisible && !isVisible) {
+                LOGGER.debug("Node for step '{}' is no longer visible. Reverting.", step.title());
+                revertToPreviousStep();
+            }
+        };
+        node.visibleProperty().addListener(nodeVisibleListener);
         display(step, window, node);
     }
 
@@ -279,6 +326,7 @@ public class WalkthroughOverlay {
     }
 
     private void revertToPreviousStep() {
+        stopCheckingRevert();
         LOGGER.info("Attempting to revert to previous resolvable step");
 
         int currentIndex = walkthrough.currentStepProperty().get();
@@ -295,5 +343,22 @@ public class WalkthroughOverlay {
         }
 
         LOGGER.warn("No previous resolvable step found, staying at current step");
+    }
+
+    private void startTimeout(Runnable onTimeout) {
+        LOGGER.debug("Started timeout");
+        cancelTimeout();
+
+        timeoutTransition = new PauseTransition(Duration.millis(RESOLUTION_TIMEOUT_MS));
+        timeoutTransition.setOnFinished(_ -> onTimeout.run());
+        timeoutTransition.play();
+    }
+
+    private void cancelTimeout() {
+        LOGGER.debug("Timeout cancelled");
+        if (timeoutTransition != null) {
+            timeoutTransition.stop();
+            timeoutTransition = null;
+        }
     }
 }

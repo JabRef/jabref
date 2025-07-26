@@ -2,6 +2,7 @@ package org.jabref.gui.walkthrough.effects;
 
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -19,6 +20,7 @@ public class BackdropHighlight extends WalkthroughEffect {
     private Rectangle backdrop;
     private Rectangle hole;
     private @Nullable Shape overlayShape;
+    private @Nullable Runnable onClickHandler;
 
     public BackdropHighlight(@NonNull Pane pane) {
         super(pane);
@@ -32,6 +34,10 @@ public class BackdropHighlight extends WalkthroughEffect {
         this.node = node;
         setupListeners(this.node);
         updateLayout();
+    }
+
+    public void setOnClick(@Nullable Runnable onClickHandler) {
+        this.onClickHandler = onClickHandler;
     }
 
     @Override
@@ -89,6 +95,14 @@ public class BackdropHighlight extends WalkthroughEffect {
         this.overlayShape = Shape.subtract(backdrop, hole);
         this.overlayShape.setFill(OVERLAY_COLOR);
         this.overlayShape.setVisible(true);
+        
+        if (onClickHandler != null) {
+            this.overlayShape.setOnMouseClicked(this::handleClick);
+            this.overlayShape.setMouseTransparent(false);
+        } else {
+            this.overlayShape.setMouseTransparent(true);
+        }
+        
         this.pane.getChildren().add(oldIndex, this.overlayShape);
     }
 
@@ -97,5 +111,12 @@ public class BackdropHighlight extends WalkthroughEffect {
         if (overlayShape != null) {
             overlayShape.setVisible(false);
         }
+    }
+
+    private void handleClick(MouseEvent event) {
+        if (onClickHandler != null) {
+            onClickHandler.run();
+        }
+        event.consume();
     }
 }

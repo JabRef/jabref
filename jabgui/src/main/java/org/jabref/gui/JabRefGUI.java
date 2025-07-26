@@ -22,6 +22,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.TextInputKeyBindings;
+import org.jabref.gui.keyboard.WalkthroughKeyBindings;
 import org.jabref.gui.openoffice.OOBibBaseConnect;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.remote.CLIMessageHandler;
@@ -279,6 +280,7 @@ public class JabRefGUI extends Application {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
             SelectableTextFlowKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
+            WalkthroughKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);

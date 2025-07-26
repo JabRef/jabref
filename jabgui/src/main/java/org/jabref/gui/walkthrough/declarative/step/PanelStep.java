@@ -27,7 +27,9 @@ public record PanelStep(
         @Nullable Double widthValue,
         @Nullable Double heightValue,
         @Nullable MultiWindowHighlight highlightValue,
-        @Nullable WindowResolver activeWindowResolverValue) implements WalkthroughStep {
+        @Nullable WindowResolver activeWindowResolverValue,
+        boolean showQuitButtonValue,
+        @NonNull QuitButtonPosition quitButtonPositionValue) implements WalkthroughStep {
 
     @Override
     public Optional<NodeResolver> resolver() {
@@ -74,6 +76,16 @@ public record PanelStep(
         return Optional.ofNullable(activeWindowResolverValue);
     }
 
+    @Override
+    public boolean showQuitButton() {
+        return showQuitButtonValue;
+    }
+
+    @Override
+    public QuitButtonPosition quitButtonPosition() {
+        return quitButtonPositionValue;
+    }
+
     public static Builder builder(@NonNull String title) {
         return new Builder(title);
     }
@@ -91,6 +103,8 @@ public record PanelStep(
         private @Nullable Double height;
         private @Nullable MultiWindowHighlight highlight;
         private @Nullable WindowResolver activeWindowResolver;
+        private boolean showQuitButton = true;
+        private QuitButtonPosition quitButtonPosition = QuitButtonPosition.AUTO;
 
         private Builder(@NonNull String title) {
             this.title = title;
@@ -164,6 +178,16 @@ public record PanelStep(
             return this;
         }
 
+        public Builder showQuitButton(boolean showQuitButton) {
+            this.showQuitButton = showQuitButton;
+            return this;
+        }
+
+        public Builder quitButtonPosition(@NonNull QuitButtonPosition quitButtonPosition) {
+            this.quitButtonPosition = quitButtonPosition;
+            return this;
+        }
+
         public PanelStep build() {
             if (height != null && (position == PanelPosition.LEFT || position == PanelPosition.RIGHT)) {
                 throw new IllegalArgumentException("Height is not applicable for left/right positioned panels.");
@@ -182,7 +206,9 @@ public record PanelStep(
                     width,
                     height,
                     highlight,
-                    activeWindowResolver);
+                    activeWindowResolver,
+                    showQuitButton,
+                    quitButtonPosition);
         }
     }
 }

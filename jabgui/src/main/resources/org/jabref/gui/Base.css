@@ -2663,6 +2663,36 @@ journalInfo .grid-cell-b {
     -fx-padding: 0.25em 0.5em;
 }
 
+.walkthrough-quit-button {
+    -fx-background-color: -jr-gray-1;
+    -fx-border-color: transparent;
+    /* For easy clipping */
+    -fx-padding: 0.5em;
+    -fx-min-width: 2em;
+    -fx-min-height: 2em;
+    -fx-pref-width: 2em;
+    -fx-pref-height: 2em;
+    -fx-max-width: 2em;
+    -fx-max-height: 2em;
+}
+
+.walkthrough-quit-button:hover {
+    /* FIXME: Use derive/JabRef variable colors */
+    -fx-background-color: derive(-jr-gray-1, -20%);
+}
+
+.walkthrough-quit-button:pressed {
+    -fx-background-color: derive(-jr-gray-1, -30%);
+}
+
+.walkthrough-quit-button .glyph-icon,
+.walkthrough-quit-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.2em;
+}
+
 .walkthrough-fullscreen-content {
     -fx-padding: 0.1875em;
     -fx-spacing: 1em;

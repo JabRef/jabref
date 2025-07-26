@@ -1,5 +1,6 @@
 package org.jabref.gui.walkthrough.effects;
 
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -15,9 +16,14 @@ public class FullScreenDarken extends WalkthroughEffect {
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
 
     private @Nullable Rectangle overlay;
+    private @Nullable Runnable onClickHandler;
 
     public FullScreenDarken(@NonNull Pane pane) {
         super(pane);
+    }
+
+    public void setOnClick(@Nullable Runnable onClickHandler) {
+        this.onClickHandler = onClickHandler;
     }
 
     @Override
@@ -52,6 +58,14 @@ public class FullScreenDarken extends WalkthroughEffect {
         overlay.setY(0);
         overlay.setWidth(pane.getWidth());
         overlay.setHeight(pane.getHeight());
+        
+        if (onClickHandler != null) {
+            overlay.setOnMouseClicked(this::handleClick);
+            overlay.setMouseTransparent(false);
+        } else {
+            overlay.setMouseTransparent(true);
+        }
+        
         overlay.setVisible(true);
     }
 
@@ -59,5 +73,12 @@ public class FullScreenDarken extends WalkthroughEffect {
     protected void hideEffect() {
         assert overlay != null : "Run attach() before hideEffect()";
         overlay.setVisible(false);
+    }
+
+    private void handleClick(MouseEvent event) {
+        if (onClickHandler != null) {
+            onClickHandler.run();
+        }
+        event.consume();
     }
 }

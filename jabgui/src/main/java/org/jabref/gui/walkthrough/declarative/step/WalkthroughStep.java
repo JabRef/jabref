@@ -33,6 +33,14 @@ public sealed interface WalkthroughStep permits PanelStep, TooltipStep {
 
     Optional<WindowResolver> activeWindowResolver();
 
+    default boolean showQuitButton() {
+        return true;
+    }
+
+    default QuitButtonPosition quitButtonPosition() {
+        return QuitButtonPosition.AUTO;
+    }
+
     static TooltipStep.Builder tooltip(String key) {
         return TooltipStep.builder(key);
     }

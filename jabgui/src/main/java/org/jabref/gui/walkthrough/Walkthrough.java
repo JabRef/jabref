@@ -10,8 +10,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.stage.Stage;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -29,6 +31,7 @@ public class Walkthrough {
     private final List<WalkthroughStep> steps;
     private @Nullable WalkthroughOverlay overlay;
     private Stage currentStage;
+    private StateManager stateManager;
 
     public Walkthrough(List<WalkthroughStep> steps) {
         if (steps.isEmpty() || steps.stream().anyMatch(Objects::isNull)) {
@@ -38,6 +41,7 @@ public class Walkthrough {
         this.currentStep = new SimpleIntegerProperty(0);
         this.active = new SimpleBooleanProperty(false);
         this.steps = steps;
+        this.stateManager = Injector.instantiateModelOrService(StateManager.class);
     }
 
     public Walkthrough(@NonNull WalkthroughStep... steps) {
@@ -70,6 +74,7 @@ public class Walkthrough {
 
         currentStep.set(0);
         active.set(true);
+        stateManager.setActiveWalkthrough(this);
 
         if (overlay == null) {
             LOGGER.warn("Overlay is null after initialization, cannot display step");
@@ -124,6 +129,7 @@ public class Walkthrough {
             overlay.detachAll();
         }
         active.set(false);
+        stateManager.setActiveWalkthrough(null);
     }
 
     public void goToStep(int stepIndex) {
@@ -148,6 +154,16 @@ public class Walkthrough {
 
     public void skip() {
         stop();
+    }
+
+    public void quit() {
+        stop();
+    }
+
+    public void showQuitConfirmationAndQuit() {
+        if (overlay != null) {
+            overlay.showQuitConfirmationAndQuit();
+        }
     }
 
     private @NonNull WalkthroughStep getCurrentStep() {

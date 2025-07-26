@@ -73,6 +73,7 @@ public class WalkthroughAction extends SimpleCommand {
                         new WindowEffect(HighlightEffect.ANIMATED_PULSE),
                         new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
                 ))
+                .showQuitButton(false)
                 .build();
 
         MultiWindowHighlight preferenceHighlight = new MultiWindowHighlight(
@@ -109,14 +110,27 @@ public class WalkthroughAction extends SimpleCommand {
                         new TextBlock(Localization.lang("Congratulations. Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
                         new InfoBlock(Localization.lang("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks"))
                 )
-                .height(180)
                 .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
+                .continueButton(Localization.lang("Continue"))
                 .navigation(NavigationPredicate.onClick())
                 .position(PanelPosition.TOP)
                 .highlight(preferenceHighlight)
                 .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
                 .build();
 
-        return new Walkthrough(step1, step2, step3, step4, step5);
+        WalkthroughStep step6 = PanelStep
+                .builder(Localization.lang("Click \"Save\" to save changes"))
+                .content(
+                        new TextBlock(Localization.lang("Congratulations. Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
+                        new InfoBlock(Localization.lang("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks"))
+                )
+                .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
+                .navigation(NavigationPredicate.onClick())
+                .position(PanelPosition.LEFT)
+                .highlight(preferenceHighlight)
+                .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
+                .build();
+
+        return new Walkthrough(step1, step2, step3, step4, step5, step6);
     }
 }
