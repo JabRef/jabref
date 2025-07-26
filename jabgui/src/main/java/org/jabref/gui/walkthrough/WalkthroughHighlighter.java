@@ -62,6 +62,22 @@ public class WalkthroughHighlighter {
         });
     }
 
+    /// Detch the highlight effects for a specific window.
+    public void detach(@NonNull Window window) {
+        backdropHighlights.computeIfPresent(window, (_, highlight) -> {
+            highlight.detach();
+            return null;
+        });
+        pulseIndicators.computeIfPresent(window, (_, indicator) -> {
+            indicator.detach();
+            return null;
+        });
+        fullScreenDarkens.computeIfPresent(window, (_, darken) -> {
+            darken.detach();
+            return null;
+        });
+    }
+
     /**
      * Detaches all active highlight effects.
      */
@@ -88,22 +104,8 @@ public class WalkthroughHighlighter {
                     applyPulseAnimation(window, targetNode);
                 }
             }
-            case FULL_SCREEN_DARKEN ->
-                    applyFullScreenDarken(window);
-            case NONE -> {
-                backdropHighlights.computeIfPresent(window, (_, highlight) -> {
-                    highlight.detach();
-                    return null;
-                });
-                pulseIndicators.computeIfPresent(window, (_, indicator) -> {
-                    indicator.detach();
-                    return null;
-                });
-                fullScreenDarkens.computeIfPresent(window, (_, darken) -> {
-                    darken.detach();
-                    return null;
-                });
-            }
+            case FULL_SCREEN_DARKEN -> applyFullScreenDarken(window);
+            case NONE -> detach(window);
         }
     }
 

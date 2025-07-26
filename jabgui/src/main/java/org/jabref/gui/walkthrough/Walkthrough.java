@@ -77,7 +77,7 @@ public class Walkthrough {
         }
 
         WalkthroughStep step = getCurrentStep();
-        overlay.displayStep(step);
+        overlay.show(step);
     }
 
     /**
@@ -97,7 +97,7 @@ public class Walkthrough {
         }
 
         WalkthroughStep step = getCurrentStep();
-        overlay.displayStep(step);
+        overlay.show(step);
     }
 
     /**
@@ -116,7 +116,7 @@ public class Walkthrough {
         }
 
         WalkthroughStep step = getCurrentStep();
-        overlay.displayStep(step);
+        overlay.show(step);
     }
 
     private void stop() {
@@ -139,7 +139,7 @@ public class Walkthrough {
         }
 
         WalkthroughStep step = getCurrentStep();
-        overlay.displayStep(step);
+        overlay.show(step);
     }
 
     public @NonNull WalkthroughStep getStepAtIndex(int index) {

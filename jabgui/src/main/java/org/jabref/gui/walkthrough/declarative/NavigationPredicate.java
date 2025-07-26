@@ -2,7 +2,12 @@ package org.jabref.gui.walkthrough.declarative;
 
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javafx.application.Platform;
@@ -10,10 +15,12 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventDispatchChain;
+import javafx.event.EventDispatcher;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ButtonBase;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.input.MouseEvent;
@@ -22,82 +29,66 @@ import javafx.stage.Window;
 import org.jabref.gui.frame.MainMenu;
 
 import com.sun.javafx.scene.control.ContextMenuContent;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Defines a predicate for when navigation should occur on a target node.
- */
+/// Defines a predicate for when navigation should occur on a target node.
 @FunctionalInterface
 public interface NavigationPredicate {
-    long HANDLER_TIMEOUT_MS = 1000;
+    long TIMEOUT_MS = 1000;
+    ScheduledExecutorService SCHEDULED_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    /**
-     * Attaches the navigation listeners to the target node.
-     *
-     * @param targetNode     the node to attach the listeners to
-     * @param beforeNavigate the runnable to execute before navigation
-     * @param onNavigate     the runnable to execute when navigation occurs
-     * @return a runnable to clean up the listeners
-     */
-    Runnable attachListeners(@NonNull Node targetNode, Runnable beforeNavigate, Runnable onNavigate);
+    /// Attaches the navigation listeners to the target node.
+    ///
+    /// @param node           the node to attach the listeners to
+    /// @param beforeNavigate the runnable to execute before navigation
+    /// @param onNavigate     the runnable to execute when navigation occurs
+    /// @return a runnable to clean up the listeners
+    Runnable attachListeners(@NonNull Node node, Runnable beforeNavigate, Runnable onNavigate);
 
     static NavigationPredicate onClick() {
-        return (targetNode, beforeNavigate, onNavigate) -> {
-            EventHandler<? super MouseEvent> onClicked = targetNode.getOnMouseClicked();
-            targetNode.setOnMouseClicked(decorate(beforeNavigate, onClicked, onNavigate));
+        return (node, beforeNavigate, onNavigate) -> {
+            EventDispatcher dispatcher = node.getEventDispatcher();
+            node.setEventDispatcher(getPatchedDispatcher(beforeNavigate, onNavigate, node,
+                    ActionEvent.ACTION, MouseEvent.MOUSE_CLICKED));
 
-            Optional<MenuItem> item = resolveMenuItem(targetNode);
+            Optional<MenuItem> item = resolveMenuItem(node);
             if (item.isPresent()) {
                 MenuItem menuItem = item.get();
-                // Note MenuItem doesn't extend Node, so the duplication between MenuItem and ButtonBase cannot be removed
                 EventHandler<ActionEvent> onAction = menuItem.getOnAction();
-                EventHandler<ActionEvent> decoratedAction = decorate(beforeNavigate, onAction, onNavigate);
-                menuItem.setOnAction(decoratedAction);
-                menuItem.addEventFilter(ActionEvent.ACTION, decoratedAction);
+                EventHandler<ActionEvent> decoratedHandler = getPatchedEventHandler(beforeNavigate, onNavigate, onAction);
+                menuItem.setOnAction(decoratedHandler);
+                menuItem.addEventFilter(ActionEvent.ACTION, decoratedHandler);
 
                 return () -> {
-                    targetNode.setOnMouseClicked(onClicked);
+                    node.setEventDispatcher(dispatcher);
                     menuItem.setOnAction(onAction);
-                    menuItem.removeEventFilter(ActionEvent.ACTION, decoratedAction);
+                    menuItem.removeEventFilter(ActionEvent.ACTION, decoratedHandler);
                 };
             }
 
-            if (targetNode instanceof ButtonBase button) {
-                EventHandler<ActionEvent> onAction = button.getOnAction();
-                EventHandler<ActionEvent> decoratedAction = decorate(beforeNavigate, onAction, onNavigate);
-
-                button.setOnAction(decoratedAction);
-                button.addEventFilter(ActionEvent.ACTION, decoratedAction);
-
-                return () -> {
-                    targetNode.setOnMouseClicked(onClicked);
-                    button.setOnAction(onAction);
-                    button.removeEventFilter(ActionEvent.ACTION, decoratedAction);
-                };
-            }
-
-            return () -> targetNode.setOnMouseClicked(onClicked);
+            return () -> node.setEventDispatcher(dispatcher);
         };
     }
 
     static NavigationPredicate onHover() {
-        return (targetNode, beforeNavigate, onNavigate) -> {
-            EventHandler<? super MouseEvent> onEnter = targetNode.getOnMouseEntered();
-            targetNode.setOnMouseEntered(decorate(beforeNavigate, onEnter, onNavigate));
+        return (node, beforeNavigate, onNavigate) -> {
+            EventHandler<? super MouseEvent> onEnter = node.getOnMouseEntered();
+            node.setOnMouseEntered(getPatchedEventHandler(beforeNavigate, onNavigate, onEnter));
 
-            Optional<MenuItem> item = resolveMenuItem(targetNode);
+            Optional<MenuItem> item = resolveMenuItem(node);
             if (item.isPresent()) {
                 throw new IllegalArgumentException("onHover cannot be used with MenuItems");
             }
 
-            return () -> targetNode.setOnMouseEntered(onEnter);
+            return () -> node.setOnMouseEntered(onEnter);
         };
     }
 
     static NavigationPredicate onTextInput() {
-        return (targetNode, beforeNavigate, onNavigate) -> {
-            if (targetNode instanceof TextInputControl textInput) {
+        return (node, beforeNavigate, onNavigate) -> {
+            if (node instanceof TextInputControl textInput) {
                 ChangeListener<String> listener = (_, _, newText) -> {
                     if (!newText.trim().isEmpty()) {
                         beforeNavigate.run();
@@ -147,87 +138,118 @@ public interface NavigationPredicate {
                      .findFirst();
     }
 
-    static <T extends Event> EventHandler<T> decorate(
+    /// Decorates an event dispatcher to execute additional logic before and after the
+    /// original dispatcher, ensuring onNavigate runs concurrently or after a timeout,
+    /// or upon a window change.
+    ///
+    /// @param beforeNavigate the runnable to execute before the original dispatcher
+    /// @param onNavigate     the runnable to execute after the original dispatcher,
+    ///                       timeout, or window change
+    /// @param node           the node to which the dispatcher is attached
+    /// @param eventTypes     the event types to patch
+    /// @return the decorated event dispatcher
+    @SafeVarargs
+    private static @NotNull EventDispatcher getPatchedDispatcher(
             Runnable beforeNavigate,
-            EventHandler<? super T> originalHandler,
-            Runnable onNavigate) {
-        return event -> navigate(beforeNavigate, originalHandler, event, onNavigate);
+            Runnable onNavigate,
+            Node node,
+            EventType<? extends Event>... eventTypes
+    ) {
+        EventDispatcher dispatcher = node.getEventDispatcher();
+        Set<EventType<? extends Event>> eventTypeSet = Set.of(eventTypes);
+        return new EventDispatcher() {
+            @Override
+            public Event dispatchEvent(Event event, EventDispatchChain tail) {
+                if (eventTypeSet.contains(event.getEventType())) {
+                    if (node.isDisabled()) {
+                        return fallbackDispatch(event, tail);
+                    }
+                    return patched(
+                            beforeNavigate,
+                            onNavigate,
+                            () -> dispatcher.dispatchEvent(event, tail)
+                    );
+                }
+                return fallbackDispatch(event, tail);
+            }
+
+            private Event fallbackDispatch(Event event, EventDispatchChain tail) {
+                return dispatcher.dispatchEvent(event, tail);
+            }
+        };
     }
 
-    /// Navigates to the target node by consuming the event.
-    /// 1. Execute beforeNavigate, which typically used to stop node polling and prevent
-    /// auto-fallback navigation during the handler execution.
-    /// 2. Execute the original event handler if it exists.
-    /// 3. Execute the onNavigate runnable, when
-    ///    - The original handler has completed execution, or
-    ///    - The handler has timed out after HANDLER_TIMEOUT_MS milliseconds.
-    ///    - A new window has been opened.
+    /// Decorates an event handler to execute additional logic before and after the
+    /// original handler, ensuring onNavigate runs concurrently or after a timeout, or
+    /// upon a window change.
     ///
-    /// These conditions ensure that we will still navigate if original handler is
-    /// blocking (e.g., showing a dialog, and we are highlighting a node in the dialog)
-    /// and is still responsive (i.e., we will navigate after a certain amount of time,
-    /// or a new window has been opened, and we can start polling the new window).
-    ///
-    /// @param <T>             the type of the event
-    /// @param beforeNavigate  a runnable to execute before navigation
-    /// @param originalHandler the original event handler to execute
-    /// @param event           the event to navigate
-    static <T extends Event> void navigate(
-            @NonNull Runnable beforeNavigate,
-            @Nullable EventHandler<? super T> originalHandler,
-            @NonNull T event,
-            @NonNull Runnable onNavigate) {
-
-        event.consume();
-        beforeNavigate.run();
-
-        // To allow running onNavigate immediately after the original handler,
-        // future is used more as a signal to indicate that the original handler has finished.
-        CompletableFuture<Void> handlerFuture = new CompletableFuture<>();
-
-        if (originalHandler != null) {
-            Platform.runLater(() -> {
-                try {
-                    originalHandler.handle(event);
-                } finally {
-                    handlerFuture.complete(null);
+    /// @param beforeNavigate the runnable to execute before the original handler
+    /// @param onNavigate     the runnable to execute after the original handler,
+    ///                       timeout, or window change
+    /// @param handler        the original event handler
+    /// @return the decorated event handler
+    private static @NotNull <T extends Event> EventHandler<T> getPatchedEventHandler(
+            Runnable beforeNavigate,
+            Runnable onNavigate,
+            @Nullable EventHandler<? super T> handler
+    ) {
+        return event -> patched(
+                beforeNavigate,
+                onNavigate,
+                () -> {
+                    if (handler != null) {
+                        handler.handle(event);
+                        event.consume();
+                        return null;
+                    }
+                    return null;
                 }
-            });
-        } else {
-            handlerFuture.complete(null);
+        );
+    }
+
+    private static @NotNull <T> T patched(Runnable before, Runnable after, Supplier<T> between) {
+        before.run();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        Runnable fxAfter = () -> Platform.runLater(after);
+        ListChangeListener<Window> windowListener = getWindowListener(latch, fxAfter);
+
+        SCHEDULED_EXECUTOR.schedule(() -> {
+            if (latch.getCount() > 0) {
+                latch.countDown();
+                fxAfter.run();
+            }
+            Window.getWindows().removeListener(windowListener);
+        }, TIMEOUT_MS, TimeUnit.MILLISECONDS);
+
+        T result = between.get();
+
+        if (latch.getCount() > 0) {
+            latch.countDown();
+            after.run();
         }
+        Window.getWindows().removeListener(windowListener);
 
-        CompletableFuture<Void> windowFuture = new CompletableFuture<>();
+        return result;
+    }
 
-        ListChangeListener<Window> listener = new ListChangeListener<>() {
+    private static @NotNull ListChangeListener<Window> getWindowListener(CountDownLatch latch, Runnable fxOnNavigate) {
+        ListChangeListener<Window> windowListener = new ListChangeListener<>() {
             @Override
             public void onChanged(Change<? extends Window> change) {
                 while (change.next()) {
-                    if (change.wasAdded()) {
+                    if (change.wasAdded() || change.wasRemoved()) {
+                        if (latch.getCount() > 0) {
+                            latch.countDown();
+                            fxOnNavigate.run();
+                        }
                         Window.getWindows().removeListener(this);
-                        windowFuture.complete(null);
-                        return;
+                        break;
                     }
                 }
             }
         };
-
-        Platform.runLater(() -> Window.getWindows().addListener(listener));
-
-        CompletableFuture<Void> timeoutFuture = CompletableFuture.runAsync(() -> {
-            try {
-                Thread.sleep(HANDLER_TIMEOUT_MS);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        });
-
-        CompletableFuture.anyOf(handlerFuture, windowFuture, timeoutFuture)
-                         .whenComplete((_, _) -> {
-                             Platform.runLater(onNavigate);
-                             timeoutFuture.cancel(true);
-                             Platform.runLater(() -> Window.getWindows().removeListener(listener));
-                             windowFuture.cancel(true);
-                         });
+        Window.getWindows().addListener(windowListener);
+        return windowListener;
     }
 }

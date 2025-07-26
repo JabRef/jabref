@@ -30,11 +30,9 @@ public class FullScreenDarken extends WalkthroughEffect {
     }
 
     public void attach() {
-        updater.cleanup();
         if (overlay == null) {
             initializeEffect();
         }
-        setupPaneListeners();
         updateLayout();
     }
 

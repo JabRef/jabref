@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-import org.jabref.gui.walkthrough.WalkthroughUpdater;
+import org.jabref.gui.walkthrough.WalkthroughUtils;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -30,8 +30,7 @@ public class BackdropHighlight extends WalkthroughEffect {
             initializeEffect();
         }
         this.node = node;
-        setupNodeListeners(this.node);
-        setupPaneListeners();
+        setupListeners(this.node);
         updateLayout();
     }
 
@@ -57,7 +56,7 @@ public class BackdropHighlight extends WalkthroughEffect {
 
     @Override
     protected void updateLayout() {
-        if (WalkthroughUpdater.cannotPositionNode(node)) {
+        if (WalkthroughUtils.cannotPositionNode(node)) {
             hideEffect();
             return;
         }
@@ -95,7 +94,8 @@ public class BackdropHighlight extends WalkthroughEffect {
 
     @Override
     protected void hideEffect() {
-        assert overlayShape != null : "Overlay shape should be initialized before hiding effect";
-        overlayShape.setVisible(false);
+        if (overlayShape != null) {
+            overlayShape.setVisible(false);
+        }
     }
 }

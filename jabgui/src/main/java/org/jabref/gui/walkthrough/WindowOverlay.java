@@ -1,8 +1,11 @@
 package org.jabref.gui.walkthrough;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -20,29 +23,29 @@ import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Manages the overlay for displaying walkthrough steps in a single window.
- */
-public class SingleWindowWalkthroughOverlay {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SingleWindowWalkthroughOverlay.class);
+/// Manages the overlay for displaying walkthrough steps in a single window.
+public class WindowOverlay {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WindowOverlay.class);
 
     private final Window window;
     private final GridPane overlayPane;
     private final Pane originalRoot;
     private final StackPane stackPane;
     private final WalkthroughRenderer renderer;
-    private final WalkthroughUpdater updater = new WalkthroughUpdater();
+    private final Walkthrough walkthrough;
+    private final List<Runnable> cleanupTasks = new ArrayList<>();
 
-    public SingleWindowWalkthroughOverlay(Window window) {
+    public WindowOverlay(Window window, Walkthrough walkthrough) {
         this.window = window;
         this.renderer = new WalkthroughRenderer();
+        this.walkthrough = walkthrough;
 
         overlayPane = new GridPane();
         overlayPane.getStyleClass().add("walkthrough-overlay");
@@ -63,65 +66,24 @@ public class SingleWindowWalkthroughOverlay {
         scene.setRoot(stackPane);
     }
 
-    /// Display a walkthrough step without a target node.
-    public void displayStep(WalkthroughStep step, Runnable beforeNavigate, Walkthrough walkthrough) {
-        displayStep(step, null, beforeNavigate, walkthrough);
-    }
-
-    /// Displays a walkthrough step, with or without a target node.
-    public void displayStep(WalkthroughStep step,
-                            @Nullable Node targetNode,
-                            Runnable beforeNavigate,
-                            Walkthrough walkthrough) {
+    /// Display a tooltip for the given step at the specified node.
+    ///
+    /// @param step           The step to display.
+    /// @param node           The node to anchor the tooltip to, or null to show it at
+    ///                       the window.
+    /// @param beforeNavigate A runnable to execute before navigating to the next step.
+    ///                       More precisely, the runnable to execute immediately upon
+    ///                       the button press before Walkthrough's state change to the
+    ///                       next step and before the original button/node's action is
+    ///                       executed. Usually used to prevent automatic revert from
+    ///                       unexpected reverting to the previous step when the node is
+    ///                       not yet ready to be displayed
+    /// @see WindowOverlay#showPanel(PanelStep, Runnable)
+    /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
+    public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
 
-        switch (step) {
-            case TooltipStep tooltipStep -> {
-                Node content = renderer.render(tooltipStep, walkthrough, beforeNavigate);
-                displayTooltipStep(content, targetNode, tooltipStep);
-                hideOverlayPane();
-            }
-            case PanelStep panelStep -> {
-                Node content = renderer.render(panelStep, walkthrough, beforeNavigate);
-                displayPanelStep(content, panelStep);
-                setupClipping(content);
-                overlayPane.toFront();
-            }
-        }
-
-        if (targetNode == null) {
-            return;
-        }
-
-        step.navigationPredicate().ifPresent(predicate -> updater
-                .addCleanupTask(predicate.attachListeners(targetNode, beforeNavigate, walkthrough::nextStep)));
-    }
-
-    /**
-     * Hide the overlay and clean up any resources.
-     */
-    public void hide() {
-        overlayPane.getChildren().clear();
-        overlayPane.setClip(null);
-        overlayPane.setVisible(true);
-        updater.cleanup();
-    }
-
-    /**
-     * Detaches the overlay and restores the original scene root.
-     */
-    public void detach() {
-        hide();
-
-        Scene scene = window.getScene();
-        if (scene != null && originalRoot != null) {
-            stackPane.getChildren().remove(originalRoot);
-            scene.setRoot(originalRoot);
-            LOGGER.debug("Restored original scene root: {}", originalRoot.getClass().getName());
-        }
-    }
-
-    private void displayTooltipStep(Node content, @Nullable Node targetNode, TooltipStep step) {
+        Node content = renderer.render(step, walkthrough, beforeNavigate);
         PopOver popover = new PopOver();
         popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets()); // FIXME: walkaround to prevent popover from not properly inheriting styles
         popover.setContentNode(content);
@@ -132,23 +94,51 @@ public class SingleWindowWalkthroughOverlay {
         popover.setAutoHide(false);
         popover.setAutoFix(true);
 
-        if (targetNode == null) {
+        cleanupTasks.add(popover::hide);
+        overlayPane.setVisible(false);
+
+        if (node == null) {
             popover.show(window);
             return;
         }
 
-        popover.show(targetNode);
-        updater.addCleanupTask(popover::hide);
-        Runnable showPopover = () -> {
-            if (WalkthroughUpdater.cannotPositionNode(targetNode)) {
+        popover.show(node);
+
+        cleanupTasks.add(EasyBind.subscribe(node.localToSceneTransformProperty(), _ -> {
+            if (WalkthroughUtils.cannotPositionNode(node)) {
                 return;
             }
-            popover.show(targetNode);
-        };
-        updater.setupScrollContainerListeners(targetNode, showPopover);
+            popover.show(node);
+        })::unsubscribe);
+        step.navigationPredicate().ifPresent(predicate ->
+                cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
     }
 
-    private void displayPanelStep(Node content, PanelStep step) {
+    public void showPanel(PanelStep step, Runnable beforeNavigate) {
+        showPanel(step, null, beforeNavigate);
+    }
+
+    /// Display a Panel for the given step at the specified node.
+    ///
+    /// @param step           The step to display.
+    /// @param node           The node to anchor highlight to (e.g., BackdropHighlight
+    ///                       may poke a hole at the position of the node), or null to
+    ///                       use fallback effect of corresponding position.
+    /// @param beforeNavigate A runnable to execute before navigating to the next step.
+    ///                       More precisely, the runnable to execute immediately upon
+    ///                       the button press before Walkthrough's state change to the
+    ///                       next step and before the original button/node's action is
+    ///                       executed. Usually used to prevent automatic revert from
+    ///                       unexpected reverting to the previous step when the node is
+    ///                       not yet ready to be displayed
+    /// @see WindowOverlay#showPanel(PanelStep, Runnable)
+    /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
+    public void showPanel(PanelStep step, @Nullable Node node, Runnable beforeNavigate) {
+        hide();
+
+        overlayPane.setVisible(true);
+
+        Node content = renderer.render(step, walkthrough, beforeNavigate);
         overlayPane.getChildren().clear();
         overlayPane.getRowConstraints().clear();
         overlayPane.getColumnConstraints().clear();
@@ -185,6 +175,34 @@ public class SingleWindowWalkthroughOverlay {
                 overlayPane.setAlignment(Pos.CENTER);
             }
         }
+        setupClipping(content);
+        overlayPane.toFront();
+
+        if (node != null) {
+            step.navigationPredicate().ifPresent(predicate ->
+                    cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
+        }
+    }
+
+    /// Hide the overlay and clean up any resources.
+    public void hide() {
+        overlayPane.getChildren().clear();
+        overlayPane.setClip(null);
+        overlayPane.setVisible(false);
+        cleanupTasks.forEach(Runnable::run);
+        cleanupTasks.clear();
+    }
+
+    /// Detaches the overlay and restores the original scene root.
+    public void detach() {
+        hide();
+
+        Scene scene = window.getScene();
+        if (scene != null && originalRoot != null) {
+            stackPane.getChildren().remove(originalRoot);
+            scene.setRoot(originalRoot);
+            LOGGER.debug("Restored original scene root: {}", originalRoot.getClass().getName());
+        }
     }
 
     private void configurePanelLayout(PanelPosition position) {
@@ -220,22 +238,12 @@ public class SingleWindowWalkthroughOverlay {
 
     private Optional<PopOver.ArrowLocation> mapToArrowLocation(TooltipPosition position) {
         return Optional.ofNullable(switch (position) {
-            case TOP ->
-                    PopOver.ArrowLocation.BOTTOM_CENTER;
-            case BOTTOM ->
-                    PopOver.ArrowLocation.TOP_CENTER;
-            case LEFT ->
-                    PopOver.ArrowLocation.RIGHT_CENTER;
-            case RIGHT ->
-                    PopOver.ArrowLocation.LEFT_CENTER;
-            case AUTO ->
-                    null;
+            case TOP -> PopOver.ArrowLocation.BOTTOM_CENTER;
+            case BOTTOM -> PopOver.ArrowLocation.TOP_CENTER;
+            case LEFT -> PopOver.ArrowLocation.RIGHT_CENTER;
+            case RIGHT -> PopOver.ArrowLocation.LEFT_CENTER;
+            case AUTO -> null;
         });
-    }
-
-    private void hideOverlayPane() {
-        overlayPane.setVisible(false);
-        updater.addCleanupTask(() -> overlayPane.setVisible(true));
     }
 
     private void setupClipping(Node node) {
@@ -246,7 +254,9 @@ public class SingleWindowWalkthroughOverlay {
                 overlayPane.setClip(clip);
             }
         };
-        updater.listen(node.boundsInLocalProperty(), listener);
+        ObservableValue<Bounds> property = node.boundsInLocalProperty();
+        property.addListener(listener);
+        cleanupTasks.add(() -> property.removeListener(listener));
         listener.changed(null, null, node.getBoundsInParent());
     }
 }
