@@ -2677,12 +2677,11 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-quit-button:hover {
-    /* FIXME: Use derive/JabRef variable colors */
     -fx-background-color: derive(-jr-gray-1, -20%);
 }
 
 .walkthrough-quit-button:pressed {
-    -fx-background-color: derive(-jr-gray-1, -30%);
+    -fx-background-color: derive(-jr-gray-1, 30%);
 }
 
 .walkthrough-quit-button .glyph-icon,
