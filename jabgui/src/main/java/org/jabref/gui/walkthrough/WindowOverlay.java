@@ -3,6 +3,7 @@ package org.jabref.gui.walkthrough;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,6 +23,7 @@ import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
+import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -78,31 +80,39 @@ public class WindowOverlay {
     /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable).
     public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
-        Node content = renderer.render(step, walkthrough, beforeNavigate);
-        PopOver popover = new PopOver();
-        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets());
-        popover.setContentNode(content);
-        popover.setDetachable(false);
-        popover.setCloseButtonEnabled(false);
-        popover.setHeaderAlwaysVisible(false);
-        mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
-        popover.setAutoHide(false);
-        popover.setConsumeAutoHidingEvents(false);
-
-        cleanupTasks.add(popover::hide);
-        addQuitButton(step);
 
         if (node == null) {
+            PopOver popover = createPopover(step, beforeNavigate);
+            cleanupTasks.add(popover::hide);
+            addQuitButton(step);
             popover.show(window);
             return;
         }
 
+        PopOver popover = createPopover(step, beforeNavigate);
+        cleanupTasks.add(popover::hide);
+        addQuitButton(step);
         popover.show(node);
+
+        AtomicReference<PopOver> currentPopover = new AtomicReference<>(popover);
+
+        cleanupTasks.add(EasyBind.subscribe(currentPopover.get().showingProperty(), showing -> {
+            if (!showing && !WalkthroughUtils.cannotPositionNode(node)) {
+                currentPopover.get().hide();
+                PopOver newPopover = createPopover(step, beforeNavigate);
+                currentPopover.set(newPopover);
+                cleanupTasks.add(newPopover::hide);
+                newPopover.show(node);
+            }
+        })::unsubscribe);
 
         step.navigationPredicate().ifPresent(predicate ->
                 cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
     }
 
+    /// Convenience method to show a panel for the given step without a node.
+    ///
+    /// See [WindowOverlay#showPanel(PanelStep, Node, Runnable)] for details.
     public void showPanel(PanelStep step, Runnable beforeNavigate) {
         showPanel(step, null, beforeNavigate);
     }
@@ -192,6 +202,19 @@ public class WindowOverlay {
             scene.setRoot(original);
             LOGGER.debug("Restored original scene root: {}", original.getClass().getName());
         }
+    }
+
+    private PopOver createPopover(TooltipStep step, Runnable beforeNavigate) {
+        Node content = renderer.render(step, walkthrough, beforeNavigate);
+        PopOver popover = new PopOver();
+        popover.getScene().getStylesheets().setAll(window.getScene().getStylesheets());
+        popover.setContentNode(content);
+        popover.setDetachable(false);
+        popover.setCloseButtonEnabled(false);
+        popover.setHeaderAlwaysVisible(false);
+        popover.setAutoHide(false);
+        mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
+        return popover;
     }
 
     private Optional<PopOver.ArrowLocation> mapToArrowLocation(TooltipPosition position) {
