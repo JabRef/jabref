@@ -18,7 +18,7 @@ import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
 import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
+import org.jabref.gui.walkthrough.declarative.step.VisibleWalkthroughStep;
 import org.jabref.logic.l10n.Localization;
 
 /// Renders the walkthrough steps and content blocks into JavaFX Nodes.
@@ -134,7 +134,7 @@ public class WalkthroughRenderer {
         return container;
     }
 
-    private HBox makeActions(WalkthroughStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
+    private HBox makeActions(VisibleWalkthroughStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
         HBox actions = new HBox();
         actions.setAlignment(Pos.CENTER_LEFT);
         actions.getStyleClass().add("walkthrough-actions");
@@ -163,7 +163,7 @@ public class WalkthroughRenderer {
         return actions;
     }
 
-    private VBox makeContent(WalkthroughStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
+    private VBox makeContent(VisibleWalkthroughStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
         VBox contentBox = new VBox();
         contentBox.getStyleClass().add("walkthrough-content");
         contentBox.getChildren().addAll(step.content().stream().map(block ->

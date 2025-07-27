@@ -30,7 +30,7 @@ public record TooltipStep(
         @Nullable WindowResolver activeWindowResolverValue,
         boolean showQuitButtonValue,
         @NonNull QuitButtonPosition quitButtonPositionValue
-) implements WalkthroughStep {
+) implements VisibleWalkthroughStep {
     public static final double DEFAULT_WIDTH = 384;
 
     @Override
