@@ -31,6 +31,7 @@ public record TooltipStep(
         boolean showQuitButtonValue,
         @NonNull QuitButtonPosition quitButtonPositionValue
 ) implements WalkthroughStep {
+    public static final double DEFAULT_WIDTH = 384;
 
     @Override
     public Optional<NodeResolver> resolver() {
@@ -58,12 +59,12 @@ public record TooltipStep(
     }
 
     @Override
-    public OptionalDouble width() {
-        return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.empty();
+    public OptionalDouble maxWidth() {
+        return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.of(DEFAULT_WIDTH);
     }
 
     @Override
-    public OptionalDouble height() {
+    public OptionalDouble maxHeight() {
         return heightValue != null ? OptionalDouble.of(heightValue) : OptionalDouble.empty();
     }
 

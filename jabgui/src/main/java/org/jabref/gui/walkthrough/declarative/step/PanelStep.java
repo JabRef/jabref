@@ -57,12 +57,12 @@ public record PanelStep(
     }
 
     @Override
-    public OptionalDouble width() {
+    public OptionalDouble maxWidth() {
         return widthValue != null ? OptionalDouble.of(widthValue) : OptionalDouble.empty();
     }
 
     @Override
-    public OptionalDouble height() {
+    public OptionalDouble maxHeight() {
         return heightValue != null ? OptionalDouble.of(heightValue) : OptionalDouble.empty();
     }
 

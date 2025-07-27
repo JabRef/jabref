@@ -53,6 +53,7 @@ public class WindowOverlay {
         original = scene.getRoot();
         stackPane = new StackPane();
         stackPane.getChildren().add(original);
+        stackPane.setMinSize(0, 0); // NOTE: Default size is 600x400, which makes the overlay too large
         scene.setRoot(stackPane);
     }
 
@@ -99,7 +100,7 @@ public class WindowOverlay {
         cleanupTasks.add(EasyBind.subscribe(currentPopover.get().showingProperty(), showing -> {
             if (!showing && !WalkthroughUtils.cannotPositionNode(node)) {
                 currentPopover.get().hide();
-                PopOver newPopover = createPopover(step, beforeNavigate);
+                PopOver newPopover = createPopover(step, beforeNavigate); // Show the original PopOver usually lead to "cannot open closed window" exception
                 currentPopover.set(newPopover);
                 cleanupTasks.add(newPopover::hide);
                 newPopover.show(node);
@@ -137,7 +138,6 @@ public class WindowOverlay {
         Node content = renderer.render(step, walkthrough, beforeNavigate);
         content.setMouseTransparent(false);
         currentContentNode = content;
-        // Position content directly in StackPane
         switch (step.position()) {
             case LEFT -> {
                 StackPane.setAlignment(content, Pos.CENTER_LEFT);

@@ -83,7 +83,6 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step3 = TooltipStep
                 .builder(Localization.lang("Select the \"Linked files\" tab"))
                 .content(new TextBlock(Localization.lang("This section manages how JabRef handles your PDF files and other documents.")))
-                .width(400)
                 .resolver(NodeResolver.predicate(node ->
                         node.getStyleClass().contains("list-cell") &&
                                 node.toString().contains(Localization.lang("Linked files"))))
@@ -96,7 +95,6 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step4 = TooltipStep
                 .builder(Localization.lang("Enable \"Main file directory\" option"))
                 .content(new TextBlock(Localization.lang("Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step.")))
-                .width(400)
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.AUTO)
