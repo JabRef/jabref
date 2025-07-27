@@ -34,23 +34,23 @@ public class WalkthroughAction extends SimpleCommand {
     private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new HashMap<>(); // must be mutable to allow caching of created walkthroughs
 
     private final Walkthrough walkthrough;
-    private final Stage mainStage;
+    private final Stage stage;
 
     public WalkthroughAction(String name) {
-        this.mainStage = Injector.instantiateModelOrService(Stage.class);
+        this.stage = Injector.instantiateModelOrService(Stage.class);
         if (WALKTHROUGH_CACHE.containsKey(name)) {
             this.walkthrough = WALKTHROUGH_CACHE.get(name);
         } else {
             Function<Stage, Walkthrough> walkthroughProvider = WALKTHROUGH_REGISTRY.get(name);
             Objects.requireNonNull(walkthroughProvider, "Walkthrough not found: " + name);
-            this.walkthrough = walkthroughProvider.apply(mainStage);
+            this.walkthrough = walkthroughProvider.apply(stage);
             WALKTHROUGH_CACHE.put(name, this.walkthrough);
         }
     }
 
     @Override
     public void execute() {
-        walkthrough.start(this.mainStage);
+        walkthrough.start(this.stage);
     }
 
     private static Walkthrough createMainFileDirectoryWalkthrough(Stage mainStage) {

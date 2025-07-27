@@ -5,24 +5,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.keyboard.KeyBindingRepository;
+import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
+import org.jabref.gui.keyboard.WalkthroughKeyBindings;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
+import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
 import org.jspecify.annotations.Nullable;
@@ -38,6 +45,7 @@ public class WindowOverlay {
     private final WalkthroughRenderer renderer;
     private final Walkthrough walkthrough;
     private final List<Runnable> cleanupTasks = new ArrayList<>();
+    private final KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
     private @Nullable Button quitButton;
     private @Nullable Node currentContentNode;
@@ -54,6 +62,7 @@ public class WindowOverlay {
         stackPane = new StackPane();
         stackPane.getChildren().add(original);
         stackPane.setMinSize(0, 0); // NOTE: Default size is 600x400, which makes the overlay too large
+        listenKeybindings(stackPane, scene);
         scene.setRoot(stackPane);
     }
 
@@ -103,6 +112,11 @@ public class WindowOverlay {
                 PopOver newPopover = createPopover(step, beforeNavigate); // Show the original PopOver usually lead to "cannot open closed window" exception
                 currentPopover.set(newPopover);
                 cleanupTasks.add(newPopover::hide);
+                cleanupTasks.add(EasyBind.subscribe(newPopover.showingProperty(), newPopoverShowing -> {
+                    if (newPopoverShowing) {
+                        WalkthroughUtils.cannotPositionNode(node);
+                    }
+                })::unsubscribe);
                 newPopover.show(node);
             }
         })::unsubscribe);
@@ -213,8 +227,35 @@ public class WindowOverlay {
         popover.setCloseButtonEnabled(false);
         popover.setHeaderAlwaysVisible(false);
         popover.setAutoHide(false);
+        popover.setConsumeAutoHidingEvents(false);
+        popover.setHideOnEscape(false);
         mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
+
+        Scene scene = popover.getScene();
+        if (scene == null) {
+            return popover;
+        }
+        listenKeybindings(scene, scene);
         return popover;
+    }
+
+    /// Adds keybinding listeners to the scene to handle key events for the
+    /// walkthrough.
+    ///
+    /// This method is necessary because:
+    /// 1. PopOver is in a separate scene, so the [org.jabref.gui.JabRefGUI]'s
+    /// keybindings registration on the main scene doesn't/cannot capture the key events
+    /// on the PopOver scene. If a user, presumably, focus on the PopOver and press Esc,
+    /// quit Walkthrough will not work.
+    /// 2. Likewise, for new dialog windows, the keybindings doesn't work. If a user is
+    /// interested in copy/paste walkthrough text, they will not be able to do so.
+    private void listenKeybindings(EventTarget target, Scene scene) {
+        EventHandler<KeyEvent> eventFilter = event -> {
+            SelectableTextFlowKeyBindings.call(scene, event, keyBindingRepository);
+            WalkthroughKeyBindings.call(event, keyBindingRepository);
+        };
+        target.addEventFilter(KeyEvent.KEY_PRESSED, eventFilter);
+        cleanupTasks.add(() -> scene.removeEventFilter(KeyEvent.KEY_PRESSED, eventFilter));
     }
 
     private Optional<PopOver.ArrowLocation> mapToArrowLocation(TooltipPosition position) {

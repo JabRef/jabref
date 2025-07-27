@@ -34,7 +34,6 @@ public enum KeyBinding {
     CLEANUP("Clean up", Localization.lang("Clean up entries"), "alt+F8", KeyBindingCategory.QUALITY),
     CLOSE_DATABASE("Close library", Localization.lang("Close library"), "ctrl+W", KeyBindingCategory.FILE),
     CLOSE("Close dialog", Localization.lang("Close dialog"), "Esc", KeyBindingCategory.VIEW),
-    QUIT_WALKTHROUGH("Quit walkthrough", Localization.lang("Quit walkthrough"), "Esc", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl+C", KeyBindingCategory.EDIT),
     COPY_TITLE("Copy title", Localization.lang("Copy title"), "ctrl+shift+alt+T", KeyBindingCategory.EDIT),
 

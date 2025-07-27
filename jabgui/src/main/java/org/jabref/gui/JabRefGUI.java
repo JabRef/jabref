@@ -280,7 +280,7 @@ public class JabRefGUI extends Application {
         scene.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             TextInputKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
             SelectableTextFlowKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
-            WalkthroughKeyBindings.call(scene, event, preferences.getKeyBindingRepository());
+            WalkthroughKeyBindings.call(event, preferences.getKeyBindingRepository());
         });
 
         mainStage.setTitle(JabRefFrame.FRAME_TITLE);

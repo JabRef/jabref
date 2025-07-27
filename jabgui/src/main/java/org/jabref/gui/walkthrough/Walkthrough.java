@@ -19,9 +19,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Maintains the state of a walkthrough.
- */
+/// Maintains the state of a walkthrough.
 public class Walkthrough {
     private static final Logger LOGGER = LoggerFactory.getLogger(Walkthrough.class);
 
@@ -29,9 +27,10 @@ public class Walkthrough {
     private final BooleanProperty active;
 
     private final List<WalkthroughStep> steps;
+    private final StateManager stateManager;
+
     private @Nullable WalkthroughOverlay overlay;
     private Stage currentStage;
-    private StateManager stateManager;
 
     public Walkthrough(List<WalkthroughStep> steps) {
         if (steps.isEmpty() || steps.stream().anyMatch(Objects::isNull)) {
@@ -48,20 +47,16 @@ public class Walkthrough {
         this(List.of(steps));
     }
 
-    /**
-     * Gets the current step index property.
-     *
-     * @return The current step index property.
-     */
+    /// Gets the current step index property.
+    ///
+    /// @return The current step index property.
     public ReadOnlyIntegerProperty currentStepProperty() {
         return currentStep;
     }
 
-    /**
-     * Starts the walkthrough from the first step.
-     *
-     * @param stage The stage to display the walkthrough on
-     */
+    /// Starts the walkthrough from the first step.
+    ///
+    /// @param stage The stage to display the walkthrough on
     public void start(Stage stage) {
         if (currentStage != stage) {
             if (overlay != null) {
@@ -85,9 +80,7 @@ public class Walkthrough {
         overlay.show(step);
     }
 
-    /**
-     * Moves to the next step in the walkthrough.
-     */
+    /// Moves to the next step in the walkthrough.
     public void nextStep() {
         int nextIndex = currentStep.get() + 1;
         if (nextIndex >= steps.size()) {
@@ -105,9 +98,7 @@ public class Walkthrough {
         overlay.show(step);
     }
 
-    /**
-     * Moves to the previous step in the walkthrough.
-     */
+    /// Moves to the previous step in the walkthrough.
     public void previousStep() {
         int prevIndex = currentStep.get() - 1;
         if (prevIndex < 0) {
