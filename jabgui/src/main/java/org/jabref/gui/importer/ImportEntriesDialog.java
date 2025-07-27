@@ -188,13 +188,23 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     private void displayBibTeX(BibEntry entry, String bibTeX) {
         if (entriesListView.getCheckModel().isChecked(entry)) {
-            bibTeXData.clear();
             bibTeXData.appendText(bibTeX);
+            bibTeXData.appendText(OS.NEWLINE);
             bibTeXData.moveTo(0);
             bibTeXData.requestFollowCaret();
         } else {
+            String currentText = bibTeXData.getText();
+            String newText = currentText.replace(bibTeX, "");
             bibTeXData.clear();
+            bibTeXData.appendText(newText);
         }
+    }
+    
+    private void displayBibTeXesWithoutCheck(String bibTeXes) {
+        bibTeXData.clear();
+        bibTeXData.appendText(bibTeXes);
+        bibTeXData.moveTo(0);
+        bibTeXData.requestFollowCaret();
     }
 
     private void initBibTeX() {
@@ -209,6 +219,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public void unselectAll() {
         entriesListView.getCheckModel().clearChecks();
+        bibTeXData.clear();
     }
 
     public void selectAllNewEntries() {
@@ -216,7 +227,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
         for (BibEntry entry : entriesListView.getItems()) {
             if (!viewModel.hasDuplicate(entry)) {
                 entriesListView.getCheckModel().check(entry);
-                displayBibTeX(entry, viewModel.getSourceString(entry));
+                displayBibTeX(entry, viewModel.getSourceString(entry, true));
             }
         }
     }
@@ -224,5 +235,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public void selectAllEntries() {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
+        List<BibEntry> entries = entriesListView.getItems();
+        displayBibTeXesWithoutCheck(viewModel.getSourcesString(entries));
     }
 }
