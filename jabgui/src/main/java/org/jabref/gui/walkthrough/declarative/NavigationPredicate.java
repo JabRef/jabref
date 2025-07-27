@@ -102,16 +102,13 @@ public interface NavigationPredicate {
         };
     }
 
-    static NavigationPredicate manual() {
+    /// This navigation predicate does nothing when attached. This requires the user to
+    /// click on "continue" or "skip" to proceed.
+    ///
+    /// @deprecated Just don't specify a navigation predicate if you want manual
+    /// navigation.
+    static NavigationPredicate onContinue() {
         return (_, _, _) -> () -> {
-        };
-    }
-
-    static NavigationPredicate auto() {
-        return (_, _, onNavigate) -> {
-            onNavigate.run();
-            return () -> {
-            };
         };
     }
 

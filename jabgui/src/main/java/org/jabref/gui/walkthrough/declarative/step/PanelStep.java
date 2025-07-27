@@ -12,6 +12,7 @@ import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -29,7 +30,7 @@ public record PanelStep(
         @Nullable WalkthroughEffect highlightValue,
         @Nullable WindowResolver activeWindowResolverValue,
         boolean showQuitButtonValue,
-        @NonNull QuitButtonPosition quitButtonPositionValue) implements WalkthroughStep {
+        @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleWalkthroughStep {
 
     @Override
     public Optional<NodeResolver> resolver() {

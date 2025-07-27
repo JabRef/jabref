@@ -27,7 +27,7 @@ import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
+import org.jabref.gui.walkthrough.declarative.step.VisibleWalkthroughStep;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.tobiasdiez.easybind.EasyBind;
@@ -45,7 +45,7 @@ public class WindowOverlay {
     private final WalkthroughRenderer renderer;
     private final Walkthrough walkthrough;
     private final List<Runnable> cleanupTasks = new ArrayList<>();
-    private final KeyBindingRepository keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+    private final KeyBindingRepository keyBindingRepository;
 
     private @Nullable Button quitButton;
     private @Nullable Node currentContentNode;
@@ -54,6 +54,7 @@ public class WindowOverlay {
         this.window = window;
         this.renderer = new WalkthroughRenderer();
         this.walkthrough = walkthrough;
+        this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
 
         Scene scene = window.getScene();
         assert scene != null; // NOTE: This should never happen.
@@ -268,7 +269,7 @@ public class WindowOverlay {
         });
     }
 
-    private void addQuitButton(WalkthroughStep step) {
+    private void addQuitButton(VisibleWalkthroughStep step) {
         if (!step.showQuitButton()) {
             removeQuitButton();
             return;
@@ -293,7 +294,7 @@ public class WindowOverlay {
         return button;
     }
 
-    private QuitButtonPosition resolveQuitButtonPosition(WalkthroughStep step) {
+    private QuitButtonPosition resolveQuitButtonPosition(VisibleWalkthroughStep step) {
         QuitButtonPosition position = step.quitButtonPosition();
         if (position == QuitButtonPosition.AUTO && step instanceof PanelStep panelStep) {
             return switch (panelStep.position()) {
