@@ -21,6 +21,7 @@ import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
 import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
@@ -106,29 +107,16 @@ public class WalkthroughAction extends SimpleCommand {
                 .builder(Localization.lang("Click \"Save\" to save changes"))
                 .content(
                         new TextBlock(Localization.lang("Congratulations. Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
-                        new InfoBlock(Localization.lang("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks"))
+                        new InfoBlock(Localization.lang("Additional information on main file directory can be found in [help](https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks)"))
                 )
                 .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
-                .continueButton(Localization.lang("Continue"))
                 .navigation(NavigationPredicate.onClick())
                 .position(PanelPosition.TOP)
+                .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
                 .highlight(preferenceHighlight)
                 .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
                 .build();
 
-        WalkthroughStep step6 = PanelStep
-                .builder(Localization.lang("Click \"Save\" to save changes"))
-                .content(
-                        new TextBlock(Localization.lang("Congratulations. Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
-                        new InfoBlock(Localization.lang("Additional information on main file directory can be found in https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks"))
-                )
-                .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
-                .navigation(NavigationPredicate.onClick())
-                .position(PanelPosition.LEFT)
-                .highlight(preferenceHighlight)
-                .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
-                .build();
-
-        return new Walkthrough(step1, step2, step3, step4, step5, step6);
+        return new Walkthrough(step1, step2, step3, step4, step5);
     }
 }
