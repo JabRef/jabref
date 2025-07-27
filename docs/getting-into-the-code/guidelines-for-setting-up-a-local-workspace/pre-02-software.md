@@ -21,12 +21,13 @@ It is strongly recommended that you have git installed.
 
 ### Windows
 
-* Use [git for windows](https://git-for-windows.github.io), no additional git tooling required
+* Install [Git for Windows](https://git-for-windows.github.io), no additional git tooling required. Git for Windows includes Git Bash.
   * [Download the installer](http://git-scm.com/download/win) and install it.
   * Activate the option "Use Git and optional Unix tools from the Windows Command Prompt".
   * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation. Aim: Store password for GitHub permanently for `https` repository locations
   * [Configure using Visual Studio Code as editor](https://code.visualstudio.com/docs/sourcecontrol/overview#_vs-code-as-git-editor) for any git prompts (commit messages at merge, ...)
-* We recommend using [Windows Terminal](https://aka.ms/terminal).
+* We recommend using [Windows Terminal](https://aka.ms/terminal), [configured to start Git Bash](https://www.timschaeps.be/post/adding-git-bash-to-windows-terminal/).
+* Install [WixToolSet](https://github.com/wixtoolset/wix).
 
 {: note}
 You can use [chocolatey](https://chocolatey.org/) to install git more smoothly.
