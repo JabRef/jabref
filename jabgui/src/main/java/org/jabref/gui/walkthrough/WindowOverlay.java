@@ -22,7 +22,6 @@ import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
-import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -59,7 +58,8 @@ public class WindowOverlay {
     ///
     /// @param step           The step to display.
     /// @param node           The node to anchor the tooltip to, or null to show it at
-    ///                       the window.
+    ///                       the window. The node is expected to be positionable by
+    ///                       [WalkthroughUtils#cannotPositionNode(Node)] standard.
     /// @param beforeNavigate A runnable to execute before navigating to the next step.
     ///                       More precisely, the runnable to execute immediately upon
     ///                       the button press before Walkthrough's state change to the
@@ -67,8 +67,15 @@ public class WindowOverlay {
     ///                       executed. Usually used to prevent automatic revert from
     ///                       unexpected reverting to the previous step when the node is
     ///                       not yet ready to be displayed
+    /// @implNote The requirement for the node to be positionable by
+    /// [WalkthroughUtils#cannotPositionNode(Node)] standard is just to make things
+    /// easier to define. This requirement come from
+    /// [javafx.stage.PopupWindow#show(Node)], which check whether the node is tree
+    /// visible before showing the popup and [PopOver#show(Node)], which checks whether
+    /// the node contains a scene and window to assign the owning window to the
+    /// popover.
     /// @see WindowOverlay#showPanel(PanelStep, Runnable)
-    /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
+    /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable).
     public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
         Node content = renderer.render(step, walkthrough, beforeNavigate);
@@ -80,7 +87,6 @@ public class WindowOverlay {
         popover.setHeaderAlwaysVisible(false);
         mapToArrowLocation(step.position()).ifPresent(popover::setArrowLocation);
         popover.setAutoHide(false);
-        popover.setAutoFix(true);
         popover.setConsumeAutoHidingEvents(false);
 
         cleanupTasks.add(popover::hide);
@@ -93,12 +99,6 @@ public class WindowOverlay {
 
         popover.show(node);
 
-        cleanupTasks.add(EasyBind.subscribe(node.localToSceneTransformProperty(), _ -> {
-            if (WalkthroughUtils.cannotPositionNode(node)) {
-                return;
-            }
-            popover.show(node);
-        })::unsubscribe);
         step.navigationPredicate().ifPresent(predicate ->
                 cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
     }

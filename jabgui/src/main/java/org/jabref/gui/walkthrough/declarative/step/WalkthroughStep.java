@@ -7,7 +7,7 @@ import java.util.OptionalDouble;
 import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
-import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
+import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 
 public sealed interface WalkthroughStep permits PanelStep, TooltipStep {
@@ -29,7 +29,7 @@ public sealed interface WalkthroughStep permits PanelStep, TooltipStep {
 
     OptionalDouble height();
 
-    Optional<MultiWindowHighlight> highlight();
+    Optional<WalkthroughEffect> highlight();
 
     Optional<WindowResolver> activeWindowResolver();
 

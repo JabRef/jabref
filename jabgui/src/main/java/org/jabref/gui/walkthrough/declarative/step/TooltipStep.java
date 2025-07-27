@@ -8,7 +8,7 @@ import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
-import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
+import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 
@@ -26,7 +26,7 @@ public record TooltipStep(
         @NonNull TooltipPosition position,
         @Nullable Double widthValue,
         @Nullable Double heightValue,
-        @Nullable MultiWindowHighlight highlightValue,
+        @Nullable WalkthroughEffect highlightValue,
         @Nullable WindowResolver activeWindowResolverValue,
         boolean showQuitButtonValue,
         @NonNull QuitButtonPosition quitButtonPositionValue
@@ -68,7 +68,7 @@ public record TooltipStep(
     }
 
     @Override
-    public Optional<MultiWindowHighlight> highlight() {
+    public Optional<WalkthroughEffect> highlight() {
         return Optional.ofNullable(highlightValue);
     }
 
@@ -102,7 +102,7 @@ public record TooltipStep(
         private TooltipPosition position = TooltipPosition.AUTO;
         private @Nullable Double width;
         private @Nullable Double height;
-        private @Nullable MultiWindowHighlight highlight;
+        private @Nullable WalkthroughEffect highlight;
         private @Nullable WindowResolver activeWindowResolver;
         private boolean showQuitButton = true;
         private QuitButtonPosition quitButtonPosition = QuitButtonPosition.AUTO;
@@ -161,13 +161,13 @@ public record TooltipStep(
             return this;
         }
 
-        public Builder highlight(@NonNull MultiWindowHighlight highlight) {
+        public Builder highlight(@NonNull WalkthroughEffect highlight) {
             this.highlight = highlight;
             return this;
         }
 
         public Builder highlight(@NonNull WindowEffect effect) {
-            return highlight(new MultiWindowHighlight(effect));
+            return highlight(new WalkthroughEffect(effect));
         }
 
         public Builder highlight(@NonNull HighlightEffect effect) {

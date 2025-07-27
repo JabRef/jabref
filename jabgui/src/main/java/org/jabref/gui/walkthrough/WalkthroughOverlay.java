@@ -7,13 +7,13 @@ import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.util.RecursiveChildrenListener;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
@@ -41,11 +41,8 @@ public class WalkthroughOverlay {
     private @Nullable ListChangeListener<Window> windowListListener;
     /// Listener for waiting till scene to be set to attempt node resolution
     private @Nullable ChangeListener<Scene> sceneListener;
-    /// Listener for scene root change to attempt node resolution
-    private @Nullable ChangeListener<Parent> sceneRootListener;
-    /// Listener for scene tree (that's not root, i.e., root's children list) change to
-    /// attempt node resolution
-    private @Nullable ListChangeListener<Node> childrenListener;
+    /// Recursive listener for scene tree changes to attempt node resolution
+    private @Nullable RecursiveChildrenListener recursiveChildrenListener;
 
     /// Listeners for reverting when window closed
     private @Nullable ChangeListener<Boolean> windowShowingListener;
@@ -115,10 +112,11 @@ public class WalkthroughOverlay {
                 resolvedWindow.sceneProperty().removeListener(sceneListener);
                 sceneListener = null;
             }
-            Scene scene = resolvedWindow.getScene();
-            if (scene != null) {
-                removeSceneRootListener(scene);
-            }
+        }
+
+        if (recursiveChildrenListener != null) {
+            recursiveChildrenListener.detach();
+            recursiveChildrenListener = null;
         }
 
         if (resolvedNode != null) {
@@ -130,36 +128,6 @@ public class WalkthroughOverlay {
 
         resolvedWindow = null;
         resolvedNode = null;
-    }
-
-    private void removeSceneRootListener(Scene scene) {
-        if (sceneRootListener != null) {
-            scene.rootProperty().removeListener(sceneRootListener);
-            sceneRootListener = null;
-        }
-        Parent root = scene.getRoot();
-        if (root != null && childrenListener != null) {
-            removeChildrenListener(root);
-            childrenListener = null;
-        }
-    }
-
-    private void removeChildrenListener(Parent parent) {
-        parent.getChildrenUnmodifiable().removeListener(childrenListener);
-        for (Node child : parent.getChildrenUnmodifiable()) {
-            if (child instanceof Parent childParent) {
-                removeChildrenListener(childParent);
-            }
-        }
-    }
-
-    private void addChildrenListener(Parent parent) {
-        parent.getChildrenUnmodifiable().addListener(childrenListener);
-        for (Node child : parent.getChildrenUnmodifiable()) {
-            if (child instanceof Parent childParent) {
-                addChildrenListener(childParent);
-            }
-        }
     }
 
     private void resolveWindow(WalkthroughStep step, WindowResolver resolver) {
@@ -249,33 +217,17 @@ public class WalkthroughOverlay {
                 () -> {
                     LOGGER.debug("Node for step '{}' not found. Listening for scene changes.", step.title());
 
-                    childrenListener = _ -> resolver.resolve(scene).ifPresent(foundNode -> {
+                    ListChangeListener<Node> childrenListener = _ -> resolver.resolve(scene).ifPresent(foundNode -> {
                         LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
-                        removeSceneRootListener(scene);
+                        if (recursiveChildrenListener != null) {
+                            recursiveChildrenListener.detach();
+                            recursiveChildrenListener = null;
+                        }
                         handleNodeResolved(step, window, foundNode);
                     });
 
-                    sceneRootListener = (_, oldRoot, newRoot) -> {
-                        if (oldRoot != null && childrenListener != null) {
-                            removeChildrenListener(oldRoot);
-                        }
-                        if (newRoot != null) {
-                            resolver.resolve(scene).ifPresentOrElse(
-                                    foundNode -> {
-                                        LOGGER.debug("Node found via sceneRootListener for step '{}'", step.title());
-                                        cancelTimeout();
-                                        removeSceneRootListener(scene);
-                                        handleNodeResolved(step, window, foundNode);
-                                    },
-                                    () -> addChildrenListener(newRoot));
-                        }
-                    };
-                    scene.rootProperty().addListener(sceneRootListener);
-
-                    Parent currentRoot = scene.getRoot();
-                    if (currentRoot != null) {
-                        addChildrenListener(currentRoot);
-                    }
+                    recursiveChildrenListener = new RecursiveChildrenListener(childrenListener);
+                    recursiveChildrenListener.attachToScene(scene);
                 });
     }
 

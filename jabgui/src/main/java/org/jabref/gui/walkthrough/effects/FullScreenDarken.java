@@ -8,11 +8,7 @@ import javafx.scene.shape.Rectangle;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Creates a full screen darken effect. Usually used to force user to ignore certain
- * window and focus on the modal.
- */
-public class FullScreenDarken extends WalkthroughEffect {
+public final class FullScreenDarken extends BaseWindowEffect {
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
 
     private @Nullable Rectangle overlay;
@@ -32,7 +28,7 @@ public class FullScreenDarken extends WalkthroughEffect {
         this.overlay.setFill(OVERLAY_COLOR);
         this.overlay.setVisible(false);
         this.overlay.setManaged(false);
-        this.pane.getChildren().add(overlay);
+        getOrAddToPane();
     }
 
     public void attach() {
@@ -45,34 +41,47 @@ public class FullScreenDarken extends WalkthroughEffect {
     @Override
     public void detach() {
         super.detach();
-        assert overlay != null : "Run attach() before detach()";
-        overlay.setVisible(false);
-        pane.getChildren().remove(overlay);
-        overlay = null;
+        if (overlay != null) {
+            overlay.setVisible(false);
+            if (overlay.getParent() instanceof Pane parentPane) {
+                parentPane.getChildren().remove(overlay);
+            }
+            overlay = null;
+        }
     }
 
     @Override
     protected void updateLayout() {
-        assert overlay != null : "Run attach() before updateLayout()";
+        if (overlay == null) {
+            return;
+        }
+
         overlay.setX(0);
         overlay.setY(0);
         overlay.setWidth(pane.getWidth());
         overlay.setHeight(pane.getHeight());
-        
+
         if (onClickHandler != null) {
             overlay.setOnMouseClicked(this::handleClick);
             overlay.setMouseTransparent(false);
         } else {
             overlay.setMouseTransparent(true);
         }
-        
+
         overlay.setVisible(true);
     }
 
     @Override
     protected void hideEffect() {
-        assert overlay != null : "Run attach() before hideEffect()";
-        overlay.setVisible(false);
+        if (overlay != null) {
+            overlay.setVisible(false);
+        }
+    }
+
+    private void getOrAddToPane() {
+        if (overlay != null && !pane.getChildren().contains(overlay)) {
+            pane.getChildren().add(overlay);
+        }
     }
 
     private void handleClick(MouseEvent event) {

@@ -15,7 +15,7 @@ import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
-import org.jabref.gui.walkthrough.declarative.effect.MultiWindowHighlight;
+import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
@@ -69,14 +69,14 @@ public class WalkthroughAction extends SimpleCommand {
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.RIGHT)
                 .activeWindow(WindowResolver.clazz(ContextMenu.class))
-                .highlight(new MultiWindowHighlight(
+                .highlight(new WalkthroughEffect(
                         new WindowEffect(HighlightEffect.ANIMATED_PULSE),
                         new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
                 ))
                 .showQuitButton(false)
                 .build();
 
-        MultiWindowHighlight preferenceHighlight = new MultiWindowHighlight(
+        WalkthroughEffect preferenceHighlight = new WalkthroughEffect(
                 new WindowEffect(HighlightEffect.BACKDROP_HIGHLIGHT),
                 new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
         );
