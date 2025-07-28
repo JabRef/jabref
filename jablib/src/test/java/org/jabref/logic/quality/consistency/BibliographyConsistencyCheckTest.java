@@ -187,6 +187,6 @@ class BibliographyConsistencyCheckTest {
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Online);
 
-        assertEquals(List.of(withDate, withoutDate), typeResult.sortedEntries().stream().toList());
+        assertEquals(List.of(withDate), typeResult.sortedEntries().stream().toList());
     }
 }
