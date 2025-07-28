@@ -93,6 +93,7 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
         ReferencesResponse referencesResponse = GSON.fromJson(response, ReferencesResponse.class);
 
         if (referencesResponse.getData() == null) {
+            // Get error message from citingPaperInfo.openAccessPdf.disclaimer
             JSONObject responseObject = new JSONObject(response);
             Optional.ofNullable(responseObject.optJSONObject("citingPaperInfo"))
                     .ifPresent(citingPaperInfo ->
