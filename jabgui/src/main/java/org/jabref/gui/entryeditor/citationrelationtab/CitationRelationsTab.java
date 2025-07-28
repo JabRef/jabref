@@ -444,7 +444,7 @@ public class CitationRelationsTab extends EntryEditorTab {
                                   executeSearch(citationComponents);
                                   executeSearch(otherCitationComponents);
                               } else {
-                                  dialogService.notify(Localization.lang("No DOI found"));
+                                  dialogService.notify(Localization.lang("No DOI found."));
                                   setUpEmptyPanel(citationComponents, otherCitationComponents);
                                   setUpEmptyPanel(otherCitationComponents, citationComponents);
                               }
