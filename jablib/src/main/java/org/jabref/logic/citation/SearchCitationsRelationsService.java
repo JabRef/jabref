@@ -1,6 +1,7 @@
 package org.jabref.logic.citation;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citation.repository.BibEntryCitationsAndReferencesRepository;
@@ -72,6 +73,17 @@ public class SearchCitationsRelationsService {
             relationsRepository.insertCitations(cited, citedBy);
         }
         return relationsRepository.readCitations(cited);
+    }
+
+    public int getCitationCount(BibEntry citationCounted, Optional<String> actualFieldValue) throws FetcherException {
+        boolean isFetchingAllowed = actualFieldValue.isEmpty() ||
+                relationsRepository.isCitationsUpdatable(citationCounted);
+        if (isFetchingAllowed) {
+            Optional<Integer> citationCountResult = citationFetcher.searchCitationCount(citationCounted);
+            return citationCountResult.orElse(0);
+        }
+        assert actualFieldValue.isPresent();
+        return Integer.parseInt(actualFieldValue.get());
     }
 
     public void close() {

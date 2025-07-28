@@ -146,7 +146,7 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-heylogs-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
@@ -154,13 +154,13 @@ jobs:
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
-            jbang-
+            jbang-heylogs-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.10.0:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.11.1:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
