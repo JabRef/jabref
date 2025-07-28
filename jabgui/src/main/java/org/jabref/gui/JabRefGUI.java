@@ -167,7 +167,7 @@ public class JabRefGUI extends Application {
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
 
-        JabRefGUI.stateManager = new StateManager();
+        JabRefGUI.stateManager = new JabRefGuiStateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
 
         Injector.setModelOrService(KeyBindingRepository.class, preferences.getKeyBindingRepository());
@@ -414,7 +414,7 @@ public class JabRefGUI extends Application {
         }
 
         if (remotePreferences.enableHttpServer()) {
-            httpServerManager.start(stateManager.getOpenDatabases(), remotePreferences.getHttpServerUri());
+            httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
         }
     }
 

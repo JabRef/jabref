@@ -96,7 +96,7 @@ public class RightClickMenu {
                 factory.createMenuItem(StandardActions.ATTACH_FILE, new AttachFileAction(libraryTab, dialogService, stateManager, preferences.getFilePreferences(), preferences.getExternalApplicationsPreferences())),
                 factory.createMenuItem(StandardActions.ATTACH_FILE_FROM_URL, new AttachFileFromURLAction(dialogService, stateManager, taskExecutor, preferences)),
                 factory.createMenuItem(StandardActions.OPEN_FOLDER, new OpenFolderAction(dialogService, stateManager, preferences, taskExecutor)),
-                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenExternalFileAction(dialogService, stateManager, preferences, taskExecutor)),
+                factory.createMenuItem(StandardActions.OPEN_EXTERNAL_FILE, new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor)),
                 extractFileReferencesOnline,
                 extractFileReferencesOffline,
 
@@ -132,7 +132,7 @@ public class RightClickMenu {
 
         Optional<String> sourceDatabaseName = libraryTab
                 .getBibDatabaseContext().getDatabasePath().stream()
-                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), path).stream())
+                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), path).stream())
                 .findFirst();
 
         if (!openDatabases.isEmpty()) {
@@ -141,7 +141,7 @@ public class RightClickMenu {
                 String destinationDatabaseName = "";
 
                 if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
+                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
                     if (uniqueFilePathFragment.equals(sourceDatabaseName)) {
                         return;
                     }

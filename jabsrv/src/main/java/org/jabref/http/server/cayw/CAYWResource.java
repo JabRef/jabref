@@ -15,19 +15,23 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import javafx.application.Platform;
 
 import org.jabref.architecture.AllowedToUseAwt;
+import org.jabref.http.JabRefSrvStateManager;
+import org.jabref.http.SrvStateManager;
 import org.jabref.http.server.cayw.format.CAYWFormatter;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.cayw.gui.CAYWEntry;
 import org.jabref.http.server.cayw.gui.SearchDialog;
-import org.jabref.http.server.services.ContextsToServe;
 import org.jabref.http.server.services.FilesToServe;
 import org.jabref.http.server.services.ServerUtils;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.logic.preferences.CliPreferences;
+import org.jabref.logic.push.CitationCommandString;
+import org.jabref.logic.push.PushToApplications;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -60,51 +64,53 @@ public class CAYWResource {
     private FilesToServe filesToServe;
 
     @Inject
-    private ContextsToServe contextsToServe;
+    private SrvStateManager srvStateManager;
 
     @GET
     public Response getCitation(
             @BeanParam CAYWQueryParams queryParams
     ) throws IOException, ExecutionException, InterruptedException {
+        // Probe parameter handling
         if (queryParams.isProbe()) {
             return Response.ok("ready").build();
         }
+        
         BibDatabaseContext databaseContext = getBibDatabaseContext(queryParams);
 
-        /* unused until DatabaseSearcher is fixed
-        PostgreServer postgreServer = new PostgreServer();
-        IndexManager.clearOldSearchIndices();
-        searcher = new DatabaseSearcher(
-                databaseContext,
-                new CurrentThreadTaskExecutor(),
-                preferences,
-                postgreServer);
-          */
-
-        List<CAYWEntry> entries = databaseContext.getEntries()
-                                 .stream()
-                                 .map(this::createCAYWEntry)
-                                 .toList();
-
-        initializeGUI();
-
-        CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
-        Platform.runLater(() -> {
-            SearchDialog dialog = new SearchDialog();
-            // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
-            //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
-            List<CAYWEntry> results = dialog.show(
-                    searchQuery ->
-                            entries.stream()
-                                   .filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
-                    entries);
-            future.complete(results);
-        });
-
-        List<CAYWEntry> searchResults = future.get();
+        // Selected parameter handling
+        List<CAYWEntry> searchResults;
+        if (queryParams.isSelected()) {
+            if (srvStateManager instanceof JabRefSrvStateManager) {
+                LOGGER.error("The 'selected' parameter is not supported in CLI mode. Please use the GUI to use the selected entries.");
+                return Response.status(Response.Status.BAD_REQUEST)
+                               .entity("The 'selected' parameter is not supported in CLI mode. Please use the GUI to use the selected entries.")
+                               .build();
+            }
+            searchResults = srvStateManager.getSelectedEntries().stream().map(this::createCAYWEntry).toList();
+        } else {
+            List<CAYWEntry> entries = databaseContext.getEntries()
+                                                     .stream()
+                                                     .map(this::createCAYWEntry)
+                                                     .collect(Collectors.toList());
+            initializeGUI();
+            searchResults = openSearchGui(entries);
+        }
 
         if (searchResults.isEmpty()) {
             return Response.noContent().build();
+        }
+
+        // Select parameter handling
+        if (queryParams.isSelect()) {
+            if (srvStateManager instanceof JabRefSrvStateManager) {
+                LOGGER.error("The 'select' parameter is not supported in CLI mode. Please use the GUI to select entries.");
+                return Response.status(Response.Status.BAD_REQUEST)
+                               .entity("The 'select' parameter is not supported in CLI mode. Please use the GUI to select entries.")
+                               .build();
+            }
+            srvStateManager.getActiveSelectionTabProperty().get().ifPresent(selectionTab -> {
+                selectionTab.clearAndSelect(searchResults.stream().map(CAYWEntry::bibEntry).collect(Collectors.toList()));
+            });
         }
 
         // Format parameter handling
@@ -119,27 +125,62 @@ public class CAYWResource {
             systemClipboard.setContents(strSel, null);
         }
 
+        // Push to Application parameter handling
+        if (queryParams.getApplication().isPresent()) {
+            CitationCommandString citationCmd = new CitationCommandString("\\".concat(queryParams.getCommand()).concat("{"), ",", "}");
+            PushToApplications.getApplication(queryParams.getApplication().get(), LOGGER::info, preferences.getPushToApplicationPreferences().withCitationCommand(citationCmd))
+                              .ifPresent(application -> application.pushEntries(searchResults.stream().map(CAYWEntry::bibEntry).toList()));
+        }
+
         return Response.ok(formattedResponse).type(formatter.getMediaType()).build();
+    }
+
+    private List<CAYWEntry> openSearchGui(List<CAYWEntry> entries) throws InterruptedException, ExecutionException {
+        /* unused until DatabaseSearcher is fixed
+        PostgreServer postgreServer = new PostgreServer();
+        IndexManager.clearOldSearchIndices();
+        searcher = new DatabaseSearcher(
+                databaseContext,
+                new CurrentThreadTaskExecutor(),
+                preferences,
+                postgreServer);
+          */
+
+        CompletableFuture<List<CAYWEntry>> future = new CompletableFuture<>();
+        Platform.runLater(() -> {
+            SearchDialog dialog = new SearchDialog();
+            // TODO: Using the DatabaseSearcher directly here results in a lot of exceptions being thrown, so we use an alternative for now until we have a nice way of using the DatabaseSearcher class.
+            //       searchDialog.set(new SearchDialog<>(s -> searcher.getMatches(new SearchQuery(s)), entries));
+            List<CAYWEntry> results = dialog.show(
+                    searchQuery ->
+                            entries.stream()
+                                   .filter(caywEntry -> matches(caywEntry, searchQuery)).toList(),
+                    entries);
+            future.complete(results);
+        });
+
+        return future.get();
     }
 
     private BibDatabaseContext getBibDatabaseContext(CAYWQueryParams queryParams) throws IOException {
         Optional<String> libraryId = queryParams.getLibraryId();
         if (libraryId.isPresent()) {
-            if ("demo".equals(libraryId.get())) {
-                return ServerUtils.getBibDatabaseContext("demo", filesToServe, contextsToServe, preferences.getImportFormatPreferences());
-            }
-            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext(libraryId.get(), filesToServe, srvStateManager, preferences.getImportFormatPreferences());
         }
 
         Optional<String> libraryPath = queryParams.getLibraryPath();
         if (libraryPath.isPresent() && "demo".equals(libraryPath.get())) {
-            return ServerUtils.getBibDatabaseContext("demo", filesToServe, contextsToServe, preferences.getImportFormatPreferences());
+            return ServerUtils.getBibDatabaseContext("demo", filesToServe, srvStateManager, preferences.getImportFormatPreferences());
         }
 
-        if (queryParams.getLibraryPath().isPresent()) {
-            assert !"demo".equalsIgnoreCase(queryParams.getLibraryPath().get());
-            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(queryParams.getLibraryPath().get()));
+        if (libraryPath.isPresent()) {
+            assert !"demo".equalsIgnoreCase(libraryPath.get());
+            InputStream inputStream = getDatabaseStreamFromPath(java.nio.file.Path.of(libraryPath.get()));
             return getDatabaseContextFromStream(inputStream);
+        }
+
+        if (srvStateManager.getActiveDatabase().isPresent()) {
+            return srvStateManager.getActiveDatabase().get();
         }
 
         return getDatabaseContextFromStream(getLatestDatabaseStream());
@@ -184,7 +225,7 @@ public class CAYWResource {
     private synchronized void initializeGUI() {
         // TODO: Implement a better way to handle the window popup since this is a bit hacky.
         if (!initialized) {
-            if (!contextsToServe.isEmpty()) {
+            if (!(srvStateManager instanceof JabRefSrvStateManager)) {
                 LOGGER.debug("Running inside JabRef UI, no need to initialize JavaFX for CAYW resource.");
                 initialized = true;
                 return;
@@ -222,8 +263,8 @@ public class CAYWResource {
             return true;
         }
         String lowerSearchText = searchText.toLowerCase();
-        return entry.getLabel().toLowerCase().contains(lowerSearchText) ||
-                entry.getDescription().toLowerCase().contains(lowerSearchText) ||
-                entry.getShortLabel().toLowerCase().contains(lowerSearchText);
+        return entry.label().toLowerCase().contains(lowerSearchText) ||
+                entry.description().toLowerCase().contains(lowerSearchText) ||
+                entry.shortLabel().toLowerCase().contains(lowerSearchText);
     }
 }

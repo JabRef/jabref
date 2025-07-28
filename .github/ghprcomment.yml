@@ -102,7 +102,7 @@
     [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
 
 
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "CHANGELOG.md".
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Source Code Tests" (on the left), subsection "CHANGELOG.md".
 - jobName: Markdown
   workflowName: 'Source Code Tests'
   message: >
@@ -111,7 +111,7 @@
     [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
 
 
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Source Code Tests" (on the left), subsection "Markdown".
 
 
 # Submodules and branches
@@ -154,7 +154,16 @@
     See [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md#pull-request-process) for more details.
 
 
-# PR text
+# PR hygiene
+
+- jobName: 'Ensure that contributor is assigned (fails if not commented on issue)'
+  workflowName: 'On PR opened/updated'
+  message: >
+    You did not assign yourself to the issue.
+    Thus, it looks like you skipped reading our [CONTRIBUTING.md](https://github.com/JabRef/jabref/blob/main/CONTRIBUTING.md), which explains exactly how to participate. No worries, it happens to the best of us.
+
+
+    Give it a read, and you’ll discover the ancient wisdom of assigning issues to yourself. Trust me, it’s worth it. 🚀
 
 - jobName: 'PR title must not start with "Fix for issue <number>"'
   workflowName: 'PR Tests'
