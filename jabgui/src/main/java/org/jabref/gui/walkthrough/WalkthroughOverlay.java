@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.animation.PauseTransition;
+import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
@@ -169,10 +170,7 @@ public class WalkthroughOverlay {
             }
         }
 
-        if (recursiveChildrenListener != null) {
-            recursiveChildrenListener.detach();
-            recursiveChildrenListener = null;
-        }
+        detachChildrenListener();
 
         if (resolvedNode != null) {
             if (nodeVisibleListener != null) {
@@ -267,23 +265,35 @@ public class WalkthroughOverlay {
     }
 
     private void attemptNodeResolutionOnScene(VisibleWalkthroughStep step, Window window, Scene scene, NodeResolver resolver) {
-        resolver.resolve(scene).ifPresentOrElse(
-                node -> handleNodeResolved(step, window, node),
-                () -> {
-                    LOGGER.debug("Node for step '{}' not found. Listening for scene changes.", step.title());
+        resolver.resolve(scene)
+                .ifPresentOrElse(
+                        node -> handleNodeResolved(step, window, node),
+                        () -> {
+                            LOGGER.debug("Node for step '{}' not found. Listening for scene changes.", step.title());
 
-                    ListChangeListener<Node> childrenListener = _ -> resolver.resolve(scene).ifPresent(foundNode -> {
-                        LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
-                        if (recursiveChildrenListener != null) {
-                            recursiveChildrenListener.detach();
-                            recursiveChildrenListener = null;
-                        }
-                        handleNodeResolved(step, window, foundNode);
-                    });
+                            InvalidationListener childrenListener = _ -> resolver.resolve(scene).ifPresent(foundNode -> {
+                                LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
+                                synchronized (this) {
+                                    if (resolvedNode != null) {
+                                        LOGGER.debug("Node already resolved for step '{}', ignoring new resolution", step.title());
+                                        detachChildrenListener();
+                                        return;
+                                    }
+                                    detachChildrenListener();
+                                    handleNodeResolved(step, window, foundNode);
+                                }
+                            });
 
-                    recursiveChildrenListener = new RecursiveChildrenListener(childrenListener);
-                    recursiveChildrenListener.attachToScene(scene);
-                });
+                            recursiveChildrenListener = new RecursiveChildrenListener(childrenListener);
+                            recursiveChildrenListener.attachToScene(scene);
+                        });
+    }
+
+    private void detachChildrenListener() {
+        if (recursiveChildrenListener != null) {
+            recursiveChildrenListener.detach();
+            recursiveChildrenListener = null;
+        }
     }
 
     private void handleNodeResolved(VisibleWalkthroughStep step, Window window, @Nullable Node node) {

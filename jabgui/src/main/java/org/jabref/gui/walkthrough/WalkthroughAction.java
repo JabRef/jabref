@@ -3,6 +3,7 @@ package org.jabref.gui.walkthrough;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -33,7 +34,7 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.injection.Injector;
 
 public class WalkthroughAction extends SimpleCommand {
-    private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new HashMap<>(); // must be mutable to allow caching of created walkthroughs
+    private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new ConcurrentHashMap<>(); // must be mutable to allow caching of created walkthroughs
 
     private final Walkthrough walkthrough;
     private final JabRefFrame frame;
@@ -42,13 +43,7 @@ public class WalkthroughAction extends SimpleCommand {
     public WalkthroughAction(JabRefFrame frame, String name) {
         this.stage = Injector.instantiateModelOrService(Stage.class);
         this.frame = frame;
-
-        if (WALKTHROUGH_CACHE.containsKey(name)) {
-            this.walkthrough = WALKTHROUGH_CACHE.get(name);
-        } else {
-            this.walkthrough = getWalkthrough(name);
-            WALKTHROUGH_CACHE.put(name, this.walkthrough);
-        }
+        this.walkthrough = getWalkthrough(name);
     }
 
     @Override

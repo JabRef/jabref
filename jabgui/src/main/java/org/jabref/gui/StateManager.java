@@ -107,11 +107,5 @@ public interface StateManager extends SrvStateManager {
 
     void setActiveWalkthrough(Walkthrough walkthrough);
 
-    OptionalObjectProperty<Walkthrough> activeWalkthroughProperty();
-
     Optional<Walkthrough> getActiveWalkthrough();
-
-    boolean hasActiveWalkthrough();
-
-    void quitActiveWalkthrough();
 }

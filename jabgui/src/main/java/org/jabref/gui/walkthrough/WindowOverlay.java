@@ -118,7 +118,7 @@ public class WindowOverlay {
                         WalkthroughUtils.cannotPositionNode(node);
                     }
                 })::unsubscribe);
-//                newPopover.show(node);
+                newPopover.show(node);
             }
         })::unsubscribe);
 

@@ -1,7 +1,12 @@
 package org.jabref.gui.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -10,17 +15,18 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class RecursiveChildrenListener {
-    private final ListChangeListener<Node> childrenListener;
+    private final InvalidationListener listener;
     private @Nullable ChangeListener<Parent> sceneRootListener;
     private @Nullable Scene attachedScene;
     private @Nullable Parent attachedRoot;
+    private final @NonNull Map<Parent, ListChangeListener<Node>> childListeners = new HashMap<>();
 
     /// Creates a new RecursiveChildrenListener that will recursively monitor changes in
     /// the children of all parent nodes in a scene graph.
     ///
-    /// @param childrenListener the listener to be called when children change
-    public RecursiveChildrenListener(@NonNull ListChangeListener<Node> childrenListener) {
-        this.childrenListener = childrenListener;
+    /// @param listener the listener to be called when children change
+    public RecursiveChildrenListener(@NonNull InvalidationListener listener) {
+        this.listener = listener;
     }
 
     /// Attaches the listener to a scene, monitoring its root and all descendants. If
@@ -77,7 +83,31 @@ public class RecursiveChildrenListener {
     }
 
     private void addChildrenListener(Parent parent) {
-        parent.getChildrenUnmodifiable().addListener(childrenListener);
+        ObservableList<Node> childrenUnmodifiable = parent.getChildrenUnmodifiable();
+
+        ListChangeListener<Node> childListener = change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Node added : change.getAddedSubList()) {
+                        if (added instanceof Parent addedParent) {
+                            addChildrenListener(addedParent);
+                        }
+                    }
+                }
+                if (change.wasRemoved()) {
+                    for (Node removed : change.getRemoved()) {
+                        if (removed instanceof Parent removedParent) {
+                            removeChildrenListener(removedParent);
+                        }
+                    }
+                }
+            }
+            listener.invalidated(childrenUnmodifiable);
+        };
+
+        childrenUnmodifiable.addListener(childListener);
+        childListeners.put(parent, childListener);
+
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof Parent childParent) {
                 addChildrenListener(childParent);
@@ -86,7 +116,11 @@ public class RecursiveChildrenListener {
     }
 
     private void removeChildrenListener(Parent parent) {
-        parent.getChildrenUnmodifiable().removeListener(childrenListener);
+        ListChangeListener<Node> childListener = childListeners.remove(parent);
+        if (childListener != null) {
+            parent.getChildrenUnmodifiable().removeListener(childListener);
+        }
+
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof Parent childParent) {
                 removeChildrenListener(childParent);

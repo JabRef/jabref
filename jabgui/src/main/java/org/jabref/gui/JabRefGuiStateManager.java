@@ -304,23 +304,7 @@ public class JabRefGuiStateManager implements StateManager {
     }
 
     @Override
-    public OptionalObjectProperty<Walkthrough> activeWalkthroughProperty() {
-        return activeWalkthrough;
-    }
-
-    @Override
     public Optional<Walkthrough> getActiveWalkthrough() {
         return activeWalkthrough.get();
-    }
-
-    @Override
-    public boolean hasActiveWalkthrough() {
-        return activeWalkthrough.get().isPresent();
-    }
-
-    @Override
-    public void quitActiveWalkthrough() {
-        Optional<Walkthrough> walkthrough = getActiveWalkthrough();
-        walkthrough.ifPresent(Walkthrough::quit);
     }
 }

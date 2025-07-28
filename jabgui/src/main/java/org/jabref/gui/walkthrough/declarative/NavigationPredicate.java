@@ -105,20 +105,24 @@ public interface NavigationPredicate {
     static NavigationPredicate onDoubleClick() {
         return (node, beforeNavigate, onNavigate) -> {
             EventHandler<? super MouseEvent> onMouseClicked = node.getOnMouseClicked();
-            EventHandler<MouseEvent> doubleClickHandler = event -> {
-                if (event.getClickCount() == 2) {
-                    beforeNavigate.run();
-                    onNavigate.run();
-                }
-            };
 
             if (onMouseClicked != null) {
                 node.setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 2) {
+                        beforeNavigate.run();
+                    }
                     onMouseClicked.handle(event);
-                    doubleClickHandler.handle(event);
+                    if (event.getClickCount() == 2) {
+                        onNavigate.run();
+                    }
                 });
             } else {
-                node.setOnMouseClicked(doubleClickHandler);
+                node.setOnMouseClicked(event -> {
+                    if (event.getClickCount() == 2) {
+                        beforeNavigate.run();
+                        onNavigate.run();
+                    }
+                });
             }
 
             return () -> node.setOnMouseClicked(onMouseClicked);
