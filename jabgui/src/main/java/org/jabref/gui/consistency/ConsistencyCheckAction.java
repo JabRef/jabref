@@ -11,6 +11,7 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
@@ -51,10 +52,10 @@ public class ConsistencyCheckAction extends SimpleCommand {
 
                 Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
                 if (databaseContext.isEmpty()) {
-                    throw new IllegalStateException((Localization.lang("No library present")));
+                    throw new JabRefException("No library present.");
                 }
 
-                BibDatabaseContext bibContext = databaseContext.orElseThrow(() -> new IllegalStateException("database not present"));
+                BibDatabaseContext bibContext = databaseContext.get();
 
                 BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
                 return consistencyCheck.check(bibContext, (count, total) ->
