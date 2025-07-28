@@ -73,6 +73,7 @@ public class ThemeManager {
         this.workspacePreferences = Objects.requireNonNull(workspacePreferences);
         this.fileUpdateMonitor = Objects.requireNonNull(fileUpdateMonitor);
         this.updateRunner = Objects.requireNonNull(updateRunner);
+        // Always returns something even if the native library is not available - see https://github.com/dukke/FXThemes/issues/15
         this.themeWindowManager = ThemeWindowManagerFactory.create();
 
         this.baseStyleSheet = StyleSheet.create(Theme.BASE_CSS).get();
@@ -121,8 +122,14 @@ public class ThemeManager {
             return;
         }
 
-        themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
-        LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
+        try {
+            themeWindowManager.setDarkModeForWindowFrame(stage, darkMode);
+            LOGGER.debug("Applied {} mode to window: {}", darkMode ? "dark" : "light", stage);
+        } catch (NoClassDefFoundError | UnsatisfiedLinkError e) {
+            // We need to handle these exceptions because the native library may not be available on all platforms (e.g., x86).
+            // See https://github.com/dukke/FXThemes/issues/13 for details.
+            LOGGER.debug("Failed to set dark mode for window frame (likely due to native library compatibility issues on intel)", e);
+        }
     }
 
     private void applyDarkModeToAllWindows(boolean darkMode) {
