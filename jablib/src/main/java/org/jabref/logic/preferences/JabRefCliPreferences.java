@@ -91,6 +91,7 @@ import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.shared.security.Password;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.Directories;
+import org.jabref.logic.util.UserAndHost;
 import org.jabref.logic.util.Version;
 import org.jabref.logic.util.io.AutoLinkPreferences;
 import org.jabref.logic.util.io.FileHistory;
@@ -443,7 +444,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * Cache variables
      */
-    private String userAndHost;
+    private UserAndHost userAndHost;
 
     private LibraryPreferences libraryPreferences;
     private DOIPreferences doiPreferences;
@@ -1621,12 +1622,13 @@ public class JabRefCliPreferences implements CliPreferences {
         return internalPreferences;
     }
 
-    private String getUserAndHost() {
-        if (StringUtil.isNotBlank(userAndHost)) {
+    private UserAndHost getUserAndHost() {
+        if (userAndHost != null) {
             return userAndHost;
         }
-        userAndHost = get(DEFAULT_OWNER) + '-' + OS.getHostName();
-        return userAndHost;
+
+        UserAndHost result =new UserAndHost(get(DEFAULT_OWNER), OS.getHostName());
+        return result;
     }
 
     protected Language getLanguage() {
@@ -1675,7 +1677,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         filePreferences = new FilePreferences(
-                getInternalPreferences().getUserAndHost(),
+                getUserAndHost(),
                 getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),

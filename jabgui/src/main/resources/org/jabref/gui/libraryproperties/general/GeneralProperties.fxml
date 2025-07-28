@@ -45,6 +45,7 @@
             <tooltip>
                 <Tooltip fx:id ="libSpecificFileDirSwitchTooltip" text="%Switch to absolute path: converts the path to an absolute path."/>
             </tooltip>
+
         </Button>
         <Button onAction="#browseLibrarySpecificFileDirectory"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
@@ -60,7 +61,12 @@
         <Label text="%User-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="2"/>
         <TextField fx:id="userSpecificFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <tooltip>
+                <Tooltip fx:id="userSpecificFileDirectoryTooltip"/>
+            </tooltip>
+        </TextField>
+
         <Button fx:id="userSpecificFileDirSwitchId" onAction="#userSpecificFileDirPathSwitch"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="2">

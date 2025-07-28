@@ -102,16 +102,16 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             userSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            //TODO- add tooltip to userSpecificFileDirectory: user: {username}, host: {hostname}.
+            userSpecificFileDirectoryTooltip.setText(Localization.lang(preferences.getFilePreferences().getUserAndHost()));
         });
 
         laTexFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            //TODO- add tooltip to laTexFileDirectory: default LaTeX directory??
+            // TODO- add tooltip to laTexFileDirectory: default LaTeX directory??
         });
-        //TODO- Add changes on .fxml
+        // TODO- Add changes on .fxml
 
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
