@@ -110,9 +110,9 @@ class BibliographyConsistencyCheckTest {
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.PAGES, "some pages");
-        List<BibEntry> bibentriesList = List.of(first, second);
+        List<BibEntry> bibEntriesList = List.of(first, second);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntries(bibentriesList);
+        bibDatabase.insertEntries(bibEntriesList);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
 
