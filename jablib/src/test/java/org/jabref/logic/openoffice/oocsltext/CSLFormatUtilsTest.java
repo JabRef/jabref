@@ -284,7 +284,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "(Smith et al. 2016)",
+                        "(Smith, Jones, and Williams 2016)",
                         STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
                 ),
 
