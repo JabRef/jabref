@@ -1,6 +1,5 @@
 package org.jabref.gui.walkthrough.declarative.step;
 
-/// Base interface for all walkthrough steps.
 public sealed interface WalkthroughStep permits SideEffectStep, VisibleWalkthroughStep {
     String title();
 

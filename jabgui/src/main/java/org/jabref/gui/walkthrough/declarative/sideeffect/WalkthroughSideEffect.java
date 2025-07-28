@@ -10,6 +10,8 @@ import org.jspecify.annotations.NonNull;
 
 /// Walkthrough side effects that can be executed between steps.
 public interface WalkthroughSideEffect {
+    int DEFAULT_TIMEOUT_MS = 2500;
+
     /// Expected condition that determines when this side effect can be executed.
     @NonNull
     ExpectedCondition expectedCondition();
@@ -24,7 +26,7 @@ public interface WalkthroughSideEffect {
     /// Timeout in milliseconds for waiting for the expected condition to become true.
     /// Defaults to 2500ms if not overridden.
     default long timeoutMs() {
-        return 2500;
+        return DEFAULT_TIMEOUT_MS;
     }
 
     /// Forward effect (what should be done).

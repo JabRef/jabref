@@ -29,7 +29,6 @@ import javafx.stage.Window;
 import org.jabref.gui.frame.MainMenu;
 
 import com.sun.javafx.scene.control.ContextMenuContent;
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -173,7 +172,7 @@ public interface NavigationPredicate {
     /// @param eventTypes     the event types to patch
     /// @return the decorated event dispatcher
     @SafeVarargs
-    private static @NotNull EventDispatcher getPatchedDispatcher(
+    private static @NonNull EventDispatcher getPatchedDispatcher(
             Runnable beforeNavigate,
             Runnable onNavigate,
             Node node,
@@ -212,7 +211,7 @@ public interface NavigationPredicate {
     ///                       timeout, or window change
     /// @param handler        the original event handler
     /// @return the decorated event handler
-    private static @NotNull <T extends Event> EventHandler<T> getPatchedEventHandler(
+    private static @NonNull <T extends Event> EventHandler<T> getPatchedEventHandler(
             Runnable beforeNavigate,
             Runnable onNavigate,
             @Nullable EventHandler<? super T> handler
@@ -231,7 +230,7 @@ public interface NavigationPredicate {
         );
     }
 
-    private static @NotNull <T> T patched(Runnable before, Runnable after, Supplier<T> between) {
+    private static @NonNull <T> T patched(Runnable before, Runnable after, Supplier<T> between) {
         before.run();
 
         CountDownLatch latch = new CountDownLatch(1);
@@ -257,7 +256,7 @@ public interface NavigationPredicate {
         return result;
     }
 
-    private static @NotNull ListChangeListener<Window> getWindowListener(CountDownLatch latch, Runnable fxOnNavigate) {
+    private static @NonNull ListChangeListener<Window> getWindowListener(CountDownLatch latch, Runnable fxOnNavigate) {
         ListChangeListener<Window> windowListener = new ListChangeListener<>() {
             @Override
             public void onChanged(Change<? extends Window> change) {

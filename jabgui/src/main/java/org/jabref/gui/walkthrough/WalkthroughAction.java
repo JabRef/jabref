@@ -1,6 +1,5 @@
 package org.jabref.gui.walkthrough;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +33,8 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.injection.Injector;
 
 public class WalkthroughAction extends SimpleCommand {
+    public static final String PDF_LINK_WALKTHROUGH_NAME = "pdfLink";
+    public static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME = "mainFileDirectory";
     private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new ConcurrentHashMap<>(); // must be mutable to allow caching of created walkthroughs
 
     private final Walkthrough walkthrough;
@@ -54,8 +55,9 @@ public class WalkthroughAction extends SimpleCommand {
     private Walkthrough getWalkthrough(String name) {
         return WALKTHROUGH_CACHE.computeIfAbsent(name, _ ->
                 switch (name) {
-                    case "mainFileDirectory" -> createMainFileDirectoryWalkthrough();
-                    case "pdfLink" -> createPdfLinkWalkthrough();
+                    case MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME ->
+                            createMainFileDirectoryWalkthrough();
+                    case PDF_LINK_WALKTHROUGH_NAME -> createPdfLinkWalkthrough();
                     default ->
                             throw new IllegalArgumentException("Unknown walkthrough: " + name);
                 }

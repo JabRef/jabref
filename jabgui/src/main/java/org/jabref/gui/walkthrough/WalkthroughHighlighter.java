@@ -243,7 +243,7 @@ public class WalkthroughHighlighter {
 
     private record EffectState(HighlightEffect effect, @Nullable Node targetNode) {
         boolean canTransitionTo(EffectState other) {
-            return effect == other.effect; // Current implementation only supports same effect transitions
+            return effect == other.effect;
         }
     }
 }
