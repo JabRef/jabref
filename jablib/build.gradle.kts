@@ -106,8 +106,6 @@ dependencies {
 
     implementation("com.fasterxml:aalto-xml")
 
-    implementation("org.hisp.dhis:json-tree")
-
     implementation("org.postgresql:postgresql")
 
     antlr("org.antlr:antlr4")
