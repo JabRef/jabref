@@ -108,6 +108,9 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         BibDatabase database = new BibDatabase();
         database.insertEntry(first);
         database.insertEntry(second);
+        database.insertEntry(third);
+        database.insertEntry(fourth);
+        database.insertEntry(fifth);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
