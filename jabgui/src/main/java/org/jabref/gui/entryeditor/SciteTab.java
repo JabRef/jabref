@@ -87,7 +87,7 @@ public class SciteTab extends EntryEditorTab {
 
     private void onDoiLookUpError() {
         onDoiMissing();
-        dialogService.notify(Localization.lang("Could not fetch DOI."));
+        dialogService.notify(Localization.lang("No DOI found."));
     }
 
     @Override
