@@ -96,19 +96,15 @@ public class SemanticScholarCitationFetcher implements CitationFetcher, Customiz
             // Get error message from citingPaperInfo.openAccessPdf.disclaimer
             JSONObject responseObject = new JSONObject(response);
             Optional.ofNullable(responseObject.optJSONObject("citingPaperInfo"))
-                    .ifPresent(citingPaperInfo ->
-                            Optional.ofNullable(citingPaperInfo.optJSONObject("openAccessPdf"))
-                                    .ifPresent(openAccessPdf -> Optional.ofNullable(openAccessPdf.optString("disclaimer"))
-                                                                        .ifPresent(Unchecked.consumer(disclaimer -> {
-                                                                                            LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
-                                                                                            if (disclaimer.contains("references")) {
-                                                                                                throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
-                                                                                            }
-                                                                                        }
-                                                                                )
-                                                                        )
-                                    )
-                    );
+                    .flatMap(citingPaperInfo -> Optional.ofNullable(citingPaperInfo.optJSONObject("openAccessPdf")))
+                    .flatMap(openAccessPdf -> Optional.ofNullable(openAccessPdf.optString("disclaimer")))
+                    .ifPresent(Unchecked.consumer(disclaimer -> {
+                                LOGGER.debug("Received a disclaimer from Semantic Scholar: {}", disclaimer);
+                                if (disclaimer.contains("references")) {
+                                    throw new FetcherException(Localization.lang("Restricted access to references: %0", disclaimer));
+                                }
+                            }
+                    ));
             return List.of();
         }
 
