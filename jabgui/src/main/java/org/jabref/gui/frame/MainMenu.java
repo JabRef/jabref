@@ -376,7 +376,8 @@ public class MainMenu extends MenuBar {
                 new SeparatorMenuItem(),
 
                 factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
-                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction(frame, "mainFileDirectory"))
+                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction(frame, "mainFileDirectory")),
+                        factory.createMenuItem(StandardActions.PDF_LINK_WALKTHROUGH, new WalkthroughAction(frame, "pdfLink"))
                 ),
 
                 new SeparatorMenuItem(),

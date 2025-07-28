@@ -102,6 +102,29 @@ public interface NavigationPredicate {
         };
     }
 
+    static NavigationPredicate onDoubleClick() {
+        return (node, beforeNavigate, onNavigate) -> {
+            EventHandler<? super MouseEvent> onMouseClicked = node.getOnMouseClicked();
+            EventHandler<MouseEvent> doubleClickHandler = event -> {
+                if (event.getClickCount() == 2) {
+                    beforeNavigate.run();
+                    onNavigate.run();
+                }
+            };
+
+            if (onMouseClicked != null) {
+                node.setOnMouseClicked(event -> {
+                    onMouseClicked.handle(event);
+                    doubleClickHandler.handle(event);
+                });
+            } else {
+                node.setOnMouseClicked(doubleClickHandler);
+            }
+
+            return () -> node.setOnMouseClicked(onMouseClicked);
+        };
+    }
+
     /// This navigation predicate does nothing when attached. This requires the user to
     /// click on "continue" or "skip" to proceed.
     ///

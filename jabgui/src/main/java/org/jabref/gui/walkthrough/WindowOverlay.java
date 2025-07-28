@@ -118,11 +118,11 @@ public class WindowOverlay {
                         WalkthroughUtils.cannotPositionNode(node);
                     }
                 })::unsubscribe);
-                newPopover.show(node);
+//                newPopover.show(node);
             }
         })::unsubscribe);
 
-        step.navigationPredicate().ifPresent(predicate ->
+        step.navigation().ifPresent(predicate ->
                 cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
     }
 
@@ -190,7 +190,7 @@ public class WindowOverlay {
         stackPane.getChildren().add(content);
         addQuitButton(step);
         if (node != null) {
-            step.navigationPredicate().ifPresent(predicate ->
+            step.navigation().ifPresent(predicate ->
                     cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
         }
     }

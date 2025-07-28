@@ -54,7 +54,7 @@ public record TooltipStep(
     }
 
     @Override
-    public Optional<NavigationPredicate> navigationPredicate() {
+    public Optional<NavigationPredicate> navigation() {
         return Optional.ofNullable(navigationPredicateValue);
     }
 

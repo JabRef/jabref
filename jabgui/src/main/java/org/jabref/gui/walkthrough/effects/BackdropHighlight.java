@@ -15,11 +15,13 @@ import javafx.util.Duration;
 
 import org.jabref.gui.walkthrough.WalkthroughUtils;
 
-import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class BackdropHighlight extends BaseWindowEffect {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackdropHighlight.class);
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
     private static final Duration TRANSITION_DURATION = Duration.millis(300);
 
@@ -127,6 +129,7 @@ public final class BackdropHighlight extends BaseWindowEffect {
     @Override
     protected void updateLayout() {
         if (WalkthroughUtils.cannotPositionNode(node)) {
+            LOGGER.debug("Node \"{}\" cannot be positioned, hiding BackdropHighlight effect", node);
             hideEffect();
             return;
         }
@@ -161,16 +164,9 @@ public final class BackdropHighlight extends BaseWindowEffect {
     protected void hideEffect() {
         if (overlayShape != null) {
             overlayShape.setVisible(false);
+        } else {
+            LOGGER.debug("Overlay shape is null, cannot hide effect");
         }
-    }
-
-    @Override
-    protected void setupListeners(@NonNull Node node) {
-        super.setupListeners(node);
-        subscriptions.add(EasyBind.subscribe(node.visibleProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(node.disabledProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(pane.widthProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(pane.heightProperty(), _ -> this.updateLayout()));
     }
 
     private void updateOverlayShape() {

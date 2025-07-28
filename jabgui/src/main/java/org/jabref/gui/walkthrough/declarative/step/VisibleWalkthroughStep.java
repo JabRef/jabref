@@ -35,7 +35,7 @@ public sealed interface VisibleWalkthroughStep extends WalkthroughStep permits P
 
     /// Navigation predicate that determines when to advance by attaching to the UI
     /// elements that could trigger navigation.
-    Optional<NavigationPredicate> navigationPredicate();
+    Optional<NavigationPredicate> navigation();
 
     /// Maximum width for the display element.
     OptionalDouble maxWidth();

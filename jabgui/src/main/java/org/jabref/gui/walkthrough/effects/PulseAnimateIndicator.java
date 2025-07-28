@@ -15,9 +15,13 @@ import org.jabref.gui.walkthrough.WalkthroughUtils;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class PulseAnimateIndicator extends BaseWindowEffect {
     public static final int INDICATOR_OFFSET = 5;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PulseAnimateIndicator.class);
     private static final Duration TRANSITION_DURATION = Duration.millis(300);
 
     private Circle pulseIndicator;
@@ -122,6 +126,7 @@ public final class PulseAnimateIndicator extends BaseWindowEffect {
     @Override
     protected void updateLayout() {
         if (WalkthroughUtils.cannotPositionNode(node)) {
+            LOGGER.debug("Cannot position node \"{}\" for pulse animation.", node);
             hideEffect();
             return;
         }
@@ -147,16 +152,9 @@ public final class PulseAnimateIndicator extends BaseWindowEffect {
     protected void hideEffect() {
         if (pulseIndicator != null) {
             pulseIndicator.setVisible(false);
+        } else {
+            LOGGER.debug("Pulse indicator is null, cannot hide effect");
         }
-    }
-
-    @Override
-    protected void setupListeners(@NonNull Node node) {
-        super.setupListeners(node);
-        subscriptions.add(EasyBind.subscribe(node.visibleProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(node.disabledProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(pane.widthProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(pane.heightProperty(), _ -> this.updateLayout()));
     }
 
     private void getOrAddToPane() {

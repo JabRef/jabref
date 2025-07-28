@@ -4,11 +4,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
 import org.jabref.gui.actions.SimpleCommand;
+import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.frame.JabRefFrame;
+import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
@@ -55,29 +60,104 @@ public class WalkthroughAction extends SimpleCommand {
         return WALKTHROUGH_CACHE.computeIfAbsent(name, _ ->
                 switch (name) {
                     case "mainFileDirectory" -> createMainFileDirectoryWalkthrough();
+                    case "pdfLink" -> createPdfLinkWalkthrough();
                     default ->
                             throw new IllegalArgumentException("Unknown walkthrough: " + name);
                 }
         );
     }
 
-    private Walkthrough createMainFileDirectoryWalkthrough() {
-        WindowResolver mainResolver = () -> Optional.of(stage);
+    private NavigationPredicate createFileAddedNavigationPredicate() {
+        return (node, beforeNavigate, onNavigate) -> {
+            ListView<?> listView = (ListView<?>) node.lookup("#listView");
 
-        WalkthroughStep step0 = WalkthroughStep.sideEffect(Localization.lang("Open Example Library"))
+            if (listView != null) {
+                ListChangeListener<Object> listener = change -> {
+                    while (change.next()) {
+                        if (change.wasAdded() && !change.getAddedSubList().isEmpty()) {
+                            beforeNavigate.run();
+                            onNavigate.run();
+                            break;
+                        }
+                    }
+                };
+
+                @SuppressWarnings("unchecked")
+                ObservableList<Object> items = (ObservableList<Object>) listView.getItems();
+                items.addListener(listener);
+
+                return () -> items.removeListener(listener);
+            }
+
+            return () -> {
+            };
+        };
+    }
+
+    private Walkthrough createPdfLinkWalkthrough() {
+        WalkthroughStep step1 = WalkthroughStep.sideEffect(Localization.lang("Open Example Library"))
                                                .sideEffect(new OpenLibrarySideEffect(frame))
                                                .build();
 
-        WalkthroughStep step1 = WalkthroughStep
-                .tooltip(Localization.lang("Welcome to the File Directory Setup"))
-                .content(new TextBlock(Localization.lang("This walkthrough will guide you through setting up a main file directory. We've opened an example library so you can see how this feature works with actual bibliography entries.")))
-                .resolver(NodeResolver.selector(".split-pane"))
+        WalkthroughStep step2 = WalkthroughStep
+                .panel(Localization.lang("Welcome to PDF linking walkthrough"))
+                .content(new TextBlock(Localization.lang("This walkthrough will guide you through how to link your PDF files with JabRef. We've opened an example library so you can see how this feature works with actual bibliography entries.")))
+                .resolver(NodeResolver.predicate(MainTable.class::isInstance))
                 .continueButton(Localization.lang("Continue"))
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
-                .position(TooltipPosition.BOTTOM)
+                .position(PanelPosition.BOTTOM)
                 .build();
 
-        WalkthroughStep step2 = WalkthroughStep
+        WalkthroughStep step3 = WalkthroughStep
+                .tooltip(Localization.lang("Double click on the \"Ding_2006\" entry"))
+                .content(new TextBlock(Localization.lang("Let's start by selecting an entry to work with. Double click on the entry titled \"Chocolate and Prevention of Cardiovascular Disease: A Systematic Review\" by Ding et al.")))
+                .resolver(NodeResolver.selectorWithText(".table-row-cell",
+                        text -> "Ding_2006".equals(text)
+                                || "Ding et al.".equals(text)
+                                || "Chocolate and Prevention of Cardiovascular Disease: A Systematic Review".equals(text)))
+                .navigation(NavigationPredicate.onDoubleClick())
+                .position(TooltipPosition.RIGHT)
+                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .build();
+
+        WalkthroughStep step4 = WalkthroughStep
+                .tooltip(Localization.lang("Click on the \"General\" tab"))
+                .content(new TextBlock(Localization.lang("Now we need to access the entry editor. Click on the \"General\" tab to view and edit the entry details.")))
+                .resolver(NodeResolver.selectorWithText(".tab", text -> Localization.lang("General").equals(text)))
+                .navigation(NavigationPredicate.onClick())
+                .position(TooltipPosition.BOTTOM)
+                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .build();
+
+        WalkthroughStep step5 = WalkthroughStep
+                .panel(Localization.lang("PDF file management area"))
+                .content(
+                        new TextBlock(Localization.lang("This is where you manage PDF files for this entry. You have three buttons on the right side to link a PDF file:\n1. **Add PDF file** - Link a file from your computer\n2. **Find full text** - Use JabRef's online fetchers to find the PDF\n3. **Download from URL** - Enter a link and JabRef will download it for you.\nWithout using those buttons, you can also drag and drop PDF files directly onto this area.\n\nTry one of the options above to link a file. You can download a PDF from [this URL](https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2) or use any PDF file of your choice.")),
+                        new InfoBlock(Localization.lang("For detailed information: [Adding PDFs](https://docs.jabref.org/collect/add-pdfs-to-an-entry), [Managing files](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks), [Finding unlinked files](https://docs.jabref.org/collect/findunlinkedfiles)."))
+                )
+                .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
+                .navigation(createFileAddedNavigationPredicate())
+                .position(PanelPosition.RIGHT)
+                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .showQuitButton(false)
+                .build();
+
+        WalkthroughStep step6 = WalkthroughStep
+                .panel(Localization.lang("Perfect! PDF file linked successfully"))
+                .content(new TextBlock(Localization.lang("Congratulations! You have successfully linked a PDF file to a bibliography entry. This makes it easy to access your research documents directly from JabRef. You can repeat this process for all your entries.")))
+                .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
+                .continueButton(Localization.lang("Finish"))
+                .position(PanelPosition.RIGHT)
+                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .build();
+
+        return new Walkthrough(step1, step2, step3, step4, step5, step6);
+    }
+
+    private Walkthrough createMainFileDirectoryWalkthrough() {
+        WindowResolver mainResolver = () -> Optional.of(stage);
+
+        WalkthroughStep step1 = WalkthroughStep
                 .tooltip(Localization.lang("Click on \"File\" menu"))
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
                 .navigation(NavigationPredicate.onClick())
@@ -85,7 +165,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
                 .build();
 
-        WalkthroughStep step3 = WalkthroughStep
+        WalkthroughStep step2 = WalkthroughStep
                 .tooltip(Localization.lang("Click on \"Preferences\""))
                 .resolver(NodeResolver.menuItem("Preferences"))
                 .navigation(NavigationPredicate.onClick())
@@ -103,19 +183,17 @@ public class WalkthroughAction extends SimpleCommand {
                 new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
         );
 
-        WalkthroughStep step4 = WalkthroughStep
+        WalkthroughStep step3 = WalkthroughStep
                 .tooltip(Localization.lang("Select the \"Linked files\" tab"))
                 .content(new TextBlock(Localization.lang("This section manages how JabRef handles your PDF files and other documents.")))
-                .resolver(NodeResolver.predicate(node ->
-                        node.getStyleClass().contains("list-cell") &&
-                                node.toString().contains(Localization.lang("Linked files"))))
+                .resolver(NodeResolver.selectorWithText(".list-cell", text -> Localization.lang("Linked files").equals(text)))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.AUTO)
                 .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
                 .highlight(preferenceHighlight)
                 .build();
 
-        WalkthroughStep step5 = WalkthroughStep
+        WalkthroughStep step4 = WalkthroughStep
                 .tooltip(Localization.lang("Enable \"Main file directory\" option"))
                 .content(new TextBlock(Localization.lang("Choose this option to tell JabRef where your research files are stored. This makes it easy to attach PDFs and other documents to your bibliography entries. You can browse to select your preferred folder in the next step.")))
                 .resolver(NodeResolver.fxId("useMainFileDirectory"))
@@ -125,13 +203,13 @@ public class WalkthroughAction extends SimpleCommand {
                 .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
                 .build();
 
-        WalkthroughStep step6 = WalkthroughStep
+        WalkthroughStep step5 = WalkthroughStep
                 .panel(Localization.lang("Click \"Save\" to save changes"))
                 .content(
                         new TextBlock(Localization.lang("Congratulations. Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
                         new InfoBlock(Localization.lang("Additional information on main file directory can be found in [help](https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks)"))
                 )
-                .resolver(NodeResolver.predicate(node -> node.getStyleClass().contains("button") && node.toString().contains(Localization.lang("Save"))))
+                .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("Save").equals(text)))
                 .navigation(NavigationPredicate.onClick())
                 .position(PanelPosition.TOP)
                 .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
@@ -139,6 +217,6 @@ public class WalkthroughAction extends SimpleCommand {
                 .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
                 .build();
 
-        return new Walkthrough(step0, step1, step2, step3, step4, step5, step6);
+        return new Walkthrough(step1, step2, step3, step4, step5);
     }
 }

@@ -14,68 +14,72 @@ import javafx.scene.control.ContextMenu;
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.logic.l10n.Localization;
 
+import com.sun.javafx.scene.control.LabeledText;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Resolves nodes from a Scene
- */
+/// Resolves nodes from a Scene
 @FunctionalInterface
 public interface NodeResolver {
-    /**
-     * Resolves a node from the given scene.
-     *
-     * @param scene the scene to search in
-     * @return an optional containing the found node, or empty if not found
-     */
+    /// Resolves a node from the given scene.
+    ///
+    /// @param scene the scene to search in
+    /// @return an optional containing the found node, or empty if not found
     Optional<Node> resolve(@NonNull Scene scene);
 
-    /**
-     * Creates a resolver that finds a node by CSS selector.
-     *
-     * @param selector the CSS selector to find the node
-     * @return a resolver that finds the node by selector
-     */
+    /// Creates a resolver that finds a node by CSS selector.
+    ///
+    /// @param selector the CSS selector to find the node
+    /// @return a resolver that finds the node by selector
     static NodeResolver selector(@NonNull String selector) {
         return scene -> Optional.ofNullable(scene.lookup(selector));
     }
 
-    /**
-     * Creates a resolver that finds a node by its fx:id.
-     *
-     * @param fxId the fx:id of the node
-     * @return a resolver that finds the node by fx:id
-     */
+    /// Creates a resolver that finds a node by its fx:id.
+    ///
+    /// @param fxId the fx:id of the node
+    /// @return a resolver that finds the node by fx:id
     static NodeResolver fxId(@NonNull String fxId) {
         return scene -> Optional.ofNullable(scene.lookup("#" + fxId));
     }
 
-    /**
-     * Creates a resolver that finds a node by a predicate.
-     *
-     * @param predicate the predicate to match the node
-     * @return a resolver that finds the node matching the predicate
-     */
+    /// Creates a resolver that finds a node by a predicate.
+    ///
+    /// @param predicate the predicate to match the node
+    /// @return a resolver that finds the node matching the predicate
     static NodeResolver predicate(@NonNull Predicate<Node> predicate) {
         return scene -> Optional.ofNullable(findNode(scene.getRoot(), predicate));
     }
 
-    /**
-     * Creates a resolver that finds a button by its StandardAction.
-     *
-     * @param action the StandardAction associated with the button
-     * @return a resolver that finds the button by action
-     */
+    /// Creates a resolver that finds a button by its StandardAction.
+    ///
+    /// @param action the StandardAction associated with the button
+    /// @return a resolver that finds the button by action
     static NodeResolver action(@NonNull StandardActions action) {
         return scene -> Optional.ofNullable(findNodeByAction(scene, action));
     }
 
-    /**
-     * Creates a resolver that finds a menu item by its language key.
-     *
-     * @param key the language key of the menu item
-     * @return a resolver that finds the menu item by language key
-     */
+    /// Creates a resolver that finds a node by selector first, then predicate.
+    ///
+    /// @param selector    the style class to match
+    /// @param textMatcher predicate to match text content in LabeledText children
+    /// @return a resolver that finds the node by style class and text content
+    static NodeResolver selectorWithText(@NonNull String selector, @NonNull Predicate<String> textMatcher) {
+        return scene -> scene.getRoot().lookupAll(selector).stream().filter(
+                node -> textMatcher.test(node.toString()) || node.lookupAll(".text").stream().anyMatch(child -> {
+                            if (child instanceof LabeledText text) {
+                                String textContent = text.getText();
+                                return textContent != null && textMatcher.test(textContent);
+                            }
+                            return false;
+                        }
+                )).findFirst();
+    }
+
+    /// Creates a resolver that finds a menu item by its language key.
+    ///
+    /// @param key the language key of the menu item
+    /// @return a resolver that finds the menu item by language key
     static NodeResolver menuItem(@NonNull String key) {
         return scene -> {
             if (!(scene.getWindow() instanceof ContextMenu menu)) {

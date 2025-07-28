@@ -62,6 +62,7 @@ public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScr
 
     protected void setupListeners(@NonNull Node node) {
         subscriptions.add(EasyBind.subscribe(node.localToSceneTransformProperty(), _ -> this.updateLayout()));
+        subscriptions.add(EasyBind.subscribe(node.boundsInLocalProperty(), _ -> this.updateLayout()));
         subscriptions.add(EasyBind.subscribe(new TreeShowingProperty(node), _ -> this.updateLayout()));
 
         Scene scene = node.getScene();
