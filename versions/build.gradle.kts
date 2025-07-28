@@ -6,7 +6,7 @@ javaPlatform {
     allowDependencies()
 }
 
-val javafx = "24.0.1"
+val javafx = "24.0.2"
 val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
@@ -33,7 +33,7 @@ dependencies.constraints {
 
     api("com.ibm.icu:icu4j:72.0.1!!")
 
-    api("com.dlsc.gemsfx:gemsfx:3.1.3")
+    api("com.dlsc.gemsfx:gemsfx:3.3.5")
     api("com.dlsc.pdfviewfx:pdfviewfx:3.1.1")
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1")
@@ -53,7 +53,7 @@ dependencies.constraints {
     api("com.konghq:unirest-java-core:4.4.7")
     api("com.konghq:unirest-modules-gson:4.4.7")
     api("com.pixelduke:fxthemes:1.6.0")
-    api("com.squareup.okhttp3:okhttp:4.12.0")
+    api("com.squareup.okhttp3:okhttp:5.1.0")
     api("com.squareup.okio:okio-jvm:3.12.0")
     api("com.squareup.retrofit2:retrofit:3.0.0")
     api("com.tngtech.archunit:archunit:1.4.1")
@@ -84,11 +84,12 @@ dependencies.constraints {
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     api("net.bytebuddy:byte-buddy:1.17.6")
     api("net.harawata:appdirs:1.4.0")
+    api("net.java.dev.jna:jna-jpms:5.17.0")
     api("net.java.dev.jna:jna-platform:5.17.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")
     api("org.apache.commons:commons-csv:1.14.0")
-    api("org.apache.commons:commons-lang3:3.17.0")
+    api("org.apache.commons:commons-lang3:3.18.0")
     api("org.apache.commons:commons-text:1.13.1")
     api("org.apache.httpcomponents.client5:httpclient5:5.5")
     api("org.apache.logging.log4j:log4j-to-slf4j:2.25.0")
@@ -101,7 +102,7 @@ dependencies.constraints {
     api("org.apache.pdfbox:pdfbox:$pdfbox")
     api("org.apache.pdfbox:xmpbox:$pdfbox")
     api("org.apache.velocity:velocity-engine-core:2.4.1")
-    api("org.bouncycastle:bcprov-jdk18on:1.80")
+    api("org.bouncycastle:bcprov-jdk18on:1.81")
     api("org.controlsfx:controlsfx:11.2.2")
     api("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
     api("org.fxmisc.flowless:flowless:0.7.4")
@@ -125,16 +126,16 @@ dependencies.constraints {
     api("org.jooq:jool:0.9.15")
     api("org.jsoup:jsoup:1.20.1")
     api("org.jspecify:jspecify:1.0.0")
-    api("org.junit.jupiter:junit-jupiter-api:5.13.1")
-    api("org.junit.jupiter:junit-jupiter-params:5.13.1")
-    api("org.junit.jupiter:junit-jupiter:5.13.1")
+    api("org.junit.jupiter:junit-jupiter-api:5.13.3")
+    api("org.junit.jupiter:junit-jupiter-params:5.13.3")
+    api("org.junit.jupiter:junit-jupiter:5.13.3")
     api("org.junit.platform:junit-platform-launcher:1.13.1")
     api("org.kordamp.ikonli:ikonli-javafx:12.4.0")
     api("org.kordamp.ikonli:ikonli-materialdesign2-pack:12.4.0")
     api("org.libreoffice:libreoffice:24.8.4")
     api("org.libreoffice:unoloader:24.8.4")
     api("org.mockito:mockito-core:5.18.0")
-    api("org.ow2.asm:asm:9.6")
+    api("org.ow2.asm:asm:9.8")
     api("org.postgresql:postgresql:42.7.7")
     api("org.slf4j:jul-to-slf4j:2.0.17")
     api("org.slf4j:slf4j-api:2.0.17")

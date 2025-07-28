@@ -2,9 +2,7 @@ package org.jabref.http.manager;
 
 import java.net.URI;
 
-import javafx.collections.ObservableList;
-
-import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.http.SrvStateManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,13 +19,13 @@ public class HttpServerManager implements AutoCloseable {
 
     private HttpServerThread httpServerThread;
 
-    public synchronized void start(ObservableList<BibDatabaseContext> contextsToServe, URI uri) {
+    public synchronized void start(SrvStateManager srvStateManager, URI uri) {
         if (httpServerThread != null) {
             LOGGER.warn("HTTP server manager already started, cannot start again.");
             return;
         }
 
-        httpServerThread = new HttpServerThread(contextsToServe, uri);
+        httpServerThread = new HttpServerThread(srvStateManager, uri);
         // This enqueues the thread to run in the background
         // The JVM will take care of running it at some point in time in the future
         // Thus, we cannot check directly if it really runs

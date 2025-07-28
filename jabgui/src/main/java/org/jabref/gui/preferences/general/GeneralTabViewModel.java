@@ -18,7 +18,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.SpinnerValueFactory;
 
 import org.jabref.gui.DialogService;
@@ -44,7 +43,6 @@ import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.remote.RemoteUtil;
 import org.jabref.logic.remote.server.RemoteListenerServerManager;
 import org.jabref.logic.util.StandardFileType;
-import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
@@ -113,6 +111,8 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final StringProperty remotePortProperty = new SimpleStringProperty("");
     private final Validator remotePortValidator;
     private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
+    private final StringProperty httpPortProperty = new SimpleStringProperty("");
+    private final Validator httpPortValidator;
     private final TrustStoreManager trustStoreManager;
 
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -166,12 +166,26 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                         Localization.lang("Network"),
                         Localization.lang("Remote operation"),
                         Localization.lang("You must enter an integer value in the interval 1025-65535"))));
-
+        httpPortValidator = new FunctionBasedValidator<>(
+                httpPortProperty,
+                input -> {
+                    try {
+                        int portNumber = Integer.parseInt(httpPortProperty().getValue());
+                        return RemoteUtil.isUserPort(portNumber);
+                    } catch (NumberFormatException ex) {
+                        return false;
+                    }
+                },
+                ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
         this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
 
     public ValidationStatus remotePortValidationStatus() {
         return remotePortValidator.getValidationStatus();
+    }
+
+    public ValidationStatus httpPortValidationStatus() {
+        return httpPortValidator.getValidationStatus();
     }
 
     @Override
@@ -219,6 +233,7 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         remotePortProperty.setValue(String.valueOf(remotePreferences.getPort()));
 
         enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());
+        httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpPort()));
     }
 
     @Override
@@ -288,14 +303,19 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             remoteListenerServerManager.stop();
         }
 
+        getPortAsInt(httpPortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentHttpPort(newPort)) {
+                remotePreferences.setHttpPort(newPort);
+            }
+        });
+
         HttpServerManager httpServerManager = Injector.instantiateModelOrService(HttpServerManager.class);
         // stop in all cases, because the port might have changed
         httpServerManager.stop();
         if (enableHttpServerProperty.getValue()) {
             remotePreferences.setEnableHttpServer(true);
-            ObservableList<BibDatabaseContext> openDatabases = Injector.instantiateModelOrService(StateManager.class).getOpenDatabases();
             URI uri = remotePreferences.getHttpServerUri();
-            httpServerManager.start(openDatabases, uri);
+            httpServerManager.start(Injector.instantiateModelOrService(StateManager.class), uri);
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();
@@ -318,6 +338,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         if (remoteServerProperty.getValue()) {
             validator.addValidators(remotePortValidator);
+        }
+
+        if (enableHttpServerProperty.getValue()) {
+            validator.addValidators(httpPortValidator);
         }
 
         if (fontOverrideProperty.getValue()) {
@@ -460,6 +484,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public BooleanProperty enableHttpServerProperty() {
         return enableHttpServerProperty;
+    }
+
+    public StringProperty httpPortProperty() {
+        return httpPortProperty;
     }
 
     public void openBrowser() {
