@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
@@ -180,6 +181,7 @@ class BibliographyConsistencyCheckTest {
         bibDatabase.insertEntries(bibEntriesList);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBLATEX);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
                 .check(bibContext, (_, _) -> { });
@@ -187,6 +189,6 @@ class BibliographyConsistencyCheckTest {
         BibliographyConsistencyCheck.EntryTypeResult typeResult =
                 result.entryTypeToResultMap().get(StandardEntryType.Online);
 
-        assertEquals(List.of(withDate), typeResult.sortedEntries().stream().toList());
+        assertEquals(List.of(withDate, withoutDate), typeResult.sortedEntries().stream().toList());
     }
 }
