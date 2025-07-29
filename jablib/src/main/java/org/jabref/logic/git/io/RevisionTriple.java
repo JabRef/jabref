@@ -19,8 +19,5 @@ public record RevisionTriple(
         RevCommit local,
         RevCommit remote) {
     public RevisionTriple {
-        if (local == null || remote == null) {
-            throw new IllegalArgumentException("local and remote commits must not be null");
-        }
     }
 }
