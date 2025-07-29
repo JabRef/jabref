@@ -29,6 +29,7 @@ import org.jabref.model.entry.types.EntryType;
 public class BibliographyConsistencyCheck {
 
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
+                            StandardField.KEY,
                             StandardField.COMMENT,
                             StandardField.CROSSREF,
                             StandardField.GROUPS,
@@ -134,9 +135,11 @@ public class BibliographyConsistencyCheck {
                         .computeIfAbsent(entryType, _ -> new HashSet<>())
                         .addAll(filteredFields);
 
-                entryTypeToFieldsInAllEntriesMap
-                        .computeIfAbsent(entryType, _ -> new HashSet<>())
-                        .retainAll(filteredFields);
+                if (!entryTypeToFieldsInAllEntriesMap.containsKey(entryType)) {
+                    entryTypeToFieldsInAllEntriesMap.put(entryType, new HashSet<>(filteredFields));
+                } else {
+                    entryTypeToFieldsInAllEntriesMap.get(entryType).retainAll(filteredFields);
+                }
 
                 entryTypeToEntriesMap
                         .computeIfAbsent(entryType, _ -> new HashSet<>())
