@@ -344,7 +344,6 @@ extraJavaModuleInfo {
         exportAllPackages()
     }
 
-
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
         exportAllPackages()
         requireAllDefinedDependencies()
