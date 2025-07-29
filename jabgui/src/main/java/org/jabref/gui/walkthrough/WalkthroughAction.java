@@ -35,7 +35,7 @@ import com.airhacks.afterburner.injection.Injector;
 public class WalkthroughAction extends SimpleCommand {
     public static final String PDF_LINK_WALKTHROUGH_NAME = "pdfLink";
     public static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME = "mainFileDirectory";
-    private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new ConcurrentHashMap<>(); // must be mutable to allow caching of created walkthroughs
+    private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new ConcurrentHashMap<>();
 
     private final Walkthrough walkthrough;
     private final JabRefFrame frame;
