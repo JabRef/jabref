@@ -63,7 +63,7 @@ public class MetaData {
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
-    private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User, FilePath>
+    private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User-Host, FilePath>
 
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
@@ -110,8 +110,7 @@ public class MetaData {
     /**
      * Sets a new group root node. <b>WARNING </b>: This invalidates everything returned by getGroups() so far!!!
      */
-    public void setGroups(GroupTreeNode root) {
-        Objects.requireNonNull(root);
+    public void setGroups(@NonNull GroupTreeNode root) {
         groupsRoot.setValue(root);
         root.subscribeToDescendantChanged(groupTreeNode -> groupsRootBinding.invalidate());
         root.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
@@ -131,8 +130,7 @@ public class MetaData {
     /**
      * @return the stored label patterns
      */
-    public AbstractCitationKeyPatterns getCiteKeyPatterns(GlobalCitationKeyPatterns globalPatterns) {
-        Objects.requireNonNull(globalPatterns);
+    public AbstractCitationKeyPatterns getCiteKeyPatterns(@NonNull GlobalCitationKeyPatterns globalPatterns) {
         AbstractCitationKeyPatterns bibtexKeyPatterns = new DatabaseCitationKeyPatterns(globalPatterns);
 
         // Add stored key patterns
@@ -147,9 +145,7 @@ public class MetaData {
      *
      * @param bibtexKeyPatterns the key patterns to update to. <br /> A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
-    public void setCiteKeyPattern(AbstractCitationKeyPatterns bibtexKeyPatterns) {
-        Objects.requireNonNull(bibtexKeyPatterns);
-
+    public void setCiteKeyPattern(@NonNull AbstractCitationKeyPatterns bibtexKeyPatterns) {
         CitationKeyPattern defaultValue = bibtexKeyPatterns.getDefaultValue();
         Map<EntryType, CitationKeyPattern> nonDefaultPatterns = bibtexKeyPatterns.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
@@ -178,8 +174,8 @@ public class MetaData {
         return Optional.ofNullable(saveActions);
     }
 
-    public void setSaveActions(FieldFormatterCleanups saveActions) {
-        this.saveActions = Objects.requireNonNull(saveActions);
+    public void setSaveActions(@NonNull FieldFormatterCleanups saveActions) {
+        this.saveActions = saveActions;
         postChange();
     }
 
@@ -187,12 +183,12 @@ public class MetaData {
         return Optional.ofNullable(mode);
     }
 
-    public void setMode(BibDatabaseMode mode) {
+    public void setMode(@NonNull BibDatabaseMode mode) {
         if (mode == this.mode) {
             return;
         }
 
-        this.mode = Objects.requireNonNull(mode);
+        this.mode = mode;
         postChange();
     }
 
@@ -226,8 +222,8 @@ public class MetaData {
         return Optional.ofNullable(librarySpecificFileDirectory);
     }
 
-    public void setLibrarySpecificFileDirectory(String path) {
-        librarySpecificFileDirectory = Objects.requireNonNull(path).trim();
+    public void setLibrarySpecificFileDirectory(@NonNull String path) {
+        librarySpecificFileDirectory = path.trim();
         postChange();
     }
 
@@ -235,8 +231,8 @@ public class MetaData {
         return Optional.ofNullable(versionDBStructure);
     }
 
-    public void setVersionDBStructure(String version) {
-        versionDBStructure = Objects.requireNonNull(version).trim();
+    public void setVersionDBStructure(@NonNull String version) {
+        versionDBStructure = version.trim();
         postChange();
     }
 
@@ -254,8 +250,8 @@ public class MetaData {
         postChange();
     }
 
-    public void setUserFileDirectory(String user, String path) {
-        userFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+    public void setUserFileDirectory(@NonNull String user, @NonNull String path) {
+        userFileDirectory.put(user, path);
         postChange();
     }
 
@@ -264,20 +260,20 @@ public class MetaData {
         postChange();
     }
 
-    public Optional<Path> getLatexFileDirectory(String user) {
-        // First try to get the LaTeX file directory for the exact user
-        Path path = laTexFileDirectory.get(user);
+    public Optional<Path> getLatexFileDirectory(String userHostString) {
+        // First try to get the LaTeX file directory for the exact user-host
+        Path path = laTexFileDirectory.get(userHostString);
         if (path != null) {
             return Optional.of(path);
         }
         
         // If not found, try to find a LaTeX file directory for the same host
         // This handles the case where a file is moved between hosts with different users
-        if (user.contains("-")) {
-            String currentHost = user.substring(user.lastIndexOf('-') + 1);
+        UserHostInfo requestedUserHost = UserHostInfo.parse(userHostString);
+        if (!requestedUserHost.host().isEmpty()) {
             for (Map.Entry<String, Path> entry : laTexFileDirectory.entrySet()) {
-                String entryUser = entry.getKey();
-                if (entryUser.endsWith("-" + currentHost)) {
+                UserHostInfo entryUserHost = UserHostInfo.parse(entry.getKey());
+                if (entryUserHost.hasSameHost(requestedUserHost)) {
                     // Found a LaTeX file directory for the same host, return it
                     return Optional.of(entry.getValue());
                 }
@@ -287,13 +283,13 @@ public class MetaData {
         return Optional.empty();
     }
 
-    public void setLatexFileDirectory(String user, Path path) {
-        laTexFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+    public void setLatexFileDirectory(@NonNull String userHostString, @NonNull Path path) {
+        laTexFileDirectory.put(userHostString, path);
         postChange();
     }
 
-    public void clearLatexFileDirectory(String user) {
-        laTexFileDirectory.remove(user);
+    public void clearLatexFileDirectory(String userHostString) {
+        laTexFileDirectory.remove(userHostString);
         postChange();
     }
 
@@ -335,8 +331,8 @@ public class MetaData {
     /**
      * This method (with additional parameter) has been introduced to avoid event loops while saving a database.
      */
-    public void setEncoding(Charset encoding, ChangePropagation postChanges) {
-        this.encoding = Objects.requireNonNull(encoding);
+    public void setEncoding(@NonNull Charset encoding, ChangePropagation postChanges) {
+        this.encoding = encoding;
         if (postChanges == ChangePropagation.POST_EVENT) {
             postChange();
         }
@@ -392,10 +388,7 @@ public class MetaData {
         return Collections.unmodifiableMap(unknownMetaData);
     }
 
-    public void putUnknownMetaDataItem(String key, List<String> value) {
-        Objects.requireNonNull(key);
-        Objects.requireNonNull(value);
-
+    public void putUnknownMetaDataItem(@NonNull String key, @NonNull List<String> value) {
         unknownMetaData.put(key, value);
     }
 
