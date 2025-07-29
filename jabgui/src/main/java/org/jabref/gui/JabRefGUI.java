@@ -214,7 +214,7 @@ public class JabRefGUI extends Application {
             return;
         }
 
-        if (!(preferences.getProxyPreferences().shouldUseAuthentication())) {
+        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
             ProxyRegisterer.register(preferences.getProxyPreferences());
             return;
         }
