@@ -88,7 +88,7 @@ public class WindowOverlay {
     /// the node contains a scene and window to assign the owning window to the
     /// popover.
     /// @see WindowOverlay#showPanel(PanelStep, Runnable)
-    /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable).
+    /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
     public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
 
