@@ -17,24 +17,26 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.Field;
 
-/**
- * Detects semantic merge conflicts between base, local, and remote.
- *
- * Strategy:
- * Instead of computing full diffs from base to local/remote, we simulate a Git-style merge
- * by applying the diff between base and remote onto local (`result := local + remoteDiff`).
- *
- * Caveats:
- * Entries without citation keys are ignored (cannot be matched).
- */
+/// Detects semantic merge conflicts between base, local, and remote.
+///
+/// Strategy:
+/// Instead of computing full diffs from base to local/remote, we simulate a Git-style merge
+/// by applying the diff between base and remote onto local (`result := local + remoteDiff`).
+///
+/// Caveats:
+/// - Only entries with the same citation key are considered matching.
+/// - Entries without citation keys are currently ignored.
+///   - TODO: Improve handling of such entries.
+///     See: `BibDatabaseDiffTest#compareOfTwoEntriesWithSameContentAndMixedLineEndingsReportsNoDifferences`
+/// - Changing a citation key is not supported and is treated as deletion + addition.
 public class SemanticConflictDetector {
     public static List<ThreeWayEntryConflict> detectConflicts(BibDatabaseContext base, BibDatabaseContext local, BibDatabaseContext remote) {
         // 1. get diffs between base and remote
         List<BibEntryDiff> remoteDiffs = BibDatabaseDiff.compare(base, remote).getEntryDifferences();
 
         // 2. map citation key to entry for local/remote diffs
-        Map<String, BibEntry> baseEntries = toEntryMap(base);
-        Map<String, BibEntry> localEntries = toEntryMap(local);
+        Map<String, BibEntry> baseEntries = getCitationKeyToEntryMap(base);
+        Map<String, BibEntry> localEntries = getCitationKeyToEntryMap(local);
 
         List<ThreeWayEntryConflict> conflicts = new ArrayList<>();
 
@@ -73,7 +75,7 @@ public class SemanticConflictDetector {
         return conflicts;
     }
 
-    public static Map<String, BibEntry> toEntryMap(BibDatabaseContext context) {
+    private static Map<String, BibEntry> getCitationKeyToEntryMap(BibDatabaseContext context) {
         return context.getDatabase().getEntries().stream()
                       .filter(entry -> entry.getCitationKey().isPresent())
                       .collect(Collectors.toMap(
@@ -110,8 +112,8 @@ public class SemanticConflictDetector {
      * @return A {@link MergePlan} describing how to update the local copy with remote changes.
      */
     public static MergePlan extractMergePlan(BibDatabaseContext base, BibDatabaseContext remote) {
-        Map<String, BibEntry> baseMap = toEntryMap(base);
-        Map<String, BibEntry> remoteMap = toEntryMap(remote);
+        Map<String, BibEntry> baseMap = getCitationKeyToEntryMap(base);
+        Map<String, BibEntry> remoteMap = getCitationKeyToEntryMap(remote);
 
         Map<String, Map<Field, String>> fieldPatches = new LinkedHashMap<>();
         List<BibEntry> newEntries = new ArrayList<>();
@@ -142,18 +144,19 @@ public class SemanticConflictDetector {
      * @return A map from field to new value
      */
     private static Map<Field, String> computeFieldPatch(BibEntry base, BibEntry remote) {
-        return Stream.concat(base.getFields().stream(), remote.getFields().stream())
-                     .distinct()
-                     .filter(field -> {
-                         String baseValue = base.getField(field).orElse(null);
-                         String remoteValue = remote.getField(field).orElse(null);
-                         return !Objects.equals(baseValue, remoteValue);
-                     })
-                     .collect(Collectors.toMap(
-                             field -> field,
-                             field -> remote.getField(field).orElse(null),
-                             (existing, replacement) -> replacement,
-                             LinkedHashMap::new
-                             ));
+        Map<Field, String> patch = new LinkedHashMap<>();
+
+        Stream.concat(base.getFields().stream(), remote.getFields().stream())
+              .distinct()
+              .forEach(field -> {
+                  String baseValue = base.getField(field).orElse(null);
+                  String remoteValue = remote.getField(field).orElse(null);
+
+                  if (!Objects.equals(baseValue, remoteValue)) {
+                      patch.put(field, remoteValue);
+                  }
+              });
+
+        return patch;
     }
 }

@@ -8,6 +8,7 @@ import org.jabref.gui.AbstractViewModel;
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.model.MergeResult;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -24,12 +25,12 @@ public class GitPullViewModel extends AbstractViewModel {
     public MergeResult pull() throws IOException, GitAPIException, JabRefException {
         Optional<BibDatabaseContext> maybeContext = gitStatusViewModel.getDatabaseContext();
         if (maybeContext.isEmpty()) {
-            throw new JabRefException("Cannot pull: No active BibDatabaseContext.");
+            throw new JabRefException(Localization.lang("Cannot pull: No active BibDatabaseContext."));
         }
 
         BibDatabaseContext localBibDatabaseContext = maybeContext.get();
         Path bibFilePath = localBibDatabaseContext.getDatabasePath().orElseThrow(() ->
-                new JabRefException("Cannot pull: .bib file path missing in BibDatabaseContext.")
+                new JabRefException(Localization.lang("Cannot pull: .bib file path missing in BibDatabaseContext."))
         );
 
         MergeResult result = syncService.fetchAndMerge(localBibDatabaseContext, bibFilePath);

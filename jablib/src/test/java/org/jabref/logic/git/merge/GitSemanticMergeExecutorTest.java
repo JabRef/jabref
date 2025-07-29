@@ -3,9 +3,11 @@ package org.jabref.logic.git.merge;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
@@ -14,8 +16,10 @@ import org.jabref.model.entry.field.StandardField;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Answers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -28,6 +32,8 @@ public class GitSemanticMergeExecutorTest {
     private ImportFormatPreferences preferences;
     private GitSemanticMergeExecutor executor;
     private Path tempFile;
+    @TempDir
+    private Path tempDir;
 
     @BeforeEach
     public void setup() throws IOException {
@@ -35,7 +41,8 @@ public class GitSemanticMergeExecutorTest {
         local = new BibDatabaseContext();
         remote = new BibDatabaseContext();
 
-        BibEntry baseEntry = new BibEntry().withCitationKey("Smith2020").withField(StandardField.TITLE, "Old Title");
+        BibEntry baseEntry = new BibEntry().withCitationKey("Smith2020")
+                                           .withField(StandardField.TITLE, "Old Title");
         BibEntry localEntry = (BibEntry) baseEntry.clone();
         BibEntry remoteEntry = (BibEntry) baseEntry.clone();
         remoteEntry.setField(StandardField.TITLE, "New Title");
@@ -50,16 +57,22 @@ public class GitSemanticMergeExecutorTest {
 
         executor = new GitSemanticMergeExecutorImpl(preferences);
 
-        tempFile = Files.createTempFile("merged", ".bib");
-        tempFile.toFile().deleteOnExit();
+        tempFile = tempDir.resolve("merged.bib");
     }
 
     @Test
-    public void successfulMergeAndWrite() throws IOException {
+    public void successfulMergeAndWrite() throws IOException, JabRefException {
         MergeResult result = executor.merge(base, local, remote, tempFile);
 
         assertTrue(result.isSuccessful());
-        String content = Files.readString(tempFile);
-        assertTrue(content.contains("New Title"));
+
+        String mergedContent = Files.readString(tempFile);
+        BibDatabaseContext mergedContext = BibDatabaseContext.of(mergedContent, preferences);
+
+        BibEntry expected = new BibEntry()
+                .withCitationKey("Smith2020")
+                .withField(StandardField.TITLE, "New Title");
+
+        assertEquals(List.of(expected), mergedContext.getDatabase().getEntries());
     }
 }

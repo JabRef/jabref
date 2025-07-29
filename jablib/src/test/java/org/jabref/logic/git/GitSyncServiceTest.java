@@ -1,11 +1,11 @@
 package org.jabref.logic.git;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
@@ -21,7 +21,10 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.ConfigConstants;
+import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
@@ -45,6 +48,7 @@ class GitSyncServiceTest {
     private Path bobDir;
     private Git aliceGit;
     private Git bobGit;
+    private Git remoteGit;
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
     private GitSemanticMergeExecutor mergeExecutor;
@@ -57,6 +61,10 @@ class GitSyncServiceTest {
 
     private final PersonIdent alice = new PersonIdent("Alice", "alice@example.org");
     private final PersonIdent bob = new PersonIdent("Bob", "bob@example.org");
+
+    // TODO: This is a text-based E2E test to verify Git-level behavior.
+    // In the future, consider replacing with structured BibEntry construction
+    // to improve semantic robustness and avoid syntax errors.
     private final String initialContent = """
             @article{a,
               author = {don't know the author},
@@ -111,12 +119,11 @@ class GitSyncServiceTest {
 
         // create fake remote repo
         remoteDir = tempDir.resolve("remote.git");
-        Git remoteGit = Git.init()
+        remoteGit = Git.init()
                            .setBare(true)
                            .setInitialBranch("main")
                            .setDirectory(remoteDir.toFile())
                            .call();
-        remoteGit.close();
 
         // Alice init local repository
         aliceDir = tempDir.resolve("alice");
@@ -139,6 +146,8 @@ class GitSyncServiceTest {
            .setRemote("origin")
            .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
            .call();
+
+        configureTracking(aliceGit, "main", "origin");
 
         // Bob clone remote
         bobDir = tempDir.resolve("bob");
@@ -167,6 +176,19 @@ class GitSyncServiceTest {
 
         // Debug hint: Show the created git graph on the command line
         //   git log --graph --oneline --decorate --all --reflog
+    }
+
+    @AfterEach
+    void cleanup() {
+        if (aliceGit != null) {
+            aliceGit.close();
+        }
+        if (bobGit != null) {
+            bobGit.close();
+        }
+        if (remoteGit != null) {
+            remoteGit.close();
+        }
     }
 
     @Test
@@ -271,7 +293,7 @@ class GitSyncServiceTest {
             // We simulate conflict resolution by choosing the remote version and modifying the author field.
             BibEntry resolved = (BibEntry) conflict.remote().clone();
             resolved.setField(StandardField.AUTHOR, "alice-c + bob-c");
-            return Optional.of(List.of(resolved));
+            return List.of(resolved);
         });
 
         GitHandler handler = new GitHandler(aliceDir);
@@ -303,16 +325,6 @@ class GitSyncServiceTest {
         assertEquals(bobUpdatedContent, remote);
     }
 
-    @AfterEach
-    void cleanup() {
-        if (aliceGit != null) {
-            aliceGit.close();
-        }
-        if (bobGit != null) {
-            bobGit.close();
-        }
-    }
-
     private RevCommit writeAndCommit(String content, String message, PersonIdent author, Path library, Git git) throws Exception {
         Files.writeString(library, content, StandardCharsets.UTF_8);
         String relativePath = git.getRepository().getWorkTree().toPath().relativize(library).toString();
@@ -328,5 +340,12 @@ class GitSyncServiceTest {
                 .replaceAll("@[aA]rticle", "@article")
                 .replaceAll("\\s+", "")
                 .toLowerCase();
+    }
+
+    private static void configureTracking(Git git, String branch, String remote) throws IOException {
+        StoredConfig config = git.getRepository().getConfig();
+        config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, branch, ConfigConstants.CONFIG_KEY_REMOTE, remote);
+        config.setString(ConfigConstants.CONFIG_BRANCH_SECTION, branch, ConfigConstants.CONFIG_KEY_MERGE, Constants.R_HEADS + branch);
+        config.save();
     }
 }

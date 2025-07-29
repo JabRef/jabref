@@ -10,6 +10,7 @@ import org.jabref.logic.git.io.GitRevisionLocator;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -46,7 +47,10 @@ public class GitStatusChecker {
             boolean hasUncommittedChanges = !status.isClean();
 
             ObjectId localHead = repo.resolve("HEAD");
-            ObjectId remoteHead = repo.resolve("refs/remotes/origin/main");
+            // TODO: Handle remote branches properly + Test
+            String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();
+            ObjectId remoteHead = (trackingBranch != null) ? repo.resolve(trackingBranch) : null;
+
             SyncStatus syncStatus = determineSyncStatus(repo, localHead, remoteHead);
 
             return new GitStatusSnapshot(
@@ -57,7 +61,7 @@ public class GitStatusChecker {
                     Optional.ofNullable(localHead).map(ObjectId::getName)
             );
         } catch (IOException | GitAPIException e) {
-            LOGGER.warn("Failed to check Git status: {}", e.getMessage(), e);
+            LOGGER.warn("Failed to check Git status", e);
             return new GitStatusSnapshot(
                     true,
                     SyncStatus.UNKNOWN,
@@ -70,6 +74,7 @@ public class GitStatusChecker {
 
     private static SyncStatus determineSyncStatus(Repository repo, ObjectId localHead, ObjectId remoteHead) throws IOException {
         if (localHead == null || remoteHead == null) {
+            LOGGER.debug("localHead or remoteHead null");
             return SyncStatus.UNKNOWN;
         }
 
@@ -92,6 +97,7 @@ public class GitStatusChecker {
             } else if (behind) {
                 return SyncStatus.BEHIND;
             } else {
+                LOGGER.debug("Could not determine git sync status. All commits differ or mergeBase is null.");
                 return SyncStatus.UNKNOWN;
             }
         }

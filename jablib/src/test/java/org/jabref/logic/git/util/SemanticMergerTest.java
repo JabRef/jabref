@@ -1,9 +1,9 @@
 package org.jabref.logic.git.util;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
-import org.jabref.logic.git.io.GitBibParser;
 import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.logic.git.merge.SemanticMerger;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,39 +31,44 @@ public class SemanticMergerTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
     }
 
-    @ParameterizedTest(name = "Database patch: {0}")
-    @MethodSource("provideDatabasePatchCases")
+    // These test cases are based on documented scenarios from docs/code-howtos/git.md.
+    @ParameterizedTest
+    @MethodSource
     void patchDatabase(String description, String base, String local, String remote, String expectedAuthor) throws Exception {
-        BibDatabaseContext baseDatabaseContext = GitBibParser.parseBibFromGit(base, importFormatPreferences);
-        BibDatabaseContext localDatabaseContext = GitBibParser.parseBibFromGit(local, importFormatPreferences);
-        BibDatabaseContext remoteDatabaseContext = GitBibParser.parseBibFromGit(remote, importFormatPreferences);
+        BibDatabaseContext baseDatabaseContext = BibDatabaseContext.of(base, importFormatPreferences);
+        BibDatabaseContext localDatabaseContext = BibDatabaseContext.of(local, importFormatPreferences);
+        BibDatabaseContext remoteDatabaseContext = BibDatabaseContext.of(remote, importFormatPreferences);
 
         MergePlan plan = SemanticConflictDetector.extractMergePlan(baseDatabaseContext, remoteDatabaseContext);
         SemanticMerger.applyMergePlan(localDatabaseContext, plan);
 
         BibEntry patched = localDatabaseContext.getDatabase().getEntryByCitationKey("a").orElseThrow();
-        assertEquals(expectedAuthor, patched.getField(StandardField.AUTHOR).orElse(null));
+        if (expectedAuthor == null) {
+            assertTrue(patched.getField(StandardField.AUTHOR).isEmpty());
+        } else {
+            assertEquals(Optional.of(expectedAuthor), patched.getField(StandardField.AUTHOR));
+        }
     }
 
-    static Stream<Arguments> provideDatabasePatchCases() {
+    static Stream<Arguments> patchDatabase() {
         return Stream.of(
                 Arguments.of("T1 - remote changed a field, local unchanged",
                         """
-                        @article{a,
-                            author = {lala},
-                            doi = {xya},
-                        }
-                        """,
+                         @article{a,
+                             author = {TestAuthor},
+                             doi = {ExampleDoi}
+                         }
+                         """,
                         """
                         @article{a,
-                            author = {lala},
-                            doi = {xya},
+                            author = {TestAuthor},
+                            doi = {ExampleDoi}
                         }
                         """,
                         """
                         @article{a,
                             author = {bob},
-                            doi = {xya},
+                            doi = {ExampleDoi}
                         }
                         """,
                         "bob"
@@ -70,20 +76,20 @@ public class SemanticMergerTest {
                 Arguments.of("T2 - local changed a field, remote unchanged",
                         """
                         @article{a,
-                            author = {lala},
-                            doi = {xya},
+                            author = {TestAuthor},
+                            doi = {ExampleDoi}
                         }
                         """,
                         """
                         @article{a,
                             author = {alice},
-                            doi = {xya},
+                            doi = {ExampleDoi}
                         }
                         """,
                         """
                         @article{a,
-                            author = {lala},
-                            doi = {xya},
+                            author = {TestAuthor},
+                            doi = {ExampleDoi}
                         }
                         """,
                         "alice"
@@ -91,23 +97,43 @@ public class SemanticMergerTest {
                 Arguments.of("T3 - both changed to same value",
                         """
                         @article{a,
-                            author = {lala},
-                            doi = {xya},
+                            author = {TestAuthor},
+                            doi = {ExampleDoi}
                         }
                         """,
                         """
                         @article{a,
                             author = {bob},
-                            doi = {xya},
+                            doi = {ExampleDoi}
                         }
                         """,
                         """
                         @article{a,
                             author = {bob},
-                            doi = {xya},
+                            doi = {ExampleDoi}
                         }
                         """,
                         "bob"
+                ),
+                Arguments.of("T4 - field removed in remote, unchanged in local",
+                        """
+                        @article{a,
+                            author = {TestAuthor},
+                            doi = {ExampleDoi},
+                        }
+                        """,
+                        """
+                        @article{a,
+                            author = {TestAuthor},
+                            doi = {ExampleDoi},
+                        }
+                        """,
+                        """
+                        @article{a,
+                            doi = {ExampleDoi},
+                        }
+                        """,
+                        null
                 )
         );
     }

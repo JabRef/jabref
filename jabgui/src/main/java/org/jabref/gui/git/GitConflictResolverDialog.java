@@ -9,12 +9,12 @@ import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighte
 import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 
-/**
- * UI wrapper
- * Receives a semantic conflict (ThreeWayEntryConflict), pops up an interactive GUI (belonging to mergeentries), and returns a user-confirmed BibEntry merge result.
- */
+/// A wrapper around {@link MergeEntriesDialog} for Git feature
+///
+/// Receives a semantic conflict (ThreeWayEntryConflict), pops up an interactive GUI (belonging to mergeentries), and returns a user-confirmed BibEntry merge result.
 public class GitConflictResolverDialog {
     private final DialogService dialogService;
     private final GuiPreferences preferences;
@@ -30,8 +30,8 @@ public class GitConflictResolverDialog {
         BibEntry remote = conflict.remote();
 
         MergeEntriesDialog dialog = new MergeEntriesDialog(local, remote, preferences);
-        dialog.setLeftHeaderText("Local");
-        dialog.setRightHeaderText("Remote");
+        dialog.setLeftHeaderText(Localization.lang("Local"));
+        dialog.setRightHeaderText(Localization.lang("Remote"));
         ShowDiffConfig diffConfig = new ShowDiffConfig(
                 ThreeWayMergeToolbar.DiffView.SPLIT,
                 DiffHighlighter.BasicDiffMethod.WORDS

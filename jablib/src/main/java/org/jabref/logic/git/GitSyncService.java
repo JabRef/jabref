@@ -9,7 +9,6 @@ import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
-import org.jabref.logic.git.io.GitBibParser;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.io.GitRevisionLocator;
 import org.jabref.logic.git.io.RevisionTriple;
@@ -29,13 +28,12 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * GitSyncService currently serves as an orchestrator for Git pull/push logic.
- * if (hasConflict)
- *     → UI merge;
- * else
- *     → autoMerge := local + remoteDiff
- */
+/// GitSyncService currently serves as an orchestrator for Git pull/push logic.
+///
+/// if (hasConflict)
+///     → UI merge;
+/// else
+///     → autoMerge := local + remoteDiff
 public class GitSyncService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitSyncService.class);
 
@@ -93,6 +91,7 @@ public class GitSyncService {
             MergeResult result = performSemanticMerge(git, triple.base(), triple.remote(), localDatabaseContext, bibFilePath);
 
             // 4. Auto-commit merge result if successful
+            // TODO: Allow user customization of auto-merge commit message (e.g. conventional commits)
             if (result.isSuccessful()) {
                 gitHandler.createCommitOnCurrentBranch("Auto-merged by JabRef", !AMEND);
             }
@@ -120,14 +119,13 @@ public class GitSyncService {
         BibDatabaseContext base;
         if (maybeBaseCommit.isPresent()) {
             Optional<String> baseContent = GitFileReader.readFileFromCommit(git, maybeBaseCommit.get(), relativePath);
-            base = GitBibParser.parseBibFromGit(baseContent, importFormatPreferences);
+            base = baseContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(baseContent.get(), importFormatPreferences);
         } else {
             base = new BibDatabaseContext();
         }
 
         Optional<String> remoteContent = GitFileReader.readFileFromCommit(git, remoteCommit, relativePath);
-        BibDatabaseContext remote = GitBibParser.parseBibFromGit(remoteContent, importFormatPreferences);
-
+        BibDatabaseContext remote = remoteContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(remoteContent.get(), importFormatPreferences);
         BibDatabaseContext local = localDatabaseContext;
 
         // 2. Conflict detection
@@ -138,15 +136,15 @@ public class GitSyncService {
             effectiveRemote = remote;
         } else {
             // 3. If there are conflicts, ask strategy to resolve
-            Optional<List<BibEntry>> maybeResolved = gitConflictResolverStrategy.resolveConflicts(conflicts);
-            if (maybeResolved.isEmpty()) {
+            List<BibEntry> resolved = gitConflictResolverStrategy.resolveConflicts(conflicts);
+            if (resolved.isEmpty()) {
                 LOGGER.warn("Merge aborted: Conflict resolution was canceled or denied.");
                 return MergeResult.failure();
             }
-            effectiveRemote = GitMergeUtil.replaceEntries(remote, maybeResolved.get());
+            effectiveRemote = GitMergeUtil.replaceEntries(remote, resolved);
         }
 
-        //  4. Apply resolved remote (either original or conflict-resolved) to local
+        // 4. Apply resolved remote (either original or conflict-resolved) to local
         MergeResult result = mergeExecutor.merge(base, local, effectiveRemote, bibFilePath);
 
         return result;

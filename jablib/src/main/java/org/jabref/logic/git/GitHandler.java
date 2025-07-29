@@ -209,7 +209,7 @@ public class GitHandler {
                .setCredentialsProvider(credentialsProvider)
                .call();
         } catch (GitAPIException e) {
-            LOGGER.info("Failed to fetch from remote", e);
+            LOGGER.error("Failed to fetch from remote", e);
         }
     }
 

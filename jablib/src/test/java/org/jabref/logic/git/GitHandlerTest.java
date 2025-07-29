@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.AnyObjectId;
@@ -53,9 +54,14 @@ class GitHandlerTest {
                     .setRemote("origin")
                     .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
                     .call();
-        }
 
-        Files.writeString(remoteRepoPath.resolve("HEAD"), "ref: refs/heads/main");
+            localGit.branchCreate()
+                    .setName("main")
+                    .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
+                    .setStartPoint("origin/main")
+                    .setForce(true)
+                    .call();
+        }
     }
 
     @Test

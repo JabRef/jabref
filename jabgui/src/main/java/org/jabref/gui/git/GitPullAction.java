@@ -13,6 +13,7 @@ import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
+import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
@@ -39,20 +40,26 @@ public class GitPullAction extends SimpleCommand {
     @Override
     public void execute() {
         if (stateManager.getActiveDatabase().isEmpty()) {
-            dialogService.showErrorDialogAndWait("No database open", "Please open a database before pulling.");
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No library open"),
+                    Localization.lang("Please open a library before pulling.")
+            );
             return;
         }
 
         BibDatabaseContext database = stateManager.getActiveDatabase().get();
         if (database.getDatabasePath().isEmpty()) {
-            dialogService.showErrorDialogAndWait("No .bib file path", "Cannot pull from Git: No file is associated with this database.");
+            dialogService.showErrorDialogAndWait(
+                    Localization.lang("No library file path"),
+                    Localization.lang("Cannot pull from Git: No file is associated with this library.")
+            );
             return;
         }
 
         Path bibFilePath = database.getDatabasePath().get();
         GitHandler handler = new GitHandler(bibFilePath.getParent());
         GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
-        GitConflictResolverStrategy resolver = new GuiConflictResolverStrategy(dialog);
+        GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
         GitSemanticMergeExecutor mergeExecutor = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
 
         GitSyncService syncService = new GitSyncService(guiPreferences.getImportFormatPreferences(), handler, resolver, mergeExecutor);
@@ -63,20 +70,42 @@ public class GitPullAction extends SimpleCommand {
                 .wrap(() -> viewModel.pull())
                 .onSuccess(result -> {
                     if (result.isSuccessful()) {
-                        dialogService.showInformationDialogAndWait("Git Pull", "Successfully merged and updated.");
+                        dialogService.showInformationDialogAndWait(
+                                Localization.lang("Git Pull"),
+                                Localization.lang("Successfully merged and updated.")
+                        );
                     } else {
-                        dialogService.showWarningDialogAndWait("Git Pull", "Merge completed with conflicts.");
+                        dialogService.showWarningDialogAndWait(
+                                Localization.lang("Git Pull"),
+                                Localization.lang("Merge completed with conflicts.")
+                        );
                     }
                 })
                 .onFailure(ex -> {
                     if (ex instanceof JabRefException e) {
-                        dialogService.showErrorDialogAndWait("Git Pull Failed", e.getLocalizedMessage());
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Git Pull Failed"),
+                                e.getLocalizedMessage(),
+                                e
+                        );
                     } else if (ex instanceof GitAPIException e) {
-                        dialogService.showErrorDialogAndWait("Git Pull Failed", "An unexpected Git error occurred: " + e.getLocalizedMessage());
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Git Pull Failed"),
+                                Localization.lang("An unexpected Git error occurred: %0", e.getLocalizedMessage()),
+                                e
+                        );
                     } else if (ex instanceof IOException e) {
-                        dialogService.showErrorDialogAndWait("Git Pull Failed", "I/O error: " + e.getLocalizedMessage());
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Git Pull Failed"),
+                                Localization.lang("I/O error: %0", e.getLocalizedMessage()),
+                                e
+                        );
                     } else {
-                        dialogService.showErrorDialogAndWait("Git Pull Failed", "Unexpected error: " + ex.getLocalizedMessage());
+                        dialogService.showErrorDialogAndWait(
+                                Localization.lang("Git Pull Failed"),
+                                Localization.lang("Unexpected error: %0", ex.getLocalizedMessage()),
+                                ex
+                        );
                     }
                 })
                 .executeWith(taskExecutor);

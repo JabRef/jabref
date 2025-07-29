@@ -16,10 +16,11 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.treewalk.TreeWalk;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class GitFileReader {
-    public static Optional<String> readFileFromCommit(Git git, RevCommit commit, @NonNull Path relativePath) throws JabRefException {
+    public static Optional<String> readFileFromCommit(Git git, RevCommit commit, Path relativePath) throws JabRefException {
         // ref: https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/api/ReadFileFromCommit.java
         // 1. get commit-pointing tree
         Repository repository = git.getRepository();

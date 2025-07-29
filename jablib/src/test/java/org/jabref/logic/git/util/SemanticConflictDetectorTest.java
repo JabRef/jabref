@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import org.jabref.logic.git.conflicts.SemanticConflictDetector;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
-import org.jabref.logic.git.io.GitBibParser;
 import org.jabref.logic.git.io.GitFileReader;
 import org.jabref.logic.git.merge.MergePlan;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -20,6 +19,7 @@ import org.jabref.model.entry.field.StandardField;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -54,8 +54,15 @@ class SemanticConflictDetectorTest {
         library = tempDir.resolve("library.bib");
     }
 
-    @ParameterizedTest(name = "{0}")
-    @MethodSource("provideConflictCases")
+    @AfterEach
+    void cleanup() {
+        if (git != null) {
+            git.close();
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource
     void semanticConflicts(String description, String base, String local, String remote, boolean expectConflict) throws Exception {
         RevCommit baseCommit = writeAndCommit(base, "base", alice);
         RevCommit localCommit = writeAndCommit(local, "local", alice);
@@ -76,7 +83,7 @@ class SemanticConflictDetectorTest {
 
     private BibDatabaseContext parse(RevCommit commit) throws Exception {
         String content = GitFileReader.readFileFromCommit(git, commit, Path.of("library.bib")).orElse("");
-        return GitBibParser.parseBibFromGit(content, importFormatPreferences);
+        return BibDatabaseContext.of(content, importFormatPreferences);
     }
 
     private RevCommit writeAndCommit(String content, String message, PersonIdent author, Path file, Git git) throws Exception {
@@ -89,18 +96,19 @@ class SemanticConflictDetectorTest {
         return writeAndCommit(content, message, author, library, git);
     }
 
-    static Stream<Arguments> provideConflictCases() {
+    // See docs/code-howtos/git.md for testing patterns
+    static Stream<Arguments> semanticConflicts() {
         return Stream.of(
                 Arguments.of("T1 - remote changed a field, local unchanged",
                         """
                         @article{a,
-                            author = {lala},
+                            author = {Test Author},
                             doi = {xya},
                         }
                         """,
                         """
                         @article{a,
-                            author = {lala},
+                            author = {Test Author},
                             doi = {xya},
                         }
                         """,
@@ -115,7 +123,7 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T2 - local changed a field, remote unchanged",
                         """
                         @article{a,
-                            author = {lala},
+                            author = {Test Author},
                             doi = {xya},
                         }
                         """,
@@ -127,7 +135,7 @@ class SemanticConflictDetectorTest {
                         """,
                         """
                         @article{a,
-                            author = {lala},
+                            author = {Test Author},
                             doi = {xya},
                         }
                         """,
@@ -136,7 +144,7 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T3 - both changed to same value",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -157,7 +165,7 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T4 - both changed to different values",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -178,7 +186,7 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T5 - local deleted field, remote changed it",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -197,7 +205,7 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T6 - local changed, remote deleted",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -216,13 +224,13 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T7 - remote deleted, local unchanged",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -235,7 +243,7 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T8 - local changed field A, remote changed field B",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -247,7 +255,7 @@ class SemanticConflictDetectorTest {
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xyz},
                             }
                         """,
@@ -256,19 +264,19 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T9 - field order changed only",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
                                 doi = {xya},
-                                author = {lala},
+                                author = {Test Author},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -277,12 +285,12 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T10 - local changed entry a, remote changed entry b",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                               }
 
                             @article{b,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xyz},
                             }
                         """,
@@ -292,7 +300,7 @@ class SemanticConflictDetectorTest {
                                 doi = {xya},
                             }
                             @article{b,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xyz},
                             }
                         """,
@@ -303,7 +311,7 @@ class SemanticConflictDetectorTest {
                             }
 
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -312,19 +320,19 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T11 - remote added field, local unchanged",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                                 year = {2025},
                             }
@@ -334,20 +342,20 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T12 - both added same field with different values",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                                 year = {2023},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                                 year = {2025},
                             }
@@ -357,19 +365,19 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T13 - local added field, remote unchanged",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {newfield},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
@@ -378,19 +386,19 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T14 - both added same field with same value",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {value},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {value},
                             }
                         """,
@@ -399,19 +407,19 @@ class SemanticConflictDetectorTest {
                 Arguments.of("T15 - both added same field with different values",
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {xya},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {value1},
                             }
                         """,
                         """
                             @article{a,
-                                author = {lala},
+                                author = {Test Author},
                                 doi = {value2},
                             }
                         """,
@@ -456,11 +464,11 @@ class SemanticConflictDetectorTest {
     void extractMergePlanT10OnlyRemoteChangedEntryB() throws Exception {
         String base = """
             @article{a,
-                author = {lala},
+                author = {Test Author},
                 doi = {xya},
             }
             @article{b,
-                author = {lala},
+                author = {Test Author},
                 doi = {xyz},
             }
         """;
@@ -470,7 +478,7 @@ class SemanticConflictDetectorTest {
                 doi = {xyz},
             }
             @article{a,
-                author = {lala},
+                author = {Test Author},
                 doi = {xya},
             }
         """;
@@ -493,13 +501,13 @@ class SemanticConflictDetectorTest {
     void extractMergePlanT11RemoteAddsField() throws Exception {
         String base = """
             @article{a,
-                author = {lala},
+                author = {Test Author},
                 doi = {xya},
             }
         """;
         String remote = """
             @article{a,
-                author = {lala},
+                author = {Test Author},
                 doi = {xya},
                 year = {2025},
             }

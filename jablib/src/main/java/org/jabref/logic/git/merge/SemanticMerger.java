@@ -23,8 +23,7 @@ public class SemanticMerger {
         applyPatchToDatabase(local, plan.fieldPatches());
 
         for (BibEntry newEntry : plan.newEntries()) {
-            BibEntry clone = new BibEntry(newEntry.getType()).withFields(newEntry.getFieldMap());
-            newEntry.getCitationKey().ifPresent(clone::withCitationKey);
+            BibEntry clone = (BibEntry) newEntry.clone();
 
             clone.getCitationKey().ifPresent(citationKey ->
                     local.getDatabase().getEntryByCitationKey(citationKey).ifPresent(existing -> {
@@ -34,7 +33,6 @@ public class SemanticMerger {
             );
 
             local.getDatabase().insertEntry(clone);
-            clone.setChanged(true);
             LOGGER.debug("Inserted (or replaced) entry '{}', fields={}, marked as changed",
                     clone.getCitationKey().orElse("?"),
                     clone.getFieldMap());

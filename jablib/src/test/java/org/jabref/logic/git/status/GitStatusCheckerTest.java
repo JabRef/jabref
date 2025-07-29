@@ -5,11 +5,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -22,6 +24,7 @@ class GitStatusCheckerTest {
     private Path localLibrary;
     private Git localGit;
     private Git remoteGit;
+    private Git seedGit;
 
     private final PersonIdent author = new PersonIdent("Tester", "tester@example.org");
 
@@ -67,7 +70,7 @@ class GitStatusCheckerTest {
         remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
 
         Path seedDir = tempDir.resolve("seed");
-        Git seedGit = Git.init()
+        seedGit = Git.init()
                          .setInitialBranch("main")
                          .setDirectory(seedDir.toFile())
                          .call();
@@ -93,8 +96,27 @@ class GitStatusCheckerTest {
                       .setDirectory(localDir.toFile())
                       .setBranch("main")
                       .call();
+        localGit.branchCreate()
+                .setName("main")
+                .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.SET_UPSTREAM)
+                .setStartPoint("origin/main")
+                .setForce(true)
+                .call();
 
         this.localLibrary = localDir.resolve("library.bib");
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (seedGit != null) {
+            seedGit.close();
+        }
+        if (localGit != null) {
+            localGit.close();
+        }
+        if (remoteGit != null) {
+            remoteGit.close();
+        }
     }
 
     @Test
