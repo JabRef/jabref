@@ -198,7 +198,7 @@ public class WalkthroughOverlay {
                 },
                 () -> {
                     LOGGER.debug("Window for step '{}' not found. Listening for new windows.", step.title());
-                    final AtomicBoolean noExecution = new AtomicBoolean(false);
+                    AtomicBoolean noExecution = new AtomicBoolean(false);
                     windowListListener = change -> {
                         if (!noExecution.compareAndSet(false, true)) {
                             return; // No concurrent resolutions
