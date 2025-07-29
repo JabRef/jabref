@@ -146,7 +146,7 @@ class KeywordListTest {
     })
     void roundTripPreservesStructure(String original) {
         KeywordList parsed = KeywordList.parse(original, ',', '>');
-        String serialized = parsed.toString();  // wraps Keyword#getSubchainAsString
+        String serialized = parsed.toString();
         KeywordList reparsed = KeywordList.parse(serialized, ',', '>');
 
         assertEquals(parsed.toString(), reparsed.toString());

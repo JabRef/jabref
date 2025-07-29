@@ -35,7 +35,7 @@ class KeywordTest {
     })
     void getSubchainAsString(String input) {
         Keyword keyword = new Keyword(input);
-        String result = keyword.toString(); // wraps Keyword#getSubchainAsString
+        String result = keyword.toString();
         assertEquals(input, result);
     }
 }
