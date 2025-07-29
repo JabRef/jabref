@@ -18,6 +18,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.keyboard.KeyBindingRepository;
@@ -46,6 +47,7 @@ public class WindowOverlay {
     private final Walkthrough walkthrough;
     private final List<Runnable> cleanupTasks = new ArrayList<>();
     private final KeyBindingRepository keyBindingRepository;
+    private final StateManager stateManager;
 
     private @Nullable Button quitButton;
     private @Nullable Node currentContentNode;
@@ -55,6 +57,7 @@ public class WindowOverlay {
         this.renderer = new WalkthroughRenderer();
         this.walkthrough = walkthrough;
         this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
+        this.stateManager = Injector.instantiateModelOrService(StateManager.class);
 
         Scene scene = window.getScene();
         assert scene != null; // NOTE: This should never happen.
@@ -253,7 +256,7 @@ public class WindowOverlay {
     private void listenKeybindings(EventTarget target, Scene scene) {
         EventHandler<KeyEvent> eventFilter = event -> {
             SelectableTextFlowKeyBindings.call(scene, event, keyBindingRepository);
-            WalkthroughKeyBindings.call(event, keyBindingRepository);
+            WalkthroughKeyBindings.call(event, stateManager, keyBindingRepository);
         };
         target.addEventFilter(KeyEvent.KEY_PRESSED, eventFilter);
         cleanupTasks.add(() -> scene.removeEventFilter(KeyEvent.KEY_PRESSED, eventFilter));
