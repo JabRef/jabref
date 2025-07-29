@@ -1,9 +1,11 @@
 # Git
 
 ## Why Semantic Merge?
+
 In JabRef, we aim to minimize user interruptions when collaborating on the same `.bib` library file using Git. To achieve this, we go beyond Git’s default line-based syntactic merging and implement our own semantic merge logic that understands the structure of BibTeX entries.
 
 This means:
+
 * Even if Git detects conflicting lines,
 * JabRef is able to recognize that both sides are editing the same BibTeX entry,
 * And determine—at the field level—whether there is an actual semantic conflict.
@@ -27,7 +29,9 @@ The following example illustrates a case where Git detects a conflict, but JabRe
 ```
 
 ### Bob's Side
+
 Bob reorders the entries and updates the author field of entry b:
+
 ```bibtex
 @article{b,
   author = {author-b},
@@ -39,8 +43,11 @@ Bob reorders the entries and updates the author field of entry b:
   doi = {xya},
 }
 ```
+
 ### Alice's Side
+
 Alice modifies the author field of entry a:
+
 ```bibtex
 @article{a,
   author = {author-a},
@@ -52,7 +59,9 @@ Alice modifies the author field of entry a:
   doi = {xyz},
 }
 ```
+
 ### Merge Outcome
+
 When Alice runs git pull, Git sees that both branches have modified overlapping lines (due to reordering and content changes) and reports a syntactic conflict.
 
 However, JabRef is able to analyze the entries and determine that:
@@ -64,9 +73,11 @@ However, JabRef is able to analyze the entries and determine that:
 Therefore, JabRef performs an automatic merge without requiring manual conflict resolution.
 
 ## Related Test Cases
+
 The semantic conflict detection and merge resolution logic is covered by:
-* `org.jabref.logic.git.util.SemanticMergerTest` 
-* `org.jabref.logic.git.util.SemanticConflictDetectorTest`.
+
+* `org.jabref.logic.git.util.SemanticMergerTest#patchDatabase`
+* `org.jabref.logic.git.util.SemanticConflictDetectorTest#patchDatabase`.
 
 ## Conflict Scenarios
 
