@@ -62,7 +62,6 @@ public class WalkthroughOverlay {
     private @Nullable Node resolvedNode;
     private @Nullable PauseTransition timeoutTransition;
 
-    /// Track executed side effects for each step to enable reverting
     private final Map<Integer, List<WalkthroughSideEffect>> executedSideEffects = new HashMap<>();
     /// Flag to prevent unwanted reverts while transitioning between steps
     ///
