@@ -1,0 +1,73 @@
+package org.jabref.model.metadata;
+
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
+
+/**
+ * Record to represent user and host information.
+ * This is used to identify the user when retrieving file directories.
+ */
+public record UserHostInfo(@NonNull String user, @NonNull String host) {
+    /**
+     * Creates a new UserHostInfo with the given user and host.
+     *
+     * @param user the user
+     * @param host the host
+     */
+    public UserHostInfo {
+        // Constructor validation handled by @NonNull annotations
+    }
+
+    /**
+     * Creates a new UserHostInfo from a user-host string.
+     * The user-host string is expected to be in the format "user-host".
+     * If the string does not contain a hyphen, the entire string is considered as the user and the host is empty.
+     *
+     * @param userHostString the user-host string
+     * @return a new UserHostInfo
+     */
+    public static @NonNull UserHostInfo parse(@NonNull String userHostString) {
+        if (userHostString.contains("-")) {
+            String host = userHostString.substring(userHostString.lastIndexOf('-') + 1);
+            String user = userHostString.substring(0, userHostString.lastIndexOf('-'));
+            return new UserHostInfo(user, host);
+        } else {
+            return new UserHostInfo(userHostString, "");
+        }
+    }
+
+    /**
+     * Returns the user-host string representation.
+     * If the host is empty, only the user is returned.
+     * Otherwise, the format is "user-host".
+     *
+     * @return the user-host string
+     */
+    public String getUserHostString() {
+        if (host.isEmpty()) {
+            return user;
+        } else {
+            return user + "-" + host;
+        }
+    }
+
+    /**
+     * Checks if this UserHostInfo has the same host as the given UserHostInfo.
+     *
+     * @param other the other UserHostInfo
+     * @return true if the hosts are the same and not empty, false otherwise
+     */
+    public boolean hasSameHost(UserHostInfo other) {
+        return !host.isEmpty() && !other.host.isEmpty() && host.equals(other.host);
+    }
+
+    /**
+     * Returns the user-host string representation.
+     *
+     * @return the user-host string
+     */
+    @Override
+    public @NotNull String toString() {
+        return getUserHostString();
+    }
+}
