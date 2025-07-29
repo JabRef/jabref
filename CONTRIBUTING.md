@@ -58,7 +58,7 @@ The challenge of these issues is to understand **where** in the code base someth
 
 ### I am a lecturer
 
-If you ask yourself how to integrate JabRef into your class, please read the [documentation about how to integrate JabRef into a class of software engineering training](https://devdocs.jabref.org/teaching.html#jabref-and-software-engineering-training).
+If you ask yourself how to integrate JabRef into your class, please read the [documentation about how to integrate JabRef into a class of software engineering training](https://devdocs.jabref.org/teaching#jabref-and-software-engineering-training).
 As student, you may notify your lecturer about this possibility.
 
 ### I want something with huge impact
@@ -71,7 +71,7 @@ A typical subclassifications scheme is "priority" (high, normal and low). Fixing
 
 ### I want to know how to contribute code and set up my workspace
 
-Check out the [documentation for developers](https://devdocs.jabref.org/contributing.html#contribute-code)
+Check out the [documentation for developers](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/)
 
 ### I want to improve the developer's documentation
 
@@ -95,10 +95,10 @@ GitHub will then automatically assign you.
 
 ## Pull Request Process
 
-1. Follow the steps at [Pre Condition 3: Code on the local machine](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code.html) to a) create a fork and b) have the fork checked out on your local machine
+1. Follow the steps at [Pre Condition 3: Code on the local machine](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/pre-03-code) to a) create a fork and b) have the fork checked out on your local machine
 2. Ensure that you followed the [steps to set up a local workspace](https://devdocs.jabref.org/getting-into-the-code/guidelines-for-setting-up-a-local-workspace/) to have the code running properly in IntelliJ.
 3. **Create a new branch** (such as `fix-for-issue-121`). Be sure to create a **separate branch** for each improvement you implement.
-4. Read our [architecture and components](https://devdocs.jabref.org/architecture-and-components.html).
+4. Read our [architecture and components](https://devdocs.jabref.org/architecture-and-components).
 5. Work on the **new branch — not the `main` branch.** Refer to our [code how-tos](https://devdocs.jabref.org/code-howtos) if you have questions about your implementation.
 6. Create a [pull request to JabRef main repository](https://github.com/JabRef/jabref/pulls).
    For an overview on the concept of pull requests, take a look at GitHub's [pull request help documentation](https://help.github.com/articles/about-pull-requests/).
@@ -184,7 +184,7 @@ Please look into them and handle accordingly.
 After implementing changes, commit to the branch your pull request is *from* and push.
 The pull request will automatically be updated with your changes.
 To maintain a clean git history, your commits will also be automatically squashed upon acceptance of the pull request, during merging.
-Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq.html#submodules).
+Thus, no need to worry about WIP commits or [fixing git submodule issues](https://devdocs.jabref.org/code-howtos/faq#submodules).
 As a concequece, force-pushing is not required - and must be **avoided**.
 
 After all the basic checks are green, maintainers will look at your pull request.
@@ -236,7 +236,7 @@ Add the above snippet to the English translation file located at `src/main/resou
 
 You can also directly run the specific test in your IDE.
 The test "`LocalizationConsistencyTest`" is placed under `src/test/java/org.jabref.logic.l10n/LocalizationConsistencyTest.java`.
-Find more information in the [JabRef developer docs](https://devdocs.jabref.org/code-howtos/localization.html).
+Find more information in the [JabRef developer docs](https://devdocs.jabref.org/code-howtos/localization).
 
 #### **Format of keyboard shortcuts**
 
