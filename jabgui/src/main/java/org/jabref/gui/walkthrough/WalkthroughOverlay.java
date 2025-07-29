@@ -198,18 +198,28 @@ public class WalkthroughOverlay {
                 },
                 () -> {
                     LOGGER.debug("Window for step '{}' not found. Listening for new windows.", step.title());
+                    final AtomicBoolean noExecution = new AtomicBoolean(false);
                     windowListListener = change -> {
+                        if (!noExecution.compareAndSet(false, true)) {
+                            return; // No concurrent resolutions
+                        }
                         while (change.next()) {
                             if (change.wasAdded()) {
-                                resolver.resolve().ifPresent(newWindow -> {
-                                    LOGGER.debug("Dynamically resolved window for step '{}'", step.title());
-                                    cancelTimeout();
-                                    if (windowListListener != null) {
-                                        Window.getWindows().removeListener(windowListListener);
-                                        windowListListener = null;
-                                    }
-                                    handleWindowResolved(step, newWindow);
-                                });
+                                resolver.resolve().ifPresentOrElse(
+                                        newWindow -> {
+                                            LOGGER.debug("Dynamically resolved window for step '{}'", step.title());
+                                            cancelTimeout();
+                                            if (windowListListener != null) {
+                                                Window.getWindows().removeListener(windowListListener);
+                                                windowListListener = null;
+                                            }
+                                            handleWindowResolved(step, newWindow);
+                                        },
+                                        () -> {
+                                            LOGGER.debug("Still no window found for step '{}', continuing to listen for new windows.", step.title());
+                                            noExecution.set(false); // Reset for next execution
+                                        }
+                                );
                             }
                         }
                     };
@@ -251,14 +261,23 @@ public class WalkthroughOverlay {
         }
 
         LOGGER.debug("Scene for step '{}' not ready. Listening for scene.", step.title());
+        AtomicBoolean noExecution = new AtomicBoolean(false);
         sceneListener = (_, _, newScene) -> {
-            if (newScene != null) {
-                if (sceneListener != null) {
-                    window.sceneProperty().removeListener(sceneListener);
-                    sceneListener = null;
-                }
-                attemptNodeResolutionOnScene(step, window, newScene, resolver);
+            if (!noExecution.compareAndSet(false, true)) {
+                return; // No concurrent resolutions
             }
+
+            if (newScene == null) {
+                LOGGER.debug("Scene for step '{}' is still null, continuing to listen for scene changes.", step.title());
+                noExecution.set(false); // Reset for next execution
+                return;
+            }
+
+            if (sceneListener != null) {
+                window.sceneProperty().removeListener(sceneListener);
+                sceneListener = null;
+            }
+            attemptNodeResolutionOnScene(step, window, newScene, resolver);
         };
         window.sceneProperty().addListener(sceneListener);
     }
@@ -269,19 +288,25 @@ public class WalkthroughOverlay {
                         node -> handleNodeResolved(step, window, node),
                         () -> {
                             LOGGER.debug("Node for step '{}' not found. Listening for scene changes.", step.title());
+                            AtomicBoolean noExecution = new AtomicBoolean(false);
 
-                            InvalidationListener childrenListener = _ -> resolver.resolve(scene).ifPresent(foundNode -> {
-                                LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
-                                synchronized (this) {
-                                    if (resolvedNode != null) {
-                                        LOGGER.debug("Node already resolved for step '{}', ignoring new resolution", step.title());
-                                        detachChildrenListener();
-                                        return;
-                                    }
-                                    detachChildrenListener();
-                                    handleNodeResolved(step, window, foundNode);
+                            InvalidationListener childrenListener = _ -> {
+                                if (!noExecution.compareAndSet(false, true)) {
+                                    return; // No concurrent resolutions
                                 }
-                            });
+
+                                resolver.resolve(scene).ifPresentOrElse(
+                                        foundNode -> {
+                                            LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
+                                            detachChildrenListener();
+                                            handleNodeResolved(step, window, foundNode);
+                                            // No need to reset noExecution. Block all further executions.
+                                        },
+                                        () -> {
+                                            LOGGER.debug("Node still not found for step '{}', continuing to listen for changes.", step.title());
+                                            noExecution.set(false); // Reset for next execution
+                                        });
+                            };
 
                             recursiveChildrenListener = new RecursiveChildrenListener(childrenListener);
                             recursiveChildrenListener.attachToScene(scene);
