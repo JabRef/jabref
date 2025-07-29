@@ -107,7 +107,7 @@ public class WindowOverlay {
 
         AtomicReference<PopOver> currentPopover = new AtomicReference<>(popover);
 
-        cleanupTasks.add(EasyBind.subscribe(currentPopover.get().showingProperty(), showing -> {
+        cleanupTasks.add(EasyBind.subscribe(popover.showingProperty(), showing -> {
             if (!showing && !WalkthroughUtils.cannotPositionNode(node)) {
                 currentPopover.get().hide();
                 PopOver newPopover = createPopover(step, beforeNavigate); // Show the original PopOver usually lead to "cannot open closed window" exception
