@@ -15,11 +15,13 @@ import javafx.beans.property.StringProperty;
 import org.jabref.gui.AbstractViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.FetcherException;
+import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.URLDownload;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.identifier.DOI;
 
 import kong.unirest.core.json.JSONObject;
@@ -33,16 +35,19 @@ public class SciteTabViewModel extends AbstractViewModel {
     public enum SciteStatus {
         IN_PROGRESS,
         FOUND,
-        ERROR
+        ERROR,
+        DOI_MISSING,
+        DOI_LOOK_UP,
+        DOI_LOOK_UP_ERROR
     }
 
     private static final String BASE_URL = "https://api.scite.ai/";
+
     private final GuiPreferences preferences;
     private final TaskExecutor taskExecutor;
     private final ObjectProperty<SciteStatus> status;
     private final StringProperty searchError;
     private Optional<SciteTallyModel> currentResult = Optional.empty();
-
     private Future<?> searchTask;
 
     public SciteTabViewModel(GuiPreferences preferences, TaskExecutor taskExecutor) {
@@ -68,8 +73,7 @@ public class SciteTabViewModel extends AbstractViewModel {
 
         // The scite.ai api requires a DOI
         if (entry.getDOI().isEmpty()) {
-            searchError.set(Localization.lang("This entry does not have a DOI"));
-            status.set(SciteStatus.ERROR);
+            status.set(SciteStatus.DOI_MISSING);
             return;
         }
 
@@ -114,6 +118,25 @@ public class SciteTabViewModel extends AbstractViewModel {
             throw new FetcherException("Unexpected result data.");
         }
         return SciteTallyModel.fromJSONObject(tallies);
+    }
+
+    public void lookUpDoi(BibEntry entry) {
+        CrossRef doiFetcher = new CrossRef();
+
+        BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
+                      .onRunning(() -> {
+                          status.set(SciteStatus.DOI_LOOK_UP);
+                      })
+                      .onSuccess(identifier -> {
+                          if (identifier.isPresent()) {
+                              entry.setField(StandardField.DOI, identifier.get().asString());
+                              bindToEntry(entry);
+                          } else {
+                              status.set(SciteStatus.DOI_MISSING);
+                          }
+                      }).onFailure(ex -> {
+                          status.set(SciteStatus.DOI_LOOK_UP_ERROR);
+                      }).executeWith(taskExecutor);
     }
 
     public ObjectProperty<SciteStatus> statusProperty() {
