@@ -8,15 +8,6 @@ import org.jspecify.annotations.NonNull;
  * This is used to identify the user when retrieving file directories.
  */
 public record UserHostInfo(@NonNull String user, @NonNull String host) {
-    /**
-     * Creates a new UserHostInfo with the given user and host.
-     *
-     * @param user the user
-     * @param host the host
-     */
-    public UserHostInfo {
-        // Constructor validation handled by @NonNull annotations
-    }
 
     /**
      * Creates a new UserHostInfo from a user-host string.
