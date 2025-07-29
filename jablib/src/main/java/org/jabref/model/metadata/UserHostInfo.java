@@ -1,6 +1,5 @@
 package org.jabref.model.metadata;
 
-import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 
 /**
@@ -57,7 +56,7 @@ public record UserHostInfo(@NonNull String user, @NonNull String host) {
      * @return the user-host string
      */
     @Override
-    public @NotNull String toString() {
+    public @NonNull String toString() {
         return getUserHostString();
     }
 }
