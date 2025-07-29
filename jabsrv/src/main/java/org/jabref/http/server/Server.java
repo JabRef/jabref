@@ -16,7 +16,9 @@ import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
 import org.jabref.http.server.languageserver.LSPLauncher;
 import org.jabref.http.server.services.FilesToServe;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.os.OS;
+import org.jabref.logic.preferences.CliPreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -58,7 +60,8 @@ public class Server {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
-        LSPLauncher launcher = new LSPLauncher();
+        LSPLauncher launcher = new LSPLauncher(serviceLocator.getService(CliPreferences.class), new JournalAbbreviationRepository());
+
         ServiceLocatorUtilities.addOneConstant(serviceLocator, launcher);
 
         // Required for CLI only

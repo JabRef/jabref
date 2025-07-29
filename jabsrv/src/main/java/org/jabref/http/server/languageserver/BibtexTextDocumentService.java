@@ -13,7 +13,6 @@ import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
 import org.eclipse.lsp4j.CompletionParams;
@@ -36,9 +35,9 @@ public class BibtexTextDocumentService implements TextDocumentService {
     private final JournalAbbreviationRepository abbreviationRepository;
     private LanguageClient client;
 
-    public BibtexTextDocumentService() {
-        jabRefCliPreferences = Injector.instantiateModelOrService(CliPreferences.class);
-        abbreviationRepository = Injector.instantiateModelOrService(JournalAbbreviationRepository.class);
+    public BibtexTextDocumentService(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+        this.jabRefCliPreferences = cliPreferences;
+        this.abbreviationRepository = abbreviationRepository;
     }
 
     public void setClient(LanguageClient client) {
@@ -47,6 +46,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {
+        System.out.println("DidOpenTextDocumentParams: " + params);
         handleDiagnostics(params.getTextDocument().getUri(), params.getTextDocument().getText(), params.getTextDocument().getVersion());
     }
 

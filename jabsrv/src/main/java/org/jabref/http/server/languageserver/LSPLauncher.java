@@ -9,6 +9,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.CliPreferences;
+
 import org.eclipse.lsp4j.jsonrpc.Launcher;
 import org.eclipse.lsp4j.services.LanguageClient;
 import org.slf4j.Logger;
@@ -21,9 +24,13 @@ public class LSPLauncher {
     private ServerSocket serverSocket;
     private ExecutorService threadPool;
     private volatile boolean running;
+    private CliPreferences jabRefCliPreferences;
+    private JournalAbbreviationRepository abbreviationRepository;
 
-    public LSPLauncher() {
-        start(2087);
+    public LSPLauncher(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+        this.jabRefCliPreferences = cliPreferences;
+        this.abbreviationRepository = abbreviationRepository;
+        start(12345);
     }
 
     public void start(int port) {
@@ -53,7 +60,7 @@ public class LSPLauncher {
     }
 
     private void handleClient(Socket socket) {
-        LSPServer server = new LSPServer();
+        LSPServer server = new LSPServer(jabRefCliPreferences, abbreviationRepository);
         try (socket; InputStream in = socket.getInputStream();
              OutputStream out = socket.getOutputStream()) {
             Launcher<LanguageClient> launcher = org.eclipse.lsp4j.launch.LSPLauncher.createServerLauncher(server, in, out, Executors.newCachedThreadPool(), Function.identity());

@@ -2,6 +2,9 @@ package org.jabref.http.server.languageserver;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.CliPreferences;
+
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.InitializeResult;
 import org.eclipse.lsp4j.MessageParams;
@@ -26,9 +29,9 @@ public class LSPServer implements LanguageServer, LanguageClientAware {
     private TextDocumentService textDocumentService;
     private int exitCode = 1;
 
-    public LSPServer() {
+    public LSPServer(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.workspaceService = new BibtexWorkspaceService();
-        this.textDocumentService = new BibtexTextDocumentService();
+        this.textDocumentService = new BibtexTextDocumentService(cliPreferences, abbreviationRepository);
     }
 
     @Override
