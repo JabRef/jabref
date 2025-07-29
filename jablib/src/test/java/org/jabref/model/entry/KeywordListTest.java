@@ -1,7 +1,13 @@
 package org.jabref.model.entry;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,6 +20,17 @@ class KeywordListTest {
         keywords = new KeywordList();
         keywords.add("keywordOne");
         keywords.add("keywordTwo");
+    }
+
+    private static Stream<Arguments> provideParseKeywordCases() {
+        return Stream.of(
+                Arguments.of("keyword\\,one, keywordTwo", new KeywordList("keyword,one", "keywordTwo")),
+                Arguments.of("keywordOne\\,, keywordTwo", new KeywordList("keywordOne,", "keywordTwo")),
+                Arguments.of("keyword\\\\, keywordTwo", new KeywordList("keyword\\", "keywordTwo")),
+                Arguments.of("keyword\\,one > sub", new KeywordList(Keyword.of("keyword,one", "sub"))),
+                Arguments.of("one\\,two\\,three, four", new KeywordList("one,two,three", "four")),
+                Arguments.of("keywordOne\\\\", new KeywordList("keywordOne\\"))
+        );
     }
 
     @Test
@@ -116,40 +133,22 @@ class KeywordListTest {
         assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
     }
 
-    @Test
-    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword() {
-        assertEquals(new KeywordList("keyword,one", "keywordTwo"),
-                KeywordList.parse("keyword\\,one, keywordTwo", ',', '>'));
+    @ParameterizedTest
+    @MethodSource("provideParseKeywordCases")
+    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword(String input, KeywordList expected) {
+        assertEquals(expected, KeywordList.parse(input, ',', '>'));
     }
 
-    @Test
-    void parseKeywordWithEscapedDelimiterAtEndPreservesDelimiter() {
-        assertEquals(new KeywordList("keywordOne,", "keywordTwo"),
-                KeywordList.parse("keywordOne\\,, keywordTwo", ',', '>'));
-    }
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "Keyword > Keyword",
+            "Keyword \\> Keyword"
+    })
+    void roundTripPreservesStructure(String original) {
+        KeywordList parsed = KeywordList.parse(original, ',', '>');
+        String serialized = parsed.toString();  // wraps Keyword#getSubchainAsString
+        KeywordList reparsed = KeywordList.parse(serialized, ',', '>');
 
-    @Test
-    void parseKeywordWithEscapedBackslashTreatsItAsLiteral() {
-        assertEquals(new KeywordList("keyword\\", "keywordTwo"),
-                KeywordList.parse("keyword\\\\, keywordTwo", ',', '>'));
-    }
-
-    @Test
-    void parseKeywordWithEscapedDelimiterAndHierarchicalDelimiterCreatesHierarchy() {
-        Keyword expected = Keyword.of("keyword,one", "sub");
-        assertEquals(new KeywordList(expected),
-                KeywordList.parse("keyword\\,one > sub", ',', '>'));
-    }
-
-    @Test
-    void parseKeywordWithMultipleEscapedDelimitersTreatsThemAsLiteral() {
-        assertEquals(new KeywordList("one,two,three", "four"),
-                KeywordList.parse("one\\,two\\,three, four", ',', '>'));
-    }
-
-    @Test
-    void parseKeywordWithTrailingEscapeCharacterTreatsItAsLiteralBackslash() {
-        assertEquals(new KeywordList("keywordOne\\"),
-                KeywordList.parse("keywordOne\\\\", ',', '>'));
+        assertEquals(parsed.toString(), reparsed.toString());
     }
 }
