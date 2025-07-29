@@ -1,6 +1,5 @@
 package org.jabref.gui.keyboard;
 
-import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 
 import org.jabref.gui.StateManager;

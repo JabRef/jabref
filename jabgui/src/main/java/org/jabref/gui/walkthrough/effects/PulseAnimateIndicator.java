@@ -13,7 +13,6 @@ import javafx.util.Duration;
 
 import org.jabref.gui.walkthrough.WalkthroughUtils;
 
-import com.tobiasdiez.easybind.EasyBind;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

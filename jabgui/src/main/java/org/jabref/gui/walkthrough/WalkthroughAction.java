@@ -127,14 +127,15 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step5 = WalkthroughStep
                 .panel(Localization.lang("PDF file management area"))
                 .content(
-                        new TextBlock(Localization.lang("""
-                                This is where you manage PDF files for this entry. You have three buttons on the right side to link a PDF file:
-                                1. **Add PDF file** - Link a file from your computer
-                                2. **Find full text** - Use JabRef's online fetchers to find the PDF
-                                3. **Download from URL** - Enter a link and JabRef will download it for you.
-                                Without using those buttons, you can also drag and drop PDF files directly onto this area.
-
-                                Try one of the options above to link a file. You can download a PDF from [this URL](https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2) or use any PDF file of your choice.""")),
+                        new TextBlock(Localization.lang(
+                                "This is where you manage PDF files for this entry. You have three buttons on the right side to link a PDF file:\n" +
+                                        "1. **Add PDF file** - Link a file from your computer\n" +
+                                        "2. **Find full text** - Use JabRef's online fetchers to find the PDF\n" +
+                                        "3. **Download from URL** - Enter a link and JabRef will download it for you.\n" +
+                                        "Without using those buttons, you can also drag and drop PDF files directly onto this area.\n" +
+                                        "\n" +
+                                        "Try one of the options above to link a file. You can download a PDF from [this URL](https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2) or use any PDF file of your choice."
+                        )),
                         new InfoBlock(Localization.lang("For detailed information: [Adding PDFs](https://docs.jabref.org/collect/add-pdfs-to-an-entry), [Managing files](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks), [Finding unlinked files](https://docs.jabref.org/collect/findunlinkedfiles)."))
                 )
                 .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
