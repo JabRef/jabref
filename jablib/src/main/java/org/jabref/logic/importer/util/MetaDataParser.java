@@ -133,10 +133,7 @@ public class MetaDataParser {
                 String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
                 Path path = Path.of(parseDirectory(entry.getValue())).normalize();
                 
-                // Parse the user-host string into a UserHostInfo object
                 UserHostInfo userHostInfo = UserHostInfo.parse(userHostString);
-                
-                // Check if this is the current host
                 String currentHost = org.jabref.logic.os.OS.getHostName();
                 
                 if (!userHostInfo.host().isEmpty() && !userHostInfo.host().equals(currentHost)) {

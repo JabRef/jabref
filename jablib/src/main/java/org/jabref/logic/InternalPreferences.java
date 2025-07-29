@@ -78,7 +78,7 @@ public class InternalPreferences {
     
     /**
      * Returns the user and host information as a UserHostInfo object.
-     * 
+     *
      * @return the user and host information
      */
     public UserHostInfo getUserHostInfo() {
@@ -87,7 +87,7 @@ public class InternalPreferences {
     
     /**
      * Sets the user and host information from a UserHostInfo object.
-     * 
+     *
      * @param userHostInfo the user and host information
      */
     public void setUserHostInfo(UserHostInfo userHostInfo) {
