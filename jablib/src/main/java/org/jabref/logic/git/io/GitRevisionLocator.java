@@ -27,7 +27,7 @@ public class GitRevisionLocator {
         assert headId != null : "Local HEAD commit is missing.";
 
         String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();
-        ObjectId remoteId = (trackingBranch != null) ? repo.resolve(trackingBranch) : null;
+        ObjectId remoteId = trackingBranch != null ? repo.resolve(trackingBranch) : null;
         assert remoteId != null : "Remote tracking branch is missing.";
 
         try (RevWalk walk = new RevWalk(git.getRepository())) {

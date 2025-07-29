@@ -65,6 +65,7 @@ Alice modifies the author field of entry a:
 When Alice runs git pull, Git sees that both branches have modified overlapping lines (due to reordering and content changes) and reports a syntactic conflict.
 
 However, JabRef is able to analyze the entries and determine that:
+
 * Entry a was modified only by Alice.
 * Entry b was modified only by Bob.
 * There is no conflict at the field level.
