@@ -1,9 +1,10 @@
 package org.jabref.logic.quality.consistency;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SequencedCollection;
@@ -51,6 +52,19 @@ public class BibliographyConsistencyCheck {
                      .collect(Collectors.toSet());
     }
 
+    private static List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
+        List<BibEntry> filteredEntries = new ArrayList<>();
+        for (BibEntry entry : entries) {
+            Set<Field> entryFields = filterExcludedFields(entry.getFields());
+            boolean hasDiff = differingFields.stream()
+                                             .anyMatch(diff -> entryFields.contains(diff) != fieldsInAllEntries.contains(diff));
+            if (hasDiff) {
+                filteredEntries.add(entry);
+            }
+        }
+        return filteredEntries;
+    }
+
     public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
     }
 
@@ -70,42 +84,74 @@ public class BibliographyConsistencyCheck {
      */
     public Result check(BibDatabaseContext bibContext, BiConsumer<Integer, Integer> entriesGroupingProgress) {
         // collects fields existing in any entry, scoped by entry type
-        Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new HashMap<>();
+        Map<EntryType, Set<Field>> entryTypeToFieldsInAnyEntryMap = new LinkedHashMap<>();
         // collects fields existing in all entries, scoped by entry type
-        Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap = new HashMap<>();
+        Map<EntryType, Set<Field>> entryTypeToFieldsInAllEntriesMap = new LinkedHashMap<>();
         // collects entries of the same type
-        Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new HashMap<>();
+        Map<EntryType, Set<BibEntry>> entryTypeToEntriesMap = new LinkedHashMap<>();
 
         collectEntriesIntoMaps(bibContext, entryTypeToFieldsInAnyEntryMap, entryTypeToFieldsInAllEntriesMap, entryTypeToEntriesMap);
 
-        Map<EntryType, EntryTypeResult> resultMap = new HashMap<>();
+        Map<EntryType, EntryTypeResult> resultMap = new LinkedHashMap<>();
+        BibDatabaseMode mode = bibContext.getMode();
+        List<BibEntryType> entryTypeDefinitions = (mode == BibDatabaseMode.BIBLATEX)
+                ? BiblatexEntryTypeDefinitions.ALL
+                : BibtexEntryTypeDefinitions.ALL;
 
         int counter = 0;
         for (Map.Entry<EntryType, Set<Field>> mapEntry : entryTypeToFieldsInAnyEntryMap.entrySet()) {
             entriesGroupingProgress.accept(counter++, entryTypeToFieldsInAnyEntryMap.size());
             EntryType entryType = mapEntry.getKey();
-            Set<Field> fields = mapEntry.getValue();
-            Set<Field> commonFields = entryTypeToFieldsInAllEntriesMap.get(entryType);
-            assert commonFields != null;
-            Set<Field> uniqueFields = new HashSet<>(fields);
-            uniqueFields.removeAll(commonFields);
+            Set<Field> fieldsInAnyEntry = mapEntry.getValue();
+            Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.get(entryType);
+            assert fieldsInAllEntries != null;
+            Set<Field> differingFields = new LinkedHashSet<>(fieldsInAnyEntry);
+            differingFields.removeAll(fieldsInAllEntries);
 
-            if (uniqueFields.isEmpty()) {
+            BibEntryType typeDef = entryTypeDefinitions.stream()
+                    .filter(def -> def.getType().equals(entryType))
+                    .findFirst().orElse(null);
+            if (typeDef == null) {
                 continue;
             }
 
-            List<Comparator<BibEntry>> comparators = List.of(
-                    new BibEntryByCitationKeyComparator(),
-                    new BibEntryByFieldsComparator());
-            FieldComparatorStack<BibEntry> comparatorStack = new FieldComparatorStack<>(comparators);
+            Set<Field> requiredFields = typeDef.getRequiredFields().stream()
+                    .flatMap(orFields -> orFields.getFields().stream())
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
 
-            List<BibEntry> differingEntries = entryTypeToEntriesMap
-                    .get(entryType).stream()
-                    .filter(entry -> !filterExcludedFields(entry.getFields()).equals(commonFields))
-                    .sorted(comparatorStack)
-                    .toList();
+            if (mode == BibDatabaseMode.BIBLATEX) {
+                for (Field req : requiredFields) {
+                    if (fieldsInAnyEntry.contains(req) && !fieldsInAllEntries.contains(req)) {
+                        differingFields.add(req);
+                    }
+                }
+            }
 
-            resultMap.put(entryType, new EntryTypeResult(uniqueFields, differingEntries));
+            Set<BibEntry> entries = entryTypeToEntriesMap.get(entryType);
+            if (entries == null || entries.size() <= 1 || differingFields.isEmpty()) {
+                continue;
+            }
+
+            List<BibEntry> sortedEntries;
+            if (mode == BibDatabaseMode.BIBLATEX) {
+                boolean hasRequiredFieldDifferences = requiredFields.stream()
+                        .anyMatch(req -> fieldsInAnyEntry.contains(req) && !fieldsInAllEntries.contains(req));
+                if (hasRequiredFieldDifferences) {
+                    sortedEntries = new ArrayList<>(entries);
+                } else {
+                    sortedEntries = filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
+                }
+            } else {
+                sortedEntries = filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
+            }
+
+            if (!sortedEntries.isEmpty()) {
+                sortedEntries.sort(new FieldComparatorStack<>(List.of(
+                        new BibEntryByCitationKeyComparator(),
+                        new BibEntryByFieldsComparator()
+                )));
+                resultMap.put(entryType, new EntryTypeResult(differingFields, sortedEntries));
+            }
         }
 
         return new Result(resultMap);
@@ -142,7 +188,7 @@ public class BibliographyConsistencyCheck {
                 }
 
                 entryTypeToEntriesMap
-                        .computeIfAbsent(entryType, _ -> new HashSet<>())
+                        .computeIfAbsent(entryType, _ -> new java.util.LinkedHashSet<>())
                         .add(entry);
             }
         }
