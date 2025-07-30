@@ -31,7 +31,6 @@ public class SemanticMergerTest {
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
     }
 
-    // These test cases are based on documented scenarios from docs/code-howtos/git.md.
     @ParameterizedTest
     @MethodSource
     void patchDatabase(String description, String base, String local, String remote, String expectedAuthor) throws Exception {
@@ -50,6 +49,7 @@ public class SemanticMergerTest {
         }
     }
 
+    // These test cases are based on documented scenarios from docs/code-howtos/git.md.
     static Stream<Arguments> patchDatabase() {
         return Stream.of(
                 Arguments.of("T1 - remote changed a field, local unchanged",

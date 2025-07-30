@@ -78,7 +78,7 @@ Therefore, JabRef performs an automatic merge without requiring manual conflict 
 The semantic conflict detection and merge resolution logic is covered by:
 
 * `org.jabref.logic.git.util.SemanticMergerTest#patchDatabase`
-* `org.jabref.logic.git.util.SemanticConflictDetectorTest#patchDatabase`.
+* `org.jabref.logic.git.util.SemanticConflictDetectorTest#semanticConflicts`.
 
 ## Conflict Scenarios
 
