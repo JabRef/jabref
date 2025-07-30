@@ -46,7 +46,7 @@ requirementTracing {
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
 
-// TODO: "run" shou>ld run the GUI, not all modules
+// TODO: "run" should run the GUI, not all modules
 tasks.register("run") {
     group = "application"
     description = "Runs the GUI"
