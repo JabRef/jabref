@@ -27,18 +27,18 @@ public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
 
     public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
-        Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(anyPathInsideRepo);
+        Optional<GitHandler> gitHandlerOpt = GitHandler.fromAnyPath(anyPathInsideRepo);
 
-        if (maybeHandler.isEmpty()) {
+        if (gitHandlerOpt.isEmpty()) {
             return new GitStatusSnapshot(
-                    false,
+                    GitStatusSnapshot.NOT_TRACKING,
                     SyncStatus.UNTRACKED,
-                    false,
-                    false,
+                    GitStatusSnapshot.NO_CONFLICT,
+                    GitStatusSnapshot.NO_UNCOMMITTED,
                     Optional.empty()
             );
         }
-        GitHandler handler = maybeHandler.get();
+        GitHandler handler = gitHandlerOpt.get();
 
         try (Git git = Git.open(handler.getRepositoryPathAsFile())) {
             Repository repo = git.getRepository();
@@ -53,7 +53,7 @@ public class GitStatusChecker {
             SyncStatus syncStatus = determineSyncStatus(repo, localHead, remoteHead);
 
             return new GitStatusSnapshot(
-                    true,
+                    GitStatusSnapshot.TRACKING,
                     syncStatus,
                     hasConflict,
                     hasUncommittedChanges,
@@ -62,10 +62,10 @@ public class GitStatusChecker {
         } catch (IOException | GitAPIException e) {
             LOGGER.warn("Failed to check Git status", e);
             return new GitStatusSnapshot(
-                    true,
+                    GitStatusSnapshot.TRACKING,
                     SyncStatus.UNKNOWN,
-                    false,
-                    false,
+                    GitStatusSnapshot.NO_CONFLICT,
+                    GitStatusSnapshot.NO_UNCOMMITTED,
                     Optional.empty()
             );
         }

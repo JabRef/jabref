@@ -51,8 +51,8 @@ public class GitSyncService {
     }
 
     public MergeResult fetchAndMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
-        Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(bibFilePath);
-        if (maybeHandler.isEmpty()) {
+        Optional<GitHandler> gitHandlerOpt = GitHandler.fromAnyPath(bibFilePath);
+        if (gitHandlerOpt.isEmpty()) {
             LOGGER.warn("Pull aborted: The file is not inside a Git repository.");
             return MergeResult.failure();
         }
@@ -101,7 +101,7 @@ public class GitSyncService {
     }
 
     public MergeResult performSemanticMerge(Git git,
-                                            Optional<RevCommit> maybeBaseCommit,
+                                            Optional<RevCommit> baseCommitOpt,
                                             RevCommit remoteCommit,
                                             BibDatabaseContext localDatabaseContext,
                                             Path bibFilePath) throws IOException, JabRefException {
@@ -117,8 +117,8 @@ public class GitSyncService {
 
         // 1. Load three versions
         BibDatabaseContext base;
-        if (maybeBaseCommit.isPresent()) {
-            Optional<String> baseContent = GitFileReader.readFileFromCommit(git, maybeBaseCommit.get(), relativePath);
+        if (baseCommitOpt.isPresent()) {
+            Optional<String> baseContent = GitFileReader.readFileFromCommit(git, baseCommitOpt.get(), relativePath);
             base = baseContent.isEmpty() ? BibDatabaseContext.empty() : BibDatabaseContext.of(baseContent.get(), importFormatPreferences);
         } else {
             base = new BibDatabaseContext();

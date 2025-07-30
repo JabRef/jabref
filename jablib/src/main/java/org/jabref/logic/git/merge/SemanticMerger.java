@@ -43,14 +43,14 @@ public class SemanticMerger {
         for (Map.Entry<String, Map<Field, String>> entry : patchMap.entrySet()) {
             String key = entry.getKey();
             Map<Field, String> fieldPatch = entry.getValue();
-            Optional<BibEntry> maybeLocalEntry = local.getDatabase().getEntryByCitationKey(key);
+            Optional<BibEntry> localEntryOpt = local.getDatabase().getEntryByCitationKey(key);
 
-            if (maybeLocalEntry.isEmpty()) {
+            if (localEntryOpt.isEmpty()) {
                 LOGGER.warn("Skip patch: local does not contain entry '{}'", key);
                 continue;
             }
 
-            BibEntry localEntry = maybeLocalEntry.get();
+            BibEntry localEntry = localEntryOpt.get();
             applyFieldPatchToEntry(localEntry, fieldPatch);
         }
     }

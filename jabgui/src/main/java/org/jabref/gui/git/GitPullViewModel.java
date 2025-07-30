@@ -23,12 +23,12 @@ public class GitPullViewModel extends AbstractViewModel {
     }
 
     public MergeResult pull() throws IOException, GitAPIException, JabRefException {
-        Optional<BibDatabaseContext> maybeContext = gitStatusViewModel.getDatabaseContext();
-        if (maybeContext.isEmpty()) {
+        Optional<BibDatabaseContext> databaseContextOpt = gitStatusViewModel.getDatabaseContext();
+        if (databaseContextOpt.isEmpty()) {
             throw new JabRefException(Localization.lang("Cannot pull: No active BibDatabaseContext."));
         }
 
-        BibDatabaseContext localBibDatabaseContext = maybeContext.get();
+        BibDatabaseContext localBibDatabaseContext = databaseContextOpt.get();
         Path bibFilePath = localBibDatabaseContext.getDatabasePath().orElseThrow(() ->
                 new JabRefException(Localization.lang("Cannot pull: .bib file path missing in BibDatabaseContext."))
         );

@@ -23,13 +23,12 @@ public class GuiGitConflictResolverStrategy implements GitConflictResolverStrate
     public List<BibEntry> resolveConflicts(List<ThreeWayEntryConflict> conflicts) {
         List<BibEntry> resolved = new ArrayList<>();
         for (ThreeWayEntryConflict conflict : conflicts) {
-            // TODO: We discussed somewhere else that Optional<List<BibEntry>> should be List<BibEntry> - and that this list is empty if it was cancelled.
-            Optional<BibEntry> maybeEntry = dialog.resolveConflict(conflict);
-            if (maybeEntry.isEmpty()) {
+            Optional<BibEntry> entryOpt = dialog.resolveConflict(conflict);
+            if (entryOpt.isEmpty()) {
                 LOGGER.debug("User cancelled conflict resolution for entry {}", conflict.local().getCitationKey().orElse("<unknown>"));
                 return List.of();
             }
-            resolved.add(maybeEntry.get());
+            resolved.add(entryOpt.get());
         }
         return resolved;
     }

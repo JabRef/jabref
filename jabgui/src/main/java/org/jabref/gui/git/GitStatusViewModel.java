@@ -63,22 +63,22 @@ public class GitStatusViewModel extends AbstractViewModel {
     }
 
     protected void updateStatusFromContext(BibDatabaseContext context) {
-        Optional<Path> maybePath = context.getDatabasePath();
-        if (maybePath.isEmpty()) {
+        Optional<Path> databasePathOpt = context.getDatabasePath();
+        if (databasePathOpt.isEmpty()) {
             LOGGER.debug("No .bib file path available in database context; resetting Git status.");
             reset();
             return;
         }
 
-        Path path = maybePath.get();
+        Path path = databasePathOpt.get();
 
-        Optional<GitHandler> maybeHandler = GitHandler.fromAnyPath(path);
-        if (maybeHandler.isEmpty()) {
+        Optional<GitHandler> gitHandlerOpt = GitHandler.fromAnyPath(path);
+        if (gitHandlerOpt.isEmpty()) {
             LOGGER.debug("No Git repository found for path {}; resetting Git status.", path);
             reset();
             return;
         }
-        this.activeHandler = maybeHandler.get();
+        this.activeHandler = gitHandlerOpt.get();
 
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(path);
         setTracking(snapshot.tracking());
