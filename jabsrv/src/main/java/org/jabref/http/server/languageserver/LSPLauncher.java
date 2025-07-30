@@ -62,14 +62,14 @@ public class LSPLauncher {
 
     private void handleClient(Socket socket) {
         LSPServer server = new LSPServer(jabRefCliPreferences, abbreviationRepository);
-        LOGGER.info("LSP server started.");
+        LOGGER.debug("LSP server started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();
              OutputStream out = socket.getOutputStream()) {
             Launcher<LanguageClient> launcher = org.eclipse.lsp4j.launch.LSPLauncher.createServerLauncher(server, in, out, Executors.newCachedThreadPool(), Function.identity());
-            LOGGER.info("LSP server launched.");
+            LOGGER.debug("LSP server launched.");
             server.connect(launcher.getRemoteProxy());
-            LOGGER.info("LSP server connected.");
+            LOGGER.debug("LSP server connected.");
             launcher.startListening().get();
         } catch (Throwable e) {
             LOGGER.error("Error in handleClient", e);
@@ -88,7 +88,7 @@ public class LSPLauncher {
                 threadPool.shutdownNow();
             }
         } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
+            LOGGER.error("Error during LSP shutdown", e);
         }
         LOGGER.info("LSP Server shutdown.");
     }

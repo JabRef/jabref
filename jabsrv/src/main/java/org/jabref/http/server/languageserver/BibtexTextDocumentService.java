@@ -46,7 +46,6 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public void didOpen(DidOpenTextDocumentParams params) {
-        System.out.println("DidOpenTextDocumentParams: " + params);
         handleDiagnostics(params.getTextDocument().getUri(), params.getTextDocument().getText(), params.getTextDocument().getVersion());
     }
 

@@ -31,6 +31,10 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/BibtexTextDocumentService.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/BibtexWorkspaceService.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/LSPLauncher.java
+//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/LSPServer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java
@@ -82,6 +86,7 @@
 //DEPS org.jabref:afterburner.fx:2.0.0
 //DEPS net.harawata:appdirs:1.4.0
 //DEPS de.undercouch:citeproc-java:3.3.0
+//DEPS com.github.eclipse:lsp4j:0.24.0
 
 /// This class is required for [jbang](https://www.jbang.dev/)
 public class JabSrvLauncher {

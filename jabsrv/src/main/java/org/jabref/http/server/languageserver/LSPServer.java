@@ -56,7 +56,7 @@ public class LSPServer implements LanguageServer, LanguageClientAware {
 
     @Override
     public void exit() {
-        //System.exit(exitCode);
+        // System.exit(exitCode);
     }
 
     @Override
