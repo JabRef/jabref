@@ -13,8 +13,6 @@ module org.jabref.jabsrv {
     opens org.jabref.http.server.command to com.google.gson, org.glassfish.hk2.locator, org.glassfish.hk2.utilities, com.fasterxml.jackson.databind;
     exports org.jabref.http.server.services;
     exports org.jabref.http;
-    exports org.jabref.http.server.languageserver;
-    opens org.jabref.http.server.languageserver to org.glassfish.hk2.locator, org.glassfish.hk2.utilities, lsp4j, lsp4j.jsonrpc;
 
     requires javafx.base;
 

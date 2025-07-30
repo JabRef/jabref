@@ -1,4 +1,4 @@
-package org.jabref.http.server.languageserver;
+package org.jabref.languageserver;
 
 import java.io.StringReader;
 import java.util.ArrayList;

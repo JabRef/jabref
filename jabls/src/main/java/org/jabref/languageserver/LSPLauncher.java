@@ -1,4 +1,4 @@
-package org.jabref.http.server.languageserver;
+package org.jabref.languageserver;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,11 +24,15 @@ public class LSPLauncher {
     private ServerSocket serverSocket;
     private ExecutorService threadPool;
     private volatile boolean running;
-    private CliPreferences jabRefCliPreferences;
+    private CliPreferences cliPreferences;
     private JournalAbbreviationRepository abbreviationRepository;
 
-    public LSPLauncher(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
-        this.jabRefCliPreferences = cliPreferences;
+    public void run(CliPreferences cliPreferences) {
+        run(cliPreferences, new JournalAbbreviationRepository());
+    }
+
+    public void run(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+        this.cliPreferences = cliPreferences;
         this.abbreviationRepository = abbreviationRepository;
         start(2087);
     }
@@ -61,7 +65,7 @@ public class LSPLauncher {
     }
 
     private void handleClient(Socket socket) {
-        LSPServer server = new LSPServer(jabRefCliPreferences, abbreviationRepository);
+        LSPServer server = new LSPServer(cliPreferences, abbreviationRepository);
         LOGGER.debug("LSP server started.");
         try (socket; // socket should be closed on error
              InputStream in = socket.getInputStream();

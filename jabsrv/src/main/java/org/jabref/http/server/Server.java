@@ -14,11 +14,8 @@ import org.jabref.http.dto.GsonFactory;
 import org.jabref.http.server.cayw.CAYWResource;
 import org.jabref.http.server.cayw.format.FormatterService;
 import org.jabref.http.server.command.CommandResource;
-import org.jabref.http.server.languageserver.LSPLauncher;
 import org.jabref.http.server.services.FilesToServe;
-import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.os.OS;
-import org.jabref.logic.preferences.CliPreferences;
 
 import net.harawata.appdirs.AppDirsFactory;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -60,17 +57,12 @@ public class Server {
         ServiceLocatorUtilities.addOneConstant(serviceLocator, srvStateManager, "statemanager", SrvStateManager.class);
         HttpServer httpServer = startServer(serviceLocator, uri);
 
-        LSPLauncher launcher = new LSPLauncher(serviceLocator.getService(CliPreferences.class), new JournalAbbreviationRepository());
-
-        ServiceLocatorUtilities.addOneConstant(serviceLocator, launcher);
-
         // Required for CLI only
         // GUI uses HttpServerManager
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 LOGGER.debug("Shutting down jabsrv...");
                 httpServer.shutdownNow();
-                launcher.shutdown();
                 LOGGER.debug("Done, exit.");
             } catch (Exception e) {
                 LOGGER.error("Could not shut down server", e);

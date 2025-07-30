@@ -39,13 +39,14 @@ requirementTracing {
             "jablib/src/main/java", "jablib/src/test/java",
             "jabkit/src/main/java", "jabkit/src/test/java",
             "jabgui/src/main/java", "jabgui/src/test/java",
-            "jabsrv/src/main/java", "jabsrv/src/test/java"
+            "jabsrv/src/main/java", "jabsrv/src/test/java",
+            "jabls/src/main/java", "jabls/src/test/java"
         )
     )
     // TODO: Short Tag Importer: https://github.com/itsallcode/openfasttrace-gradle#configuring-the-short-tag-importer
 }
 
-// TODO: "run" should run the GUI, not all modules
+// TODO: "run" shou>ld run the GUI, not all modules
 tasks.register("run") {
     group = "application"
     description = "Runs the GUI"
