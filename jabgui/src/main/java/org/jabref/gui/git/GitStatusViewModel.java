@@ -56,9 +56,9 @@ public class GitStatusViewModel extends AbstractViewModel {
             }
         });
 
-        stateManager.getActiveDatabase().ifPresent(ctx -> {
-            databaseContext.set(ctx);
-            updateStatusFromContext(ctx);
+        stateManager.getActiveDatabase().ifPresent(presentContext -> {
+            databaseContext.set(presentContext);
+            updateStatusFromContext(presentContext);
         });
     }
 
