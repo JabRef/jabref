@@ -11,6 +11,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -69,7 +70,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
     void entriesMissingRequiredFieldsAreReported(@TempDir Path tempDir) throws Exception {
         BibEntry withDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withDate")
+                // required field
                 .withField(StandardField.DATE, "date")
+                // optional field
                 .withField(StandardField.URLDATE, "urldate");
         BibEntry withoutDate = new BibEntry(StandardEntryType.Online)
                 .withCitationKey("withoutDate")
@@ -80,6 +83,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         bibDatabase.insertEntries(bibEntriesList);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBLATEX);
 
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
                 .check(bibContext, (_, _) -> {
@@ -90,12 +94,16 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
              BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false)) {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
+
+        // "Date" is required, therefore, a "x" at withDAte
+        // Does not output "urldate", because it set by all entries
         assertEquals("""
                 Field Presence Consistency Check Result
 
                 | entry type | citation key | Date |
                 | ---------- | ------------ | ---- |
-                | Online     | withDate     | ?    |
+                | Online     | withDate     | x    |
+                | Online     | withoutDate  | -    |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
@@ -111,9 +119,9 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         UnknownField customField = new UnknownField("custom");
         BibEntry first = new BibEntry(StandardEntryType.Article, "first")
                 .withField(StandardField.AUTHOR, "Author One") // required
-                .withField(StandardField.TITLE, "Title") // required
-                .withField(StandardField.PAGES, "some pages") // optional
-                .withField(customField, "custom"); // unknown
+                .withField(StandardField.TITLE, "Title")       // required
+                .withField(StandardField.PAGES, "some pages")  // optional
+                .withField(customField, "custom");             // unknown
         BibEntry second = new BibEntry(StandardEntryType.Article, "second")
                 .withField(StandardField.AUTHOR, "Author One");
         List<BibEntry> bibEntriesList = List.of(first, second);
@@ -134,6 +142,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | entry type | citation key | Custom | Pages | Title |
                 | ---------- | ------------ | ------ | ----- | ----- |
                 | Article    | first        | ?      | o     | x     |
+                | Article    | second       | -      | -     | -     |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |
@@ -171,6 +180,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 | entry type | citation key        | Custom | Pages | Title |
                 | ---------- | ------------------- | ------ | ----- | ----- |
                 | Article    | first-very-long-key | ?      | o     | x     |
+                | Article    | second              | -      | -     | -     |
 
                 | Symbol | Meaning                   |
                 | ------ | ------------------------- |

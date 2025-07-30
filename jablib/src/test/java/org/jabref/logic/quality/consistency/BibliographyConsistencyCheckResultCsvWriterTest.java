@@ -77,9 +77,12 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
              BibliographyConsistencyCheckResultCsvWriter paperConsistencyCheckResultCsvWriter = new BibliographyConsistencyCheckResultCsvWriter(result, writer, true)) {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
+
+        // "second" is output, because it missies the required field "title"
         assertEquals("""
                 entry type,citation key,Custom,Pages,Title
                 Article,first,?,o,x
+                Article,second,-,-,-
                 """, Files.readString(csvFile).replace("\r\n", "\n"));
     }
 
