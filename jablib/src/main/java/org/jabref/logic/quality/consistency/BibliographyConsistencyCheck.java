@@ -51,7 +51,7 @@ public class BibliographyConsistencyCheck {
                             StandardField.TYPE,
                             StandardField.XREF,
                             StandardField.CITATIONCOUNT, // JabRef-specific
-                            InternalField.KEY_FIELD      // Internal field
+                            InternalField.KEY_FIELD      // Citation key
                     );
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
