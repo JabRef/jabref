@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -140,15 +139,10 @@ class KeywordListTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "Keyword > Keyword",
-            "Keyword \\> Keyword"
-    })
+    @MethodSource("provideParseKeywordCases")
     void roundTripPreservesStructure(String original) {
         KeywordList parsed = KeywordList.parse(original, ',', '>');
-        String serialized = parsed.toString();
-        KeywordList reparsed = KeywordList.parse(serialized, ',', '>');
-
-        assertEquals(parsed.toString(), reparsed.toString());
+        // We need to test the toString() functionality
+        assertEquals(original, parsed.toString());
     }
 }

@@ -79,7 +79,13 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      * E.g., calling {@link #getSubchainAsString(Character)} on the node "B" in "A > B > C" returns "B > C".
      */
     private String getSubchainAsString(Character hierarchicalDelimiter) {
-        return keyword +
+        // Undoing escaping and delimiter handling done at parsing ensures round-trip integrity
+        String escapedKeyword = keyword
+                .replace("\\", "\\\\")
+                .replace(hierarchicalDelimiter.toString(), "\\" + hierarchicalDelimiter)
+                .replace(",", "\\,");
+
+        return escapedKeyword +
                 getChild().map(child -> " " + hierarchicalDelimiter + " " + child.getSubchainAsString(hierarchicalDelimiter))
                           .orElse("");
     }
