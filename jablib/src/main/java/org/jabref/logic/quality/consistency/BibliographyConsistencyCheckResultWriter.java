@@ -126,6 +126,20 @@ public abstract class BibliographyConsistencyCheckResultWriter implements Closea
         BibliographyConsistencyCheck.EntryTypeResult entries = mapEntry.getValue();
         SequencedCollection<BibEntry> bibEntries = entries.sortedEntries();
 
+        if (bibDatabaseMode == BibDatabaseMode.BIBLATEX) {
+            Set<Field> reportedFields = Set.copyOf(entries.fields());
+            boolean hasRequiredFieldDifferences = requiredFields.stream()
+                    .anyMatch(reportedFields::contains);
+
+            if (hasRequiredFieldDifferences) {
+                bibEntries = bibEntries.stream()
+                        .filter(entry -> reportedFields.stream()
+                                .filter(requiredFields::contains)
+                                .noneMatch(field -> entry.hasField(field)))
+                        .collect(Collectors.toCollection(java.util.LinkedHashSet::new));
+            }
+        }
+
         bibEntries.forEach(Unchecked.consumer(bibEntry -> writeBibEntry(bibEntry, entryType, requiredFields, optionalFields)));
     }
 

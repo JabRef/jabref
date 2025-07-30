@@ -57,7 +57,7 @@ public class BibliographyConsistencyCheck {
         for (BibEntry entry : entries) {
             Set<Field> entryFields = filterExcludedFields(entry.getFields());
             boolean hasDiff = differingFields.stream()
-                                             .anyMatch(diff -> entryFields.contains(diff) != fieldsInAllEntries.contains(diff));
+                                             .anyMatch(diff -> entryFields.contains(diff));
             if (hasDiff) {
                 filteredEntries.add(entry);
             }
@@ -137,7 +137,17 @@ public class BibliographyConsistencyCheck {
                 boolean hasRequiredFieldDifferences = requiredFields.stream()
                         .anyMatch(req -> fieldsInAnyEntry.contains(req) && !fieldsInAllEntries.contains(req));
                 if (hasRequiredFieldDifferences) {
-                    sortedEntries = new ArrayList<>(entries);
+                    // In BibLaTeX con required fields mancanti, include tutte le entry che sono inconsistenti
+                    sortedEntries = new ArrayList<>();
+                    for (BibEntry entry : entries) {
+                        Set<Field> entryFields = filterExcludedFields(entry.getFields());
+                        boolean isInconsistent = differingFields.stream()
+                            .anyMatch(diff -> entryFields.contains(diff) ||
+                                    (requiredFields.contains(diff) && !entryFields.contains(diff)));
+                        if (isInconsistent) {
+                            sortedEntries.add(entry);
+                        }
+                    }
                 } else {
                     sortedEntries = filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
                 }
