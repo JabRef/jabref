@@ -25,7 +25,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
@@ -73,6 +72,8 @@ import org.jabref.model.util.FileUpdateMonitor;
 
 import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.CheckListView;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -341,24 +342,24 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     private void showEntrySourceDialog(BibEntry entry) {
-        TextArea area = new TextArea();
-
+        CodeArea ca = new CodeArea();
         try {
             BibDatabaseMode mode = stateManager.getActiveDatabase().map(BibDatabaseContext::getMode)
                                                .orElse(BibDatabaseMode.BIBLATEX);
-            area.appendText(getSourceString(entry, mode, preferences.getFieldPreferences(), this.entryTypesManager));
+            ca.appendText(getSourceString(entry, mode, preferences.getFieldPreferences(), this.entryTypesManager));
         } catch (IOException e) {
             LOGGER.warn("Incorrect entry, could not load source:", e);
             return;
         }
 
-        area.setWrapText(true);
-        area.setPadding(new Insets(0, 10, 0, 10));
+        ca.setWrapText(true);
+        ca.setPadding(new Insets(0, 10, 0, 10));
+        ca.showParagraphAtTop(0);
 
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-        scrollPane.setContent(area);
+        scrollPane.setContent(new VirtualizedScrollPane<>(ca));
 
         DialogPane dialogPane = new DialogPane();
         dialogPane.setPrefSize(800, 400);
