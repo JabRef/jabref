@@ -80,7 +80,6 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
 
-        // "second" is output, because it missies the required field "title"
         assertEquals("""
                 entry type,citation key,Custom,Pages,Title
                 Article,first,?,o,x
@@ -126,12 +125,13 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
             paperConsistencyCheckResultCsvWriter.writeFindings();
         }
         assertEquals("""
-                entry type,citation key,Location,Pages,Publisher
-                Article,first,-,o,-
-                Article,second,-,-,?
-                InProceedings,fourth,-,-,o
-                InProceedings,third,?,o,-
-                """, Files.readString(csvFile).replace("\r\n", "\n"));
+entry type,citation key,Location,Pages,Publisher
+Article,first,-,o,-
+Article,second,-,-,?
+InProceedings,fifth,-,-,-
+InProceedings,fourth,-,-,o
+InProceedings,third,?,o,-
+""", Files.readString(csvFile).replace("\r\n", "\n"));
     }
 
     @Test

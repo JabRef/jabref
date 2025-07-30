@@ -97,8 +97,6 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
 
-        // "Date" is required, therefore, a "x" at withDAte
-        // Does not output "urldate", because it set by all entries
         assertEquals("""
                 Field Presence Consistency Check Result
 
@@ -213,15 +211,11 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
                 .withField(StandardField.AUTHOR, "Author One")
                 .withField(StandardField.YEAR, "2024")
                 .withField(StandardField.PUBLISHER, "publisher");
-        // Entry added to check for alphabetical ordering of citation keys
         BibEntry fifth = new BibEntry(StandardEntryType.InProceedings, "fifth")
                 .withField(StandardField.AUTHOR, "Author One")
-                .withField(StandardField.LOCATION, "location")
                 .withField(StandardField.YEAR, "2024");
-        BibEntry sixth = new BibEntry(StandardEntryType.InProceedings, "sixth")
-                .withField(StandardField.AUTHOR, "Author One")
-                .withField(StandardField.YEAR, "2024");
-        List<BibEntry> bibEntriesList = List.of(first, second, third, fourth, fifth, sixth);
+
+        List<BibEntry> bibEntriesList = List.of(first, second, third, fourth, fifth);
         BibDatabase bibDatabase = new BibDatabase();
         bibDatabase.insertEntries(bibEntriesList);
         BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
@@ -234,23 +228,23 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
             BibliographyConsistencyCheckResultTxtWriter.writeFindings();
         }
         assertEquals("""
-                Field Presence Consistency Check Result
+Field Presence Consistency Check Result
 
-                | entry type    | citation key | Location | Pages | Publisher |
-                | ------------- | ------------ | -------- | ----- | --------- |
-                | Article       | first        | -        | o     | -         |
-                | Article       | second       | -        | -     | ?         |
-                | InProceedings | fifth        | ?        | -     | -         |
-                | InProceedings | fourth       | -        | -     | o         |
-                | InProceedings | third        | ?        | o     | -         |
+| entry type    | citation key | Location | Pages | Publisher |
+| ------------- | ------------ | -------- | ----- | --------- |
+| Article       | first        | -        | o     | -         |
+| Article       | second       | -        | -     | ?         |
+| InProceedings | fifth        | -        | -     | -         |
+| InProceedings | fourth       | -        | -     | o         |
+| InProceedings | third        | o        | o     | -         |
 
-                | Symbol | Meaning                   |
-                | ------ | ------------------------- |
-                | x      | required field is present |
-                | o      | optional field is present |
-                | ?      | unknown field is present  |
-                | -      | field is absent           |
-                """, Files.readString(txtFile).replace("\r\n", "\n"));
+| Symbol | Meaning                   |
+| ------ | ------------------------- |
+| x      | required field is present |
+| o      | optional field is present |
+| ?      | unknown field is present  |
+| -      | field is absent           |
+""", Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
     @Test

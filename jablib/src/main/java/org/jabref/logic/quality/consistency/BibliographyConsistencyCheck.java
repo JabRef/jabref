@@ -64,14 +64,21 @@ public class BibliographyConsistencyCheck {
     }
 
     private static List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
-        // For required fields (when the BibliographyConsistencyCheck adds them to differingFields),
-        // we need to include ALL entries that participate in the inconsistency.
-        // For regular fields, we only include entries that actually have the differing fields.
-
-        // If this method is called, it means there are field differences that need to be reported
-        // Since the logic above already determines which fields are differing and adds required fields
-        // when they're inconsistent, we should include all entries to show the complete picture
-        return new ArrayList<>(entries);
+        for (Field field : differingFields) {
+            if (!fieldsInAllEntries.contains(field)) {
+                return new ArrayList<>(entries);
+            }
+        }
+        List<BibEntry> filteredEntries = new ArrayList<>();
+        for (BibEntry entry : entries) {
+            Set<Field> entryFields = filterExcludedFields(entry.getFields());
+            boolean hasDifferingField = differingFields.stream()
+                                                       .anyMatch(entryFields::contains);
+            if (hasDifferingField) {
+                filteredEntries.add(entry);
+            }
+        }
+        return filteredEntries;
     }
 
     public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
