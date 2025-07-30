@@ -38,6 +38,7 @@ class GitHandlerTest {
         Git remoteGit = Git.init()
                            .setBare(true)
                            .setDirectory(remoteRepoPath.toFile())
+                           .setInitialBranch("main")
                            .call();
         Path testFile = repositoryPath.resolve("initial.txt");
         Files.writeString(testFile, "init");

@@ -47,7 +47,6 @@ public class GitStatusChecker {
             boolean hasUncommittedChanges = !status.isClean();
 
             ObjectId localHead = repo.resolve("HEAD");
-            // TODO: Handle remote branches properly + Test
             String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();
             ObjectId remoteHead = trackingBranch != null ? repo.resolve(trackingBranch) : null;
 
