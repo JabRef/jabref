@@ -31,10 +31,6 @@
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/CommandResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/command/SelectEntriesCommand.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/CORSFilter.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/BibtexTextDocumentService.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/BibtexWorkspaceService.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/LSPLauncher.java
-//SOURCES ../jabsrv/src/main/java/org/jabref/http/server/languageserver/LSPServer.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibrariesResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/LibraryResource.java
 //SOURCES ../jabsrv/src/main/java/org/jabref/http/server/PreferencesFactory.java

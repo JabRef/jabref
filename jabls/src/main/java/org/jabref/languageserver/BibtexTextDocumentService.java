@@ -70,7 +70,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
     private void handleDiagnostics(String uri, String content, int version) {
         BibDatabaseContext bibDatabaseContext;
         try {
-            bibDatabaseContext = new BibtexParser(jabRefCliPreferences.getImportFormatPreferences()).parse(new StringReader(content)).getDatabaseContext();
+            bibDatabaseContext = new BibtexParser(jabRefCliPreferences.getImportFormatPreferences()).parse(StringReader.of(content)).getDatabaseContext();
         } catch (Exception e) {
             Diagnostic parseDiagnostic = new Diagnostic(
                     new Range(new Position(0, 0), new Position(0, 1)),
