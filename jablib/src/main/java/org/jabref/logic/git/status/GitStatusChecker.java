@@ -31,10 +31,10 @@ public class GitStatusChecker {
 
         if (gitHandlerOpt.isEmpty()) {
             return new GitStatusSnapshot(
-                    GitStatusSnapshot.NOT_TRACKING,
+                    !GitStatusSnapshot.TRACKING,
                     SyncStatus.UNTRACKED,
-                    GitStatusSnapshot.NO_CONFLICT,
-                    GitStatusSnapshot.NO_UNCOMMITTED,
+                    !GitStatusSnapshot.CONFLICT,
+                    !GitStatusSnapshot.UNCOMMITTED,
                     Optional.empty()
             );
         }
@@ -64,8 +64,8 @@ public class GitStatusChecker {
             return new GitStatusSnapshot(
                     GitStatusSnapshot.TRACKING,
                     SyncStatus.UNKNOWN,
-                    GitStatusSnapshot.NO_CONFLICT,
-                    GitStatusSnapshot.NO_UNCOMMITTED,
+                    !GitStatusSnapshot.CONFLICT,
+                    !GitStatusSnapshot.UNCOMMITTED,
                     Optional.empty()
             );
         }
