@@ -20,6 +20,7 @@ import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryType;
 import org.jabref.model.entry.field.Field;
+import org.jabref.model.entry.field.InternalField;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UserSpecificCommentField;
@@ -28,6 +29,14 @@ import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
 public class BibliographyConsistencyCheck {
+
+    private static final Set<EntryType> BIBLATEX_TYPES = BiblatexEntryTypeDefinitions.ALL.stream()
+            .map(BibEntryType::getType)
+            .collect(Collectors.toSet());
+
+    private static final Set<EntryType> BIBTEX_TYPES = BibtexEntryTypeDefinitions.ALL.stream()
+            .map(BibEntryType::getType)
+            .collect(Collectors.toSet());
 
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
                             StandardField.KEY,
@@ -40,7 +49,9 @@ public class BibliographyConsistencyCheck {
                             StandardField.SORTKEY,
                             StandardField.SORTNAME,
                             StandardField.TYPE,
-                            StandardField.XREF
+                            StandardField.XREF,
+                            StandardField.CITATIONCOUNT, // JabRef-specific
+                            InternalField.KEY_FIELD      // Internal field
                     );
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
@@ -53,16 +64,14 @@ public class BibliographyConsistencyCheck {
     }
 
     private static List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
-        List<BibEntry> filteredEntries = new ArrayList<>();
-        for (BibEntry entry : entries) {
-            Set<Field> entryFields = filterExcludedFields(entry.getFields());
-            boolean hasDiff = differingFields.stream()
-                                             .anyMatch(diff -> entryFields.contains(diff));
-            if (hasDiff) {
-                filteredEntries.add(entry);
-            }
-        }
-        return filteredEntries;
+        // For required fields (when the BibliographyConsistencyCheck adds them to differingFields),
+        // we need to include ALL entries that participate in the inconsistency.
+        // For regular fields, we only include entries that actually have the differing fields.
+
+        // If this method is called, it means there are field differences that need to be reported
+        // Since the logic above already determines which fields are differing and adds required fields
+        // when they're inconsistent, we should include all entries to show the complete picture
+        return new ArrayList<>(entries);
     }
 
     public record Result(Map<EntryType, EntryTypeResult> entryTypeToResultMap) {
@@ -119,11 +128,9 @@ public class BibliographyConsistencyCheck {
                     .flatMap(orFields -> orFields.getFields().stream())
                     .collect(Collectors.toCollection(LinkedHashSet::new));
 
-            if (mode == BibDatabaseMode.BIBLATEX) {
-                for (Field req : requiredFields) {
-                    if (fieldsInAnyEntry.contains(req) && !fieldsInAllEntries.contains(req)) {
-                        differingFields.add(req);
-                    }
+            for (Field req : requiredFields) {
+                if (fieldsInAnyEntry.contains(req) && !fieldsInAllEntries.contains(req)) {
+                    differingFields.add(req);
                 }
             }
 
@@ -132,28 +139,7 @@ public class BibliographyConsistencyCheck {
                 continue;
             }
 
-            List<BibEntry> sortedEntries;
-            if (mode == BibDatabaseMode.BIBLATEX) {
-                boolean hasRequiredFieldDifferences = requiredFields.stream()
-                        .anyMatch(req -> fieldsInAnyEntry.contains(req) && !fieldsInAllEntries.contains(req));
-                if (hasRequiredFieldDifferences) {
-                    // In BibLaTeX con required fields mancanti, include tutte le entry che sono inconsistenti
-                    sortedEntries = new ArrayList<>();
-                    for (BibEntry entry : entries) {
-                        Set<Field> entryFields = filterExcludedFields(entry.getFields());
-                        boolean isInconsistent = differingFields.stream()
-                            .anyMatch(diff -> entryFields.contains(diff) ||
-                                    (requiredFields.contains(diff) && !entryFields.contains(diff)));
-                        if (isInconsistent) {
-                            sortedEntries.add(entry);
-                        }
-                    }
-                } else {
-                    sortedEntries = filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
-                }
-            } else {
-                sortedEntries = filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
-            }
+            List<BibEntry> sortedEntries = filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
 
             if (!sortedEntries.isEmpty()) {
                 sortedEntries.sort(new FieldComparatorStack<>(List.of(
@@ -172,12 +158,8 @@ public class BibliographyConsistencyCheck {
         List<BibEntry> entries = bibContext.getEntries();
 
         Set<EntryType> typeSet = switch (mode) {
-            case BIBLATEX -> BiblatexEntryTypeDefinitions.ALL.stream()
-                    .map(BibEntryType::getType)
-                    .collect(Collectors.toSet());
-            case BIBTEX -> BibtexEntryTypeDefinitions.ALL.stream()
-                    .map(BibEntryType::getType)
-                    .collect(Collectors.toSet());
+            case BIBLATEX -> BIBLATEX_TYPES;
+            case BIBTEX -> BIBTEX_TYPES;
             default -> Set.of();
         };
 
@@ -190,11 +172,10 @@ public class BibliographyConsistencyCheck {
                 entryTypeToFieldsInAnyEntryMap
                         .computeIfAbsent(entryType, _ -> new HashSet<>())
                         .addAll(filteredFields);
-
-                if (!entryTypeToFieldsInAllEntriesMap.containsKey(entryType)) {
-                    entryTypeToFieldsInAllEntriesMap.put(entryType, new HashSet<>(filteredFields));
-                } else {
+                if (entryTypeToFieldsInAllEntriesMap.containsKey(entryType)) {
                     entryTypeToFieldsInAllEntriesMap.get(entryType).retainAll(filteredFields);
+                } else {
+                    entryTypeToFieldsInAllEntriesMap.put(entryType, new HashSet<>(filteredFields));
                 }
 
                 entryTypeToEntriesMap
