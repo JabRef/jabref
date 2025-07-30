@@ -12,6 +12,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 
 import org.jabref.gui.actions.StandardActions;
+import org.jabref.gui.icon.IconTheme;
+import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.logic.l10n.Localization;
 
 import com.sun.javafx.scene.control.LabeledText;
@@ -41,6 +43,18 @@ public interface NodeResolver {
     /// @return a resolver that finds the node by fx:id
     static NodeResolver fxId(@NonNull String fxId) {
         return scene -> Optional.ofNullable(scene.lookup("#" + fxId));
+    }
+
+    /// Creates a resolver that finds a button by its graphic.
+    ///
+    /// @param glyph the graphic of the button
+    /// @return a resolver that finds the button by graphic
+    static NodeResolver buttonWithGraphic(IconTheme.JabRefIcons glyph) {
+        return scene -> scene.getRoot().lookupAll(".button").stream()
+                             .filter(node -> node instanceof Button button
+                                     && button.getGraphic() instanceof JabRefIconView icon
+                                     && icon.getGlyph() == glyph)
+                             .findFirst();
     }
 
     /// Creates a resolver that finds a node by a predicate.

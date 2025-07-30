@@ -6,17 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.frame.JabRefFrame;
-import org.jabref.gui.icon.JabRefIconView;
+import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
@@ -144,22 +141,7 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step6 = WalkthroughStep
                 .tooltip(Localization.lang("Click \"Add\" to link a file from your computer"))
                 .content(new TextBlock(Localization.lang("Click the \"Add\" button (first button with a plus icon) to link a PDF file that you already have on your computer. This will open a dialog where you can browse and select the file.")))
-                .resolver(scene -> scene.getRoot().lookupAll(".button").stream()
-                                        .filter(node -> node instanceof Button)
-                                        .map(Button.class::cast)
-                                        .filter(button -> button.getGraphic() instanceof StackPane || button.getGraphic() instanceof JabRefIconView)
-                                        .filter(button -> {
-                                            Node parent = button.getParent();
-                                            while (parent != null) {
-                                                if (parent instanceof LinkedFilesEditor) {
-                                                    return true;
-                                                }
-                                                parent = parent.getParent();
-                                            }
-                                            return false;
-                                        })
-                                        .findFirst()
-                                        .map(Node.class::cast))
+                .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.LINKED_FILE_ADD))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.LEFT)
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
@@ -167,34 +149,26 @@ public class WalkthroughAction extends SimpleCommand {
 
         WalkthroughStep step7 = WalkthroughStep
                 .tooltip(Localization.lang("Fill out file information"))
-                .content(new TextBlock(Localization.lang("In this dialog, you can:\n• **Link**: Browse and select your PDF file\n• **Description**: Add a meaningful description\n• **Filetype**: Choose the appropriate file type\n• **Source URL**: Optionally add the source URL\n\nFill out the information and click \"Add\" to complete, or \"Cancel\" to try another method.")))
-                .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("Add").equals(text) || Localization.lang("Cancel").equals(text)))
+                .content(new TextBlock(Localization.lang("In this dialog, you can:\n" +
+                        "- **Link**: Browse and select your PDF file\n" +
+                        "- **Description**: Add a meaningful description\n" +
+                        "- **Filetype**: Choose the appropriate file type\n" +
+                        "- **Source URL**: Optionally add the source URL\n" +
+                        "\n" +
+                        "Fill out the information and click \"Add\" to complete, or \"Cancel\" to try another method.")))
+                .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("Add").equals(text)))
                 .navigation(NavigationPredicate.onClick())
-                .position(TooltipPosition.BOTTOM)
-                .activeWindow(WindowResolver.title(""))
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
+                .highlight(new WalkthroughEffect(
+                        new WindowEffect(() -> Optional.of(stage), HighlightEffect.FULL_SCREEN_DARKEN),
+                        new WindowEffect(HighlightEffect.ANIMATED_PULSE)
+                ))
                 .build();
 
         WalkthroughStep step8 = WalkthroughStep
                 .tooltip(Localization.lang("Click \"Get fulltext\" to find PDFs automatically"))
                 .content(new TextBlock(Localization.lang("Click the \"Get fulltext\" button (second button with a download icon) to let JabRef automatically search for and download the PDF using online fetchers. This works when your entry has proper metadata like DOI or title.")))
-                .resolver(scene -> scene.getRoot().lookupAll(".button").stream()
-                                        .filter(node -> node instanceof Button)
-                                        .map(Button.class::cast)
-                                        .filter(button -> button.getGraphic() instanceof StackPane)
-                                        .filter(button -> {
-                                            Node parent = button.getParent();
-                                            while (parent != null) {
-                                                if (parent instanceof LinkedFilesEditor) {
-                                                    return true;
-                                                }
-                                                parent = parent.getParent();
-                                            }
-                                            return false;
-                                        })
-                                        .skip(1)
-                                        .findFirst()
-                                        .map(Node.class::cast))
+                .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.FETCH_FULLTEXT))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.LEFT)
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
@@ -203,23 +177,7 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step9 = WalkthroughStep
                 .tooltip(Localization.lang("Click \"Download from URL\" to download from a web link"))
                 .content(new TextBlock(Localization.lang("Click the \"Download from URL\" button (third button with a download icon) to download a PDF directly from a web URL. JabRef will prompt you to enter the URL and then download the file automatically. You can try this URL: https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2")))
-                .resolver(scene -> scene.getRoot().lookupAll(".button").stream()
-                                        .filter(node -> node instanceof Button)
-                                        .map(Button.class::cast)
-                                        .filter(button -> button.getGraphic() instanceof JabRefIconView)
-                                        .filter(button -> {
-                                            Node parent = button.getParent();
-                                            while (parent != null) {
-                                                if (parent instanceof LinkedFilesEditor) {
-                                                    return true;
-                                                }
-                                                parent = parent.getParent();
-                                            }
-                                            return false;
-                                        })
-                                        .skip(1)
-                                        .findFirst()
-                                        .map(Node.class::cast))
+                .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.DOWNLOAD))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.LEFT)
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
