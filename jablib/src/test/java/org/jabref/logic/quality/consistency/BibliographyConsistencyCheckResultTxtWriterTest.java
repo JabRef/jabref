@@ -43,7 +43,7 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
         database.insertEntry(second);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
-        bibContext.setMode(BibDatabaseMode.BIBTEX.BIBTEX);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
