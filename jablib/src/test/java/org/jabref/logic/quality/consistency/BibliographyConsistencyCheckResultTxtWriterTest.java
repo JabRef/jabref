@@ -48,8 +48,8 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
         }
         assertEquals("""
                 Field Presence Consistency Check Result
@@ -93,8 +93,8 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
         }
 
         assertEquals("""
@@ -134,8 +134,8 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkDifferentOutputSymbols-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
         }
         assertEquals("""
                 Field Presence Consistency Check Result
@@ -173,8 +173,8 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkDifferentOutputSymbols-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
         }
         assertEquals("""
                 Field Presence Consistency Check Result
@@ -224,8 +224,8 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
 
         Path txtFile = tempDir.resolve("checkSimpleLibrary-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
         }
         assertEquals("""
 Field Presence Consistency Check Result
@@ -264,8 +264,8 @@ Field Presence Consistency Check Result
 
         Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, false, new BibEntryTypesManager(), bibContext.getMode())) {
+            txtWriter.writeFindings();
         }
         assertEquals("""
                 Field Presence Consistency Check Result
@@ -291,8 +291,8 @@ Field Presence Consistency Check Result
 
         Path txtFile = tempDir.resolve("checkLibraryWithoutIssues-result.txt");
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
+            txtWriter.writeFindings();
         }
         assertEquals("", Files.readString(txtFile).replace("\r\n", "\n"));
     }
@@ -305,8 +305,8 @@ Field Presence Consistency Check Result
         BibDatabaseContext databaseContext = importer.importDatabase(file).getDatabaseContext();
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(databaseContext, (_, _) -> { });
         try (Writer writer = new OutputStreamWriter(Files.newOutputStream(txtFile));
-             BibliographyConsistencyCheckResultTxtWriter BibliographyConsistencyCheckResultTxtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
-            BibliographyConsistencyCheckResultTxtWriter.writeFindings();
+             BibliographyConsistencyCheckResultTxtWriter txtWriter = new BibliographyConsistencyCheckResultTxtWriter(result, writer, true)) {
+            txtWriter.writeFindings();
         }
     }
 }
