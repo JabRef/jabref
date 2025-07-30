@@ -192,4 +192,26 @@ class BibliographyConsistencyCheckTest {
 
         assertEquals(List.of(withDate, withoutDate), typeResult.sortedEntries().stream().toList());
     }
+
+    @Test
+    void unsetFieldsReportedInBibtexMode() {
+        BibEntry withDate = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("withDate")
+                .withField(StandardField.DATE, "date")
+                .withField(StandardField.URLDATE, "urldate");
+        BibEntry withoutDate = new BibEntry(StandardEntryType.Online)
+                .withCitationKey("withoutDate")
+                .withField(StandardField.URLDATE, "urldate");
+
+        List<BibEntry> bibEntriesList = List.of(withDate, withoutDate);
+        BibDatabase bibDatabase = new BibDatabase(bibEntriesList);
+        bibDatabase.insertEntries(bibEntriesList);
+
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck()
+                .check(bibContext, (_, _) -> { });
+
+        assertEquals(Map.of(), result.entryTypeToResultMap());
+    }
 }
