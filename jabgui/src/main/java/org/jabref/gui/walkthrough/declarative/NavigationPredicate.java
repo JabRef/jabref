@@ -3,10 +3,10 @@ package org.jabref.gui.walkthrough.declarative;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -48,15 +48,18 @@ public interface NavigationPredicate {
 
     static NavigationPredicate onClick() {
         return (node, beforeNavigate, onNavigate) -> {
+            Runnable beforeNavigateOnce = once(beforeNavigate);
+            Runnable onNavigateOnce = once(onNavigate);
+
             EventDispatcher dispatcher = node.getEventDispatcher();
-            node.setEventDispatcher(getPatchedDispatcher(beforeNavigate, onNavigate, node,
+            node.setEventDispatcher(getPatchedDispatcher(beforeNavigateOnce, onNavigateOnce, node,
                     ActionEvent.ACTION, MouseEvent.MOUSE_CLICKED));
 
             Optional<MenuItem> item = resolveMenuItem(node);
             if (item.isPresent()) {
                 MenuItem menuItem = item.get();
                 EventHandler<ActionEvent> onAction = menuItem.getOnAction();
-                EventHandler<ActionEvent> decoratedHandler = getPatchedEventHandler(beforeNavigate, onNavigate, onAction);
+                EventHandler<ActionEvent> decoratedHandler = getPatchedEventHandler(beforeNavigateOnce, onNavigateOnce, onAction);
                 menuItem.setOnAction(decoratedHandler);
                 menuItem.addEventFilter(ActionEvent.ACTION, decoratedHandler);
 
@@ -73,8 +76,11 @@ public interface NavigationPredicate {
 
     static NavigationPredicate onHover() {
         return (node, beforeNavigate, onNavigate) -> {
+            Runnable beforeNavigateOnce = once(beforeNavigate);
+            Runnable onNavigateOnce = once(onNavigate);
+
             EventHandler<? super MouseEvent> onEnter = node.getOnMouseEntered();
-            node.setOnMouseEntered(getPatchedEventHandler(beforeNavigate, onNavigate, onEnter));
+            node.setOnMouseEntered(getPatchedEventHandler(beforeNavigateOnce, onNavigateOnce, onEnter));
 
             Optional<MenuItem> item = resolveMenuItem(node);
             if (item.isPresent()) {
@@ -87,11 +93,14 @@ public interface NavigationPredicate {
 
     static NavigationPredicate onTextInput() {
         return (node, beforeNavigate, onNavigate) -> {
+            Runnable beforeNavigateOnce = once(beforeNavigate);
+            Runnable onNavigateOnce = once(onNavigate);
+
             if (node instanceof TextInputControl textInput) {
                 ChangeListener<String> listener = (_, _, newText) -> {
                     if (!newText.trim().isEmpty()) {
-                        beforeNavigate.run();
-                        onNavigate.run();
+                        beforeNavigateOnce.run();
+                        onNavigateOnce.run();
                     }
                 };
                 textInput.textProperty().addListener(listener);
@@ -104,22 +113,24 @@ public interface NavigationPredicate {
     static NavigationPredicate onDoubleClick() {
         return (node, beforeNavigate, onNavigate) -> {
             EventHandler<? super MouseEvent> onMouseClicked = node.getOnMouseClicked();
+            Runnable beforeNavigateOnce = once(beforeNavigate);
+            Runnable onNavigateOnce = once(onNavigate);
 
             if (onMouseClicked != null) {
                 node.setOnMouseClicked(event -> {
                     if (event.getClickCount() == 2) {
-                        beforeNavigate.run();
+                        beforeNavigateOnce.run();
                     }
                     onMouseClicked.handle(event);
                     if (event.getClickCount() == 2) {
-                        onNavigate.run();
+                        onNavigateOnce.run();
                     }
                 });
             } else {
                 node.setOnMouseClicked(event -> {
                     if (event.getClickCount() == 2) {
-                        beforeNavigate.run();
-                        onNavigate.run();
+                        beforeNavigateOnce.run();
+                        onNavigateOnce.run();
                     }
                 });
             }
@@ -230,16 +241,24 @@ public interface NavigationPredicate {
         );
     }
 
+    private static Runnable once(Runnable runnable) {
+        AtomicBoolean executed = new AtomicBoolean(false);
+        return () -> {
+            if (executed.compareAndSet(false, true)) {
+                runnable.run();
+            }
+        };
+    }
+
     private static @NonNull <T> T patched(Runnable before, Runnable after, Supplier<T> between) {
         before.run();
 
-        CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean navigated = new AtomicBoolean(false);
         Runnable fxAfter = () -> Platform.runLater(after);
-        ListChangeListener<Window> windowListener = getWindowListener(latch, fxAfter);
+        ListChangeListener<Window> windowListener = getWindowListener(navigated, fxAfter);
 
         SCHEDULED_EXECUTOR.schedule(() -> {
-            if (latch.getCount() > 0) {
-                latch.countDown();
+            if (navigated.compareAndSet(false, true)) {
                 fxAfter.run();
             }
             Window.getWindows().removeListener(windowListener);
@@ -247,8 +266,7 @@ public interface NavigationPredicate {
 
         T result = between.get();
 
-        if (latch.getCount() > 0) {
-            latch.countDown();
+        if (navigated.compareAndSet(false, true)) {
             after.run();
         }
         Window.getWindows().removeListener(windowListener);
@@ -256,14 +274,13 @@ public interface NavigationPredicate {
         return result;
     }
 
-    private static @NonNull ListChangeListener<Window> getWindowListener(CountDownLatch latch, Runnable fxOnNavigate) {
+    private static @NonNull ListChangeListener<Window> getWindowListener(java.util.concurrent.atomic.AtomicBoolean navigated, Runnable fxOnNavigate) {
         ListChangeListener<Window> windowListener = new ListChangeListener<>() {
             @Override
             public void onChanged(Change<? extends Window> change) {
                 while (change.next()) {
                     if (change.wasAdded() || change.wasRemoved()) {
-                        if (latch.getCount() > 0) {
-                            latch.countDown();
+                        if (navigated.compareAndSet(false, true)) {
                             fxOnNavigate.run();
                         }
                         Window.getWindows().removeListener(this);
