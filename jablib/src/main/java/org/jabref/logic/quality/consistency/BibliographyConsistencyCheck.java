@@ -57,7 +57,7 @@ public class BibliographyConsistencyCheck {
         for (BibEntry entry : entries) {
             Set<Field> entryFields = filterExcludedFields(entry.getFields());
             boolean hasDiff = differingFields.stream()
-                                             .anyMatch(diff -> entryFields.contains(diff) != fieldsInAllEntries.contains(diff));
+                                             .anyMatch(diff -> entryFields.contains(diff));
             if (hasDiff) {
                 filteredEntries.add(entry);
             }

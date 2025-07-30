@@ -10,6 +10,7 @@ import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.importer.fileformat.BibtexImporter;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -70,6 +71,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(second);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
 
         Path csvFile = tempDir.resolve("checkDifferentOutputSymbols-result.csv");
@@ -142,6 +144,7 @@ class BibliographyConsistencyCheckResultCsvWriterTest {
         database.insertEntry(second);
 
         BibDatabaseContext bibContext = new BibDatabaseContext(database);
+        bibContext.setMode(BibDatabaseMode.BIBTEX);
         BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (count, total) -> { });
 
         Path csvFile = tempDir.resolve("checkLibraryWithoutIssues-result.csv");
