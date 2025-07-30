@@ -294,6 +294,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         // Note the missing "lsp4j" at the group
         mergeJar("com.github.eclipse:lsp4j")
+        requires("com.google.gson")
 
     }
     module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.debug", "lsp4j.debug") {
@@ -304,21 +305,25 @@ extraJavaModuleInfo {
         overrideModuleName()
         exportAllPackages()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "lsp4j.websocket.jakarta") {
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "lsp4j.jsonrpc") {
+        overrideModuleName()
+        exportAllPackages()
+        requires("com.google.gson")
+        requires("java.logging")
+    }
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "lsp4j.jsonrpc.debug") {
         overrideModuleName()
         exportAllPackages()
     }
     module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "lsp4j.websocket") {
         overrideModuleName()
         exportAllPackages()
+        requireAllDefinedDependencies()
     }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "lsp4j.jsonrpc") {
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "lsp4j.websocket.jakarta") {
         overrideModuleName()
         exportAllPackages()
-    }
-    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "lsp4j.jsonrpc.debug") {
-        overrideModuleName()
-        exportAllPackages()
+        requireAllDefinedDependencies()
     }
     module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket") {
         overrideModuleName()

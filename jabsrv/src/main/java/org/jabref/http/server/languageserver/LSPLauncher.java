@@ -30,7 +30,7 @@ public class LSPLauncher {
     public LSPLauncher(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.jabRefCliPreferences = cliPreferences;
         this.abbreviationRepository = abbreviationRepository;
-        start(12345);
+        start(2087);
     }
 
     public void start(int port) {
@@ -44,32 +44,35 @@ public class LSPLauncher {
                 while (running) {
                     try {
                         Socket socket = serverSocket.accept();
-                        LOGGER.info("LSP Client connected!");
-
+                        LOGGER.info("LSP Client connected.");
                         threadPool.submit(() -> handleClient(socket));
                     } catch (IOException e) {
                         if (running) {
-                            LOGGER.error(e.getMessage(), e);
+                            LOGGER.error("Error during LSP run", e);
+                        } else {
+                            LOGGER.debug("Error while not running", e);
                         }
                     }
                 }
             });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.error("Error during LSP run", e);
         }
     }
 
     private void handleClient(Socket socket) {
         LSPServer server = new LSPServer(jabRefCliPreferences, abbreviationRepository);
-        try (socket; InputStream in = socket.getInputStream();
+        LOGGER.info("LSP server started.");
+        try (socket; // socket should be closed on error
+             InputStream in = socket.getInputStream();
              OutputStream out = socket.getOutputStream()) {
             Launcher<LanguageClient> launcher = org.eclipse.lsp4j.launch.LSPLauncher.createServerLauncher(server, in, out, Executors.newCachedThreadPool(), Function.identity());
-
+            LOGGER.info("LSP server launched.");
             server.connect(launcher.getRemoteProxy());
-
+            LOGGER.info("LSP server connected.");
             launcher.startListening().get();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage(), e);
+        } catch (Throwable e) {
+            LOGGER.error("Error in handleClient", e);
         } finally {
             LOGGER.info("LSP Client disconnected.");
         }
