@@ -210,10 +210,16 @@ public class JabRefGUI extends Application {
     }
 
     private void setupProxy() {
-        if (!preferences.getProxyPreferences().shouldUseProxy()
-                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
+        if (!preferences.getProxyPreferences().shouldUseProxy()) {
             return;
         }
+
+        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
+            ProxyRegisterer.register(preferences.getProxyPreferences());
+            return;
+        }
+
+        assert preferences.getProxyPreferences().shouldUseAuthentication();
 
         if (preferences.getProxyPreferences().shouldPersistPassword()
                 && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
