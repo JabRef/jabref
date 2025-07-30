@@ -39,7 +39,8 @@ public class GitPullAction extends SimpleCommand {
 
     @Override
     public void execute() {
-        if (stateManager.getActiveDatabase().isEmpty()) {
+        Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
+        if (activeDatabaseOpt.isEmpty()) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("No library open"),
                     Localization.lang("Please open a library before pulling.")
@@ -47,8 +48,9 @@ public class GitPullAction extends SimpleCommand {
             return;
         }
 
-        BibDatabaseContext database = stateManager.getActiveDatabase().get();
-        if (database.getDatabasePath().isEmpty()) {
+        BibDatabaseContext activeDatabase = activeDatabaseOpt.get();
+        Optional<Path> bibFilePathOpt = activeDatabase.getDatabasePath();
+        if (bibFilePathOpt.isEmpty()) {
             dialogService.showErrorDialogAndWait(
                     Localization.lang("No library file path"),
                     Localization.lang("Cannot pull from Git: No file is associated with this library.")
@@ -56,7 +58,7 @@ public class GitPullAction extends SimpleCommand {
             return;
         }
 
-        Path bibFilePath = database.getDatabasePath().get();
+        Path bibFilePath = bibFilePathOpt.get();
         GitHandler handler = new GitHandler(bibFilePath.getParent());
         GitConflictResolverDialog dialog = new GitConflictResolverDialog(dialogService, guiPreferences);
         GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
