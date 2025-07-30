@@ -136,7 +136,7 @@ public class SummaryComponent extends AiPrivacyNoticeGuardedComponent {
     private Node showErrorNotSummarized() {
         return ErrorStateComponent.withSpinner(
                 Localization.lang("Processing..."),
-                Localization.lang("The attached file(s) are currently being processed by %0. Once completed, you will be able to see the summary.", aiPreferences.getAiProvider().getLabel())
+                Localization.lang("The attached file(s) are currently being processed by %0. Once completed, you will be able to see the summary.", aiPreferences.getSelectedChatModel())
         );
     }
 

@@ -176,7 +176,7 @@ class CSLFormatUtilsTest {
                 ),
 
                 Arguments.of(
-                        "Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” Edited by Phil Taylor. <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
+                        "Smith, Bill, Bob Jones, and Jeff Williams. 2016. “Title of the Test Entry.” <i>BibTeX Journal</i> 34 (3): 45–67. https://doi.org/10.1001/bla.blubb.<p></p>",
                         STYLE_LIST.stream().filter(e -> "Chicago Manual of Style 17th edition (author-date)".equals(e.getTitle())).findAny().get()
                 ),
 
