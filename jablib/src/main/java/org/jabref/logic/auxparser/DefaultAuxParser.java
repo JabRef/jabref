@@ -177,7 +177,7 @@ public class DefaultAuxParser implements AuxParser {
     private void insertEntries(List<BibEntry> entries, AuxParserResult result) {
         List<BibEntry> clonedEntries = new ArrayList<>();
         for (BibEntry entry : entries) {
-            BibEntry bibEntryToAdd = (BibEntry) entry.clone();
+            BibEntry bibEntryToAdd = new BibEntry(entry);
             // ensure proper "rendering" of the BibTeX code
             bibEntryToAdd.setChanged(true);
             clonedEntries.add(bibEntryToAdd);
