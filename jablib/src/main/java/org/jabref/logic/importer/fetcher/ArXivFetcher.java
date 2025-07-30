@@ -453,7 +453,7 @@ public class ArXivFetcher implements FulltextFetcher, PagedSearchBasedFetcher, I
         }
 
         private List<ArXivEntry> searchForEntries(BibEntry originalEntry) throws FetcherException {
-            // We need to clone the entry, because we modify it by a cleanup job.
+            // We need to copy the entry, because we modify it by a cleanup job.
             final BibEntry entry = new BibEntry(originalEntry);
 
             // 1. Check for Eprint
