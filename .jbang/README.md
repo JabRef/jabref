@@ -75,4 +75,10 @@ With `gg.cmd`:
 sh ./gg.cmd jbang jabsrv@jabref
 ```
 
+With `npx`:
+
+```terminal
+npx @jbangdev/jbang jabsrv@jabref
+```
+
 One can add `--help` to see available options. E.g., how to set another port and how to specify served libraries.
