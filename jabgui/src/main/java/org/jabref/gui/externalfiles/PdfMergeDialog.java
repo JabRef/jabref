@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-import org.jabref.gui.mergeentries.MultiMergeEntriesView;
+import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.Importer;
 import org.jabref.logic.importer.ParserResult;
