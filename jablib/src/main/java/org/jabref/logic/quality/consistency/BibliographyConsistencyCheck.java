@@ -29,6 +29,8 @@ import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class BibliographyConsistencyCheck {
 
     private static final Set<EntryType> BIBLATEX_TYPES = BiblatexEntryTypeDefinitions.ALL.stream()
@@ -40,20 +42,24 @@ public class BibliographyConsistencyCheck {
             .collect(Collectors.toSet());
 
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
-                            StandardField.KEY,
-                            StandardField.COMMENT,
-                            StandardField.CROSSREF,
-                            StandardField.GROUPS,
-                            StandardField.CITES,
-                            StandardField.PDF,
-                            StandardField.REVIEW,
-                            StandardField.SORTKEY,
-                            StandardField.SORTNAME,
-                            StandardField.TYPE,
-                            StandardField.XREF,
-                            StandardField.CITATIONCOUNT, // JabRef-specific
-                            InternalField.KEY_FIELD      // Citation key
-                    );
+            StandardField.KEY,
+            StandardField.COMMENT,
+            StandardField.CROSSREF,
+            StandardField.GROUPS,
+            StandardField.CITES,
+            StandardField.PDF,
+            StandardField.REVIEW,
+            StandardField.SORTKEY,
+            StandardField.SORTNAME,
+            StandardField.TYPE,
+            StandardField.XREF,
+            StandardField.OWNER,
+            StandardField.CITATIONCOUNT,
+            StandardField.TIMESTAMP,
+            StandardField.CREATIONDATE,
+            StandardField.MODIFICATIONDATE,
+            InternalField.KEY_FIELD
+    );
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
         return fields.stream()
@@ -71,6 +77,7 @@ public class BibliographyConsistencyCheck {
      * @param fieldsInAllEntries fields that are present in all entries
      * @return a list of entries that present at least one of the differing fields
      */
+    @VisibleForTesting
     List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
         for (Field field : differingFields) {
             if (!fieldsInAllEntries.contains(field)) {
