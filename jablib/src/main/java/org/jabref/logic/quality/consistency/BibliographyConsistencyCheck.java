@@ -54,11 +54,11 @@ public class BibliographyConsistencyCheck {
             StandardField.TYPE,
             StandardField.XREF,
             StandardField.OWNER,
-            StandardField.CITATIONCOUNT,
+            StandardField.CITATIONCOUNT, // JabRef-specific
             StandardField.TIMESTAMP,
             StandardField.CREATIONDATE,
             StandardField.MODIFICATIONDATE,
-            InternalField.KEY_FIELD
+            InternalField.KEY_FIELD // Citation key
     );
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
