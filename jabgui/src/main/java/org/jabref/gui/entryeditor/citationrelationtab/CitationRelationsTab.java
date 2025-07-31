@@ -150,10 +150,10 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByHBox.setPrefHeight(40);
 
         // Create Heading Lab
-        Label citingLabel = new Label(Localization.lang("Cites"));
-        styleLabel(citingLabel);
-        Label citedByLabel = new Label(Localization.lang("Cited By"));
-        styleLabel(citedByLabel);
+        Label citingLabel = new Label(Localization.lang("References (cites)"));
+        styleLabel(citingLabel, Localization.lang("Works cited by the work at hand"));
+        Label citedByLabel = new Label(Localization.lang("Citations (this paper is cited by)"));
+        styleLabel(citedByLabel, Localization.lang("Works citing the work at hand"));
 
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
@@ -370,13 +370,21 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * Method to style heading labels
+     * Method
+     * to
+     * style
+     * heading
+     * labels
      *
-     * @param label label to style
+     * @param label       label
+     *                    to
+     *                    style
+     * @param tooltipText
      */
-    private void styleLabel(Label label) {
+    private void styleLabel(Label label, String tooltipText) {
         label.setStyle("-fx-padding: 5px");
         label.setAlignment(Pos.CENTER);
+        label.setTooltip(new Tooltip(tooltipText));
         AnchorPane.setTopAnchor(label, 0.0);
         AnchorPane.setLeftAnchor(label, 0.0);
         AnchorPane.setBottomAnchor(label, 0.0);
