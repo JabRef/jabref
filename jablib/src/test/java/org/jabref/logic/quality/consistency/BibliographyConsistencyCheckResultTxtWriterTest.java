@@ -228,23 +228,23 @@ class BibliographyConsistencyCheckResultTxtWriterTest {
             txtWriter.writeFindings();
         }
         assertEquals("""
-Field Presence Consistency Check Result
+                Field Presence Consistency Check Result
 
-| entry type    | citation key | Location | Pages | Publisher |
-| ------------- | ------------ | -------- | ----- | --------- |
-| Article       | first        | -        | o     | -         |
-| Article       | second       | -        | -     | ?         |
-| InProceedings | fifth        | -        | -     | -         |
-| InProceedings | fourth       | -        | -     | o         |
-| InProceedings | third        | o        | o     | -         |
+                | entry type    | citation key | Location | Pages | Publisher |
+                | ------------- | ------------ | -------- | ----- | --------- |
+                | Article       | first        | -        | o     | -         |
+                | Article       | second       | -        | -     | ?         |
+                | InProceedings | fifth        | -        | -     | -         |
+                | InProceedings | fourth       | -        | -     | o         |
+                | InProceedings | third        | o        | o     | -         |
 
-| Symbol | Meaning                   |
-| ------ | ------------------------- |
-| x      | required field is present |
-| o      | optional field is present |
-| ?      | unknown field is present  |
-| -      | field is absent           |
-""", Files.readString(txtFile).replace("\r\n", "\n"));
+                | Symbol | Meaning                   |
+                | ------ | ------------------------- |
+                | x      | required field is present |
+                | o      | optional field is present |
+                | ?      | unknown field is present  |
+                | -      | field is absent           |
+                """, Files.readString(txtFile).replace("\r\n", "\n"));
     }
 
     @Test
