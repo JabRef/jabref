@@ -10,5 +10,4 @@ module org.jabref.jabls.cli {
     requires jul.to.slf4j;
 
     requires info.picocli;
-
 }

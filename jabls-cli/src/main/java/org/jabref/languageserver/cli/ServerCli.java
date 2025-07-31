@@ -16,9 +16,6 @@ import picocli.CommandLine;
 public class ServerCli implements Callable<Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerCli.class);
 
-    /**
-     * Starts a languageserver<br>
-     */
     public static void main(final String[] args) throws InterruptedException {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();

@@ -1,17 +1,14 @@
 package org.jabref.languageserver;
 
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.integrity.IntegrityCheck;
-import org.jabref.logic.integrity.IntegrityMessage;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 
 import org.eclipse.lsp4j.CompletionItem;
 import org.eclipse.lsp4j.CompletionList;
@@ -56,11 +53,12 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     @Override
     public void didClose(DidCloseTextDocumentParams params) {
-        client.publishDiagnostics(new PublishDiagnosticsParams(params.getTextDocument().getUri(), new ArrayList<>()));
+        client.publishDiagnostics(new PublishDiagnosticsParams(params.getTextDocument().getUri(), List.of()));
     }
 
     @Override
-    public void didSave(DidSaveTextDocumentParams params) { }
+    public void didSave(DidSaveTextDocumentParams params) {
+    }
 
     @Override
     public CompletableFuture<Either<List<CompletionItem>, CompletionList>> completion(CompletionParams position) {
@@ -90,20 +88,16 @@ public class BibtexTextDocumentService implements TextDocumentService {
                 true
         );
 
-        List<Diagnostic> diagnostics = new ArrayList<>();
-
-        for (BibEntry entry : bibDatabaseContext.getEntries()) {
-            List<IntegrityMessage> messages = integrityCheck.checkEntry(entry);
-            for (IntegrityMessage message : messages) {
-                diagnostics.add(new Diagnostic(
-                        // works because the whole bibtex file gets parsed on every change
-                        findTextRange(content, entry.getParsedSerialization()),
-                        message.message(),
-                        DiagnosticSeverity.Warning,
-                        "JabRef"
-                ));
-            }
-        }
+        List<Diagnostic> diagnostics = bibDatabaseContext.getEntries().stream()
+                                                         .flatMap(entry -> integrityCheck.checkEntry(entry).stream()
+                                                                                         .map(message -> new Diagnostic(
+                                                                                                 findTextRange(content, entry.getParsedSerialization()),
+                                                                                                 message.message(),
+                                                                                                 DiagnosticSeverity.Warning,
+                                                                                                 "JabRef"
+                                                                                         ))
+                                                         )
+                                                         .toList();
 
         client.publishDiagnostics(new PublishDiagnosticsParams(uri, diagnostics, version));
     }

@@ -25,8 +25,8 @@ public class LSPServer implements LanguageServer, LanguageClientAware {
     private static final Logger LOGGER = LoggerFactory.getLogger(LSPServer.class);
 
     private LanguageClient client;
-    private WorkspaceService workspaceService;
-    private TextDocumentService textDocumentService;
+    private BibtexWorkspaceService workspaceService;
+    private BibtexTextDocumentService textDocumentService;
     private int exitCode = 1;
 
     public LSPServer(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
@@ -72,8 +72,8 @@ public class LSPServer implements LanguageServer, LanguageClientAware {
     @Override
     public void connect(LanguageClient client) {
         this.client = client;
-        ((BibtexWorkspaceService) workspaceService).setClient(client);
-        ((BibtexTextDocumentService) textDocumentService).setClient(client);
+        workspaceService.setClient(client);
+        textDocumentService.setClient(client);
         client.logMessage(new MessageParams(MessageType.Warning, "BibtexLSPServer connected."));
     }
 }

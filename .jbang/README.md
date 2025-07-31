@@ -51,3 +51,17 @@ With `gg.cmd`:
 ```terminal
 sh ./gg.cmd jbang jabsrv@jabref --help
 ```
+
+## Running JabLs
+
+If you have JBang installed, just run following command
+
+```terminal
+jbang jabls@jabref --help
+```
+
+With `gg.cmd`:
+
+```terminal
+sh ./gg.cmd jbang jabls@jabref --help
+```
