@@ -3,14 +3,12 @@ package org.jabref.gui.walkthrough;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.scene.Node;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
@@ -19,6 +17,7 @@ import javafx.stage.Stage;
 
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
+import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTable;
@@ -101,51 +100,25 @@ public class WalkthroughAction extends SimpleCommand {
 
     private NavigationPredicate createFetchFulltextNavigationPredicate() {
         return (node, beforeNavigate, onNavigate) -> {
-            LinkedFilesEditor linkedFilesEditor = null;
-            if (node instanceof LinkedFilesEditor) {
-                linkedFilesEditor = (LinkedFilesEditor) node;
-            } else {
-                Node current = node;
-                while (current != null && !(current instanceof LinkedFilesEditor)) {
-                    current = current.getParent();
-                }
-                if (current != null) {
-                    linkedFilesEditor = (LinkedFilesEditor) current;
-                }
+            if (!(node instanceof LinkedFilesEditor linkedFilesEditor)) {
+                throw new IllegalArgumentException("Node must be an instance of LinkedFilesEditor");
             }
 
-            if (linkedFilesEditor != null) {
-                // Try to access the viewModel through reflection or find another way
-                // For now, we'll use a simple timeout-based approach
-                // In a real implementation, we would need access to the viewModel's fulltextLookupInProgress property
+            LinkedFilesEditorViewModel viewModel = linkedFilesEditor.getViewModel();
+            AtomicBoolean hasTriggered = new AtomicBoolean(false);
 
-                // Use a scheduled check to detect when fulltext lookup is finished
-                AtomicBoolean hasTriggered = new AtomicBoolean(false);
-                ScheduledFuture<?> scheduledFuture = NavigationPredicate.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> {
-                    // Check if there's no progress indicator visible (indicating completion)
-                    Node progressIndicator = node.lookup(".progress-indicator");
-                    if (progressIndicator == null || !progressIndicator.isVisible()) {
-                        // Wait a bit more to ensure the operation is truly complete
-                        NavigationPredicate.SCHEDULED_EXECUTOR.schedule(() -> {
-                            if (hasTriggered.compareAndSet(false, true)) {
-                                Platform.runLater(() -> {
-                                    beforeNavigate.run();
-                                    onNavigate.run();
-                                });
-                            }
-                        }, 500, TimeUnit.MILLISECONDS);
-                    }
-                }, 1000, 500, TimeUnit.MILLISECONDS);
-
-                return () -> {
-                    if (!scheduledFuture.isDone()) {
-                        scheduledFuture.cancel(true);
-                    }
-                };
-            }
-
-            return () -> {
+            ChangeListener<Boolean> fulltextListener = (_, _, inProgress) -> {
+                if (!inProgress && hasTriggered.compareAndSet(false, true)) {
+                    Platform.runLater(() -> {
+                        beforeNavigate.run();
+                        onNavigate.run();
+                    });
+                }
             };
+
+            viewModel.fulltextLookupInProgressProperty().addListener(fulltextListener);
+
+            return () -> viewModel.fulltextLookupInProgressProperty().removeListener(fulltextListener);
         };
     }
 
@@ -313,7 +286,9 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step17 = WalkthroughStep
                 .tooltip(Localization.lang("Confirm URL download"))
                 .content(new TextBlock(Localization.lang("Click \"OK\" to start downloading the PDF from the entered URL.")))
-                .resolver(scene -> Optional.ofNullable(scene.getRoot() instanceof DialogPane pane ? pane.lookupButton(ButtonType.OK) : null))
+                .resolver(scene -> NodeResolver.predicate(DialogPane.class::isInstance)
+                                               .resolve(scene)
+                                               .map(node -> node instanceof DialogPane pane ? pane.lookupButton(ButtonType.OK) : null))
                 .navigation(NavigationPredicate.onClick())
                 .activeWindow(WindowResolver.not(stage))
                 .highlight(pdfDialogEffect)
