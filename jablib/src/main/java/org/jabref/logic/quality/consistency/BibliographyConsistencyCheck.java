@@ -29,8 +29,6 @@ import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
 
-import org.jetbrains.annotations.VisibleForTesting;
-
 public class BibliographyConsistencyCheck {
 
     private static final Set<EntryType> BIBLATEX_TYPES = BiblatexEntryTypeDefinitions.ALL.stream()
