@@ -42,10 +42,10 @@ public class BibliographyConsistencyCheck {
             .collect(Collectors.toSet());
 
     private static final Set<Field> EXPLICITLY_EXCLUDED_FIELDS = Set.of(
+            InternalField.KEY_FIELD, // Citation key
             StandardField.KEY,
             StandardField.COMMENT,
             StandardField.CROSSREF,
-            StandardField.GROUPS,
             StandardField.CITES,
             StandardField.PDF,
             StandardField.REVIEW,
@@ -53,12 +53,14 @@ public class BibliographyConsistencyCheck {
             StandardField.SORTNAME,
             StandardField.TYPE,
             StandardField.XREF,
+
+            // JabRef-specific
+            StandardField.GROUPS,
             StandardField.OWNER,
-            StandardField.CITATIONCOUNT, // JabRef-specific
+            StandardField.CITATIONCOUNT,
             StandardField.TIMESTAMP,
             StandardField.CREATIONDATE,
-            StandardField.MODIFICATIONDATE,
-            InternalField.KEY_FIELD // Citation key
+            StandardField.MODIFICATIONDATE
     );
 
     private static Set<Field> filterExcludedFields(Collection<Field> fields) {
