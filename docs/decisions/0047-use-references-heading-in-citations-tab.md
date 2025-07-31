@@ -3,8 +3,8 @@ nav_order: 47
 parent: Decision Records
 status: accepted
 date: 2025-07-31
- decision-makers: "@ryan-carpenter, @ThiloteE, @SiedlerChr, @callixtus, @koppor"
- ---
+decision-makers: "@ryan-carpenter, @ThiloteE, @SiedlerChr, @callixtus, @koppor"
+---
 <!-- markdownlint-disable-next-line MD025 -->
 # Use References Headings in Citations Tab
 
