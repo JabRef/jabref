@@ -104,11 +104,11 @@ public class BibtexTextDocumentService implements TextDocumentService {
 
     private static Range findTextRange(String content, String searchText) {
         int startOffset = content.indexOf(searchText);
-        if (startOffset != -1) {
-            int endOffset = startOffset + searchText.length();
-            return new Range(offsetToPosition(content, startOffset), offsetToPosition(content, endOffset));
+        if (startOffset == -1) {
+            return new Range(new Position(0, 0), new Position(0, 0));
         }
-        return new Range(new Position(0, 0), new Position(0, 0));
+        int endOffset = startOffset + searchText.length();
+        return new Range(offsetToPosition(content, startOffset), offsetToPosition(content, endOffset));
     }
 
     private static Position offsetToPosition(String content, int offset) {
