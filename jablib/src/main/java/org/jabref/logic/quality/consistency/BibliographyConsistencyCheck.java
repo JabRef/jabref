@@ -191,7 +191,6 @@ public class BibliographyConsistencyCheck {
         Set<EntryType> typeSet = switch (mode) {
             case BIBLATEX -> BIBLATEX_TYPES;
             case BIBTEX -> BIBTEX_TYPES;
-            default -> Set.of();
         };
 
         for (BibEntry entry : entries) {
