@@ -1,6 +1,7 @@
 package org.jabref.logic.quality.consistency;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -9,6 +10,7 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.field.UnknownField;
@@ -213,5 +215,51 @@ class BibliographyConsistencyCheckTest {
                 .check(bibContext, (_, _) -> { });
 
         assertEquals(Map.of(), result.entryTypeToResultMap());
+    }
+
+    @Test
+    void checkFieldEntriesWithFieldDifferences() {
+        Set<BibEntry> entries = new HashSet<>();
+        Set<Field> differingFields = Set.of(
+                StandardField.TITLE,
+                StandardField.PAGES,
+                new UnknownField("customField"),
+                StandardField.PUBLISHER
+        );
+
+        BibEntry entry1 = new BibEntry(StandardEntryType.Article, "id1")
+                .withField(StandardField.AUTHOR, "Autore Uno")
+                .withField(StandardField.TITLE, "Titolo Articolo")
+                .withField(StandardField.PAGES, "1-10");
+
+        BibEntry entry2 = new BibEntry(StandardEntryType.Article, "id2")
+                .withField(StandardField.AUTHOR, "Autore Due");
+
+        BibEntry entry3 = new BibEntry(StandardEntryType.Article, "id3")
+                .withField(StandardField.AUTHOR, "Autore Tre")
+                .withField(new UnknownField("customField"), "valore custom");
+
+        BibEntry entry4 = new BibEntry(StandardEntryType.Article, "id4")
+                .withField(StandardField.AUTHOR, "Autore Quattro")
+                .withField(StandardField.PDF, "file.pdf");
+
+        BibEntry entry5 = new BibEntry(StandardEntryType.Article, "id5")
+                .withField(StandardField.AUTHOR, "Autore Cinque")
+                .withField(StandardField.PUBLISHER, "Editore");
+
+        entries.add(entry1);
+        entries.add(entry2);
+        entries.add(entry3);
+        entries.add(entry4);
+        entries.add(entry5);
+
+        Set<Field> fieldsInAllEntries = Set.of(StandardField.AUTHOR);
+
+        BibliographyConsistencyCheck check = new BibliographyConsistencyCheck();
+
+        List<BibEntry> result = check.filterEntriesWithFieldDifferences(entries, differingFields, fieldsInAllEntries);
+        List<BibEntry> expected = List.of(entry1, entry2, entry3, entry4, entry5);
+
+        assertEquals(Set.copyOf(expected), Set.copyOf(result));
     }
 }

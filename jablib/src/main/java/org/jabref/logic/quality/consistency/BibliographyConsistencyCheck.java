@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SequencedCollection;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -27,6 +28,8 @@ import org.jabref.model.entry.field.UserSpecificCommentField;
 import org.jabref.model.entry.types.BiblatexEntryTypeDefinitions;
 import org.jabref.model.entry.types.BibtexEntryTypeDefinitions;
 import org.jabref.model.entry.types.EntryType;
+
+import org.jetbrains.annotations.VisibleForTesting;
 
 public class BibliographyConsistencyCheck {
 
@@ -63,7 +66,15 @@ public class BibliographyConsistencyCheck {
                      .collect(Collectors.toSet());
     }
 
-    private static List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
+    /**
+     *
+     * @param entries entries to analyze
+     * @param differingFields fields that are present in some entries but not in all
+     * @param fieldsInAllEntries fields that are present in all entries
+     * @return a list of entries that present at least one of the differing fields
+     */
+    @VisibleForTesting
+    List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
         for (Field field : differingFields) {
             if (!fieldsInAllEntries.contains(field)) {
                 return new ArrayList<>(entries);
@@ -120,23 +131,30 @@ public class BibliographyConsistencyCheck {
             EntryType entryType = mapEntry.getKey();
             Set<Field> fieldsInAnyEntry = mapEntry.getValue();
             Set<Field> fieldsInAllEntries = entryTypeToFieldsInAllEntriesMap.get(entryType);
+            Set<Field> filteredFieldsInAnyEntry = filterExcludedFields(fieldsInAnyEntry);
+            Set<Field> filteredFieldsInAllEntries = filterExcludedFields(fieldsInAllEntries);
+
+            Set<Field> differingFields = new LinkedHashSet<>(filteredFieldsInAnyEntry);
+            differingFields.removeAll(filteredFieldsInAllEntries);
             assert fieldsInAllEntries != null;
-            Set<Field> differingFields = new LinkedHashSet<>(fieldsInAnyEntry);
+
             differingFields.removeAll(fieldsInAllEntries);
 
-            BibEntryType typeDef = entryTypeDefinitions.stream()
-                    .filter(def -> def.getType().equals(entryType))
-                    .findFirst().orElse(null);
-            if (typeDef == null) {
-                continue;
-            }
+            Optional<BibEntryType> typeDefOpt = entryTypeDefinitions.stream()
+                                                                 .filter(def -> def.getType().equals(entryType))
+                                                                 .findFirst();
 
-            Set<Field> requiredFields = typeDef.getRequiredFields().stream()
-                    .flatMap(orFields -> orFields.getFields().stream())
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<Field> requiredFields = new LinkedHashSet<>();
+            typeDefOpt.ifPresent(typeDef -> {
+                requiredFields.addAll(
+                        typeDef.getRequiredFields().stream()
+                               .flatMap(orFields -> orFields.getFields().stream())
+                               .collect(Collectors.toSet())
+                );
+            });
 
             for (Field req : requiredFields) {
-                if (fieldsInAnyEntry.contains(req) && !fieldsInAllEntries.contains(req)) {
+                if (filteredFieldsInAnyEntry.contains(req) && !filteredFieldsInAllEntries.contains(req)) {
                     differingFields.add(req);
                 }
             }
