@@ -98,7 +98,7 @@ class BibEntryWriterTest {
                 .withField(StandardField.AUTHOR, "  two spaces before and after  ")
                 .withChanged(true);
 
-        BibEntry original = (BibEntry) entry.clone();
+        BibEntry original = new BibEntry(entry);
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 

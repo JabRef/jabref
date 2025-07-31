@@ -143,6 +143,11 @@
     -fx-stroke: -jr-gray-3;
 }
 
+.code-area {
+    -fx-background-color: -jr-background-alt;
+    -fx-text-fill: -fx-mid-text-color;
+}
+
 .code-area .lineno {
     -fx-background-color: -jr-background-alt;
     -fx-text-fill: -fx-mid-text-color;

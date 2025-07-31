@@ -484,7 +484,7 @@ public class BibDatabase {
         if (inPlace) {
             resultingEntry = entry;
         } else {
-            resultingEntry = (BibEntry) entry.clone();
+            resultingEntry = new BibEntry(entry);
         }
 
         for (Map.Entry<Field, String> field : resultingEntry.getFieldMap().entrySet()) {

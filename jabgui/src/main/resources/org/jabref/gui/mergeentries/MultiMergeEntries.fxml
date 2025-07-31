@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.jabref.gui.mergeentries.MultiMergeEntriesView"
+            fx:controller="org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView"
             prefHeight="500.0" prefWidth="800.0"
             id="multiMergeEntries">
 

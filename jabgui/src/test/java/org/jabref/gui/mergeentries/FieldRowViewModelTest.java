@@ -2,8 +2,8 @@ package org.jabref.gui.mergeentries;
 
 import java.util.Optional;
 
-import org.jabref.gui.mergeentries.newmergedialog.FieldRowViewModel;
-import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.FieldMergerFactory;
+import org.jabref.gui.mergeentries.threewaymerge.FieldRowViewModel;
+import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.FieldMergerFactory;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryPreferences;
 import org.jabref.model.entry.Month;
