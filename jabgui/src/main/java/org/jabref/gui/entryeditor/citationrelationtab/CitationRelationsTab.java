@@ -152,7 +152,7 @@ public class CitationRelationsTab extends EntryEditorTab {
         // Create Heading Lab
         Label citingLabel = new Label(Localization.lang("References (cites)"));
         styleLabel(citingLabel, Localization.lang("Works cited by the work at hand"));
-        Label citedByLabel = new Label(Localization.lang("Citations (this paper is cited by)"));
+        Label citedByLabel = new Label(Localization.lang("Citations (cited by)"));
         styleLabel(citedByLabel, Localization.lang("Works citing the work at hand"));
 
         // Create ListViews
