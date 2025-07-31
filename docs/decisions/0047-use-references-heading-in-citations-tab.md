@@ -94,7 +94,7 @@ Tooltip: Works citing the work at hand
 
 ## "References" and "Cited by"
 
-Example: https://dblp.org/rec/conf/zeus/VoigtKW21.html
+Example: <https://dblp.org/rec/conf/zeus/VoigtKW21.html>
 
 * Good, because used by DBLP
 * Good, because "Cited by" is easy to understand.
