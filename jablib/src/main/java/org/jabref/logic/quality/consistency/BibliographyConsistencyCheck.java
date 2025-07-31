@@ -73,7 +73,6 @@ public class BibliographyConsistencyCheck {
      * @param fieldsInAllEntries fields that are present in all entries
      * @return a list of entries that present at least one of the differing fields
      */
-    @VisibleForTesting
     List<BibEntry> filterEntriesWithFieldDifferences(Set<BibEntry> entries, Set<Field> differingFields, Set<Field> fieldsInAllEntries) {
         for (Field field : differingFields) {
             if (!fieldsInAllEntries.contains(field)) {
