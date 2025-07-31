@@ -15,22 +15,20 @@ import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public record TooltipStep(
-        @NonNull String title,
-        @NonNull List<WalkthroughRichTextBlock> content,
-        @NonNull NodeResolver resolverValue,
-        @Nullable String continueButtonTextValue,
-        @Nullable String skipButtonTextValue,
-        @Nullable String backButtonTextValue,
-        @Nullable NavigationPredicate navigationPredicateValue,
-        @NonNull TooltipPosition position,
-        @Nullable Double widthValue,
-        @Nullable Double heightValue,
-        @Nullable WalkthroughEffect highlightValue,
-        @Nullable WindowResolver activeWindowResolverValue,
-        boolean showQuitButtonValue,
-        @NonNull QuitButtonPosition quitButtonPositionValue
-) implements VisibleWalkthroughStep {
+public record TooltipStep(@NonNull String title,
+                          @NonNull List<WalkthroughRichTextBlock> content,
+                          @NonNull NodeResolver resolverValue,
+                          @Nullable String continueButtonTextValue,
+                          @Nullable String skipButtonTextValue,
+                          @Nullable String backButtonTextValue,
+                          @Nullable NavigationPredicate navigationPredicateValue,
+                          @NonNull TooltipPosition position,
+                          @Nullable Double widthValue,
+                          @Nullable Double heightValue,
+                          @Nullable WalkthroughEffect highlightValue,
+                          @Nullable WindowResolver activeWindowResolverValue,
+                          boolean showQuitButtonValue,
+                          @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleWalkthroughStep {
     public static final double DEFAULT_WIDTH = 384;
 
     @Override

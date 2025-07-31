@@ -75,26 +75,26 @@ public class WalkthroughAction extends SimpleCommand {
         return (node, beforeNavigate, onNavigate) -> {
             ListView<?> listView = (ListView<?>) node.lookup("#listView");
 
-            if (listView != null) {
-                ListChangeListener<Object> listener = change -> {
-                    while (change.next()) {
-                        if (change.wasAdded() && !change.getAddedSubList().isEmpty()) {
-                            beforeNavigate.run();
-                            onNavigate.run();
-                            break;
-                        }
-                    }
+            if (listView == null) {
+                return () -> {
                 };
-
-                @SuppressWarnings("unchecked")
-                ObservableList<Object> items = (ObservableList<Object>) listView.getItems();
-                items.addListener(listener);
-
-                return () -> items.removeListener(listener);
             }
 
-            return () -> {
+            ListChangeListener<Object> listener = change -> {
+                while (change.next()) {
+                    if (change.wasAdded() && !change.getAddedSubList().isEmpty()) {
+                        beforeNavigate.run();
+                        onNavigate.run();
+                        break;
+                    }
+                }
             };
+
+            @SuppressWarnings("unchecked")
+            ObservableList<Object> items = (ObservableList<Object>) listView.getItems();
+            items.addListener(listener);
+
+            return () -> items.removeListener(listener);
         };
     }
 

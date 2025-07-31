@@ -184,12 +184,10 @@ public interface NavigationPredicate {
     /// @param eventTypes     the event types to patch
     /// @return the decorated event dispatcher
     @SafeVarargs
-    private static @NonNull EventDispatcher getPatchedDispatcher(
-            Runnable beforeNavigate,
-            Runnable onNavigate,
-            Node node,
-            EventType<? extends Event>... eventTypes
-    ) {
+    private static @NonNull EventDispatcher getPatchedDispatcher(Runnable beforeNavigate,
+                                                                 Runnable onNavigate,
+                                                                 Node node,
+                                                                 EventType<? extends Event>... eventTypes) {
         EventDispatcher dispatcher = node.getEventDispatcher();
         Set<EventType<? extends Event>> eventTypeSet = Set.of(eventTypes);
         return new EventDispatcher() {
@@ -223,11 +221,7 @@ public interface NavigationPredicate {
     ///                       timeout, or window change
     /// @param handler        the original event handler
     /// @return the decorated event handler
-    private static @NonNull <T extends Event> EventHandler<T> getPatchedEventHandler(
-            Runnable beforeNavigate,
-            Runnable onNavigate,
-            @Nullable EventHandler<? super T> handler
-    ) {
+    private static @NonNull <T extends Event> EventHandler<T> getPatchedEventHandler(Runnable beforeNavigate, Runnable onNavigate, @Nullable EventHandler<? super T> handler) {
         return event -> patched(
                 beforeNavigate,
                 onNavigate,

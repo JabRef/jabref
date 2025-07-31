@@ -37,11 +37,7 @@ public class WalkthroughHighlighter {
     /// @param scene          The primary scene to apply the highlight to.
     /// @param fallbackTarget The fallback target node to use if no highlight
     ///                       configuration is provided.
-    public synchronized void applyHighlight(
-            @Nullable WalkthroughEffect config,
-            @NonNull Scene scene,
-            @Nullable Node fallbackTarget
-    ) {
+    public synchronized void applyHighlight(@Nullable WalkthroughEffect config, @NonNull Scene scene, @Nullable Node fallbackTarget) {
         Map<Window, EffectState> newEffects = computeNewEffects(config, scene, fallbackTarget);
 
         Map<Window, EffectState> toUpdate = new HashMap<>();
@@ -102,11 +98,7 @@ public class WalkthroughHighlighter {
         currentEffects.clear();
     }
 
-    private Map<Window, EffectState> computeNewEffects(
-            @Nullable WalkthroughEffect config,
-            @NonNull Scene fallbackWindow,
-            @Nullable Node fallbackTarget
-    ) {
+    private Map<Window, EffectState> computeNewEffects(@Nullable WalkthroughEffect config, @NonNull Scene fallbackWindow, @Nullable Node fallbackTarget) {
         Map<Window, EffectState> newEffects = new HashMap<>();
 
         if (config == null) {
@@ -138,13 +130,11 @@ public class WalkthroughHighlighter {
         return newEffects;
     }
 
-    private void diffEffects(
-            Map<Window, EffectState> current,
-            Map<Window, EffectState> desired,
-            Map<Window, EffectState> toUpdate,
-            Map<Window, EffectState> toCreate,
-            Map<Window, EffectState> toRemove
-    ) {
+    private void diffEffects(Map<Window, EffectState> current,
+                             Map<Window, EffectState> desired,
+                             Map<Window, EffectState> toUpdate,
+                             Map<Window, EffectState> toCreate,
+                             Map<Window, EffectState> toRemove) {
         current.forEach((window, currentState) -> {
             EffectState desiredState = desired.get(window);
             if (desiredState == null) {

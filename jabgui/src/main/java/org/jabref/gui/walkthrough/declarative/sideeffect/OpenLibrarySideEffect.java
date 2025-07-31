@@ -9,7 +9,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.walkthrough.Walkthrough;
@@ -38,11 +37,11 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
     private final StateManager stateManager;
     private @Nullable LibraryTab createdTab;
 
-    public OpenLibrarySideEffect(JabRefFrame frame) {
+    public OpenLibrarySideEffect(LibraryTabContainer frame) {
         this(frame, "Chocolate.bib");
     }
 
-    public OpenLibrarySideEffect(JabRefFrame frame, String libraryName) {
+    public OpenLibrarySideEffect(LibraryTabContainer frame, String libraryName) {
         this.tabContainer = frame;
         this.stateManager = Injector.instantiateModelOrService(StateManager.class);
         this.libraryName = libraryName;

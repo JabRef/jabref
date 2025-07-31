@@ -113,7 +113,7 @@ public class WalkthroughOverlay {
             case VisibleWalkthroughStep visibleStep ->
                     visibleStep.activeWindowResolver()
                                .ifPresentOrElse(
-                                       resolver -> resolveWindow(visibleStep, resolver),
+                                       resolver -> attemptWindowResolution(visibleStep, resolver),
                                        () -> handleWindowResolved(visibleStep, stage));
         }
     }
@@ -199,7 +199,7 @@ public class WalkthroughOverlay {
         resolvedNode = null;
     }
 
-    private void resolveWindow(VisibleWalkthroughStep step, WindowResolver resolver) {
+    private void attemptWindowResolution(VisibleWalkthroughStep step, WindowResolver resolver) {
         startTimeout(() -> {
             if (resolvedWindow == null) {
                 LOGGER.warn("Timeout reached while waiting for window resolution for step '{}'. Reverting.", step.title());
@@ -217,7 +217,7 @@ public class WalkthroughOverlay {
                     LOGGER.debug("Window for step '{}' not found. Listening for new windows.", step.title());
                     AtomicBoolean windowResolved = new AtomicBoolean(false);
 
-                    Runnable processWindowChange = WalkthroughUtils.retryableOnce(
+                    Runnable tryResolveAndProceed = WalkthroughUtils.retryableOnce(
                             () -> {
                                 resolver.resolve().ifPresent(newWindow -> {
                                     LOGGER.debug("Dynamically resolved window for step '{}'", step.title());
@@ -239,7 +239,7 @@ public class WalkthroughOverlay {
                     windowListListener = change -> {
                         while (change.next()) {
                             if (change.wasAdded()) {
-                                processWindowChange.run();
+                                tryResolveAndProceed.run();
                             }
                         }
                     };
@@ -261,11 +261,11 @@ public class WalkthroughOverlay {
 
         step.resolver()
             .ifPresentOrElse(
-                    resolver -> resolveNode(step, window, resolver),
+                    resolver -> attemptNodeResolution(step, window, resolver),
                     () -> handleNodeResolved(step, window, null));
     }
 
-    private void resolveNode(VisibleWalkthroughStep step, Window window, NodeResolver resolver) {
+    private void attemptNodeResolution(VisibleWalkthroughStep step, Window window, NodeResolver resolver) {
         startTimeout(() -> {
             if (resolvedNode == null) {
                 LOGGER.warn("Timeout reached while waiting for node resolution for step '{}'. Reverting.", step.title());

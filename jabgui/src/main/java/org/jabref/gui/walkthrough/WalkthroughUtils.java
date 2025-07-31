@@ -1,5 +1,6 @@
 package org.jabref.gui.walkthrough;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
@@ -26,10 +27,11 @@ public class WalkthroughUtils {
     ///
     /// @param runnable the runnable to execute once
     /// @return a runnable that will only execute the original runnable once
-    public static Runnable once(Runnable runnable) {
-        AtomicBoolean executed = new AtomicBoolean(false);
+   public static Runnable once(Runnable runnable) {
+        CountDownLatch latch = new CountDownLatch(1);
         return () -> {
-            if (executed.compareAndSet(false, true)) {
+            if (latch.getCount() > 0) {
+                latch.countDown();
                 runnable.run();
             }
         };
