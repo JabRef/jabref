@@ -524,8 +524,6 @@ extraJavaModuleInfo {
     module("org.wiremock:wiremock", "wiremock") {
         exportAllPackages()
 
-        requires("org.apache.httpcomponents.client5.httpclient5")
-        requires("org.apache.commons.lang3")
         requires("com.fasterxml.jackson.core")
         requires("com.fasterxml.jackson.databind")
         requires("com.fasterxml.jackson.datatype.jsr310")
@@ -533,6 +531,9 @@ extraJavaModuleInfo {
         requires("commons.fileupload")
         requires("java.xml")
         requires("json.path")
+        requires("org.apache.httpcomponents.client5.httpclient5")
+        requires("org.apache.commons.lang3")
+        requires("org.apache.commons.text")
         requires("org.custommonkey.xmlunit")
         requires("org.eclipse.jetty.server")
         requires("org.eclipse.jetty.servlet")
