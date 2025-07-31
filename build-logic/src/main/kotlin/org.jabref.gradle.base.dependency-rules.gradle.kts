@@ -525,6 +525,7 @@ extraJavaModuleInfo {
         exportAllPackages()
 
         requires("org.apache.httpcomponents.client5.httpclient5")
+        requires("org.apache.commons.lang3")
         requires("com.fasterxml.jackson.core")
         requires("com.fasterxml.jackson.databind")
         requires("com.fasterxml.jackson.datatype.jsr310")
