@@ -49,8 +49,10 @@ Tooltip left: Also called "backward citations"
 
 Tooltrip right: Also called "forward citations"
 
-* Good, because no confusion regarding "References" and "Citations"
-* Good, because left and right cite are different
+Regarding "cited in {citationkey}" or "cited by {citationkey}", either would do, but I am going on the theory that user-x thinks of {citationkey} as the paper, so the most natural cognitive process is that the references are cited by the authors in the paper.
+
+* Good, because no confusion regarding "References" and "Citations".
+* Good, because left and right cite are different on purpose to create contrast.
 
 ## "backward (cites)" and "forward (cited by)"
 
