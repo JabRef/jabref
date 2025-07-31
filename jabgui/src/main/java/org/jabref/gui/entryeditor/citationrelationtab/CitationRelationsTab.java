@@ -370,16 +370,10 @@ public class CitationRelationsTab extends EntryEditorTab {
     }
 
     /**
-     * Method
-     * to
-     * style
-     * heading
-     * labels
+     * Method to style heading labels
      *
-     * @param label       label
-     *                    to
-     *                    style
-     * @param tooltipText
+     * @param label       label to style
+     * @param tooltipText tooltip text
      */
     private void styleLabel(Label label, String tooltipText) {
         label.setStyle("-fx-padding: 5px");
