@@ -27,6 +27,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Window;
 
 import org.jabref.gui.frame.MainMenu;
+import org.jabref.gui.walkthrough.WalkthroughUtils;
 
 import com.sun.javafx.scene.control.ContextMenuContent;
 import org.jspecify.annotations.NonNull;
@@ -48,8 +49,8 @@ public interface NavigationPredicate {
 
     static NavigationPredicate onClick() {
         return (node, beforeNavigate, onNavigate) -> {
-            Runnable beforeNavigateOnce = once(beforeNavigate);
-            Runnable onNavigateOnce = once(onNavigate);
+            Runnable beforeNavigateOnce = WalkthroughUtils.once(beforeNavigate);
+            Runnable onNavigateOnce = WalkthroughUtils.once(onNavigate);
 
             EventDispatcher dispatcher = node.getEventDispatcher();
             node.setEventDispatcher(getPatchedDispatcher(beforeNavigateOnce, onNavigateOnce, node,
@@ -76,8 +77,8 @@ public interface NavigationPredicate {
 
     static NavigationPredicate onHover() {
         return (node, beforeNavigate, onNavigate) -> {
-            Runnable beforeNavigateOnce = once(beforeNavigate);
-            Runnable onNavigateOnce = once(onNavigate);
+            Runnable beforeNavigateOnce = WalkthroughUtils.once(beforeNavigate);
+            Runnable onNavigateOnce = WalkthroughUtils.once(onNavigate);
 
             EventHandler<? super MouseEvent> onEnter = node.getOnMouseEntered();
             node.setOnMouseEntered(getPatchedEventHandler(beforeNavigateOnce, onNavigateOnce, onEnter));
@@ -93,8 +94,8 @@ public interface NavigationPredicate {
 
     static NavigationPredicate onTextInput() {
         return (node, beforeNavigate, onNavigate) -> {
-            Runnable beforeNavigateOnce = once(beforeNavigate);
-            Runnable onNavigateOnce = once(onNavigate);
+            Runnable beforeNavigateOnce = WalkthroughUtils.once(beforeNavigate);
+            Runnable onNavigateOnce = WalkthroughUtils.once(onNavigate);
 
             if (node instanceof TextInputControl textInput) {
                 ChangeListener<String> listener = (_, _, newText) -> {
@@ -113,8 +114,8 @@ public interface NavigationPredicate {
     static NavigationPredicate onDoubleClick() {
         return (node, beforeNavigate, onNavigate) -> {
             EventHandler<? super MouseEvent> onMouseClicked = node.getOnMouseClicked();
-            Runnable beforeNavigateOnce = once(beforeNavigate);
-            Runnable onNavigateOnce = once(onNavigate);
+            Runnable beforeNavigateOnce = WalkthroughUtils.once(beforeNavigate);
+            Runnable onNavigateOnce = WalkthroughUtils.once(onNavigate);
 
             if (onMouseClicked != null) {
                 node.setOnMouseClicked(event -> {
@@ -239,15 +240,6 @@ public interface NavigationPredicate {
                     return null;
                 }
         );
-    }
-
-    private static Runnable once(Runnable runnable) {
-        AtomicBoolean executed = new AtomicBoolean(false);
-        return () -> {
-            if (executed.compareAndSet(false, true)) {
-                runnable.run();
-            }
-        };
     }
 
     private static @NonNull <T> T patched(Runnable before, Runnable after, Supplier<T> between) {

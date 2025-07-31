@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 
+import org.jabref.gui.walkthrough.WalkthroughUtils;
+
 import com.sun.javafx.scene.TreeShowingProperty;
 import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
@@ -17,9 +19,12 @@ import org.jspecify.annotations.NonNull;
 /// Base class for walkthrough effects [BackdropHighlight], [FullScreenDarken], and
 /// [PulseAnimateIndicator].
 public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScreenDarken, PulseAnimateIndicator {
+    private static final long LAYOUT_DEBOUNCE_MS = 50;
+    
     protected final Pane pane;
     protected final List<Subscription> subscriptions = new ArrayList<>();
     private ChangeListener<Number> windowSizeListener;
+    private final Runnable debouncedUpdateLayout;
 
     /// Constructor for WalkthroughEffect. No scene graph modification is done here. The
     /// effect is not attached to the pane until [BaseWindowEffect#initializeEffect] is
@@ -30,6 +35,7 @@ public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScr
     ///             [Window#getScene()] and [Scene#getRoot()]
     protected BaseWindowEffect(@NonNull Pane pane) {
         this.pane = pane;
+        this.debouncedUpdateLayout = WalkthroughUtils.debounced(this::updateLayout, LAYOUT_DEBOUNCE_MS);
         setupPaneListeners();
     }
 
@@ -61,14 +67,14 @@ public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScr
     }
 
     protected void setupListeners(@NonNull Node node) {
-        subscriptions.add(EasyBind.subscribe(node.localToSceneTransformProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(node.boundsInLocalProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(new TreeShowingProperty(node), _ -> this.updateLayout()));
+        subscriptions.add(EasyBind.subscribe(node.localToSceneTransformProperty(), _ -> debouncedUpdateLayout.run()));
+        subscriptions.add(EasyBind.subscribe(node.boundsInLocalProperty(), _ -> debouncedUpdateLayout.run()));
+        subscriptions.add(EasyBind.subscribe(new TreeShowingProperty(node), _ -> debouncedUpdateLayout.run()));
 
         Scene scene = node.getScene();
         if (scene != null) {
-            subscriptions.add(EasyBind.subscribe(scene.widthProperty(), _ -> this.updateLayout()));
-            subscriptions.add(EasyBind.subscribe(scene.heightProperty(), _ -> this.updateLayout()));
+            subscriptions.add(EasyBind.subscribe(scene.widthProperty(), _ -> debouncedUpdateLayout.run()));
+            subscriptions.add(EasyBind.subscribe(scene.heightProperty(), _ -> debouncedUpdateLayout.run()));
 
             setupWindowListeners(scene.getWindow());
         }
@@ -78,22 +84,22 @@ public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScr
                 cleanupWindowListeners();
             }
             if (newScene != null) {
-                subscriptions.add(EasyBind.subscribe(newScene.widthProperty(), _ -> this.updateLayout()));
-                subscriptions.add(EasyBind.subscribe(newScene.heightProperty(), _ -> this.updateLayout()));
+                subscriptions.add(EasyBind.subscribe(newScene.widthProperty(), _ -> debouncedUpdateLayout.run()));
+                subscriptions.add(EasyBind.subscribe(newScene.heightProperty(), _ -> debouncedUpdateLayout.run()));
                 setupWindowListeners(newScene.getWindow());
             }
         });
     }
 
     private void setupPaneListeners() {
-        subscriptions.add(EasyBind.subscribe(pane.widthProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(pane.heightProperty(), _ -> this.updateLayout()));
-        subscriptions.add(EasyBind.subscribe(pane.layoutBoundsProperty(), _ -> this.updateLayout()));
+        subscriptions.add(EasyBind.subscribe(pane.widthProperty(), _ -> debouncedUpdateLayout.run()));
+        subscriptions.add(EasyBind.subscribe(pane.heightProperty(), _ -> debouncedUpdateLayout.run()));
+        subscriptions.add(EasyBind.subscribe(pane.layoutBoundsProperty(), _ -> debouncedUpdateLayout.run()));
     }
 
     private void setupWindowListeners(Window window) {
         if (window != null) {
-            windowSizeListener = (_, _, _) -> this.updateLayout();
+            windowSizeListener = (_, _, _) -> debouncedUpdateLayout.run();
             window.widthProperty().addListener(windowSizeListener);
             window.heightProperty().addListener(windowSizeListener);
             window.xProperty().addListener(windowSizeListener);

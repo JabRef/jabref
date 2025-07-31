@@ -26,7 +26,7 @@ public final class BackdropHighlight extends BaseWindowEffect {
     private Rectangle backdrop;
     private Rectangle hole;
     private Rectangle animatedHole;
-    private @Nullable Shape overlayShape;
+    private volatile @Nullable Shape overlayShape;
     private @Nullable Runnable onClickHandler;
     private @Nullable Timeline transitionAnimation;
 
@@ -34,7 +34,7 @@ public final class BackdropHighlight extends BaseWindowEffect {
         super(pane);
     }
 
-    public void attach(@NonNull Node node) {
+    public synchronized void attach(@NonNull Node node) {
         if (overlayShape == null) {
             initializeEffect();
         }
@@ -48,7 +48,7 @@ public final class BackdropHighlight extends BaseWindowEffect {
         updateLayout();
     }
 
-    public void transitionTo(@NonNull Node newNode) {
+    public synchronized void transitionTo(@NonNull Node newNode) {
         if (overlayShape == null || !overlayShape.isVisible()) {
             attach(newNode);
             return;
@@ -116,15 +116,16 @@ public final class BackdropHighlight extends BaseWindowEffect {
         this.backdrop = new Rectangle();
         this.hole = new Rectangle();
         this.animatedHole = new Rectangle();
-        this.overlayShape = Shape.subtract(backdrop, hole);
-        this.overlayShape.setFill(OVERLAY_COLOR);
-        this.overlayShape.setVisible(false);
+        Shape shape = Shape.subtract(backdrop, hole);
+        shape.setFill(OVERLAY_COLOR);
+        shape.setVisible(false);
+        overlayShape = shape;
 
         getOrAddToPane();
     }
 
     @Override
-    protected void updateLayout() {
+    protected synchronized void updateLayout() {
         if (WalkthroughUtils.cannotPositionNode(node)) {
             hideEffect();
             return;
@@ -163,7 +164,7 @@ public final class BackdropHighlight extends BaseWindowEffect {
         }
     }
 
-    private void updateOverlayShape() {
+    private synchronized void updateOverlayShape() {
         Shape oldOverlayShape = this.overlayShape;
         int oldIndex = getOrAddToPane();
 
@@ -172,17 +173,18 @@ public final class BackdropHighlight extends BaseWindowEffect {
             this.pane.getChildren().remove(oldIndex);
         }
 
-        this.overlayShape = Shape.subtract(backdrop, animatedHole);
-        this.overlayShape.setFill(OVERLAY_COLOR);
-        this.overlayShape.setVisible(true);
+        Shape shape = Shape.subtract(backdrop, animatedHole);
+        shape.setFill(OVERLAY_COLOR);
+        shape.setVisible(true);
 
         if (onClickHandler != null) {
-            this.overlayShape.setOnMouseClicked(this::handleClick);
-            this.overlayShape.setMouseTransparent(false);
+            shape.setOnMouseClicked(this::handleClick);
+            shape.setMouseTransparent(false);
         } else {
-            this.overlayShape.setMouseTransparent(true);
+            shape.setMouseTransparent(true);
         }
 
+        this.overlayShape = shape;
         this.pane.getChildren().add(oldIndex, this.overlayShape);
     }
 

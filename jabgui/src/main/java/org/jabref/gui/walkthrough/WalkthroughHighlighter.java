@@ -34,15 +34,15 @@ public class WalkthroughHighlighter {
     ///
     /// @param config         The highlight configuration to apply. Default to
     ///                       BackdropHighlight on the primary windows if null.
-    /// @param fallbackWindow The primary scene to apply the highlight to.
+    /// @param scene          The primary scene to apply the highlight to.
     /// @param fallbackTarget The fallback target node to use if no highlight
     ///                       configuration is provided.
-    public void applyHighlight(
+    public synchronized void applyHighlight(
             @Nullable WalkthroughEffect config,
-            @NonNull Scene fallbackWindow,
+            @NonNull Scene scene,
             @Nullable Node fallbackTarget
     ) {
-        Map<Window, EffectState> newEffects = computeNewEffects(config, fallbackWindow, fallbackTarget);
+        Map<Window, EffectState> newEffects = computeNewEffects(config, scene, fallbackTarget);
 
         Map<Window, EffectState> toUpdate = new HashMap<>();
         Map<Window, EffectState> toCreate = new HashMap<>();

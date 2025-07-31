@@ -10,8 +10,14 @@ import javafx.animation.PauseTransition;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TreeView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Duration;
@@ -58,6 +64,11 @@ public class WalkthroughOverlay {
     private @Nullable ChangeListener<Boolean> windowShowingListener;
     /// Listener for reverting when node visibility changes
     private @Nullable ChangeListener<Boolean> nodeVisibleListener;
+
+    /// Map of scrollable parents to their bounds change listeners
+    private final Map<Node, ChangeListener<Bounds>> parentBoundsListeners = new HashMap<>();
+    /// Flag to prevent concurrent scroll operations
+    private final AtomicBoolean isScrolling = new AtomicBoolean(false);
 
     private @Nullable Window resolvedWindow;
     private @Nullable Node resolvedNode;
@@ -182,6 +193,8 @@ public class WalkthroughOverlay {
             }
         }
 
+        cleanUpScrollableParentListeners();
+
         resolvedWindow = null;
         resolvedNode = null;
     }
@@ -202,28 +215,31 @@ public class WalkthroughOverlay {
                 },
                 () -> {
                     LOGGER.debug("Window for step '{}' not found. Listening for new windows.", step.title());
-                    AtomicBoolean noExecution = new AtomicBoolean(false);
+                    AtomicBoolean windowResolved = new AtomicBoolean(false);
+
+                    Runnable processWindowChange = WalkthroughUtils.retryableOnce(
+                            () -> {
+                                resolver.resolve().ifPresent(newWindow -> {
+                                    LOGGER.debug("Dynamically resolved window for step '{}'", step.title());
+                                    cancelTimeout();
+                                    if (windowListListener != null) {
+                                        Window.getWindows().removeListener(windowListListener);
+                                        windowListListener = null;
+                                    }
+                                    windowResolved.set(true);
+                                    handleWindowResolved(step, newWindow);
+                                });
+                                if (!windowResolved.get()) {
+                                    LOGGER.debug("Still no window found for step '{}', continuing to listen for new windows.", step.title());
+                                }
+                            },
+                            windowResolved::get
+                    );
+
                     windowListListener = change -> {
-                        if (!noExecution.compareAndSet(false, true)) {
-                            return; // No concurrent resolutions
-                        }
                         while (change.next()) {
                             if (change.wasAdded()) {
-                                resolver.resolve().ifPresentOrElse(
-                                        newWindow -> {
-                                            LOGGER.debug("Dynamically resolved window for step '{}'", step.title());
-                                            cancelTimeout();
-                                            if (windowListListener != null) {
-                                                Window.getWindows().removeListener(windowListListener);
-                                                windowListListener = null;
-                                            }
-                                            handleWindowResolved(step, newWindow);
-                                        },
-                                        () -> {
-                                            LOGGER.debug("Still no window found for step '{}', continuing to listen for new windows.", step.title());
-                                            noExecution.set(false); // Reset for next execution
-                                        }
-                                );
+                                processWindowChange.run();
                             }
                         }
                     };
@@ -265,24 +281,27 @@ public class WalkthroughOverlay {
         }
 
         LOGGER.debug("Scene for step '{}' not ready. Listening for scene.", step.title());
-        AtomicBoolean noExecution = new AtomicBoolean(false);
-        sceneListener = (_, _, newScene) -> {
-            if (!noExecution.compareAndSet(false, true)) {
-                return; // No concurrent resolutions
-            }
+        AtomicBoolean sceneResolved = new AtomicBoolean(false);
 
-            if (newScene == null) {
-                LOGGER.debug("Scene for step '{}' is still null, continuing to listen for scene changes.", step.title());
-                noExecution.set(false); // Reset for next execution
-                return;
-            }
+        Runnable processSceneChange = WalkthroughUtils.retryableOnce(
+                () -> {
+                    Scene currentScene = window.getScene();
+                    if (currentScene == null) {
+                        LOGGER.debug("Scene for step '{}' is still null, continuing to listen for scene changes.", step.title());
+                        return;
+                    }
 
-            if (sceneListener != null) {
-                window.sceneProperty().removeListener(sceneListener);
-                sceneListener = null;
-            }
-            attemptNodeResolutionOnScene(step, window, newScene, resolver);
-        };
+                    if (sceneListener != null) {
+                        window.sceneProperty().removeListener(sceneListener);
+                        sceneListener = null;
+                    }
+                    sceneResolved.set(true);
+                    attemptNodeResolutionOnScene(step, window, currentScene, resolver);
+                },
+                sceneResolved::get
+        );
+
+        sceneListener = (_, _, newScene) -> processSceneChange.run();
         window.sceneProperty().addListener(sceneListener);
     }
 
@@ -291,28 +310,30 @@ public class WalkthroughOverlay {
                 .ifPresentOrElse(
                         node -> handleNodeResolved(step, window, node),
                         () -> {
-                            LOGGER.debug("Node for step '{}' not found. Listening for scene changes.", step.title());
-                            AtomicBoolean noExecution = new AtomicBoolean(false);
+                            AtomicBoolean nodeFound = new AtomicBoolean(false);
 
-                            InvalidationListener childrenListener = _ -> {
-                                if (!noExecution.compareAndSet(false, true)) {
-                                    return; // No concurrent resolutions
-                                }
+                            Runnable attemptNodeResolution = WalkthroughUtils.retryableOnce(
+                                    () -> {
+                                        resolver.resolve(scene).ifPresentOrElse(
+                                                foundNode -> {
+                                                    LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
+                                                    nodeFound.set(true);
+                                                    detachChildrenListener();
+                                                    handleNodeResolved(step, window, foundNode);
+                                                },
+                                                () -> {
+                                                    LOGGER.debug("Node still not found for step '{}', continuing to listen for changes.", step.title());
+                                                });
+                                    },
+                                    () -> nodeFound.get()
+                            );
 
-                                resolver.resolve(scene).ifPresentOrElse(
-                                        foundNode -> {
-                                            LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
-                                            detachChildrenListener();
-                                            handleNodeResolved(step, window, foundNode);
-                                            // No need to reset noExecution. Block all further executions.
-                                        },
-                                        () -> {
-                                            LOGGER.debug("Node still not found for step '{}', continuing to listen for changes.", step.title());
-                                            noExecution.set(false); // Reset for next execution
-                                        });
-                            };
+                            InvalidationListener debouncedChildrenListener = WalkthroughUtils.debounced(
+                                    _ -> attemptNodeResolution.run(),
+                                    100
+                            ); // Debounce node resolution attempts by 100ms
 
-                            recursiveChildrenListener = new RecursiveChildrenListener(childrenListener);
+                            recursiveChildrenListener = new RecursiveChildrenListener(debouncedChildrenListener);
                             recursiveChildrenListener.attachToScene(scene);
                         });
     }
@@ -339,6 +360,9 @@ public class WalkthroughOverlay {
             }
         };
         node.visibleProperty().addListener(nodeVisibleListener);
+
+        setupScrollableParentMonitoring(node);
+
         display(step, window, node);
     }
 
@@ -368,6 +392,243 @@ public class WalkthroughOverlay {
         if (resolvedNode != null && nodeVisibleListener != null) {
             resolvedNode.visibleProperty().removeListener(nodeVisibleListener);
             nodeVisibleListener = null;
+        }
+    }
+
+    /// Cleans up all scrollable parent listeners
+    private void cleanUpScrollableParentListeners() {
+        LOGGER.debug("Cleaning up {} scrollable parent listeners", parentBoundsListeners.size());
+        parentBoundsListeners.forEach((parent, listener) -> {
+            parent.boundsInParentProperty().removeListener(listener);
+        });
+        parentBoundsListeners.clear();
+        isScrolling.set(false);
+    }
+
+    /// Sets up scrollable parent monitoring for the resolved node
+    private void setupScrollableParentMonitoring(@NonNull Node node) {
+        LOGGER.debug("Setting up scrollable parent monitoring for node: {}", node.getClass().getSimpleName());
+
+        List<Node> scrollableParents = findScrollableParents(node);
+        LOGGER.debug("Found {} scrollable parents", scrollableParents.size());
+
+        scrollNodeIntoView(node, scrollableParents);
+
+        for (Node parent : scrollableParents) {
+            ChangeListener<Bounds> boundsListener = (_, _, _) -> {
+                if (!isScrolling.compareAndSet(false, true)) {
+                    return; // Prevent concurrent scroll operations
+                }
+                try {
+                    // Check if node is still valid and attached to scene
+                    if (node.getScene() != null && parent.getScene() != null) {
+                        scrollNodeIntoView(node, List.of(parent));
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug("Error during bounds change scroll: {}", e.getMessage());
+                } finally {
+                    isScrolling.set(false);
+                }
+            };
+
+            parent.boundsInParentProperty().addListener(boundsListener);
+            parentBoundsListeners.put(parent, boundsListener);
+        }
+    }
+
+    private List<Node> findScrollableParents(@NonNull Node node) {
+        List<Node> scrollableParents = new ArrayList<>();
+        Parent parent = node.getParent();
+
+        while (parent != null) {
+            if (isScrollable(parent)) {
+                scrollableParents.add(parent);
+            }
+            parent = parent.getParent();
+        }
+
+        return scrollableParents;
+    }
+
+    private boolean isScrollable(@NonNull Node node) {
+        return node instanceof ScrollPane ||
+                node instanceof ListView<?> ||
+                node instanceof TableView<?> ||
+                node instanceof TreeView<?>;
+    }
+
+    private void scrollNodeIntoView(@NonNull Node targetNode, @NonNull List<Node> scrollableParents) {
+        for (Node scrollableParent : scrollableParents) {
+            scrollNodeIntoViewForParent(targetNode, scrollableParent);
+        }
+    }
+
+    private void scrollNodeIntoViewForParent(@NonNull Node targetNode, @NonNull Node scrollableParent) {
+        try {
+            // Ensure both nodes are still attached to scenes
+            if (targetNode.getScene() == null || scrollableParent.getScene() == null) {
+                return;
+            }
+
+            Bounds targetBounds = targetNode.localToScene(targetNode.getBoundsInLocal());
+            Bounds parentBounds = scrollableParent.localToScene(scrollableParent.getBoundsInLocal());
+
+            if (targetBounds == null || parentBounds == null) {
+                return;
+            }
+
+            switch (scrollableParent) {
+                case ScrollPane scrollPane ->
+                        scrollIntoScrollPane(scrollPane, targetBounds, parentBounds);
+                case ListView<?> listView -> scrollIntoListView(targetNode, listView);
+                case TableView<?> tableView ->
+                        scrollIntoTableView(targetNode, tableView);
+                case TreeView<?> treeView -> scrollIntoTreeView(targetNode, treeView);
+                default ->
+                        LOGGER.debug("Unsupported scrollable type: {}", scrollableParent.getClass().getSimpleName());
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Failed to scroll node into view: {}", e.getMessage());
+        }
+    }
+
+    private void scrollIntoScrollPane(@NonNull ScrollPane scrollPane, @NonNull Bounds targetBounds, @NonNull Bounds parentBounds) {
+        Node content = scrollPane.getContent();
+        if (content == null) {
+            return;
+        }
+
+        Bounds contentBounds = content.getBoundsInLocal();
+        double viewportWidth = scrollPane.getViewportBounds().getWidth();
+        double viewportHeight = scrollPane.getViewportBounds().getHeight();
+
+        if (contentBounds.getWidth() <= viewportWidth && contentBounds.getHeight() <= viewportHeight) {
+            return; // No scrolling needed if content fits in viewport
+        }
+
+        // Convert target bounds to content coordinate system
+        Bounds targetInContent = content.sceneToLocal(targetBounds);
+        if (targetInContent == null) {
+            return;
+        }
+
+        double targetCenterX = targetInContent.getCenterX();
+        double targetCenterY = targetInContent.getCenterY();
+
+        // Calculate scroll values to center the target in the viewport
+        double hValue = 0;
+        double vValue = 0;
+
+        if (contentBounds.getWidth() > viewportWidth) {
+            double maxScrollX = contentBounds.getWidth() - viewportWidth;
+            double desiredScrollX = targetCenterX - (viewportWidth / 2);
+            hValue = Math.max(0, Math.min(1, desiredScrollX / maxScrollX));
+        }
+
+        if (contentBounds.getHeight() > viewportHeight) {
+            double maxScrollY = contentBounds.getHeight() - viewportHeight;
+            double desiredScrollY = targetCenterY - (viewportHeight / 2);
+            vValue = Math.max(0, Math.min(1, desiredScrollY / maxScrollY));
+        }
+
+        scrollPane.setHvalue(hValue);
+        scrollPane.setVvalue(vValue);
+        LOGGER.debug("Scrolled in ScrollPane to center target: h={}, v={}", hValue, vValue);
+    }
+
+    private void scrollIntoListView(@NonNull Node targetNode, @NonNull ListView<?> listView) {
+        try {
+            Bounds listBounds = listView.getBoundsInLocal();
+            Bounds targetBounds = listView.sceneToLocal(targetNode.localToScene(targetNode.getBoundsInLocal()));
+
+            if (targetBounds == null || listBounds.contains(targetBounds)) {
+                return; // Already visible
+            }
+
+            // Estimate which item should be centered based on target position
+            double itemHeight = listView.getFixedCellSize();
+            if (itemHeight <= 0) {
+                // Fallback: estimate based on list height and item count
+                int itemCount = listView.getItems().size();
+                if (itemCount > 0) {
+                    itemHeight = listBounds.getHeight() / Math.min(itemCount, 10); // Estimate
+                }
+            }
+
+            if (itemHeight > 0) {
+                double targetCenterY = targetBounds.getCenterY();
+                int estimatedIndex = (int) Math.max(0, Math.min(listView.getItems().size() - 1,
+                        targetCenterY / itemHeight));
+
+                listView.scrollTo(estimatedIndex);
+                LOGGER.debug("Scrolled ListView to estimated index: {}", estimatedIndex);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not scroll ListView: {}", e.getMessage());
+        }
+    }
+
+    private void scrollIntoTableView(@NonNull Node targetNode, @NonNull TableView<?> tableView) {
+        try {
+            Bounds tableBounds = tableView.getBoundsInLocal();
+            Bounds targetBounds = tableView.sceneToLocal(targetNode.localToScene(targetNode.getBoundsInLocal()));
+
+            if (targetBounds == null || tableBounds.contains(targetBounds)) {
+                return; // Already visible
+            }
+
+            // Estimate which row should be centered based on target position
+            double rowHeight = tableView.getFixedCellSize();
+            if (rowHeight <= 0) {
+                // Fallback: estimate based on table height and item count
+                int itemCount = tableView.getItems().size();
+                if (itemCount > 0) {
+                    rowHeight = tableBounds.getHeight() / Math.min(itemCount, 10); // Estimate
+                }
+            }
+
+            if (rowHeight > 0) {
+                double targetCenterY = targetBounds.getCenterY();
+                int estimatedIndex = (int) Math.max(0, Math.min(tableView.getItems().size() - 1,
+                        targetCenterY / rowHeight));
+
+                tableView.scrollTo(estimatedIndex);
+                LOGGER.debug("Scrolled TableView to estimated index: {}", estimatedIndex);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not scroll TableView: {}", e.getMessage());
+        }
+    }
+
+    private void scrollIntoTreeView(@NonNull Node targetNode, @NonNull TreeView<?> treeView) {
+        try {
+            Bounds treeBounds = treeView.getBoundsInLocal();
+            Bounds targetBounds = treeView.sceneToLocal(targetNode.localToScene(targetNode.getBoundsInLocal()));
+
+            if (targetBounds == null || treeBounds.contains(targetBounds)) {
+                return; // Already visible
+            }
+
+            // Estimate which row should be centered based on target position
+            double rowHeight = treeView.getFixedCellSize();
+            if (rowHeight <= 0) {
+                // Fallback: estimate based on tree height and expanded row count
+                int rowCount = treeView.getExpandedItemCount();
+                if (rowCount > 0) {
+                    rowHeight = treeBounds.getHeight() / Math.min(rowCount, 10); // Estimate
+                }
+            }
+
+            if (rowHeight > 0) {
+                double targetCenterY = targetBounds.getCenterY();
+                int estimatedIndex = (int) Math.max(0, Math.min(treeView.getExpandedItemCount() - 1,
+                        targetCenterY / rowHeight));
+
+                treeView.scrollTo(estimatedIndex);
+                LOGGER.debug("Scrolled TreeView to estimated index: {}", estimatedIndex);
+            }
+        } catch (Exception e) {
+            LOGGER.debug("Could not scroll TreeView: {}", e.getMessage());
         }
     }
 
