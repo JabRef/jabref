@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javafx.animation.AnimationTimer;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.geometry.Insets;
@@ -30,7 +31,6 @@ import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.VisibleWalkthroughStep;
 
 import com.airhacks.afterburner.injection.Injector;
-import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.PopOver;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -43,6 +43,7 @@ class WindowOverlay {
     private final WalkthroughPane pane;
     private final WalkthroughRenderer renderer;
     private final Walkthrough walkthrough;
+    /// Mutable list of clean up tasks that are executed when the overlay is hidden or detached.
     private final List<Runnable> cleanupTasks = new ArrayList<>();
     private final KeyBindingRepository keyBindingRepository;
     private final StateManager stateManager;
@@ -97,27 +98,45 @@ class WindowOverlay {
             return;
         }
 
-        PopOver popover = createPopover(step, beforeNavigate);
-        cleanupTasks.add(popover::hide);
+        final AtomicReference<PopOver> popOverRef = new AtomicReference<>();
+        popOverRef.set(createPopover(step, beforeNavigate));
         addQuitButton(step);
-        popover.show(node);
 
-        AtomicReference<PopOver> currentPopover = new AtomicReference<>(popover);
+        AnimationTimer timer = new AnimationTimer() {
+            private boolean isInternallyHidden = false;
 
-        cleanupTasks.add(EasyBind.subscribe(popover.showingProperty(), showing -> {
-            if (!showing && !WalkthroughUtils.cannotPositionNode(node)) {
-                currentPopover.get().hide();
-                PopOver newPopover = createPopover(step, beforeNavigate); // Show the original PopOver usually lead to "cannot open closed window" exception
-                currentPopover.set(newPopover);
-                cleanupTasks.add(newPopover::hide);
-                cleanupTasks.add(EasyBind.subscribe(newPopover.showingProperty(), newPopoverShowing -> {
-                    if (newPopoverShowing) {
-                        WalkthroughUtils.cannotPositionNode(node);
+            @Override
+            public void handle(long now) {
+                PopOver currentPopOver = popOverRef.get();
+                boolean canPositionNode = !WalkthroughUtils.cannotPositionNode(node);
+
+                if (canPositionNode) {
+                    if (!currentPopOver.isShowing() && !isInternallyHidden) {
+                        // PopOver was hidden externally, or node is now ready. Recreate and show.
+                        currentPopOver.hide();
+                        PopOver newPopOver = createPopover(step, beforeNavigate);
+                        popOverRef.set(newPopOver);
+                        newPopOver.show(node);
                     }
-                })::unsubscribe);
-                newPopover.show(node);
+                    isInternallyHidden = false;
+                } else {
+                    if (currentPopOver.isShowing()) {
+                        currentPopOver.hide();
+                        isInternallyHidden = true;
+                    }
+                }
             }
-        })::unsubscribe);
+        };
+
+        if (!WalkthroughUtils.cannotPositionNode(node)) {
+            popOverRef.get().show(node);
+        } else {
+            popOverRef.get().hide();
+        }
+
+        timer.start();
+        cleanupTasks.add(timer::stop);
+        cleanupTasks.add(() -> popOverRef.get().hide());
 
         step.navigation().ifPresent(predicate ->
                 cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));

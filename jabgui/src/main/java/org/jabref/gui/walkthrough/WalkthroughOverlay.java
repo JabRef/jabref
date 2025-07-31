@@ -154,7 +154,7 @@ public class WalkthroughOverlay {
         boolean shouldQuit = dialogService.showConfirmationDialogAndWait(
                 Localization.lang("Quit walkthrough"),
                 Localization.lang("Are you sure you want to quit the walkthrough?"),
-                Localization.lang("Quit"),
+                Localization.lang("Quit walkthrough"),
                 Localization.lang("Continue walkthrough")
         );
 
@@ -301,7 +301,7 @@ public class WalkthroughOverlay {
                 sceneResolved::get
         );
 
-        sceneListener = (_, _, newScene) -> processSceneChange.run();
+        sceneListener = (_, _, _) -> processSceneChange.run();
         window.sceneProperty().addListener(sceneListener);
     }
 
@@ -313,19 +313,15 @@ public class WalkthroughOverlay {
                             AtomicBoolean nodeFound = new AtomicBoolean(false);
 
                             Runnable attemptNodeResolution = WalkthroughUtils.retryableOnce(
-                                    () -> {
-                                        resolver.resolve(scene).ifPresentOrElse(
-                                                foundNode -> {
-                                                    LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
-                                                    nodeFound.set(true);
-                                                    detachChildrenListener();
-                                                    handleNodeResolved(step, window, foundNode);
-                                                },
-                                                () -> {
-                                                    LOGGER.debug("Node still not found for step '{}', continuing to listen for changes.", step.title());
-                                                });
-                                    },
-                                    () -> nodeFound.get()
+                                    () -> resolver.resolve(scene).ifPresentOrElse(
+                                            foundNode -> {
+                                                LOGGER.debug("Node found via childrenListener for step '{}'", step.title());
+                                                nodeFound.set(true);
+                                                detachChildrenListener();
+                                                handleNodeResolved(step, window, foundNode);
+                                            },
+                                            () -> LOGGER.debug("Node still not found for step '{}', continuing to listen for changes.", step.title())),
+                                    nodeFound::get
                             );
 
                             InvalidationListener debouncedChildrenListener = WalkthroughUtils.debounced(
@@ -395,17 +391,13 @@ public class WalkthroughOverlay {
         }
     }
 
-    /// Cleans up all scrollable parent listeners
     private void cleanUpScrollableParentListeners() {
         LOGGER.debug("Cleaning up {} scrollable parent listeners", parentBoundsListeners.size());
-        parentBoundsListeners.forEach((parent, listener) -> {
-            parent.boundsInParentProperty().removeListener(listener);
-        });
+        parentBoundsListeners.forEach((parent, listener) -> parent.boundsInParentProperty().removeListener(listener));
         parentBoundsListeners.clear();
         isScrolling.set(false);
     }
 
-    /// Sets up scrollable parent monitoring for the resolved node
     private void setupScrollableParentMonitoring(@NonNull Node node) {
         LOGGER.debug("Setting up scrollable parent monitoring for node: {}", node.getClass().getSimpleName());
 
@@ -479,7 +471,7 @@ public class WalkthroughOverlay {
 
             switch (scrollableParent) {
                 case ScrollPane scrollPane ->
-                        scrollIntoScrollPane(scrollPane, targetBounds, parentBounds);
+                        scrollIntoScrollPane(scrollPane, targetBounds);
                 case ListView<?> listView -> scrollIntoListView(targetNode, listView);
                 case TableView<?> tableView ->
                         scrollIntoTableView(targetNode, tableView);
@@ -492,7 +484,7 @@ public class WalkthroughOverlay {
         }
     }
 
-    private void scrollIntoScrollPane(@NonNull ScrollPane scrollPane, @NonNull Bounds targetBounds, @NonNull Bounds parentBounds) {
+    private void scrollIntoScrollPane(@NonNull ScrollPane scrollPane, @NonNull Bounds targetBounds) {
         Node content = scrollPane.getContent();
         if (content == null) {
             return;
@@ -542,13 +534,11 @@ public class WalkthroughOverlay {
             Bounds targetBounds = listView.sceneToLocal(targetNode.localToScene(targetNode.getBoundsInLocal()));
 
             if (targetBounds == null || listBounds.contains(targetBounds)) {
-                return; // Already visible
+                return;
             }
 
-            // Estimate which item should be centered based on target position
             double itemHeight = listView.getFixedCellSize();
             if (itemHeight <= 0) {
-                // Fallback: estimate based on list height and item count
                 int itemCount = listView.getItems().size();
                 if (itemCount > 0) {
                     itemHeight = listBounds.getHeight() / Math.min(itemCount, 10); // Estimate
@@ -574,13 +564,11 @@ public class WalkthroughOverlay {
             Bounds targetBounds = tableView.sceneToLocal(targetNode.localToScene(targetNode.getBoundsInLocal()));
 
             if (targetBounds == null || tableBounds.contains(targetBounds)) {
-                return; // Already visible
+                return;
             }
 
-            // Estimate which row should be centered based on target position
             double rowHeight = tableView.getFixedCellSize();
             if (rowHeight <= 0) {
-                // Fallback: estimate based on table height and item count
                 int itemCount = tableView.getItems().size();
                 if (itemCount > 0) {
                     rowHeight = tableBounds.getHeight() / Math.min(itemCount, 10); // Estimate

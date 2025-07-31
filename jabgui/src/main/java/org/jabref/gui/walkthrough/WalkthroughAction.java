@@ -11,7 +11,9 @@ import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
@@ -311,7 +313,7 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step17 = WalkthroughStep
                 .tooltip(Localization.lang("Confirm URL download"))
                 .content(new TextBlock(Localization.lang("Click \"OK\" to start downloading the PDF from the entered URL.")))
-                .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("OK").equals(text)))
+                .resolver(scene -> Optional.ofNullable(scene.getRoot() instanceof DialogPane pane ? pane.lookupButton(ButtonType.OK) : null))
                 .navigation(NavigationPredicate.onClick())
                 .activeWindow(WindowResolver.not(stage))
                 .highlight(pdfDialogEffect)
@@ -385,7 +387,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step5 = WalkthroughStep
-                .tooltip(Localization.lang("Specify the \"Main file directory\" option"))
+                .tooltip(Localization.lang("Specify \"Main file directory\" option"))
                 .resolver(scene -> Optional.ofNullable(scene.lookup("#useMainFileDirectory").getParent()))
                 .position(TooltipPosition.BOTTOM)
                 .highlight(preferenceHighlight)
