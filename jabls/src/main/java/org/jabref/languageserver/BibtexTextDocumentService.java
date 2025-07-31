@@ -28,6 +28,7 @@ import org.eclipse.lsp4j.services.TextDocumentService;
 
 public class BibtexTextDocumentService implements TextDocumentService {
 
+    private static final Range NULL_RANGE = new Range(new Position(0, 0), new Position(0, 0));
     private final CliPreferences jabRefCliPreferences;
     private final JournalAbbreviationRepository abbreviationRepository;
     private LanguageClient client;
@@ -71,7 +72,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
             bibDatabaseContext = new BibtexParser(jabRefCliPreferences.getImportFormatPreferences()).parse(StringReader.of(content)).getDatabaseContext();
         } catch (Exception e) {
             Diagnostic parseDiagnostic = new Diagnostic(
-                    new Range(new Position(0, 0), new Position(0, 1)),
+                    NULL_RANGE,
                     "Parse error: " + e.getMessage(),
                     DiagnosticSeverity.Error,
                     "JabRef"
@@ -105,7 +106,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
     private static Range findTextRange(String content, String searchText) {
         int startOffset = content.indexOf(searchText);
         if (startOffset == -1) {
-            return new Range(new Position(0, 0), new Position(0, 0));
+            return NULL_RANGE;
         }
         int endOffset = startOffset + searchText.length();
         return new Range(offsetToPosition(content, startOffset), offsetToPosition(content, endOffset));
