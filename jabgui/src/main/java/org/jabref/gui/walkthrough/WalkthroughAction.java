@@ -3,9 +3,14 @@ package org.jabref.gui.walkthrough;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
@@ -92,6 +97,56 @@ public class WalkthroughAction extends SimpleCommand {
         };
     }
 
+    private NavigationPredicate createFetchFulltextNavigationPredicate() {
+        return (node, beforeNavigate, onNavigate) -> {
+            LinkedFilesEditor linkedFilesEditor = null;
+            if (node instanceof LinkedFilesEditor) {
+                linkedFilesEditor = (LinkedFilesEditor) node;
+            } else {
+                Node current = node;
+                while (current != null && !(current instanceof LinkedFilesEditor)) {
+                    current = current.getParent();
+                }
+                if (current != null) {
+                    linkedFilesEditor = (LinkedFilesEditor) current;
+                }
+            }
+
+            if (linkedFilesEditor != null) {
+                // Try to access the viewModel through reflection or find another way
+                // For now, we'll use a simple timeout-based approach
+                // In a real implementation, we would need access to the viewModel's fulltextLookupInProgress property
+
+                // Use a scheduled check to detect when fulltext lookup is finished
+                AtomicBoolean hasTriggered = new AtomicBoolean(false);
+                ScheduledFuture<?> scheduledFuture = NavigationPredicate.SCHEDULED_EXECUTOR.scheduleAtFixedRate(() -> {
+                    // Check if there's no progress indicator visible (indicating completion)
+                    Node progressIndicator = node.lookup(".progress-indicator");
+                    if (progressIndicator == null || !progressIndicator.isVisible()) {
+                        // Wait a bit more to ensure the operation is truly complete
+                        NavigationPredicate.SCHEDULED_EXECUTOR.schedule(() -> {
+                            if (hasTriggered.compareAndSet(false, true)) {
+                                Platform.runLater(() -> {
+                                    beforeNavigate.run();
+                                    onNavigate.run();
+                                });
+                            }
+                        }, 500, TimeUnit.MILLISECONDS);
+                    }
+                }, 1000, 500, TimeUnit.MILLISECONDS);
+
+                return () -> {
+                    if (!scheduledFuture.isDone()) {
+                        scheduledFuture.cancel(true);
+                    }
+                };
+            }
+
+            return () -> {
+            };
+        };
+    }
+
     private Walkthrough createPdfLinkWalkthrough() {
         WalkthroughStep step1 = WalkthroughStep.sideEffect(Localization.lang("Open Example Library"))
                                                .sideEffect(new OpenLibrarySideEffect(frame))
@@ -128,7 +183,7 @@ public class WalkthroughAction extends SimpleCommand {
         WalkthroughStep step5 = WalkthroughStep
                 .panel(Localization.lang("PDF file management area"))
                 .content(
-                        new TextBlock(Localization.lang("This is the PDF file management area where you can link files to your bibliography entries. Notice the three buttons on the right side - each offers a different way to add PDF files. Let's explore each method step by step."))
+                        new TextBlock(Localization.lang("This is the PDF file management area where you can link files to your bibliography entries. Notice the three buttons on the right side—each offers a different way to add PDF files. Let's explore each method step by step."))
                 )
                 .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
                 .position(PanelPosition.RIGHT)
@@ -139,6 +194,19 @@ public class WalkthroughAction extends SimpleCommand {
                 .build();
 
         WalkthroughStep step6 = WalkthroughStep
+                .panel(Localization.lang("Drag and drop files"))
+                .content(
+                        new TextBlock(Localization.lang("You can drag and drop PDF files directly onto the file list area. This is often the quickest way to link files that are already on your computer.")),
+                        new InfoBlock(Localization.lang("Try dragging a PDF file here to continue the walkthrough."))
+                )
+                .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
+                .navigation(createFileAddedNavigationPredicate())
+                .position(PanelPosition.RIGHT)
+                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .showQuitButton(false)
+                .build();
+
+        WalkthroughStep step7 = WalkthroughStep
                 .tooltip(Localization.lang("Click \"Add\" to link a file from your computer"))
                 .content(new TextBlock(Localization.lang("Click the \"Add\" button (first button with a plus icon) to link a PDF file that you already have on your computer. This will open a dialog where you can browse and select the file.")))
                 .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.LINKED_FILE_ADD))
@@ -147,25 +215,63 @@ public class WalkthroughAction extends SimpleCommand {
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
                 .build();
 
-        WalkthroughStep step7 = WalkthroughStep
-                .tooltip(Localization.lang("Fill out file information"))
-                .content(new TextBlock(Localization.lang("In this dialog, you can:\n" +
-                        "- **Link**: Browse and select your PDF file\n" +
-                        "- **Description**: Add a meaningful description\n" +
-                        "- **Filetype**: Choose the appropriate file type\n" +
-                        "- **Source URL**: Optionally add the source URL\n" +
-                        "\n" +
-                        "Fill out the information and click \"Add\" to complete, or \"Cancel\" to try another method.")))
+        WalkthroughEffect pdfDialogEffect = new WalkthroughEffect(
+                new WindowEffect(() -> Optional.of(stage), HighlightEffect.FULL_SCREEN_DARKEN),
+                new WindowEffect(HighlightEffect.ANIMATED_PULSE)
+        );
+
+        WalkthroughStep step8 = WalkthroughStep
+                .tooltip(Localization.lang("Browse for your PDF file"))
+                .content(new TextBlock(Localization.lang("Use the \"Browse\" button to select a PDF file from your computer. Click the folder icon next to the \"Link\" field to open the file browser.")))
+                .resolver(NodeResolver.fxId("browse"))
+                .navigation(NavigationPredicate.onClick())
+                .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
+                .showQuitButton(false)
+                .highlight(pdfDialogEffect)
+                .build();
+
+        WalkthroughStep step9 = WalkthroughStep
+                .tooltip(Localization.lang("Add a description for the file"))
+                .content(new TextBlock(Localization.lang("Enter a meaningful description for this file in the \"Description\" field. This helps you identify the file later.")))
+                .resolver(NodeResolver.fxId("description"))
+                .navigation(NavigationPredicate.onTextInput())
+                .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
+                .showQuitButton(false)
+                .highlight(pdfDialogEffect)
+                .build();
+
+        WalkthroughStep step10 = WalkthroughStep
+                .tooltip(Localization.lang("Select the file type"))
+                .content(new TextBlock(Localization.lang("Choose the appropriate file type from the \"Filetype\" dropdown. Usually \"PDF\" is the correct choice for research papers.")))
+                .resolver(NodeResolver.fxId("fileType"))
+                .navigation(NavigationPredicate.onClick())
+                .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
+                .showQuitButton(false)
+                .highlight(pdfDialogEffect)
+                .build();
+
+        WalkthroughStep step11 = WalkthroughStep
+                .tooltip(Localization.lang("Optionally add source URL"))
+                .content(new TextBlock(Localization.lang("If you downloaded this file from a website, you can add the source URL in the \"Source URL\" field. This is optional but helpful for tracking where you found the file.")))
+                .resolver(NodeResolver.fxId("sourceUrl"))
+                .navigation(NavigationPredicate.onTextInput())
+                .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
+                .highlight(pdfDialogEffect)
+                .showQuitButton(false)
+
+                .build();
+
+        WalkthroughStep step12 = WalkthroughStep
+                .tooltip(Localization.lang("Complete the file linking"))
+                .content(new TextBlock(Localization.lang("Now click \"Add\" to complete the file linking process, or \"Cancel\" to try another method.")))
                 .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("Add").equals(text)))
                 .navigation(NavigationPredicate.onClick())
                 .activeWindow(WindowResolver.title(Localization.lang("Add file link")))
-                .highlight(new WalkthroughEffect(
-                        new WindowEffect(() -> Optional.of(stage), HighlightEffect.FULL_SCREEN_DARKEN),
-                        new WindowEffect(HighlightEffect.ANIMATED_PULSE)
-                ))
+                .highlight(pdfDialogEffect)
+                .showQuitButton(false)
                 .build();
 
-        WalkthroughStep step8 = WalkthroughStep
+        WalkthroughStep step13 = WalkthroughStep
                 .tooltip(Localization.lang("Click \"Get fulltext\" to find PDFs automatically"))
                 .content(new TextBlock(Localization.lang("Click the \"Get fulltext\" button (second button with a download icon) to let JabRef automatically search for and download the PDF using online fetchers. This works when your entry has proper metadata like DOI or title.")))
                 .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.FETCH_FULLTEXT))
@@ -174,30 +280,44 @@ public class WalkthroughAction extends SimpleCommand {
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
                 .build();
 
-        WalkthroughStep step9 = WalkthroughStep
+        WalkthroughStep step14 = WalkthroughStep
+                .tooltip(Localization.lang("Wait for fulltext search to complete"))
+                .content(new TextBlock(Localization.lang("JabRef is now searching for the full text of this paper using various online sources. Please wait for the search to complete.")))
+                .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
+                .navigation(createFetchFulltextNavigationPredicate())
+                .position(TooltipPosition.LEFT)
+                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .build();
+
+        WalkthroughStep step15 = WalkthroughStep
                 .tooltip(Localization.lang("Click \"Download from URL\" to download from a web link"))
-                .content(new TextBlock(Localization.lang("Click the \"Download from URL\" button (third button with a download icon) to download a PDF directly from a web URL. JabRef will prompt you to enter the URL and then download the file automatically. You can try this URL: https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2")))
+                .content(new TextBlock(Localization.lang("Click the \"Download from URL\" button (third button with a download icon) to download a PDF directly from a web URL. JabRef will prompt you to enter the URL and then download the file automatically.")))
                 .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.DOWNLOAD))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.LEFT)
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
                 .build();
 
-        WalkthroughStep step10 = WalkthroughStep
-                .panel(Localization.lang("Drag and drop files"))
-                .content(
-                        new TextBlock(Localization.lang("Alternative method: You can also drag and drop PDF files directly onto the file list area. This is often the quickest way to link files that are already on your computer.")),
-                        new InfoBlock(Localization.lang("Try any of the above methods to link a PDF file to this entry, then the walkthrough will continue automatically."))
-                )
-                .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
-                .navigation(createFileAddedNavigationPredicate())
-                .position(PanelPosition.RIGHT)
-                .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+        WalkthroughStep step16 = WalkthroughStep
+                .tooltip(Localization.lang("Enter URL for download"))
+                .content(new TextBlock(Localization.lang("Enter the URL of the PDF file you want to download. You can try this example URL: https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2")))
+                .resolver(NodeResolver.selector(".text-input"))
+                .navigation(NavigationPredicate.onTextInput())
+                .activeWindow(WindowResolver.not(stage))
                 .showQuitButton(false)
+                .highlight(pdfDialogEffect)
                 .build();
 
-        WalkthroughStep step11 = WalkthroughStep
+        WalkthroughStep step17 = WalkthroughStep
+                .tooltip(Localization.lang("Confirm URL download"))
+                .content(new TextBlock(Localization.lang("Click \"OK\" to start downloading the PDF from the entered URL.")))
+                .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("OK").equals(text)))
+                .navigation(NavigationPredicate.onClick())
+                .activeWindow(WindowResolver.not(stage))
+                .highlight(pdfDialogEffect)
+                .build();
+
+        WalkthroughStep step18 = WalkthroughStep
                 .panel(Localization.lang("Perfect! PDF file linked successfully"))
                 .content(
                         new TextBlock(Localization.lang("Congratulations! You have successfully linked a PDF file to a bibliography entry. This makes it easy to access your research documents directly from JabRef. You can repeat this process for all your entries.")),
@@ -210,7 +330,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
                 .build();
 
-        return new Walkthrough(step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11);
+        return new Walkthrough(step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, step12, step13, step14, step15, step16, step17, step18);
     }
 
     private Walkthrough createMainFileDirectoryWalkthrough() {

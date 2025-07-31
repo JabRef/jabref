@@ -17,11 +17,8 @@ import org.jabref.gui.walkthrough.WalkthroughUtils;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public final class BackdropHighlight extends BaseWindowEffect {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BackdropHighlight.class);
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
     private static final Duration TRANSITION_DURATION = Duration.millis(300);
 
@@ -129,7 +126,6 @@ public final class BackdropHighlight extends BaseWindowEffect {
     @Override
     protected void updateLayout() {
         if (WalkthroughUtils.cannotPositionNode(node)) {
-            LOGGER.debug("Node \"{}\" cannot be positioned, hiding BackdropHighlight effect", node);
             hideEffect();
             return;
         }
@@ -164,8 +160,6 @@ public final class BackdropHighlight extends BaseWindowEffect {
     protected void hideEffect() {
         if (overlayShape != null) {
             overlayShape.setVisible(false);
-        } else {
-            LOGGER.debug("Overlay shape is null, cannot hide effect");
         }
     }
 

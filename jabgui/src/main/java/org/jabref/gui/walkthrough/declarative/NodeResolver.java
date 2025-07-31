@@ -52,8 +52,9 @@ public interface NodeResolver {
     static NodeResolver buttonWithGraphic(IconTheme.JabRefIcons glyph) {
         return scene -> scene.getRoot().lookupAll(".button").stream()
                              .filter(node -> node instanceof Button button
-                                     && button.getGraphic() instanceof JabRefIconView icon
-                                     && icon.getGlyph() == glyph)
+                                     && Optional.ofNullable(findNode(button.getGraphic(), JabRefIconView.class::isInstance))
+                                                .map(JabRefIconView.class::cast).filter(icon -> icon.getGlyph() == glyph)
+                                                .isPresent())
                              .findFirst();
     }
 

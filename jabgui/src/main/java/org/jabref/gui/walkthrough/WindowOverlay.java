@@ -10,7 +10,6 @@ import javafx.event.EventTarget;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.input.KeyEvent;
@@ -38,11 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /// Manages the overlay for displaying walkthrough steps in a single window.
-public class WindowOverlay {
+class WindowOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WindowOverlay.class);
     private final Window window;
-    private final Parent original;
-    private final StackPane stackPane;
+    private final WalkthroughPane pane;
     private final WalkthroughRenderer renderer;
     private final Walkthrough walkthrough;
     private final List<Runnable> cleanupTasks = new ArrayList<>();
@@ -52,22 +50,18 @@ public class WindowOverlay {
     private @Nullable Button quitButton;
     private @Nullable Node currentContentNode;
 
-    public WindowOverlay(Window window, Walkthrough walkthrough) {
+    public WindowOverlay(Window window, WalkthroughPane pane, Walkthrough walkthrough) {
         this.window = window;
+        this.pane = pane;
         this.renderer = new WalkthroughRenderer();
         this.walkthrough = walkthrough;
         this.keyBindingRepository = Injector.instantiateModelOrService(KeyBindingRepository.class);
         this.stateManager = Injector.instantiateModelOrService(StateManager.class);
 
         Scene scene = window.getScene();
-        assert scene != null; // NOTE: This should never happen.
+        assert scene != null;
 
-        original = scene.getRoot();
-        stackPane = new StackPane();
-        stackPane.getChildren().add(original);
-        stackPane.setMinSize(0, 0); // NOTE: Default size is 600x400, which makes the overlay too large
-        listenKeybindings(stackPane, scene);
-        scene.setRoot(stackPane);
+        listenKeybindings(pane, scene);
     }
 
     /// Display a tooltip for the given step at the specified node.
@@ -190,7 +184,7 @@ public class WindowOverlay {
                 StackPane.setAlignment(content, Pos.CENTER);
             }
         }
-        stackPane.getChildren().add(content);
+        pane.getChildren().add(content);
         addQuitButton(step);
         if (node != null) {
             step.navigation().ifPresent(predicate ->
@@ -202,24 +196,17 @@ public class WindowOverlay {
     public void hide() {
         removeQuitButton();
         if (currentContentNode != null) {
-            stackPane.getChildren().remove(currentContentNode);
+            pane.getChildren().remove(currentContentNode);
             currentContentNode = null;
         }
         cleanupTasks.forEach(Runnable::run);
         cleanupTasks.clear();
     }
 
-    /// Detaches the overlay and restores the original scene root. Once this method is
-    /// called, the overlay is no longer active and subsequent calls to showTooltip or
-    /// showPanel will **not** work.
+    /// Detaches the overlay.
     public void detach() {
         hide();
-        Scene scene = window.getScene();
-        if (scene != null && original != null) {
-            stackPane.getChildren().remove(original);
-            scene.setRoot(original);
-            LOGGER.debug("Restored original scene root: {}", original.getClass().getName());
-        }
+        LOGGER.debug("WindowOverlay detached for window: {}", window.getClass().getSimpleName());
     }
 
     private PopOver createPopover(TooltipStep step, Runnable beforeNavigate) {
@@ -282,7 +269,7 @@ public class WindowOverlay {
         quitButton.setMouseTransparent(false);
         QuitButtonPosition position = resolveQuitButtonPosition(step);
         positionQuitButton(quitButton, position);
-        stackPane.getChildren().add(quitButton);
+        pane.getChildren().add(quitButton);
         quitButton.toFront();
     }
 
@@ -332,7 +319,7 @@ public class WindowOverlay {
 
     private void removeQuitButton() {
         if (quitButton != null) {
-            stackPane.getChildren().remove(quitButton);
+            pane.getChildren().remove(quitButton);
             quitButton = null;
         }
     }

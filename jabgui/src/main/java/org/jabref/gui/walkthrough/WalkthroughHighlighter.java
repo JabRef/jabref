@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 import javafx.stage.Window;
 
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
@@ -24,7 +23,12 @@ public class WalkthroughHighlighter {
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
 
     private final Map<Window, EffectState> currentEffects = new HashMap<>();
+    private final WalkthroughPane.Supplier paneSupplier;
     private @Nullable Runnable onBackgroundClickHandler;
+
+    public WalkthroughHighlighter(WalkthroughPane.Supplier paneSupplier) {
+        this.paneSupplier = paneSupplier;
+    }
 
     /// Applies the specified highlight configuration.
     ///
@@ -80,6 +84,7 @@ public class WalkthroughHighlighter {
             darken.detach();
             return null;
         });
+
         currentEffects.remove(window);
     }
 
@@ -198,10 +203,8 @@ public class WalkthroughHighlighter {
     }
 
     private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
-        Scene scene = window.getScene();
-        if (scene == null || !(scene.getRoot() instanceof Pane pane)) {
-            return;
-        }
+        WalkthroughPane pane = paneSupplier.get(window);
+        pane.attach();
 
         BackdropHighlight backdrop = getOrCreateBackdropHighlight(window, pane);
         backdrop.setOnClick(onBackgroundClickHandler);
@@ -209,35 +212,31 @@ public class WalkthroughHighlighter {
     }
 
     private void applyPulseAnimation(@NonNull Window window, @NonNull Node targetNode) {
-        Scene scene = window.getScene();
-        if (scene == null || !(scene.getRoot() instanceof Pane pane)) {
-            return;
-        }
+        WalkthroughPane pane = paneSupplier.get(window);
+        pane.attach();
 
         PulseAnimateIndicator pulse = getOrCreatePulseIndicator(window, pane);
         pulse.attach(targetNode);
     }
 
     private void applyFullScreenDarken(@NonNull Window window) {
-        Scene scene = window.getScene();
-        if (scene == null || !(scene.getRoot() instanceof Pane pane)) {
-            return;
-        }
+        WalkthroughPane pane = paneSupplier.get(window);
+        pane.attach();
 
         FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);
         fullDarken.setOnClick(onBackgroundClickHandler);
         fullDarken.attach();
     }
 
-    private BackdropHighlight getOrCreateBackdropHighlight(@NonNull Window window, @NonNull Pane pane) {
+    private BackdropHighlight getOrCreateBackdropHighlight(@NonNull Window window, @NonNull WalkthroughPane pane) {
         return backdropHighlights.computeIfAbsent(window, _ -> new BackdropHighlight(pane));
     }
 
-    private PulseAnimateIndicator getOrCreatePulseIndicator(@NonNull Window window, @NonNull Pane pane) {
+    private PulseAnimateIndicator getOrCreatePulseIndicator(@NonNull Window window, @NonNull WalkthroughPane pane) {
         return pulseIndicators.computeIfAbsent(window, _ -> new PulseAnimateIndicator(pane));
     }
 
-    private FullScreenDarken getOrCreateFullScreenDarken(@NonNull Window window, @NonNull Pane pane) {
+    private FullScreenDarken getOrCreateFullScreenDarken(@NonNull Window window, @NonNull WalkthroughPane pane) {
         return fullScreenDarkens.computeIfAbsent(window, _ -> new FullScreenDarken(pane));
     }
 
