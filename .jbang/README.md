@@ -59,16 +59,20 @@ With `npx`:
 npx @jbangdev/jbang jabls@jabref
 ```
 
+One can add `--help` to see available options.
+
 ## Running JabSrv
 
 If you have JBang installed, just run following command
 
 ```terminal
-jbang jabsrv@jabref --help
+jbang jabsrv@jabref
 ```
 
 With `gg.cmd`:
 
 ```terminal
-sh ./gg.cmd jbang jabsrv@jabref --help
+sh ./gg.cmd jbang jabsrv@jabref
 ```
+
+One can add `--help` to see available options. E.g., how to set another port and how to specify served libraries.
