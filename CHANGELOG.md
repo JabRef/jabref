@@ -24,7 +24,6 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added quick settings for welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - In case no citation relation information can be fetched, we show the data providers reason. [#13549](https://github.com/JabRef/jabref/pull/13549)
 
-
 ### Changed
 
 - We changed the name from Open AI Provider to Open AI (or API compatible). [#13585](https://github.com/JabRef/jabref/issues/13585)
