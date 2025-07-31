@@ -13,11 +13,13 @@ public class BibtexWorkspaceService implements WorkspaceService {
 
     private LanguageClient client;
 
+    // Todo: handle event
     @Override
     public void didChangeConfiguration(DidChangeConfigurationParams didChangeConfigurationParams) {
         LOGGER.debug("DidChangeConfigurationParams: {}", didChangeConfigurationParams);
     }
 
+    // Todo: handle event
     @Override
     public void didChangeWatchedFiles(DidChangeWatchedFilesParams didChangeWatchedFilesParams) {
         LOGGER.debug("DidChangeWatchedFilesParams: {}}", didChangeWatchedFilesParams);

@@ -27,7 +27,6 @@ public class LSPServer implements LanguageServer, LanguageClientAware {
     private LanguageClient client;
     private BibtexWorkspaceService workspaceService;
     private BibtexTextDocumentService textDocumentService;
-    private int exitCode = 1;
 
     public LSPServer(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
         this.workspaceService = new BibtexWorkspaceService();
@@ -50,13 +49,14 @@ public class LSPServer implements LanguageServer, LanguageClientAware {
 
     @Override
     public CompletableFuture<Object> shutdown() {
-        exitCode = 0;
         return CompletableFuture.completedFuture(null);
     }
 
+    /// currently not implemented because it comes from the LanguageServer interface and is documented like here
+    /// https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#exit
+    /// we have to decide how to implement this so jabls gets stopped only when started before by a lsp client
     @Override
     public void exit() {
-        // System.exit(exitCode);
     }
 
     @Override

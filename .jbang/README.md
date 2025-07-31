@@ -3,10 +3,11 @@
 This directory contains JBang scripts for JabRef.
 [JBang](https://www.jbang.dev/) allows for running Java applications without having a JDK installed (before).
 
-Three use cases:
+Four use cases:
 
 - Try out any pull request with minimal installation. See [our blog entry](https://blog.jabref.org/2025/05/31/run-pr/) for details.
 - Run JabKit - JabRef's CLI tool.
+- Run JabLs - JabRef's Language Server.
 - Run JabSrv - JabRef's HTTP server.
 
 ## Running JabKit without installation
@@ -38,6 +39,26 @@ You can also install `jabkit` permanently in your `PATH`:
 
 [JBang takes care about updating JabKit automatically](https://github.com/orgs/jbangdev/discussions/1636#discussioncomment-6150992).
 
+## Running JabLs
+
+If you have JBang installed, just run following command
+
+```terminal
+jbang jabls@jabref
+```
+
+With `gg.cmd`:
+
+```terminal
+sh ./gg.cmd jbang jabls@jabref
+```
+
+With `npx`:
+
+```terminal
+npx @jbangdev/jbang jabls@jabref
+```
+
 ## Running JabSrv
 
 If you have JBang installed, just run following command
@@ -50,18 +71,4 @@ With `gg.cmd`:
 
 ```terminal
 sh ./gg.cmd jbang jabsrv@jabref --help
-```
-
-## Running JabLs
-
-If you have JBang installed, just run following command
-
-```terminal
-jbang jabls@jabref --help
-```
-
-With `gg.cmd`:
-
-```terminal
-sh ./gg.cmd jbang jabls@jabref --help
 ```
