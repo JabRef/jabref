@@ -47,7 +47,6 @@ public class WalkthroughOverlay {
     private static final long RESOLUTION_TIMEOUT_MS = 2500;
 
     private final Map<Window, WindowOverlay> overlays = new HashMap<>();
-    private final Map<Window, WalkthroughPane> panes = new HashMap<>();
     private final Stage stage;
     private final WalkthroughHighlighter walkthroughHighlighter;
     private final Walkthrough walkthrough;
@@ -90,7 +89,7 @@ public class WalkthroughOverlay {
     public WalkthroughOverlay(Stage stage, Walkthrough walkthrough) {
         this.stage = stage;
         this.walkthrough = walkthrough;
-        this.walkthroughHighlighter = new WalkthroughHighlighter(this::getOrCreateWalkthroughPane);
+        this.walkthroughHighlighter = new WalkthroughHighlighter();
         this.walkthroughHighlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
         this.sideEffectExecutor = new SideEffectExecutor();
     }
@@ -126,9 +125,6 @@ public class WalkthroughOverlay {
         walkthroughHighlighter.detachAll();
         overlays.values().forEach(WindowOverlay::detach);
         overlays.clear();
-
-        panes.values().forEach(WalkthroughPane::detach);
-        panes.clear();
     }
 
     /// Reverts all executed side effects.
@@ -365,7 +361,7 @@ public class WalkthroughOverlay {
     private void display(VisibleWalkthroughStep step, Window window, @Nullable Node node) {
         LOGGER.debug("Displaying overlay for step '{}'", step.title());
         walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), window.getScene(), node);
-        WindowOverlay overlay = overlays.computeIfAbsent(window, w -> new WindowOverlay(w, getOrCreateWalkthroughPane(w), walkthrough));
+        WindowOverlay overlay = overlays.computeIfAbsent(window, w -> new WindowOverlay(w, WalkthroughPane.getInstance(w), walkthrough));
         switch (step) {
             case TooltipStep tooltip ->
                     overlay.showTooltip(tooltip, node, this::stopCheckingRevert);
@@ -706,9 +702,5 @@ public class WalkthroughOverlay {
             timeoutTransition.stop();
             timeoutTransition = null;
         }
-    }
-
-    private WalkthroughPane getOrCreateWalkthroughPane(@NonNull Window window) {
-        return panes.computeIfAbsent(window, WalkthroughPane::new);
     }
 }

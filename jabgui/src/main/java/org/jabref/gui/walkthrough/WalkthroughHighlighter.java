@@ -23,12 +23,7 @@ public class WalkthroughHighlighter {
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
 
     private final Map<Window, EffectState> currentEffects = new HashMap<>();
-    private final WalkthroughPane.Supplier paneSupplier;
     private @Nullable Runnable onBackgroundClickHandler;
-
-    public WalkthroughHighlighter(WalkthroughPane.Supplier paneSupplier) {
-        this.paneSupplier = paneSupplier;
-    }
 
     /// Applies the specified highlight configuration.
     ///
@@ -193,7 +188,7 @@ public class WalkthroughHighlighter {
     }
 
     private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
-        WalkthroughPane pane = paneSupplier.get(window);
+        WalkthroughPane pane = WalkthroughPane.getInstance(window);
         pane.attach();
 
         BackdropHighlight backdrop = getOrCreateBackdropHighlight(window, pane);
@@ -202,7 +197,7 @@ public class WalkthroughHighlighter {
     }
 
     private void applyPulseAnimation(@NonNull Window window, @NonNull Node targetNode) {
-        WalkthroughPane pane = paneSupplier.get(window);
+        WalkthroughPane pane = WalkthroughPane.getInstance(window);
         pane.attach();
 
         PulseAnimateIndicator pulse = getOrCreatePulseIndicator(window, pane);
@@ -210,7 +205,7 @@ public class WalkthroughHighlighter {
     }
 
     private void applyFullScreenDarken(@NonNull Window window) {
-        WalkthroughPane pane = paneSupplier.get(window);
+        WalkthroughPane pane = WalkthroughPane.getInstance(window);
         pane.attach();
 
         FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);

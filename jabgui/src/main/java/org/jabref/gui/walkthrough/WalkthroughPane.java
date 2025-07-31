@@ -1,5 +1,7 @@
 package org.jabref.gui.walkthrough;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -19,14 +21,20 @@ import org.slf4j.LoggerFactory;
 /// be identified as part of the walkthrough system.
 public class WalkthroughPane extends StackPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughPane.class);
+    private static final ConcurrentHashMap<Window, WalkthroughPane> INSTANCES = new ConcurrentHashMap<>();
 
     private final Window window;
     private @Nullable Parent root;
     private volatile boolean isAttached = false;
 
     public WalkthroughPane(@NonNull Window window) {
+        if (INSTANCES.containsKey(window)) {
+            throw new IllegalStateException("WalkthroughPane already exists for this window: " + window.getClass().getSimpleName());
+        }
+
         this.window = window;
         setMinSize(0, 0);
+        INSTANCES.put(this.window, this);
     }
 
     /// Attaches this pane to the window by replacing the scene root. The original root
@@ -53,6 +61,8 @@ public class WalkthroughPane extends StackPane {
 
     /// Detaches this pane from the window by restoring the original scene root.
     public synchronized void detach() {
+        INSTANCES.remove(window);
+
         if (!isAttached) {
             LOGGER.debug("WalkthroughPane not attached to window: {}", window.getClass().getSimpleName());
             return;
@@ -72,9 +82,7 @@ public class WalkthroughPane extends StackPane {
         LOGGER.debug("WalkthroughPane detached from window: {}", window.getClass().getSimpleName());
     }
 
-    @FunctionalInterface
-    public interface Supplier {
-        @NonNull
-        WalkthroughPane get(@NonNull Window window);
+    public static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
+        return INSTANCES.computeIfAbsent(window, WalkthroughPane::new);
     }
 }

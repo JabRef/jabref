@@ -225,6 +225,7 @@ class WindowOverlay {
     /// Detaches the overlay.
     public void detach() {
         hide();
+        pane.detach();
         LOGGER.debug("WindowOverlay detached for window: {}", window.getClass().getSimpleName());
     }
 
