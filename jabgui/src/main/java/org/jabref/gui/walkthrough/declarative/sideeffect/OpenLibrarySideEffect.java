@@ -2,7 +2,6 @@ package org.jabref.gui.walkthrough.declarative.sideeffect;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 import java.util.Optional;
 
 import org.jabref.gui.ClipBoardManager;
@@ -14,9 +13,7 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.importer.Importer;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
+import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.util.TaskExecutor;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -67,14 +64,14 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
         }
 
         try {
-            BibDatabaseContext databaseContext = loadExampleLibrary();
-            if (databaseContext == null) {
+            Optional<BibDatabaseContext> databaseContext = loadExampleLibrary();
+            if (databaseContext.isEmpty()) {
                 LOGGER.error("Failed to load example library");
                 return false;
             }
 
             LibraryTab libraryTab = LibraryTab.createLibraryTab(
-                    databaseContext,
+                    databaseContext.get(),
                     tabContainer,
                     Injector.instantiateModelOrService(DialogService.class),
                     Injector.instantiateModelOrService(AiService.class),
@@ -145,23 +142,19 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                            .findFirst();
     }
 
-    private @Nullable BibDatabaseContext loadExampleLibrary() {
+    private Optional<BibDatabaseContext> loadExampleLibrary() {
         try (InputStream in = getClass().getClassLoader().getResourceAsStream(libraryName)) {
             if (in == null) {
                 LOGGER.warn("\"{}\" Library file not found", libraryName);
-                return null;
+                return Optional.empty();
             }
 
-            Reader reader = Importer.getReader(in);
-            BibtexParser bibtexParser = new BibtexParser(
-                    Injector.instantiateModelOrService(org.jabref.gui.preferences.GuiPreferences.class).getImportFormatPreferences(),
-                    Injector.instantiateModelOrService(org.jabref.model.util.FileUpdateMonitor.class)
-            );
-            ParserResult result = bibtexParser.parse(reader);
-            return result.getDatabaseContext();
+            return Optional.of(OpenDatabase.loadDatabase(in,
+                    Injector.instantiateModelOrService(GuiPreferences.class).getImportFormatPreferences(),
+                    Injector.instantiateModelOrService(FileUpdateMonitor.class)).getDatabaseContext());
         } catch (IOException e) {
             LOGGER.error("Failed to load \"{}\" library from resource", libraryName, e);
-            return null;
+            return Optional.empty();
         }
     }
 }

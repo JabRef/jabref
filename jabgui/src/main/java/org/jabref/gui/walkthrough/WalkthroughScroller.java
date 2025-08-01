@@ -110,7 +110,7 @@ public class WalkthroughScroller {
         Bounds contentBounds = content.getBoundsInLocal();
         double viewportHeight = scrollPane.getViewportBounds().getHeight();
         if (contentBounds.getHeight() <= viewportHeight) {
-            return; // No vertical scrolling needed
+            return;
         }
 
         Bounds targetInContent = content.sceneToLocal(targetBounds);
