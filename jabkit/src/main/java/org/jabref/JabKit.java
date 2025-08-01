@@ -85,6 +85,12 @@ public class JabKit {
                     ArgumentProcessor.getAvailableImportFormats(preferences),
                     ArgumentProcessor.getAvailableExportFormats(preferences),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
+
+            if (args.length == 0) {
+                commandLine.usage(System.out);
+                System.exit(0);
+            }
+
             int result = commandLine.execute(args);
             System.exit(result);
         } catch (Exception ex) {
