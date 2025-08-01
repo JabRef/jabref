@@ -29,7 +29,7 @@ class LinkedFileTransferHelperTest {
   private Path testFile;
   private BibEntry sourceEntry;
   private BibEntry targetEntry;
-  private FilePreferences filePreferences = mock(FilePreferences.class);
+  private final FilePreferences filePreferences = mock(FilePreferences.class);
 
   @Nested
   class WhenFileIsReachable {
@@ -56,9 +56,9 @@ class LinkedFileTransferHelperTest {
       sourceEntry = new BibEntry();
       LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
-      sourceEntry.withFiles(List.of(linkedFile));
+      sourceEntry.setFiles(List.of(linkedFile));
       targetEntry = new BibEntry(sourceEntry);
-      targetEntry.withFiles(List.of(linkedFile));
+      targetEntry.setFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
       targetContext.getDatabase().insertEntry(targetEntry);
@@ -103,9 +103,9 @@ class LinkedFileTransferHelperTest {
       sourceEntry = new BibEntry();
       LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
-      sourceEntry.withFiles(List.of(linkedFile));
+      sourceEntry.setFiles(List.of(linkedFile));
       targetEntry = new BibEntry(sourceEntry);
-      targetEntry.withFiles(List.of(linkedFile));
+      targetEntry.setFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
       targetContext.getDatabase().insertEntry(targetEntry);
@@ -150,9 +150,9 @@ class LinkedFileTransferHelperTest {
       sourceEntry = new BibEntry();
       LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
-      sourceEntry.withFiles(List.of(linkedFile));
+      sourceEntry.setFiles(List.of(linkedFile));
       targetEntry = new BibEntry(sourceEntry);
-      targetEntry.withFiles(List.of(linkedFile));
+      targetEntry.setFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
       targetContext.getDatabase().insertEntry(targetEntry);
