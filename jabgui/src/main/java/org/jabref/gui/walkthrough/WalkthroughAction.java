@@ -15,6 +15,7 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 
+import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
@@ -307,7 +308,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
                 .build();
 
-        return new Walkthrough(step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, step12, step13, step14, step15, step16, step17, step18);
+        return new Walkthrough(Injector.instantiateModelOrService(StateManager.class), step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, step12, step13, step14, step15, step16, step17, step18);
     }
 
     private Walkthrough createMainFileDirectoryWalkthrough() {
@@ -385,6 +386,6 @@ public class WalkthroughAction extends SimpleCommand {
                 .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
                 .build();
 
-        return new Walkthrough(step1, step2, step3, step4, step5, step6);
+        return new Walkthrough(Injector.instantiateModelOrService(StateManager.class), step1, step2, step3, step4, step5, step6);
     }
 }

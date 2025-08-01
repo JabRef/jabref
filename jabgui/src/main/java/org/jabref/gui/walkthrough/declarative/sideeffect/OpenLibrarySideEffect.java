@@ -3,6 +3,7 @@ package org.jabref.gui.walkthrough.declarative.sideeffect;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.Optional;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -57,11 +58,11 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
         LOGGER.debug("Executing forward: Opening example library");
 
         // Check if example library is already open
-        LibraryTab existingTab = findLibraryTab();
-        if (existingTab != null) {
+        Optional<LibraryTab> existingTabOpt = findLibraryTab();
+        if (existingTabOpt.isPresent()) {
             LOGGER.debug("Example library already open, selecting existing tab");
-            tabContainer.showLibraryTab(existingTab);
-            createdTab = existingTab;
+            tabContainer.showLibraryTab(existingTabOpt.get());
+            createdTab = existingTabOpt.get();
             return true;
         }
 
@@ -115,9 +116,9 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
             }
         }
 
-        LibraryTab exampleTab = findLibraryTab();
-        if (exampleTab != null) {
-            boolean closed = tabContainer.closeTab(exampleTab);
+        Optional<LibraryTab> exampleTab = findLibraryTab();
+        if (exampleTab.isPresent()) {
+            boolean closed = tabContainer.closeTab(exampleTab.get());
             if (!closed) {
                 LOGGER.debug("Successfully closed found example library tab");
             } else {
@@ -135,14 +136,13 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
         return "Open \"%s\" library.".formatted(libraryName);
     }
 
-    private @Nullable LibraryTab findLibraryTab() {
+    private Optional<LibraryTab> findLibraryTab() {
         return tabContainer.getLibraryTabs().stream()
                            .filter(tab -> WALKTHROUGH_LIBRARY_TEMPLATE
                                    .formatted(libraryName).equals(tab.getText()) ||
                                    (tab.getBibDatabaseContext().getDatabasePath().isEmpty() &&
                                            tab.getBibDatabaseContext().getDatabase().getEntryCount() > 0))
-                           .findFirst()
-                           .orElse(null);
+                           .findFirst();
     }
 
     private @Nullable BibDatabaseContext loadExampleLibrary() {
@@ -157,7 +157,7 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                     Injector.instantiateModelOrService(org.jabref.gui.preferences.GuiPreferences.class).getImportFormatPreferences(),
                     Injector.instantiateModelOrService(org.jabref.model.util.FileUpdateMonitor.class)
             );
-        ParserResult result = bibtexParser.parse(reader);
+            ParserResult result = bibtexParser.parse(reader);
             return result.getDatabaseContext();
         } catch (IOException e) {
             LOGGER.error("Failed to load \"{}\" library from resource", libraryName, e);
