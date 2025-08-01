@@ -1,6 +1,7 @@
 package org.jabref.logic.externalfiles;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -198,13 +199,12 @@ public class LinkedFileTransferHelper {
     try {
       // [impl->req~logic.externalfiles.file-transfer.not-reachable-different-path~1]
       Files.createDirectories(fullTargetPath.getParent());
-      if (Files.exists(fullTargetPath)) {
-          LOGGER.warn("Target file {} already exists – not overwriting", fullTargetPath);
-          return false;
-      }
-      Files.copy(sourcePath, fullTargetPath);
+      Files.copy(sourcePath, fullTargetPath); // no overwrite
       LOGGER.info("Copied file from {} to {}", sourcePath, fullTargetPath);
       return true;
+    } catch (FileAlreadyExistsException e) {
+      LOGGER.warn("Target file {} already exists – not overwriting", fullTargetPath);
+      return false;
     } catch (IOException e) {
       LOGGER.error("Failed to copy file from {} to {}: {}", sourcePath, fullTargetPath, e.getMessage(), e);
       return false;
