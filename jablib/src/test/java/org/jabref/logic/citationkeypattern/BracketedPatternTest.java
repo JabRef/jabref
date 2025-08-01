@@ -345,7 +345,9 @@ class BracketedPatternTest {
                 Arguments.of("Berlin", "Aachen and Berlin"),
                 Arguments.of("Chemnitz", "Aachen and Berlin and Chemnitz"),
                 Arguments.of("Düsseldorf", "Aachen and Berlin and Chemnitz and Düsseldorf"),
-                Arguments.of("Essen", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen")
+                Arguments.of("Essen", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
+                Arguments.of("Aalst", "Wil van der Aalst"),
+                Arguments.of("Lessen", "Wil van der Aalst and Tammo van Lessen")
         );
     }
 
