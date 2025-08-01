@@ -16,7 +16,7 @@
     <content>
         <VBox styleClass="quick-settings-dialog-container">
             <HBox alignment="CENTER_LEFT" spacing="4">
-                <Label text="Set the default directory for storing attached files. Files will be stored relative to this directory unless specified otherwise."
+                <Label text="%Set the default directory for storing attached files. Files will be stored relative to this directory unless specified otherwise."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
                 <HelpButton fx:id="helpButton"/>
             </HBox>

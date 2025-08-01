@@ -24,6 +24,7 @@ import org.jspecify.annotations.NonNull;
 public class OnlineServicesDialogViewModel extends AbstractViewModel {
     private final BooleanProperty versionCheckProperty = new SimpleBooleanProperty();
     private final BooleanProperty webSearchProperty = new SimpleBooleanProperty();
+    private final BooleanProperty dlibEnabledProperty = new SimpleBooleanProperty();
     private final BooleanProperty grobidEnabledProperty = new SimpleBooleanProperty();
     private final StringProperty grobidUrlProperty = new SimpleStringProperty("");
 
@@ -42,6 +43,7 @@ public class OnlineServicesDialogViewModel extends AbstractViewModel {
     private void initializeSettings() {
         versionCheckProperty.set(preferences.getInternalPreferences().isVersionCheckEnabled());
         webSearchProperty.set(preferences.getImporterPreferences().areImporterEnabled());
+        dlibEnabledProperty.set(preferences.getMrDlibPreferences().shouldAcceptRecommendations());
         grobidEnabledProperty.set(preferences.getGrobidPreferences().isGrobidEnabled());
         grobidUrlProperty.set(preferences.getGrobidPreferences().getGrobidURL());
     }
@@ -77,6 +79,14 @@ public class OnlineServicesDialogViewModel extends AbstractViewModel {
         return webSearchProperty.get();
     }
 
+    public BooleanProperty dlibEnabledProperty() {
+        return dlibEnabledProperty;
+    }
+
+    public boolean isDlibEnabled() {
+        return dlibEnabledProperty.get();
+    }
+
     public BooleanProperty grobidEnabledProperty() {
         return grobidEnabledProperty;
     }
@@ -102,6 +112,7 @@ public class OnlineServicesDialogViewModel extends AbstractViewModel {
         preferences.getImporterPreferences().setImporterEnabled(isWebSearchEnabled());
         preferences.getGrobidPreferences().setGrobidEnabled(isGrobidEnabled());
         preferences.getGrobidPreferences().setGrobidURL(getGrobidUrl());
+        preferences.getMrDlibPreferences().setAcceptRecommendations(isDlibEnabled());
 
         List<String> enabledFetchers = new ArrayList<>();
         for (StudyCatalogItem fetcher : fetchersProperty) {

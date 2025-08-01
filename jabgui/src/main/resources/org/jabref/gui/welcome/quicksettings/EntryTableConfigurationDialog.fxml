@@ -12,7 +12,7 @@
     <content>
         <VBox styleClass="quick-settings-dialog-container">
             <HBox alignment="CENTER_LEFT" spacing="4">
-                <Label text="Configure which columns are displayed in the entry table. The citation key column can be toggled to show or hide reference keys."
+                <Label text="%Configure which columns are displayed in the entry table. The citation key column can be toggled to show or hide citation keys."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
                 <HelpButton fx:id="helpButton"/>
             </HBox>

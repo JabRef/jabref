@@ -15,13 +15,15 @@
     <content>
         <VBox styleClass="quick-settings-dialog-container">
             <HBox alignment="CENTER_LEFT" spacing="4">
-                <Label text="Configure online databases and services for importing entries. Enable web search, update checking, and metadata extraction services."
+                <Label text="%Configure online catalogues and services for importing entries. Enable web search, update checking, and metadata extraction services."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
                 <HelpButton fx:id="helpButton"/>
             </HBox>
 
             <CheckBox fx:id="versionCheckBox" text="%Check for updates at startup"/>
             <CheckBox fx:id="webSearchBox" text="%Enable web search"/>
+            <CheckBox fx:id="dlibCheckBox"
+                      text="%Enable recommendations by Mr. DLib"/>
             <CheckBox fx:id="grobidCheckBox"
                       text="%Enable Grobid (metadata extraction service)"/>
 

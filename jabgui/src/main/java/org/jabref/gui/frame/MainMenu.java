@@ -375,13 +375,6 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
-                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction("mainFileDirectory")),
-                        factory.createMenuItem(StandardActions.CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH, new WalkthroughAction("customizeEntryTable"))
-                ),
-
-                new SeparatorMenuItem(),
-
                 factory.createMenuItem(StandardActions.ERROR_CONSOLE, new ErrorConsoleAction()),
 
                 new SeparatorMenuItem(),

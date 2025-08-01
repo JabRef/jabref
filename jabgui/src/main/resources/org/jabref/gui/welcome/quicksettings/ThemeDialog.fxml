@@ -18,7 +18,7 @@
     <content>
         <VBox styleClass="quick-settings-dialog-container">
             <HBox alignment="CENTER_LEFT" spacing="4">
-                <Label text="Choose between light, dark, or custom themes to personalize your JabRef experience."
+                <Label text="%Choose between light, dark, or custom themes to personalize your JabRef experience."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
                 <HelpButton fx:id="helpButton"/>
             </HBox>

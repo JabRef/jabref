@@ -19,9 +19,9 @@ import org.jabref.logic.l10n.Localization;
 import com.airhacks.afterburner.views.ViewLoader;
 
 public class OnlineServicesDialog extends FXDialog {
-
     @FXML private CheckBox versionCheckBox;
     @FXML private CheckBox webSearchBox;
+    @FXML private CheckBox dlibCheckBox;
     @FXML private CheckBox grobidCheckBox;
     @FXML private TextField grobidUrlField;
     @FXML private HBox grobidUrlContainer;
@@ -61,6 +61,7 @@ public class OnlineServicesDialog extends FXDialog {
         webSearchBox.selectedProperty().bindBidirectional(viewModel.webSearchProperty());
         grobidCheckBox.selectedProperty().bindBidirectional(viewModel.grobidEnabledProperty());
         grobidUrlField.textProperty().bindBidirectional(viewModel.grobidUrlProperty());
+        dlibCheckBox.selectedProperty().bindBidirectional(viewModel.dlibEnabledProperty());
 
         grobidUrlContainer.visibleProperty().bind(grobidCheckBox.selectedProperty());
         grobidUrlContainer.managedProperty().bind(grobidCheckBox.selectedProperty());

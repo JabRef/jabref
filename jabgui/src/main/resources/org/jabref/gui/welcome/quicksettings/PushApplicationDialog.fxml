@@ -16,7 +16,7 @@
     <content>
         <VBox styleClass="quick-settings-dialog-container">
             <HBox alignment="CENTER_LEFT" spacing="4.0">
-                <Label text="Configure external applications to push citations to. Detected applications are highlighted. Applications that are not detected can be set manually by specifying the path to the executable."
+                <Label text="%Configure external applications to push citations to. Detected applications are highlighted. Applications that are not detected can be set manually by specifying the path to the executable."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
                 <HelpButton fx:id="helpButton"/>
             </HBox>

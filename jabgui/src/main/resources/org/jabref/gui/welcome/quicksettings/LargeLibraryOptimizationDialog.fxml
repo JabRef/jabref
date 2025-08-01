@@ -12,7 +12,7 @@
     <content>
         <VBox styleClass="quick-settings-dialog-container">
             <HBox alignment="CENTER_LEFT" spacing="4">
-                <Label text="Select features to disable. Disabling these features can significantly improve performance when working with large libraries."
+                <Label text="%Select features to disable. Disabling these features can significantly improve performance when working with large libraries."
                        wrapText="true" HBox.hgrow="ALWAYS"/>
                 <HelpButton fx:id="helpButton"/>
             </HBox>
