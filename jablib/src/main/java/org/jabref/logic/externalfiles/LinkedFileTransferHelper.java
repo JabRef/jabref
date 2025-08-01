@@ -73,6 +73,7 @@ public class LinkedFileTransferHelper {
         }
 
         if (isReachableFromPrimaryDirectory(relative)) {
+          // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
           entryChanged = isPathAdjusted(linkedFile, relative, linkedFiles, entryChanged);
         } else {
           entryChanged = isFileCopied(context, linkedFile, linkedFiles, entryChanged);
@@ -153,6 +154,7 @@ public class LinkedFileTransferHelper {
     LinkedFile linkedFile,
     Path relativePath
   ) {
+    // [impl->req~logic.externalfiles.file-transfer.reachable-no-copy~1]
     try {
       String newLink = relativePath.toString();
       String currentLink = linkedFile.getLink();
@@ -179,6 +181,8 @@ public class LinkedFileTransferHelper {
     LinkedFile linkedFile,
     FileCopyContext context
   ) {
+    // [impl->req~logic.externalfiles.file-transfer.not-reachable-same-path~1]
+    // [impl->req~logic.externalfiles.file-transfer.not-reachable-different-path~1]
     Optional<Path> sourcePathOpt = linkedFile.findIn(context.sourceContext(), context.filePreferences());
     Optional<Path> targetDirOpt = getPrimaryPath(context.targetContext(), context.filePreferences());
 
@@ -192,6 +196,7 @@ public class LinkedFileTransferHelper {
     Path fullTargetPath = targetDirOpt.get().resolve(relativeLinkPath);
 
     try {
+      // [impl->req~logic.externalfiles.file-transfer.not-reachable-different-path~1]
       Files.createDirectories(fullTargetPath.getParent());
       if (Files.exists(fullTargetPath)) {
           LOGGER.warn("Target file {} already exists – not overwriting", fullTargetPath);
