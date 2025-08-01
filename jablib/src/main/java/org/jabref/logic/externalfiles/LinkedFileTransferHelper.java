@@ -1,13 +1,5 @@
 package org.jabref.logic.externalfiles;
 
-import org.jabref.logic.FilePreferences;
-import org.jabref.logic.util.io.FileUtil;
-import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
-import org.jabref.model.entry.LinkedFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,13 +9,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.jabref.logic.FilePreferences;
+import org.jabref.logic.util.io.FileUtil;
+import org.jabref.model.database.BibDatabaseContext;
+import org.jabref.model.entry.BibEntry;
+import org.jabref.model.entry.LinkedFile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class LinkedFileTransferHelper {
 
   private record FileCopyContext(
     BibDatabaseContext sourceContext,
     BibDatabaseContext targetContext,
     FilePreferences filePreferences
-  ) {}
+  ) { }
 
   private static final Logger LOGGER = LoggerFactory.getLogger(LinkedFileTransferHelper.class);
 
