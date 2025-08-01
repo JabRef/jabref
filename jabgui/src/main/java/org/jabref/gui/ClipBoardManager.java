@@ -37,10 +37,11 @@ public class ClipBoardManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ClipBoardManager.class);
 
-    private BibDatabaseContext sourceDatabaseContext;
-
     private static Clipboard clipboard;
+
     private static java.awt.datatransfer.Clipboard primary;
+
+    private BibDatabaseContext sourceDatabaseContext;
 
     public ClipBoardManager() {
         this(Clipboard.getSystemClipboard(), Toolkit.getDefaultToolkit().getSystemSelection());
