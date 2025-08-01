@@ -3,10 +3,10 @@ package org.jabref.gui.git;
 import java.util.Optional;
 
 import org.jabref.gui.DialogService;
-import org.jabref.gui.mergeentries.MergeEntriesDialog;
-import org.jabref.gui.mergeentries.newmergedialog.ShowDiffConfig;
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
-import org.jabref.gui.mergeentries.newmergedialog.toolbar.ThreeWayMergeToolbar;
+import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
+import org.jabref.gui.mergeentries.threewaymerge.ShowDiffConfig;
+import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.threewaymerge.toolbar.ThreeWayMergeToolbar;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.git.conflicts.ThreeWayEntryConflict;
 import org.jabref.logic.l10n.Localization;
