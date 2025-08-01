@@ -43,8 +43,8 @@ public class GitSemanticMergeExecutorTest {
 
         BibEntry baseEntry = new BibEntry().withCitationKey("Smith2020")
                                            .withField(StandardField.TITLE, "Old Title");
-        BibEntry localEntry = (BibEntry) baseEntry.clone();
-        BibEntry remoteEntry = (BibEntry) baseEntry.clone();
+        BibEntry localEntry = new BibEntry(baseEntry);
+        BibEntry remoteEntry = new BibEntry(baseEntry);
         remoteEntry.setField(StandardField.TITLE, "New Title");
 
         base.getDatabase().insertEntry(baseEntry);

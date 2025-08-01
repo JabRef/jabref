@@ -37,12 +37,12 @@ public class GitMergeUtil {
             }
 
             // Clone the entry and add it to new DB
-            newDatabase.insertEntry((BibEntry) entry.clone());
+            newDatabase.insertEntry(new BibEntry(entry));
         }
 
         // 4. Insert all resolved entries (cloned for safety)
         for (BibEntry resolved : resolvedEntries) {
-            newDatabase.insertEntry((BibEntry) resolved.clone());
+            newDatabase.insertEntry(new BibEntry(resolved));
         }
 
         // 5. Construct a new BibDatabaseContext with this new database and same metadata

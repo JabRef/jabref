@@ -23,7 +23,7 @@ public class SemanticMerger {
         applyPatchToDatabase(local, plan.fieldPatches());
 
         for (BibEntry newEntry : plan.newEntries()) {
-            BibEntry clone = (BibEntry) newEntry.clone();
+            BibEntry clone = new BibEntry(newEntry);
 
             clone.getCitationKey().ifPresent(citationKey ->
                     local.getDatabase().getEntryByCitationKey(citationKey).ifPresent(existing -> {

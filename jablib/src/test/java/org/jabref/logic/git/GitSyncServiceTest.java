@@ -291,7 +291,7 @@ class GitSyncServiceTest {
             ThreeWayEntryConflict conflict = conflicts.getFirst();
             // In this test, both Alice and Bob independently added a new entry 'c', so the base is null.
             // We simulate conflict resolution by choosing the remote version and modifying the author field.
-            BibEntry resolved = (BibEntry) conflict.remote().clone();
+            BibEntry resolved = new BibEntry(conflict.remote());
             resolved.setField(StandardField.AUTHOR, "alice-c + bob-c");
             return List.of(resolved);
         });
