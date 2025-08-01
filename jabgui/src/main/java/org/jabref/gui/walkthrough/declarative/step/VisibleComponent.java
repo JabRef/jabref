@@ -11,7 +11,7 @@ import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
 
 /// Walkthrough steps that display visible UI elements.
-public sealed interface VisibleWalkthroughStep extends WalkthroughStep permits PanelStep, TooltipStep {
+public sealed interface VisibleComponent extends WalkthroughStep permits PanelStep, TooltipStep {
     /// Content blocks to display
     List<WalkthroughRichTextBlock> content();
 
@@ -47,7 +47,7 @@ public sealed interface VisibleWalkthroughStep extends WalkthroughStep permits P
     Optional<WalkthroughEffect> highlight();
 
     /// Window resolver for targeting specific windows.
-    Optional<WindowResolver> activeWindowResolver();
+    Optional<WindowResolver> windowResolver();
 
     /// Whether to show the quit button.
     boolean showQuitButton();

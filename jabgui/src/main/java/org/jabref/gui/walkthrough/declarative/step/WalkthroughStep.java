@@ -1,6 +1,6 @@
 package org.jabref.gui.walkthrough.declarative.step;
 
-public sealed interface WalkthroughStep permits SideEffectStep, VisibleWalkthroughStep {
+public sealed interface WalkthroughStep permits SideEffect, VisibleComponent {
     String title();
 
     static TooltipStep.Builder tooltip(String title) {
@@ -11,7 +11,7 @@ public sealed interface WalkthroughStep permits SideEffectStep, VisibleWalkthrou
         return PanelStep.builder(title);
     }
 
-    static SideEffectStep.Builder sideEffect(String title) {
-        return SideEffectStep.builder(title);
+    static SideEffect.Builder sideEffect(String title) {
+        return SideEffect.builder(title);
     }
 }

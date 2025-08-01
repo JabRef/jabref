@@ -157,7 +157,7 @@ public class Walkthrough {
         }
     }
 
-    private @NonNull WalkthroughStep getCurrentStep() {
+    public @NonNull WalkthroughStep getCurrentStep() {
         return steps.get(currentStep.get());
     }
 }

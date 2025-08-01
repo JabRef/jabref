@@ -1,5 +1,6 @@
 package org.jabref.gui.walkthrough.declarative.sideeffect;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -21,21 +22,28 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// Executes walkthrough side effects with timeout and dependency monitoring.
 public class SideEffectExecutor {
     private static final Logger LOGGER = LoggerFactory.getLogger(SideEffectExecutor.class);
 
     private @Nullable PauseTransition timeoutTransition;
     private @Nullable InvalidationListener dependencyListener;
-    private final List<Observable> currentDependencies = new java.util.ArrayList<>();
+    private final List<Observable> currentDependencies = new ArrayList<>();
 
     /// Executes a side effect's forward action, waiting for the expected condition if
     /// necessary.
+    ///
+    /// @param sideEffect  the side effect to execute
+    /// @param walkthrough the walkthrough context
+    /// @return true if the side effect was executed successfully, false otherwise
     public boolean executeForward(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough) {
         return execute(sideEffect, walkthrough, true);
     }
 
     /// Executes a side effect's backward action.
+    ///
+    /// @param sideEffect  the side effect to execute
+    /// @param walkthrough the walkthrough context
+    /// @return true if the side effect was executed successfully, false otherwise
     public boolean executeBackward(@NonNull WalkthroughSideEffect sideEffect, @NonNull Walkthrough walkthrough) {
         return execute(sideEffect, walkthrough, false);
     }

@@ -18,7 +18,7 @@ import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
 import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.VisibleWalkthroughStep;
+import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
 import org.jabref.logic.l10n.Localization;
 
 /// Renders the walkthrough steps and content blocks into JavaFX Nodes.
@@ -134,7 +134,7 @@ public class WalkthroughRenderer {
         return container;
     }
 
-    private HBox makeActions(VisibleWalkthroughStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
+    private HBox makeActions(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
         HBox actions = new HBox();
         actions.setAlignment(Pos.CENTER_LEFT);
         actions.getStyleClass().add("walkthrough-actions");
@@ -142,31 +142,31 @@ public class WalkthroughRenderer {
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
-        step.backButtonText()
-            .ifPresent(text ->
-                    actions.getChildren()
-                           .add(makeButton(text, "walkthrough-back-button", beforeNavigate, walkthrough::previousStep)));
+        component.backButtonText()
+                 .ifPresent(text ->
+                         actions.getChildren()
+                                .add(makeButton(text, "walkthrough-back-button", beforeNavigate, walkthrough::previousStep)));
 
         HBox rightActions = new HBox();
         rightActions.setAlignment(Pos.CENTER_RIGHT);
         rightActions.getStyleClass().add("walkthrough-right-actions");
 
-        step.skipButtonText()
-            .ifPresent(text ->
-                    rightActions.getChildren()
-                                .add(makeButton(text, "walkthrough-skip-button", beforeNavigate, walkthrough::skip)));
-        step.continueButtonText()
-            .ifPresent(text ->
-                    rightActions.getChildren()
-                                .add(makeButton(text, "walkthrough-continue-button", beforeNavigate, walkthrough::nextStep)));
+        component.skipButtonText()
+                 .ifPresent(text ->
+                         rightActions.getChildren()
+                                     .add(makeButton(text, "walkthrough-skip-button", beforeNavigate, walkthrough::skip)));
+        component.continueButtonText()
+                 .ifPresent(text ->
+                         rightActions.getChildren()
+                                     .add(makeButton(text, "walkthrough-continue-button", beforeNavigate, walkthrough::nextStep)));
         actions.getChildren().addAll(spacer, rightActions);
         return actions;
     }
 
-    private VBox makeContent(VisibleWalkthroughStep step, Walkthrough walkthrough, Runnable beforeNavigate) {
+    private VBox makeContent(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
         VBox contentBox = new VBox();
         contentBox.getStyleClass().add("walkthrough-content");
-        contentBox.getChildren().addAll(step.content().stream().map(block ->
+        contentBox.getChildren().addAll(component.content().stream().map(block ->
                 switch (block) {
                     case TextBlock textBlock -> render(textBlock);
                     case InfoBlock infoBlock -> render(infoBlock);

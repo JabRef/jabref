@@ -5,7 +5,7 @@ import org.jabref.gui.walkthrough.declarative.sideeffect.WalkthroughSideEffect;
 import org.jspecify.annotations.NonNull;
 
 /// A walkthrough step that executes side effects without displaying any UI.
-public record SideEffectStep(
+public record SideEffect(
         @NonNull String title,
         @NonNull WalkthroughSideEffect sideEffect
 ) implements WalkthroughStep {
@@ -26,11 +26,11 @@ public record SideEffectStep(
             return this;
         }
 
-        public SideEffectStep build() {
+        public SideEffect build() {
             if (sideEffect == null) {
                 throw new IllegalStateException("Side effect is required for SideEffectStep");
             }
-            return new SideEffectStep(title, sideEffect);
+            return new SideEffect(title, sideEffect);
         }
     }
 }

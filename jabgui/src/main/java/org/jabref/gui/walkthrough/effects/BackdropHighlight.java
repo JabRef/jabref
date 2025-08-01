@@ -49,6 +49,7 @@ public final class BackdropHighlight extends BaseWindowEffect {
     }
 
     public synchronized void transitionTo(@NonNull Node newNode) {
+        Shape overlayShape = this.overlayShape;
         if (overlayShape == null || !overlayShape.isVisible()) {
             attach(newNode);
             return;
@@ -104,9 +105,10 @@ public final class BackdropHighlight extends BaseWindowEffect {
             transitionAnimation = null;
         }
         super.detach();
+        Shape overlayShape = this.overlayShape;
         if (overlayShape != null && overlayShape.getParent() instanceof Pane parentPane) {
             parentPane.getChildren().remove(overlayShape);
-            overlayShape = null;
+            this.overlayShape = null;
         }
         this.node = null;
     }
@@ -116,11 +118,10 @@ public final class BackdropHighlight extends BaseWindowEffect {
         this.backdrop = new Rectangle();
         this.hole = new Rectangle();
         this.animatedHole = new Rectangle();
-        Shape shape = Shape.subtract(backdrop, hole);
-        shape.setFill(OVERLAY_COLOR);
-        shape.setVisible(false);
-        overlayShape = shape;
-
+        Shape overlayShape = Shape.subtract(backdrop, hole);
+        overlayShape.setFill(OVERLAY_COLOR);
+        overlayShape.setVisible(false);
+        this.overlayShape = overlayShape;
         getOrAddToPane();
     }
 
@@ -159,6 +160,7 @@ public final class BackdropHighlight extends BaseWindowEffect {
 
     @Override
     protected void hideEffect() {
+        Shape overlayShape = this.overlayShape;
         if (overlayShape != null) {
             overlayShape.setVisible(false);
         }
@@ -173,18 +175,18 @@ public final class BackdropHighlight extends BaseWindowEffect {
             this.pane.getChildren().remove(oldIndex);
         }
 
-        Shape shape = Shape.subtract(backdrop, animatedHole);
-        shape.setFill(OVERLAY_COLOR);
-        shape.setVisible(true);
+        Shape overlayShape = Shape.subtract(backdrop, animatedHole);
+        overlayShape.setFill(OVERLAY_COLOR);
+        overlayShape.setVisible(true);
 
         if (onClickHandler != null) {
-            shape.setOnMouseClicked(this::handleClick);
-            shape.setMouseTransparent(false);
+            overlayShape.setOnMouseClicked(this::handleClick);
+            overlayShape.setMouseTransparent(false);
         } else {
-            shape.setMouseTransparent(true);
+            overlayShape.setMouseTransparent(true);
         }
 
-        this.overlayShape = shape;
+        this.overlayShape = overlayShape;
         this.pane.getChildren().add(oldIndex, this.overlayShape);
     }
 

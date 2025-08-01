@@ -157,7 +157,7 @@ public class OpenLibrarySideEffect implements WalkthroughSideEffect {
                     Injector.instantiateModelOrService(org.jabref.gui.preferences.GuiPreferences.class).getImportFormatPreferences(),
                     Injector.instantiateModelOrService(org.jabref.model.util.FileUpdateMonitor.class)
             );
-            ParserResult result = bibtexParser.parse(reader);
+        ParserResult result = bibtexParser.parse(reader);
             return result.getDatabaseContext();
         } catch (IOException e) {
             LOGGER.error("Failed to load \"{}\" library from resource", libraryName, e);

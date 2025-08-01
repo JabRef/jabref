@@ -3,9 +3,10 @@ package org.jabref.gui.walkthrough;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javafx.animation.AnimationTimer;
+import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.geometry.Insets;
@@ -17,6 +18,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Window;
+import javafx.util.Duration;
 
 import org.jabref.gui.StateManager;
 import org.jabref.gui.icon.IconTheme;
@@ -28,10 +30,12 @@ import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
-import org.jabref.gui.walkthrough.declarative.step.VisibleWalkthroughStep;
+import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
 
 import com.airhacks.afterburner.injection.Injector;
+import com.sun.javafx.scene.NodeHelper;
 import org.controlsfx.control.PopOver;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,14 +43,18 @@ import org.slf4j.LoggerFactory;
 /// Manages the overlay for displaying walkthrough steps in a single window.
 class WindowOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WindowOverlay.class);
+    private static final int POPOVER_CREATION_DELAY = 200;
+
     private final Window window;
     private final WalkthroughPane pane;
     private final WalkthroughRenderer renderer;
     private final Walkthrough walkthrough;
-    /// Mutable list of clean up tasks that are executed when the overlay is hidden or detached.
+    /// Mutable list of clean up tasks that are executed when the overlay is hidden or
+    /// detached.
     private final List<Runnable> cleanupTasks = new ArrayList<>();
     private final KeyBindingRepository keyBindingRepository;
     private final StateManager stateManager;
+    private final AtomicBoolean showing = new AtomicBoolean(true);
 
     private @Nullable Button quitButton;
     private @Nullable Node currentContentNode;
@@ -89,7 +97,7 @@ class WindowOverlay {
     /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
     public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
-
+        showing.set(true);
         if (node == null) {
             PopOver popover = createPopover(step, beforeNavigate);
             cleanupTasks.add(popover::hide);
@@ -99,44 +107,68 @@ class WindowOverlay {
         }
 
         final AtomicReference<PopOver> popOverRef = new AtomicReference<>();
-        popOverRef.set(createPopover(step, beforeNavigate));
         addQuitButton(step);
 
-        AnimationTimer timer = new AnimationTimer() {
-            private boolean isInternallyHidden = false;
+        final AtomicReference<ChangeListener<Boolean>> popoverShowingListenerRef = new AtomicReference<>();
 
+        final Runnable updatePopoverVisibility = new Runnable() {
             @Override
-            public void handle(long now) {
-                PopOver currentPopOver = popOverRef.get();
-                boolean canPositionNode = !WalkthroughUtils.cannotPositionNode(node);
+            public void run() {
+                boolean shouldBeShowing = showing.get() && NodeHelper.isTreeVisible(node);
+                PopOver currentPopover = popOverRef.get();
 
-                if (canPositionNode) {
-                    if (!currentPopOver.isShowing() && !isInternallyHidden) {
-                        // PopOver was hidden externally, or node is now ready. Recreate and show.
-                        currentPopOver.hide();
-                        PopOver newPopOver = createPopover(step, beforeNavigate);
-                        popOverRef.set(newPopOver);
-                        newPopOver.show(node);
+                if (!shouldBeShowing) {
+                    if (currentPopover != null && currentPopover.isShowing()) {
+                        currentPopover.hide();
                     }
-                    isInternallyHidden = false;
-                } else {
-                    if (currentPopOver.isShowing()) {
-                        currentPopOver.hide();
-                        isInternallyHidden = true;
-                    }
+                    return;
                 }
+
+                if (currentPopover == null || !currentPopover.isShowing()) {
+                    if (currentPopover != null) {
+                        currentPopover.showingProperty().removeListener(popoverShowingListenerRef.get());
+                    }
+                    // Prevent infinite loop. Consider: window want to close -> popover created
+                    // -> popover got notified to be closed -> popover hide -> popover showing again from this...
+                    Timeout timeout = createPopoverDelayed();
+                    cleanupTasks.add(timeout::cancel);
+                }
+            }
+
+            private @NotNull Timeout createPopoverDelayed() {
+                Timeout timeout = new Timeout(new Duration(POPOVER_CREATION_DELAY), () -> {
+                    PopOver newPopover = createPopover(step, beforeNavigate);
+                    popOverRef.set(newPopover);
+
+                    ChangeListener<Boolean> newListener = (_, wasShowing, isShowing) -> {
+                        if (wasShowing && !isShowing) {
+                            this.run();
+                        }
+                    };
+                    popoverShowingListenerRef.set(newListener);
+                    newPopover.showingProperty().addListener(newListener);
+                    newPopover.show(node);
+                });
+                timeout.start();
+                return timeout;
             }
         };
 
-        if (!WalkthroughUtils.cannotPositionNode(node)) {
-            popOverRef.get().show(node);
-        } else {
-            popOverRef.get().hide();
-        }
+        Runnable debouncedUpdate = WalkthroughUtils.debounced(updatePopoverVisibility, 50);
 
-        timer.start();
-        cleanupTasks.add(timer::stop);
-        cleanupTasks.add(() -> popOverRef.get().hide());
+        ChangeListener<Boolean> treeVisibleListener = (_, _, _) -> debouncedUpdate.run();
+        NodeHelper.treeVisibleProperty(node).addListener(treeVisibleListener);
+
+        updatePopoverVisibility.run();
+
+        cleanupTasks.add(() -> {
+            NodeHelper.treeVisibleProperty(node).removeListener(treeVisibleListener);
+            PopOver currentPopover = popOverRef.get();
+            if (currentPopover != null) {
+                currentPopover.showingProperty().removeListener(popoverShowingListenerRef.get());
+                currentPopover.hide();
+            }
+        });
 
         step.navigation().ifPresent(predicate ->
                 cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
@@ -166,6 +198,7 @@ class WindowOverlay {
     /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
     public void showPanel(PanelStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
+        showing.set(true);
         Node content = renderer.render(step, walkthrough, beforeNavigate);
         content.setMouseTransparent(false);
         currentContentNode = content;
@@ -213,6 +246,7 @@ class WindowOverlay {
 
     /// Hide the overlay and clean up any resources.
     public void hide() {
+        showing.set(false);
         removeQuitButton();
         if (currentContentNode != null) {
             pane.getChildren().remove(currentContentNode);
@@ -279,15 +313,15 @@ class WindowOverlay {
         });
     }
 
-    private void addQuitButton(VisibleWalkthroughStep step) {
-        if (!step.showQuitButton()) {
+    private void addQuitButton(VisibleComponent component) {
+        if (!component.showQuitButton()) {
             removeQuitButton();
             return;
         }
         removeQuitButton();
         quitButton = createQuitButton();
         quitButton.setMouseTransparent(false);
-        QuitButtonPosition position = resolveQuitButtonPosition(step);
+        QuitButtonPosition position = resolveQuitButtonPosition(component);
         positionQuitButton(quitButton, position);
         pane.getChildren().add(quitButton);
         quitButton.toFront();
@@ -304,9 +338,9 @@ class WindowOverlay {
         return button;
     }
 
-    private QuitButtonPosition resolveQuitButtonPosition(VisibleWalkthroughStep step) {
-        QuitButtonPosition position = step.quitButtonPosition();
-        if (position == QuitButtonPosition.AUTO && step instanceof PanelStep panelStep) {
+    private QuitButtonPosition resolveQuitButtonPosition(VisibleComponent component) {
+        QuitButtonPosition position = component.quitButtonPosition();
+        if (position == QuitButtonPosition.AUTO && component instanceof PanelStep panelStep) {
             return switch (panelStep.position()) {
                 case LEFT, BOTTOM -> QuitButtonPosition.TOP_RIGHT;
                 case RIGHT -> QuitButtonPosition.TOP_LEFT;

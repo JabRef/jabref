@@ -27,14 +27,25 @@ public class WalkthroughPane extends StackPane {
     private @Nullable Parent root;
     private volatile boolean isAttached = false;
 
-    public WalkthroughPane(@NonNull Window window) {
+    private WalkthroughPane(@NonNull Window window) {
         if (INSTANCES.containsKey(window)) {
+            // NOTE: This should never happen since constructor is private and
+            // getInstance() ensures only one instance per window.
             throw new IllegalStateException("WalkthroughPane already exists for this window: " + window.getClass().getSimpleName());
         }
 
         this.window = window;
         setMinSize(0, 0);
         INSTANCES.put(this.window, this);
+    }
+
+    public static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
+        WalkthroughPane instance = INSTANCES.get(window);
+        if (instance == null) {
+            instance = new WalkthroughPane(window);
+            instance.attach();
+        }
+        return instance;
     }
 
     /// Attaches this pane to the window by replacing the scene root. The original root
@@ -80,9 +91,5 @@ public class WalkthroughPane extends StackPane {
         isAttached = false;
 
         LOGGER.debug("WalkthroughPane detached from window: {}", window.getClass().getSimpleName());
-    }
-
-    public static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
-        return INSTANCES.computeIfAbsent(window, WalkthroughPane::new);
     }
 }

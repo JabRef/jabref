@@ -7,10 +7,13 @@ import java.util.function.Supplier;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
+import javafx.stage.Window;
 import javafx.util.Duration;
 
 import com.sun.javafx.scene.NodeHelper;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class WalkthroughUtils {
@@ -27,7 +30,7 @@ public class WalkthroughUtils {
     ///
     /// @param runnable the runnable to execute once
     /// @return a runnable that will only execute the original runnable once
-   public static Runnable once(Runnable runnable) {
+    public static Runnable once(Runnable runnable) {
         CountDownLatch latch = new CountDownLatch(1);
         return () -> {
             if (latch.getCount() > 0) {
@@ -106,28 +109,43 @@ public class WalkthroughUtils {
         };
     }
 
-    /// Creates a runnable that prevents concurrent execution but allows retries until
-    /// success. Once the task succeeds, all future executions are blocked permanently.
-    /// Thread-safe implementation using atomic operations.
+    /// Attaches a listener to the global window list that fires on every window change
+    /// until a stop condition is met.
     ///
-    /// @param task          the task to execute
-    /// @param wasSuccessful supplier that returns true if the task succeeded and no
-    ///                      more executions should be allowed
-    /// @return a runnable that can be retried until success, preventing concurrent
-    ///         executions
-    public static Runnable retryableOnce(Runnable task, Supplier<Boolean> wasSuccessful) {
-        AtomicBoolean noExecution = new AtomicBoolean(false);
-
-        return () -> {
-            if (!noExecution.compareAndSet(false, true)) {
-                return; // No concurrent executions
-            }
-
-            task.run();
-
-            if (!wasSuccessful.get()) {
-                noExecution.set(false); // Reset for next execution
+    /// @param onEvent       The runnable to execute when a window change is detected.
+    /// @param stopCondition A supplier that should return true when the listener should be detached.
+    /// @return A runnable that can be used to detach the listener prematurely.
+    public static Runnable onWindowChangedUntil(@NonNull Runnable onEvent, @NonNull Supplier<Boolean> stopCondition) {
+        ListChangeListener<Window> listener = new ListChangeListener<>() {
+            @Override
+            public void onChanged(Change<? extends Window> change) {
+                while (change.next()) {
+                    if (change.wasAdded() || change.wasRemoved()) {
+                        onEvent.run();
+                        if (stopCondition.get()) {
+                            Window.getWindows().removeListener(this);
+                            break;
+                        }
+                    }
+                }
             }
         };
+        Window.getWindows().addListener(listener);
+        return () -> Window.getWindows().removeListener(listener);
+    }
+
+    /// Attaches a listener to the global window list that fires once when a window is
+    /// added or removed, then immediately detaches itself.
+    ///
+    /// @param onNavigate The runnable to execute when a window change is detected.
+    /// @return A runnable that can be used to detach the listener prematurely.
+    public static Runnable onWindowChangedOnce(Runnable onNavigate) {
+        AtomicBoolean navigated = new AtomicBoolean(false);
+        Runnable onNavigateOnce = () -> {
+            if (navigated.compareAndSet(false, true)) {
+                onNavigate.run();
+            }
+        };
+        return onWindowChangedUntil(onNavigateOnce, navigated::get);
     }
 }

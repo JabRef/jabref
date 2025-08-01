@@ -28,7 +28,7 @@ public record TooltipStep(@NonNull String title,
                           @Nullable WalkthroughEffect highlightValue,
                           @Nullable WindowResolver activeWindowResolverValue,
                           boolean showQuitButtonValue,
-                          @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleWalkthroughStep {
+                          @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
     public static final double DEFAULT_WIDTH = 384;
 
     @Override
@@ -72,7 +72,7 @@ public record TooltipStep(@NonNull String title,
     }
 
     @Override
-    public Optional<WindowResolver> activeWindowResolver() {
+    public Optional<WindowResolver> windowResolver() {
         return Optional.ofNullable(activeWindowResolverValue);
     }
 
