@@ -21,11 +21,14 @@ import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.ConfigConstants;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.AfterEach;
@@ -43,12 +46,16 @@ import static org.mockito.Mockito.when;
 
 class GitSyncServiceTest {
     private Path library;
-    private Path remoteDir;
+
+    // Class variables for debugging purposes
     private Path aliceDir;
     private Path bobDir;
+    private Path remoteDir;
+
     private Git aliceGit;
     private Git bobGit;
     private Git remoteGit;
+
     private ImportFormatPreferences importFormatPreferences;
     private GitConflictResolverStrategy gitConflictResolverStrategy;
     private GitSemanticMergeExecutor mergeExecutor;
@@ -189,6 +196,11 @@ class GitSyncServiceTest {
         if (remoteGit != null) {
             remoteGit.close();
         }
+        // Required by JGit
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-2765437816 for details
+        RepositoryCache.clear();
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-3095957214
+        WindowCache.reconfigure(new WindowCacheConfig());
     }
 
     @Test
@@ -240,7 +252,7 @@ class GitSyncServiceTest {
     }
 
     @Test
-    void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution(@TempDir Path tempDir) throws Exception {
+    void mergeConflictOnSameFieldTriggersDialogAndUsesUserResolution() throws Exception {
         Path bobLibrary = bobDir.resolve("library.bib");
         String bobEntry = """
               @article{b,

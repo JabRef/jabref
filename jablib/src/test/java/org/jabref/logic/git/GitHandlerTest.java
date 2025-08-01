@@ -10,11 +10,15 @@ import java.util.Optional;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.internal.storage.file.WindowCache;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.RepositoryCache;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.storage.file.WindowCacheConfig;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.URIish;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -35,11 +39,13 @@ class GitHandlerTest {
     void setUpGitHandler() throws IOException, GitAPIException, URISyntaxException {
         gitHandler = new GitHandler(repositoryPath);
 
-        Git remoteGit = Git.init()
+        try (Git remoteGit = Git.init()
                            .setBare(true)
                            .setDirectory(remoteRepoPath.toFile())
                            .setInitialBranch("main")
-                           .call();
+                           .call()) {
+            // This ensures the remote repository is initialized and properly closed
+        }
         Path testFile = repositoryPath.resolve("initial.txt");
         Files.writeString(testFile, "init");
 
@@ -63,6 +69,15 @@ class GitHandlerTest {
                     .setForce(true)
                     .call();
         }
+    }
+
+    @AfterEach
+    void cleanUp() {
+        // Required by JGit
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-2765437816 for details
+        RepositoryCache.clear();
+        // See https://github.com/eclipse-jgit/jgit/issues/155#issuecomment-3095957214
+        WindowCache.reconfigure(new WindowCacheConfig());
     }
 
     @Test
@@ -96,7 +111,7 @@ class GitHandlerTest {
     }
 
     @Test
-    void fetchOnCurrentBranch() throws IOException, GitAPIException, URISyntaxException {
+    void fetchOnCurrentBranch() throws IOException, GitAPIException {
         try (Git cloneGit = Git.cloneRepository()
                                .setURI(remoteRepoPath.toUri().toString())
                                .setDirectory(clonePath.toFile())
