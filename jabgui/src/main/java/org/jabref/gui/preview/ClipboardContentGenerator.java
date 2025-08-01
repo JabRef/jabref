@@ -23,6 +23,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.google.common.annotations.VisibleForTesting;
+import com.vladsch.flexmark.html2md.converter.FlexmarkHtmlConverter;
 
 public class ClipboardContentGenerator {
 
@@ -45,6 +46,7 @@ public class ClipboardContentGenerator {
             return switch (outputFormat) {
                 case HTML -> processHtml(citations);
                 case TEXT -> processText(citations);
+                case MARKDOWN -> processMarkdown(citations);
             };
         } else {
             // if it is not a citation style take care of the preview
@@ -117,6 +119,32 @@ public class ClipboardContentGenerator {
         ClipboardContent content = new ClipboardContent();
         content.putString(result);
         content.putHtml(result);
+        return content;
+    }
+
+    /**
+     * Insert each citation into HTML.
+     * convert HTML to markdown using flexmark.
+    */
+    @VisibleForTesting
+    static ClipboardContent processMarkdown(List<String> citations) {
+        String result = "<!DOCTYPE html>" + OS.NEWLINE +
+                "<html>" + OS.NEWLINE +
+                "   <head>" + OS.NEWLINE +
+                "      <meta charset=\"utf-8\">" + OS.NEWLINE +
+                "   </head>" + OS.NEWLINE +
+                "   <body>" + OS.NEWLINE + OS.NEWLINE;
+
+        result += String.join(CitationStyleOutputFormat.HTML.getLineSeparator(), citations);
+        result += OS.NEWLINE +
+                "   </body>" + OS.NEWLINE +
+                "</html>" + OS.NEWLINE;
+
+        FlexmarkHtmlConverter converter = FlexmarkHtmlConverter.builder().build();
+        String markdown = converter.convert(result);
+
+        ClipboardContent content = new ClipboardContent();
+        content.putString(markdown);
         return content;
     }
 

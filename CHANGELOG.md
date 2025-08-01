@@ -21,10 +21,12 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added the field `monthfiled` to the default list of fields to resolve BibTeX-Strings for [#13375](https://github.com/JabRef/jabref/issues/13375)
 - We added a new ID based fetcher for [EuropePMC](https://europepmc.org/). [#13389](https://github.com/JabRef/jabref/pull/13389)
 - We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)
+- We added "copy preview as markdown" feature. [#12552](https://github.com/JabRef/jabref/issues/12552)
 - In case no citation relation information can be fetched, we show the data providers reason. [#13549](https://github.com/JabRef/jabref/pull/13549)
 
 ### Changed
 
+- We changed the name from Open AI Provider to Open AI (or API compatible). [#13585](https://github.com/JabRef/jabref/issues/13585)
 - We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We added a tooltip to keywords that resemble Math Subject Classification (MSC) codes. [#12944](https://github.com/JabRef/jabref/issues/12944)
 - We added a formatter to convert keywords that resemble MSC codes to their descriptions. [#12944](https://github.com/JabRef/jabref/issues/12944)
@@ -65,6 +67,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed dark mode of BibTeX Source dialog in Citation Relations tab. [#13599](https://github.com/JabRef/jabref/issues/13599)
+- We fixed an issue where the LibreOffice integration did not support citation keys containing Unicode characters. [#13301](https://github.com/JabRef/jabref/issues/13301)
 - We fixed an issue where the "Search ShortScience" action did not convert LaTeX-formatted titles to Unicode.[#13418](https://github.com/JabRef/jabref/issues/13418)
 - We added a fallback for the "Convert to biblatex" cleanup when it failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). [#11868](https://github.com/JabRef/jabref/issues/11868)
 - We fixed an issue where directory check for relative path was not handled properly under library properties. [#13017](https://github.com/JabRef/jabref/issues/13017)
@@ -77,6 +81,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We fixed an issue where the preview area in the "Select Style" dialog of the LibreOffice integration was too small to display full content. [#13051](https://github.com/JabRef/jabref/issues/13051)
 - We excluded specific fields (e.g., `comment`, `pdf`, `sortkey`) from the consistency check to reduce false positives [#13131](https://github.com/JabRef/jabref/issues/13131)
 - We fixed an issue where moved or renamed linked files in the file directory were not automatically relinked by the “search for unlinked files” feature. [#13264](https://github.com/JabRef/jabref/issues/13264)
+- We fixed an issue with proxy setup in the absence of a password. [#12412](https://github.com/JabRef/jabref/issues/12412)
 - We fixed an issue where the tab showing the fulltext search results was not displayed. [#12865](https://github.com/JabRef/jabref/issues/12865)
 - We fixed an issue showing an empty tooltip in maintable. [#11681](https://github.com/JabRef/jabref/issues/11681)
 - We fixed an issue displaying a warning if a file to open is not found. [#13430](https://github.com/JabRef/jabref/pull/13430)

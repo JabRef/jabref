@@ -10,6 +10,8 @@ import java.util.TreeSet;
 import javax.swing.undo.UndoManager;
 
 import org.jabref.gui.DialogService;
+import org.jabref.gui.mergeentries.threewaymerge.EntriesMergeResult;
+import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesDialog;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.NamedCompound;
 import org.jabref.gui.undo.UndoableChangeType;
