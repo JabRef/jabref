@@ -162,7 +162,7 @@ public class LinkedFileTransferHelper {
         return true;
       }
     } catch (Exception e) {
-      LOGGER.warn("Failed to adjust path for file {}: {}", linkedFile.getLink(), e.getMessage());
+      LOGGER.warn("Failed to adjust path for file {}: {}", linkedFile.getLink(), e.getMessage(), e);
     }
     return false;
   }
@@ -200,7 +200,7 @@ public class LinkedFileTransferHelper {
       LOGGER.info("Copied file from {} to {}", sourcePath, fullTargetPath);
       return true;
     } catch (IOException e) {
-      LOGGER.error("Failed to copy file from {} to {}: {}", sourcePath, fullTargetPath, e.getMessage());
+      LOGGER.error("Failed to copy file from {} to {}: {}", sourcePath, fullTargetPath, e.getMessage(), e);
       return false;
     }
   }
