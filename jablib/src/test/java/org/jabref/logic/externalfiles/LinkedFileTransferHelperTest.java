@@ -53,7 +53,7 @@ class LinkedFileTransferHelperTest {
       LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
       sourceEntry.setFiles(List.of(linkedFile));
-      targetEntry = (BibEntry) sourceEntry.clone();
+      targetEntry = new BibEntry(sourceEntry);
       targetEntry.setFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
@@ -100,7 +100,7 @@ class LinkedFileTransferHelperTest {
       LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
       sourceEntry.setFiles(List.of(linkedFile));
-      targetEntry = (BibEntry) sourceEntry.clone();
+      targetEntry = new BibEntry(sourceEntry);
       targetEntry.setFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
@@ -147,7 +147,7 @@ class LinkedFileTransferHelperTest {
       LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
       sourceEntry.setFiles(List.of(linkedFile));
-      targetEntry = (BibEntry) sourceEntry.clone();
+      targetEntry = new BibEntry(sourceEntry);
       targetEntry.setFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
