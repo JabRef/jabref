@@ -136,7 +136,7 @@ class CSLStyleUtilsTest {
                 Arguments.of("IEEE", IEEE),
                 Arguments.of("American Psychological Association 7th edition", APA),
                 Arguments.of("Vancouver", VANCOUVER),
-                Arguments.of("Chicago Manual of Style 17th edition (author-date)", CHICAGO_AUTHOR_DATE),
+                Arguments.of("Chicago Manual of Style 18th edition (author-date)", CHICAGO_AUTHOR_DATE),
                 Arguments.of("Nature", NATURE),
                 Arguments.of("Modern Language Association 9th edition", MLA),
                 Arguments.of("The Journal of Clinical Ethics", JOURNAL_OF_CLINICAL_ETHICS)

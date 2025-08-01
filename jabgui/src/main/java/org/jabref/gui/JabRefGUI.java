@@ -210,10 +210,16 @@ public class JabRefGUI extends Application {
     }
 
     private void setupProxy() {
-        if (!preferences.getProxyPreferences().shouldUseProxy()
-                || !preferences.getProxyPreferences().shouldUseAuthentication()) {
+        if (!preferences.getProxyPreferences().shouldUseProxy()) {
             return;
         }
+
+        if (!preferences.getProxyPreferences().shouldUseAuthentication()) {
+            ProxyRegisterer.register(preferences.getProxyPreferences());
+            return;
+        }
+
+        assert preferences.getProxyPreferences().shouldUseAuthentication();
 
         if (preferences.getProxyPreferences().shouldPersistPassword()
                 && StringUtil.isNotBlank(preferences.getProxyPreferences().getPassword())) {
@@ -505,5 +511,8 @@ public class JabRefGUI extends Application {
         }
 
         LOGGER.trace("Finished stop");
+
+        // Just to be sure that we do not leave any threads running
+        System.exit(0);
     }
 }
