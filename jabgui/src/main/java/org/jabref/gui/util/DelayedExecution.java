@@ -1,14 +1,14 @@
-package org.jabref.gui.walkthrough;
+package org.jabref.gui.util;
 
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 
 /// Executes a runnable after a specified duration. It uses a [PauseTransition] to
 /// ensure the runnable is executed on the JavaFX Application Thread.
-public class Timeout {
+public class DelayedExecution {
     private final PauseTransition transition;
 
-    public Timeout(Duration duration, Runnable onFinished) {
+    public DelayedExecution(Duration duration, Runnable onFinished) {
         this.transition = new PauseTransition(duration);
         this.transition.setOnFinished(_ -> onFinished.run());
     }

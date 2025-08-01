@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;

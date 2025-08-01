@@ -26,6 +26,7 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.WalkthroughKeyBindings;
+import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
@@ -130,13 +131,13 @@ class WindowOverlay {
                     }
                     // Prevent infinite loop. Consider: window want to close -> popover created
                     // -> popover got notified to be closed -> popover hide -> popover showing again from this...
-                    Timeout timeout = createPopoverDelayed();
-                    cleanupTasks.add(timeout::cancel);
+                    DelayedExecution delayedExecution = createPopoverDelayed();
+                    cleanupTasks.add(delayedExecution::cancel);
                 }
             }
 
-            private @NonNull Timeout createPopoverDelayed() {
-                Timeout timeout = new Timeout(new Duration(POPOVER_CREATION_DELAY), () -> {
+            private @NonNull DelayedExecution createPopoverDelayed() {
+                DelayedExecution delayedExecution = new DelayedExecution(new Duration(POPOVER_CREATION_DELAY), () -> {
                     PopOver newPopover = createPopover(step, beforeNavigate);
                     popOverRef.set(newPopover);
 
@@ -149,8 +150,8 @@ class WindowOverlay {
                     newPopover.showingProperty().addListener(newListener);
                     newPopover.show(node);
                 });
-                timeout.start();
-                return timeout;
+                delayedExecution.start();
+                return delayedExecution;
             }
         };
 

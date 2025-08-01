@@ -22,7 +22,7 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 import org.jabref.gui.frame.MainMenu;
-import org.jabref.gui.walkthrough.Timeout;
+import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.walkthrough.WalkthroughUtils;
 
 import com.sun.javafx.scene.control.ContextMenuContent;
@@ -181,18 +181,17 @@ public interface NavigationPredicate {
     }
 
     private static @NonNull <T extends Event> EventHandler<T> getPatchedEventHandler(Runnable beforeNavigate, Runnable onNavigate, @Nullable EventHandler<? super T> handler) {
-        return event -> patched(
-                beforeNavigate,
-                onNavigate,
-                () -> {
-                    if (handler != null) {
-                        handler.handle(event);
-                        event.consume();
-                        return null;
-                    }
+        return event -> {
+            Supplier<Void> supplier = () -> {
+                if (handler != null) {
+                    handler.handle(event);
+                    event.consume();
                     return null;
                 }
-        );
+                return null;
+            };
+            patched(beforeNavigate, onNavigate, supplier);
+        };
     }
 
     private static @NonNull <T> T patched(Runnable before, Runnable after, Supplier<T> between) {
@@ -202,15 +201,15 @@ public interface NavigationPredicate {
         Runnable fxOnNavigate = () -> Platform.runLater(onNavigateOnce);
 
         Runnable cleanupWindowListener = WalkthroughUtils.onWindowChangedOnce(fxOnNavigate);
-        Timeout timeout = new Timeout(TIMEOUT_DURATION, () -> {
+        DelayedExecution delayedExecution = new DelayedExecution(TIMEOUT_DURATION, () -> {
             fxOnNavigate.run();
             cleanupWindowListener.run();
         });
-        timeout.start();
+        delayedExecution.start();
 
         T result = between.get();
 
-        timeout.cancel();
+        delayedExecution.cancel();
         cleanupWindowListener.run();
         onNavigateOnce.run();
 
