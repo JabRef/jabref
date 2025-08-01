@@ -150,10 +150,12 @@ public class CitationRelationsTab extends EntryEditorTab {
         citedByHBox.setPrefHeight(40);
 
         // Create Heading Lab
-        Label citingLabel = new Label(Localization.lang("References (cites)"));
-        styleLabel(citingLabel, Localization.lang("Works cited by the work at hand"));
-        Label citedByLabel = new Label(Localization.lang("Citations (cited by)"));
-        styleLabel(citedByLabel, Localization.lang("Works citing the work at hand"));
+        String citationKey = entry.getCitationKey().orElse("this entry");
+
+        Label citingLabel = new Label(Localization.lang("References cited in %0", citationKey));
+        styleLabel(citingLabel, Localization.lang("Also called \"backward citations\""));
+        Label citedByLabel = new Label(Localization.lang("References that cite %0", citationKey));
+        styleLabel(citedByLabel, Localization.lang("Also called \"forward citations\""));
 
         // Create ListViews
         CheckListView<CitationRelationItem> citingListView = new CheckListView<>();
