@@ -137,19 +137,18 @@ class GitStatusCheckerTest {
     @Test
     void behindStatusWhenRemoteHasNewCommit(@TempDir Path tempDir) throws Exception {
         Path remoteWork = tempDir.resolve("remoteWork");
-        Git remoteClone = Git.cloneRepository()
+        try (Git remoteClone = Git.cloneRepository()
                              .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
                              .setDirectory(remoteWork.toFile())
                              .setBranchesToClone(List.of("refs/heads/main"))
                              .setBranch("main")
-                             .call();
-        Path remoteFile = remoteWork.resolve("library.bib");
-        commitFile(remoteClone, remoteUpdatedContent, "Remote update");
-        remoteClone.push()
-                   .setRemote("origin")
-                   .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-                   .call();
-
+                             .call()) {
+            commitFile(remoteClone, remoteUpdatedContent, "Remote update");
+            remoteClone.push()
+                       .setRemote("origin")
+                       .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                       .call();
+        }
         localGit.fetch().setRemote("origin").call();
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);
         assertEquals(SyncStatus.BEHIND, snapshot.syncStatus());
@@ -167,19 +166,18 @@ class GitStatusCheckerTest {
         commitFile(localGit, localUpdatedContent, "Local update");
 
         Path remoteWork = tempDir.resolve("remoteWork");
-        Git remoteClone = Git.cloneRepository()
+        try (Git remoteClone = Git.cloneRepository()
                              .setURI(remoteGit.getRepository().getDirectory().toURI().toString())
                              .setDirectory(remoteWork.toFile())
                              .setBranchesToClone(List.of("refs/heads/main"))
                              .setBranch("main")
-                             .call();
-        Path remoteFile = remoteWork.resolve("library.bib");
-        commitFile(remoteClone, remoteUpdatedContent, "Remote update");
-        remoteClone.push()
-                   .setRemote("origin")
-                   .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
-                   .call();
-
+                             .call()) {
+            commitFile(remoteClone, remoteUpdatedContent, "Remote update");
+            remoteClone.push()
+                       .setRemote("origin")
+                       .setRefSpecs(new RefSpec("refs/heads/main:refs/heads/main"))
+                       .call();
+        }
         localGit.fetch().setRemote("origin").call();
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);
         assertEquals(SyncStatus.DIVERGED, snapshot.syncStatus());
