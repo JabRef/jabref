@@ -56,9 +56,9 @@ class LinkedFileTransferHelperTest {
       sourceEntry = new BibEntry();
       LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
-      sourceEntry.setFiles(List.of(linkedFile));
+      sourceEntry.withFiles(List.of(linkedFile));
       targetEntry = new BibEntry(sourceEntry);
-      targetEntry.setFiles(List.of(linkedFile));
+      targetEntry.withFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
       targetContext.getDatabase().insertEntry(targetEntry);
@@ -103,9 +103,9 @@ class LinkedFileTransferHelperTest {
       sourceEntry = new BibEntry();
       LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
-      sourceEntry.setFiles(List.of(linkedFile));
+      sourceEntry.withFiles(List.of(linkedFile));
       targetEntry = new BibEntry(sourceEntry);
-      targetEntry.setFiles(List.of(linkedFile));
+      targetEntry.withFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
       targetContext.getDatabase().insertEntry(targetEntry);
@@ -150,9 +150,9 @@ class LinkedFileTransferHelperTest {
       sourceEntry = new BibEntry();
       LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
-      sourceEntry.setFiles(List.of(linkedFile));
+      sourceEntry.withFiles(List.of(linkedFile));
       targetEntry = new BibEntry(sourceEntry);
-      targetEntry.setFiles(List.of(linkedFile));
+      targetEntry.withFiles(List.of(linkedFile));
 
       sourceContext.getDatabase().insertEntry(sourceEntry);
       targetContext.getDatabase().insertEntry(targetEntry);
