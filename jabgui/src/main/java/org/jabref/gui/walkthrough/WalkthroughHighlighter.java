@@ -189,7 +189,7 @@ public class WalkthroughHighlighter {
 
     private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
         WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        pane.attach();
+        pane.ensureAttached();
 
         BackdropHighlight backdrop = getOrCreateBackdropHighlight(window, pane);
         backdrop.setOnClick(onBackgroundClickHandler);
@@ -198,7 +198,7 @@ public class WalkthroughHighlighter {
 
     private void applyPulseAnimation(@NonNull Window window, @NonNull Node targetNode) {
         WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        pane.attach();
+        pane.ensureAttached();
 
         PulseAnimateIndicator pulse = getOrCreatePulseIndicator(window, pane);
         pulse.attach(targetNode);
@@ -206,7 +206,7 @@ public class WalkthroughHighlighter {
 
     private void applyFullScreenDarken(@NonNull Window window) {
         WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        pane.attach();
+        pane.ensureAttached();
 
         FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);
         fullDarken.setOnClick(onBackgroundClickHandler);

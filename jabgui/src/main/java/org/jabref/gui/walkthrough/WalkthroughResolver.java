@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.stage.Window;
 import javafx.util.Duration;
 
+import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.util.RecursiveChildrenListener;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
@@ -33,7 +34,7 @@ public class WalkthroughResolver {
     private @Nullable Runnable windowListenerCleanup;
     private @Nullable ChangeListener<Scene> sceneListener;
     private @Nullable RecursiveChildrenListener recursiveChildrenListener;
-    private @Nullable Timeout timeout;
+    private @Nullable DelayedExecution delayedExecution;
 
     public WalkthroughResolver(WindowResolver windowResolver,
                                @Nullable NodeResolver nodeResolver,
@@ -44,11 +45,11 @@ public class WalkthroughResolver {
     }
 
     public void startResolution() {
-        timeout = new Timeout(RESOLVE_TIMEOUT, () -> {
+        delayedExecution = new DelayedExecution(RESOLVE_TIMEOUT, () -> {
             LOGGER.error("Walkthrough resolution timed out.");
             finish(new WalkthroughResult(null, null));
         });
-        timeout.start();
+        delayedExecution.start();
 
         Optional<Window> window = windowResolver.resolve();
         if (window.isPresent()) {
@@ -123,9 +124,9 @@ public class WalkthroughResolver {
     }
 
     public void cancel() {
-        if (timeout != null) {
-            timeout.cancel();
-            timeout = null;
+        if (delayedExecution != null) {
+            delayedExecution.cancel();
+            delayedExecution = null;
         }
         if (windowListenerCleanup != null) {
             windowListenerCleanup.run();

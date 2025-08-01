@@ -85,7 +85,7 @@ import org.slf4j.LoggerFactory;
 /// In case you search for a builder as described in Item 2 of the book "Effective Java", you won't find one. Please use the methods [#withCitationKey(String)] and [#withField(Field,String)]. All these methods set [#hasChanged()] to <code>false</code>. In case <code>changed</code>, use [#withChanged(boolean)].
 ///
 @AllowedToUseLogic("because it needs access to parser and writers")
-public class BibEntry implements Cloneable {
+public class BibEntry {
 
     public static final EntryType DEFAULT_TYPE = StandardEntryType.Misc;
     private static final Logger LOGGER = LoggerFactory.getLogger(BibEntry.class);
@@ -155,6 +155,19 @@ public class BibEntry implements Cloneable {
     public BibEntry(EntryType type, String citationKey) {
         this(type);
         this.setCitationKey(citationKey);
+    }
+
+    /**
+     * Returns a copy of this entry.
+     * This will set a new ID for the copied entry to be able to distinguish both copies.
+     * Does <em>not</em> port the listeners.
+     */
+    public BibEntry(BibEntry other) {
+        this(other.type.getValue());
+        this.fields = FXCollections.observableMap(new ConcurrentHashMap<>(other.fields));
+        this.commentsBeforeEntry = other.commentsBeforeEntry;
+        this.parsedSerialization = other.parsedSerialization;
+        this.changed = other.changed;
     }
 
     public Optional<FieldChange> setMonth(Month parsedMonth) {
@@ -692,21 +705,6 @@ public class BibEntry implements Cloneable {
         return fields.stream().allMatch(field -> this.getResolvedFieldOrAlias(field, database).isPresent());
     }
 
-    /**
-     * Returns a clone of this entry. Useful for copying.
-     * This will set a new ID for the cloned entry to be able to distinguish both copies.
-     * Does <em>not</em> port the listeners.
-     */
-    @Override
-    public Object clone() {
-        BibEntry clone = new BibEntry(type.getValue());
-        clone.fields = FXCollections.observableMap(new ConcurrentHashMap<>(fields));
-        clone.commentsBeforeEntry = commentsBeforeEntry;
-        clone.parsedSerialization = parsedSerialization;
-        clone.changed = changed;
-        return clone;
-    }
-
     /// Serializes all fields, even the JabRef internal ones. Does NOT serialize "KEY_FIELD" as field, but as key.
     ///
     /// We do it this way to
@@ -754,11 +752,11 @@ public class BibEntry implements Cloneable {
 
         StringBuilder textBuilder = new StringBuilder();
         textBuilder.append(formattedAuthors)
-                .append(": \"")
-                .append(formattedTitle)
-                .append("\" (")
-                .append(yearField)
-                .append(')');
+                   .append(": \"")
+                   .append(formattedTitle)
+                   .append("\" (")
+                   .append(yearField)
+                   .append(')');
 
         return StringUtil.limitStringLength(textBuilder.toString(), maxCharacters);
     }
@@ -1200,7 +1198,7 @@ public class BibEntry implements Cloneable {
      * This method. adds the given path (as file) to the entry and removes the url.
      *
      * @param linkToDownloadedFile the link to the file, which was downloaded
-     * @param downloadedFile the path to be added to the entry
+     * @param downloadedFile       the path to be added to the entry
      */
     public void replaceDownloadedFile(String linkToDownloadedFile, LinkedFile downloadedFile) {
         List<LinkedFile> linkedFiles = this.getFiles();
@@ -1238,7 +1236,7 @@ public class BibEntry implements Cloneable {
      * Merge this entry's fields with another BibEntry. Non-intersecting fields will be automatically merged. In cases of
      * intersection, priority is given to THIS entry's field value, UNLESS specified otherwise in the arguments.
      *
-     * @param other another BibEntry from which fields are sourced from
+     * @param other                  another BibEntry from which fields are sourced from
      * @param otherPrioritizedFields collection of Fields in which 'other' has a priority into final result
      */
     public void mergeWith(BibEntry other, Set<Field> otherPrioritizedFields) {

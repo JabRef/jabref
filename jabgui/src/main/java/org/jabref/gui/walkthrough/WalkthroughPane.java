@@ -39,18 +39,19 @@ public class WalkthroughPane extends StackPane {
         INSTANCES.put(this.window, this);
     }
 
-    public static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
+    public synchronized static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
         WalkthroughPane instance = INSTANCES.get(window);
         if (instance == null) {
             instance = new WalkthroughPane(window);
-            instance.attach();
+            instance.ensureAttached();
         }
         return instance;
     }
 
-    /// Attaches this pane to the window by replacing the scene root. The original root
-    /// becomes a child of this pane.
-    public synchronized void attach() {
+    /// Ensure the WalkthroughPane is attached to the window's scene root. This method
+    /// replaces the scene root with this WalkthroughPane, allowing it to manage
+    /// walkthrough overlays effectively.
+    public synchronized void ensureAttached() {
         if (isAttached) {
             LOGGER.debug("WalkthroughPane already attached to window: {}", window.getClass().getSimpleName());
             return;
@@ -70,8 +71,8 @@ public class WalkthroughPane extends StackPane {
         LOGGER.debug("WalkthroughPane attached to window: {}", window.getClass().getSimpleName());
     }
 
-    /// Detaches this pane from the window by restoring the original scene root.
-    public synchronized void detach() {
+    /// Ensure the WalkthroughPane is detached from the window.
+    public synchronized void ensureDetached() {
         INSTANCES.remove(window);
 
         if (!isAttached) {

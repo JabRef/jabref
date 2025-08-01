@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
-import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ public class Walkthrough {
     private @Nullable WalkthroughOverlay overlay;
     private Stage currentStage;
 
-    public Walkthrough(List<WalkthroughStep> steps) {
+    public Walkthrough(StateManager stateManager, List<WalkthroughStep> steps) {
         if (steps.isEmpty() || steps.stream().anyMatch(Objects::isNull)) {
             // This throwing is acceptable, since the Walkthrough is often hardcoded and won't make the application crash
             throw new IllegalArgumentException("Walkthrough must have at least one step and no null steps allowed.");
@@ -40,11 +39,11 @@ public class Walkthrough {
         this.currentStep = new SimpleIntegerProperty(0);
         this.active = new SimpleBooleanProperty(false);
         this.steps = steps;
-        this.stateManager = Injector.instantiateModelOrService(StateManager.class);
+        this.stateManager = stateManager;
     }
 
-    public Walkthrough(@NonNull WalkthroughStep... steps) {
-        this(List.of(steps));
+    public Walkthrough(StateManager stateManager, @NonNull WalkthroughStep... steps) {
+        this(stateManager, List.of(steps));
     }
 
     /// Gets the current step index property.

@@ -26,6 +26,7 @@ import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.keyboard.SelectableTextFlowKeyBindings;
 import org.jabref.gui.keyboard.WalkthroughKeyBindings;
+import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.walkthrough.declarative.step.PanelStep;
 import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
@@ -35,7 +36,7 @@ import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
 import com.airhacks.afterburner.injection.Injector;
 import com.sun.javafx.scene.NodeHelper;
 import org.controlsfx.control.PopOver;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,13 +131,13 @@ class WindowOverlay {
                     }
                     // Prevent infinite loop. Consider: window want to close -> popover created
                     // -> popover got notified to be closed -> popover hide -> popover showing again from this...
-                    Timeout timeout = createPopoverDelayed();
-                    cleanupTasks.add(timeout::cancel);
+                    DelayedExecution delayedExecution = createPopoverDelayed();
+                    cleanupTasks.add(delayedExecution::cancel);
                 }
             }
 
-            private @NotNull Timeout createPopoverDelayed() {
-                Timeout timeout = new Timeout(new Duration(POPOVER_CREATION_DELAY), () -> {
+            private @NonNull DelayedExecution createPopoverDelayed() {
+                DelayedExecution delayedExecution = new DelayedExecution(new Duration(POPOVER_CREATION_DELAY), () -> {
                     PopOver newPopover = createPopover(step, beforeNavigate);
                     popOverRef.set(newPopover);
 
@@ -149,8 +150,8 @@ class WindowOverlay {
                     newPopover.showingProperty().addListener(newListener);
                     newPopover.show(node);
                 });
-                timeout.start();
-                return timeout;
+                delayedExecution.start();
+                return delayedExecution;
             }
         };
 
@@ -259,7 +260,7 @@ class WindowOverlay {
     /// Detaches the overlay.
     public void detach() {
         hide();
-        pane.detach();
+        pane.ensureDetached();
         LOGGER.debug("WindowOverlay detached for window: {}", window.getClass().getSimpleName());
     }
 

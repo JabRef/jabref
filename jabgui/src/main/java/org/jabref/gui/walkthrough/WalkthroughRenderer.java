@@ -40,11 +40,11 @@ public class WalkthroughRenderer {
         titleFlow.setMarkdown("## " + Localization.lang(step.title()));
         titleContainer.getChildren().add(titleFlow);
 
-        VBox contentContainer = makeContent(step, walkthrough, beforeNavigate);
+        VBox contentContainer = createContent(step, walkthrough, beforeNavigate);
         contentContainer.getStyleClass().add("walkthrough-tooltip-content");
         VBox.setVgrow(contentContainer, Priority.ALWAYS);
 
-        HBox actionsContainer = makeActions(step, walkthrough, beforeNavigate);
+        HBox actionsContainer = createActions(step, walkthrough, beforeNavigate);
         actionsContainer.getStyleClass().add("walkthrough-tooltip-actions");
 
         step.maxHeight().ifPresent(tooltip::setMaxHeight);
@@ -71,8 +71,8 @@ public class WalkthroughRenderer {
         titleFlow.setMarkdown("## " + Localization.lang(step.title()));
         titleContainer.getChildren().add(titleFlow);
 
-        VBox contentContainer = makeContent(step, walkthrough, beforeNavigate);
-        HBox actionsContainer = makeActions(step, walkthrough, beforeNavigate);
+        VBox contentContainer = createContent(step, walkthrough, beforeNavigate);
+        HBox actionsContainer = createActions(step, walkthrough, beforeNavigate);
         VBox.setVgrow(contentContainer, Priority.ALWAYS);
 
         panel.getChildren().addAll(titleContainer, contentContainer, actionsContainer);
@@ -134,7 +134,7 @@ public class WalkthroughRenderer {
         return container;
     }
 
-    private HBox makeActions(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
+    private HBox createActions(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
         HBox actions = new HBox();
         actions.setAlignment(Pos.CENTER_LEFT);
         actions.getStyleClass().add("walkthrough-actions");
@@ -163,7 +163,7 @@ public class WalkthroughRenderer {
         return actions;
     }
 
-    private VBox makeContent(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
+    private VBox createContent(VisibleComponent component, Walkthrough walkthrough, Runnable beforeNavigate) {
         VBox contentBox = new VBox();
         contentBox.getStyleClass().add("walkthrough-content");
         contentBox.getChildren().addAll(component.content().stream().map(block ->
