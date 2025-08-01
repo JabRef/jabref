@@ -52,26 +52,8 @@ public class WalkthroughUtils {
         Timeline timeline = new Timeline();
 
         return observable -> {
-            if (!pending.compareAndSet(false, true)) {
-                return;
-            }
-
-            timeline.stop();
-            timeline.getKeyFrames().clear();
-
-            KeyFrame keyFrame = new KeyFrame(
-                    Duration.millis(intervalMs),
-                    _ -> {
-                        try {
-                            listener.invalidated(observable);
-                        } finally {
-                            pending.set(false);
-                        }
-                    }
-            );
-
-            timeline.getKeyFrames().add(keyFrame);
-            timeline.play();
+            Runnable action = () -> listener.invalidated(observable);
+            scheduleExecution(timeline, pending, intervalMs, action);
         };
     }
 
@@ -84,36 +66,31 @@ public class WalkthroughUtils {
     public static Runnable debounced(Runnable runnable, long intervalMs) {
         AtomicBoolean pending = new AtomicBoolean(false);
         Timeline timeline = new Timeline();
+        return () -> scheduleExecution(timeline, pending, intervalMs, runnable);
+    }
 
-        return () -> {
-            if (!pending.compareAndSet(false, true)) {
-                return;
+    private static void scheduleExecution(Timeline timeline, AtomicBoolean pending, long intervalMs, Runnable action) {
+        if (!pending.compareAndSet(false, true)) {
+            return;
+        }
+
+        timeline.stop();
+        timeline.getKeyFrames().setAll(new KeyFrame(Duration.millis(intervalMs), _ -> {
+            try {
+                action.run();
+            } finally {
+                pending.set(false);
             }
-
-            timeline.stop();
-            timeline.getKeyFrames().clear();
-
-            KeyFrame keyFrame = new KeyFrame(
-                    Duration.millis(intervalMs),
-                    _ -> {
-                        try {
-                            runnable.run();
-                        } finally {
-                            pending.set(false);
-                        }
-                    }
-            );
-
-            timeline.getKeyFrames().add(keyFrame);
-            timeline.play();
-        };
+        }));
+        timeline.play();
     }
 
     /// Attaches a listener to the global window list that fires on every window change
     /// until a stop condition is met.
     ///
     /// @param onEvent       The runnable to execute when a window change is detected.
-    /// @param stopCondition A supplier that should return true when the listener should be detached.
+    /// @param stopCondition A supplier that should return true when the listener should
+    ///                      be detached.
     /// @return A runnable that can be used to detach the listener prematurely.
     public static Runnable onWindowChangedUntil(@NonNull Runnable onEvent, @NonNull Supplier<Boolean> stopCondition) {
         ListChangeListener<Window> listener = new ListChangeListener<>() {
