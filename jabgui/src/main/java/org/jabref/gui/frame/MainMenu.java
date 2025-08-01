@@ -78,7 +78,6 @@ import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.URLs;
 import org.jabref.gui.util.UiTaskExecutor;
-import org.jabref.gui.walkthrough.WalkthroughAction;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleOutputFormat;
 import org.jabref.logic.help.HelpFile;
