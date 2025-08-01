@@ -192,7 +192,8 @@ public class RightClickMenu {
         if (previewPreferences.getSelectedPreviewLayout() instanceof CitationStylePreviewLayout) {
             copySpecialMenu.getItems().addAll(
                     factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),
-                    factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new CopyCitationAction(CitationStyleOutputFormat.TEXT, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));
+                    factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new CopyCitationAction(CitationStyleOutputFormat.TEXT, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),
+                    factory.createMenuItem(StandardActions.COPY_CITATION_MARKDOWN, new CopyCitationAction(CitationStyleOutputFormat.MARKDOWN, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));
         } else {
             copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));
         }
