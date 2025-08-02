@@ -251,7 +251,7 @@ public class ImportHandler {
     }
 
     private void importEntryWithDuplicateCheck(BibDatabaseContext bibDatabaseContext, BibEntry entry, DuplicateResolverDialog.DuplicateResolverResult decision, EntryImportHandlerTracker tracker) {
-        BibEntry entryToInsert = cleanUpEntry(bibDatabaseContext, entry);
+        BibEntry entryToInsert = new BibEntry(cleanUpEntry(bibDatabaseContext, entry));
 
         BackgroundTask.wrap(() -> findDuplicate(bibDatabaseContext, entryToInsert))
                       .onFailure(e -> {
