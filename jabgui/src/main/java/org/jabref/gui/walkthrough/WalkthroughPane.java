@@ -1,6 +1,8 @@
 package org.jabref.gui.walkthrough;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,85 +14,91 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/// A specialized StackPane that manages walkthrough overlays for a specific window.
-/// Each window can have at most one WalkthroughPane instance.
+/// A thread-safe, specialized StackPane that manages walkthrough overlays for a
+/// specific window. Each window can have at most one WalkthroughPane instance.
 ///
 /// @implNote This pane is created since [impl.org.controlsfx.skin.DecorationPane] from
 /// ControlsFX also modifies the scene root, which can lead to issues with overlapping,
 /// never-removed Walkthrough effects. To prevent this, we use a dedicated pane that can
 /// be identified as part of the walkthrough system.
+///
+/// Although thread-safety is NOT needed for this class, this is still used to ensure
+/// the class is thread-safe even in extreme cases. In the existing use cases, this is
+/// not necessary since:
+///
+/// 1. At most one [Walkthrough], and therefore, at most one [WalkthroughOverlay]
+/// instance at a time
+/// 2. Only the [WindowOverlay] and [WalkthroughHighlighter] uses this class, both are
+/// singletons (per walkthrough) and their operations are sequentially executed
+/// (highlight first, then displaying the overlay).
 public class WalkthroughPane extends StackPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughPane.class);
-    private static final ConcurrentHashMap<Window, WalkthroughPane> INSTANCES = new ConcurrentHashMap<>();
+    private static final Map<Window, WalkthroughPane> INSTANCES = new ConcurrentHashMap<>();
 
     private final Window window;
     private @Nullable Parent root;
-    private volatile boolean isAttached = false;
+
+    private final AtomicBoolean isAttached = new AtomicBoolean(false);
 
     private WalkthroughPane(@NonNull Window window) {
-        if (INSTANCES.containsKey(window)) {
-            // NOTE: This should never happen since constructor is private and
-            // getInstance() ensures only one instance per window.
-            throw new IllegalStateException("WalkthroughPane already exists for this window: " + window.getClass().getSimpleName());
-        }
-
         this.window = window;
         setMinSize(0, 0);
-        INSTANCES.put(this.window, this);
     }
 
-    public synchronized static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
-        WalkthroughPane instance = INSTANCES.get(window);
-        if (instance == null) {
-            instance = new WalkthroughPane(window);
-            instance.ensureAttached();
-        }
-        return instance;
+    /// Returns the WalkthroughPane instance for the specified window, creating and
+    /// attach it if necessary.
+    public static @NonNull WalkthroughPane getInstance(@NonNull Window window) {
+        return INSTANCES.computeIfAbsent(window, key -> {
+            WalkthroughPane newPane = new WalkthroughPane(key);
+            newPane.attach();
+            return newPane;
+        });
     }
 
-    /// Ensure the WalkthroughPane is attached to the window's scene root. This method
-    /// replaces the scene root with this WalkthroughPane, allowing it to manage
-    /// walkthrough overlays effectively.
-    public synchronized void ensureAttached() {
-        if (isAttached) {
-            LOGGER.debug("WalkthroughPane already attached to window: {}", window.getClass().getSimpleName());
-            return;
+    private void attach() {
+        if (!isAttached.compareAndSet(false, true)) {
+            LOGGER.error("WalkthroughPane already attached to window: {}", window.getClass().getSimpleName());
+            throw new IllegalStateException("WalkthroughPane already attached to window: " + window.getClass().getSimpleName());
         }
+        try {
+            Scene scene = window.getScene();
+            if (scene == null) {
+                throw new IllegalStateException("Cannot attach WalkthroughPane: scene is null for window: " + window.getClass().getSimpleName());
+            }
 
-        Scene scene = window.getScene();
-        if (scene == null) {
-            LOGGER.warn("Cannot attach WalkthroughPane: window has no scene");
-            return;
+            root = scene.getRoot();
+            if (root == null) {
+                throw new IllegalStateException("Cannot attach WalkthroughPane: original root is null for window: " + window.getClass().getSimpleName());
+            }
+            getChildren().add(root);
+            scene.setRoot(this);
+            LOGGER.debug("WalkthroughPane attached to window: {}", window.getClass().getSimpleName());
+        } catch (RuntimeException e) {
+            isAttached.set(false);
+            throw e;
         }
-
-        root = scene.getRoot();
-        getChildren().add(root);
-        scene.setRoot(this);
-        isAttached = true;
-
-        LOGGER.debug("WalkthroughPane attached to window: {}", window.getClass().getSimpleName());
     }
 
     /// Ensure the WalkthroughPane is detached from the window.
-    public synchronized void ensureDetached() {
-        INSTANCES.remove(window);
-
-        if (!isAttached) {
-            LOGGER.debug("WalkthroughPane not attached to window: {}", window.getClass().getSimpleName());
-            return;
+    public void detach() {
+        if (!isAttached.compareAndSet(true, false)) {
+            LOGGER.error("WalkthroughPane not attached to window: {}", window.getClass().getSimpleName());
+            throw new IllegalStateException("WalkthroughPane not attached to window: " + window.getClass().getSimpleName());
         }
+        try {
+            Scene scene = window.getScene();
+            if (scene == null || root == null) {
+                throw new IllegalStateException("Cannot detach WalkthroughPane: scene or root is null for window: " + window.getClass().getSimpleName());
+            }
 
-        Scene scene = window.getScene();
-        if (scene == null || root == null) {
-            LOGGER.warn("Cannot detach WalkthroughPane: scene or original root is null");
-            return;
+            getChildren().remove(root);
+            scene.setRoot(root);
+            root = null;
+            INSTANCES.remove(window);
+            LOGGER.debug("WalkthroughPane detached from window: {}", window.getClass().getSimpleName());
+        } catch (RuntimeException e) {
+            isAttached.set(true);
+            throw e;
         }
-
-        getChildren().remove(root);
-        scene.setRoot(root);
-        root = null;
-        isAttached = false;
-
-        LOGGER.debug("WalkthroughPane detached from window: {}", window.getClass().getSimpleName());
     }
 }

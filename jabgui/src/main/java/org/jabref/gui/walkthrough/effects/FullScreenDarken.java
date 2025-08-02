@@ -2,15 +2,12 @@ package org.jabref.gui.walkthrough.effects;
 
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public final class FullScreenDarken extends BaseWindowEffect {
-    private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
-
     private @Nullable Rectangle overlay;
     private @Nullable Runnable onClickHandler;
 
@@ -22,32 +19,31 @@ public final class FullScreenDarken extends BaseWindowEffect {
         this.onClickHandler = onClickHandler;
     }
 
-    @Override
-    protected void initializeEffect() {
-        this.overlay = new Rectangle();
-        this.overlay.setFill(OVERLAY_COLOR);
-        this.overlay.setVisible(false);
-        this.overlay.setManaged(false);
-        getOrAddToPane();
-    }
-
     public void attach() {
-        if (overlay == null) {
-            initializeEffect();
+        if (overlay != null) {
+            throw new IllegalStateException("FullScreenDarken is already attached. Detach it first.");
         }
+        Rectangle overlay = new Rectangle();
+        overlay.getStyleClass().add("walkthrough-darken");
+        overlay.setVisible(false);
+        overlay.setManaged(false);
+        pane.getChildren().add(overlay);
+        this.overlay = overlay;
+        setupPaneListeners();
         updateLayout();
     }
 
     @Override
     public void detach() {
-        super.detach();
-        if (overlay != null) {
-            overlay.setVisible(false);
-            if (overlay.getParent() instanceof Pane parentPane) {
-                parentPane.getChildren().remove(overlay);
-            }
-            overlay = null;
+        if (overlay == null) {
+            throw new IllegalStateException("FullScreenDarken is not attached.");
         }
+        super.detach();
+        overlay.setVisible(false);
+        if (overlay.getParent() instanceof Pane parentPane) {
+            parentPane.getChildren().remove(overlay);
+        }
+        overlay = null;
     }
 
     @Override
@@ -75,12 +71,6 @@ public final class FullScreenDarken extends BaseWindowEffect {
     protected void hideEffect() {
         if (overlay != null) {
             overlay.setVisible(false);
-        }
-    }
-
-    private void getOrAddToPane() {
-        if (overlay != null && !pane.getChildren().contains(overlay)) {
-            pane.getChildren().add(overlay);
         }
     }
 

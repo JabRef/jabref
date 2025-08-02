@@ -2531,6 +2531,21 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
 }
 
+.walkthrough-spotlight {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
+.walkthrough-ping {
+    /* -jr-accent with 75% Alpha */
+    -fx-fill: rgba(163, 183, 230, 0.75);
+}
+
+.walkthrough-darken {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
 /* Tooltip Content */
 .walkthrough-tooltip-content-container {
     -fx-spacing: 1em;

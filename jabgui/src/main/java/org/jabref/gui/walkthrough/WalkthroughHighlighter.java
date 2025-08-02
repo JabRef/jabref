@@ -10,16 +10,16 @@ import javafx.stage.Window;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
-import org.jabref.gui.walkthrough.effects.BackdropHighlight;
 import org.jabref.gui.walkthrough.effects.FullScreenDarken;
-import org.jabref.gui.walkthrough.effects.PulseAnimateIndicator;
+import org.jabref.gui.walkthrough.effects.Ping;
+import org.jabref.gui.walkthrough.effects.Spotlight;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class WalkthroughHighlighter {
-    private final Map<Window, BackdropHighlight> backdropHighlights = new HashMap<>();
-    private final Map<Window, PulseAnimateIndicator> pulseIndicators = new HashMap<>();
+    private final Map<Window, Spotlight> backdropHighlights = new HashMap<>();
+    private final Map<Window, Ping> pulseIndicators = new HashMap<>();
     private final Map<Window, FullScreenDarken> fullScreenDarkens = new HashMap<>();
 
     private final Map<Window, EffectState> currentEffects = new HashMap<>();
@@ -81,10 +81,10 @@ public class WalkthroughHighlighter {
 
     /// Detaches all effects from all windows. See [WalkthroughHighlighter#detach].
     public void detachAll() {
-        backdropHighlights.values().forEach(BackdropHighlight::detach);
+        backdropHighlights.values().forEach(Spotlight::detach);
         backdropHighlights.clear();
 
-        pulseIndicators.values().forEach(PulseAnimateIndicator::detach);
+        pulseIndicators.values().forEach(Ping::detach);
         pulseIndicators.clear();
 
         fullScreenDarkens.values().forEach(FullScreenDarken::detach);
@@ -99,7 +99,7 @@ public class WalkthroughHighlighter {
         if (config == null) {
             if (fallbackTarget != null) {
                 newEffects.put(fallbackWindow.getWindow(),
-                        new EffectState(HighlightEffect.BACKDROP_HIGHLIGHT, fallbackTarget));
+                        new EffectState(HighlightEffect.SPOT_LIGHT, fallbackTarget));
             }
             return newEffects;
         }
@@ -151,16 +151,16 @@ public class WalkthroughHighlighter {
 
     private void updateExistingEffect(@NonNull Window window, @NonNull EffectState newState) {
         switch (newState.effect) {
-            case BACKDROP_HIGHLIGHT -> {
-                BackdropHighlight backdrop = backdropHighlights.get(window);
+            case SPOT_LIGHT -> {
+                Spotlight backdrop = backdropHighlights.get(window);
                 if (backdrop != null && newState.targetNode != null) {
                     backdrop.transitionTo(newState.targetNode);
                 }
             }
-            case ANIMATED_PULSE -> {
-                PulseAnimateIndicator pulse = pulseIndicators.get(window);
-                if (pulse != null && newState.targetNode != null) {
-                    pulse.transitionTo(newState.targetNode);
+            case PING -> {
+                Ping ping = pulseIndicators.get(window);
+                if (ping != null && newState.targetNode != null) {
+                    ping.transitionTo(newState.targetNode);
                 }
             }
             case FULL_SCREEN_DARKEN -> {
@@ -172,12 +172,12 @@ public class WalkthroughHighlighter {
 
     private void applyEffect(@NonNull Window window, @NonNull HighlightEffect effect, @Nullable Node targetNode) {
         switch (effect) {
-            case BACKDROP_HIGHLIGHT -> {
+            case SPOT_LIGHT -> {
                 if (targetNode != null) {
                     applyBackdropHighlight(window, targetNode);
                 }
             }
-            case ANIMATED_PULSE -> {
+            case PING -> {
                 if (targetNode != null) {
                     applyPulseAnimation(window, targetNode);
                 }
@@ -189,36 +189,30 @@ public class WalkthroughHighlighter {
 
     private void applyBackdropHighlight(@NonNull Window window, @NonNull Node targetNode) {
         WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        pane.ensureAttached();
-
-        BackdropHighlight backdrop = getOrCreateBackdropHighlight(window, pane);
+        Spotlight backdrop = getOrCreateBackdropHighlight(window, pane);
         backdrop.setOnClick(onBackgroundClickHandler);
         backdrop.attach(targetNode);
     }
 
     private void applyPulseAnimation(@NonNull Window window, @NonNull Node targetNode) {
         WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        pane.ensureAttached();
-
-        PulseAnimateIndicator pulse = getOrCreatePulseIndicator(window, pane);
-        pulse.attach(targetNode);
+        Ping ping = getOrCreatePulseIndicator(window, pane);
+        ping.attach(targetNode);
     }
 
     private void applyFullScreenDarken(@NonNull Window window) {
         WalkthroughPane pane = WalkthroughPane.getInstance(window);
-        pane.ensureAttached();
-
         FullScreenDarken fullDarken = getOrCreateFullScreenDarken(window, pane);
         fullDarken.setOnClick(onBackgroundClickHandler);
         fullDarken.attach();
     }
 
-    private BackdropHighlight getOrCreateBackdropHighlight(@NonNull Window window, @NonNull WalkthroughPane pane) {
-        return backdropHighlights.computeIfAbsent(window, _ -> new BackdropHighlight(pane));
+    private Spotlight getOrCreateBackdropHighlight(@NonNull Window window, @NonNull WalkthroughPane pane) {
+        return backdropHighlights.computeIfAbsent(window, _ -> new Spotlight(pane));
     }
 
-    private PulseAnimateIndicator getOrCreatePulseIndicator(@NonNull Window window, @NonNull WalkthroughPane pane) {
-        return pulseIndicators.computeIfAbsent(window, _ -> new PulseAnimateIndicator(pane));
+    private Ping getOrCreatePulseIndicator(@NonNull Window window, @NonNull WalkthroughPane pane) {
+        return pulseIndicators.computeIfAbsent(window, _ -> new Ping(pane));
     }
 
     private FullScreenDarken getOrCreateFullScreenDarken(@NonNull Window window, @NonNull WalkthroughPane pane) {

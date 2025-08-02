@@ -16,41 +16,25 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
 
-/// Base class for walkthrough effects [BackdropHighlight], [FullScreenDarken], and
-/// [PulseAnimateIndicator].
-public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScreenDarken, PulseAnimateIndicator {
-    private static final long LAYOUT_DEBOUNCE_MS = 50;
-    
+/// Base class for walkthrough effects [Spotlight], [FullScreenDarken], and
+/// [Ping].
+public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarken, Ping {
+    private static final long LAYOUT_DEBOUNCE_MS = 100;
+
     protected final Pane pane;
     protected final List<Subscription> subscriptions = new ArrayList<>();
     private ChangeListener<Number> windowSizeListener;
     private final Runnable debouncedUpdateLayout;
 
     /// Constructor for WalkthroughEffect. No scene graph modification is done here. The
-    /// effect is not attached to the pane until [BaseWindowEffect#initializeEffect] is
-    /// called. This only sets up the pane and prepares it for the effect to be attached
-    /// later.
+    /// effect is not attached to the pane until [#attach(Node)] is called.
     ///
     /// @param pane The pane where the effect will be applied. Usually obtained from
     ///             [Window#getScene()] and [Scene#getRoot()]
     protected BaseWindowEffect(@NonNull Pane pane) {
         this.pane = pane;
         this.debouncedUpdateLayout = WalkthroughUtils.debounced(this::updateLayout, LAYOUT_DEBOUNCE_MS);
-        setupPaneListeners();
     }
-
-    /// Attaches the effect to the pane. This method should be called before using the
-    /// effect.
-    protected abstract void initializeEffect();
-
-    /// Updates the layout of the effect. This method is called whenever the pane or the
-    /// target node (if any) changes its size or position.
-    protected abstract void updateLayout();
-
-    /// Hides the effect. The WalkthroughEffect can still be shown again after this
-    /// method is called by calling [BaseWindowEffect#updateLayout()], either manually
-    /// or due to a layout change in the pane or the target node.
-    protected abstract void hideEffect();
 
     /// The effect is no longer usable and permanently removed from the scene graph. To
     /// use this effect again, you can ONLY create a new instance of
@@ -60,6 +44,15 @@ public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScr
         cleanupListeners();
         cleanupWindowListeners();
     }
+
+    /// Updates the layout of the effect. This method is called whenever the pane or the
+    /// target node (if any) changes its size or position.
+    protected abstract void updateLayout();
+
+    /// Hides the effect. The WalkthroughEffect can still be shown again after this
+    /// method is called by calling [BaseWindowEffect#updateLayout()], either manually
+    /// or due to a layout change in the pane or the target node.
+    protected abstract void hideEffect();
 
     protected void cleanupListeners() {
         subscriptions.forEach(Subscription::unsubscribe);
@@ -91,7 +84,7 @@ public sealed abstract class BaseWindowEffect permits BackdropHighlight, FullScr
         });
     }
 
-    private void setupPaneListeners() {
+    protected void setupPaneListeners() {
         subscriptions.add(EasyBind.subscribe(pane.widthProperty(), _ -> debouncedUpdateLayout.run()));
         subscriptions.add(EasyBind.subscribe(pane.heightProperty(), _ -> debouncedUpdateLayout.run()));
         subscriptions.add(EasyBind.subscribe(pane.layoutBoundsProperty(), _ -> debouncedUpdateLayout.run()));

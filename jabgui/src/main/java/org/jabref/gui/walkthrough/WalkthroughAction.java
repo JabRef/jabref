@@ -133,7 +133,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .content(new TextBlock(Localization.lang("This walkthrough will guide you through how to link your PDF files with JabRef. We've opened an example library so you can see how this feature works with actual bibliography entries.")))
                 .resolver(NodeResolver.predicate(MainTable.class::isInstance))
                 .continueButton(Localization.lang("Continue"))
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .position(PanelPosition.BOTTOM)
                 .build();
 
@@ -145,7 +145,7 @@ public class WalkthroughAction extends SimpleCommand {
                                 || "Ding et al.".equals(text)
                                 || "Chocolate and Prevention of Cardiovascular Disease: A Systematic Review".equals(text)))
                 .navigation(NavigationPredicate.onDoubleClick())
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         WalkthroughStep step4 = WalkthroughStep
@@ -153,7 +153,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .content(new TextBlock(Localization.lang("Now we need to access the entry editor. Click on the \"General\" tab to view and edit the entry details.")))
                 .resolver(NodeResolver.selectorWithText(".tab", text -> Localization.lang("General").equals(text)))
                 .navigation(NavigationPredicate.onClick())
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         WalkthroughStep step5 = WalkthroughStep
@@ -164,7 +164,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
                 .position(PanelPosition.RIGHT)
                 .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .showQuitButton(false)
                 .continueButton(Localization.lang("Continue"))
                 .build();
@@ -178,7 +178,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
                 .navigation(createFileAddedNavigationPredicate())
                 .position(PanelPosition.RIGHT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .showQuitButton(false)
                 .build();
 
@@ -188,12 +188,12 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.LINKED_FILE_ADD))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.LEFT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         WalkthroughEffect pdfDialogEffect = new WalkthroughEffect(
                 new WindowEffect(() -> Optional.of(stage), HighlightEffect.FULL_SCREEN_DARKEN),
-                new WindowEffect(HighlightEffect.ANIMATED_PULSE)
+                new WindowEffect(HighlightEffect.PING)
         );
 
         WalkthroughStep step8 = WalkthroughStep
@@ -253,7 +253,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.FETCH_FULLTEXT))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.LEFT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         WalkthroughStep step14 = WalkthroughStep
@@ -262,7 +262,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
                 .navigation(createFetchFulltextNavigationPredicate())
                 .position(TooltipPosition.LEFT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         WalkthroughStep step15 = WalkthroughStep
@@ -271,7 +271,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.DOWNLOAD))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.LEFT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         WalkthroughStep step16 = WalkthroughStep
@@ -305,7 +305,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .continueButton(Localization.lang("Finish"))
                 .position(PanelPosition.RIGHT)
                 .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         return new Walkthrough(Injector.instantiateModelOrService(StateManager.class), step1, step2, step3, step4, step5, step6, step7, step8, step9, step10, step11, step12, step13, step14, step15, step16, step17, step18);
@@ -319,7 +319,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
                 .navigation(NavigationPredicate.onClick())
                 .position(TooltipPosition.BOTTOM)
-                .highlight(HighlightEffect.BACKDROP_HIGHLIGHT)
+                .highlight(HighlightEffect.SPOT_LIGHT)
                 .build();
 
         WalkthroughStep step2 = WalkthroughStep
@@ -329,14 +329,14 @@ public class WalkthroughAction extends SimpleCommand {
                 .position(TooltipPosition.RIGHT)
                 .activeWindow(WindowResolver.clazz(ContextMenu.class))
                 .highlight(new WalkthroughEffect(
-                        new WindowEffect(HighlightEffect.ANIMATED_PULSE),
+                        new WindowEffect(HighlightEffect.PING),
                         new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
                 ))
                 .showQuitButton(false)
                 .build();
 
         WalkthroughEffect preferenceHighlight = new WalkthroughEffect(
-                new WindowEffect(HighlightEffect.BACKDROP_HIGHLIGHT),
+                new WindowEffect(HighlightEffect.SPOT_LIGHT),
                 new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
         );
 
