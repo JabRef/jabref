@@ -74,7 +74,7 @@ public class ParseLatexResultViewModel extends AbstractViewModel {
      */
     public void importButtonClicked() {
         DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
-        ImportEntriesDialog dialog = new ImportEntriesDialog(databaseContext, BackgroundTask.wrap(() -> new ParserResult(resolverResult.getNewEntries())));
+        ImportEntriesDialog dialog = new ImportEntriesDialog(databaseContext, BackgroundTask.wrap(() -> new ParserResult(resolverResult.getNewEntries())), null, null);
         dialog.setTitle(Localization.lang("Import entries from LaTeX files"));
         dialogService.showCustomDialogAndWait(dialog);
     }
