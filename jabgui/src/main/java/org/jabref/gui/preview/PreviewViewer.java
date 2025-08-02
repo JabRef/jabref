@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -54,8 +53,6 @@ import org.w3c.dom.html.HTMLAnchorElement;
 public class PreviewViewer extends ScrollPane implements InvalidationListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreviewViewer.class);
-    AtomicBoolean widthSet = new AtomicBoolean(false);
-
     // https://stackoverflow.com/questions/5669448/get-selected-texts-html-in-div/5670825#5670825
     private static final String JS_GET_SELECTION_HTML_SCRIPT = """
         function getSelectionHtml() {
@@ -90,6 +87,7 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
     private @Nullable BibEntry entry;
     private PreviewLayout layout;
     private String layoutText;
+    private final AtomicBoolean widthSet = new AtomicBoolean(false);
 
     public PreviewViewer(DialogService dialogService,
                          GuiPreferences preferences,
@@ -128,22 +126,24 @@ public class PreviewViewer extends ScrollPane implements InvalidationListener {
                 return;
             }
 
-            Platform.runLater(() -> {
-                if (previewView.getEngine().executeScript("document.getElementById('content').scrollHeight") instanceof java.lang.Number heightVal) {
-                    double actualHeight = (heightVal).doubleValue();
-                    LOGGER.debug("Preview Height {}", actualHeight);
-                    previewView.setPrefHeight(actualHeight + 4);
-                }
+            previewView.getEngine().executeScript("document.body.offsetHeight;");
 
-                if (previewView.getEngine().executeScript("document.getElementById('content').scrollWidth") instanceof java.lang.Number widthVal && !widthSet.get()) {
-                    double actualWidth = (widthVal).doubleValue();
-                    double updatedWidth = actualWidth + 310;
+            if (previewView.getEngine().executeScript("document.getElementById('content').scrollHeight") instanceof java.lang.Number heightVal) {
+                double actualHeight = (heightVal).doubleValue();
+                LOGGER.debug("Preview Height {}", actualHeight);
+                previewView.setMaxHeight(actualHeight + 10);
+                previewView.setPrefHeight(actualHeight + 10);
+            }
+            previewView.getEngine().executeScript("document.body.style.overflow='hidden';");
 
-                    LOGGER.debug("Preview Width {}", actualWidth);
-                    previewView.setPrefWidth(Math.min(updatedWidth, 500));
-                    widthSet.set(true);
-                }
-            });
+            if (previewView.getEngine().executeScript("document.getElementById('content').scrollWidth") instanceof java.lang.Number widthVal && !widthSet.get()) {
+                double actualWidth = (widthVal).doubleValue();
+                double updatedWidth = actualWidth + 350;
+
+                LOGGER.debug("Preview Width {}", actualWidth);
+                previewView.setPrefWidth(Math.min(updatedWidth, 500));
+                widthSet.set(true);
+            }
 
             // https://stackoverflow.com/questions/15555510/javafx-stop-opening-url-in-webview-open-in-browser-instead
             NodeList anchorList = previewView.getEngine().getDocument().getElementsByTagName("a");
