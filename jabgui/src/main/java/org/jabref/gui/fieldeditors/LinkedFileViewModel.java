@@ -35,7 +35,7 @@ import org.jabref.gui.icon.JabRefIcon;
 import org.jabref.gui.linkedfile.DeleteFileAction;
 import org.jabref.gui.linkedfile.DownloadLinkedFileAction;
 import org.jabref.gui.linkedfile.LinkedFileEditDialog;
-import org.jabref.gui.mergeentries.MultiMergeEntriesView;
+import org.jabref.gui.mergeentries.multiwaymerge.MultiMergeEntriesView;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.FilePreferences;

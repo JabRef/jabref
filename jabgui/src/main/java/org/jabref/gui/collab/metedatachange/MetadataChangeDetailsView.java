@@ -7,8 +7,8 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.layout.VBox;
 
 import org.jabref.gui.collab.DatabaseChangeDetailsView;
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.DiffHighlighter;
-import org.jabref.gui.mergeentries.newmergedialog.diffhighlighter.SplitDiffHighlighter;
+import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.DiffHighlighter;
+import org.jabref.gui.mergeentries.threewaymerge.diffhighlighter.SplitDiffHighlighter;
 import org.jabref.logic.bibtex.comparator.MetaDataDiff;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.l10n.Localization;
