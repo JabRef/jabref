@@ -23,6 +23,7 @@ public class MainTableTooltip extends Tooltip {
         this.preferences = preferences;
         this.preview = new PreviewViewer(dialogService, preferences, themeManager, taskExecutor);
         this.tooltipContent.getChildren().addAll(fieldValueLabel, preview);
+        this.preview.setMinHeight(200);
     }
 
     public Tooltip createTooltip(BibDatabaseContext databaseContext, BibEntry entry, String fieldValue) {
