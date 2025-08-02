@@ -1,21 +1,31 @@
 package org.jabref.gui.walkthrough;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ConcurrentHashMap;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import javafx.util.Duration;
 
+import org.jabref.gui.DialogService;
+import org.jabref.gui.walkthrough.WalkthroughResolver.WalkthroughResult;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
+import org.jabref.gui.walkthrough.declarative.sideeffect.SideEffectExecutor;
+import org.jabref.gui.walkthrough.declarative.sideeffect.WalkthroughSideEffect;
+import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+import org.jabref.gui.walkthrough.declarative.step.SideEffect;
+import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
+import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
+import org.jabref.logic.l10n.Localization;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,120 +34,259 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
 
-    private final Map<Window, SingleWindowWalkthroughOverlay> overlays = new HashMap<>();
+    private enum WalkthroughPhase {
+        INACTIVE,
+        RESOLVING,
+        DISPLAYING,
+        NAVIGATING
+    }
+
+    private final Map<Window, WindowOverlay> overlays = new HashMap<>();
     private final Stage stage;
-    private final WalkthroughHighlighter walkthroughHighlighter;
     private final Walkthrough walkthrough;
-    private @Nullable Timeline nodePollingTimeline;
+    private final WalkthroughHighlighter walkthroughHighlighter;
+    private final WalkthroughScroller walkthroughScroller;
+    private final SideEffectExecutor sideEffectExecutor;
+    private final Map<Integer, List<WalkthroughSideEffect>> executedSideEffects = new ConcurrentHashMap<>();
+
+    private @Nullable WalkthroughResolver resolver;
+    private @Nullable ChangeListener<Boolean> windowShowingListener;
+    private @Nullable ChangeListener<Boolean> nodeVisibleListener;
+
+    private volatile WalkthroughPhase phase = WalkthroughPhase.INACTIVE;
+    private Window resolvedWindow;
+    private Node resolvedNode;
 
     public WalkthroughOverlay(Stage stage, Walkthrough walkthrough) {
         this.stage = stage;
         this.walkthrough = walkthrough;
         this.walkthroughHighlighter = new WalkthroughHighlighter();
+        this.walkthroughScroller = new WalkthroughScroller();
+        this.sideEffectExecutor = new SideEffectExecutor();
+        this.walkthroughHighlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
     }
 
-    /**
-     * Displays the specified walkthrough step in the appropriate window.
-     */
-    public void displayStep(@NonNull WalkthroughStep step) {
-        overlays.values().forEach(SingleWindowWalkthroughOverlay::hide);
-        Window window = step.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(stage);
-        Scene scene = window.getScene();
+    public void show(@NonNull WalkthroughStep step) {
+        LOGGER.debug("Showing step: {}", step.title());
+        cleanUp();
+        phase = WalkthroughPhase.RESOLVING;
 
-        Optional<Node> targetNode = step.resolver().flatMap(resolver -> resolver.resolve(scene));
+        switch (step) {
+            case SideEffect(String title, WalkthroughSideEffect sideEffect) -> {
+                int currentStepIndex = walkthrough.currentStepProperty().get();
+                LOGGER.debug("Executing side effect for step: {}", title);
 
-        if (step.resolver().isPresent()) {
-            startNodePolling(step, window, targetNode.orElse(null));
-        } else {
-            walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), scene, null);
-            displayStep(step, window, null);
+                if (sideEffectExecutor.executeForward(sideEffect, walkthrough)) {
+                    executedSideEffects.computeIfAbsent(currentStepIndex, _ -> new ArrayList<>())
+                                       .add(sideEffect);
+                    walkthrough.nextStep();
+                } else {
+                    LOGGER.error("Failed to execute side effect: {}", sideEffect.description());
+                    LOGGER.warn("Side effect failed for step: {}", title);
+                    revertToPreviousStep();
+                }
+            }
+            case VisibleComponent component -> {
+                WindowResolver windowResolver = component.windowResolver()
+                                                         .orElse(() -> Optional.of(stage));
+
+                resolver = new WalkthroughResolver(
+                        windowResolver,
+                        component.resolver().orElse(null),
+                        this::handleResolutionResult);
+                resolver.startResolution();
+            }
         }
     }
 
     public void detachAll() {
-        stopNodePolling();
+        cleanUp();
+        revertAllSideEffects();
+
         walkthroughHighlighter.detachAll();
-        overlays.values().forEach(SingleWindowWalkthroughOverlay::detach);
+        overlays.values().forEach(WindowOverlay::detach);
         overlays.clear();
     }
 
-    private void tryRevertToPreviousResolvableStep() {
-        LOGGER.info("Attempting to revert to previous resolvable step");
+    public void showQuitConfirmationAndQuit() {
+        overlays.values().forEach(WindowOverlay::hide);
 
+        DialogService dialogService = Injector.instantiateModelOrService(DialogService.class);
+        boolean shouldQuit = dialogService.showConfirmationDialogAndWait(
+                Localization.lang("Quit walkthrough"),
+                Localization.lang("Are you sure you want to quit the walkthrough?"),
+                Localization.lang("Quit walkthrough"),
+                Localization.lang("Continue walkthrough"));
+
+        if (shouldQuit) {
+            walkthrough.quit();
+        } else {
+            show(walkthrough.getCurrentStep());
+        }
+    }
+
+    private void handleResolutionResult(WalkthroughResult result) {
+        if (result.wasSuccessful()) {
+            displayWalkthroughStep(result);
+        } else {
+            LOGGER.error("Failed to resolve node for step '{}'. Reverting.", walkthrough.getCurrentStep().title());
+            revertToPreviousStep();
+        }
+        resolver = null;
+    }
+
+    private void displayWalkthroughStep(WalkthroughResult result) {
+        Optional<Window> window = result.window();
+        if (window.isEmpty()) {
+            LOGGER.error("Resolution succeeded but window is missing for component '{}'", walkthrough.getCurrentStep().title());
+            revertToPreviousStep();
+            return;
+        }
+        this.resolvedWindow = window.get();
+        this.resolvedNode = result.node().orElse(null);
+        VisibleComponent component = (VisibleComponent) walkthrough.getCurrentStep();
+        phase = WalkthroughPhase.DISPLAYING;
+
+        LOGGER.debug("Displaying overlay for component '{}'", component.title());
+
+        setupRevertListeners(component);
+
+        if (resolvedNode != null) {
+            walkthroughScroller.setup(resolvedNode);
+        }
+        walkthroughHighlighter.applyHighlight(component.highlight().orElse(null),
+                resolvedWindow.getScene(), resolvedNode);
+
+        WindowOverlay overlay = overlays.computeIfAbsent(resolvedWindow,
+                w -> new WindowOverlay(w, WalkthroughPane.getInstance(w), walkthrough));
+
+        switch (component) {
+            case TooltipStep tooltip ->
+                    overlay.showTooltip(tooltip, resolvedNode, this::prepareForNavigation);
+            case PanelStep panel ->
+                    overlay.showPanel(panel, resolvedNode, this::prepareForNavigation);
+        }
+    }
+
+    private void setupRevertListeners(VisibleComponent component) {
+        windowShowingListener = (_, wasShowing, isShowing) -> {
+            if (wasShowing && !isShowing) {
+                LOGGER.debug("Window for step '{}' closed. Reverting.", component.title());
+                revertToPreviousStep();
+            }
+        };
+        resolvedWindow.showingProperty().addListener(windowShowingListener);
+
+        if (resolvedNode != null) {
+            nodeVisibleListener = (_, wasVisible, isVisible) -> {
+                if (wasVisible && !isVisible) {
+                    LOGGER.debug("Node for step '{}' is no longer visible. Reverting.", component.title());
+                    revertToPreviousStep();
+                }
+            };
+            resolvedNode.visibleProperty().addListener(nodeVisibleListener);
+        }
+    }
+
+    private void revertSideEffects(@NonNull List<WalkthroughSideEffect> sideEffectsToRevert) {
+        LOGGER.debug("Reverting {} side effects", sideEffectsToRevert.size());
+        for (int i = sideEffectsToRevert.size() - 1; i >= 0; i--) {
+            WalkthroughSideEffect sideEffect = sideEffectsToRevert.get(i);
+            if (!sideEffectExecutor.executeBackward(sideEffect, walkthrough)) {
+                LOGGER.warn("Failed to revert side effect: {}", sideEffect.description());
+            }
+        }
+    }
+
+    private void revertAllSideEffects() {
+        LOGGER.debug("Reverting all executed side effects");
+        List<Integer> stepIndices = new ArrayList<>(executedSideEffects.keySet());
+        stepIndices.sort(Integer::compareTo);
+        for (int i = stepIndices.size() - 1; i >= 0; i--) {
+            Integer stepIndex = stepIndices.get(i);
+            List<WalkthroughSideEffect> stepSideEffects = executedSideEffects.get(stepIndex);
+            if (stepSideEffects != null) {
+                revertSideEffects(stepSideEffects);
+            }
+        }
+        executedSideEffects.clear();
+    }
+
+    private void revertToPreviousStep() {
+        synchronized (this) {
+            if (phase != WalkthroughPhase.DISPLAYING) {
+                return;
+            }
+            phase = WalkthroughPhase.NAVIGATING;
+        }
+
+        stopRevertListeners();
+        LOGGER.info("Attempting to revert to previous resolvable step");
         int currentIndex = walkthrough.currentStepProperty().get();
 
+        List<WalkthroughSideEffect> currentStepSideEffects = executedSideEffects.remove(currentIndex);
+        if (currentStepSideEffects != null) {
+            revertSideEffects(currentStepSideEffects);
+        }
+
         for (int i = currentIndex - 1; i >= 0; i--) {
-            WalkthroughStep previousStep = walkthrough.getStepAtIndex(i);
-            Window activeWindow = previousStep.activeWindowResolver().flatMap(WindowResolver::resolve).orElse(stage);
+            if (!(walkthrough.getStepAtIndex(i) instanceof VisibleComponent previousStep)) {
+                continue;
+            }
+
+            Optional<Window> window = previousStep.windowResolver().flatMap(WindowResolver::resolve);
+            if (window.isEmpty() && previousStep.windowResolver().isPresent()) {
+                continue;
+            }
+            Window activeWindow = window.orElse(stage);
             Scene scene = activeWindow.getScene();
             if (scene != null && (previousStep.resolver().isEmpty() || previousStep.resolver().get().resolve(scene).isPresent())) {
                 LOGGER.info("Reverting to step {} from step {}", i, currentIndex);
+                for (int j = currentIndex - 1; j > i; j--) {
+                    List<WalkthroughSideEffect> stepSideEffects = executedSideEffects.remove(j);
+                    if (stepSideEffects != null) {
+                        revertSideEffects(stepSideEffects);
+                    }
+                }
                 walkthrough.goToStep(i);
                 return;
             }
         }
 
-        LOGGER.warn("No previous resolvable step found, staying at current step");
+        LOGGER.warn("No previous resolvable step found, quitting walkthrough.");
+        walkthrough.quit();
     }
 
-    private void displayStep(WalkthroughStep step, Window window, @Nullable Node node) {
-        SingleWindowWalkthroughOverlay overlay = getOrCreateOverlay(window);
-        overlay.displayStep(step, node, this::stopNodePolling, walkthrough);
-    }
-
-    private void startNodePolling(WalkthroughStep step, Window window, @Nullable Node node) {
-        stopNodePolling();
-
-        AtomicBoolean nodeEverResolved = new AtomicBoolean(node != null);
-
-        Scene initialScene = window.getScene();
-
-        walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), initialScene, node);
-        displayStep(step, window, node);
-
-        LOGGER.info("Starting continuous node polling for step: {}", step.title());
-
-        nodePollingTimeline = new Timeline(new KeyFrame(Duration.millis(500), _ -> {
-            Scene scene = window.getScene();
-            if (scene == null) {
-                return;
-            }
-
-            step.resolver().flatMap(resolver -> resolver.resolve(scene)).ifPresentOrElse(
-                    (currentNode) -> {
-                        if (!nodeEverResolved.get()) {
-                            LOGGER.info("Target node found for step: {}, updating display", step.title());
-                            walkthroughHighlighter.applyHighlight(step.highlight().orElse(null), scene, currentNode);
-                            displayStep(step, window, currentNode);
-                            nodeEverResolved.set(true);
-                        }
-                    },
-                    () -> {
-                        if (!nodeEverResolved.get()) {
-                            return;
-                        }
-
-                        LOGGER.info("Node disappeared for step: {}, auto-falling back", step.title());
-                        stopNodePolling();
-                        tryRevertToPreviousResolvableStep();
-                    }
-            );
-        }));
-
-        nodePollingTimeline.setCycleCount(Timeline.INDEFINITE);
-        nodePollingTimeline.play();
-    }
-
-    private void stopNodePolling() {
-        LOGGER.info("Stopping node polling for step.");
-        if (nodePollingTimeline == null) {
-            return;
+    private void cleanUp() {
+        LOGGER.debug("Cleaning up listeners and state for the previous step");
+        if (resolver != null) {
+            resolver.cancel();
+            resolver = null;
         }
-        nodePollingTimeline.stop();
-        nodePollingTimeline = null;
+
+        stopRevertListeners();
+        walkthroughScroller.cleanup();
+
+        resolvedWindow = null;
+        resolvedNode = null;
+        phase = WalkthroughPhase.INACTIVE;
+
+        overlays.values().forEach(WindowOverlay::hide);
     }
 
-    private SingleWindowWalkthroughOverlay getOrCreateOverlay(Window window) {
-        return overlays.computeIfAbsent(window, SingleWindowWalkthroughOverlay::new);
+    private void prepareForNavigation() {
+        this.phase = WalkthroughPhase.NAVIGATING;
+        stopRevertListeners();
+    }
+
+    private void stopRevertListeners() {
+        if (resolvedWindow != null && windowShowingListener != null) {
+            resolvedWindow.showingProperty().removeListener(windowShowingListener);
+            windowShowingListener = null;
+        }
+        if (resolvedNode != null && nodeVisibleListener != null) {
+            resolvedNode.visibleProperty().removeListener(nodeVisibleListener);
+            nodeVisibleListener = null;
+        }
     }
 }

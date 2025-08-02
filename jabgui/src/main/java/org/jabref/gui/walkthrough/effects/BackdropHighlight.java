@@ -1,46 +1,114 @@
 package org.jabref.gui.walkthrough.effects;
 
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import javafx.util.Duration;
 
-import org.jabref.gui.walkthrough.WalkthroughUpdater;
+import org.jabref.gui.walkthrough.WalkthroughUtils;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-public class BackdropHighlight extends WalkthroughEffect {
+public final class BackdropHighlight extends BaseWindowEffect {
     private static final Color OVERLAY_COLOR = Color.rgb(0, 0, 0, 0.55);
+    private static final Duration TRANSITION_DURATION = Duration.millis(300);
 
     private @Nullable Node node;
     private Rectangle backdrop;
     private Rectangle hole;
-    private @Nullable Shape overlayShape;
+    private Rectangle animatedHole;
+    private volatile @Nullable Shape overlayShape;
+    private @Nullable Runnable onClickHandler;
+    private @Nullable Timeline transitionAnimation;
 
     public BackdropHighlight(@NonNull Pane pane) {
         super(pane);
     }
 
-    public void attach(@NonNull Node node) {
-        detach();
+    public synchronized void attach(@NonNull Node node) {
         if (overlayShape == null) {
             initializeEffect();
         }
+
+        if (this.node != null) {
+            cleanupListeners();
+        }
+
         this.node = node;
-        setupNodeListeners(this.node);
-        setupPaneListeners();
+        setupListeners(this.node);
         updateLayout();
+    }
+
+    public synchronized void transitionTo(@NonNull Node newNode) {
+        Shape overlayShape = this.overlayShape;
+        if (overlayShape == null || !overlayShape.isVisible()) {
+            attach(newNode);
+            return;
+        }
+
+        if (transitionAnimation != null) {
+            transitionAnimation.stop();
+        }
+
+        Bounds oldBounds = hole.getBoundsInParent();
+        Bounds newBoundsInScene = newNode.localToScene(newNode.getBoundsInLocal());
+        Bounds newBoundsInPane = pane.sceneToLocal(newBoundsInScene);
+
+        animatedHole.setX(oldBounds.getMinX());
+        animatedHole.setY(oldBounds.getMinY());
+        animatedHole.setWidth(oldBounds.getWidth());
+        animatedHole.setHeight(oldBounds.getHeight());
+
+        transitionAnimation = new Timeline(
+                new KeyFrame(TRANSITION_DURATION,
+                        new KeyValue(animatedHole.xProperty(), newBoundsInPane.getMinX(), Interpolator.EASE_BOTH),
+                        new KeyValue(animatedHole.yProperty(), newBoundsInPane.getMinY(), Interpolator.EASE_BOTH),
+                        new KeyValue(animatedHole.widthProperty(), newBoundsInPane.getWidth(), Interpolator.EASE_BOTH),
+                        new KeyValue(animatedHole.heightProperty(), newBoundsInPane.getHeight(), Interpolator.EASE_BOTH)
+                )
+        );
+
+        transitionAnimation.setOnFinished(_ -> {
+            if (this.node != null) {
+                cleanupListeners();
+            }
+            this.node = newNode;
+            setupListeners(this.node);
+            updateLayout();
+        });
+
+        animatedHole.xProperty().addListener((_, _, _) -> updateOverlayShape());
+        animatedHole.yProperty().addListener((_, _, _) -> updateOverlayShape());
+        animatedHole.widthProperty().addListener((_, _, _) -> updateOverlayShape());
+        animatedHole.heightProperty().addListener((_, _, _) -> updateOverlayShape());
+
+        transitionAnimation.play();
+    }
+
+    public void setOnClick(@Nullable Runnable onClickHandler) {
+        this.onClickHandler = onClickHandler;
     }
 
     @Override
     public void detach() {
+        if (transitionAnimation != null) {
+            transitionAnimation.stop();
+            transitionAnimation = null;
+        }
         super.detach();
+        Shape overlayShape = this.overlayShape;
         if (overlayShape != null && overlayShape.getParent() instanceof Pane parentPane) {
             parentPane.getChildren().remove(overlayShape);
-            overlayShape = null;
+            this.overlayShape = null;
         }
         this.node = null;
     }
@@ -49,15 +117,17 @@ public class BackdropHighlight extends WalkthroughEffect {
     protected void initializeEffect() {
         this.backdrop = new Rectangle();
         this.hole = new Rectangle();
-        this.overlayShape = Shape.subtract(backdrop, hole);
-        this.overlayShape.setFill(OVERLAY_COLOR);
-        this.overlayShape.setVisible(false);
-        this.pane.getChildren().add(overlayShape);
+        this.animatedHole = new Rectangle();
+        Shape overlayShape = Shape.subtract(backdrop, hole);
+        overlayShape.setFill(OVERLAY_COLOR);
+        overlayShape.setVisible(false);
+        this.overlayShape = overlayShape;
+        getOrAddToPane();
     }
 
     @Override
-    protected void updateLayout() {
-        if (WalkthroughUpdater.cannotPositionNode(node)) {
+    protected synchronized void updateLayout() {
+        if (WalkthroughUtils.cannotPositionNode(node)) {
             hideEffect();
             return;
         }
@@ -80,22 +150,58 @@ public class BackdropHighlight extends WalkthroughEffect {
         hole.setWidth(nodeBoundsInRootPane.getWidth());
         hole.setHeight(nodeBoundsInRootPane.getHeight());
 
+        animatedHole.setX(hole.getX());
+        animatedHole.setY(hole.getY());
+        animatedHole.setWidth(hole.getWidth());
+        animatedHole.setHeight(hole.getHeight());
+
+        updateOverlayShape();
+    }
+
+    @Override
+    protected void hideEffect() {
+        Shape overlayShape = this.overlayShape;
+        if (overlayShape != null) {
+            overlayShape.setVisible(false);
+        }
+    }
+
+    private synchronized void updateOverlayShape() {
         Shape oldOverlayShape = this.overlayShape;
-        int oldIndex = -1;
+        int oldIndex = getOrAddToPane();
+
         if (this.pane.getChildren().contains(oldOverlayShape)) {
             oldIndex = this.pane.getChildren().indexOf(oldOverlayShape);
             this.pane.getChildren().remove(oldIndex);
         }
 
-        this.overlayShape = Shape.subtract(backdrop, hole);
-        this.overlayShape.setFill(OVERLAY_COLOR);
-        this.overlayShape.setVisible(true);
+        Shape overlayShape = Shape.subtract(backdrop, animatedHole);
+        overlayShape.setFill(OVERLAY_COLOR);
+        overlayShape.setVisible(true);
+
+        if (onClickHandler != null) {
+            overlayShape.setOnMouseClicked(this::handleClick);
+            overlayShape.setMouseTransparent(false);
+        } else {
+            overlayShape.setMouseTransparent(true);
+        }
+
+        this.overlayShape = overlayShape;
         this.pane.getChildren().add(oldIndex, this.overlayShape);
     }
 
-    @Override
-    protected void hideEffect() {
-        assert overlayShape != null : "Overlay shape should be initialized before hiding effect";
-        overlayShape.setVisible(false);
+    private int getOrAddToPane() {
+        if (overlayShape != null && !pane.getChildren().contains(overlayShape)) {
+            pane.getChildren().add(overlayShape);
+            return pane.getChildren().size() - 1;
+        }
+        return -1;
+    }
+
+    private void handleClick(MouseEvent event) {
+        if (onClickHandler != null) {
+            onClickHandler.run();
+        }
+        event.consume();
     }
 }

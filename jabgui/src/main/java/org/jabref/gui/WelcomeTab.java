@@ -2,7 +2,6 @@ package org.jabref.gui;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Reader;
 
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
@@ -27,9 +26,8 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.util.URLs;
 import org.jabref.logic.ai.AiService;
-import org.jabref.logic.importer.Importer;
+import org.jabref.logic.importer.OpenDatabase;
 import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BuildInfo;
 import org.jabref.logic.util.TaskExecutor;
@@ -145,9 +143,7 @@ public class WelcomeTab extends Tab {
                     LOGGER.warn("Example library file not found.");
                     return;
                 }
-                Reader reader = Importer.getReader(in);
-                BibtexParser bibtexParser = new BibtexParser(preferences.getImportFormatPreferences(), fileUpdateMonitor);
-                ParserResult result = bibtexParser.parse(reader);
+                ParserResult result = OpenDatabase.loadDatabase(in, preferences.getImportFormatPreferences(), fileUpdateMonitor);
                 BibDatabaseContext databaseContext = result.getDatabaseContext();
                 LibraryTab libraryTab = LibraryTab.createLibraryTab(databaseContext, tabContainer, dialogService, aiService,
                         preferences, stateManager, fileUpdateMonitor, entryTypesManager, undoManager, clipBoardManager, taskExecutor);
