@@ -122,6 +122,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     private FileAnnotationCache annotationCache;
     private MainTable mainTable;
     private DatabaseNotification databaseNotificationPane;
+    private AutoRenameFileOnEntryChange autoRenameFileOnEntryChange;
 
     // Indicates whether the tab is loading data using a dataloading task
     // The constructors take care to the right true/false assignment during start.
@@ -210,7 +211,9 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
         bibDatabaseContext.getDatabase().registerListener(this);
         bibDatabaseContext.getMetaData().registerListener(this);
-        new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences);
+
+        autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences);
+        autoRenameFileOnEntryChange.bindToDatabase();
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
         this.tableModel = new MainTableDataModel(getBibDatabaseContext(), preferences, taskExecutor, getIndexManager(), selectedGroupsProperty(), searchQueryProperty, resultSizeProperty());
@@ -708,6 +711,10 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         if (tableModel != null) {
             tableModel.unbind();
+        }
+
+        if (autoRenameFileOnEntryChange != null) {
+            autoRenameFileOnEntryChange.unbindFromDatabase();
         }
 
         // clean up the groups map
