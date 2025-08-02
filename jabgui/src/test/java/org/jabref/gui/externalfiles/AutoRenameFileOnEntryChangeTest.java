@@ -3,7 +3,6 @@ package org.jabref.gui.externalfiles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 import org.jabref.gui.preferences.GuiPreferences;
@@ -14,10 +13,12 @@ import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.LinkedFile;
+import org.jabref.model.entry.event.FieldChangedEvent;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
 import org.jabref.model.metadata.MetaData;
 
+import com.google.common.eventbus.Subscribe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -64,7 +65,24 @@ class AutoRenameFileOnEntryChangeTest {
                 .withField(StandardField.YEAR, "2081");
 
         bibDatabaseContext.getDatabase().insertEntry(entry);
-        new AutoRenameFileOnEntryChange(bibDatabaseContext, guiPreferences);
+        AutoRenameFileOnEntryChange autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, guiPreferences);
+        autoRenameFileOnEntryChange.bindToDatabase();
+
+        // Update citation-key when author/year changes
+        bibDatabaseContext.getDatabase().registerListener(new Object() {
+            @Subscribe
+            public void listen(FieldChangedEvent event) {
+                if (event.getField().equals(StandardField.AUTHOR)) {
+                    String author = event.getNewValue();
+                    String year = entry.getField(StandardField.YEAR).orElse("");
+                    entry.setCitationKey(author + year);
+                } else if (event.getField().equals(StandardField.YEAR)) {
+                    String author = entry.getField(StandardField.AUTHOR).orElse("");
+                    String year = event.getNewValue();
+                    entry.setCitationKey(author + year);
+                }
+            }
+        });
     }
 
     @Test
@@ -109,7 +127,7 @@ class AutoRenameFileOnEntryChangeTest {
     @Test
     void multipleFilesRenameOnEntryChange() throws IOException {
         // create multiple entries
-        List<String> fileNames = Arrays.asList(
+        List<String> fileNames = List.of(
                 "oldKey2081.pdf",
                 "oldKey2081.jpg",
                 "oldKey2081.csv",
