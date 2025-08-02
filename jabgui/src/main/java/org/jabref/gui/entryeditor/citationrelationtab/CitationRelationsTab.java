@@ -149,7 +149,8 @@ public class CitationRelationsTab extends EntryEditorTab {
         AnchorPane citedByHBox = new AnchorPane();
         citedByHBox.setPrefHeight(40);
 
-        // Create Heading Lab
+        // Create Headings
+        // See ADR-0047
         String citationKey = entry.getCitationKey().orElse("this entry");
 
         Label citingLabel = new Label(Localization.lang("References cited in %0", citationKey));
