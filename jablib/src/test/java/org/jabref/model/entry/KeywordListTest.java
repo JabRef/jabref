@@ -1,7 +1,12 @@
 package org.jabref.model.entry;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,6 +19,17 @@ class KeywordListTest {
         keywords = new KeywordList();
         keywords.add("keywordOne");
         keywords.add("keywordTwo");
+    }
+
+    private static Stream<Arguments> provideParseKeywordCases() {
+        return Stream.of(
+                Arguments.of("keyword\\,one, keywordTwo", new KeywordList("keyword,one", "keywordTwo")),
+                Arguments.of("keywordOne\\,, keywordTwo", new KeywordList("keywordOne,", "keywordTwo")),
+                Arguments.of("keyword\\\\, keywordTwo", new KeywordList("keyword\\", "keywordTwo")),
+                Arguments.of("keyword\\,one > sub", new KeywordList(Keyword.of("keyword,one", "sub"))),
+                Arguments.of("one\\,two\\,three, four", new KeywordList("one,two,three", "four")),
+                Arguments.of("keywordOne\\\\", new KeywordList("keywordOne\\"))
+        );
     }
 
     @Test
@@ -114,5 +130,19 @@ class KeywordListTest {
     @Test
     void mergeTwoListsOfKeywordsShouldReturnTheKeywordsMerged() {
         assertEquals(new KeywordList("Figma", "Adobe", "JabRef", "Eclipse", "JetBrains"), KeywordList.merge("Figma, Adobe, JetBrains, Eclipse", "Adobe, JabRef", ','));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParseKeywordCases")
+    void parseKeywordWithEscapedDelimiterDoesNotSplitKeyword(String input, KeywordList expected) {
+        assertEquals(expected, KeywordList.parse(input, ',', '>'));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParseKeywordCases")
+    void roundTripPreservesStructure(String original) {
+        KeywordList parsed = KeywordList.parse(original, ',', '>');
+        // We need to test the toString() functionality
+        assertEquals(original, parsed.toString());
     }
 }
