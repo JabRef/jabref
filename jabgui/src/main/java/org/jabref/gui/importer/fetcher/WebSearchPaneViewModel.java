@@ -162,7 +162,7 @@ public class WebSearchPaneViewModel {
                                                           .withInitialMessage(Localization.lang("Processing \"%0\"...", query));
         task.onFailure(dialogService::showErrorDialogAndWait);
 
-        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task);
+        ImportEntriesDialog dialog = new ImportEntriesDialog(stateManager.getActiveDatabase().get(), task, activeFetcher, query);
         dialog.setTitle(fetcherName);
         dialogService.showCustomDialogAndWait(dialog);
     }

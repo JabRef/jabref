@@ -6,6 +6,7 @@ import javax.swing.undo.UndoManager;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.collections.ListChangeListener;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -35,7 +36,9 @@ import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.NoSelectionModel;
 import org.jabref.gui.util.ViewModelListCellFactory;
+import org.jabref.logic.importer.PagedSearchBasedFetcher;
 import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.SearchBasedFetcher;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.util.BackgroundTask;
@@ -53,7 +56,8 @@ import org.controlsfx.control.CheckListView;
 import org.fxmisc.richtext.CodeArea;
 
 public class ImportEntriesDialog extends BaseDialog<Boolean> {
-
+    @FXML private HBox paginationBox;
+    @FXML private Label pageNumberLabel;
     @FXML private CheckListView<BibEntry> entriesListView;
     @FXML private ComboBox<BibDatabaseContext> libraryListView;
     @FXML private ButtonType importButton;
@@ -68,6 +72,8 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     private final BackgroundTask<ParserResult> task;
     private final BibDatabaseContext database;
     private ImportEntriesViewModel viewModel;
+    private final SearchBasedFetcher searchBasedFetcher;
+    private final String query;
 
     @Inject private TaskExecutor taskExecutor;
     @Inject private DialogService dialogService;
@@ -83,12 +89,19 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * @param database the database to import into
      * @param task     the task executed for parsing the selected files(s).
      */
-    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
+    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
         this.task = task;
+        this.searchBasedFetcher = fetcher;
+        this.query = query;
+
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
+
+        boolean showPagination = (searchBasedFetcher != null) && (query != null);
+        paginationBox.setVisible(showPagination);
+        paginationBox.setManaged(showPagination);
 
         BooleanBinding booleanBind = Bindings.isEmpty(entriesListView.getCheckModel().getCheckedItems());
         Button btn = (Button) this.getDialogPane().lookupButton(importButton);
@@ -98,7 +111,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
         setResultConverter(button -> {
             if (button == importButton) {
-                viewModel.importEntries(entriesListView.getCheckModel().getCheckedItems(), downloadLinkedOnlineFiles.isSelected());
+                viewModel.importEntries(viewModel.getCheckedEntries().stream().toList(), downloadLinkedOnlineFiles.isSelected());
             } else {
                 dialogService.notify(Localization.lang("Import canceled"));
             }
@@ -109,11 +122,25 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     @FXML
     private void initialize() {
-        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor);
+        viewModel = new ImportEntriesViewModel(task, taskExecutor, database, dialogService, undoManager, preferences, stateManager, entryTypesManager, fileUpdateMonitor, searchBasedFetcher, query);
         Label placeholder = new Label();
         placeholder.textProperty().bind(viewModel.messageProperty());
         entriesListView.setPlaceholder(placeholder);
         entriesListView.setItems(viewModel.getEntries());
+        entriesListView.getCheckModel().getCheckedItems().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (BibEntry entry : change.getAddedSubList()) {
+                        viewModel.getCheckedEntries().add(entry);
+                    }
+                }
+                if (change.wasRemoved()) {
+                    for (BibEntry entry : change.getRemoved()) {
+                        viewModel.getCheckedEntries().remove(entry);
+                    }
+                }
+            }
+        });
 
         libraryListView.setEditable(false);
         libraryListView.getItems().addAll(stateManager.getOpenDatabases());
@@ -180,14 +207,39 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 .withPseudoClass(entrySelected, entriesListView::getItemBooleanProperty)
                 .install(entriesListView);
 
-        selectedItems.textProperty().bind(Bindings.size(entriesListView.getCheckModel().getCheckedItems()).asString());
-        totalItems.textProperty().bind(Bindings.size(entriesListView.getItems()).asString());
+        selectedItems.textProperty().bind(Bindings.size(viewModel.getCheckedEntries()).asString());
+        totalItems.textProperty().bind(Bindings.size(viewModel.getAllEntries()).asString());
         entriesListView.setSelectionModel(new NoSelectionModel<>());
         initBibTeX();
+        if (searchBasedFetcher != null) {
+            updatePageUI();
+        }
+    }
+
+    private void updatePageUI() {
+        pageNumberLabel.textProperty().bind(Bindings.createStringBinding(() -> {
+            int totalPages = viewModel.totalPagesProperty().get();
+            int currentPage = viewModel.currentPageProperty().get() + 1;
+            if (searchBasedFetcher instanceof PagedSearchBasedFetcher && currentPage == totalPages) {
+                return Localization.lang("Fetching...");
+            }
+            if (totalPages != 0) {
+                return currentPage + " " + Localization.lang("of") + " " + totalPages;
+            }
+            return "";
+        }, viewModel.currentPageProperty(), viewModel.totalPagesProperty()));
+
+        viewModel.getAllEntries().addListener((ListChangeListener<BibEntry>) change -> {
+            while (change.next()) {
+                if (change.wasAdded() || change.wasRemoved()) {
+                    viewModel.updateTotalPages();
+                }
+            }
+        });
     }
 
     private void displayBibTeX(BibEntry entry, String bibTeX) {
-        if (entriesListView.getCheckModel().isChecked(entry)) {
+        if (viewModel.getCheckedEntries().contains(entry)) {
             bibTeXData.clear();
             bibTeXData.appendText(bibTeX);
             bibTeXData.moveTo(0);
@@ -208,14 +260,18 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     }
 
     public void unselectAll() {
-        entriesListView.getCheckModel().clearChecks();
+        viewModel.getCheckedEntries().clear();
+        for (int i = 0; i < entriesListView.getItems().size(); i++) {
+            entriesListView.getCheckModel().clearCheck(i);
+        }
     }
 
     public void selectAllNewEntries() {
         unselectAll();
-        for (BibEntry entry : entriesListView.getItems()) {
+        for (BibEntry entry : viewModel.getAllEntries()) {
             if (!viewModel.hasDuplicate(entry)) {
                 entriesListView.getCheckModel().check(entry);
+                viewModel.getCheckedEntries().add(entry);
                 displayBibTeX(entry, viewModel.getSourceString(entry));
             }
         }
@@ -224,5 +280,26 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
     public void selectAllEntries() {
         unselectAll();
         entriesListView.getCheckModel().checkAll();
+        viewModel.getCheckedEntries().addAll(viewModel.getAllEntries());
+    }
+
+    @FXML
+    private void onPrevPage() {
+        viewModel.prevPage();
+        restoreCheckedEntries();
+    }
+
+    @FXML
+    private void onNextPage() {
+        viewModel.nextPage();
+        restoreCheckedEntries();
+    }
+
+    private void restoreCheckedEntries() {
+        for (BibEntry entry : viewModel.getEntries()) {
+            if (viewModel.getCheckedEntries().contains(entry)) {
+                entriesListView.getCheckModel().check(entry);
+            }
+        }
     }
 }
