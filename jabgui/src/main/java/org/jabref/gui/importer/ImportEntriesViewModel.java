@@ -120,12 +120,25 @@ public class ImportEntriesViewModel extends AbstractViewModel {
                 .containsDuplicate(selectedDb.getValue().getDatabase(), entry, selectedDb.getValue().getMode()).isPresent();
     }
 
-    public String getSourceString(BibEntry entry) {
+    public String getSourcesString(List<BibEntry> entries) {
+        StringWriter writer = new StringWriter();
+        BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
+        FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
+        String serializedStrings;
+        try {
+            serializedStrings = new BibEntryWriter(fieldWriter, entryTypesManager).serializeAll(entries, selectedDb.getValue().getMode());
+        } catch (IOException ioException) {
+            serializedStrings = "";
+        }
+        return serializedStrings;
+    }
+
+    public String getSourceString(BibEntry entry, boolean reformat) {
         StringWriter writer = new StringWriter();
         BibWriter bibWriter = new BibWriter(writer, OS.NEWLINE);
         FieldWriter fieldWriter = FieldWriter.buildIgnoreHashes(preferences.getFieldPreferences());
         try {
-            new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode());
+            new BibEntryWriter(fieldWriter, entryTypesManager).write(entry, bibWriter, selectedDb.getValue().getMode(), reformat);
         } catch (IOException ioException) {
             return "";
         }
