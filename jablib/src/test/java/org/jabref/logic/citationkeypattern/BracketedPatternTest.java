@@ -335,24 +335,20 @@ class BracketedPatternTest {
         assertEquals(expected, BracketedPattern.authAuthEa(list));
     }
 
-    static Stream<Arguments> authLast() {
-        return Stream.of(
-                Arguments.of("Newton", "Isaac Newton"),
-                Arguments.of("Maxwell", "Isaac Newton and James Maxwell"),
-                Arguments.of("Einstein", "Isaac Newton and James Maxwell and Albert Einstein"),
-                Arguments.of("Bohr", "Isaac Newton and James Maxwell and Albert Einstein and N. Bohr"),
-                Arguments.of("Aachen", "Aachen"),
-                Arguments.of("Berlin", "Aachen and Berlin"),
-                Arguments.of("Chemnitz", "Aachen and Berlin and Chemnitz"),
-                Arguments.of("Düsseldorf", "Aachen and Berlin and Chemnitz and Düsseldorf"),
-                Arguments.of("Essen", "Aachen and Berlin and Chemnitz and Düsseldorf and Essen"),
-                Arguments.of("Aalst", "Wil van der Aalst"),
-                Arguments.of("Lessen", "Wil van der Aalst and Tammo van Lessen")
-        );
-    }
-
     @ParameterizedTest
-    @MethodSource
+    @CsvSource({
+            "'Newton', 'Isaac Newton'",
+            "'Maxwell', 'Isaac Newton and James Maxwell'",
+            "'Einstein', 'Isaac Newton and James Maxwell and Albert Einstein'",
+            "'Bohr', 'Isaac Newton and James Maxwell and Albert Einstein and N. Bohr'",
+            "'Aachen', 'Aachen'",
+            "'Berlin', 'Aachen and Berlin'",
+            "'Chemnitz', 'Aachen and Berlin and Chemnitz'",
+            "'Düsseldorf', 'Aachen and Berlin and Chemnitz and Düsseldorf'",
+            "'Essen', 'Aachen and Berlin and Chemnitz and Düsseldorf and Essen'",
+            "'Aalst', 'Wil van der Aalst",
+            "'Lessen', 'Wil van der Aalst and Tammo van Lessen'"
+    })
     void authLast(String expected, AuthorList list) {
         assertEquals(expected, BracketedPattern.lastAuthor(list));
     }

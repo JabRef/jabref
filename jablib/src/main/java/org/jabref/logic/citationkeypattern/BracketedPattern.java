@@ -807,6 +807,7 @@ public class BracketedPattern {
      * @param authorList an {@link AuthorList}
      * @return the surname of an author/editor
      */
+    @VisibleForTesting
     static String lastAuthor(AuthorList authorList) {
         if (authorList.isEmpty()) {
             return "";
@@ -1221,7 +1222,7 @@ public class BracketedPattern {
 
     /**
      * <p>
-     * An author or editor may be and institution not a person. In that case the key generator builds very long keys,
+     * An author or editor may be an institution not a person. In that case the key generator builds very long keys,
      * e.g.: for &ldquo;The Attributed Graph Grammar System (AGG)&rdquo; -> &ldquo;TheAttributedGraphGrammarSystemAGG&rdquo;.
      * </p>
      *
