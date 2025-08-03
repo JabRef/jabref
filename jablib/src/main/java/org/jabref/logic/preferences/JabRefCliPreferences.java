@@ -2430,7 +2430,7 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (_, _, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
         EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (_, _, newValue) -> putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));
         EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (_, _, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
-        EasyBind.listen(openOfficePreferences.SmartSpaceAfterProperty(), (_, _, newValue) -> putBoolean(OO_SMART_SPACE_AFTER, newValue));
+        EasyBind.listen(openOfficePreferences.smartSpaceAfterProperty(), (_, _, newValue) -> putBoolean(OO_SMART_SPACE_AFTER, newValue));
 
         openOfficePreferences.getExternalJStyles().addListener((InvalidationListener) _ ->
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalJStyles()));

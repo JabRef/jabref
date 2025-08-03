@@ -218,15 +218,11 @@ public class OpenOfficePreferences {
         externalCslStyles.addAll(paths);
     }
 
-    /*
-      * Adding smart space after reference.
-     */
-
     public boolean getSmartSpaceAfter() {
         return smartSpaceAfter.get();
     }
 
-    public BooleanProperty SmartSpaceAfterProperty() {
+    public BooleanProperty smartSpaceAfterProperty() {
         return smartSpaceAfter;
     }
 
