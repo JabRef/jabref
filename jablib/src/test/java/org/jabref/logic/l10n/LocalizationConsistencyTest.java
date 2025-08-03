@@ -129,9 +129,7 @@ class LocalizationConsistencyTest {
         assertEquals(List.of(), missingKeys,
                 missingKeys.stream()
                            .map(key -> LocalizationKey.fromKey(key.getKey()))
-                           .map(key -> "%s=%s".formatted(
-                                   key.getEscapedPropertiesKey(),
-                                   key.getValueForEnglishPropertiesFile()))
+                           .map(key -> key.getEscapedPropertiesKey() + "=" + key.getValueForEnglishPropertiesFile())
                            .collect(Collectors.joining("\n",
                                    """
 
