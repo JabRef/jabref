@@ -178,7 +178,7 @@ public class ClipBoardManager {
     }
 
     public void setSourceBibDatabaseContext(@NonNull BibDatabaseContext context) {
-        sourceDatabaseContext = Objects.requireNonNull(context, "context must not be null");
+        sourceDatabaseContext = context;
     }
 
     private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
