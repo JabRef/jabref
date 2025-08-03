@@ -138,6 +138,10 @@ class KeywordListTest {
         assertEquals(expected, KeywordList.parse(input, ',', '>'));
     }
 
+    // TODO: We need to redefine the roundtrip test depending on the context GUI or BibTex,
+    //  we want the user to type in escaping character but see the "clean" String as in:
+    //  keyword1\,keyword2, keyword3 --> "keyword1,keyword2", "keyword3"
+    // how is the .bib parser handling this? will there be escaping characters at all?
     @ParameterizedTest
     @MethodSource("provideParseKeywordCases")
     void roundTripPreservesStructure(String original) {

@@ -67,7 +67,7 @@ public class KeywordList implements Iterable<Keyword> {
                 hierarchy.add(currentToken.toString().trim());
                 currentToken.setLength(0);
             } else if (currentChar == delimiter) {
-                hierarchy.add(currentToken.toString().trim());
+                hierarchy.add(currentToken.toString());
                 currentToken.setLength(0);
                 keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
                 hierarchy.clear();
@@ -97,7 +97,7 @@ public class KeywordList implements Iterable<Keyword> {
     }
 
     public static String serialize(List<Keyword> keywords, Character delimiter) {
-        return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));
+        return keywords.stream().map(keyword -> keyword.getEscaped(delimiter)).collect(Collectors.joining(delimiter.toString()));
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {

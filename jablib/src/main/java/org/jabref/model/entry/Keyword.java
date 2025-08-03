@@ -2,6 +2,8 @@ package org.jabref.model.entry;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -13,6 +15,7 @@ import org.jabref.model.ChainNode;
  */
 public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
 
+    // Note: {@link org.jabref.model.entry.KeywordList#parse(java.lang.String, java.lang.Character, java.lang.Character) offers configuration, which is not available here
     public static Character DEFAULT_HIERARCHICAL_DELIMITER = '>';
     private final String keyword;
 
@@ -78,12 +81,23 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      * Returns a text representation of the subchain starting at this item.
      * E.g., calling {@link #getSubchainAsString(Character)} on the node "B" in "A > B > C" returns "B > C".
      */
-    private String getSubchainAsString(Character hierarchicalDelimiter) {
-        return keyword +
+    private String getSubchainAsString(Character hierarchicalDelimiter) {return getEscaped(hierarchicalDelimiter) +
                 getChild().map(child -> " " + hierarchicalDelimiter + " " + child.getSubchainAsString(hierarchicalDelimiter))
                           .orElse("");
     }
 
+    /**
+     * Returns the keyword string with all unescaped occurrences of the given hierarchical delimiter escaped.
+     * This ensures that delimiters within keyword values are not misinterpreted as separators.
+     */
+    // TODO: This method needs refactoring, Expected :keyword\,one > sub
+    //  Actual   :keyword,one ----> it is eating the delimiter up
+    public String getEscaped(Character hierarchicalDelimiter) {
+        String escapedDelimiter = Pattern.quote(String.valueOf(hierarchicalDelimiter));
+        Pattern pattern = Pattern.compile("(?<!\\\\)" + escapedDelimiter);
+        Matcher matcher = pattern.matcher(keyword);
+        return matcher.replaceAll("\\" + hierarchicalDelimiter);
+    }
     /**
      * Gets the keyword of this node in the chain.
      */
