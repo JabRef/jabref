@@ -244,7 +244,7 @@ public class CSLCitationOOAdapter {
             }
         }
 
-        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, true);
+        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, false);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
     }
