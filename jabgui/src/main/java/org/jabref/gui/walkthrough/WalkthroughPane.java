@@ -27,10 +27,11 @@ import org.slf4j.LoggerFactory;
 /// not necessary since:
 ///
 /// 1. At most one [Walkthrough], and therefore, at most one [WalkthroughOverlay]
-/// instance at a time
+/// instance at a time.
 /// 2. Only the [WindowOverlay] and [WalkthroughHighlighter] uses this class, both are
 /// singletons (per walkthrough) and their operations are sequentially executed
-/// (highlight first, then displaying the overlay).
+/// (highlight first then displaying the overlay), and only those operations would call
+/// [#getInstance(Window)].
 public class WalkthroughPane extends StackPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughPane.class);
     private static final Map<Window, WalkthroughPane> INSTANCES = new ConcurrentHashMap<>();
