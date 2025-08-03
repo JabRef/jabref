@@ -397,9 +397,10 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
+                // NOTE: This section will be removed in the WelcomeTab PR. Currently left in here to provide a methods of testing.
                 factory.createSubMenu(StandardActions.WALKTHROUGH_MENU,
-                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction(frame, WalkthroughAction.MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME)),
-                        factory.createMenuItem(StandardActions.PDF_LINK_WALKTHROUGH, new WalkthroughAction(frame, WalkthroughAction.PDF_LINK_WALKTHROUGH_NAME))
+                        factory.createMenuItem(StandardActions.MAIN_FILE_DIRECTORY_WALKTHROUGH, new WalkthroughAction(Injector.instantiateModelOrService(Stage.class), frame, stateManager, WalkthroughAction.MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME)),
+                        factory.createMenuItem(StandardActions.PDF_LINK_WALKTHROUGH, new WalkthroughAction(Injector.instantiateModelOrService(Stage.class), frame, stateManager, WalkthroughAction.PDF_LINK_WALKTHROUGH_NAME))
                 ),
 
                 factory.createMenuItem(StandardActions.OPEN_WELCOME_TAB, new SimpleCommand() {
