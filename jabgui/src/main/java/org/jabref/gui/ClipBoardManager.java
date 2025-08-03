@@ -7,7 +7,6 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -124,10 +123,6 @@ public class ClipBoardManager {
         return getContents();
     }
 
-    public Optional<BibDatabaseContext> getSourceBibDatabaseContext() {
-      return Optional.ofNullable(sourceDatabaseContext);
-    }
-
     /**
      * Puts content onto the system clipboard.
      *
@@ -175,6 +170,10 @@ public class ClipBoardManager {
         String serializedEntries = serializeEntries(entries, entryTypesManager);
         builder.append(serializedEntries);
         setContent(builder.toString());
+    }
+
+    public Optional<BibDatabaseContext> getSourceBibDatabaseContext() {
+      return Optional.ofNullable(sourceDatabaseContext);
     }
 
     public void setSourceBibDatabaseContext(@NonNull BibDatabaseContext context) {
