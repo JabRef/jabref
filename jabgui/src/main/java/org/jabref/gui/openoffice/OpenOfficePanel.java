@@ -680,7 +680,7 @@ public class OpenOfficePanel {
         }
 
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
-        autoSync.setOnAction(_ -> openOfficePreferences.setSmartSpaceAfter(smartSpace.isSelected()));
+        smartSpace.setOnAction(_ -> openOfficePreferences.setSmartSpaceAfter(smartSpace.isSelected()));
         useAllBases.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));
         useActiveBase.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));
         clearConnectionSettings.setOnAction(_ -> {
