@@ -55,6 +55,9 @@ class WindowOverlay {
     private final List<Runnable> cleanupTasks = new ArrayList<>();
     private final KeyBindingRepository keyBindingRepository;
     private final StateManager stateManager;
+    /// Ensure the [#hide()] can efficiently communicate to the
+    /// [#showTooltip(TooltipStep, Node, Runnable)]'s showing property listener (and
+    /// also just as a way to circumvent effectively final requirement for lambda).
     private final AtomicBoolean showing = new AtomicBoolean(true);
 
     private @Nullable Button quitButton;
