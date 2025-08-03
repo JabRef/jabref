@@ -28,7 +28,7 @@ public class InternalPreferences {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
-        this.userAndHost = new SimpleStringProperty(userAndHost.user(), userAndHost.host());
+        this.userAndHost = new SimpleStringProperty(userAndHost.getCanonicalForm());
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
     }
 

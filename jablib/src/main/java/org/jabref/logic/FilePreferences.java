@@ -10,7 +10,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.util.UserAndHost;
 import org.jabref.model.strings.StringUtil;
 
 /**
@@ -37,7 +36,7 @@ public class FilePreferences {
     private final BooleanProperty openFileExplorerInFileDirectory = new SimpleBooleanProperty();
     private final BooleanProperty openFileExplorerInLastUsedDirectory = new SimpleBooleanProperty();
 
-    public FilePreferences(UserAndHost userAndHost,
+    public FilePreferences(String userAndHost,
                            String mainFileDirectory,
                            boolean storeFilesRelativeToBibFile,
                            String fileNamePattern,
@@ -53,7 +52,7 @@ public class FilePreferences {
                            Path lastUsedDirectory,
                            boolean openFileExplorerInFileDirectory,
                            boolean openFileExplorerInLastUsedDirectory) {
-        this.userAndHost.setValue(userAndHost.getCanonicalForm());
+        this.userAndHost.setValue(userAndHost);
         this.mainFileDirectory.setValue(mainFileDirectory);
         this.storeFilesRelativeToBibFile.setValue(storeFilesRelativeToBibFile);
         this.fileNamePattern.setValue(fileNamePattern);

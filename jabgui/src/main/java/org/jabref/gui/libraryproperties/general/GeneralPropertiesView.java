@@ -83,7 +83,10 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
+        userSpecificFileDirectoryTooltip.setText(Localization.lang(preferences.getFilePreferences().getUserAndHost()));
+        userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        // TODO- add tooltip to laTexFileDirectory: default LaTeX directory??
 
         librarySpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
@@ -102,17 +105,13 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             userSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            userSpecificFileDirectoryTooltip.setText(Localization.lang(preferences.getFilePreferences().getUserAndHost()));
         });
 
         laTexFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            // TODO- add tooltip to laTexFileDirectory: default LaTeX directory??
         });
-        // TODO- Add changes on .fxml
-
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
             userSpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.userSpecificFileDirectoryStatus(), userSpecificFileDirectory);

@@ -1627,8 +1627,8 @@ public class JabRefCliPreferences implements CliPreferences {
             return userAndHost;
         }
 
-        UserAndHost result =new UserAndHost(get(DEFAULT_OWNER), OS.getHostName());
-        return result;
+        userAndHost = new UserAndHost(get(DEFAULT_OWNER), OS.getHostName());
+        return userAndHost;
     }
 
     protected Language getLanguage() {
@@ -1677,7 +1677,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         filePreferences = new FilePreferences(
-                getUserAndHost(),
+                getUserAndHost().getCanonicalForm(),
                 getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 get(IMPORT_FILENAMEPATTERN),
