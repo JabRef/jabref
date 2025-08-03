@@ -34,7 +34,8 @@ import org.jspecify.annotations.Nullable;
 public interface NavigationPredicate {
     Duration TIMEOUT_DURATION = Duration.millis(1000);
 
-    /// Attaches the navigation listeners to the target node.
+    /// Attaches the navigation listeners to the target node. `beforeNavigate` and
+    /// `onNavigate` are guaranteed to run at most once.
     ///
     /// @param node           the node to attach the listeners to
     /// @param beforeNavigate the runnable to execute before navigation

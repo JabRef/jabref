@@ -16,7 +16,7 @@ public sealed interface VisibleComponent extends WalkthroughStep permits PanelSt
     List<WalkthroughRichTextBlock> content();
 
     /// Node resolver for the node to highlight / tooltip to position / etc.
-    Optional<NodeResolver> resolver();
+    Optional<NodeResolver> nodeResolver();
 
     /// Custom text for the continue button.
     /// - If [Optional#empty()], no continue button is shown.

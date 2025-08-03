@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.beans.value.ChangeListener;
 import javafx.scene.Node;
@@ -31,15 +30,43 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// Overlay to display, render, highlight, and mutate walkthroughs.
+///
+/// @implNote This class is only thread-safe for its intended use case. For each
+/// walkthrough, the following occurs:
+///
+/// 1. [#show(WalkthroughStep)] is called
+/// 2. Attempt to resolve the node using [WalkthroughResolver]. Upon completion, at most
+/// one call is made to [#displayWalkthroughStep(WalkthroughResult)] or
+/// [#revertToPreviousStep()].
+///     1. For [#revertToPreviousStep()], no concurrency is involved (note that no
+/// listeners that could trigger revert are attached yet). Back to case 1.
+///     2. For [#displayWalkthroughStep(WalkthroughResult)]
+///         1. We start listening for potential revert, creating
+/// [#revertToPreviousStep()] trying to revert at the same time, which is secured to
+/// only accept the first call and ignore all the rest of the calls from property
+/// changes. Back to case 2.1.
+///         2. We start listening for when the next step of navigation can occur, see
+/// [WindowOverlay], which could lead to at most one call to [#prepareForNavigation()]
+/// first, and then another call to [#show(WalkthroughStep)] (as a result of
+/// state-change in the [Walkthrough]) (see
+/// [org.jabref.gui.walkthrough.declarative.NavigationPredicate]'s guard rail on
+/// preventing multiple calls). In the extreme case where [#show(WalkthroughStep)]
+/// occurs at the same time as [#displayWalkthroughStep(WalkthroughResult)], we have
+/// synchronized them, preventing failure to keep track of overlays and listeners. Back
+/// to case 1.
+///         3. We also could be [#detachAll()], see [#showQuitConfirmationAndQuit()]
+/// which is applied to the highlight effects. Consider when a user clicks on the
+/// highlight to quit when the highlight is applied and [WindowOverlay] is not added to
+/// the pane yet, we now have [#detachAll()] and
+/// [#displayWalkthroughStep(WalkthroughResult)] at the same time. We would not have
+/// properly cleaned up since [#overlays], [#windowShowingListener], and
+/// [#nodeVisibleListener] have yet to be registered, so we `synchronized` them.
+///
+/// In most sane cases, no concurrency issue would occur unless the user clicks at some
+/// extremely fast speed.
 public class WalkthroughOverlay {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughOverlay.class);
-
-    private enum WalkthroughPhase {
-        INACTIVE,
-        RESOLVING,
-        DISPLAYING,
-        NAVIGATING
-    }
 
     private final Map<Window, WindowOverlay> overlays = new HashMap<>();
     private final Stage stage;
@@ -47,13 +74,12 @@ public class WalkthroughOverlay {
     private final WalkthroughHighlighter walkthroughHighlighter;
     private final WalkthroughScroller walkthroughScroller;
     private final SideEffectExecutor sideEffectExecutor;
-    private final Map<Integer, List<WalkthroughSideEffect>> executedSideEffects = new ConcurrentHashMap<>();
+    private final Map<Integer, WalkthroughSideEffect> executedSideEffects = new HashMap<>();
 
     private @Nullable WalkthroughResolver resolver;
     private @Nullable ChangeListener<Boolean> windowShowingListener;
     private @Nullable ChangeListener<Boolean> nodeVisibleListener;
 
-    private volatile WalkthroughPhase phase = WalkthroughPhase.INACTIVE;
     private Window resolvedWindow;
     private Node resolvedNode;
 
@@ -66,10 +92,9 @@ public class WalkthroughOverlay {
         this.walkthroughHighlighter.setOnBackgroundClick(this::showQuitConfirmationAndQuit);
     }
 
-    public void show(@NonNull WalkthroughStep step) {
+    public synchronized void show(@NonNull WalkthroughStep step) {
         LOGGER.debug("Showing step: {}", step.title());
         cleanUp();
-        phase = WalkthroughPhase.RESOLVING;
 
         switch (step) {
             case SideEffect(String title, WalkthroughSideEffect sideEffect) -> {
@@ -77,8 +102,7 @@ public class WalkthroughOverlay {
                 LOGGER.debug("Executing side effect for step: {}", title);
 
                 if (sideEffectExecutor.executeForward(sideEffect, walkthrough)) {
-                    executedSideEffects.computeIfAbsent(currentStepIndex, _ -> new ArrayList<>())
-                                       .add(sideEffect);
+                    executedSideEffects.put(currentStepIndex, sideEffect);
                     walkthrough.nextStep();
                 } else {
                     LOGGER.error("Failed to execute side effect: {}", sideEffect.description());
@@ -92,14 +116,14 @@ public class WalkthroughOverlay {
 
                 resolver = new WalkthroughResolver(
                         windowResolver,
-                        component.resolver().orElse(null),
+                        component.nodeResolver().orElse(null),
                         this::handleResolutionResult);
                 resolver.startResolution();
             }
         }
     }
 
-    public void detachAll() {
+    public synchronized void detachAll() {
         cleanUp();
         revertAllSideEffects();
 
@@ -135,28 +159,24 @@ public class WalkthroughOverlay {
         resolver = null;
     }
 
-    private void displayWalkthroughStep(WalkthroughResult result) {
+    private synchronized void displayWalkthroughStep(WalkthroughResult result) {
         Optional<Window> window = result.window();
         if (window.isEmpty()) {
-            LOGGER.error("Resolution succeeded but window is missing for component '{}'", walkthrough.getCurrentStep().title());
-            revertToPreviousStep();
-            return;
+            throw new IllegalStateException("Resolution should not be successful without Window being resolved.");
         }
         this.resolvedWindow = window.get();
         this.resolvedNode = result.node().orElse(null);
         VisibleComponent component = (VisibleComponent) walkthrough.getCurrentStep();
-        phase = WalkthroughPhase.DISPLAYING;
 
         LOGGER.debug("Displaying overlay for component '{}'", component.title());
-
-        setupRevertListeners(component);
 
         if (resolvedNode != null) {
             walkthroughScroller.setup(resolvedNode);
         }
-        walkthroughHighlighter.applyHighlight(component.highlight().orElse(null),
-                resolvedWindow.getScene(), resolvedNode);
-
+        walkthroughHighlighter.applyHighlight(
+                component.highlight().orElse(null),
+                resolvedWindow.getScene(),
+                resolvedNode);
         WindowOverlay overlay = overlays.computeIfAbsent(resolvedWindow,
                 w -> new WindowOverlay(w, WalkthroughPane.getInstance(w), walkthrough));
 
@@ -166,13 +186,17 @@ public class WalkthroughOverlay {
             case PanelStep panel ->
                     overlay.showPanel(panel, resolvedNode, this::prepareForNavigation);
         }
+
+        setupRevertListeners(component);
     }
 
     private void setupRevertListeners(VisibleComponent component) {
+        Runnable reverter = WalkthroughUtils.once(this::revertToPreviousStep);
+
         windowShowingListener = (_, wasShowing, isShowing) -> {
             if (wasShowing && !isShowing) {
                 LOGGER.debug("Window for step '{}' closed. Reverting.", component.title());
-                revertToPreviousStep();
+                reverter.run();
             }
         };
         resolvedWindow.showingProperty().addListener(windowShowingListener);
@@ -181,20 +205,19 @@ public class WalkthroughOverlay {
             nodeVisibleListener = (_, wasVisible, isVisible) -> {
                 if (wasVisible && !isVisible) {
                     LOGGER.debug("Node for step '{}' is no longer visible. Reverting.", component.title());
-                    revertToPreviousStep();
+                    reverter.run();
                 }
             };
             resolvedNode.visibleProperty().addListener(nodeVisibleListener);
         }
     }
 
-    private void revertSideEffects(@NonNull List<WalkthroughSideEffect> sideEffectsToRevert) {
-        LOGGER.debug("Reverting {} side effects", sideEffectsToRevert.size());
-        for (int i = sideEffectsToRevert.size() - 1; i >= 0; i--) {
-            WalkthroughSideEffect sideEffect = sideEffectsToRevert.get(i);
-            if (!sideEffectExecutor.executeBackward(sideEffect, walkthrough)) {
-                LOGGER.warn("Failed to revert side effect: {}", sideEffect.description());
-            }
+    private void revertSideEffect(@Nullable WalkthroughSideEffect sideEffect) {
+        if (sideEffect == null) {
+            return;
+        }
+        if (!sideEffectExecutor.executeBackward(sideEffect, walkthrough)) {
+            LOGGER.warn("Failed to revert side effect: {}", sideEffect.description());
         }
     }
 
@@ -204,30 +227,16 @@ public class WalkthroughOverlay {
         stepIndices.sort(Integer::compareTo);
         for (int i = stepIndices.size() - 1; i >= 0; i--) {
             Integer stepIndex = stepIndices.get(i);
-            List<WalkthroughSideEffect> stepSideEffects = executedSideEffects.get(stepIndex);
-            if (stepSideEffects != null) {
-                revertSideEffects(stepSideEffects);
-            }
+            revertSideEffect(executedSideEffects.get(stepIndex));
         }
         executedSideEffects.clear();
     }
 
     private void revertToPreviousStep() {
-        synchronized (this) {
-            if (phase != WalkthroughPhase.DISPLAYING) {
-                return;
-            }
-            phase = WalkthroughPhase.NAVIGATING;
-        }
-
         stopRevertListeners();
         LOGGER.info("Attempting to revert to previous resolvable step");
         int currentIndex = walkthrough.currentStepProperty().get();
-
-        List<WalkthroughSideEffect> currentStepSideEffects = executedSideEffects.remove(currentIndex);
-        if (currentStepSideEffects != null) {
-            revertSideEffects(currentStepSideEffects);
-        }
+        revertSideEffect(executedSideEffects.remove(currentIndex));
 
         for (int i = currentIndex - 1; i >= 0; i--) {
             if (!(walkthrough.getStepAtIndex(i) instanceof VisibleComponent previousStep)) {
@@ -240,13 +249,10 @@ public class WalkthroughOverlay {
             }
             Window activeWindow = window.orElse(stage);
             Scene scene = activeWindow.getScene();
-            if (scene != null && (previousStep.resolver().isEmpty() || previousStep.resolver().get().resolve(scene).isPresent())) {
+            if (scene != null && (previousStep.nodeResolver().isEmpty() || previousStep.nodeResolver().get().resolve(scene).isPresent())) {
                 LOGGER.info("Reverting to step {} from step {}", i, currentIndex);
                 for (int j = currentIndex - 1; j > i; j--) {
-                    List<WalkthroughSideEffect> stepSideEffects = executedSideEffects.remove(j);
-                    if (stepSideEffects != null) {
-                        revertSideEffects(stepSideEffects);
-                    }
+                    revertSideEffect(executedSideEffects.remove(j));
                 }
                 walkthrough.goToStep(i);
                 return;
@@ -269,13 +275,11 @@ public class WalkthroughOverlay {
 
         resolvedWindow = null;
         resolvedNode = null;
-        phase = WalkthroughPhase.INACTIVE;
 
         overlays.values().forEach(WindowOverlay::hide);
     }
 
     private void prepareForNavigation() {
-        this.phase = WalkthroughPhase.NAVIGATING;
         stopRevertListeners();
     }
 

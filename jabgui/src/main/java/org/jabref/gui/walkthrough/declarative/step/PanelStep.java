@@ -31,7 +31,7 @@ public record PanelStep(@NonNull String title,
                         @NonNull QuitButtonPosition quitButtonPositionValue) implements VisibleComponent {
 
     @Override
-    public Optional<NodeResolver> resolver() {
+    public Optional<NodeResolver> nodeResolver() {
         return Optional.ofNullable(resolverValue);
     }
 

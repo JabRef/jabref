@@ -265,7 +265,6 @@ public class WalkthroughAction extends SimpleCommand {
                         .position(TooltipPosition.LEFT)
                         .highlight(HighlightEffect.SPOT_LIGHT)
                         .build())
-
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Enter URL for download"))
                         .content(new TextBlock(Localization.lang("Enter the URL of the PDF file you want to download. You can try this example URL: https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2")))
@@ -284,6 +283,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .navigation(NavigationPredicate.onClick())
                         .activeWindow(WindowResolver.not(stage))
                         .highlight(pdfDialogEffect)
+                        .showQuitButton(false)
                         .build())
                 // Completion
                 .addStep(WalkthroughStep

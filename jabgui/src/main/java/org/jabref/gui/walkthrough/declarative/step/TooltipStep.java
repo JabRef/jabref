@@ -32,7 +32,7 @@ public record TooltipStep(@NonNull String title,
     public static final double DEFAULT_WIDTH = 384;
 
     @Override
-    public Optional<NodeResolver> resolver() {
+    public Optional<NodeResolver> nodeResolver() {
         return Optional.of(resolverValue);
     }
 
