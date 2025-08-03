@@ -645,8 +645,8 @@ public class OpenOfficePanel {
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
         autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
 
-        CheckMenuItem smartSpace = new CheckMenuItem(Localization.lang("Add smart space after citation"));
-        smartSpace.selectedProperty().set(openOfficePreferences.getSmartSpaceAfter());
+        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add smart space after citation"));
+        addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());
 
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());
@@ -680,7 +680,7 @@ public class OpenOfficePanel {
         }
 
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
-        smartSpace.setOnAction(_ -> openOfficePreferences.setSmartSpaceAfter(smartSpace.isSelected()));
+        addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
         useAllBases.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));
         useActiveBase.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));
         clearConnectionSettings.setOnAction(_ -> {
@@ -690,6 +690,7 @@ public class OpenOfficePanel {
 
         contextMenu.getItems().addAll(
                 autoSync,
+                addSpaceAfter,
                 new SeparatorMenuItem(),
                 useActiveBase,
                 useAllBases,

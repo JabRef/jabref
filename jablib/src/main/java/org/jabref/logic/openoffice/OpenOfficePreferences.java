@@ -38,7 +38,7 @@ public class OpenOfficePreferences {
     private final StringProperty cslBibliographyHeaderFormat;
     private final StringProperty cslBibliographyBodyFormat;
     private final ObservableList<String> externalCslStyles;
-    private final BooleanProperty smartSpaceAfter;
+    private final BooleanProperty addSpaceAfter;
 
     public OpenOfficePreferences(String executablePath,
                                  boolean useAllDatabases,
@@ -51,7 +51,7 @@ public class OpenOfficePreferences {
                                  String cslBibliographyHeaderFormat,
                                  String cslBibliographyBodyFormat,
                                  List<String> externalCslStyles,
-                                 boolean smartSpaceAfter) {
+                                 boolean addSpaceAfter) {
         this.executablePath = new SimpleStringProperty(executablePath);
         this.useAllDatabases = new SimpleBooleanProperty(useAllDatabases);
         this.syncWhenCiting = new SimpleBooleanProperty(syncWhenCiting);
@@ -63,7 +63,7 @@ public class OpenOfficePreferences {
         this.cslBibliographyHeaderFormat = new SimpleStringProperty(cslBibliographyHeaderFormat);
         this.cslBibliographyBodyFormat = new SimpleStringProperty(cslBibliographyBodyFormat);
         this.externalCslStyles = FXCollections.observableArrayList(externalCslStyles);
-        this.smartSpaceAfter = new SimpleBooleanProperty(smartSpaceAfter);
+        this.addSpaceAfter = new SimpleBooleanProperty(addSpaceAfter);
     }
 
     public void clearConnectionSettings() {
@@ -218,15 +218,15 @@ public class OpenOfficePreferences {
         externalCslStyles.addAll(paths);
     }
 
-    public boolean getSmartSpaceAfter() {
-        return smartSpaceAfter.get();
+    public boolean getAddSpaceAfter() {
+        return addSpaceAfter.get();
     }
 
-    public BooleanProperty smartSpaceAfterProperty() {
-        return smartSpaceAfter;
+    public BooleanProperty addSpaceAfterProperty() {
+        return addSpaceAfter;
     }
 
-    public void setSmartSpaceAfter(boolean smartSpaceAfter) {
-        this.smartSpaceAfter.setValue(smartSpaceAfter);
+    public void setAddSpaceAfter(boolean addSpaceAfter) {
+        this.addSpaceAfter.setValue(addSpaceAfter);
     }
 }
