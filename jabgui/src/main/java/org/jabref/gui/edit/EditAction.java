@@ -7,12 +7,14 @@ import javax.swing.undo.UndoManager;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.web.WebView;
 
+import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.actions.StandardActions;
 
+import com.airhacks.afterburner.injection.Injector;
 import org.fxmisc.richtext.CodeArea;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,8 +80,20 @@ public class EditAction extends SimpleCommand {
                 // Not sure what is selected -> copy/paste/cut selected entries except for Preview and CodeArea
 
                 switch (action) {
-                    case COPY -> tabSupplier.get().copyEntry();
-                    case CUT -> tabSupplier.get().cutEntry();
+                    case COPY -> {
+                      ClipBoardManager clipBoardManager = new ClipBoardManager();
+                      Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                      tabSupplier.get().copyEntry();
+                    }
+                    case CUT -> {
+                      ClipBoardManager clipBoardManager = new ClipBoardManager();
+                      Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                      tabSupplier.get().cutEntry();
+                    }
                     case PASTE -> tabSupplier.get().pasteEntry();
                     case DELETE_ENTRY -> tabSupplier.get().deleteEntry();
                     case UNDO -> {
