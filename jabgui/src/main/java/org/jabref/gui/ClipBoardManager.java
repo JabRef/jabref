@@ -7,6 +7,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javafx.application.Platform;
@@ -27,6 +28,7 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.BibtexString;
 
 import com.airhacks.afterburner.injection.Injector;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,10 +177,8 @@ public class ClipBoardManager {
         setContent(builder.toString());
     }
 
-    public void setSourceBibDatabaseContext(BibDatabaseContext context) {
-      if (context != null) {
-        sourceDatabaseContext = context;
-      }
+    public void setSourceBibDatabaseContext(@NonNull BibDatabaseContext context) {
+        sourceDatabaseContext = Objects.requireNonNull(context, "context must not be null");
     }
 
     private String serializeEntries(List<BibEntry> entries, BibEntryTypesManager entryTypesManager) throws IOException {
