@@ -138,4 +138,22 @@ class ClipboardContentGeneratorTest {
         Object actual = htmlTransferable.getHtml();
         assertEquals(expected, actual);
     }
+
+    @Test
+    void processMarkdownAsMarkdown() {
+        String expected = "\\[1\\]  \n" +
+                "B. Smith, B. Jones, and J. Williams, \"Title of the test entry,\" *BibTeX Journal*, vol. 34, no. 3, pp. 45--67, Jul. 2016.\n" +
+                "\n" +
+                "\\[1\\]  \n" +
+                "B. Smith, B. Jones, and J. Williams, \"Title of the test entry,\" *BibTeX Journal*, vol. 34, no. 3, pp. 45--67, Jul. 2016.\n";
+
+        String citation = "  <div class=\"csl-entry\">" + OS.NEWLINE +
+                "    <div class=\"csl-left-margin\">[1]</div><div class=\"csl-right-inline\">B. Smith, B. Jones, and J. Williams, “Title of the test entry,” <i>BibTeX Journal</i>, vol. 34, no. 3, pp. 45–67, Jul. 2016.</div>" + OS.NEWLINE +
+                "  </div>" + OS.NEWLINE;
+
+        ClipboardContent markdown = ClipboardContentGenerator.processMarkdown(List.of(citation, citation));
+        String actual = markdown.getString();
+        assertEquals(expected, actual);
+    }
 }
+

@@ -274,8 +274,9 @@ extraJavaModuleInfo {
     module("org.xmlunit:xmlunit-matchers", "org.xmlunit.matchers") {
         exportAllPackages()
         requires("java.logging")
-        requires("org.xmlunit")
+        requires("java.xml")
         requires("org.hamcrest")
+        requires("org.xmlunit")
     }
     module("org.xmlunit:xmlunit-placeholders", "org.xmlunit.placeholder")
 
@@ -283,6 +284,70 @@ extraJavaModuleInfo {
     module("com.github.javaparser:javaparser-core", "com.github.javaparser.core")
     module("com.github.javaparser:javaparser-symbol-solver-core", "com.github.javaparser.symbolsolver.core")
     module("net.sf.jopt-simple:jopt-simple", "jopt.simple")
+
+    // "com.github.eclipse:org.eclipse.lsp4j", "lsp4j"
+    //   - The name 'org.eclipse.lsp4j' is different than the name derived from the Jar file name 'lsp4j'; turn off 'failOnModifiedDerivedModuleNames' or explicitly allow override via 'overrideModuleName()'
+    //   - Not a module and no mapping defined: lsp4j-0.24.0.jar
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j", "lsp4j") {
+        overrideModuleName()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        // Note the missing "lsp4j" at the group
+        mergeJar("com.github.eclipse:lsp4j")
+        requires("com.google.gson")
+
+    }
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.debug", "lsp4j.debug") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.generator", "lsp4j.generator") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc", "lsp4j.jsonrpc") {
+        overrideModuleName()
+        exportAllPackages()
+        requires("com.google.gson")
+        requires("java.logging")
+    }
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc.debug", "lsp4j.jsonrpc.debug") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket", "lsp4j.websocket") {
+        overrideModuleName()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("com.github.eclipse.lsp4j:org.eclipse.lsp4j.websocket.jakarta", "lsp4j.websocket.jakarta") {
+        overrideModuleName()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
+    module("jakarta.websocket:jakarta.websocket-api", "jakarta.websocket") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("javax.websocket:javax.websocket-api", "javax.websocket") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("org.eclipse.xtend:org.eclipse.xtend", "xtend") {
+        exportAllPackages()
+    }
+    module("org.eclipse.xtend:org.eclipse.xtend.lib", "xtend.lib") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("org.eclipse.xtend:org.eclipse.xtend.lib.macro", "xtend.lib.macro") {
+        overrideModuleName()
+        exportAllPackages()
+    }
+    module("org.eclipse.xtext:org.eclipse.xtext.xbase.lib", "xtext.xbase.lib") {
+        overrideModuleName()
+        exportAllPackages()
+    }
 
     module("com.tngtech.archunit:archunit-junit5-api", "com.tngtech.archunit.junit5.api") {
         exportAllPackages()

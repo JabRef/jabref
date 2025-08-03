@@ -361,7 +361,7 @@ public class DuplicateCheckTest {
     @Test
     void twoEntriesWithSameDoiButDifferentTypesAreDuplicates() {
         simpleArticle.setField(StandardField.DOI, "10.1016/j.is.2004.02.002");
-        BibEntry duplicateWithDifferentType = (BibEntry) simpleArticle.clone();
+        BibEntry duplicateWithDifferentType = new BibEntry(simpleArticle);
         duplicateWithDifferentType.setType(StandardEntryType.InCollection);
 
         assertTrue(duplicateChecker.isDuplicate(simpleArticle, duplicateWithDifferentType, BibDatabaseMode.BIBTEX));
@@ -409,14 +409,14 @@ public class DuplicateCheckTest {
                                                                        final Field field,
                                                                        final String firstValue,
                                                                        final String secondValue) {
-        final BibEntry entry1 = ((BibEntry) cloneable.clone()).withField(field, firstValue);
-        final BibEntry entry2 = ((BibEntry) cloneable.clone()).withField(field, secondValue);
+        final BibEntry entry1 = new BibEntry(cloneable).withField(field, firstValue);
+        final BibEntry entry2 = new BibEntry(cloneable).withField(field, secondValue);
         assertFalse(duplicateChecker.isDuplicate(entry1, entry2, BibDatabaseMode.BIBTEX));
     }
 
     @Test
     void inbookWithoutChapterCouldBeDuplicateOfInbookWithChapter() {
-        final BibEntry inbook2 = ((BibEntry) simpleInBook.clone()).withField(StandardField.CHAPTER, "");
+        final BibEntry inbook2 = new BibEntry(simpleInBook).withField(StandardField.CHAPTER, "");
 
         assertTrue(duplicateChecker.isDuplicate(simpleInBook, inbook2, BibDatabaseMode.BIBTEX));
     }
