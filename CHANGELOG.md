@@ -20,12 +20,14 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When adding an entry to a library, a warning is displayed if said entry already exists in an active library. [#13261](https://github.com/JabRef/jabref/issues/13261)
 - We added the field `monthfiled` to the default list of fields to resolve BibTeX-Strings for [#13375](https://github.com/JabRef/jabref/issues/13375)
 - We added a new ID based fetcher for [EuropePMC](https://europepmc.org/). [#13389](https://github.com/JabRef/jabref/pull/13389)
-- We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)  
 - We added quick settings for welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
+- We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)
+- We added "copy preview as markdown" feature. [#12552](https://github.com/JabRef/jabref/issues/12552)
 - In case no citation relation information can be fetched, we show the data providers reason. [#13549](https://github.com/JabRef/jabref/pull/13549)
 
 ### Changed
 
+- We changed Citation Relations tab and gave tab panes more descriptive titles and tooltips. [#13619](https://github.com/JabRef/jabref/issues/13619)
 - We changed the name from Open AI Provider to Open AI (or API compatible). [#13585](https://github.com/JabRef/jabref/issues/13585)
 - We improved the citations relations caching by implementing an offline storage. [#11189](https://github.com/JabRef/jabref/issues/11189)
 - We added a tooltip to keywords that resemble Math Subject Classification (MSC) codes. [#12944](https://github.com/JabRef/jabref/issues/12944)
@@ -34,6 +36,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new "Add JabRef suggested groups" option in the context menu of "All entries". [#12659](https://github.com/JabRef/jabref/issues/12659)
 - We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 - We added the provision to choose different CSL bibliography body formats (e.g. First Line Indent, Hanging Indent, Bibliography 1, etc.) in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
+- We use `https` to connect to [shortDOI](https://shortdoi.org/) service. [#13637](https://github.com/JabRef/jabref/pull/13637)
 - We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added [LOBID](https://lobid.org/) as an alternative ISBN-Fetcher. [#13076](https://github.com/JabRef/jabref/issues/13076)
 - We added a success dialog when using the "Copy to" option, indicating whether the entry was successfully copied and specifying if a cross-reference entry was included. [#12486](https://github.com/JabRef/jabref/issues/12486)
