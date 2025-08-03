@@ -7,6 +7,7 @@ When a linked file is reachable from the target context, the system must adjust 
 *Note:*  
 "Reachable" here denotes that the linked file can be accessed via a relative path that does **not** climb up the directory structure (i.e., no "`..`" segments beyond the root directory).  
 Additionally, this check respects all configured **directories for files** as defined in JabRef's file linking settings (see [directories for files](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks#directories-for-files)).
+
 Needs: impl
 
 ## File is not reachable, but the path is the same
