@@ -1,7 +1,7 @@
 plugins {
     id("org.jabref.gradle.base.repositories")
     id("org.jabref.gradle.feature.compile") // for openrewrite
-    id("org.openrewrite.rewrite") version "7.11.0"
+    id("org.openrewrite.rewrite") version "7.12.1"
     id("org.itsallcode.openfasttrace") version "3.1.0"
 }
 
@@ -37,6 +37,7 @@ rewrite {
 requirementTracing {
     inputDirectories.setFrom(files("docs",
             "jablib/src/main/java", "jablib/src/test/java",
+            "jabls/src/main/java", "jabls/src/test/java",
             "jabkit/src/main/java", "jabkit/src/test/java",
             "jabgui/src/main/java", "jabgui/src/test/java",
             "jabsrv/src/main/java", "jabsrv/src/test/java"

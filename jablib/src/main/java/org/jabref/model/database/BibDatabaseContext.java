@@ -1,5 +1,7 @@
 package org.jabref.model.database;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,8 +13,12 @@ import java.util.UUID;
 
 import org.jabref.architecture.AllowedToUseLogic;
 import org.jabref.logic.FilePreferences;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.crawler.Crawler;
 import org.jabref.logic.crawler.StudyRepository;
+import org.jabref.logic.importer.ImportFormatPreferences;
+import org.jabref.logic.importer.ParserResult;
+import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.DatabaseSynchronizer;
 import org.jabref.logic.util.CoarseChangeFilter;
@@ -274,6 +280,21 @@ public class BibDatabaseContext {
         indexPath = appData.resolve("unsaved");
         LOGGER.debug("Using index for unsaved database: {}", indexPath);
         return indexPath;
+    }
+
+    public static BibDatabaseContext of(String bibContent, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        try {
+            Reader reader = Reader.of(bibContent);
+            ParserResult result = parser.parse(reader);
+            return result.getDatabaseContext();
+        } catch (IOException e) {
+            throw new JabRefException("Failed to parse BibTeX content", e);
+        }
+    }
+
+    public static BibDatabaseContext empty() {
+        return new BibDatabaseContext(new BibDatabase(), new MetaData());
     }
 
     @Override

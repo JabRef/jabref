@@ -28,8 +28,8 @@ import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.linkedfile.AttachFileAction;
 import org.jabref.gui.linkedfile.AttachFileFromURLAction;
 import org.jabref.gui.menus.ChangeEntryTypeMenu;
-import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewPreferences;
@@ -132,7 +132,7 @@ public class RightClickMenu {
 
         Optional<String> sourceDatabaseName = libraryTab
                 .getBibDatabaseContext().getDatabasePath().stream()
-                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), path).stream())
+                .flatMap(path -> FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), path).stream())
                 .findFirst();
 
         if (!openDatabases.isEmpty()) {
@@ -141,7 +141,7 @@ public class RightClickMenu {
                 String destinationDatabaseName = "";
 
                 if (bibDatabaseContext.getDatabasePath().isPresent()) {
-                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.collectAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
+                    Optional<String> uniqueFilePathFragment = FileUtil.getUniquePathFragment(stateManager.getAllDatabasePaths(), bibDatabaseContext.getDatabasePath().get());
                     if (uniqueFilePathFragment.equals(sourceDatabaseName)) {
                         return;
                     }
@@ -192,7 +192,8 @@ public class RightClickMenu {
         if (previewPreferences.getSelectedPreviewLayout() instanceof CitationStylePreviewLayout) {
             copySpecialMenu.getItems().addAll(
                     factory.createMenuItem(StandardActions.COPY_CITATION_HTML, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),
-                    factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new CopyCitationAction(CitationStyleOutputFormat.TEXT, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));
+                    factory.createMenuItem(StandardActions.COPY_CITATION_TEXT, new CopyCitationAction(CitationStyleOutputFormat.TEXT, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)),
+                    factory.createMenuItem(StandardActions.COPY_CITATION_MARKDOWN, new CopyCitationAction(CitationStyleOutputFormat.MARKDOWN, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));
         } else {
             copySpecialMenu.getItems().add(factory.createMenuItem(StandardActions.COPY_CITATION_PREVIEW, new CopyCitationAction(CitationStyleOutputFormat.HTML, dialogService, stateManager, clipBoardManager, taskExecutor, preferences, abbreviationRepository)));
         }

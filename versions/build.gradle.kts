@@ -6,7 +6,7 @@ javaPlatform {
     allowDependencies()
 }
 
-val javafx = "24.0.1"
+val javafx = "24.0.2"
 val lucene = "10.2.2"
 val pdfbox = "3.0.5"
 
@@ -38,6 +38,7 @@ dependencies.constraints {
     api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.19.0")
     api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.1")
     api("com.fasterxml:aalto-xml:1.3.3")
+    api("com.github.eclipse:lsp4j:0.24.0")
     api("com.github.javakeyring:java-keyring:1.0.4")
     api("com.github.javaparser:javaparser-symbol-solver-core:3.27.0")
     api("com.github.jknack:handlebars-helpers:4.3.1") // Required by Wiremock - and our patching of Wiremock
@@ -84,6 +85,7 @@ dependencies.constraints {
     api("jakarta.ws.rs:jakarta.ws.rs-api:4.0.0")
     api("net.bytebuddy:byte-buddy:1.17.6")
     api("net.harawata:appdirs:1.4.0")
+    api("net.java.dev.jna:jna-jpms:5.17.0")
     api("net.java.dev.jna:jna-platform:5.17.0")
     api("org.antlr:antlr4-runtime:4.13.2")
     api("org.antlr:antlr4:4.13.2")

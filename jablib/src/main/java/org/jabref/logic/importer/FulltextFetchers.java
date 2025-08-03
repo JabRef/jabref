@@ -56,7 +56,7 @@ public class FulltextFetchers {
 
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
-        BibEntry clonedEntry = (BibEntry) entry.clone();
+        BibEntry clonedEntry = new BibEntry(entry);
         Optional<DOI> doi = clonedEntry.getField(StandardField.DOI).flatMap(DOI::parse);
 
         if (doi.isEmpty()) {

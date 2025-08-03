@@ -42,3 +42,13 @@ jobs:
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Remove labels assigned, reminder-sent, pinned, and "FirstTimeCodeContribution"
+        run: |
+          set -e
+
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📍 Assigned"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "🔔 reminder-sent"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "📌 Pinned"
+          gh issue edit ${{ github.event.issue.number }} --remove-label "FirstTimeCodeContribution"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
