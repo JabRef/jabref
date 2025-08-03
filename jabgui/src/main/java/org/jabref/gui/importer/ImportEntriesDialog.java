@@ -89,6 +89,10 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
      * @param database the database to import into
      * @param task     the task executed for parsing the selected files(s).
      */
+    public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task) {
+        this(database, task, null, null);
+    }
+
     public ImportEntriesDialog(BibDatabaseContext database, BackgroundTask<ParserResult> task, SearchBasedFetcher fetcher, String query) {
         this.database = database;
         this.task = task;

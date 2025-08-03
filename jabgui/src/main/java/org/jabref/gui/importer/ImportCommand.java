@@ -144,7 +144,7 @@ public class ImportCommand extends SimpleCommand {
                 })
                 .executeWith(taskExecutor);
         } else {
-            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task, null, null);
+            ImportEntriesDialog dialog = new ImportEntriesDialog(tab.getBibDatabaseContext(), task);
             dialog.setTitle(Localization.lang("Import"));
             dialogService.showCustomDialogAndWait(dialog);
         }
