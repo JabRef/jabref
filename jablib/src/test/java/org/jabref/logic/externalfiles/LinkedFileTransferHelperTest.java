@@ -3,6 +3,7 @@ package org.jabref.logic.externalfiles;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
 import org.jabref.logic.FilePreferences;
 import org.jabref.model.database.BibDatabase;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -66,15 +66,16 @@ class LinkedFileTransferHelperTest {
 
     @Test
     void pathDiffers_ShouldAdjustPath() {
-      var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+      Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
-      assertEquals(1, returnedEntries.size());
-      assertEquals("sourcefiles/test.pdf", sourceContext.getEntries().getFirst().getFiles().getFirst().getLink());
-      assertEquals("target/sourcefiles/test.pdf",
-        targetContext.getEntries().getFirst().getFiles().getFirst().getLink());
-      Path expectedFile = targetDir.resolve("test.pdf");
-      assertFalse(Files.exists(expectedFile));
+      BibEntry expectedEntry = new BibEntry();
+      LinkedFile expectedLinkedFile = new LinkedFile("Test", "target/sourcefiles/test.pdf", "PDF");
+      expectedEntry.setFiles(List.of(expectedLinkedFile));
+
+      Set<BibEntry> expectedEntries = Set.of(expectedEntry);
+
+      assertEquals(expectedEntries, returnedEntries);
     }
   }
 
@@ -113,15 +114,16 @@ class LinkedFileTransferHelperTest {
 
     @Test
     void fileNotReachable_ShouldCopyFile() {
-      var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+      Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
-      assertEquals(1, returnedEntries.size());
-      assertEquals("test.pdf", sourceContext.getEntries().getFirst().getFiles().getFirst().getLink());
-      assertEquals("test.pdf",
-        targetContext.getEntries().getFirst().getFiles().getFirst().getLink());
-      Path expectedFile = targetDir.resolve("test.pdf");
-      assertTrue(Files.exists(expectedFile));
+      BibEntry expectedEntry = new BibEntry();
+      LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+      expectedEntry.setFiles(List.of(expectedLinkedFile));
+
+      Set<BibEntry> expectedEntries = Set.of(expectedEntry);
+
+      assertEquals(expectedEntries, returnedEntries);
     }
   }
 
@@ -160,13 +162,17 @@ class LinkedFileTransferHelperTest {
 
     @Test
     void fileNotReachableAndPathsDiffer_ShouldCopyFileAndCreateDirectory() {
-      var returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+      Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
         filePreferences);
 
-      assertEquals(1, returnedEntries.size());
-      assertEquals("sourcefiles/test.pdf", sourceContext.getEntries().getFirst().getFiles().getFirst().getLink());
-      assertEquals("sourcefiles/test.pdf",
-        targetContext.getEntries().getFirst().getFiles().getFirst().getLink());
+      BibEntry expectedEntry = new BibEntry();
+      LinkedFile expectedLinkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
+      expectedEntry.setFiles(List.of(expectedLinkedFile));
+
+      Set<BibEntry> expectedEntries = Set.of(expectedEntry);
+
+      assertEquals(expectedEntries, returnedEntries);
+
       Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
       assertTrue(Files.exists(expectedFile));
     }
