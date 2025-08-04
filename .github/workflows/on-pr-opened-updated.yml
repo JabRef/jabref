@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       (github.repository == 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
         (github.actor == 'dependabot[bot]') ||
         (
