@@ -639,6 +639,10 @@ public class OpenOfficePanel {
         }
     }
 
+    public void addSmartSpaceAfter() {
+        ooBase.setSpaceAfter(true);
+    }
+
     private ContextMenu createSettingsPopup() {
         ContextMenu contextMenu = new ContextMenu();
 
@@ -647,6 +651,7 @@ public class OpenOfficePanel {
 
         CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add smart space after citation"));
         addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());
+        addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
 
         CheckMenuItem alwaysAddCitedOnPagesText = new CheckMenuItem(Localization.lang("Automatically add \"Cited on pages...\" at the end of bibliographic entries"));
         alwaysAddCitedOnPagesText.selectedProperty().set(openOfficePreferences.getAlwaysAddCitedOnPages());

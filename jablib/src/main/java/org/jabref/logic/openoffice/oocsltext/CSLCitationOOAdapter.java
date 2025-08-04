@@ -52,13 +52,15 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
+    private boolean addSpaceAfter = false;
 
-    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
+    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager, boolean addSpaceAfter) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.databasesSupplier = databasesSupplier;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
+        this.addSpaceAfter = addSpaceAfter;
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
 
@@ -381,5 +383,9 @@ public class CSLCitationOOAdapter {
     public boolean isCitedEntry(BibEntry entry) {
         String citationKey = entry.getCitationKey().orElse("");
         return markManager.hasCitationForKey(citationKey);
+    }
+
+    public CSLReferenceMarkManager getMarkManager() {
+        return markManager;
     }
 }
