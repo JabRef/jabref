@@ -1,4 +1,4 @@
-package org.jabref.gui.fieldeditors.identifier;
+package org.jabref.gui.fieldeditors.identifier.doi;
 
 import javax.swing.undo.UndoManager;
 
@@ -6,6 +6,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.fieldeditors.identifier.BaseIdentifierEditorViewModel;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.importer.fetcher.CrossRef;
@@ -69,4 +70,6 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         identifier.get().map(DOI::asString)
                   .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
     }
+
+
 }

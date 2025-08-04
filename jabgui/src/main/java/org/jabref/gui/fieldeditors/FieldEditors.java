@@ -10,6 +10,7 @@ import org.jabref.gui.autocompleter.ContentSelectorSuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.autocompleter.SuggestionProviders;
 import org.jabref.gui.fieldeditors.identifier.IdentifierEditor;
+import org.jabref.gui.fieldeditors.identifier.doi.DoiEditor;
 import org.jabref.gui.fieldeditors.optioneditors.LanguageEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.MonthEditorViewModel;
 import org.jabref.gui.fieldeditors.optioneditors.OptionEditor;
@@ -72,7 +73,10 @@ public class FieldEditors {
             return new UrlEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
         } else if (fieldProperties.contains(FieldProperty.JOURNAL_NAME)) {
             return new JournalEditor(field, suggestionProvider, fieldCheckers, undoAction, redoAction);
-        } else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
+        } else if (field == StandardField.DOI) {
+            // Identifier editor does not support PMID, therefore excluded at the condition above
+            return new DoiEditor(field, suggestionProvider, fieldCheckers);
+        }else if (fieldProperties.contains(FieldProperty.IDENTIFIER) && field != StandardField.PMID || field == StandardField.ISBN) {
             // Identifier editor does not support PMID, therefore excluded at the condition above
             return new IdentifierEditor(field, suggestionProvider, fieldCheckers);
         } else if (field == StandardField.CITATIONCOUNT) {

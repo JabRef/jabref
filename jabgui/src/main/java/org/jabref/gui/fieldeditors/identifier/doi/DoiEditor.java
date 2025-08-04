@@ -1,4 +1,4 @@
-package org.jabref.gui.fieldeditors.identifier;
+package org.jabref.gui.fieldeditors.identifier.doi;
 
 import java.util.Optional;
 
@@ -18,7 +18,6 @@ import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
 import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
-import org.jabref.gui.fieldeditors.identifier.doi.DoiIdentifierEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -30,16 +29,18 @@ import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-import static org.jabref.model.entry.field.StandardField.DOI;
-import static org.jabref.model.entry.field.StandardField.EPRINT;
-import static org.jabref.model.entry.field.StandardField.ISBN;
+import org.jabref.gui.fieldeditors.identifier.BaseIdentifierEditorViewModel;
 
-public class IdentifierEditor extends HBox implements FieldEditorFX {
+import static org.jabref.model.entry.field.StandardField.DOI;
+
+
+public class DoiEditor extends HBox implements FieldEditorFX {
 
     @FXML private BaseIdentifierEditorViewModel<?> viewModel;
     @FXML private EditorTextField textField;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
+    @FXML private Button shortenDoiButton;
 
     @Inject private DialogService dialogService;
     @Inject private TaskExecutor taskExecutor;
@@ -48,7 +49,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @Inject private StateManager stateManager;
     private Optional<BibEntry> entry = Optional.empty();
 
-    public IdentifierEditor(Field field,
+    public DoiEditor(Field field,
                             SuggestionProvider<?> suggestionProvider,
                             FieldCheckers fieldCheckers) {
 
@@ -57,10 +58,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         Injector.registerExistingAndInject(this);
 
         switch (field) {
-            case ISBN ->
-                    this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
-            case EPRINT ->
-                    this.viewModel = new EprintIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
+            case DOI ->
+                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
 
             // TODO: Add support for PMID
             case null, default -> {
@@ -70,8 +69,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         }
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
@@ -80,7 +79,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         lookupIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
-        textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
+
+        textField.initContextMenu(EditorMenus.getDOIMenu(textField, dialogService), preferences.getKeyBindingRepository());
 
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
@@ -114,5 +114,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML
     private void openExternalLink() {
         viewModel.openExternalLink();
+    }
+
+    @FXML
+    private void shortenDoi() {
+        //viewModel.shortenDoi();
     }
 }
