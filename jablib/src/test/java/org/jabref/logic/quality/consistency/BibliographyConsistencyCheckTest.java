@@ -228,24 +228,24 @@ class BibliographyConsistencyCheckTest {
         );
 
         BibEntry entry1 = new BibEntry(StandardEntryType.Article, "id1")
-                .withField(StandardField.AUTHOR, "Autore Uno")
-                .withField(StandardField.TITLE, "Titolo Articolo")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.TITLE, "Title ")
                 .withField(StandardField.PAGES, "1-10");
 
         BibEntry entry2 = new BibEntry(StandardEntryType.Article, "id2")
-                .withField(StandardField.AUTHOR, "Autore Due");
+                .withField(StandardField.AUTHOR, "Author Two");
 
         BibEntry entry3 = new BibEntry(StandardEntryType.Article, "id3")
-                .withField(StandardField.AUTHOR, "Autore Tre")
+                .withField(StandardField.AUTHOR, "Author Three")
                 .withField(new UnknownField("customField"), "valore custom");
 
         BibEntry entry4 = new BibEntry(StandardEntryType.Article, "id4")
-                .withField(StandardField.AUTHOR, "Autore Quattro")
+                .withField(StandardField.AUTHOR, "Author Four")
                 .withField(StandardField.PDF, "file.pdf");
 
         BibEntry entry5 = new BibEntry(StandardEntryType.Article, "id5")
-                .withField(StandardField.AUTHOR, "Autore Cinque")
-                .withField(StandardField.PUBLISHER, "Editore");
+                .withField(StandardField.AUTHOR, "Author Five")
+                .withField(StandardField.PUBLISHER, "Editor");
 
         entries.add(entry1);
         entries.add(entry2);
@@ -261,5 +261,45 @@ class BibliographyConsistencyCheckTest {
         List<BibEntry> expected = List.of(entry1, entry2, entry3, entry4, entry5);
 
         assertEquals(Set.copyOf(expected), Set.copyOf(result));
+    }
+
+    @Test
+    void checkComplexLibraryWithAdditionalEntry(@TempDir Path tempDir) {
+        BibEntry first = new BibEntry(StandardEntryType.Article, "first")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.PAGES, "some pages");
+        BibEntry second = new BibEntry(StandardEntryType.Article, "second")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.PUBLISHER, "publisher");
+
+        BibEntry third = new BibEntry(StandardEntryType.InProceedings, "third")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.LOCATION, "location")
+                .withField(StandardField.YEAR, "2024")
+                .withField(StandardField.PAGES, "some pages");
+        BibEntry fourth = new BibEntry(StandardEntryType.InProceedings, "fourth")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.YEAR, "2024")
+                .withField(StandardField.PUBLISHER, "publisher");
+        BibEntry fifth = new BibEntry(StandardEntryType.InProceedings, "fifth")
+                .withField(StandardField.AUTHOR, "Author One")
+                .withField(StandardField.YEAR, "2024");
+        BibEntry sixth = new BibEntry(StandardEntryType.InProceedings, "sixth")
+                .withField(StandardField.AUTHOR, "Author One");
+
+        List<BibEntry> bibEntriesList = List.of(first, second, third, fourth, fifth, sixth);
+        BibDatabase bibDatabase = new BibDatabase();
+        bibDatabase.insertEntries(bibEntriesList);
+        BibDatabaseContext bibContext = new BibDatabaseContext(bibDatabase);
+
+        BibliographyConsistencyCheck.Result result = new BibliographyConsistencyCheck().check(bibContext, (_, _) -> { });
+
+        BibliographyConsistencyCheck.EntryTypeResult articleResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER), List.of(first, second));
+        BibliographyConsistencyCheck.EntryTypeResult inProceedingsResult = new BibliographyConsistencyCheck.EntryTypeResult(Set.of(StandardField.PAGES, StandardField.PUBLISHER, StandardField.LOCATION, StandardField.YEAR), List.of(fifth, fourth, sixth, third));
+        BibliographyConsistencyCheck.Result expected = new BibliographyConsistencyCheck.Result(Map.of(
+                StandardEntryType.Article, articleResult,
+                StandardEntryType.InProceedings, inProceedingsResult
+        ));
+        assertEquals(expected, result);
     }
 }
