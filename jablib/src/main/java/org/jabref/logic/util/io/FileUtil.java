@@ -220,7 +220,7 @@ public class FileUtil {
      * @param pathToSourceFile      Path Source file
      * @param pathToDestinationFile Path Destination file
      * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
-     * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
+     * @return boolean Whether the copy succeeded or was stopped due to the file already existing.
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
