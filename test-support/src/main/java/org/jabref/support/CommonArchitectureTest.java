@@ -45,14 +45,14 @@ public class CommonArchitectureTest {
         ArchRuleDefinition.noClasses().that().areNotAnnotatedWith(AllowedToUseSwing.class)
                           .should().accessClassesThat()
                           .resideInAnyPackage("javax.swing",
-                           "javax.swing.border..",
-                           "javax.swing.colorchooser..",
-                           "javax.swing.event..",
-                           "javax.swing.filechooser..",
-                           "javax.swing.plaf..",
-                           "javax.swing.table..",
-                           "javax.swing.text..",
-                           "javax.swing.tree..")
+                                  "javax.swing.border..",
+                                  "javax.swing.colorchooser..",
+                                  "javax.swing.event..",
+                                  "javax.swing.filechooser..",
+                                  "javax.swing.plaf..",
+                                  "javax.swing.table..",
+                                  "javax.swing.text..",
+                                  "javax.swing.tree..")
                           .check(classes);
     }
 
@@ -160,10 +160,18 @@ public class CommonArchitectureTest {
     /// Use constructor new URI(...) instead
     @ArchTest
     public void shouldNotCallUriCreateMethod(JavaClasses classes) {
-       ArchRuleDefinition.noClasses()
-                         .that()
-                         .resideInAPackage("org.jabref..")
-                         .should().callMethod(URI.class, "create", String.class)
-                         .check(classes);
+        ArchRuleDefinition.noClasses()
+                          .that()
+                          .resideInAPackage("org.jabref..")
+                          .should().callMethod(URI.class, "create", String.class)
+                          .check(classes);
+    }
+
+    @ArchTest
+    public void shouldUseJSpecifyAnnotations(JavaClasses classes) {
+        ArchRuleDefinition.noClasses()
+                          .should().dependOnClassesThat().resideInAPackage("org.jetbrains.annotations..")
+                          .because("JSpecify annotations should be used")
+                          .check(classes);
     }
 }

@@ -32,7 +32,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.LibraryTab;
 import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
-import org.jabref.gui.WelcomeTab;
 import org.jabref.gui.actions.ActionFactory;
 import org.jabref.gui.actions.ActionHelper;
 import org.jabref.gui.actions.SimpleCommand;
@@ -53,6 +52,7 @@ import org.jabref.gui.undo.CountingUndoManager;
 import org.jabref.gui.undo.RedoAction;
 import org.jabref.gui.undo.UndoAction;
 import org.jabref.gui.util.BindingsHelper;
+import org.jabref.gui.welcome.WelcomeTab;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
@@ -419,7 +419,6 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
                                                   .noneMatch(ltab -> ((LibraryTab) ltab).getBibDatabaseContext().getUid().equals(activeUID));
                     if (wasClosed) {
                         tabbedPane.getSelectionModel().selectNext();
-                        return;
                     }
                 }
 
@@ -595,6 +594,10 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
             // Trigger org.jabref.gui.LibraryTab.onClosed
             Event.fireEvent(libraryTab, new Event(this, libraryTab, Tab.CLOSED_EVENT));
         }
+        // Force group update in the GroupTreeViewModel when all the libraries are closed
+        if (tabbedPane.getTabs().isEmpty()) {
+            stateManager.setActiveDatabase(null);
+        }
         return true;
     }
 
@@ -722,6 +725,7 @@ public class JabRefFrame extends BorderPane implements LibraryTabContainer, UiMe
 
         @Override
         public void execute() {
+            tabbedPane.getTabs().removeIf(t -> t instanceof WelcomeTab);
             for (Tab tab : tabbedPane.getTabs()) {
                 Platform.runLater(() -> closeTab((LibraryTab) tab));
             }
