@@ -138,8 +138,8 @@ public class MetaDataParser {
                 
                 if (!userHostInfo.host().isEmpty() && !userHostInfo.host().equals(currentHost)) {
                     // If the host doesn't match the current host, we need to use the current user-host
-                    // This ensures that the LaTeX file directory is set for the current user on the current host
-                    LOGGER.debug("Host mismatch for LaTeX file directory: {} vs current host {}", userHostInfo.host(), currentHost);
+                    // This w that the LaTeX file directory is set for the current user on the current host
+                    LOGGER.warn("Host mismatch for LaTeX file directory: {} vs current host {}", userHostInfo.host(), currentHost);
                     // We don't have access to the current user-host here, so we'll just store the path
                     // The correct user-host will be used when the path is retrieved via the GUI
                 }

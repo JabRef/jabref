@@ -63,7 +63,7 @@ public class MetaData {
     private final EventBus eventBus = new EventBus();
     private final Map<EntryType, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
     private final Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
-    private final Map<String, Path> laTexFileDirectory = new HashMap<>(); // <User-Host, FilePath>
+    private final Map<String, Path> latexFileDirectory = new HashMap<>(); // <User-Host, FilePath>
 
     private final ObjectProperty<GroupTreeNode> groupsRoot = new SimpleObjectProperty<>(null);
     private final OptionalBinding<GroupTreeNode> groupsRootBinding = new OptionalWrapper<>(groupsRoot);
@@ -262,7 +262,7 @@ public class MetaData {
 
     public Optional<Path> getLatexFileDirectory(String userHostString) {
         // First try to get the LaTeX file directory for the exact user-host
-        Path path = laTexFileDirectory.get(userHostString);
+        Path path = latexFileDirectory.get(userHostString);
         if (path != null) {
             return Optional.of(path);
         }
@@ -271,7 +271,7 @@ public class MetaData {
         // This handles the case where a file is moved between hosts with different users
         UserHostInfo requestedUserHost = UserHostInfo.parse(userHostString);
         if (!requestedUserHost.host().isEmpty()) {
-            for (Map.Entry<String, Path> entry : laTexFileDirectory.entrySet()) {
+            for (Map.Entry<String, Path> entry : latexFileDirectory.entrySet()) {
                 UserHostInfo entryUserHost = UserHostInfo.parse(entry.getKey());
                 if (entryUserHost.hasSameHost(requestedUserHost)) {
                     // Found a LaTeX file directory for the same host, return it
@@ -284,12 +284,12 @@ public class MetaData {
     }
 
     public void setLatexFileDirectory(@NonNull String userHostString, @NonNull Path path) {
-        laTexFileDirectory.put(userHostString, path);
+        latexFileDirectory.put(userHostString, path);
         postChange();
     }
 
     public void clearLatexFileDirectory(String userHostString) {
-        laTexFileDirectory.remove(userHostString);
+        latexFileDirectory.remove(userHostString);
         postChange();
     }
 
@@ -381,7 +381,7 @@ public class MetaData {
     }
 
     public Map<String, Path> getLatexFileDirectories() {
-        return Collections.unmodifiableMap(laTexFileDirectory);
+        return Collections.unmodifiableMap(latexFileDirectory);
     }
 
     public Map<String, List<String>> getUnknownMetaData() {
@@ -407,7 +407,7 @@ public class MetaData {
                 && Objects.equals(saveOrder, that.saveOrder)
                 && Objects.equals(citeKeyPatterns, that.citeKeyPatterns)
                 && Objects.equals(userFileDirectory, that.userFileDirectory)
-                && Objects.equals(laTexFileDirectory, that.laTexFileDirectory)
+                && Objects.equals(latexFileDirectory, that.latexFileDirectory)
                 && Objects.equals(defaultCiteKeyPattern, that.defaultCiteKeyPattern)
                 && Objects.equals(saveActions, that.saveActions)
                 && (mode == that.mode)
@@ -419,12 +419,12 @@ public class MetaData {
     @Override
     public int hashCode() {
         return Objects.hash(isProtected, groupsRoot.getValue(), encoding, encodingExplicitlySupplied, saveOrder, citeKeyPatterns, userFileDirectory,
-                laTexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
+                latexFileDirectory, defaultCiteKeyPattern, saveActions, mode, librarySpecificFileDirectory, contentSelectors, versionDBStructure);
     }
 
     @Override
     public String toString() {
-        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + laTexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
+        return "MetaData [citeKeyPatterns=" + citeKeyPatterns + ", userFileDirectory=" + userFileDirectory + ", laTexFileDirectory=" + latexFileDirectory + ", groupsRoot=" + groupsRoot + ", encoding=" + encoding + ", saveOrderConfig=" + saveOrder + ", defaultCiteKeyPattern=" + defaultCiteKeyPattern + ", saveActions=" + saveActions + ", mode=" + mode + ", isProtected=" + isProtected + ", librarySpecificFileDirectory=" + librarySpecificFileDirectory + ", contentSelectors=" + contentSelectors + ", encodingExplicitlySupplied=" + encodingExplicitlySupplied + ", VersionDBStructure=" + versionDBStructure + "]";
     }
 
     public Optional<Path> getBlgFilePath(String user) {

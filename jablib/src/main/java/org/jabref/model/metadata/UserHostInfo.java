@@ -1,12 +1,15 @@
 package org.jabref.model.metadata;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Record to represent user and host information.
  * This is used to identify the user when retrieving file directories.
  */
-public record UserHostInfo(@NonNull String user, @NonNull String host) {
+@NullMarked
+public record UserHostInfo(
+        String user,
+        String host) {
     /**
      * Creates a new UserHostInfo from a user-host string.
      * The user-host string is expected to be in the format "user-host".
@@ -15,7 +18,7 @@ public record UserHostInfo(@NonNull String user, @NonNull String host) {
      * @param userHostString the user-host string
      * @return a new UserHostInfo
      */
-    public static @NonNull UserHostInfo parse(@NonNull String userHostString) {
+    public static UserHostInfo parse(String userHostString) {
         if (userHostString.contains("-")) {
             String host = userHostString.substring(userHostString.lastIndexOf('-') + 1);
             String user = userHostString.substring(0, userHostString.lastIndexOf('-'));
@@ -56,7 +59,7 @@ public record UserHostInfo(@NonNull String user, @NonNull String host) {
      * @return the user-host string
      */
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return getUserHostString();
     }
 }
