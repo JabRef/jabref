@@ -9,7 +9,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import org.jabref.logic.util.UserAndHost;
 import org.jabref.logic.util.Version;
 
 public class InternalPreferences {
@@ -23,12 +22,12 @@ public class InternalPreferences {
     public InternalPreferences(Version ignoredVersion,
                                boolean versionCheck,
                                Path exportPath,
-                               UserAndHost userAndHost,
+                               String userAndHost,
                                boolean memoryStickMode) {
         this.ignoredVersion = new SimpleObjectProperty<>(ignoredVersion);
         this.versionCheckEnabled = new SimpleBooleanProperty(versionCheck);
         this.lastPreferencesExportPath = new SimpleObjectProperty<>(exportPath);
-        this.userAndHost = new SimpleStringProperty(userAndHost.getCanonicalForm());
+        this.userAndHost = new SimpleStringProperty(userAndHost);
         this.memoryStickMode = new SimpleBooleanProperty(memoryStickMode);
     }
 

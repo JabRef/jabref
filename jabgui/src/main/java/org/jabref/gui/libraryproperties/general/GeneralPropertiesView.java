@@ -49,6 +49,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     private final ControlsFxVisualizer laTexFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final String switchToRelativeText = Localization.lang("Switch to relative path: converts the path to a relative path.");
     private final String switchToAbsoluteText = Localization.lang("Switch to absolute path: converts the path to an absolute path.");
+    private final String laTexFileDirectoryTooltipText = Localization.lang("LaTex file directory");
 
     @Inject private CliPreferences preferences;
 
@@ -83,10 +84,14 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
+        laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+
         userSpecificFileDirectoryTooltip.setText(Localization.lang(preferences.getFilePreferences().getUserAndHost()));
         userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);
-        laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
-        // TODO- add tooltip to laTexFileDirectory: default LaTeX directory??
+        laTexFileDirectoryTooltip.setText(viewModel.laTexFileDirectoryProperty().isEmpty().get()
+                ? laTexFileDirectoryTooltipText
+                : viewModel.laTexFileDirectoryProperty().getValue());
+        laTexFileDirectory.setTooltip(laTexFileDirectoryTooltip);
 
         librarySpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
@@ -111,6 +116,8 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
+            laTexFileDirectoryTooltip.setText(newValue.trim().isEmpty() ? laTexFileDirectoryTooltipText : newValue);
+
         });
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
