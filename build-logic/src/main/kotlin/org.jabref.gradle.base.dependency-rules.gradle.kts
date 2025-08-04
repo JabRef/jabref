@@ -203,6 +203,7 @@ extraJavaModuleInfo {
     module("info.debatty:java-string-similarity", "java.string.similarity")
     module("io.github.classgraph:classgraph", "io.github.classgraph") {
         overrideModuleName()
+        exportAllPackages()
     }
     module("io.github.adr:e-adr", "io.github.adr")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
