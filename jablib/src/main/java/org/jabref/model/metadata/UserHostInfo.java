@@ -20,8 +20,9 @@ public record UserHostInfo(
      */
     public static UserHostInfo parse(String userHostString) {
         if (userHostString.contains("-")) {
-            String host = userHostString.substring(userHostString.lastIndexOf('-') + 1);
-            String user = userHostString.substring(0, userHostString.lastIndexOf('-'));
+            int index = userHostString.lastIndexOf('-');
+            String host = userHostString.substring(index + 1);
+            String user = userHostString.substring(0, index);
             return new UserHostInfo(user, host);
         } else {
             return new UserHostInfo(userHostString, "");
