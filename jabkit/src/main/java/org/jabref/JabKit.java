@@ -59,6 +59,14 @@ public class JabKit {
     public static void main(String[] args) {
         initLogging(args);
 
+        if (args.length == 0) {
+            JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
+            BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
+            CommandLine commandLine = new CommandLine(new ArgumentProcessor(preferences, entryTypesManager));
+            commandLine.usage(System.out);
+            System.exit(0);
+        }
+
         try {
             final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
             Injector.setModelOrService(CliPreferences.class, preferences);
@@ -85,11 +93,6 @@ public class JabKit {
                     ArgumentProcessor.getAvailableImportFormats(preferences),
                     ArgumentProcessor.getAvailableExportFormats(preferences),
                     WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
-
-            if (args.length == 0) {
-                commandLine.usage(System.out);
-                System.exit(0);
-            }
 
             int result = commandLine.execute(args);
             System.exit(result);
