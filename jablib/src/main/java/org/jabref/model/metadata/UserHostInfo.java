@@ -54,11 +54,6 @@ public record UserHostInfo(
         return !host.isEmpty() && !other.host.isEmpty() && host.equals(other.host);
     }
 
-    /**
-     * Returns the user-host string representation.
-     *
-     * @return the user-host string
-     */
     @Override
     public String toString() {
         return getUserHostString();
