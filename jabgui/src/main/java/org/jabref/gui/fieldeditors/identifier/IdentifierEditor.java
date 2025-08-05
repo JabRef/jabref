@@ -33,16 +33,25 @@ import static org.jabref.model.entry.field.StandardField.ISBN;
 
 public class IdentifierEditor extends HBox implements FieldEditorFX {
 
-    @FXML private BaseIdentifierEditorViewModel<?> viewModel;
-    @FXML private EditorTextField textField;
-    @FXML private Button fetchInformationByIdentifierButton;
-    @FXML private Button lookupIdentifierButton;
+    @FXML
+    private BaseIdentifierEditorViewModel<?> viewModel;
+    @FXML
+    private EditorTextField textField;
+    @FXML
+    private Button fetchInformationByIdentifierButton;
+    @FXML
+    private Button lookupIdentifierButton;
 
-    @Inject private DialogService dialogService;
-    @Inject private TaskExecutor taskExecutor;
-    @Inject private GuiPreferences preferences;
-    @Inject private UndoManager undoManager;
-    @Inject private StateManager stateManager;
+    @Inject
+    private DialogService dialogService;
+    @Inject
+    private TaskExecutor taskExecutor;
+    @Inject
+    private GuiPreferences preferences;
+    @Inject
+    private UndoManager undoManager;
+    @Inject
+    private StateManager stateManager;
     private Optional<BibEntry> entry = Optional.empty();
 
     public IdentifierEditor(Field field,
@@ -67,8 +76,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         }
 
         ViewLoader.view(this)
-                  .root(this)
-                  .load();
+                .root(this)
+                .load();
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
@@ -78,7 +87,6 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
         textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
-
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }

@@ -27,7 +27,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
 
     private final UndoManager undoManager;
     private final StateManager stateManager;
-    private final ShortenDOIFormatter shortenDOIFOrmatter;
+    private final ShortenDOIFormatter shortenDOIFormatter;
 
     public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
                                         FieldCheckers fieldCheckers,
@@ -39,7 +39,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
-        this.shortenDOIFOrmatter = new ShortenDOIFormatter();
+        this.shortenDOIFormatter = new ShortenDOIFormatter();
         configure(true, true);
     }
 
@@ -48,15 +48,15 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         CrossRef doiFetcher = new CrossRef();
 
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
-            .onRunning(() -> identifierLookupInProgress.setValue(true))
-            .onFinished(() -> identifierLookupInProgress.setValue(false))
-            .onSuccess(identifier -> {
-                if (identifier.isPresent()) {
-                    entry.setField(field, identifier.get().asString());
-                } else {
-                    dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
-                }
-            }).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
+                .onRunning(() -> identifierLookupInProgress.setValue(true))
+                .onFinished(() -> identifierLookupInProgress.setValue(false))
+                .onSuccess(identifier -> {
+                    if (identifier.isPresent()) {
+                        entry.setField(field, identifier.get().asString());
+                    } else {
+                        dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
+                    }
+                }).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
     }
 
     @Override
@@ -71,14 +71,14 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     @Override
     public void openExternalLink() {
         identifier.get().map(DOI::asString)
-                  .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
+                .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
     }
 
     @Override
-    public void shortenDOI(){
+    public void shortenDOI() {
         String doi = entry.getField(field).orElse("");
-        if(!doi.isEmpty()){
-            String shortenedDOI = shortenDOIFOrmatter.format(doi);
+        if (!doi.isEmpty()) {
+            String shortenedDOI = shortenDOIFormatter.format(doi);
             entry.setField(field, shortenedDOI);
             LOGGER.info("Shortened DOI: {} to {}", doi, shortenedDOI);
         }
