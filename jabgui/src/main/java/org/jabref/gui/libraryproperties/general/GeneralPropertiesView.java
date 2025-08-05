@@ -117,9 +117,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
             laTexFileDirectoryTooltip.setText(newValue.trim().isEmpty()
-                    ? laTexFileDirectoryTooltipText
-                    : laTexFileDirectoryTooltipText + " "+ newValue);
-
+                    ? laTexFileDirectoryTooltipText : laTexFileDirectoryTooltipText + " " + newValue);
         });
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
