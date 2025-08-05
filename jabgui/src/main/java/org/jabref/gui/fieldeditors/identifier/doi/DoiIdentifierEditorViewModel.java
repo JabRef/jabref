@@ -70,6 +70,4 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         identifier.get().map(DOI::asString)
                   .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
     }
-
-
 }
