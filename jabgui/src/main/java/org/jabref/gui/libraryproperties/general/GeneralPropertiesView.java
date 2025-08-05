@@ -49,7 +49,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     private final ControlsFxVisualizer laTexFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final String switchToRelativeText = Localization.lang("Switch to relative path: converts the path to a relative path.");
     private final String switchToAbsoluteText = Localization.lang("Switch to absolute path: converts the path to an absolute path.");
-    private final String laTexFileDirectoryTooltipText = Localization.lang("LaTex file directory");
+    private final String laTexFileDirectoryTooltipText = Localization.lang("LaTex file directory: ");
 
     @Inject private CliPreferences preferences;
 
@@ -116,7 +116,9 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            laTexFileDirectoryTooltip.setText(newValue.trim().isEmpty() ? laTexFileDirectoryTooltipText : newValue);
+            laTexFileDirectoryTooltip.setText(newValue.trim().isEmpty()
+                    ? laTexFileDirectoryTooltipText
+                    : laTexFileDirectoryTooltipText + newValue);
 
         });
         Platform.runLater(() -> {
