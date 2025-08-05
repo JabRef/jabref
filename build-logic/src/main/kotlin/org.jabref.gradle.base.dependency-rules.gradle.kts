@@ -201,6 +201,10 @@ extraJavaModuleInfo {
     module("dev.langchain4j:langchain4j-open-ai", "langchain4j.open.ai")
     module("eu.lestard:doc-annotations", "doc.annotations")
     module("info.debatty:java-string-similarity", "java.string.similarity")
+    module("io.github.classgraph:classgraph", "io.github.classgraph") {
+        overrideModuleName()
+        exportAllPackages()
+    }
     module("io.github.adr:e-adr", "io.github.adr")
     module("io.github.java-diff-utils:java-diff-utils", "io.github.javadiffutils")
     module("io.zonky.test.postgres:embedded-postgres-binaries-darwin-amd64", "embedded.postgres.binaries.darwin.amd64")
