@@ -31,6 +31,7 @@ import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.VisibleComponent;
+import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 
 import com.airhacks.afterburner.injection.Injector;
 import com.sun.javafx.scene.NodeHelper;
@@ -154,7 +155,7 @@ class WindowOverlay {
             }
         };
 
-        WalkthroughUtils.DebouncedRunnable debouncedUpdate = WalkthroughUtils.debounced(updatePopoverVisibility, 50);
+        WalkthroughUtils.DebouncedRunnable debouncedUpdate = WalkthroughUtils.debounced(updatePopoverVisibility);
         ChangeListener<Boolean> treeVisibleListener = (_, _, _) -> debouncedUpdate.run();
         NodeHelper.treeVisibleProperty(node).addListener(treeVisibleListener);
 

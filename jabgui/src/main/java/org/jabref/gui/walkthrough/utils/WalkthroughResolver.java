@@ -1,4 +1,4 @@
-package org.jabref.gui.walkthrough;
+package org.jabref.gui.walkthrough.utils;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughResolver.class);
     private static final Duration RESOLVE_TIMEOUT = Duration.millis(2_500);
-    private static final int DEBOUNCE_DELAY_MS = 200;
 
     private final WindowResolver windowResolver;
     private final @Nullable NodeResolver nodeResolver;
@@ -144,7 +143,7 @@ public class WalkthroughResolver {
                     finish(new WalkthroughResult(window, node.get()));
                 }
             }
-        }, DEBOUNCE_DELAY_MS);
+        });
 
         recursiveChildrenListener = new RecursiveChildrenListener(debouncedNodeFinder);
         recursiveChildrenListener.attachToScene(scene);

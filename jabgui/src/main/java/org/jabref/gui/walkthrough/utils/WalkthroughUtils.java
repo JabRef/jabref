@@ -1,4 +1,4 @@
-package org.jabref.gui.walkthrough;
+package org.jabref.gui.walkthrough.utils;
 
 import java.util.function.BooleanSupplier;
 
@@ -16,6 +16,8 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public class WalkthroughUtils {
+    public static final long DEFAULT_DEBOUNCE = 100L;
+
     public static boolean isNodeVisible(@Nullable Node node) {
         return node != null && NodeHelper.isTreeVisible(node);
     }
@@ -29,9 +31,25 @@ public class WalkthroughUtils {
         void cancel();
     }
 
-    /// Creates a debounced InvalidationListener that limits execution to at most once
-    /// per interval. Uses JavaFX Timeline to ensure execution on JavaFX Application
-    /// Thread.
+    /// Creates a debounced InvalidationListener that limits execution to at most once per interval. Uses JavaFX
+    /// Timeline to ensure execution on JavaFX Application Thread.
+    ///
+    /// You are probably interested in calling the [DebouncedInvalidationListener#cancel()] methods when you clean up.
+    /// Otherwise, there is a chance that this listener will run your methods after you removed it from all the
+    /// properties that it is attached to.
+    ///
+    /// @param listener the listener to debounce
+    /// @return a debounced listener
+    public static DebouncedInvalidationListener debounced(InvalidationListener listener) {
+        return debounced(listener, DEFAULT_DEBOUNCE);
+    }
+
+    /// Creates a debounced InvalidationListener that limits execution to at most once per interval. Uses JavaFX
+    /// Timeline to ensure execution on JavaFX Application Thread.
+    ///
+    /// You are probably interested in calling the [DebouncedInvalidationListener#cancel()] methods when you clean up.
+    /// Otherwise, there is a chance that this listener will run your methods after you removed it from all the
+    /// properties that it is attached to.
     ///
     /// @param listener   the listener to debounce
     /// @param intervalMs the minimum interval between executions in milliseconds
@@ -59,8 +77,25 @@ public class WalkthroughUtils {
         void cancel();
     }
 
-    /// Creates a debounced Runnable that limits execution to at most once per interval.
-    /// Uses JavaFX Timeline to ensure execution on JavaFX Application Thread.
+    /// Creates a debounced Runnable that limits execution to at most once per interval. Uses JavaFX Timeline to ensure
+    /// execution on JavaFX Application Thread.
+    ///
+    /// You are probably interested in calling the [DebouncedRunnable#cancel()] methods when you clean up. Otherwise,
+    /// there is a chance that this listener will run your methods after you removed it from all the properties that it
+    /// is attached to.
+    ///
+    /// @param runnable the runnable to debounce
+    /// @return a debounced runnable
+    public static DebouncedRunnable debounced(Runnable runnable) {
+        return debounced(runnable, DEFAULT_DEBOUNCE);
+    }
+
+    /// Creates a debounced Runnable that limits execution to at most once per interval. Uses JavaFX Timeline to ensure
+    /// execution on JavaFX Application Thread.
+    ///
+    /// You are probably interested in calling the [DebouncedRunnable#cancel()] methods when you clean up. Otherwise,
+    /// there is a chance that this listener will run your methods after you removed it from all the properties that it
+    /// is attached to.
     ///
     /// @param runnable   the runnable to debounce
     /// @param intervalMs the minimum interval between executions in milliseconds
@@ -87,12 +122,10 @@ public class WalkthroughUtils {
         timeline.play();
     }
 
-    /// Attaches a listener to the global window list that fires on every window change
-    /// until a stop condition is met.
+    /// Attaches a listener to the global window list that fires on every window change until a stop condition is met.
     ///
-    /// @param stopCondition A supplier that should return true when the listener should
-    ///                      be detached (as well as run anything interesting for the
-    ///                      actual callee).
+    /// @param stopCondition A supplier that should return true when the listener should be detached (as well as run
+    ///                      anything interesting for the actual callee).
     /// @return A runnable that can be used to detach the listener prematurely.
     public static Runnable onWindowChangedUntil(@NonNull BooleanSupplier stopCondition) {
         ListChangeListener<Window> listener = new ListChangeListener<>() {

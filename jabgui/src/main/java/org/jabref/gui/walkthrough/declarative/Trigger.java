@@ -23,7 +23,7 @@ import javafx.util.Duration;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.fieldeditors.LinkedFilesEditorViewModel;
 import org.jabref.gui.util.DelayedExecution;
-import org.jabref.gui.walkthrough.WalkthroughUtils;
+import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;

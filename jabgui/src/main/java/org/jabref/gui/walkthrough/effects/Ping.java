@@ -10,7 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
-import org.jabref.gui.walkthrough.WalkthroughUtils;
+import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 
 import org.jspecify.annotations.NonNull;
 

@@ -1,12 +1,8 @@
-package org.jabref.gui.walkthrough;
+package org.jabref.gui.walkthrough.utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import javafx.beans.value.ChangeListener;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -15,6 +11,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TreeView;
 
+import com.tobiasdiez.easybind.EasyBind;
+import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,31 +20,27 @@ import org.slf4j.LoggerFactory;
 public class WalkthroughScroller {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughScroller.class);
 
-    private final Map<Node, ChangeListener<Bounds>> parentBoundsListeners = new HashMap<>();
-    private final AtomicBoolean isScrolling = new AtomicBoolean(false);
+    /// Mutable list of all [Subscription] of parent bounds and node position
+    private final List<Subscription> subscriptions = new ArrayList<>();
+    private final WalkthroughUtils.DebouncedInvalidationListener debouncedScroller;
 
-    public void setup(@NonNull Node node) {
+    public WalkthroughScroller(@NonNull Node node) {
         LOGGER.debug("Setting up scrollable parent monitoring for node: {}", node.getClass().getSimpleName());
         List<Node> scrollableParents = findScrollableParents(node);
         LOGGER.debug("Found {} scrollable parents", scrollableParents.size());
+        debouncedScroller = WalkthroughUtils.debounced((_) -> scrollNodeIntoView(node, scrollableParents));
 
-        scrollNodeIntoView(node, scrollableParents);
-
-        for (Node parent : scrollableParents) {
-            ChangeListener<Bounds> boundsListener = (_, _, _) -> {
-                if (isScrolling.get() || node.getScene() == null || parent.getScene() == null) {
-                    return;
-                }
-                scrollNodeIntoView(node, List.of(parent));
-            };
-            parent.boundsInParentProperty().addListener(boundsListener);
-            parentBoundsListeners.put(parent, boundsListener);
-        }
+        scrollableParents
+                .stream()
+                .map(parent -> EasyBind.listen(parent.boundsInParentProperty(), debouncedScroller))
+                .forEach(subscriptions::add);
+        subscriptions.add(EasyBind.listen(node.localToSceneTransformProperty(), debouncedScroller));
     }
 
     public void cleanup() {
-        parentBoundsListeners.forEach((parent, listener) -> parent.boundsInParentProperty().removeListener(listener));
-        parentBoundsListeners.clear();
+        subscriptions.forEach(Subscription::unsubscribe);
+        subscriptions.clear();
+        debouncedScroller.cancel();
     }
 
     private List<Node> findScrollableParents(@NonNull Node node) {
@@ -66,15 +60,8 @@ public class WalkthroughScroller {
     }
 
     private void scrollNodeIntoView(@NonNull Node targetNode, @NonNull List<Node> scrollableParents) {
-        if (!isScrolling.compareAndSet(false, true)) {
-            return;
-        }
-        try {
-            for (Node scrollableParent : scrollableParents) {
-                scrollNodeIntoViewForParent(targetNode, scrollableParent);
-            }
-        } finally {
-            isScrolling.set(false);
+        for (Node scrollableParent : scrollableParents) {
+            scrollNodeIntoViewForParent(targetNode, scrollableParent);
         }
     }
 
@@ -90,11 +77,9 @@ public class WalkthroughScroller {
                     scrollIntoScrollPane(scrollPane, targetBounds);
                 }
                 case ListView<?> listView -> scrollIntoListView(targetNode, listView);
-                case TableView<?> tableView ->
-                        scrollIntoTableView(targetNode, tableView);
+                case TableView<?> tableView -> scrollIntoTableView(targetNode, tableView);
                 case TreeView<?> treeView -> scrollIntoTreeView(targetNode, treeView);
-                default ->
-                        LOGGER.warn("Unsupported scrollable type: {}", scrollableParent.getClass().getSimpleName());
+                default -> LOGGER.warn("Unsupported scrollable type: {}", scrollableParent.getClass().getSimpleName());
             }
         } catch (RuntimeException e) {
             LOGGER.warn("Failed to scroll node into view for parent {}", scrollableParent.getClass().getSimpleName(), e);

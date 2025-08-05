@@ -15,7 +15,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 
-import org.jabref.gui.walkthrough.WalkthroughUtils;
+import org.jabref.gui.walkthrough.utils.WalkthroughUtils;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -173,7 +173,7 @@ public final class Spotlight extends BaseWindowEffect {
 
     private void updateOverlayShape() {
         if (isUpdatingOverlayShape.getAndSet(true)) {
-            return;
+            throw new IllegalStateException("Overlay shape is enjoying an update!");
         }
 
         int oldIndex;
