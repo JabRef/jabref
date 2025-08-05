@@ -132,7 +132,39 @@ public class DuplicateCheckTest {
                 .withField(StandardField.JOURNAL, "B");
 
         assertTrue(duplicateChecker.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
-        assertEquals(0.75, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
+        assertEquals(0.83, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
+    }
+
+    @Test
+    void scoreWithDifferentEntryType() {
+        BibEntry one = new BibEntry(StandardEntryType.Misc)
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.YEAR, "2005")
+                .withField(StandardField.TITLE, "A title");
+
+        BibEntry two = new BibEntry(StandardEntryType.Article)
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.YEAR, "2005")
+                .withField(StandardField.TITLE, "A title");
+
+        assertEquals(0.8, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
+    }
+
+    @Test
+    void scoreWithDifferentUserComment() {
+        BibEntry one = new BibEntry(StandardEntryType.Article)
+                .withUserComments("Bill's favorite article")
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.YEAR, "2005")
+                .withField(StandardField.TITLE, "A title");
+
+        BibEntry two = new BibEntry(StandardEntryType.Article)
+                .withUserComments("Bill's best paper award")
+                .withField(StandardField.AUTHOR, "Billy Bob")
+                .withField(StandardField.YEAR, "2005")
+                .withField(StandardField.TITLE, "A title");
+
+        assertEquals(0.8, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
     }
 
     @Test
