@@ -61,7 +61,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
      * show/hide certain UI elements for certain identifier editors.
      * <p>
      * <b>NOTE: This method MUST be called by all the implementation view models in their principal constructor</b>
-     * */
+     */
     protected final void configure(boolean canFetchBibliographyInformationById, boolean canLookupIdentifier) {
         this.canLookupIdentifier.set(canLookupIdentifier);
         this.canFetchBibliographyInformationById.set(canFetchBibliographyInformationById);
@@ -140,7 +140,7 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         );
     }
 
-    public void shortenDOI(){
+    public void shortenDOI() {
         LOGGER.warn("Unable to shorten DOI");
     }
 
