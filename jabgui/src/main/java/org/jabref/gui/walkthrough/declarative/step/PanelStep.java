@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
-import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
+import org.jabref.gui.walkthrough.declarative.Trigger;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.HighlightEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
@@ -21,7 +21,7 @@ public record PanelStep(@NonNull String title,
                         @Nullable String continueButtonTextValue,
                         @Nullable String skipButtonTextValue,
                         @Nullable String backButtonTextValue,
-                        @Nullable NavigationPredicate navigationPredicateValue,
+                        @Nullable Trigger triggerValue,
                         @NonNull PanelPosition position,
                         @Nullable Double widthValue,
                         @Nullable Double heightValue,
@@ -51,8 +51,8 @@ public record PanelStep(@NonNull String title,
     }
 
     @Override
-    public Optional<NavigationPredicate> navigation() {
-        return Optional.ofNullable(navigationPredicateValue);
+    public Optional<Trigger> trigger() {
+        return Optional.ofNullable(triggerValue);
     }
 
     @Override
@@ -96,7 +96,7 @@ public record PanelStep(@NonNull String title,
         private @Nullable String continueButtonText;
         private @Nullable String skipButtonText;
         private @Nullable String backButtonText;
-        private @Nullable NavigationPredicate navigationPredicate;
+        private @Nullable Trigger trigger;
         private PanelPosition position = PanelPosition.LEFT;
         private @Nullable Double width;
         private @Nullable Double height;
@@ -139,8 +139,13 @@ public record PanelStep(@NonNull String title,
             return this;
         }
 
-        public Builder navigation(@NonNull NavigationPredicate navigationPredicate) {
-            this.navigationPredicate = navigationPredicate;
+        public Builder trigger(@NonNull Trigger trigger) {
+            this.trigger = trigger;
+            return this;
+        }
+
+        public Builder trigger(Trigger.@NonNull Builder triggerBuilder) {
+            this.trigger = triggerBuilder.build();
             return this;
         }
 
@@ -200,7 +205,7 @@ public record PanelStep(@NonNull String title,
                     continueButtonText,
                     skipButtonText,
                     backButtonText,
-                    navigationPredicate,
+                    trigger,
                     position,
                     width,
                     height,

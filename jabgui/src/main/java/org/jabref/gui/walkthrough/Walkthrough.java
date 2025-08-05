@@ -1,5 +1,6 @@
 package org.jabref.gui.walkthrough;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +12,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.stage.Stage;
 
 import org.jabref.gui.StateManager;
+import org.jabref.gui.walkthrough.declarative.step.PanelStep;
+import org.jabref.gui.walkthrough.declarative.step.SideEffect;
+import org.jabref.gui.walkthrough.declarative.step.TooltipStep;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 
 import org.jspecify.annotations.NonNull;
@@ -82,6 +86,7 @@ public class Walkthrough {
     /// Moves to the next step in the walkthrough.
     public void nextStep() {
         int nextIndex = currentStep.get() + 1;
+        LOGGER.debug("Next step: {}", nextIndex);
         if (nextIndex >= steps.size()) {
             stop();
             return;
@@ -158,6 +163,47 @@ public class Walkthrough {
 
     public @NonNull WalkthroughStep getCurrentStep() {
         return steps.get(currentStep.get());
+    }
+
+    public static Builder create(StateManager stateManager) {
+        return new Builder(stateManager);
+    }
+
+    public static class Builder {
+        private final StateManager stateManager;
+        private final List<WalkthroughStep> steps;
+
+        private Builder(StateManager stateManager) {
+            this.stateManager = stateManager;
+            this.steps = new ArrayList<>();
+        }
+
+        public Builder addStep(@NonNull WalkthroughStep step) {
+            steps.add(step);
+            return this;
+        }
+
+        public Builder addStep(TooltipStep.@NonNull Builder step) {
+            steps.add(step.build());
+            return this;
+        }
+
+        public Builder addStep(PanelStep.@NonNull Builder step) {
+            steps.add(step.build());
+            return this;
+        }
+
+        public Builder addStep(SideEffect.@NonNull Builder step) {
+            steps.add(step.build());
+            return this;
+        }
+
+        public Walkthrough build() {
+            if (steps.isEmpty()) {
+                throw new IllegalArgumentException("Walkthrough must have at least one step.");
+            }
+            return new Walkthrough(stateManager, steps);
+        }
     }
 }
 

@@ -3,7 +3,6 @@ package org.jabref.gui.walkthrough;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javafx.beans.value.ChangeListener;
@@ -55,10 +54,7 @@ class WindowOverlay {
     private final List<Runnable> cleanupTasks = new ArrayList<>();
     private final KeyBindingRepository keyBindingRepository;
     private final StateManager stateManager;
-    /// Ensure the [#hide()] can efficiently communicate to the
-    /// [#showTooltip(TooltipStep, Node, Runnable)]'s showing property listener (and
-    /// also just as a way to circumvent effectively final requirement for lambda).
-    private final AtomicBoolean showing = new AtomicBoolean(true);
+    private boolean showing = true;
 
     private @Nullable Button quitButton;
     private @Nullable Node currentContentNode;
@@ -101,7 +97,7 @@ class WindowOverlay {
     /// @see WindowOverlay#showPanel(PanelStep, Node, Runnable)
     public void showTooltip(TooltipStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
-        showing.set(true);
+        showing = true;
         if (node == null) {
             PopOver popover = createPopover(step, beforeNavigate);
             cleanupTasks.add(popover::hide);
@@ -110,15 +106,15 @@ class WindowOverlay {
             return;
         }
 
-        final AtomicReference<PopOver> popOverRef = new AtomicReference<>();
+        AtomicReference<PopOver> popOverRef = new AtomicReference<>();
         addQuitButton(step);
 
-        final AtomicReference<ChangeListener<Boolean>> popoverShowingListenerRef = new AtomicReference<>();
+        AtomicReference<ChangeListener<Boolean>> popoverShowingListenerRef = new AtomicReference<>();
 
-        final Runnable updatePopoverVisibility = new Runnable() {
+        Runnable updatePopoverVisibility = new Runnable() {
             @Override
             public void run() {
-                boolean shouldBeShowing = showing.get() && NodeHelper.isTreeVisible(node);
+                boolean shouldBeShowing = showing && NodeHelper.isTreeVisible(node);
                 PopOver currentPopover = popOverRef.get();
 
                 if (!shouldBeShowing) {
@@ -158,8 +154,7 @@ class WindowOverlay {
             }
         };
 
-        Runnable debouncedUpdate = WalkthroughUtils.debounced(updatePopoverVisibility, 50);
-
+        WalkthroughUtils.DebouncedRunnable debouncedUpdate = WalkthroughUtils.debounced(updatePopoverVisibility, 50);
         ChangeListener<Boolean> treeVisibleListener = (_, _, _) -> debouncedUpdate.run();
         NodeHelper.treeVisibleProperty(node).addListener(treeVisibleListener);
 
@@ -167,6 +162,7 @@ class WindowOverlay {
 
         cleanupTasks.add(() -> {
             NodeHelper.treeVisibleProperty(node).removeListener(treeVisibleListener);
+            debouncedUpdate.cancel();
             PopOver currentPopover = popOverRef.get();
             if (currentPopover != null) {
                 currentPopover.showingProperty().removeListener(popoverShowingListenerRef.get());
@@ -174,8 +170,8 @@ class WindowOverlay {
             }
         });
 
-        step.navigation().ifPresent(predicate ->
-                cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
+        step.trigger().ifPresent(predicate ->
+                cleanupTasks.add(predicate.attach(node, beforeNavigate, walkthrough::nextStep)));
     }
 
     /// Convenience method to show a panel for the given step without a node.
@@ -202,7 +198,7 @@ class WindowOverlay {
     /// @see WindowOverlay#showTooltip(TooltipStep, Node, Runnable)
     public void showPanel(PanelStep step, @Nullable Node node, Runnable beforeNavigate) {
         hide();
-        showing.set(true);
+        showing = true;
         Node content = renderer.render(step, walkthrough, beforeNavigate);
         content.setMouseTransparent(false);
         currentContentNode = content;
@@ -243,14 +239,14 @@ class WindowOverlay {
         pane.getChildren().add(content);
         addQuitButton(step);
         if (node != null) {
-            step.navigation().ifPresent(predicate ->
-                    cleanupTasks.add(predicate.attachListeners(node, beforeNavigate, walkthrough::nextStep)));
+            step.trigger().ifPresent(predicate ->
+                    cleanupTasks.add(predicate.attach(node, beforeNavigate, walkthrough::nextStep)));
         }
     }
 
     /// Hide the overlay and clean up any resources.
     public void hide() {
-        showing.set(false);
+        showing = false;
         removeQuitButton();
         if (currentContentNode != null) {
             pane.getChildren().remove(currentContentNode);

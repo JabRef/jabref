@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 
-import org.jabref.gui.walkthrough.declarative.NavigationPredicate;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
+import org.jabref.gui.walkthrough.declarative.Trigger;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.WalkthroughRichTextBlock;
@@ -35,7 +35,7 @@ public sealed interface VisibleComponent extends WalkthroughStep permits PanelSt
 
     /// Navigation predicate that determines when to advance by attaching to the UI
     /// elements that could trigger navigation.
-    Optional<NavigationPredicate> navigation();
+    Optional<Trigger> trigger();
 
     /// Maximum width for the display element.
     OptionalDouble maxWidth();

@@ -1,11 +1,13 @@
 package org.jabref.gui.walkthrough;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Window;
@@ -13,7 +15,6 @@ import javafx.util.Duration;
 
 import org.jabref.gui.util.DelayedExecution;
 import org.jabref.gui.util.RecursiveChildrenListener;
-import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
 
@@ -29,12 +30,12 @@ public class WalkthroughResolver {
     private final WindowResolver windowResolver;
     private final @Nullable NodeResolver nodeResolver;
     private final Consumer<WalkthroughResult> onCompletion;
-    private final AtomicBoolean isFinished = new AtomicBoolean(false);
 
     private @Nullable Runnable windowListenerCleanup;
     private @Nullable ChangeListener<Scene> sceneListener;
     private @Nullable RecursiveChildrenListener recursiveChildrenListener;
     private @Nullable DelayedExecution delayedExecution;
+    private WalkthroughUtils.@Nullable DebouncedInvalidationListener debouncedNodeFinder;
 
     /// Creates a [WalkthroughResolver] that attempts to identify the window and the
     /// node from the
@@ -74,23 +75,21 @@ public class WalkthroughResolver {
         });
         delayedExecution.start();
 
-        Optional<Window> window = windowResolver.resolve();
-        if (window.isPresent()) {
-            handleWindowResolved(window.get());
-        } else {
-            listenForWindow(windowResolver);
-        }
+        windowResolver.resolve().ifPresentOrElse(
+                this::handleWindowResolved,
+                () -> listenForWindow(windowResolver)
+        );
     }
 
     private void listenForWindow(WindowResolver resolver) {
-        AtomicBoolean windowFound = new AtomicBoolean(false);
         this.windowListenerCleanup = WalkthroughUtils.onWindowChangedUntil(() -> {
             Optional<Window> window = resolver.resolve();
             if (window.isPresent()) {
-                windowFound.set(true);
-                handleWindowResolved(window.get());
+                Platform.runLater(() -> handleWindowResolved(window.get())); // Make sure window listener detaches first.
+                return true;
             }
-        }, windowFound::get);
+            return false;
+        });
     }
 
     private void handleWindowResolved(Window window) {
@@ -99,39 +98,51 @@ public class WalkthroughResolver {
             return;
         }
 
-        if (window.getScene() != null) {
-            handleSceneResolved(window, window.getScene(), nodeResolver);
+        Scene scene = window.getScene();
+        if (scene != null) {
+            handleSceneResolved(window, scene, nodeResolver);
         } else {
             listenForScene(window, nodeResolver);
         }
     }
 
     private void listenForScene(Window window, NodeResolver resolver) {
-        sceneListener = (_, _, newScene) -> {
-            if (newScene != null) {
-                window.sceneProperty().removeListener(sceneListener);
-                sceneListener = null;
-                handleSceneResolved(window, newScene, resolver);
+        sceneListener = new ChangeListener<>() {
+            @Override
+            public void changed(ObservableValue<? extends Scene> observable, Scene oldScene, Scene newScene) {
+                if (newScene != null) {
+                    window.sceneProperty().removeListener(this);
+                    sceneListener = null;
+                    handleSceneResolved(window, newScene, resolver);
+                }
             }
         };
         window.sceneProperty().addListener(sceneListener);
     }
 
     private void handleSceneResolved(Window window, Scene scene, NodeResolver resolver) {
-        Optional<Node> node = resolver.resolve(scene);
-        if (node.isPresent()) {
-            finish(new WalkthroughResult(window, node.get()));
-        } else {
-            listenForNodeInScene(window, scene, resolver);
-        }
+        resolver.resolve(scene).ifPresentOrElse(
+                node -> finish(new WalkthroughResult(window, node)),
+                () -> listenForNodeInScene(window, scene, resolver)
+        );
     }
 
     private void listenForNodeInScene(Window window, Scene scene, NodeResolver resolver) {
-        InvalidationListener debouncedNodeFinder = WalkthroughUtils.debounced(_ -> {
-            Optional<Node> node = resolver.resolve(scene);
-            if (node.isPresent()) {
-                detachChildrenListener();
-                finish(new WalkthroughResult(window, node.get()));
+        debouncedNodeFinder = WalkthroughUtils.debounced(new InvalidationListener() {
+            private boolean handled = false;
+
+            @Override
+            public void invalidated(Observable observable) {
+                if (handled) {
+                    return;
+                }
+
+                Optional<Node> node = resolver.resolve(scene);
+                if (node.isPresent()) {
+                    handled = true;
+                    detachChildrenListener();
+                    finish(new WalkthroughResult(window, node.get()));
+                }
             }
         }, DEBOUNCE_DELAY_MS);
 
@@ -140,10 +151,8 @@ public class WalkthroughResolver {
     }
 
     private void finish(WalkthroughResult result) {
-        if (isFinished.compareAndSet(false, true)) {
-            cancel();
-            UiTaskExecutor.runInJavaFXThread(() -> onCompletion.accept(result));
-        }
+        cancel();
+        onCompletion.accept(result);
     }
 
     public void cancel() {
@@ -154,6 +163,9 @@ public class WalkthroughResolver {
         if (windowListenerCleanup != null) {
             windowListenerCleanup.run();
             windowListenerCleanup = null;
+        }
+        if (debouncedNodeFinder != null) {
+            debouncedNodeFinder.cancel();
         }
         detachChildrenListener();
     }

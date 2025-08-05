@@ -16,15 +16,14 @@ import com.tobiasdiez.easybind.EasyBind;
 import com.tobiasdiez.easybind.Subscription;
 import org.jspecify.annotations.NonNull;
 
-/// Base class for walkthrough effects [Spotlight], [FullScreenDarken], and
-/// [Ping].
+/// Base class for walkthrough effects [Spotlight], [FullScreenDarken], and [Ping].
 public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarken, Ping {
     private static final long LAYOUT_DEBOUNCE_MS = 100;
 
     protected final Pane pane;
     protected final List<Subscription> subscriptions = new ArrayList<>();
     private ChangeListener<Number> windowSizeListener;
-    private final Runnable debouncedUpdateLayout;
+    private final WalkthroughUtils.DebouncedRunnable debouncedUpdateLayout;
 
     /// Constructor for WalkthroughEffect. No scene graph modification is done here. The
     /// effect is not attached to the pane until [#attach(Node)] is called.
@@ -55,6 +54,7 @@ public sealed abstract class BaseWindowEffect permits Spotlight, FullScreenDarke
     protected abstract void hideEffect();
 
     protected void cleanupListeners() {
+        debouncedUpdateLayout.cancel();
         subscriptions.forEach(Subscription::unsubscribe);
         subscriptions.clear();
     }

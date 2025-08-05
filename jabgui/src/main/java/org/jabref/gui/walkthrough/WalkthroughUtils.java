@@ -1,12 +1,11 @@
 package org.jabref.gui.walkthrough;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.collections.ListChangeListener;
 import javafx.scene.Node;
 import javafx.stage.Window;
@@ -25,19 +24,9 @@ public class WalkthroughUtils {
         return node == null || node.getScene() == null || !isNodeVisible(node) || node.getBoundsInLocal().isEmpty();
     }
 
-    /// Creates a runnable that executes only once, preventing subsequent executions.
-    /// Thread-safe implementation using atomic operations.
-    ///
-    /// @param runnable the runnable to execute once
-    /// @return a runnable that will only execute the original runnable once
-    public static Runnable once(Runnable runnable) {
-        CountDownLatch latch = new CountDownLatch(1);
-        return () -> {
-            if (latch.getCount() > 0) {
-                latch.countDown();
-                runnable.run();
-            }
-        };
+    public interface DebouncedInvalidationListener extends InvalidationListener {
+        /// Cancel any debounced tasks that's scheduled to run in future
+        void cancel();
     }
 
     /// Creates a debounced InvalidationListener that limits execution to at most once
@@ -47,59 +36,71 @@ public class WalkthroughUtils {
     /// @param listener   the listener to debounce
     /// @param intervalMs the minimum interval between executions in milliseconds
     /// @return a debounced listener
-    public static InvalidationListener debounced(InvalidationListener listener, long intervalMs) {
-        AtomicBoolean pending = new AtomicBoolean(false);
+    public static DebouncedInvalidationListener debounced(InvalidationListener listener, long intervalMs) {
         Timeline timeline = new Timeline();
 
-        return observable -> {
-            Runnable action = () -> listener.invalidated(observable);
-            scheduleExecution(timeline, pending, intervalMs, action);
+        return new DebouncedInvalidationListener() {
+            @Override
+            public void cancel() {
+                timeline.stop();
+                timeline.getKeyFrames().clear();
+            }
+
+            @Override
+            public void invalidated(Observable observable) {
+                Runnable action = () -> listener.invalidated(observable);
+                scheduleExecution(timeline, intervalMs, action);
+            }
         };
     }
 
-    /// Creates a debounced Runnable that limits execution to at most once per
-    /// interval.
+    public interface DebouncedRunnable extends Runnable {
+        /// Cancel any debounced tasks that's scheduled to run in future
+        void cancel();
+    }
+
+    /// Creates a debounced Runnable that limits execution to at most once per interval.
+    /// Uses JavaFX Timeline to ensure execution on JavaFX Application Thread.
     ///
     /// @param runnable   the runnable to debounce
     /// @param intervalMs the minimum interval between executions in milliseconds
     /// @return a debounced runnable
-    public static Runnable debounced(Runnable runnable, long intervalMs) {
-        AtomicBoolean pending = new AtomicBoolean(false);
+    public static DebouncedRunnable debounced(Runnable runnable, long intervalMs) {
         Timeline timeline = new Timeline();
-        return () -> scheduleExecution(timeline, pending, intervalMs, runnable);
+        return new DebouncedRunnable() {
+            @Override
+            public void cancel() {
+                timeline.stop();
+                timeline.getKeyFrames().clear();
+            }
+
+            @Override
+            public void run() {
+                scheduleExecution(timeline, intervalMs, runnable);
+            }
+        };
     }
 
-    private static void scheduleExecution(Timeline timeline, AtomicBoolean pending, long intervalMs, Runnable action) {
-        if (!pending.compareAndSet(false, true)) {
-            return;
-        }
-
+    private static void scheduleExecution(Timeline timeline, long intervalMs, Runnable action) {
         timeline.stop();
-        timeline.getKeyFrames().setAll(new KeyFrame(Duration.millis(intervalMs), _ -> {
-            try {
-                action.run();
-            } finally {
-                pending.set(false);
-            }
-        }));
+        timeline.getKeyFrames().setAll(new KeyFrame(Duration.millis(intervalMs), _ -> action.run()));
         timeline.play();
     }
 
     /// Attaches a listener to the global window list that fires on every window change
     /// until a stop condition is met.
     ///
-    /// @param onEvent       The runnable to execute when a window change is detected.
     /// @param stopCondition A supplier that should return true when the listener should
-    ///                      be detached.
+    ///                      be detached (as well as run anything interesting for the
+    ///                      actual callee).
     /// @return A runnable that can be used to detach the listener prematurely.
-    public static Runnable onWindowChangedUntil(@NonNull Runnable onEvent, @NonNull Supplier<Boolean> stopCondition) {
+    public static Runnable onWindowChangedUntil(@NonNull BooleanSupplier stopCondition) {
         ListChangeListener<Window> listener = new ListChangeListener<>() {
             @Override
             public void onChanged(Change<? extends Window> change) {
                 while (change.next()) {
                     if (change.wasAdded() || change.wasRemoved()) {
-                        onEvent.run();
-                        if (stopCondition.get()) {
+                        if (stopCondition.getAsBoolean()) {
                             Window.getWindows().removeListener(this);
                             break;
                         }
@@ -109,20 +110,5 @@ public class WalkthroughUtils {
         };
         Window.getWindows().addListener(listener);
         return () -> Window.getWindows().removeListener(listener);
-    }
-
-    /// Attaches a listener to the global window list that fires once when a window is
-    /// added or removed, then immediately detaches itself.
-    ///
-    /// @param onNavigate The runnable to execute when a window change is detected.
-    /// @return A runnable that can be used to detach the listener prematurely.
-    public static Runnable onWindowChangedOnce(Runnable onNavigate) {
-        AtomicBoolean navigated = new AtomicBoolean(false);
-        Runnable onNavigateOnce = () -> {
-            if (navigated.compareAndSet(false, true)) {
-                onNavigate.run();
-            }
-        };
-        return onWindowChangedUntil(onNavigateOnce, navigated::get);
     }
 }
