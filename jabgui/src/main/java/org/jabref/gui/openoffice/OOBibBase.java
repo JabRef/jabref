@@ -77,8 +77,6 @@ public class OOBibBase {
     private CSLCitationOOAdapter cslCitationOOAdapter;
     private CSLUpdateBibliography cslUpdateBibliography;
 
-    private boolean addSpaceAfter;
-
     public OOBibBase(Path loPath, DialogService dialogService, OpenOfficePreferences openOfficePreferences)
             throws
             BootstrapException,
@@ -93,7 +91,7 @@ public class OOBibBase {
         if (cslCitationOOAdapter == null) {
             StateManager stateManager = Injector.instantiateModelOrService(StateManager.class);
             Supplier<List<BibDatabaseContext>> databasesSupplier = stateManager::getOpenDatabases;
-            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class), addSpaceAfter);
+            cslCitationOOAdapter = new CSLCitationOOAdapter(doc, databasesSupplier, openOfficePreferences, Injector.instantiateModelOrService(BibEntryTypesManager.class));
             cslUpdateBibliography = new CSLUpdateBibliography();
         }
     }
@@ -967,9 +965,5 @@ public class OOBibBase {
                 OOError.fromMisc(ex).setTitle(errorTitle).showErrorDialog(dialogService);
             }
         }
-    }
-
-    public void setSpaceAfter(boolean spaceAfter) {
-        addSpaceAfter = spaceAfter;
     }
 }

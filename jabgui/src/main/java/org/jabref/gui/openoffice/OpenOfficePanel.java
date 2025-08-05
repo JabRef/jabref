@@ -639,17 +639,13 @@ public class OpenOfficePanel {
         }
     }
 
-    public void addSmartSpaceAfter() {
-        ooBase.setSpaceAfter(true);
-    }
-
     private ContextMenu createSettingsPopup() {
         ContextMenu contextMenu = new ContextMenu();
 
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
         autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
 
-        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add smart space after citation"));
+        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add  space after citation"));
         addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());
         addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
 
@@ -685,7 +681,6 @@ public class OpenOfficePanel {
         }
 
         autoSync.setOnAction(_ -> openOfficePreferences.setSyncWhenCiting(autoSync.isSelected()));
-        addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
         useAllBases.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(useAllBases.isSelected()));
         useActiveBase.setOnAction(_ -> openOfficePreferences.setUseAllDatabases(!useActiveBase.isSelected()));
         clearConnectionSettings.setOnAction(_ -> {

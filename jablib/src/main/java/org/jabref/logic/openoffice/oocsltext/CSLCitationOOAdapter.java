@@ -52,18 +52,17 @@ public class CSLCitationOOAdapter {
 
     private CitationStyle currentStyle;
     private boolean styleChanged;
-    private boolean addSpaceAfter = false;
+    private boolean addSpaceAfter;
 
-    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager, boolean addSpaceAfter) throws WrappedTargetException, NoSuchElementException {
+    public CSLCitationOOAdapter(XTextDocument doc, Supplier<List<BibDatabaseContext>> databasesSupplier, OpenOfficePreferences openOfficePreferences, BibEntryTypesManager bibEntryTypesManager) throws WrappedTargetException, NoSuchElementException {
         this.document = doc;
         this.markManager = new CSLReferenceMarkManager(doc);
         this.databasesSupplier = databasesSupplier;
         this.bibEntryTypesManager = bibEntryTypesManager;
         this.openOfficePreferences = openOfficePreferences;
-        this.addSpaceAfter = addSpaceAfter;
 
         OOStyle initialStyle = openOfficePreferences.getCurrentStyle(); // may be a jstyle, can still be used for detecting subsequent style changes in context of CSL
-
+        this.addSpaceAfter = openOfficePreferences.getAddSpaceAfter();
         if (initialStyle instanceof CitationStyle citationStyle) {
             this.currentStyle = citationStyle; // else the currentStyle purposely stays null, still causing a difference with the subsequent style if CSL (valid comparison)
         }
@@ -245,8 +244,7 @@ public class CSLCitationOOAdapter {
                 preceedingSpaceExists = checkCursor.getString().matches("\\R");
             }
         }
-
-        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, false);
+        markManager.insertReferenceIntoOO(entries, document, cursor, ooText, !preceedingSpaceExists, addSpaceAfter);
         markManager.setRealTimeNumberUpdateRequired(isNumericStyle);
         markManager.readAndUpdateExistingMarks();
     }
@@ -383,9 +381,5 @@ public class CSLCitationOOAdapter {
     public boolean isCitedEntry(BibEntry entry) {
         String citationKey = entry.getCitationKey().orElse("");
         return markManager.hasCitationForKey(citationKey);
-    }
-
-    public CSLReferenceMarkManager getMarkManager() {
-        return markManager;
     }
 }
