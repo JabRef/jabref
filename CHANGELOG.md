@@ -10,7 +10,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
-- We added tooltips(on hover) for "User-specific file directory" and "LaTeX file directory" fields of the library properties window. [#12269](https://github.com/JabRef/jabref/issues/12269)
+
+- We added tooltips(on hover) for 'User-specific file directory' and 'LaTeX file directory' fields of the library properties window. [#12269](https://github.com/JabRef/jabref/issues/12269)
 - We added automatic lookup of DOI at citation information. [#13561](https://github.com/JabRef/jabref/issues/13561)
 - We added a field for the citation count field on the General tab. [#13477](https://github.com/JabRef/jabref/issues/13477)
 - We added automatic lookup of DOI at citation relations [#13234](https://github.com/JabRef/jabref/issues/13234)
