@@ -140,6 +140,10 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         );
     }
 
+    public void shortenDOI(){
+        LOGGER.warn("Unable to shorten DOI");
+    }
+
     @Override
     public void bindToEntry(BibEntry entry) {
         super.bindToEntry(entry);

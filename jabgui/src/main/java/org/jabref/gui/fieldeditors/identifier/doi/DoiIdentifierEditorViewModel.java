@@ -9,6 +9,7 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.fieldeditors.identifier.BaseIdentifierEditorViewModel;
 import org.jabref.gui.mergeentries.FetchAndMergeEntry;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.logic.formatter.bibtexfields.ShortenDOIFormatter;
 import org.jabref.logic.importer.fetcher.CrossRef;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -26,6 +27,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
 
     private final UndoManager undoManager;
     private final StateManager stateManager;
+    private final ShortenDOIFormatter shortenDOIFOrmatter;
 
     public DoiIdentifierEditorViewModel(SuggestionProvider<?> suggestionProvider,
                                         FieldCheckers fieldCheckers,
@@ -37,6 +39,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         super(StandardField.DOI, suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager);
         this.undoManager = undoManager;
         this.stateManager = stateManager;
+        this.shortenDOIFOrmatter = new ShortenDOIFormatter();
         configure(true, true);
     }
 
@@ -69,5 +72,15 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     public void openExternalLink() {
         identifier.get().map(DOI::asString)
                   .ifPresent(s -> NativeDesktop.openCustomDoi(s, preferences, dialogService));
+    }
+
+    @Override
+    public void shortenDOI(){
+        String doi = entry.getField(field).orElse("");
+        if(!doi.isEmpty()){
+            String shortenedDOI = shortenDOIFOrmatter.format(doi);
+            entry.setField(field, shortenedDOI);
+            LOGGER.info("Shortened DOI: {} to {}", doi, shortenedDOI);
+        }
     }
 }

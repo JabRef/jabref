@@ -16,8 +16,8 @@ import org.jabref.gui.autocompleter.SuggestionProvider;
 import org.jabref.gui.fieldeditors.EditorTextField;
 import org.jabref.gui.fieldeditors.EditorValidator;
 import org.jabref.gui.fieldeditors.FieldEditorFX;
-import org.jabref.gui.fieldeditors.contextmenu.DefaultMenu;
 import org.jabref.gui.fieldeditors.contextmenu.EditorMenus;
+import org.jabref.gui.fieldeditors.identifier.BaseIdentifierEditorViewModel;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.integrity.FieldCheckers;
 import org.jabref.logic.l10n.Localization;
@@ -29,10 +29,7 @@ import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
-import org.jabref.gui.fieldeditors.identifier.BaseIdentifierEditorViewModel;
-
 import static org.jabref.model.entry.field.StandardField.DOI;
-
 
 public class DoiEditor extends HBox implements FieldEditorFX {
 
@@ -79,9 +76,7 @@ public class DoiEditor extends HBox implements FieldEditorFX {
         lookupIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
 
-
         textField.initContextMenu(EditorMenus.getDOIMenu(textField, dialogService), preferences.getKeyBindingRepository());
-
 
         new EditorValidator(preferences).configureValidation(viewModel.getFieldValidator().getValidationStatus(), textField);
     }
@@ -118,6 +113,6 @@ public class DoiEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void shortenDoi() {
-        //viewModel.shortenDoi();
+        viewModel.shortenDOI();
     }
 }
