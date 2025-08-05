@@ -10,10 +10,10 @@ import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import org.jabref.gui.LibraryTabContainer;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.fieldeditors.LinkedFilesEditor;
-import org.jabref.gui.frame.JabRefFrame;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.preferences.PreferencesDialogView;
@@ -35,14 +35,16 @@ import org.jabref.logic.l10n.Localization;
 public class WalkthroughAction extends SimpleCommand {
     public static final String PDF_LINK_WALKTHROUGH_NAME = "pdfLink";
     public static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME = "mainFileDirectory";
+    public static final String CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME = "customizeEntryTable";
+
     private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new ConcurrentHashMap<>();
 
     private final Walkthrough walkthrough;
-    private final JabRefFrame frame;
+    private final LibraryTabContainer frame;
     private final StateManager stateManager;
     private final Stage stage;
 
-    public WalkthroughAction(Stage stage, JabRefFrame frame, StateManager stateManager, String name) {
+    public WalkthroughAction(Stage stage, LibraryTabContainer frame, StateManager stateManager, String name) {
         this.stage = stage;
         this.frame = frame;
         this.stateManager = stateManager;
@@ -57,13 +59,82 @@ public class WalkthroughAction extends SimpleCommand {
     private Walkthrough getWalkthrough(String name) {
         return WALKTHROUGH_CACHE.computeIfAbsent(name, _ ->
                 switch (name) {
-                    case MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME ->
-                            createMainFileDirectoryWalkthrough();
+                    case MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME -> createMainFileDirectoryWalkthrough();
                     case PDF_LINK_WALKTHROUGH_NAME -> createPdfLinkWalkthrough();
-                    default ->
-                            throw new IllegalArgumentException("Unknown walkthrough: " + name);
+                    case CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME -> createCustomizeEntryTableWalkthrough();
+                    default -> throw new IllegalArgumentException("Unknown walkthrough: " + name);
                 }
         );
+    }
+
+    private Walkthrough createCustomizeEntryTableWalkthrough() {
+        WindowResolver mainResolver = () -> Optional.of(stage);
+        WalkthroughEffect preferenceHighlight = new WalkthroughEffect(
+                new WindowEffect(HighlightEffect.SPOT_LIGHT),
+                new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
+        );
+
+        return Walkthrough
+                .create(stateManager)
+                // Navigate to preferences dialog
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Click on \"File\" menu"))
+                        .resolver(NodeResolver.selector(".menu-bar .menu-button:first-child"))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.SPOT_LIGHT)
+                )
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Click on \"Preferences\""))
+                        .resolver(NodeResolver.menuItem("Preferences"))
+                        .trigger(Trigger.create().withWindowChangeListener().onClick())
+                        .position(TooltipPosition.RIGHT)
+                        .activeWindow(WindowResolver.clazz(ContextMenu.class))
+                        .highlight(new WalkthroughEffect(
+                                new WindowEffect(HighlightEffect.PING),
+                                new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
+                        ))
+                        .showQuitButton(false)
+                )
+                // Configure entry table settings
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Select the \"Entry table\" tab"))
+                        .content(new TextBlock(Localization.lang("This section allows you to customize the columns displayed in the entry table when viewing your bibliography.")))
+                        .resolver(NodeResolver.selectorWithText(".list-cell", text -> Localization.lang("Entry table").equals(text)))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.AUTO)
+                        .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
+                        .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
+                        .highlight(preferenceHighlight)
+                )
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Customize your entry table columns"))
+                        .content(
+                                new TextBlock(Localization.lang("Here you can customize which columns appear in your entry table. You can add, remove, or reorder columns such as citation key, title, author, year, and journal. This helps you see the most relevant information for your research at a glance.")),
+                                new InfoBlock(Localization.lang("The columns you configure here will be displayed whenever you open a library in JabRef. You can always return to this settings page to modify your column preferences."))
+                        )
+                        .continueButton(Localization.lang("Next"))
+                        .resolver(NodeResolver.fxId("columnsList"))
+                        .position(PanelPosition.RIGHT)
+                        .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
+                        .highlight(preferenceHighlight)
+                        .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
+                )
+                // Complete configuration
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Click \"Save\" to save changes"))
+                        .content(
+                                new TextBlock(Localization.lang("Your entry table columns are now configured. These settings will be applied to all your libraries in JabRef.")),
+                                new InfoBlock(Localization.lang("You can find more information about customizing JabRef at [documentation](https://docs.jabref.org/advanced/main-window)"))
+                        )
+                        .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("Save").equals(text)))
+                        .trigger(Trigger.onClick())
+                        .position(PanelPosition.TOP)
+                        .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
+                        .highlight(preferenceHighlight)
+                        .activeWindow(WindowResolver.title(PreferencesDialogView.DIALOG_TITLE))
+                )
+                .build();
     }
 
     private Walkthrough createPdfLinkWalkthrough() {
@@ -194,7 +265,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .highlight(HighlightEffect.SPOT_LIGHT))
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Enter URL for download"))
-                        .content(new TextBlock(Localization.lang("Enter the URL of the PDF file you want to download. You can try this example URL: https://nutritionandmetabolism.biomedcentral.com/articles/10.1186/1743-7075-3-2")))
+                        .content(new TextBlock(Localization.lang("Enter the URL of the PDF file you want to download. You can try this example URL: https://nutritionandmetabolism.biomedcentral.com/counter/pdf/10.1186/1743-7075-3-2.pdf")))
                         .resolver(NodeResolver.selector(".text-input"))
                         .trigger(Trigger.onTextInput())
                         .activeWindow(WindowResolver.not(stage))
