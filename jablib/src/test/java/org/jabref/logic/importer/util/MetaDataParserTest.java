@@ -80,10 +80,6 @@ public class MetaDataParserTest {
         assertEquals(expected, parsed);
     }
 
-    /**
-     * Verifies that a user-specific .blg path (e.g. blgFilePath-testUser) is correctly parsed from metadata.
-     * Ensures that the trailing semicolon (used as separator in .bib metadata) is handled and stripped properly.
-     */
     @Test
     void parsesUserSpecificBlgPathSuccessfully() throws ParseException {
         String user = "testUser";
@@ -94,5 +90,63 @@ public class MetaDataParserTest {
         MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',');
 
         assertEquals(Optional.of(Path.of("/home/user/test.blg")), parsed.getBlgFilePath(user));
+    }
+    
+    @Test
+    void parsesLatexFileDirectoryForUserHostSuccessfully() throws ParseException {
+        String user = "testUser";
+        String host = "testHost";
+        String userHost = user + "-" + host;
+        String rawKey = "fileDirectoryLatex-" + userHost;
+        String rawValue = "/home/user/latex;";
+
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',');
+
+        assertEquals(Optional.of(Path.of("/home/user/latex")), parsed.getLatexFileDirectory(userHost));
+    }
+    
+    @Test
+    void parsesMultipleLatexFileDirectoriesSuccessfully() throws ParseException {
+        String userHost1 = "user1-host1";
+        String userHost2 = "user2-host2";
+        
+        Map<String, String> data = Map.of(
+                "fileDirectoryLatex-" + userHost1, "/path/for/host1;",
+                "fileDirectoryLatex-" + userHost2, "/path/for/host2;"
+        );
+
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(data, ',');
+
+        assertEquals(Optional.of(Path.of("/path/for/host1")), parsed.getLatexFileDirectory(userHost1));
+        assertEquals(Optional.of(Path.of("/path/for/host2")), parsed.getLatexFileDirectory(userHost2));
+    }
+    
+    @Test
+    void retrievesLatexFileDirectoryForDifferentUserOnSameHost() throws ParseException {
+        String originalUserHost = "user1-host";
+        String newUserHost = "user2-host";
+        
+        Map<String, String> data = Map.of(
+                "fileDirectoryLatex-" + originalUserHost, "/path/to/latex;"
+        );
+
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(data, ',');
+
+        assertEquals(Optional.of(Path.of("/path/to/latex")), parsed.getLatexFileDirectory(newUserHost));
+    }
+    
+    @Test
+    void parsesWindowsPathsInLatexFileDirectoryCorrectly() throws ParseException {
+        String userHost = "user-host";
+        String rawKey = "fileDirectoryLatex-" + userHost;
+        String rawValue = "C:\\\\Path\\\\To\\\\Latex;";
+
+        MetaDataParser parser = new MetaDataParser(new DummyFileUpdateMonitor());
+        MetaData parsed = parser.parse(Map.of(rawKey, rawValue), ',');
+
+        assertEquals(Optional.of(Path.of("C:\\Path\\To\\Latex")), parsed.getLatexFileDirectory(userHost));
     }
 }
