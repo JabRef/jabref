@@ -10,6 +10,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ## [Unreleased]
 
 ### Added
+
 - We added 'Add space after citation' in settings of open office panel. [#13559](https://github.com/JabRef/jabref/issues/13559)
 - We added automatic lookup of DOI at citation information. [#13561](https://github.com/JabRef/jabref/issues/13561)
 - We added a field for the citation count field on the General tab. [#13477](https://github.com/JabRef/jabref/issues/13477)
