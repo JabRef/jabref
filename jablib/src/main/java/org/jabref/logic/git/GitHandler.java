@@ -40,10 +40,12 @@ public class GitHandler {
         this.repositoryPathAsFile = this.repositoryPath.toFile();
         if (!isGitRepository()) {
             try {
-                Git.init()
+                try (Git git = Git.init()
                    .setDirectory(repositoryPathAsFile)
                    .setInitialBranch("main")
-                   .call();
+                   .call()) {
+                    // "git" object is not used later, but we need to close it after initialization
+                }
                 setupGitIgnore();
                 String initialCommit = "Initial commit";
                 if (!createCommitOnCurrentBranch(initialCommit, false)) {
