@@ -22,7 +22,7 @@ public class GitHandlerRegistry {
 
     public GitHandler get(Path repoPath) {
         if (repoPath == null) {
-            throw new IllegalArgumentException("repoPath must not be null");
+            throw new IllegalArgumentException("Path must not be null");
         }
 
         Path normalized = repoPath.toAbsolutePath().normalize();
@@ -30,6 +30,10 @@ public class GitHandlerRegistry {
     }
 
     public Optional<GitHandler> fromAnyPath(Path anyPathInsideRepo) {
+        if (anyPathInsideRepo == null) {
+            throw new IllegalArgumentException("Path must not be null");
+        }
+        
         return GitHandler.findRepositoryRoot(anyPathInsideRepo)
                          .map(this::get);
     }
