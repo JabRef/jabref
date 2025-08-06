@@ -78,7 +78,7 @@ public class SemanticConflictDetector {
             return Optional.empty();
         }
 
-        // Case 2: Both local and remote added same citation key -> compare their fields
+        // Case 1: Both local and remote added same citation key -> compare their fields
         if (base == null && local != null && remote != null) {
             if (hasConflictingFields(new BibEntry(), local, remote)) {
                 return Optional.of(new ThreeWayEntryConflict(null, local, remote));
@@ -92,32 +92,15 @@ public class SemanticConflictDetector {
             return Optional.empty();
         }
 
-        // Case 3: base exists, local unchanged, remote deleted or modified
-        if (base != null && local != null && remote != null) {
-            boolean localUnchanged = Objects.equals(base.getFieldMap(), local.getFieldMap());
-            boolean remoteUnchanged = Objects.equals(base.getFieldMap(), remote.getFieldMap());
-
-            boolean localChanged = !localUnchanged;
-            boolean remoteChanged = !remoteUnchanged;
-
-            // Case: only one side changed -> no conflict
-            if (localChanged ^ remoteChanged) {
-                return Optional.empty();
-            }
-
-            // Case: both sides changed -> check for conflicting fields
-            if (localChanged && remoteChanged) {
-                if (hasConflictingFields(base, local, remote)) {
-                    return Optional.of(new ThreeWayEntryConflict(base, local, remote));
-                }
-            }
+        // Case 3: base exists, remote deleted, local unchanged
+        if (base != null && remote == null && Objects.equals(base.getFieldMap(), local.getFieldMap())) {
+            return Optional.empty();
         }
 
         // Case 4: base exists, one side deleted, other modified -> conflict
         if (base != null) {
             boolean localDeleted = local == null;
             boolean remoteDeleted = remote == null;
-
             boolean localChanged = !localDeleted && !Objects.equals(base.getFieldMap(), local.getFieldMap());
             boolean remoteChanged = !remoteDeleted && !Objects.equals(base.getFieldMap(), remote.getFieldMap());
 
@@ -128,7 +111,10 @@ public class SemanticConflictDetector {
 
         // Case 5: base exists, both sides modified the entry -> check field-level diff
         if (base != null && local != null && remote != null) {
-            if (hasConflictingFields(base, local, remote)) {
+            boolean localChanged = !Objects.equals(base.getFieldMap(), local.getFieldMap());
+            boolean remoteChanged = !Objects.equals(base.getFieldMap(), remote.getFieldMap());
+
+            if (localChanged && remoteChanged && hasConflictingFields(base, local, remote)) {
                 return Optional.of(new ThreeWayEntryConflict(base, local, remote));
             }
         }

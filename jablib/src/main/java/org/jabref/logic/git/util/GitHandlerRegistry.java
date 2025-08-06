@@ -33,7 +33,7 @@ public class GitHandlerRegistry {
         if (anyPathInsideRepo == null) {
             throw new IllegalArgumentException("Path must not be null");
         }
-        
+
         return GitHandler.findRepositoryRoot(anyPathInsideRepo)
                          .map(this::get);
     }
