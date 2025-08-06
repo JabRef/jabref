@@ -60,7 +60,7 @@ class SearchCitationsRelationsServiceTest {
     @Nested
     class CitationsTests {
         @Test
-        void serviceShouldSearchForCitations() {
+        void serviceShouldSearchForCitations() throws FetcherException {
             // GIVEN
             BibEntry cited = new BibEntry();
             List<BibEntry> citationsToReturn = List.of(new BibEntry());
@@ -70,14 +70,14 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitations(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited);
 
             // THEN
             assertEquals(citationsToReturn, citations);
         }
 
         @Test
-        void serviceShouldCallTheFetcherForCitationsWhenRepositoryIsUpdatable() {
+        void serviceShouldCallTheFetcherForCitationsWhenRepositoryIsUpdatable() throws FetcherException {
             // GiVEN
             BibEntry cited = new BibEntry();
             BibEntry newCitations = new BibEntry();
@@ -95,7 +95,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitations(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -104,7 +104,7 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldFetchCitationsIfRepositoryIsEmpty() {
+        void serviceShouldFetchCitationsIfRepositoryIsEmpty() throws FetcherException {
             BibEntry cited = new BibEntry();
             BibEntry newCitations = new BibEntry();
             List<BibEntry> citationsToReturn = List.of(newCitations);
@@ -114,7 +114,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitations(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited);
 
             // THEN
             assertTrue(citationsDatabase.containsKey(cited));
@@ -123,7 +123,7 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void insertingAnEmptyCitationsShouldBePossible() {
+        void insertingAnEmptyCitationsShouldBePossible() throws FetcherException {
             BibEntry cited = new BibEntry();
             Map<BibEntry, List<BibEntry>> citationsDatabase = new HashMap<>();
             CitationFetcher fetcher = createEmptyMockFetcher();
@@ -131,7 +131,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchCitations(cited);
+            List<BibEntry> citations = searchService.searchCitedBy(cited);
 
             // THEN
             assertTrue(citations.isEmpty());
@@ -143,7 +143,7 @@ class SearchCitationsRelationsServiceTest {
     @Nested
     class ReferencesTests {
         @Test
-        void serviceShouldSearchForReferences() {
+        void serviceShouldSearchForReferences() throws FetcherException {
             // GIVEN
             BibEntry referencer = new BibEntry();
             List<BibEntry> referencesToReturn = List.of(new BibEntry());
@@ -153,14 +153,14 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(null, repository);
 
             // WHEN
-            List<BibEntry> references = searchService.searchReferences(referencer);
+            List<BibEntry> references = searchService.searchCites(referencer);
 
             // THEN
             assertEquals(referencesToReturn, references);
         }
 
         @Test
-        void serviceShouldCallTheFetcherForReferencesWhenRepositoryIsUpdatable() {
+        void serviceShouldCallTheFetcherForReferencesWhenRepositoryIsUpdatable() throws FetcherException {
             // GIVEN
             BibEntry referencer = new BibEntry();
             BibEntry newReference = new BibEntry();
@@ -178,7 +178,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> references = searchService.searchReferences(referencer);
+            List<BibEntry> references = searchService.searchCites(referencer);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(referencer));
@@ -187,7 +187,7 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void serviceShouldFetchReferencesIfRepositoryIsEmpty() {
+        void serviceShouldFetchReferencesIfRepositoryIsEmpty() throws FetcherException {
             BibEntry reference = new BibEntry();
             BibEntry newCitations = new BibEntry();
             List<BibEntry> referencesToReturn = List.of(newCitations);
@@ -199,7 +199,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> references = searchService.searchReferences(reference);
+            List<BibEntry> references = searchService.searchCites(reference);
 
             // THEN
             assertTrue(referencesDatabase.containsKey(reference));
@@ -208,7 +208,7 @@ class SearchCitationsRelationsServiceTest {
         }
 
         @Test
-        void insertingAnEmptyReferencesShouldBePossible() {
+        void insertingAnEmptyReferencesShouldBePossible() throws FetcherException {
             BibEntry referencer = new BibEntry();
             Map<BibEntry, List<BibEntry>> referenceDatabase = new HashMap<>();
             CitationFetcher fetcher = createEmptyMockFetcher();
@@ -218,7 +218,7 @@ class SearchCitationsRelationsServiceTest {
             SearchCitationsRelationsService searchService = new SearchCitationsRelationsService(fetcher, repository);
 
             // WHEN
-            List<BibEntry> citations = searchService.searchReferences(referencer);
+            List<BibEntry> citations = searchService.searchCites(referencer);
 
             // THEN
             assertTrue(citations.isEmpty());

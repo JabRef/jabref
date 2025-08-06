@@ -102,7 +102,7 @@
     [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
 
 
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "CHANGELOG.md".
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Source Code Tests" (on the left), subsection "CHANGELOG.md".
 - jobName: Markdown
   workflowName: 'Source Code Tests'
   message: >
@@ -111,7 +111,7 @@
     [Markdown lint's rules](https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#rules) help to keep our Markdown files consistent within this repository and consistent with the Markdown files outside here.
 
 
-    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Tests" (on the left), subsection "Markdown".
+    You can check the detailed error output by navigating to your pull request, selecting the tab "Checks", section "Source Code Tests" (on the left), subsection "Markdown".
 
 
 # Submodules and branches

@@ -265,8 +265,7 @@ public class BackupManager {
         // "Clone" the database context
         // We "know" that "only" the BibEntries might be changed during writing (see [org.jabref.logic.exporter.BibDatabaseWriter.savePartOfDatabase])
         List<BibEntry> list = bibDatabaseContext.getDatabase().getEntries().stream()
-                                                .map(BibEntry::clone)
-                                                .map(BibEntry.class::cast)
+                                                .map(BibEntry::new)
                                                 .toList();
         BibDatabase bibDatabaseClone = new BibDatabase(list);
         bibDatabaseContext.getDatabase().getStringValues().stream().map(BibtexString::clone)

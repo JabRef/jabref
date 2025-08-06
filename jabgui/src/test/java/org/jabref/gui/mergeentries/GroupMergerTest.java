@@ -2,7 +2,7 @@ package org.jabref.gui.mergeentries;
 
 import java.util.stream.Stream;
 
-import org.jabref.gui.mergeentries.newmergedialog.fieldsmerger.GroupMerger;
+import org.jabref.gui.mergeentries.threewaymerge.fieldsmerger.GroupMerger;
 import org.jabref.model.entry.BibEntryPreferences;
 
 import org.junit.jupiter.api.BeforeEach;

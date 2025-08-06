@@ -90,20 +90,20 @@ class BibEntryTest {
 
     @Test
     void clonedBibEntryHasUniqueID() {
-        BibEntry entryClone = (BibEntry) entry.clone();
+        BibEntry entryClone = new BibEntry(entry);
         assertNotEquals(entry.getId(), entryClone.getId());
     }
 
     @Test
     void clonedBibEntryWithMiscTypeHasOriginalChangedFlag() {
-        BibEntry entryClone = (BibEntry) entry.clone();
+        BibEntry entryClone = new BibEntry(entry);
         assertFalse(entryClone.hasChanged());
     }
 
     @Test
     void clonedBibEntryWithBookTypeAndOneFieldHasOriginalChangedFlag() {
         entry = new BibEntry(StandardEntryType.Book).withField(StandardField.AUTHOR, "value");
-        BibEntry entryClone = (BibEntry) entry.clone();
+        BibEntry entryClone = new BibEntry(entry);
         assertFalse(entryClone.hasChanged());
     }
 
@@ -673,7 +673,7 @@ class BibEntryTest {
                 .withField(StandardField.EPRINT, "1234.56789")
                 .withField(StandardField.DATE, "1970-01-01");
 
-        BibEntry copyEntry = (BibEntry) entry.clone();
+        BibEntry copyEntry = new BibEntry(entry);
         BibEntry otherEntry = new BibEntry();
 
         copyEntry.setField(Map.of(
@@ -696,7 +696,7 @@ class BibEntryTest {
                 .withField(StandardField.TITLE, "Test Title")
                 .withField(StandardField.DATE, "1970-01-01");
 
-        BibEntry copyEntry = (BibEntry) entry.clone();
+        BibEntry copyEntry = new BibEntry(entry);
         BibEntry otherEntry = new BibEntry();
 
         copyEntry.setField(Map.of(
@@ -720,7 +720,7 @@ class BibEntryTest {
                 .withField(StandardField.EPRINT, "1234.56789")
                 .withField(StandardField.DATE, "1970-01-01");
 
-        BibEntry copyEntry = (BibEntry) entry.clone();
+        BibEntry copyEntry = new BibEntry(entry);
         BibEntry otherEntry = new BibEntry();
 
         copyEntry.setField(Map.of(
@@ -746,7 +746,7 @@ class BibEntryTest {
                 .withField(StandardField.EPRINT, "1234.56789")
                 .withField(StandardField.DATE, "1970-01-01");
 
-        BibEntry copyEntry = (BibEntry) entry.clone();
+        BibEntry copyEntry = new BibEntry(entry);
         BibEntry otherEntry = new BibEntry();
 
         copyEntry.setField(Map.of(
@@ -771,7 +771,7 @@ class BibEntryTest {
                 .withField(StandardField.TITLE, "Test Title")
                 .withField(StandardField.DATE, "1970-01-01");
 
-        BibEntry copyEntry = (BibEntry) entry.clone();
+        BibEntry copyEntry = new BibEntry(entry);
         BibEntry otherEntry = new BibEntry();
 
         copyEntry.setField(Map.of(
@@ -796,7 +796,7 @@ class BibEntryTest {
                 .withField(StandardField.TITLE, "Test Title")
                 .withField(StandardField.DATE, "1970-01-01");
 
-        BibEntry copyEntry = (BibEntry) entry.clone();
+        BibEntry copyEntry = new BibEntry(entry);
         BibEntry otherEntry = new BibEntry();
 
         copyEntry.setField(Map.of(
