@@ -73,11 +73,6 @@ public class SemanticConflictDetector {
     private static Optional<ThreeWayEntryConflict> detectEntryConflict(BibEntry base,
                                                                        BibEntry local,
                                                                        BibEntry remote) {
-        // Case 0: all null → skip
-        if (base == null && local == null && remote == null) {
-            return Optional.empty();
-        }
-
         // Case 1: Both local and remote added same citation key -> compare their fields
         if (base == null && local != null && remote != null) {
             if (hasConflictingFields(new BibEntry(), local, remote)) {
@@ -87,17 +82,7 @@ public class SemanticConflictDetector {
             }
         }
 
-        // Case 2: base exists, local deleted, remote unchanged -> accept local deletion
-        if (base != null && local == null && Objects.equals(base.getFieldMap(), remote.getFieldMap())) {
-            return Optional.empty();
-        }
-
-        // Case 3: base exists, remote deleted, local unchanged
-        if (base != null && remote == null && Objects.equals(base.getFieldMap(), local.getFieldMap())) {
-            return Optional.empty();
-        }
-
-        // Case 4: base exists, one side deleted, other modified -> conflict
+        // Case 2: base exists, one side deleted, other modified -> conflict
         if (base != null) {
             boolean localDeleted = local == null;
             boolean remoteDeleted = remote == null;
@@ -109,7 +94,7 @@ public class SemanticConflictDetector {
             }
         }
 
-        // Case 5: base exists, both sides modified the entry -> check field-level diff
+        // Case 3: base exists, both sides modified the entry -> check field-level diff
         if (base != null && local != null && remote != null) {
             boolean localChanged = !Objects.equals(base.getFieldMap(), local.getFieldMap());
             boolean remoteChanged = !Objects.equals(base.getFieldMap(), remote.getFieldMap());
