@@ -84,8 +84,9 @@ public class SemanticConflictDetector {
 
         // Case 2: base exists, one side deleted, other modified -> conflict
         if (base != null) {
-            boolean localDeleted = (local == null);
-            boolean remoteDeleted = (remote == null);
+            boolean localDeleted = local == null;
+            boolean remoteDeleted = remote == null;
+
             boolean localChanged = !localDeleted && !base.getFieldMap().equals(local.getFieldMap());
             boolean remoteChanged = !remoteDeleted && !base.getFieldMap().equals(remote.getFieldMap());
 
