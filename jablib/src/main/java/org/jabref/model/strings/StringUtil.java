@@ -740,6 +740,17 @@ public class StringUtil {
         return StringUtils.containsIgnoreCase(text, searchString);
     }
 
+    public static boolean equalsUnifiedLineBreak(Optional<String> stringOne, Optional<String> stringTwo) {
+        if (stringOne.isEmpty() && stringTwo.isEmpty()) {
+            return true;
+        }
+        if (stringOne.isEmpty() || stringTwo.isEmpty()) {
+            return false;
+        }
+        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
+                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
+    }
+
     public static String substringBetween(String str, String open, String close) {
         return StringUtils.substringBetween(str, open, close);
     }
