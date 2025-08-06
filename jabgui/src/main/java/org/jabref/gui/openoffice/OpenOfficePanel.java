@@ -645,7 +645,7 @@ public class OpenOfficePanel {
         CheckMenuItem autoSync = new CheckMenuItem(Localization.lang("Automatically sync bibliography when inserting citations"));
         autoSync.selectedProperty().set(openOfficePreferences.getSyncWhenCiting());
 
-        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add  space after citation"));
+        CheckMenuItem addSpaceAfter = new CheckMenuItem(Localization.lang("Add space after citation"));
         addSpaceAfter.selectedProperty().set(openOfficePreferences.getAddSpaceAfter());
         addSpaceAfter.setOnAction(_ -> openOfficePreferences.setAddSpaceAfter(addSpaceAfter.isSelected()));
 
