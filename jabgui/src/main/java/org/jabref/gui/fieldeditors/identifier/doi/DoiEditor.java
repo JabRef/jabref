@@ -54,16 +54,12 @@ public class DoiEditor extends HBox implements FieldEditorFX {
         // but we need the injected vars to create the viewmodels.
         Injector.registerExistingAndInject(this);
 
-        switch (field) {
-            case DOI ->
-                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
-
-            // TODO: Add support for PMID
-            case null, default -> {
+        if (field == DOI) {
+            this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
+        } else {
                 assert field != null;
                 throw new IllegalStateException("Unable to instantiate a view model for identifier field editor '%s'".formatted(field.getDisplayName()));
             }
-        }
 
         ViewLoader.view(this)
                 .root(this)
@@ -113,6 +109,6 @@ public class DoiEditor extends HBox implements FieldEditorFX {
 
     @FXML
     private void shortenDoi() {
-        viewModel.shortenDOI();
+        viewModel.shortenID();
     }
 }

@@ -140,8 +140,8 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         );
     }
 
-    public void shortenDOI() {
-        LOGGER.warn("Unable to shorten DOI");
+    public void shortenID() {
+        dialogService.showErrorDialogAndWait("Unable to shorten DOI");
     }
 
     @Override

@@ -48,15 +48,15 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         CrossRef doiFetcher = new CrossRef();
 
         BackgroundTask.wrap(() -> doiFetcher.findIdentifier(entry))
-                .onRunning(() -> identifierLookupInProgress.setValue(true))
-                .onFinished(() -> identifierLookupInProgress.setValue(false))
-                .onSuccess(identifier -> {
-                    if (identifier.isPresent()) {
-                        entry.setField(field, identifier.get().asString());
-                    } else {
-                        dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
-                    }
-                }).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
+            .onRunning(() -> identifierLookupInProgress.setValue(true))
+            .onFinished(() -> identifierLookupInProgress.setValue(false))
+            .onSuccess(identifier -> {
+                if (identifier.isPresent()) {
+                    entry.setField(field, identifier.get().asString());
+                } else {
+                    dialogService.notify(Localization.lang("No %0 found", field.getDisplayName()));
+                }
+            }).onFailure(e -> handleIdentifierFetchingError(e, doiFetcher)).executeWith(taskExecutor);
     }
 
     @Override
@@ -75,12 +75,12 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
     }
 
     @Override
-    public void shortenDOI() {
-        String doi = entry.getField(field).orElse("");
-        if (!doi.isEmpty()) {
+    public void shortenID() {
+        entry.getField(field).ifPresent(doi -> {
             String shortenedDOI = shortenDOIFormatter.format(doi);
             entry.setField(field, shortenedDOI);
             LOGGER.info("Shortened DOI: {} to {}", doi, shortenedDOI);
-        }
+            dialogService.notify(Localization.lang("Shortened DOI") + ": " + shortenedDOI);
+        });
     }
 }
