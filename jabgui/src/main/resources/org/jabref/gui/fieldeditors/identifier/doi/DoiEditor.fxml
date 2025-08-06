@@ -11,7 +11,7 @@
          fx:controller="org.jabref.gui.fieldeditors.identifier.doi.DoiEditor">
     <EditorTextField fx:id="textField" prefHeight="0.0" HBox.hgrow="ALWAYS"/>
     <Button fx:id="shortenDoiButton" disable="${controller.viewModel.isInvalidIdentifier}"
-            onAction="#shortenDoi"
+            onAction="#shortenID"
             styleClass="icon-button"
             managed="${controller.viewModel.canFetchBibliographyInformationById}"
             visible="${controller.viewModel.canFetchBibliographyInformationById}">

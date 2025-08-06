@@ -108,7 +108,7 @@ public class DoiEditor extends HBox implements FieldEditorFX {
     }
 
     @FXML
-    private void shortenDoi() {
+    private void shortenID() {
         viewModel.shortenID();
     }
 }
