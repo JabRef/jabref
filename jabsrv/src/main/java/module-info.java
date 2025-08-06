@@ -58,4 +58,9 @@ module org.jabref.jabsrv {
     requires jersey.server;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
+
+    requires lsp4j;
+    requires lsp4j.jsonrpc;
+    requires lsp4j.websocket;
+    requires lsp4j.websocket.jakarta;
 }

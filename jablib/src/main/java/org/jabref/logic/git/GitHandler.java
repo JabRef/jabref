@@ -40,10 +40,12 @@ public class GitHandler {
         this.repositoryPathAsFile = this.repositoryPath.toFile();
         if (!isGitRepository()) {
             try {
-                Git.init()
+                try (Git git = Git.init()
                    .setDirectory(repositoryPathAsFile)
                    .setInitialBranch("main")
-                   .call();
+                   .call()) {
+                    // "git" object is not used later, but we need to close it after initialization
+                }
                 setupGitIgnore();
                 String initialCommit = "Initial commit";
                 if (!createCommitOnCurrentBranch(initialCommit, false)) {
@@ -201,5 +203,41 @@ public class GitHandler {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             return git.getRepository().getBranch();
         }
+    }
+
+    public void fetchOnCurrentBranch() throws IOException {
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            git.fetch()
+               .setCredentialsProvider(credentialsProvider)
+               .call();
+        } catch (GitAPIException e) {
+            LOGGER.error("Failed to fetch from remote", e);
+        }
+    }
+
+    /**
+     * Try to locate the Git repository root by walking up the directory tree starting from the given path.
+     * If a directory containing a .git folder is found, a new GitHandler is created and returned.
+     *
+     * @param anyPathInsideRepo Any file or directory path that is assumed to be inside a Git repository
+     * @return Optional containing a GitHandler initialized with the repository root, or empty if not found
+     */
+    public static Optional<GitHandler> fromAnyPath(Path anyPathInsideRepo) {
+        Path current = anyPathInsideRepo.toAbsolutePath();
+        while (current != null) {
+            if (Files.exists(current.resolve(".git"))) {
+                return Optional.of(new GitHandler(current));
+            }
+            current = current.getParent();
+        }
+        return Optional.empty();
+    }
+
+    public File getRepositoryPathAsFile() {
+        return repositoryPathAsFile;
+    }
+
+    public Git open() throws IOException {
+        return Git.open(this.repositoryPathAsFile);
     }
 }

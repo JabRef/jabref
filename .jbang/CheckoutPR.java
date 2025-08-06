@@ -29,7 +29,7 @@ public class CheckoutPR {
         GHRepository repo = github.getRepository("JabRef/jabref");
 
         if (args.length != 1) {
-            System.err.println("Usage: java CheckoutPR <pull-request-number>|<contributor:branch-name>");
+            System.err.println("Usage: jbang CheckoutPR.java <pull-request-number>|<contributor:branch-name>");
             System.exit(1);
         }
 
