@@ -283,9 +283,9 @@ public class WalkthroughAction extends SimpleCommand {
                         .showQuitButton(false))
                 // Completion
                 .addStep(WalkthroughStep
-                        .panel(Localization.lang("Perfect! PDF file linked successfully"))
+                        .panel(Localization.lang("PDF file linked successfully"))
                         .content(
-                                new TextBlock(Localization.lang("Congratulations! You have successfully linked a PDF file to a bibliography entry. This makes it easy to access your research documents directly from JabRef. You can repeat this process for all your entries.")),
+                                new TextBlock(Localization.lang("Congratulations. You have successfully linked a PDF file to a bibliography entry. This makes it easy to access your research documents directly from JabRef. You can repeat this process for all your entries.")),
                                 new InfoBlock(Localization.lang("For detailed information: [Adding PDFs](https://docs.jabref.org/collect/add-pdfs-to-an-entry), [Managing files](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks), [Finding unlinked files](https://docs.jabref.org/collect/findunlinkedfiles)."))
                         )
                         .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))

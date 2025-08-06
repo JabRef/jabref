@@ -34,8 +34,8 @@ import org.slf4j.LoggerFactory;
 public interface Trigger {
     Logger LOGGER = LoggerFactory.getLogger(Trigger.class);
 
-    /// Attaches the navigation triggers to the target node. `beforeNavigate` and
-    /// `onNavigate` are guaranteed to run at most once.
+    /// Attaches the navigation triggers to the target node. `beforeNavigate` and `onNavigate` are guaranteed to run at
+    /// most once.
     ///
     /// @param node           the node to attach the listeners to
     /// @param beforeNavigate the runnable to execute before navigation
@@ -82,12 +82,12 @@ public interface Trigger {
 
         @FunctionalInterface
         private interface PredicateGenerator {
-            /// Creates the trigger logic for a given node.
+            /// Modify the node's event dispatch chain or register custom logic to trigger [Trigger] when desired
+            /// conditions are met.
             ///
             /// @param node       The node to attach the trigger to.
-            /// @param onNavigate A function that wraps the original event handler. It
-            ///                   takes a Supplier representing the original action and
-            ///                   returns the result of that action.
+            /// @param onNavigate A function that wraps the original event handler. It takes a Supplier representing the
+            ///                   original action and returns the result of that action.
             /// @return A cleanup runnable that detaches the trigger.
             Runnable create(Node node, Function<Supplier<?>, ?> onNavigate);
         }
@@ -116,8 +116,8 @@ public interface Trigger {
             return this;
         }
 
-        /// Triggers navigation on a single mouse click (more precisely, press) or when
-        /// an action is performed (for Menu and Button)
+        /// Triggers navigation on a single mouse click (more precisely, press) or when an action is performed (for Menu
+        /// and Button)
         public Builder onClick() {
             setGenerator((node, onNavigate) -> {
                 final EventDispatcher originalDispatcher = node.getEventDispatcher();
@@ -265,7 +265,7 @@ public interface Trigger {
                     }
                 };
 
-                Function<Supplier<?>, Object> handleUserAction = (originalAction) -> {
+                Function<Supplier<?>, Object> handleUserAction = originalAction -> {
                     // Immediate clean-up to ensure at most called once.
                     triggerListenersCleanups.forEach(Runnable::run);
                     triggerListenersCleanups.clear();

@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 /// be identified as part of the walkthrough system.
 public class WalkthroughPane extends StackPane {
     private static final Logger LOGGER = LoggerFactory.getLogger(WalkthroughPane.class);
+    /// Mutable map of all the instances created. Not thread-safe because the entire
+    /// life-cycle of this class is used in JavaFX-thread.
     private static final Map<Window, WalkthroughPane> INSTANCES = new HashMap<>();
 
     private final Window window;
