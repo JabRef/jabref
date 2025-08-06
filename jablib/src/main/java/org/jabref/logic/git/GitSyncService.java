@@ -54,7 +54,7 @@ public class GitSyncService {
     public MergeResult fetchAndMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
         Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
         if (repoRoot.isEmpty()) {
-            LOGGER.warn("Path is not inside a Git repository");
+            LOGGER.warn("Path is not inside a Git repository.");
             return MergeResult.failure();
         }
         GitHandler gitHandler = gitHandlerRegistry.get(repoRoot.get());

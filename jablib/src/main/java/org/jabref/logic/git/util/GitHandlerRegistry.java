@@ -21,6 +21,10 @@ public class GitHandlerRegistry {
     private final Map<Path, GitHandler> handlerCache = new ConcurrentHashMap<>();
 
     public GitHandler get(Path repoPath) {
+        if (repoPath == null) {
+            throw new IllegalArgumentException("repoPath must not be null");
+        }
+
         Path normalized = repoPath.toAbsolutePath().normalize();
         return handlerCache.computeIfAbsent(normalized, GitHandler::new);
     }
