@@ -18,6 +18,7 @@ import org.jabref.logic.git.model.MergeResult;
 import org.jabref.logic.git.status.GitStatusChecker;
 import org.jabref.logic.git.status.GitStatusSnapshot;
 import org.jabref.logic.git.status.SyncStatus;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -39,25 +40,26 @@ public class GitSyncService {
 
     private static final boolean AMEND = true;
     private final ImportFormatPreferences importFormatPreferences;
-    private final GitHandler gitHandler;
+    private final GitHandlerRegistry gitHandlerRegistry;
     private final GitConflictResolverStrategy gitConflictResolverStrategy;
     private final GitSemanticMergeExecutor mergeExecutor;
 
-    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandler gitHandler, GitConflictResolverStrategy gitConflictResolverStrategy, GitSemanticMergeExecutor mergeExecutor) {
+    public GitSyncService(ImportFormatPreferences importFormatPreferences, GitHandlerRegistry gitHandlerRegistry, GitConflictResolverStrategy gitConflictResolverStrategy, GitSemanticMergeExecutor mergeExecutor) {
         this.importFormatPreferences = importFormatPreferences;
-        this.gitHandler = gitHandler;
+        this.gitHandlerRegistry = gitHandlerRegistry;
         this.gitConflictResolverStrategy = gitConflictResolverStrategy;
         this.mergeExecutor = mergeExecutor;
     }
 
     public MergeResult fetchAndMerge(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
-        Optional<GitHandler> gitHandlerOpt = GitHandler.fromAnyPath(bibFilePath);
-        if (gitHandlerOpt.isEmpty()) {
-            LOGGER.warn("Pull aborted: The file is not inside a Git repository.");
+        Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
+        if (repoRoot.isEmpty()) {
+            LOGGER.warn("Path is not inside a Git repository");
             return MergeResult.failure();
         }
+        GitHandler gitHandler = gitHandlerRegistry.get(repoRoot.get());
 
-        GitStatusSnapshot status = GitStatusChecker.checkStatus(bibFilePath);
+        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
 
         if (!status.tracking()) {
             LOGGER.warn("Pull aborted: The file is not under Git version control.");
@@ -151,10 +153,18 @@ public class GitSyncService {
     }
 
     public void push(BibDatabaseContext localDatabaseContext, Path bibFilePath) throws GitAPIException, IOException, JabRefException {
-        GitStatusSnapshot status = GitStatusChecker.checkStatus(bibFilePath);
+        Optional<Path> repoRoot = GitHandler.findRepositoryRoot(bibFilePath);
+
+        if (repoRoot.isEmpty()) {
+            LOGGER.warn("Path is not inside a Git repository");
+            return;
+        }
+        GitHandler gitHandler = gitHandlerRegistry.get(repoRoot.get());
+
+        GitStatusSnapshot status = GitStatusChecker.checkStatus(gitHandler);
 
         if (!status.tracking()) {
-            LOGGER.warn("Push aborted: file is not tracked by Git");
+            LOGGER.warn("Push aborted: File is not tracked by Git");
             return;
         }
 
