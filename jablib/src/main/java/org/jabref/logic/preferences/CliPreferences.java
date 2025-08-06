@@ -114,8 +114,6 @@ public interface CliPreferences {
 
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
 
-    WalkthroughPreferences getWalkthroughPreferences();
-
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
 
     PushToApplicationPreferences getPushToApplicationPreferences();
