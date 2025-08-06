@@ -84,22 +84,67 @@ The semantic conflict detection and merge resolution logic is covered by:
 
 The following table describes when semantic merge in JabRef should consider a situation as conflict or not during a three-way merge.
 
-| ID   | Base                       | Local Change                       | Remote Change                      | Result |
-|------|----------------------------|------------------------------------|------------------------------------|--------|
-| T1   | Field present              | (unchanged)                        | Field modified                     | No conflict. The local version remained unchanged, so the remote change can be safely applied. |
-| T2   | Field present              | Field modified                     | (unchanged)                        | No conflict. The remote version did not touch the field, so the local change is preserved. |
-| T3   | Field present              | Field changed to same value        | Field changed to same value        | No conflict. Although both sides changed the field, the result is identical—therefore, no conflict. |
-| T4   | Field present              | Field changed to A                 | Field changed to B                 | Conflict. This is a true semantic conflict that requires resolution. |
-| T5   | Field present              | Field deleted                      | Field modified                     | Conflict. One side deleted the field while the other updated it—this is contradictory. |
-| T6   | Field present              | Field modified                     | Field deleted                      | Conflict. Similar to T5, one side deletes, the other edits—this is a conflict. |
-| T7   | Field present              | (unchanged)                        | Field deleted                      | No conflict. Local did not modify anything, so remote deletion is accepted. |
-| T8   | Entry with fields A and B  | Field A modified                   | Field B modified                   | No conflict. Changes are on separate fields, so they can be merged safely. |
-| T9   | Entry with fields A and B  | Field order changed                | Field order changed differently    | No conflict. Field order is not semantically meaningful, so no conflict is detected. |
-| T10  | Entries A and B            | Entry A modified                   | Entry B modified                   | No conflict. Modifications are on different entries, which are always safe to merge. |
-| T11  | Entry with existing fields | (unchanged)                        | New field added                    | No conflict. Remote addition can be applied without issues. |
-| T12  | Entry with existing fields | New field added with value A       | New field added with value B       | Conflict. One side added while the other side modified—there is a semantic conflict. |
-| T13  | Entry with existing fields | New field added                    | (unchanged)                        | No conflict. Safe to preserve the local addition. |
-| T14  | Entry with existing fields | New field added with value A       | New field added with value A       | No conflict. Even though both sides added it, the value is the same—no need for resolution. |
-| T15  | Entry with existing fields | New field added with value A       | New field added with value B       | Conflict. The same field is introduced with different values, which creates a conflict. |
-| T16  | (entry not present)        | New entry with author A            | New entry with author B            | Conflict. Both sides created a new entry with the same citation key, but the fields differ. |
-| T17  | (entry not present)        | New entry with identical fields    | New entry with identical fields    | No conflict. Both sides created a new entry with the same citation key and identical fields, so it can be merged safely. |
+### Entry-level Conflict Cases (E-series)
+
+Each side (Base, Local, Remote) can take one of the following values:
+
+* `–`: entry does not exist (null)
+* `S`: same as base
+* `M`: modified (fields changed)
+
+> Note: Citation key is used as the entry identifier. Renaming a citation key is currently treated as deletion + addition and not supported as a standalone diff.
+
+| TestID | Base          | Local             | Remote            | Description                                                    | Common Scenario                                                                | Conflict |
+| ------ | ------------- | ----------------- | ----------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------- |
+| E01    | –             | –                 | –                 | All null                                                       | Entry absent on all sides                                                      | No       |
+| E02    | –             | –                 | M                 | Remote added entry                                             | Accept remote addition                                                         | No       |
+| E03    | –             | M                 | –                 | Local added entry                                              | Keep local addition                                                            | No       |
+| E04    | –             | M                 | M                 | Both added entry with same citation key                        | If content is identical: no conflict; else: compare fields                     | Depends  |
+| E05    | S             | –                 | –                 | Both deleted                                                   | Safe deletion                                                                  | No       |
+| E06    | S             | –                 | S                 | Local deleted, remote unchanged                                | Respect local deletion                                                         | No       |
+| E07    | S             | –                 | M                 | Local deleted, remote modified                                 | One side deleted, one side changed                                             | Yes      |
+| E08    | S             | S                 | –                 | Remote deleted, local unchanged                                | Accept remote deletion as no conflict                                          | No       |
+| E09    | S             | S                 | S                 | All sides equal                                                | No changes                                                                     | No       |
+| E10    | S             | S                 | M                 | Remote modified, local unchanged                               | Accept remote changes                                                          | No       |
+| E11    | S             | M                 | –                 | Remote deleted, local modified                                 | One side deleted, one side changed                                             | Yes      |
+| E12    | S             | M                 | S                 | Local modified, remote unchanged                               | Accept local changes                                                           | No       |
+| E13    | S             | M                 | M                 | Both sides modified                                            | If changes are equal or to different fields: no conflict; else: compare fields | Depends  |
+| E14a   | `@article{a}` | `@article{b}`     | unchanged         | Local renamed citation key                                     | Treated as deletion + addition                                                 | Yes      |
+| E14b   | `@article{a}` | unchanged         | `@article{b}`     | Remote renamed citation key                                    | Treated as deletion + addition                                                 | Yes      |
+| E14c   | `@article{a}` | `@article{b}`     | `@article{c}`     | Both renamed to different keys                                 | Treated as deletion + addition                                                 | Yes      |
+| E15    | –             | `@article{a,...}` | `@article{a,...}` | Both added entry with same citation key, but different content | Duplicate citation key from both sides                                         | Yes      |
+
+---
+
+### Field-level Conflict Cases (F-series)
+
+Each individual field (such as title, author, etc.) may have one of the following statuses relative to the base version:
+
+* Unchanged: The field value is exactly the same as in the base version.
+* Changed: The field value is different from the base version.
+* Deleted: The field existed in the base version but is now missing (i.e., null).
+* Added: The field did not exist in the base version but was added in the local or remote version.
+
+| TestID | Base                          | Local               | Remote              | Description                                | Conflict |
+| ------ | ----------------------------- | ------------------- | ------------------- | ------------------------------------------ |----------|
+| F01    | U                             | U                   | U                   | All equal                                  | No       |
+| F02    | U                             | U                   | C                   | Remote changed                             | No       |
+| F03    | U                             | C                   | U                   | Local changed                              | No       |
+| F04    | U                             | C                   | C (=)               | Both changed to same value                 | No       |
+| F05    | U                             | C                   | C (≠)               | Both changed same field, different values  | Yes      |
+| F06    | U                             | D                   | U                   | Local deleted                              | No       |
+| F07    | U                             | U                   | D                   | Remote deleted                             | No       |
+| F08    | U                             | D                   | D                   | Both deleted                               | No       |
+| F09    | U                             | C                   | D                   | Local changed, remote deleted              | Yes      |
+| F10    | U                             | D                   | C                   | Local deleted, remote changed              | Yes      |
+| F11    | –                             | –                   | –                   | Field missing on all sides                 | No       |
+| F12    | –                             | A                   | –                   | Local added field                          | No       |
+| F13    | –                             | –                   | A                   | Remote added field                         | No       |
+| F14    | –                             | A                   | A (=)               | Both added same field with same value      | No       |
+| F15    | –                             | A                   | A (≠)               | Both added same field with different values | Yes      |
+| F16    | U                             | C                   | D                   | Changed in local, deleted in remote        | Yes      |
+| F17    | U                             | D                   | C                   | Deleted in local, changed in remote        | Yes      |
+| F18    | –                             | A                   | C                   | No base, both sides added different values | Yes      |
+| F19    | `{title=Hello, author=Alice}` | reordered           | unchanged           | Field order changed only                   | No       |
+| F20    | `@article{a}`                 | `@inproceedings{a}` | unchanged           | Entry type changed in local                | No       |
+| F21    | `@article{a}`                 | `@book{a}`          | `@inproceedings{a}` | Both changed entry type differently        | Yes      |
