@@ -81,7 +81,8 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
      * Returns a text representation of the subchain starting at this item.
      * E.g., calling {@link #getSubchainAsString(Character)} on the node "B" in "A > B > C" returns "B > C".
      */
-    private String getSubchainAsString(Character hierarchicalDelimiter) {return getEscaped(hierarchicalDelimiter) +
+    private String getSubchainAsString(Character hierarchicalDelimiter) {
+        return keyword +
                 getChild().map(child -> " " + hierarchicalDelimiter + " " + child.getSubchainAsString(hierarchicalDelimiter))
                           .orElse("");
     }
@@ -101,6 +102,7 @@ public class Keyword extends ChainNode<Keyword> implements Comparable<Keyword> {
     /**
      * Gets the keyword of this node in the chain.
      */
+
     public String get() {
         return keyword;
     }

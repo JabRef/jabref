@@ -42,6 +42,8 @@ public class KeywordList implements Iterable<Keyword> {
         this(Arrays.asList(keywordChains));
     }
 
+    // TODO: #12810: we need a different parse method for BibTeX Context,
+    //  which preserves escaping and autoescaping
     public static KeywordList parse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
         if (StringUtil.isBlank(keywordString)) {
             return new KeywordList();
@@ -58,7 +60,7 @@ public class KeywordList implements Iterable<Keyword> {
         for (int i = 0; i < keywordString.length(); i++) {
             char currentChar = keywordString.charAt(i);
 
-            if (isEscaping) {
+            if (isEscaping && currentChar == delimiter) { // we only escape the keyword delimiter
                 currentToken.append(currentChar);
                 isEscaping = false;
             } else if (currentChar == '\\') {
@@ -96,6 +98,7 @@ public class KeywordList implements Iterable<Keyword> {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
+    // TODO: this will be the method we will use for BibTeX Context serializing -> escaping and autoescaping
     public static String serialize(List<Keyword> keywords, Character delimiter) {
         return keywords.stream().map(keyword -> keyword.getEscaped(delimiter)).collect(Collectors.joining(delimiter.toString()));
     }
