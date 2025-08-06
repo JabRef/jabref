@@ -84,10 +84,10 @@ public class SemanticConflictDetector {
 
         // Case 2: base exists, one side deleted, other modified -> conflict
         if (base != null) {
-            boolean localDeleted = local == null;
-            boolean remoteDeleted = remote == null;
-            boolean localChanged = !localDeleted && !Objects.equals(base.getFieldMap(), local.getFieldMap());
-            boolean remoteChanged = !remoteDeleted && !Objects.equals(base.getFieldMap(), remote.getFieldMap());
+            boolean localDeleted = (local == null);
+            boolean remoteDeleted = (remote == null);
+            boolean localChanged = !localDeleted && !base.getFieldMap().equals(local.getFieldMap());
+            boolean remoteChanged = !remoteDeleted && !base.getFieldMap().equals(remote.getFieldMap());
 
             if ((localChanged && remoteDeleted) || (remoteChanged && localDeleted)) {
                 return Optional.of(new ThreeWayEntryConflict(base, local, remote));
@@ -96,8 +96,8 @@ public class SemanticConflictDetector {
 
         // Case 3: base exists, both sides modified the entry -> check field-level diff
         if (base != null && local != null && remote != null) {
-            boolean localChanged = !Objects.equals(base.getFieldMap(), local.getFieldMap());
-            boolean remoteChanged = !Objects.equals(base.getFieldMap(), remote.getFieldMap());
+            boolean localChanged = !base.getFieldMap().equals(local.getFieldMap());
+            boolean remoteChanged = !base.getFieldMap().equals(remote.getFieldMap());
 
             if (localChanged && remoteChanged && hasConflictingFields(base, local, remote)) {
                 return Optional.of(new ThreeWayEntryConflict(base, local, remote));
@@ -145,10 +145,11 @@ public class SemanticConflictDetector {
             return false;
         }
 
-        boolean localChanged = !Objects.equals(base.getType(), local.getType());
-        boolean remoteChanged = !Objects.equals(base.getType(), remote.getType());
+        boolean localChanged = !base.getType().equals(local.getType());
+        boolean remoteChanged = !base.getType().equals(remote.getType());
+        boolean changedToDifferentTypes = !local.getType().equals(remote.getType());
 
-        return localChanged && remoteChanged && !Objects.equals(local.getType(), remote.getType());
+        return localChanged && remoteChanged && changedToDifferentTypes;
     }
 
     private static boolean modifiedOnBothSidesWithDisagreement(String baseVal, String localVal, String remoteVal) {

@@ -2,6 +2,7 @@ package org.jabref.logic.git.util;
 
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,20 +22,13 @@ public class GitHandlerRegistry {
     private final Map<Path, GitHandler> handlerCache = new ConcurrentHashMap<>();
 
     public GitHandler get(Path repoPath) {
-        if (repoPath == null) {
-            throw new IllegalArgumentException("Path must not be null");
-        }
-
-        Path normalized = repoPath.toAbsolutePath().normalize();
+        Path normalized = Objects.requireNonNull(repoPath, "Path must not be null")
+                                 .toAbsolutePath().normalize();
         return handlerCache.computeIfAbsent(normalized, GitHandler::new);
     }
 
     public Optional<GitHandler> fromAnyPath(Path anyPathInsideRepo) {
-        if (anyPathInsideRepo == null) {
-            throw new IllegalArgumentException("Path must not be null");
-        }
-
-        return GitHandler.findRepositoryRoot(anyPathInsideRepo)
+        return GitHandler.findRepositoryRoot(Objects.requireNonNull(anyPathInsideRepo, "Path must not be null"))
                          .map(this::get);
     }
 }
