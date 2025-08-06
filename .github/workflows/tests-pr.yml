@@ -22,7 +22,7 @@ jobs:
           path: pr_number.txt
 
   check_title_format:
-    name: PR title must not start with "Fix for issue <number>"
+    name: PR title must not contain "issue <number>"
     if: github.actor != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     runs-on: ubuntu-latest
     steps:
@@ -36,13 +36,8 @@ jobs:
           TITLE=$(gh pr view "${{ github.event.number }}" --json title --template '{{.title}}')
           echo "Title: $TITLE"
 
-          if echo "$TITLE" | grep -Eiq '^Fix for issue #?[0-9]+'; then
-            echo "❌ Title starts with 'Fix for issue <number>' — not allowed."
-            exit 1
-          fi
-
-          if echo "$TITLE" | grep -Eiq '^Fixed the issue'; then
-            echo "❌ Title starts with 'Fixed the issue' — not allowed."
+          if echo "$TITLE" | grep -Eiq 'issue ?#?[0-9]+.+'; then
+            echo "❌ Title contains 'issue <number>' — not allowed."
             exit 1
           fi
 
