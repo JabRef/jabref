@@ -7,6 +7,7 @@ import javafx.scene.control.TextArea;
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.GuiPreferences;
+import org.jabref.gui.theme.ThemeManager;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.logic.l10n.Localization;
@@ -24,6 +25,7 @@ public class AboutDialogView extends BaseDialog<Void> {
     @Inject private GuiPreferences preferences;
     @Inject private ClipBoardManager clipBoardManager;
     @Inject private BuildInfo buildInfo;
+    @Inject private ThemeManager themeManager;
 
     private AboutDialogViewModel viewModel;
 
@@ -35,6 +37,14 @@ public class AboutDialogView extends BaseDialog<Void> {
                   .setAsDialogPane(this);
 
         ControlHelper.setAction(copyVersionButton, getDialogPane(), event -> copyVersionToClipboard());
+
+        getDialogPane()
+                .sceneProperty()
+                .addListener((obs, oldScene, newScene) -> {
+                    if (newScene != null) {
+                        themeManager.updateFontStyle(newScene);
+                    }
+                });
     }
 
     public AboutDialogViewModel getViewModel() {
