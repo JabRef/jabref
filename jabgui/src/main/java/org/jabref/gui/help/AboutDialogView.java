@@ -36,11 +36,11 @@ public class AboutDialogView extends BaseDialog<Void> {
                   .load()
                   .setAsDialogPane(this);
 
-        ControlHelper.setAction(copyVersionButton, getDialogPane(), event -> copyVersionToClipboard());
+        ControlHelper.setAction(copyVersionButton, getDialogPane(), ignored -> copyVersionToClipboard());
 
         getDialogPane()
                 .sceneProperty()
-                .addListener((obs, oldScene, newScene) -> {
+                .addListener((_, ignored, newScene) -> {
                     if (newScene != null) {
                         themeManager.updateFontStyle(newScene);
                     }
