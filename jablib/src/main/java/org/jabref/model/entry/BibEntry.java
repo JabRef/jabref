@@ -884,6 +884,7 @@ public class BibEntry {
 
     public KeywordList getResolvedKeywords(Character delimiter, BibDatabase database) {
         Optional<String> keywordsContent = getResolvedFieldOrAlias(StandardField.KEYWORDS, database);
+        // TODO: we need to implement new KeywordList.parse for BibTeX context parsing
         return keywordsContent.map(content -> KeywordList.parse(content, delimiter)).orElse(new KeywordList());
     }
 
@@ -1052,7 +1053,7 @@ public class BibEntry {
                 return storedList.get();
             }
         }
-
+        // TODO: We need to implement new KeywordList.parse() method for bibtexContext parsing
         KeywordList keywords = getField(field)
                 .map(content -> KeywordList.parse(content, keywordSeparator))
                 .orElse(new KeywordList());
