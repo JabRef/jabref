@@ -13,8 +13,8 @@
     <Button fx:id="shortenDOIButton" disable="${controller.viewModel.isInvalidIdentifier}"
             onAction="#shortenID"
             styleClass="icon-button"
-            managed="${controller.viewModel.canFetchBibliographyInformationById}"
-            visible="${controller.viewModel.canFetchBibliographyInformationById}">
+            managed="${controller.viewModel.canShortenIdentifier}"
+            visible="${controller.viewModel.canShortenIdentifier}">
         <graphic>
             <JabRefIconView glyph="SHORTEN_DOI"/>
         </graphic>

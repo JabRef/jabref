@@ -39,7 +39,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         this.undoManager = undoManager;
         this.stateManager = stateManager;
         this.shortenDOIFormatter = new ShortenDOIFormatter();
-        configure(true, true);
+        configure(true, true, true);
     }
 
     @Override
@@ -79,7 +79,7 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
             String shortenedDOI = shortenDOIFormatter.format(doi);
             entry.setField(field, shortenedDOI);
             LOGGER.info("Shortened DOI: {} to {}", doi, shortenedDOI);
-            dialogService.notify(Localization.lang("Shortened DOI") + ": " + shortenedDOI);
+            dialogService.notify(Localization.lang("Shortened DOI to: %0", shortenedDOI));
         });
     }
 }
