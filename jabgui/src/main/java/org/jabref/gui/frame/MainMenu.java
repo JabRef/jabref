@@ -395,6 +395,8 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction(URLs.CHANGELOG_URL, dialogService, preferences.getExternalApplicationsPreferences()))
                 ),
 
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.OPEN_WELCOME_TAB, new SimpleCommand() {
                     @Override
                     public void execute() {
