@@ -1853,7 +1853,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* AboutDialog */
 #aboutDialog .about-heading {
-    -fx-font-size: 30;
+    -fx-font-size: 2.40em;
     -fx-text-fill: -jr-theme;
 }
 
@@ -1866,12 +1866,12 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #aboutDialog .dev-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: -10 0 0 0;
 }
 
 #aboutDialog .sub-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: 0.312em;
 }
 
