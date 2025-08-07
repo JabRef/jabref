@@ -125,26 +125,26 @@ Each individual field (such as title, author, etc.) may have one of the followin
 * Deleted: The field existed in the base version but is now missing (i.e., null).
 * Added: The field did not exist in the base version but was added in the local or remote version.
 
-| TestID | Base                          | Local               | Remote              | Description                                | Conflict |
-| ------ | ----------------------------- | ------------------- | ------------------- | ------------------------------------------ |----------|
-| F01    | U                             | U                   | U                   | All equal                                  | No       |
-| F02    | U                             | U                   | C                   | Remote changed                             | No       |
-| F03    | U                             | C                   | U                   | Local changed                              | No       |
-| F04    | U                             | C                   | C (=)               | Both changed to same value                 | No       |
-| F05    | U                             | C                   | C (≠)               | Both changed same field, different values  | Yes      |
-| F06    | U                             | D                   | U                   | Local deleted                              | No       |
-| F07    | U                             | U                   | D                   | Remote deleted                             | No       |
-| F08    | U                             | D                   | D                   | Both deleted                               | No       |
-| F09    | U                             | C                   | D                   | Local changed, remote deleted              | Yes      |
-| F10    | U                             | D                   | C                   | Local deleted, remote changed              | Yes      |
-| F11    | –                             | –                   | –                   | Field missing on all sides                 | No       |
-| F12    | –                             | A                   | –                   | Local added field                          | No       |
-| F13    | –                             | –                   | A                   | Remote added field                         | No       |
-| F14    | –                             | A                   | A (=)               | Both added same field with same value      | No       |
+| TestID | Base                          | Local               | Remote              | Description                                 | Conflict |
+|--------|-------------------------------|---------------------|---------------------|---------------------------------------------|----------|
+| F01    | U                             | U                   | U                   | All equal                                   | No       |
+| F02    | U                             | U                   | C                   | Remote changed                              | No       |
+| F03    | U                             | C                   | U                   | Local changed                               | No       |
+| F04    | U                             | C                   | C (=)               | Both changed to same value                  | No       |
+| F05    | U                             | C                   | C (≠)               | Both changed same field, different values   | Yes      |
+| F06    | U                             | D                   | U                   | Local deleted                               | No       |
+| F07    | U                             | U                   | D                   | Remote deleted                              | No       |
+| F08    | U                             | D                   | D                   | Both deleted                                | No       |
+| F09    | U                             | C                   | D                   | Local changed, remote deleted               | Yes      |
+| F10    | U                             | D                   | C                   | Local deleted, remote changed               | Yes      |
+| F11    | –                             | –                   | –                   | Field missing on all sides                  | No       |
+| F12    | –                             | A                   | –                   | Local added field                           | No       |
+| F13    | –                             | –                   | A                   | Remote added field                          | No       |
+| F14    | –                             | A                   | A (=)               | Both added same field with same value       | No       |
 | F15    | –                             | A                   | A (≠)               | Both added same field with different values | Yes      |
-| F16    | U                             | C                   | D                   | Changed in local, deleted in remote        | Yes      |
-| F17    | U                             | D                   | C                   | Deleted in local, changed in remote        | Yes      |
-| F18    | –                             | A                   | C                   | No base, both sides added different values | Yes      |
-| F19    | `{title=Hello, author=Alice}` | reordered           | unchanged           | Field order changed only                   | No       |
-| F20    | `@article{a}`                 | `@inproceedings{a}` | unchanged           | Entry type changed in local                | No       |
-| F21    | `@article{a}`                 | `@book{a}`          | `@inproceedings{a}` | Both changed entry type differently        | Yes      |
+| F16    | U                             | C                   | D                   | Changed in local, deleted in remote         | Yes      |
+| F17    | U                             | D                   | C                   | Deleted in local, changed in remote         | Yes      |
+| F18    | –                             | A                   | C                   | No base, both sides added different values  | Yes      |
+| F19    | `{title=Hello, author=Alice}` | reordered           | unchanged           | Field order changed only                    | No       |
+| F20    | `@article{a}`                 | `@inproceedings{a}` | unchanged           | Entry type changed in local                 | No       |
+| F21    | `@article{a}`                 | `@book{a}`          | `@inproceedings{a}` | Both changed entry type differently         | Yes      |
