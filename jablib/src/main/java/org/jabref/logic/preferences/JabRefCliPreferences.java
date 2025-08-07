@@ -471,7 +471,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
-    private WalkthroughPreferences walkthroughPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
 
     /**
@@ -2441,16 +2440,5 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
-    }
-
-    @Override
-    public WalkthroughPreferences getWalkthroughPreferences() {
-        if (walkthroughPreferences != null) {
-            return walkthroughPreferences;
-        }
-
-        walkthroughPreferences = new WalkthroughPreferences(getBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED));
-        EasyBind.listen(walkthroughPreferences.mainFileDirectoryCompletedProperty(), (_, _, newValue) -> putBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, newValue));
-        return walkthroughPreferences;
     }
 }

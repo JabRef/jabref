@@ -32,6 +32,7 @@ import org.jabref.gui.search.SearchType;
 import org.jabref.gui.sidepane.SidePaneType;
 import org.jabref.gui.util.CustomLocalDragboard;
 import org.jabref.gui.util.DialogWindowState;
+import org.jabref.gui.walkthrough.Walkthrough;
 import org.jabref.logic.command.CommandSelectionTab;
 import org.jabref.logic.search.IndexManager;
 import org.jabref.logic.util.BackgroundTask;
@@ -88,6 +89,7 @@ public class JabRefGuiStateManager implements StateManager {
     private final ObservableList<String> searchHistory = FXCollections.observableArrayList();
     private final List<AiChatWindow> aiChatWindows = new ArrayList<>();
     private final BooleanProperty editorShowing = new SimpleBooleanProperty(false);
+    private final OptionalObjectProperty<Walkthrough> activeWalkthrough = OptionalObjectProperty.empty();
 
     @Override
     public ObservableList<SidePaneType> getVisibleSidePaneComponents() {
@@ -294,5 +296,15 @@ public class JabRefGuiStateManager implements StateManager {
     @Override
     public BooleanProperty getEditorShowing() {
         return editorShowing;
+    }
+
+    @Override
+    public void setActiveWalkthrough(Walkthrough walkthrough) {
+        activeWalkthrough.set(Optional.ofNullable(walkthrough));
+    }
+
+    @Override
+    public Optional<Walkthrough> getActiveWalkthrough() {
+        return activeWalkthrough.get();
     }
 }
