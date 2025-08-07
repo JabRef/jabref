@@ -28,6 +28,7 @@ import com.airhacks.afterburner.injection.Injector;
 import com.airhacks.afterburner.views.ViewLoader;
 import jakarta.inject.Inject;
 
+import static org.jabref.model.entry.field.StandardField.DOI;
 import static org.jabref.model.entry.field.StandardField.EPRINT;
 import static org.jabref.model.entry.field.StandardField.ISBN;
 
@@ -35,6 +36,7 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
 
     @FXML private BaseIdentifierEditorViewModel<?> viewModel;
     @FXML private EditorTextField textField;
+    @FXML private Button shortenDOIButton;
     @FXML private Button fetchInformationByIdentifierButton;
     @FXML private Button lookupIdentifierButton;
 
@@ -54,6 +56,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         Injector.registerExistingAndInject(this);
 
         switch (field) {
+            case DOI ->
+                    this.viewModel = new DoiIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case ISBN ->
                     this.viewModel = new ISBNIdentifierEditorViewModel(suggestionProvider, fieldCheckers, dialogService, taskExecutor, preferences, undoManager, stateManager);
             case EPRINT ->
@@ -76,6 +80,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
                 new Tooltip(Localization.lang("Get bibliographic data from %0", field.getDisplayName())));
         lookupIdentifierButton.setTooltip(
                 new Tooltip(Localization.lang("Look up %0", field.getDisplayName())));
+        shortenDOIButton.setTooltip(
+                new Tooltip(Localization.lang("Shorten %0", field.getDisplayName())));
 
         textField.initContextMenu(new DefaultMenu(textField), preferences.getKeyBindingRepository());
 
@@ -110,5 +116,10 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
     @FXML
     private void openExternalLink() {
         viewModel.openExternalLink();
+    }
+
+    @FXML
+    private void shortenID() {
+        viewModel.shortenID();
     }
 }

@@ -140,8 +140,8 @@ public abstract class BaseIdentifierEditorViewModel<T extends Identifier> extend
         );
     }
 
-    public void shortenID() {
-        dialogService.showErrorDialogAndWait("Unable to shorten DOI");
+    public void shortenID() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Shortening of identifiers is not supported by this identifier editor.");
     }
 
     @Override
