@@ -80,7 +80,7 @@ public class GitStatusViewModel extends AbstractViewModel {
         }
         this.activeHandler = gitHandlerOpt.get();
 
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(path);
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(activeHandler);
         setTracking(snapshot.tracking());
         setSyncStatus(snapshot.syncStatus());
         setConflictDetected(snapshot.conflict());
