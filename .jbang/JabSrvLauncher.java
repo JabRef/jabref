@@ -67,12 +67,12 @@
 //DEPS org.bouncycastle:bcprov-jdk18on:1.81
 //DEPS com.konghq:unirest-modules-gson:4.5.0
 //DEPS jakarta.ws.rs:jakarta.ws.rs-api:4.0.0
-//DEPS org.glassfish.jersey.core:jersey-server:3.1.10
-//DEPS org.glassfish.jersey.inject:jersey-hk2:3.1.10
+//DEPS org.glassfish.jersey.core:jersey-server:3.1.11
+//DEPS org.glassfish.jersey.inject:jersey-hk2:3.1.11
 //DEPS org.glassfish.hk2:hk2-api:3.1.1
 //DEPS org.glassfish.hk2:hk2-utils:3.1.1
 //DEPS org.glassfish.hk2:hk2-locator:3.1.1
-//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.10
+//DEPS org.glassfish.jersey.containers:jersey-container-grizzly2-http:3.1.11
 //DEPS org.glassfish.grizzly:grizzly-http-server:4.0.2
 //DEPS org.glassfish.grizzly:grizzly-framework:4.0.2
 //DEPS jakarta.validation:jakarta.validation-api:3.1.1
