@@ -11,6 +11,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
@@ -177,13 +178,30 @@ public class WelcomeTab extends Tab {
 
         Button linkPdfWalkthroughButton = createWalkthroughButton(
                 Localization.lang("Link PDF to entries"),
-                IconTheme.JabRefIcons.TOGGLE_GROUPS,
+                IconTheme.JabRefIcons.PDF_FILE,
                 WalkthroughAction.PDF_LINK_WALKTHROUGH_NAME
         );
 
-        walkthroughsContainer.getChildren().addAll(mainFileDirWalkthroughButton, entryTableWalkthroughButton, linkPdfWalkthroughButton);
+        Button groupButton = createWalkthroughButton(
+                Localization.lang("Add group"),
+                IconTheme.JabRefIcons.NEW_GROUP,
+                WalkthroughAction.GROUP_WALKTHROUGH_NAME
+        );
 
-        return createVBoxContainer(header, walkthroughsContainer);
+        walkthroughsContainer.getChildren().addAll(
+                mainFileDirWalkthroughButton,
+                entryTableWalkthroughButton,
+                linkPdfWalkthroughButton,
+                groupButton
+        );
+
+        ScrollPane scrollPane = new ScrollPane(walkthroughsContainer);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("walkthroughs-scroll-pane");
+
+        return createVBoxContainer(header, scrollPane);
     }
 
     private VBox createCommunityBox() {

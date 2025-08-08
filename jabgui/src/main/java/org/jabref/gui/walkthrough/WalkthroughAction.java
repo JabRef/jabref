@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -36,6 +35,7 @@ public class WalkthroughAction extends SimpleCommand {
     public static final String PDF_LINK_WALKTHROUGH_NAME = "pdfLink";
     public static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME = "mainFileDirectory";
     public static final String CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME = "customizeEntryTable";
+    public static final String GROUP_WALKTHROUGH_NAME = "group";
 
     private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new ConcurrentHashMap<>();
 
@@ -59,10 +59,14 @@ public class WalkthroughAction extends SimpleCommand {
     private Walkthrough getWalkthrough(String name) {
         return WALKTHROUGH_CACHE.computeIfAbsent(name, _ ->
                 switch (name) {
-                    case MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME -> createMainFileDirectoryWalkthrough();
+                    case MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME ->
+                            createMainFileDirectoryWalkthrough();
                     case PDF_LINK_WALKTHROUGH_NAME -> createPdfLinkWalkthrough();
-                    case CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME -> createCustomizeEntryTableWalkthrough();
-                    default -> throw new IllegalArgumentException("Unknown walkthrough: " + name);
+                    case CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME ->
+                            createCustomizeEntryTableWalkthrough();
+                    case GROUP_WALKTHROUGH_NAME -> createGroupWalkthrough();
+                    default ->
+                            throw new IllegalArgumentException("Unknown walkthrough: " + name);
                 }
         );
     }
@@ -274,9 +278,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Confirm URL download"))
                         .content(new TextBlock(Localization.lang("Click \"OK\" to start downloading the PDF from the entered URL.")))
-                        .resolver(scene -> NodeResolver.predicate(DialogPane.class::isInstance)
-                                                       .resolve(scene)
-                                                       .map(node -> node instanceof DialogPane pane ? pane.lookupButton(ButtonType.OK) : null))
+                        .resolver(NodeResolver.buttonType(ButtonType.OK))
                         .trigger(Trigger.onClick())
                         .activeWindow(WindowResolver.not(stage))
                         .highlight(pdfDialogEffect)
@@ -292,6 +294,141 @@ public class WalkthroughAction extends SimpleCommand {
                         .continueButton(Localization.lang("Finish"))
                         .position(PanelPosition.RIGHT)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                .build();
+    }
+
+    private Walkthrough createGroupWalkthrough() {
+        WindowResolver mainResolver = () -> Optional.of(stage);
+        WalkthroughEffect groupHighlight = new WalkthroughEffect(
+                new WindowEffect(HighlightEffect.PING),
+                new WindowEffect(mainResolver, HighlightEffect.FULL_SCREEN_DARKEN)
+        );
+        String groupName = Localization.lang("Research Papers");
+        String addGroup = Localization.lang("Add group");
+        String addSelectedEntries = Localization.lang("Add selected entries to this group");
+
+        return Walkthrough
+                .create(stateManager)
+                // Step 1: Open example library
+                .addStep(WalkthroughStep.sideEffect(Localization.lang("Open Example Library"))
+                        .sideEffect(new OpenLibrarySideEffect(frame)))
+                // Step 2: Highlight groups sidepane
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Welcome to groups walkthrough"))
+                    .content(
+                                new TextBlock(Localization.lang("This walkthrough will guide you through creating and managing groups in JabRef. Groups help you organize your bibliography entries into collections. We've opened an example library so you can practice with real entries.")),
+                                new InfoBlock(Localization.lang("The groups panel on the left side shows all your groups in a tree structure. You can create groups, add entries to them, and organize them hierarchically."))
+                        )
+                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("GroupsSidePaneComponent")))
+                        .continueButton(Localization.lang("Continue"))
+                        .position(PanelPosition.RIGHT)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                // Step 3: Click "Add group" button
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Click on \"%0\" button", addGroup))
+                        .content(new TextBlock(Localization.lang("Let's create your first group. Click the \"%0\" button at the bottom of the groups panel to open the group creation dialog.", addGroup)))
+                        .resolver(NodeResolver.selectorWithText(".button", addGroup::equals))
+                        .trigger(Trigger.create().withWindowChangeListener().onClick())
+                        .position(TooltipPosition.TOP)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                // Step 4: Fill group creation dialog
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Enter group name"))
+                        .content(new TextBlock(Localization.lang("Type \"%0\" as the name for your group.", groupName)))
+                        .resolver(NodeResolver.fxId("nameField"))
+                        .trigger(Trigger.onTextEquals(groupName))
+                        .position(TooltipPosition.RIGHT)
+                        .activeWindow(WindowResolver.title(Localization.lang("Add group")))
+                        .showQuitButton(false)
+                        .highlight(groupHighlight))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Add a description (optional)"))
+                        .content(new TextBlock(Localization.lang("You can add a description to help remember what this group is for. For example, type \"Important research papers for my project\".")))
+                        .resolver(NodeResolver.fxId("descriptionField"))
+                        .trigger(Trigger.onTextInput())
+                        .position(TooltipPosition.RIGHT)
+                        .activeWindow(WindowResolver.title(Localization.lang("Add group")))
+                        .showQuitButton(false)
+                        .highlight(groupHighlight))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Select \"Explicit selection\""))
+                        .content(new TextBlock(Localization.lang("This allows you to manually choose which entries belong to this group.")))
+                        .resolver(NodeResolver.fxId("explicitRadioButton"))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.RIGHT)
+                        .activeWindow(WindowResolver.title(Localization.lang("Add group")))
+                        .showQuitButton(false)
+                        .highlight(groupHighlight))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Click \"OK\" to create the group"))
+                        .content(new TextBlock(Localization.lang("Now click \"OK\" to create your new group.")))
+                        .resolver(NodeResolver.buttonType(ButtonType.OK))
+                        .trigger(Trigger.onClick())
+                        .activeWindow(WindowResolver.title(Localization.lang("Add group")))
+                        .showQuitButton(false)
+                        .highlight(groupHighlight))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Click on \"All entries\" group"))
+                        .content(new TextBlock(Localization.lang("Select \"All entries\" to show all entries in the main table before dragging items to your new group.")))
+                        .resolver(NodeResolver.selectorWithText(
+                                ".tree-table-row-cell",
+                                text -> Localization.lang("All entries").equals(text)
+                                        || (text != null && text.contains(Localization.lang("All entries")))))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.RIGHT)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                // Step 5: Drag and drop entry to group
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Add entries to your group"))
+                        .content(
+                                new TextBlock(Localization.lang("Your \"%0\" group has been created. Now let's add some entries to it.", groupName)),
+                                new InfoBlock(Localization.lang("You can add entries to a group by dragging and dropping them. Try selecting the \"Ding_2006\" entry from the main table and drag it to your new group."))
+                        )
+                        .resolver(NodeResolver.selectorWithText(".table-row-cell",
+                                text -> "Ding_2006".equals(text)
+                                        || "Ding et al.".equals(text)
+                                        || "Chocolate and Prevention of Cardiovascular Disease: A Systematic Review".equals(text)))
+                        .continueButton(Localization.lang("Continue"))
+                        .position(PanelPosition.RIGHT)
+                        .highlight(HighlightEffect.PING))
+                // Step 6: Right-click to add entry
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Select the Corti_2009 entry"))
+                        .content(new TextBlock(Localization.lang("You can also add entries using the context menu. First, select the \"Corti_2009\" entry (Cocoa and Cardiovascular Health by Corti et al.) from the main table.")))
+                        .resolver(NodeResolver.selectorWithText(".table-row-cell",
+                                text -> "Corti_2009".equals(text)
+                                        || "Corti et al.".equals(text)
+                                        || "Cocoa and Cardiovascular Health".equals(text)))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.RIGHT)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Right-click on your group"))
+                        .content(new TextBlock(Localization.lang("Now right-click on your \"%0\" group to open the context menu.", groupName)))
+                        .resolver(NodeResolver.selectorWithText(".tree-table-row-cell",
+                                text -> text != null && text.contains(groupName)))
+                        .trigger(Trigger.create().withWindowChangeListener().onRightClick())
+                        .position(TooltipPosition.RIGHT)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Click \"%0\"", addSelectedEntries))
+                        .content(new TextBlock(Localization.lang("Click on \"%0\" to add the Corti_2009 entry to your group.", addSelectedEntries)))
+                        .resolver(NodeResolver.menuItem(addSelectedEntries))
+                        .trigger(Trigger.onClick())
+                        .activeWindow(WindowResolver.clazz(ContextMenu.class))
+                        .showQuitButton(false)
+                        .highlight(groupHighlight))
+                // Completion
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Groups walkthrough completed"))
+                        .content(
+                                new TextBlock(Localization.lang("You've learned how to create groups and add entries to them. Groups are a powerful way to organize your bibliography and can be nested to create hierarchical structures.")),
+                                new InfoBlock(Localization.lang("For more information about groups: [Groups documentation](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups)"))
+                        )
+                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("GroupsSidePaneComponent")))
+                        .continueButton(Localization.lang("Finish"))
+                        .position(PanelPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
                 .build();
     }

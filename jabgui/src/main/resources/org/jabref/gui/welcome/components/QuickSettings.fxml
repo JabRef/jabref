@@ -8,7 +8,7 @@
 
 <fx:root type="VBox" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
          fx:controller="org.jabref.gui.welcome.components.QuickSettings"
-         styleClass="welcome-content-column">
+         styleClass="welcome-section">
     <Label styleClass="welcome-header-label" text="%Quick settings"/>
     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
                 styleClass="quick-settings-scroll-pane">

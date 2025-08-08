@@ -1,15 +1,16 @@
 package org.jabref.gui.walkthrough.declarative;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.MenuItem;
 
 import org.jabref.gui.actions.StandardActions;
 import org.jabref.gui.icon.IconTheme;
@@ -74,6 +75,17 @@ public interface NodeResolver {
         return scene -> Optional.ofNullable(findNodeByAction(scene, action));
     }
 
+    /// Creates a resolver that finds a button by its button type, assuming the node
+    /// resolved is a [javafx.scene.control.DialogPane].
+    ///
+    /// @param buttonType the button type to find
+    /// @return a resolver that finds the button by button type
+    static NodeResolver buttonType(@NonNull ButtonType buttonType) {
+        return scene -> predicate(DialogPane.class::isInstance)
+                                .resolve(scene)
+                                .map(node -> node instanceof DialogPane pane ? pane.lookupButton(buttonType) : null);
+    }
+
     /// Creates a resolver that finds a node by selector first, then predicate.
     ///
     /// @param selector    the style class to match
@@ -110,11 +122,7 @@ public interface NodeResolver {
                                .ofNullable(item.getText())
                                .map(str -> str.contains(Localization.lang(key)))
                                .orElse(false))
-                       .flatMap(item -> Stream
-                               .iterate(item.getGraphic(), Objects::nonNull, Node::getParent)
-                               .filter(node -> node.getStyleClass().contains("menu-item"))
-                               .findFirst().stream()
-                       ).findFirst();
+                       .map(MenuItem::getStyleableNode).findFirst();
         };
     }
 

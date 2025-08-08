@@ -2584,13 +2584,13 @@ journalInfo .grid-cell-b {
 
 
 /* Quick Settings */
-
 .quick-settings-container,
 .walkthroughs-container {
     -fx-spacing: 0.6667em;
     -fx-alignment: top-left;
 }
 
+.walkthroughs-scroll-pane,
 .quick-settings-scroll-pane {
     -fx-max-height: 13.333em; /* item-size * 4 + gap * 3 = (0.0833 * 2 + 0.833 * 2 + 1) * 4 + 0.667 * 3 */
     -fx-min-height: 13.333em;
