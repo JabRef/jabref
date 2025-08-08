@@ -1853,7 +1853,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 /* AboutDialog */
 #aboutDialog .about-heading {
-    -fx-font-size: 30;
+    -fx-font-size: 2.40em;
     -fx-text-fill: -jr-theme;
 }
 
@@ -1866,12 +1866,12 @@ We want to have a look that matches our icons in the tool-bar */
 }
 
 #aboutDialog .dev-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: -10 0 0 0;
 }
 
 #aboutDialog .sub-heading {
-    -fx-font-size: 18;
+    -fx-font-size: 1.44em;
     -fx-padding: 0.312em;
 }
 
@@ -2811,47 +2811,47 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
 }
 
+.walkthrough-spotlight {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
+.walkthrough-ping {
+    /* -jr-accent with 75% Alpha */
+    -fx-fill: rgba(163, 183, 230, 0.75);
+}
+
+.walkthrough-darken {
+    /* -jr-blue-gray-4 with 75% Alpha */
+    -fx-fill: rgba(34, 47, 62, 0.75);
+}
+
 /* Tooltip Content */
 .walkthrough-tooltip-content-container {
-    -fx-spacing: 0.75em;
-    -fx-padding: 1em;
-}
-
-.walkthrough-tooltip-title {
-    -fx-text-fill: -jr-theme;
-    -fx-font-size: 1.4em;
-    -fx-font-weight: bold;
-}
-
-.walkthrough-tooltip-content {
-    -fx-spacing: 0.5em;
-}
-
-.walkthrough-tooltip-actions {
-    -fx-spacing: 0;
-}
-
-.walkthrough-panel {
-    -fx-background-color: -jr-white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 2);
-    -fx-padding: 1em;
     -fx-spacing: 1em;
+    -fx-padding: 1em;
 }
 
-.walkthrough-title {
+.walkthrough-title-container {
+    -fx-max-width: infinity;
+}
+
+.walkthrough-tooltip-title,
+.walkthrough-title,
+.walkthrough-tooltip-title .markdown-h2,
+.walkthrough-title .markdown-h2 {
     -fx-text-fill: -jr-theme;
-    -fx-font-size: 3em;
+    -fx-fill: -jr-theme;
     -fx-font-weight: bold;
-}
-
-.walkthrough-side-panel-vertical .walkthrough-title,
-.walkthrough-side-panel-horizontal .walkthrough-title {
-    -fx-font-size: 2em;
+    -fx-font-size: 1.75em;
+    -fx-line-spacing: -0.25em;
 }
 
 .walkthrough-side-panel-vertical,
 .walkthrough-side-panel-horizontal {
+    -fx-spacing: 1em;
     -fx-padding: 2em;
+    -fx-background-color: derive(-jr-gray-1, 40%);
 }
 
 .walkthrough-side-panel-vertical {
@@ -2867,59 +2867,58 @@ journalInfo .grid-cell-b {
 }
 
 .walkthrough-content {
-    -fx-spacing: 0.8em;
+    -fx-spacing: 1.5em;
 }
 
-.walkthrough-step-counter {
-    -fx-background-color: -jr-base;
-    -fx-text-fill: -jr-gray-3;
-    -fx-font-size: 1em;
-    -fx-background-radius: 100;
-    -fx-padding: 0.25em 0.75em;
-    -fx-alignment: center;
+/* Text content containers and flows */
+.walkthrough-text-container {
+    -fx-max-width: infinity;
 }
 
 .walkthrough-text-content {
     -fx-text-fill: -jr-gray-3;
     -fx-font-size: 1.2em;
-    -fx-wrap-text: true;
-    -fx-alignment: baseline-left;
+    -fx-line-spacing: 0.5em;
 }
 
+/* Info block styling */
 .walkthrough-info-container {
     -fx-border-color: -jr-theme;
-    -fx-border-width: 0 0 0 1;
+    -fx-border-width: 0 0 0 0.15em;
     -fx-padding: 0 0 0 0.75em;
-    -fx-spacing: 0.25em;
-    -fx-alignment: center-left;
+    -fx-spacing: 0.5em;
+    -fx-alignment: top-left;
 }
 
 .walkthrough-info-container .ikonli-font-icon {
     -fx-icon-color: -jr-theme;
-    -fx-font-size: 1.2em;
+    /* 20px is used, since using em seems to lead infinite icon size growth */
+    -fx-icon-size: 20px;
+    /* Center align icon with the text */
+    -fx-translate-y: -0.05em;
 }
 
-.walkthrough-info-container label {
+.walkthrough-info-text {
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.2em;
-    -fx-wrap-text: true;
-    -fx-alignment: center-left;
+    -fx-line-spacing: 0.5em;
 }
 
+/* Action buttons */
 .walkthrough-actions {
     -fx-spacing: 0;
 }
 
 .walkthrough-right-actions {
-    -fx-spacing: 4;
+    -fx-spacing: 0.5em;
 }
 
 .walkthrough-continue-button {
     -fx-background-color: -jr-theme;
     -fx-text-fill: -jr-white;
     -fx-font-size: 1.1em;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2928,9 +2927,9 @@ journalInfo .grid-cell-b {
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.1em;
     -fx-border-color: -jr-theme;
-    -fx-border-width: 0.5;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-border-width: 0.08em;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-padding: 0.25em 0.5em;
 }
 
@@ -2938,15 +2937,49 @@ journalInfo .grid-cell-b {
     -fx-background-color: transparent;
     -fx-text-fill: -jr-theme;
     -fx-font-size: 1.1em;
-    -fx-border-radius: 4;
-    -fx-background-radius: 4;
+    -fx-border-radius: 0.25em;
+    -fx-background-radius: 0.25em;
     -fx-padding: 0.25em 0.5em;
 }
 
+.walkthrough-quit-button {
+    -fx-background-color: -jr-gray-1;
+    -fx-border-color: transparent;
+    /* For easy clipping */
+    -fx-padding: 0.5em;
+    -fx-min-width: 2em;
+    -fx-min-height: 2em;
+    -fx-pref-width: 2em;
+    -fx-pref-height: 2em;
+    -fx-max-width: 2em;
+    -fx-max-height: 2em;
+}
+
+.walkthrough-quit-button:hover {
+    -fx-background-color: derive(-jr-gray-1, -20%);
+}
+
+.walkthrough-quit-button:pressed {
+    -fx-background-color: derive(-jr-gray-1, 30%);
+}
+
+.walkthrough-quit-button .glyph-icon,
+.walkthrough-quit-button .ikonli-font-icon {
+    -fx-icon-color: -jr-theme;
+    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme;
+    -fx-font-size: 1.2em;
+}
+
+.walkthrough-fullscreen-content {
+    -fx-padding: 0.1875em;
+    -fx-spacing: 1em;
+    -fx-max-width: 48em;
+    -fx-fill-width: true;
+}
 
 /* Markdown styles */
 .markdown-textflow {
-    -fx-line-spacing: 2;
     -fx-text-alignment: left;
 }
 

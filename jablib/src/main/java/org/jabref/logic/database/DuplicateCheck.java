@@ -241,29 +241,41 @@ public class DuplicateCheck {
         allFields.addAll(one.getFields());
         allFields.addAll(two.getFields());
 
+        // totalCount counts the equal "properties" of an entry, i.e. the number of fields, the entry type, and the comment
+        int totalCount = allFields.size();
+
         int score = 0;
         for (final Field field : allFields) {
             if (isSingleFieldEqual(one, two, field)) {
                 score++;
             }
         }
-        if (score == allFields.size()) {
+
+        totalCount++;
+        if (!haveDifferentEntryType(one, two)) {
+            score++;
+        }
+
+        totalCount++;
+        if (isCommentEqual(one, two)) {
+            score++;
+        }
+
+        if (score == totalCount) {
             return 1.01; // Just to make sure we can use score > 1 without trouble.
         }
-        return (double) score / allFields.size();
+        return (double) score / totalCount;
     }
 
+    private static boolean isCommentEqual(BibEntry one, BibEntry two) {
+        return StringUtil.equalsUnifiedLineBreak(Optional.of(one.getUserComments()), Optional.of(two.getUserComments()));
+    }
+
+    /// Compares the string content of the given field at each entry character by character.
+    ///
+    /// @return true if the content is equal (with normalized linebreaks), false otherwise.
     private static boolean isSingleFieldEqual(BibEntry one, BibEntry two, Field field) {
-        final Optional<String> stringOne = one.getField(field);
-        final Optional<String> stringTwo = two.getField(field);
-        if (stringOne.isEmpty() && stringTwo.isEmpty()) {
-            return true;
-        }
-        if (stringOne.isEmpty() || stringTwo.isEmpty()) {
-            return false;
-        }
-        return StringUtil.unifyLineBreaks(stringOne.get(), OS.NEWLINE).equals(
-                StringUtil.unifyLineBreaks(stringTwo.get(), OS.NEWLINE));
+        return StringUtil.equalsUnifiedLineBreak(one.getField(field), two.getField(field));
     }
 
     /**
@@ -324,6 +336,7 @@ public class DuplicateCheck {
             return true;
         }
 
+        // TODO: Work on haveDifferentEntryType - InCollection and InProceedings could point to the same publication
         if (haveDifferentEntryType(one, two) ||
                 haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
