@@ -71,8 +71,8 @@ public class IdentifierEditor extends HBox implements FieldEditorFX {
         }
 
         ViewLoader.view(this)
-                .root(this)
-                .load();
+                 .root(this)
+                 .load();
 
         textField.textProperty().bindBidirectional(viewModel.textProperty());
 
