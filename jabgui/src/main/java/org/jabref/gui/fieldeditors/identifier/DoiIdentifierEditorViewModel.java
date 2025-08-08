@@ -78,8 +78,13 @@ public class DoiIdentifierEditorViewModel extends BaseIdentifierEditorViewModel<
         entry.getField(field).ifPresent(doi -> {
             String shortenedDOI = shortenDOIFormatter.format(doi);
             entry.setField(field, shortenedDOI);
+            if (shortenedDOI.equals(doi)) {
+                LOGGER.info("DOI is already shortened");
+                dialogService.notify(Localization.lang("DOI is already shortened"));
+            } else {
             LOGGER.info("Shortened DOI: {} to {}", doi, shortenedDOI);
             dialogService.notify(Localization.lang("Shortened DOI to: %0", shortenedDOI));
+            }
         });
     }
 }
