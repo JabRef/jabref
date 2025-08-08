@@ -63,11 +63,29 @@ public class JabKit {
             final JabRefCliPreferences preferences = JabRefCliPreferences.getInstance();
             Injector.setModelOrService(CliPreferences.class, preferences);
 
-            Injector.setModelOrService(BuildInfo.class, new BuildInfo());
+            BuildInfo buildInfo = new BuildInfo();
+            Injector.setModelOrService(BuildInfo.class, buildInfo);
 
             BibEntryTypesManager entryTypesManager = preferences.getCustomEntryTypesRepository();
             Injector.setModelOrService(BibEntryTypesManager.class, entryTypesManager);
 
+            ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
+            CommandLine commandLine = new CommandLine(argumentProcessor);
+            String usageHeader = BuildInfo.JABREF_BANNER.formatted(buildInfo.version) + "\n" + JABKIT_BRAND;
+            commandLine.getCommandSpec().usageMessage().header(usageHeader);
+            applyUsageFooters(commandLine,
+                    ArgumentProcessor.getAvailableImportFormats(preferences),
+                    ArgumentProcessor.getAvailableExportFormats(preferences),
+                    WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
+
+            // Show help when no arguments are given. Placed after header and footer setup
+            // to ensure output matches --help command
+            if (args.length == 0) {
+                commandLine.usage(System.out);
+                System.exit(0);
+            }
+
+            // Heavy initialization only needed when actually executing a command
             Injector.setModelOrService(JournalAbbreviationRepository.class, JournalAbbreviationLoader.loadRepository(preferences.getJournalAbbreviationPreferences()));
             Injector.setModelOrService(ProtectedTermsLoader.class, new ProtectedTermsLoader(preferences.getProtectedTermsPreferences()));
 
@@ -76,15 +94,6 @@ public class JabKit {
 
             Injector.setModelOrService(FileUpdateMonitor.class, new DummyFileUpdateMonitor());
 
-            // Process arguments
-            ArgumentProcessor argumentProcessor = new ArgumentProcessor(preferences, entryTypesManager);
-            CommandLine commandLine = new CommandLine(argumentProcessor);
-            String usageHeader = BuildInfo.JABREF_BANNER.formatted(new BuildInfo().version) + "\n" + JABKIT_BRAND;
-            commandLine.getCommandSpec().usageMessage().header(usageHeader);
-            applyUsageFooters(commandLine,
-                    ArgumentProcessor.getAvailableImportFormats(preferences),
-                    ArgumentProcessor.getAvailableExportFormats(preferences),
-                    WebFetchers.getSearchBasedFetchers(preferences.getImportFormatPreferences(), preferences.getImporterPreferences()));
             int result = commandLine.execute(args);
             System.exit(result);
         } catch (Exception ex) {
