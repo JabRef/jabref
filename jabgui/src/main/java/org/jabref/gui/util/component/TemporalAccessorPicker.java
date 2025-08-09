@@ -11,6 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -99,7 +100,7 @@ public class TemporalAccessorPicker extends DatePicker {
     }
 
     public final StringConverter<TemporalAccessor> getStringConverter() {
-        StringConverter<TemporalAccessor> newConverter = new StringConverter<>() {
+        Supplier<StringConverter<TemporalAccessor>> converterSupplier = () -> new StringConverter<>() {
             @Override
             public String toString(TemporalAccessor value) {
                 return defaultFormatter.format(value);
@@ -118,7 +119,7 @@ public class TemporalAccessorPicker extends DatePicker {
                 }
             }
         };
-        return Objects.requireNonNullElse(stringConverterProperty().get(), newConverter);
+        return Objects.requireNonNullElseGet(stringConverterProperty().get(), converterSupplier);
     }
 
     public final void setStringConverter(StringConverter<TemporalAccessor> value) {
