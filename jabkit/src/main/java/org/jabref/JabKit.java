@@ -52,7 +52,17 @@ import picocli.CommandLine;
 ///
 /// Does not do any preference migrations.
 public class JabKit {
-    private static final Logger LOGGER = LoggerFactory.getLogger(JabKit.class);
+    // J.U.L. bridge to SLF4J must be initialized before any logger is created, see initLogging()
+    private static Logger LOGGER;
+
+    private enum LogLevel {
+        DEBUG, INFO, ERROR;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+    }
 
     private static final String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
 
@@ -132,10 +142,8 @@ public class JabKit {
                                      .collect(Collectors.joining(", ")));
     }
 
-    /**
-     * This needs to be called as early as possible. After the first log write, it
-     * is not possible to alter the log configuration programmatically anymore.
-     */
+    /// This needs to be called as early as possible. After the first log writing, it
+    /// is not possible to alter the log configuration programmatically anymore.
     public static void initLogging(String[] args) {
         // routeLoggingToSlf4J
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -143,8 +151,14 @@ public class JabKit {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug or --porcelain
-        boolean isDebugEnabled = Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase);
-        boolean isPorcelainEnabled = Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase);
+        LogLevel logLevel;
+        if (Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)) {
+            logLevel = LogLevel.DEBUG;
+        } else if (Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase)) {
+            logLevel = LogLevel.ERROR;
+        } else {
+            logLevel = LogLevel.INFO;
+        }
 
         // addLogToDisk
         // We cannot use `Injector.instantiateModelOrService(BuildInfo.class).version` here, because this initializes logging
@@ -152,31 +166,25 @@ public class JabKit {
         try {
             Files.createDirectories(directory);
         } catch (IOException e) {
+            LOGGER = LoggerFactory.getLogger(JabKit.class);
             LOGGER.error("Could not create log directory {}", directory, e);
             return;
-        }
-
-        String level;
-        if (isDebugEnabled) {
-            level = "debug";
-        } else if (isPorcelainEnabled) {
-            level = "error";
-        } else {
-            level = "info";
         }
 
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
-                "level", level,
+                "level", logLevel.toString(),
                 "writerFile", "rolling file",
-                "writerFile.level", isDebugEnabled ? "debug" : "info",
+                "writerFile.logLevel", logLevel == LogLevel.DEBUG ? LogLevel.DEBUG.toString() : LogLevel.INFO.toString(),
                 // We need to manually join the path, because ".resolve" does not work on Windows, because ":" is not allowed in file names on Windows
                 "writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt",
                 "writerFile.charset", "UTF-8",
                 "writerFile.policies", "startup",
                 "writerFile.backups", "30");
         configuration.forEach(Configuration::set);
+
+        LOGGER = LoggerFactory.getLogger(JabKit.class);
     }
 
     private static void configureProxy(ProxyPreferences proxyPreferences) {
