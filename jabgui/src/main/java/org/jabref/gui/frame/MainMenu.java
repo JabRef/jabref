@@ -7,6 +7,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.stage.Stage;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -54,14 +55,14 @@ import org.jabref.gui.linkedfile.RedownloadMissingFilesAction;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOffline;
 import org.jabref.gui.maintable.NewLibraryFromPdfActionOnline;
 import org.jabref.gui.mergeentries.BatchEntryMergeWithFetchedDataAction;
-import org.jabref.gui.mergeentries.MergeEntriesAction;
 import org.jabref.gui.mergeentries.MergeWithFetchedEntryAction;
+import org.jabref.gui.mergeentries.threewaymerge.MergeEntriesAction;
 import org.jabref.gui.newentry.NewEntryDialogTab;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.ShowPreferencesAction;
 import org.jabref.gui.preview.CopyCitationAction;
 import org.jabref.gui.preview.PreviewControls;
-import org.jabref.gui.push.PushToApplicationCommand;
+import org.jabref.gui.push.GuiPushToApplicationCommand;
 import org.jabref.gui.search.RebuildFulltextSearchIndexAction;
 import org.jabref.gui.shared.ConnectToSharedDatabaseCommand;
 import org.jabref.gui.shared.PullChangesFromSharedAction;
@@ -90,11 +91,13 @@ import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.entry.field.SpecialField;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import com.airhacks.afterburner.injection.Injector;
+
 public class MainMenu extends MenuBar {
     private final JabRefFrame frame;
     private final FileHistoryMenu fileHistoryMenu;
     private final SidePane sidePane;
-    private final PushToApplicationCommand pushToApplicationCommand;
+    private final GuiPushToApplicationCommand pushToApplicationCommand;
     private final GuiPreferences preferences;
     private final StateManager stateManager;
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -111,7 +114,7 @@ public class MainMenu extends MenuBar {
     public MainMenu(JabRefFrame frame,
                     FileHistoryMenu fileHistoryMenu,
                     SidePane sidePane,
-                    PushToApplicationCommand pushToApplicationCommand,
+                    GuiPushToApplicationCommand pushToApplicationCommand,
                     GuiPreferences preferences,
                     StateManager stateManager,
                     FileUpdateMonitor fileUpdateMonitor,
@@ -235,7 +238,9 @@ public class MainMenu extends MenuBar {
         edit.addEventHandler(ActionEvent.ACTION, event -> {
             // Work around for mac only issue, where cmd+v on a dialogue triggers the paste action of menu item, resulting in addition of the pasted content in the MainTable.
             // If the mainscreen is not focused, the actions captured by menu are consumed.
-            if (OS.OS_X && !frame.getMainStage().focusedProperty().get()) {
+            boolean isStageUnfocused = !Injector.instantiateModelOrService(Stage.class).focusedProperty().get();
+
+            if (OS.OS_X && isStageUnfocused) {
                 event.consume();
             }
         });
@@ -377,6 +382,7 @@ public class MainMenu extends MenuBar {
                 factory.createMenuItem(StandardActions.SEARCH_FOR_UPDATES, new SearchForUpdateAction(preferences, dialogService, taskExecutor)),
                 factory.createSubMenu(StandardActions.WEB_MENU,
                         factory.createMenuItem(StandardActions.OPEN_WEBPAGE, new OpenBrowserAction(URLs.WEBPAGE_URL, dialogService, preferences.getExternalApplicationsPreferences())),
+                        factory.createMenuItem(StandardActions.OPEN_PRIVACY_POLICY, new OpenBrowserAction(URLs.PRIVACY_POLICY_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_BLOG, new OpenBrowserAction(URLs.BLOG_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_LINKEDIN, new OpenBrowserAction(URLs.LINKEDIN_URL, dialogService, preferences.getExternalApplicationsPreferences())),
                         factory.createMenuItem(StandardActions.OPEN_FACEBOOK, new OpenBrowserAction(URLs.FACEBOOK_URL, dialogService, preferences.getExternalApplicationsPreferences())),
@@ -389,6 +395,8 @@ public class MainMenu extends MenuBar {
                         factory.createMenuItem(StandardActions.OPEN_CHANGELOG, new OpenBrowserAction(URLs.CHANGELOG_URL, dialogService, preferences.getExternalApplicationsPreferences()))
                 ),
 
+                new SeparatorMenuItem(),
+
                 factory.createMenuItem(StandardActions.OPEN_WELCOME_TAB, new SimpleCommand() {
                     @Override
                     public void execute() {
@@ -398,7 +406,7 @@ public class MainMenu extends MenuBar {
 
                 new SeparatorMenuItem(),
 
-                factory.createMenuItem(StandardActions.ABOUT, new AboutAction())
+                factory.createMenuItem(StandardActions.ABOUT, new AboutAction(dialogService))
         );
 
         // @formatter:on

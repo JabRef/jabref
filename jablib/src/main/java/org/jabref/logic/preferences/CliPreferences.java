@@ -26,6 +26,7 @@ import org.jabref.logic.net.ProxyPreferences;
 import org.jabref.logic.net.ssl.SSLPreferences;
 import org.jabref.logic.openoffice.OpenOfficePreferences;
 import org.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.logic.remote.RemotePreferences;
 import org.jabref.logic.search.SearchPreferences;
 import org.jabref.logic.util.io.AutoLinkPreferences;
@@ -114,4 +115,6 @@ public interface CliPreferences {
     LastFilesOpenedPreferences getLastFilesOpenedPreferences();
 
     OpenOfficePreferences getOpenOfficePreferences(JournalAbbreviationRepository journalAbbreviationRepository);
+
+    PushToApplicationPreferences getPushToApplicationPreferences();
 }

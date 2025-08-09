@@ -1,15 +1,15 @@
 plugins {
     id("org.jabref.gradle.base.repositories")
     id("org.jabref.gradle.feature.compile") // for openrewrite
-    id("org.openrewrite.rewrite") version "7.6.1"
-    id("org.itsallcode.openfasttrace") version "3.0.1"
+    id("org.openrewrite.rewrite") version "7.12.1"
+    id("org.itsallcode.openfasttrace") version "3.1.0"
 }
 
 // OpenRewrite should rewrite all sources
 // This is the behavior when applied in the root project (https://docs.openrewrite.org/reference/gradle-plugin-configuration#multi-module-gradle-projects)
 
 dependencies {
-    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.8.0"))
+    rewrite(platform("org.openrewrite.recipe:rewrite-recipe-bom:3.12.1"))
     rewrite("org.openrewrite.recipe:rewrite-static-analysis")
     rewrite("org.openrewrite.recipe:rewrite-logging-frameworks")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks")
@@ -37,6 +37,7 @@ rewrite {
 requirementTracing {
     inputDirectories.setFrom(files("docs",
             "jablib/src/main/java", "jablib/src/test/java",
+            "jabls/src/main/java", "jabls/src/test/java",
             "jabkit/src/main/java", "jabkit/src/test/java",
             "jabgui/src/main/java", "jabgui/src/test/java",
             "jabsrv/src/main/java", "jabsrv/src/test/java"

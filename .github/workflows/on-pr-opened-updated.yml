@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       (github.repository == 'JabRef/jabref') &&
+      (github.event.pull_request.head.repo.full_name != 'JabRef/jabref') &&
       !(
         (github.actor == 'dependabot[bot]') ||
         (
@@ -85,6 +86,7 @@ jobs:
           skip-if-not-in-project: true
   ensure_assignment:
     name: Ensure that contributor is assigned (fails if not commented on issue)
+    if: github.event.pull_request.head.repo.full_name != 'JabRef/jabref'
     # after determine_issue_number to ensure that there is only one failure because of no ticket number
     needs: determine_issue_number
     runs-on: ubuntu-latest
@@ -114,10 +116,25 @@ jobs:
           # Append the new assignee
           UPDATED_ASSIGNEES=$(echo "$ASSIGNEES" | jq --arg new "${{ github.event.pull_request.user.login }}" '. + [$new]')
 
+          LABELS=$(gh api repos/${{ github.repository }}/issues/${{ needs.determine_issue_number.outputs.issue_number }}/labels --jq '.[].name')
+          LABEL=$(echo "$LABELS" | grep -E '^good (first|second|third|forth) issue$' || true)
+          if [ -n "$LABEL" ]; then
+            echo "✅ Found label: $LABEL"
+            SILENT=false
+            # Apply label
+            gh issue edit "${{ github.event.pull_request.number }}" --add-label "$LABEL"
+          else
+            echo "🚫 Silent fail if not possible to add assignee"
+            SILENT=true
+          fi
+
           # Update issue with the new assignee list
           echo "Updating issue #${{ needs.determine_issue_number.outputs.issue_number }} updated with assignees: $UPDATED_ASSIGNEES..."
-          gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
-
+          if [ "$SILENT" = true ]; then
+            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}") || true
+          else
+            gh api -X PATCH /repos/JabRef/jabref/issues/${{ needs.determine_issue_number.outputs.issue_number }} --input <(echo "{\"assignees\": $UPDATED_ASSIGNEES}")
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add label "📌 Pinned"

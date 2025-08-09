@@ -12,11 +12,11 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.JabRefDialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.StandardActions;
-import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.push.CitationCommandString;
+import org.jabref.logic.push.PushToApplicationPreferences;
 import org.jabref.model.database.BibDatabase;
 import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntry;
@@ -61,9 +61,9 @@ class CopyMoreActionTest {
         keys.add("abc");
         dois.add("10.1145/3377811.3380330");
 
-        ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-        when(externalApplicationsPreferences.getCiteCommand()).thenReturn(new CitationCommandString("\\cite{", ",", "}"));
-        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+        PushToApplicationPreferences pushToApplicationPreferences = mock(PushToApplicationPreferences.class);
+        when(pushToApplicationPreferences.getCiteCommand()).thenReturn(new CitationCommandString("\\cite{", ",", "}"));
+        when(preferences.getPushToApplicationPreferences()).thenReturn(pushToApplicationPreferences);
     }
 
     @Test
@@ -79,7 +79,7 @@ class CopyMoreActionTest {
 
     @Test
     void executeCopyTitleWithNoTitle() {
-        BibEntry entryWithNoTitle = (BibEntry) entry.clone();
+        BibEntry entryWithNoTitle = new BibEntry(entry);
         entryWithNoTitle.clearField(StandardField.TITLE);
         ObservableList<BibEntry> entriesWithNoTitles = FXCollections.observableArrayList(entryWithNoTitle);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoTitles));
@@ -95,7 +95,7 @@ class CopyMoreActionTest {
 
     @Test
     void executeCopyTitleOnPartialSuccess() {
-        BibEntry entryWithNoTitle = (BibEntry) entry.clone();
+        BibEntry entryWithNoTitle = new BibEntry(entry);
         entryWithNoTitle.clearField(StandardField.TITLE);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoTitle, entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
@@ -129,7 +129,7 @@ class CopyMoreActionTest {
 
     @Test
     void executeCopyKeyWithNoKey() {
-        BibEntry entryWithNoKey = (BibEntry) entry.clone();
+        BibEntry entryWithNoKey = new BibEntry(entry);
         entryWithNoKey.clearCiteKey();
         ObservableList<BibEntry> entriesWithNoKeys = FXCollections.observableArrayList(entryWithNoKey);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoKeys));
@@ -145,7 +145,7 @@ class CopyMoreActionTest {
 
     @Test
     void executeCopyKeyOnPartialSuccess() {
-        BibEntry entryWithNoKey = (BibEntry) entry.clone();
+        BibEntry entryWithNoKey = new BibEntry(entry);
         entryWithNoKey.clearCiteKey();
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoKey, entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));
@@ -179,7 +179,7 @@ class CopyMoreActionTest {
 
     @Test
     void executeCopyDoiWithNoDoi() {
-        BibEntry entryWithNoDoi = (BibEntry) entry.clone();
+        BibEntry entryWithNoDoi = new BibEntry(entry);
         entryWithNoDoi.clearField(StandardField.DOI);
         ObservableList<BibEntry> entriesWithNoDois = FXCollections.observableArrayList(entryWithNoDoi);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(entriesWithNoDois));
@@ -195,7 +195,7 @@ class CopyMoreActionTest {
 
     @Test
     void executeCopyDoiOnPartialSuccess() {
-        BibEntry entryWithNoDoi = (BibEntry) entry.clone();
+        BibEntry entryWithNoDoi = new BibEntry(entry);
         entryWithNoDoi.clearField(StandardField.DOI);
         ObservableList<BibEntry> mixedEntries = FXCollections.observableArrayList(entryWithNoDoi, entry);
         BibDatabaseContext databaseContext = new BibDatabaseContext(new BibDatabase(mixedEntries));

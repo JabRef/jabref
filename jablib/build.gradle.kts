@@ -18,7 +18,8 @@ plugins {
 
     // id("dev.jbang") version "0.2.0"
     // Workaround for https://github.com/jbangdev/jbang-gradle-plugin/issues/7
-    id("com.github.koppor.jbang-gradle-plugin") version "fix-7-SNAPSHOT"
+    // Build state at https://jitpack.io/#koppor/jbang-gradle-plugin/fix-7-SNAPSHOT
+    id("com.github.koppor.jbang-gradle-plugin") version "8a85836163"
 }
 
 var version: String = project.findProperty("projVersion")?.toString() ?: "0.1.0"
@@ -46,7 +47,7 @@ tasks.withType<com.autonomousapps.tasks.CodeSourceExploderTask>().configureEach 
 val mockitoAgent = configurations.create("mockitoAgent")
 
 dependencies {
-    implementation(enforcedPlatform(project(":versions")))
+    // api(platform(project(":versions")))
 
     implementation("org.openjfx:javafx-base")
 
@@ -206,8 +207,10 @@ dependencies {
     testImplementation("org.xmlunit:xmlunit-core")
     testImplementation("org.xmlunit:xmlunit-matchers")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
+
+    testImplementation("com.tngtech.archunit:archunit")
     testImplementation("com.tngtech.archunit:archunit-junit5-api")
+    testRuntimeOnly("com.tngtech.archunit:archunit-junit5-engine")
 
     testImplementation("org.hamcrest:hamcrest")
 
@@ -537,8 +540,13 @@ tasks.named<Jar>("sourcesJar") {
     )
 }
 
-tasks.withType<GenerateModuleMetadata> {
-    suppressedValidationErrors.add("enforced-platform")
+
+// Include the BOM in the generated POM ("inline" / "inlining")
+// Source: https://github.com/gradle/gradle/issues/10861#issuecomment-3027387345
+publishing.publications.withType<MavenPublication>().configureEach {
+    versionMapping {
+        allVariants { fromResolutionResult() }
+    }
 }
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
@@ -557,4 +565,7 @@ javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("org.xmlunit.matchers")
     requires.add("wiremock")
     requires.add("wiremock.slf4j.spi.shim")
+
+    requires.add("com.tngtech.archunit")
+    requires.add("com.tngtech.archunit.junit5.api")
 }

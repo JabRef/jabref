@@ -20,13 +20,13 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.gui.util.OptionalObjectProperty;
 import org.jabref.logic.ai.AiDefaultPreferences;
 import org.jabref.logic.ai.AiPreferences;
 import org.jabref.logic.ai.templates.AiTemplate;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.LocalizedNumbers;
+import org.jabref.logic.util.OptionalObjectProperty;
 import org.jabref.model.ai.AiProvider;
 import org.jabref.model.ai.EmbeddingModel;
 import org.jabref.model.strings.StringUtil;

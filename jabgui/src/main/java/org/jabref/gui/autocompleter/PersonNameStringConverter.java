@@ -32,7 +32,6 @@ public class PersonNameStringConverter extends StringConverter<Author> {
             default:
                 autoCompFF = true;
                 autoCompLF = true;
-                break;
         }
 
         autoCompleteFirstNameMode = preferences.getFirstNameMode();

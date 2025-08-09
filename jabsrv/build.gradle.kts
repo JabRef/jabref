@@ -36,6 +36,9 @@ dependencies {
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("org.hibernate.validator:hibernate-validator")
 
+    // LSP4J for LSP Server
+    implementation("com.github.eclipse:lsp4j")
+
     implementation("com.konghq:unirest-modules-gson")
 
     // Allow objects "magically" to be mapped to JSON using GSON
@@ -66,7 +69,7 @@ dependencies {
 
 javaModuleTesting.whitebox(testing.suites["test"]) {
     requires.add("jul.to.slf4j")
-    requires.add("org.glassfish.jersey.test.framework.core")
+    requires.add("jersey.test.framework.core")
     requires.add("org.junit.jupiter.api")
     requires.add("org.mockito")
 }

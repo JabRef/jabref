@@ -13,16 +13,16 @@ import javafx.scene.text.Text;
 import org.jabref.logic.os.OS;
 import org.jabref.model.strings.StringUtil;
 
-public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
+public class SearchResultContainer extends ListView<CAYWEntry> {
 
     private final static int MAX_LINES = 3;
     private final static int ESTIMATED_CHARS_PER_LINE = 80;
     private final static int TOOLTIP_WIDTH = 400;
     private final static double PREF_WIDTH = 300;
 
-    private ObservableList<CAYWEntry<T>> selectedEntries = javafx.collections.FXCollections.observableArrayList();
+    private ObservableList<CAYWEntry> selectedEntries = javafx.collections.FXCollections.observableArrayList();
 
-    public SearchResultContainer(ObservableList<CAYWEntry<T>> entries, ObservableList<CAYWEntry<T>> selectedEntries) {
+    public SearchResultContainer(ObservableList<CAYWEntry> entries, ObservableList<CAYWEntry> selectedEntries) {
         super(entries);
         this.selectedEntries = selectedEntries;
         setup();
@@ -30,7 +30,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
 
     private void setup() {
         this.setCellFactory(listView -> {
-            SearchResultCell<T> searchResultCell = new SearchResultCell<T>();
+            SearchResultCell searchResultCell = new SearchResultCell();
             searchResultCell.setOnMouseClicked(event -> {
                 if (searchResultCell.getItem() == null || selectedEntries.contains(searchResultCell.getItem())) {
                     return;
@@ -50,7 +50,7 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
         }, parentProperty()));
     }
 
-    private static class SearchResultCell<T> extends ListCell<CAYWEntry<T>> {
+    private static class SearchResultCell extends ListCell<CAYWEntry> {
         private final VBox content;
         private final Text labelText;
         private final Text descriptionText;
@@ -74,16 +74,16 @@ public class SearchResultContainer<T> extends ListView<CAYWEntry<T>> {
         }
 
         @Override
-        protected void updateItem(CAYWEntry<T> item, boolean empty) {
+        protected void updateItem(CAYWEntry item, boolean empty) {
             super.updateItem(item, empty);
 
             if (empty || item == null) {
                 setGraphic(null);
                 setTooltip(null);
             } else {
-                labelText.setText(item.getLabel());
+                labelText.setText(item.label());
 
-                String fullDescription = item.getDescription();
+                String fullDescription = item.description();
                 String truncatedDescription = truncateToThreeLines(fullDescription);
 
                 descriptionText.setText(truncatedDescription);

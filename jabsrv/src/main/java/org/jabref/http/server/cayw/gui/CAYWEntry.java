@@ -1,51 +1,28 @@
 package org.jabref.http.server.cayw.gui;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import java.util.Objects;
 
-public class CAYWEntry<T> {
+import org.jabref.model.entry.BibEntry;
 
-    private final T value;
+public record CAYWEntry(
+        BibEntry bibEntry,
+        String label, // Used in the list
+        String shortLabel, // Used on the buttons ("chips")
+        String description // Used when hovering and used as bases on the second line
+) {
 
-    // Used on the buttons ("chips")
-    private final String shortLabel;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-    // Used in the list
-    private final String label;
-
-    // Used when hovering and used as bases on the second line
-    private final String description;
-
-    private EventHandler<ActionEvent> onClick;
-
-    public CAYWEntry(T value, String label, String shortLabel, String description) {
-        this.value = value;
-        this.label = label;
-        this.shortLabel = shortLabel;
-        this.description = description;
+        CAYWEntry caywEntry = (CAYWEntry) o;
+        return Objects.equals(bibEntry(), caywEntry.bibEntry());
     }
 
-    public T getValue() {
-        return value;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public String getShortLabel() {
-        return shortLabel;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public EventHandler<ActionEvent> getOnClick() {
-        return onClick;
-    }
-
-    public void setOnClick(EventHandler<ActionEvent> onClick) {
-        this.onClick = onClick;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(bibEntry());
     }
 }

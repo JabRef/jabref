@@ -2,7 +2,6 @@ package org.jabref.http.server.cayw.gui;
 
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -10,11 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 
-public class SelectedItemsContainer<T> extends FlowPane {
+public class SelectedItemsContainer extends FlowPane {
 
-    private final ObservableList<CAYWEntry<T>> items;
+    private final ObservableList<CAYWEntry> items;
 
-    public SelectedItemsContainer(ObservableList<CAYWEntry<T>> items) {
+    public SelectedItemsContainer(ObservableList<CAYWEntry> items) {
         this.items = items;
         setup();
     }
@@ -26,7 +25,7 @@ public class SelectedItemsContainer<T> extends FlowPane {
 
         items.forEach(this::addChip);
 
-        items.addListener((ListChangeListener<CAYWEntry<T>>) change -> {
+        items.addListener((ListChangeListener<CAYWEntry>) change -> {
             while (change.next()) {
                 if (change.wasAdded()) {
                     change.getAddedSubList().forEach(this::addChip);
@@ -38,24 +37,24 @@ public class SelectedItemsContainer<T> extends FlowPane {
         });
     }
 
-    private void addChip(CAYWEntry<T> entry) {
-        Chip<T> chip = new Chip<>(entry, items);
+    private void addChip(CAYWEntry entry) {
+        Chip chip = new Chip(entry, items);
         getChildren().add(chip);
     }
 
-    private void removeChip(CAYWEntry<T> entry) {
+    private void removeChip(CAYWEntry entry) {
         getChildren().removeIf(node -> {
-            if (node instanceof SelectedItemsContainer.Chip<?> chip) {
+            if (node instanceof SelectedItemsContainer.Chip chip) {
                 return chip.getEntry().equals(entry);
             }
             return false;
         });
     }
 
-    private static class Chip<T> extends HBox {
-        private final CAYWEntry<T> entry;
+    private static class Chip extends HBox {
+        private final CAYWEntry entry;
 
-        public Chip(CAYWEntry<T> entry, ObservableList<CAYWEntry<T>> parentList) {
+        public Chip(CAYWEntry entry, ObservableList<CAYWEntry> parentList) {
             this.entry = entry;
 
             this.setAlignment(Pos.CENTER_LEFT);
@@ -72,18 +71,16 @@ public class SelectedItemsContainer<T> extends FlowPane {
                 parentList.remove(entry);
             });
 
-            Label label = new Label(entry.getShortLabel());
+            Label label = new Label(entry.shortLabel());
 
             getChildren().addAll(label, removeButton);
 
             this.setOnMouseClicked(e -> {
-                if (!e.isConsumed() && entry.getOnClick() != null) {
-                    entry.getOnClick().handle(new ActionEvent(entry, null));
-                }
+                // TODO: Handle the click event and show custom fields like prefix/suffix etc.
             });
         }
 
-        public CAYWEntry<T> getEntry() {
+        public CAYWEntry getEntry() {
             return entry;
         }
     }
