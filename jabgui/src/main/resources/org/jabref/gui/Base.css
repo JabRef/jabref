@@ -1780,7 +1780,7 @@ We want to have a look that matches our icons in the tool-bar */
 
 .welcome-top-titles {
     -fx-spacing: 0.833em;
-    -fx-alignment: left;
+    -fx-alignment: top-left;
     -fx-padding: 0 0 1.667em 0;
 }
 
