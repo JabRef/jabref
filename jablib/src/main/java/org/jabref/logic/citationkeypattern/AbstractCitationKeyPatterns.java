@@ -22,8 +22,10 @@ public abstract class AbstractCitationKeyPatterns {
 
     @Override
     public String toString() {
-        String sb = "AbstractCitationKeyPattern{defaultPattern=" + defaultPattern + ", data=" + data + '}';
-        return sb;
+        return "AbstractCitationKeyPattern{" +
+                "defaultPattern='" + defaultPattern + '\'' +
+                ", data='" + data + '\'' +
+                "}";
     }
 
     @Override
