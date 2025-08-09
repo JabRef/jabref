@@ -480,9 +480,9 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     public JabRefCliPreferences() {
         try {
-            Path preferebcesPath = Path.of("jabref.xml");
-            if (Files.exists(preferebcesPath)) {
-                importPreferences(preferebcesPath);
+            Path preferencesPath = Path.of("jabref.xml");
+            if (Files.exists(preferencesPath)) {
+                importPreferences(preferencesPath);
             }
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
