@@ -275,36 +275,42 @@ public class GlobalSearchBar extends HBox {
             updateSearchQuery();
         });
 
-        regexButton.setSelected(searchPreferences.isRegularExpression());
+        regexButton.selectedProperty().bind(Bindings.createBooleanBinding(
+                () -> searchPreferences.getObservableSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION),
+                searchPreferences.getObservableSearchFlags()
+        ));
         regexButton.setTooltip(new Tooltip(Localization.lang("Regular expression") + "\n" + Localization.lang("This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator.")));
         initSearchModifierButton(regexButton);
-        regexButton.setOnAction(event -> {
+        regexButton.setOnAction(_ -> {
             searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, regexButton.isSelected());
             searchField.requestFocus();
             updateSearchQuery();
         });
 
-        caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
+        caseSensitiveButton.selectedProperty().bind(Bindings.createBooleanBinding(
+                () -> searchPreferences.getObservableSearchFlags().contains(SearchFlags.CASE_SENSITIVE),
+                searchPreferences.getObservableSearchFlags()
+        ));
         caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive") + "\n" + Localization.lang("This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator.")));
         initSearchModifierButton(caseSensitiveButton);
-        caseSensitiveButton.setOnAction(event -> {
+        caseSensitiveButton.setOnAction(_ -> {
             searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
             searchField.requestFocus();
             updateSearchQuery();
         });
 
-        keepSearchString.setSelected(searchPreferences.shouldKeepSearchString());
+        keepSearchString.selectedProperty().bindBidirectional(searchPreferences.keepSearchStingProperty());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
-        keepSearchString.selectedProperty().addListener((obs, oldVal, newVal) -> {
-            searchPreferences.setKeepSearchString(newVal);
-            searchField.requestFocus();
-        });
+        keepSearchString.selectedProperty().addListener((_, _, _) -> searchField.requestFocus());
 
-        filterModeButton.setSelected(searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER);
+        filterModeButton.selectedProperty().bind(Bindings.createBooleanBinding(
+                () -> searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER,
+                searchPreferences.searchDisplayModeProperty()
+        ));
         filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
         initSearchModifierButton(filterModeButton);
-        filterModeButton.setOnAction(event -> {
+        filterModeButton.setOnAction(_ -> {
             searchPreferences.setSearchDisplayMode(filterModeButton.isSelected() ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT);
             searchField.requestFocus();
         });
