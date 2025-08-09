@@ -70,13 +70,13 @@ public class RightClickMenu {
         MenuItem extractFileReferencesOffline = factory.createMenuItem(StandardActions.EXTRACT_FILE_REFERENCES_OFFLINE, extractReferencesAction);
 
         contextMenu.getItems().addAll(
-                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.COPY, new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
                 createCopySubMenu(factory, dialogService, stateManager, preferences, clipBoardManager, abbreviationRepository, taskExecutor),
                 createCopyToMenu(factory, dialogService, stateManager, preferences, libraryTab, importHandler),
-                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager)),
-                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.PASTE, new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
+                factory.createMenuItem(StandardActions.CUT, new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
                 factory.createMenuItem(StandardActions.MERGE_ENTRIES, new MergeEntriesAction(dialogService, stateManager, undoManager, preferences)),
-                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager)),
+                factory.createMenuItem(StandardActions.DELETE_ENTRY, new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager, clipBoardManager)),
 
                 new SeparatorMenuItem(),
 

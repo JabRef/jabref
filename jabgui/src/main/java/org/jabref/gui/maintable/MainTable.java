@@ -93,6 +93,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     private final FilePreferences filePreferences;
     private final ImportHandler importHandler;
     private final ClipboardContentGenerator clipboardContentGenerator;
+    private final ClipBoardManager clipBoardManager;
 
     private long lastKeyPressTime;
     private String columnSearchTerm;
@@ -123,6 +124,7 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
         this.filePreferences = preferences.getFilePreferences();
         this.importHandler = importHandler;
         this.clipboardContentGenerator = new ClipboardContentGenerator(preferences.getPreviewPreferences(), preferences.getLayoutFormatterPreferences(), Injector.instantiateModelOrService(JournalAbbreviationRepository.class));
+        this.clipBoardManager = clipBoardManager;
 
         MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
 
@@ -384,10 +386,10 @@ public class MainTable extends TableView<BibEntryTableViewModel> {
     }
 
     private void setupKeyBindings(KeyBindingRepository keyBindings) {
-        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager);
-        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager);
-        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager);
-        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager);
+        EditAction pasteAction = new EditAction(StandardActions.PASTE, () -> libraryTab, stateManager, undoManager, clipBoardManager);
+        EditAction copyAction = new EditAction(StandardActions.COPY, () -> libraryTab, stateManager, undoManager, clipBoardManager);
+        EditAction cutAction = new EditAction(StandardActions.CUT, () -> libraryTab, stateManager, undoManager, clipBoardManager);
+        EditAction deleteAction = new EditAction(StandardActions.DELETE_ENTRY, () -> libraryTab, stateManager, undoManager, clipBoardManager);
         OpenUrlAction openUrlAction = new OpenUrlAction(dialogService, stateManager, preferences);
         OpenSelectedEntriesFilesAction openSelectedEntriesFilesActionFileAction = new OpenSelectedEntriesFilesAction(dialogService, stateManager, preferences, taskExecutor);
         MergeWithFetchedEntryAction mergeWithFetchedEntryAction = new MergeWithFetchedEntryAction(dialogService, stateManager, taskExecutor, preferences, undoManager);

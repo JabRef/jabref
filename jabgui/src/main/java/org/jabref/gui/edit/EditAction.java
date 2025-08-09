@@ -31,12 +31,15 @@ public class EditAction extends SimpleCommand {
     private final StandardActions action;
     private final StateManager stateManager;
     private final UndoManager undoManager;
+    private final ClipBoardManager clipBoardManager;
 
-    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager, UndoManager undoManager) {
+    public EditAction(StandardActions action, Supplier<LibraryTab> tabSupplier, StateManager stateManager,
+                      UndoManager undoManager, ClipBoardManager clipBoardManager) {
         this.action = action;
         this.tabSupplier = tabSupplier;
         this.stateManager = stateManager;
         this.undoManager = undoManager;
+        this.clipBoardManager = clipBoardManager;
 
         if (action == StandardActions.PASTE) {
             this.executable.bind(ActionHelper.needsDatabase(stateManager));
@@ -80,16 +83,12 @@ public class EditAction extends SimpleCommand {
 
                 switch (action) {
                     case COPY -> {
-                        ClipBoardManager clipBoardManager = new ClipBoardManager();
                         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
-                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         tabSupplier.get().copyEntry();
                     }
                     case CUT -> {
-                        ClipBoardManager clipBoardManager = new ClipBoardManager();
                         Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
-                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
                         tabSupplier.get().cutEntry();
                     }
