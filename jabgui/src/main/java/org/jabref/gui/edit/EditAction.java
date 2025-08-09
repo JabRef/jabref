@@ -81,18 +81,18 @@ public class EditAction extends SimpleCommand {
 
                 switch (action) {
                     case COPY -> {
-                      ClipBoardManager clipBoardManager = new ClipBoardManager();
-                      Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
-                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
-                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
-                      tabSupplier.get().copyEntry();
+                        ClipBoardManager clipBoardManager = new ClipBoardManager();
+                        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                        tabSupplier.get().copyEntry();
                     }
                     case CUT -> {
-                      ClipBoardManager clipBoardManager = new ClipBoardManager();
-                      Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
-                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
-                      clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
-                      tabSupplier.get().cutEntry();
+                        ClipBoardManager clipBoardManager = new ClipBoardManager();
+                        Injector.setModelOrService(ClipBoardManager.class, clipBoardManager);
+                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                        clipBoardManager.setSourceBibDatabaseContext(tabSupplier.get().getBibDatabaseContext());
+                        tabSupplier.get().cutEntry();
                     }
                     case PASTE -> tabSupplier.get().pasteEntry();
                     case DELETE_ENTRY -> tabSupplier.get().deleteEntry();

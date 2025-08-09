@@ -824,51 +824,51 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         }
     }
 
-  public void pasteEntry() {
-    String content = ClipBoardManager.getContents();
-    List<BibEntry> entriesToAdd = importHandler.handleBibTeXData(content);
-    if (entriesToAdd.isEmpty()) {
-      entriesToAdd = handleNonBibTeXStringData(content);
+    public void pasteEntry() {
+        String content = ClipBoardManager.getContents();
+        List<BibEntry> entriesToAdd = importHandler.handleBibTeXData(content);
+        if (entriesToAdd.isEmpty()) {
+            entriesToAdd = handleNonBibTeXStringData(content);
+        }
+        if (entriesToAdd.isEmpty()) {
+            return;
+        }
+        copyEntriesWithFeedback(entriesToAdd);
     }
-    if (entriesToAdd.isEmpty()) {
-      return;
+
+    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd) {
+        final List<BibEntry> finalEntriesToAdd = entriesToAdd;
+
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
+
+        tracker.setOnFinish(() -> {
+            int importedCount = tracker.getImportedCount();
+            int skippedCount = tracker.getSkippedCount();
+
+            String targetName = bibDatabaseContext.getDatabasePath()
+                .map(path -> path.getFileName().toString())
+                .orElse(Localization.lang("target library"));
+
+            if (importedCount == finalEntriesToAdd.size()) {
+                dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1",
+              String.valueOf(importedCount), targetName));
+            } else if (importedCount == 0) {
+                dialogService.notify(Localization.lang("No entry was pasted to %0", targetName));
+            } else {
+                dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped",
+                    String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
+            }
+        });
+
+        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
+
+        clipBoardManager.getSourceBibDatabaseContext().ifPresent(sourceBibDatabaseContext ->
+            tracker.setOnFinish(() -> LinkedFileTransferHelper
+                .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
+                    bibDatabaseContext, preferences.getFilePreferences())));
     }
-    copyEntriesWithFeedback(entriesToAdd);
-  }
 
-  private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd) {
-    final List<BibEntry> finalEntriesToAdd = entriesToAdd;
-
-    EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
-
-    tracker.setOnFinish(() -> {
-      int importedCount = tracker.getImportedCount();
-      int skippedCount = tracker.getSkippedCount();
-
-      String targetName = bibDatabaseContext.getDatabasePath()
-        .map(path -> path.getFileName().toString())
-        .orElse(Localization.lang("target library"));
-
-      if (importedCount == finalEntriesToAdd.size()) {
-        dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1",
-          String.valueOf(importedCount), targetName));
-      } else if (importedCount == 0) {
-        dialogService.notify(Localization.lang("No entry was pasted to %0", targetName));
-      } else {
-        dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped",
-          String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
-      }
-    });
-
-    importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
-
-    clipBoardManager.getSourceBibDatabaseContext().ifPresent(sourceBibDatabaseContext ->
-      tracker.setOnFinish(() -> LinkedFileTransferHelper
-        .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
-          bibDatabaseContext, preferences.getFilePreferences())));
-  }
-
-  private List<BibEntry> handleNonBibTeXStringData(String data) {
+    private List<BibEntry> handleNonBibTeXStringData(String data) {
         try {
             return this.importHandler.handleStringData(data);
         } catch (FetcherException exception) {
