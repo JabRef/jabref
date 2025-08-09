@@ -85,6 +85,7 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
     @Inject private CliPreferences preferences;
     @Inject private DialogService dialogService;
     @Inject private UndoManager undoManager;
+    @Inject private ClipBoardManager clipBoardManager;
 
     private boolean isSortedTagsField = false;
     private Optional<Keyword> draggedKeyword = Optional.empty();
@@ -251,12 +252,12 @@ public class KeywordsEditor extends HBox implements FieldEditorFX {
         public void execute() {
             switch (command) {
                 case COPY -> {
-                    ClipBoardManager.setContent(keyword.get());
+                    clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
                                                            JabRefDialogService.shortenDialogMessage(keyword.get())));
                 }
                 case CUT -> {
-                    ClipBoardManager.setContent(keyword.get());
+                    clipBoardManager.setContent(keyword.get());
                     dialogService.notify(Localization.lang("Copied '%0' to clipboard.",
                                                            JabRefDialogService.shortenDialogMessage(keyword.get())));
                     keywordTagsField.removeTags(keyword);
