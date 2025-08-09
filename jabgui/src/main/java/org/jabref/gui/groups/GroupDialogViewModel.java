@@ -157,14 +157,14 @@ public class GroupDialogViewModel {
                 name -> {
                     Optional<GroupTreeNode> rootGroup = currentDatabase.getMetaData().getGroups();
                     if (rootGroup.isPresent()) {
-                        boolean existingGroupsWithSameName = rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
-                        if ((editedGroup == null) && (!existingGroupsWithSameName)) {
+                        boolean groupsExistWithSameName = !rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
+                        if ((editedGroup == null) && (groupsExistWithSameName)) {
                             // New group but there is already one group with the same name
                             return false;
                         }
 
                         // Edit group, changed name to something that is already present
-                        return (editedGroup == null) || editedGroup.getName().equals(name) || existingGroupsWithSameName;
+                        return (editedGroup == null) || editedGroup.getName().equals(name) || !groupsExistWithSameName;
                     }
                     return true;
                 },
