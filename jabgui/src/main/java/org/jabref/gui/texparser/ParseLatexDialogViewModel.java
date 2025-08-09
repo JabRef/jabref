@@ -162,7 +162,7 @@ public class ParseLatexDialogViewModel extends AbstractViewModel {
         try (Stream<Path> filesStream = Files.list(directory)) {
             fileListPartition = filesStream.collect(Collectors.partitioningBy(path -> path.toFile().isDirectory()));
         } catch (IOException e) {
-            LOGGER.error("{} while searching files:", e.getClass().getName(), e);
+            LOGGER.error("Error searching files", e);
             return parent;
         }
 
