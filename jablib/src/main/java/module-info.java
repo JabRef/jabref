@@ -257,5 +257,5 @@ open module org.jabref.jablib {
     requires org.antlr.antlr4.runtime;
     requires org.libreoffice.uno;
     requires org.jetbrains.annotations;
-    // endregion
+  // endregion
 }

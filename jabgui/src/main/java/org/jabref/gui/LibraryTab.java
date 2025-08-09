@@ -43,6 +43,7 @@ import org.jabref.gui.autosaveandbackup.BackupManager;
 import org.jabref.gui.collab.DatabaseChangeMonitor;
 import org.jabref.gui.dialogs.AutosaveUiManager;
 import org.jabref.gui.exporter.SaveDatabaseAction;
+import org.jabref.gui.externalfiles.EntryImportHandlerTracker;
 import org.jabref.gui.externalfiles.ImportHandler;
 import org.jabref.gui.fieldeditors.LinkedFileViewModel;
 import org.jabref.gui.importer.actions.OpenDatabaseAction;
@@ -60,6 +61,7 @@ import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citationstyle.CitationStyleCache;
 import org.jabref.logic.command.CommandSelectionTab;
+import org.jabref.logic.externalfiles.LinkedFileTransferHelper;
 import org.jabref.logic.importer.FetcherClientException;
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.FetcherServerException;
@@ -823,17 +825,47 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
     }
 
     public void pasteEntry() {
-        List<BibEntry> entriesToAdd;
         String content = ClipBoardManager.getContents();
-        entriesToAdd = importHandler.handleBibTeXData(content);
+        List<BibEntry> entriesToAdd = importHandler.handleBibTeXData(content);
         if (entriesToAdd.isEmpty()) {
             entriesToAdd = handleNonBibTeXStringData(content);
         }
         if (entriesToAdd.isEmpty()) {
             return;
         }
+        copyEntriesWithFeedback(entriesToAdd);
+    }
 
-        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, entriesToAdd);
+    private void copyEntriesWithFeedback(List<BibEntry> entriesToAdd) {
+        final List<BibEntry> finalEntriesToAdd = entriesToAdd;
+
+        EntryImportHandlerTracker tracker = new EntryImportHandlerTracker(finalEntriesToAdd.size());
+
+        tracker.setOnFinish(() -> {
+            int importedCount = tracker.getImportedCount();
+            int skippedCount = tracker.getSkippedCount();
+
+            String targetName = bibDatabaseContext.getDatabasePath()
+                .map(path -> path.getFileName().toString())
+                .orElse(Localization.lang("target library"));
+
+            if (importedCount == finalEntriesToAdd.size()) {
+                dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1",
+              String.valueOf(importedCount), targetName));
+            } else if (importedCount == 0) {
+                dialogService.notify(Localization.lang("No entry was pasted to %0", targetName));
+            } else {
+                dialogService.notify(Localization.lang("Pasted %0 entry(s) to %1. %2 were skipped",
+                    String.valueOf(importedCount), targetName, String.valueOf(skippedCount)));
+            }
+        });
+
+        importHandler.importEntriesWithDuplicateCheck(bibDatabaseContext, finalEntriesToAdd, tracker);
+
+        clipBoardManager.getSourceBibDatabaseContext().ifPresent(sourceBibDatabaseContext ->
+            tracker.setOnFinish(() -> LinkedFileTransferHelper
+                .adjustLinkedFilesForTarget(sourceBibDatabaseContext,
+                    bibDatabaseContext, preferences.getFilePreferences())));
     }
 
     private List<BibEntry> handleNonBibTeXStringData(String data) {
