@@ -158,7 +158,7 @@ public class GroupDialogViewModel {
                     Optional<GroupTreeNode> rootGroup = currentDatabase.getMetaData().getGroups();
                     if (rootGroup.isPresent()) {
                         boolean groupsExistWithSameName = !rootGroup.get().findChildrenSatisfying(group -> group.getName().equals(name)).isEmpty();
-                        if ((editedGroup == null) && (groupsExistWithSameName)) {
+                        if ((editedGroup == null) && groupsExistWithSameName) {
                             // New group but there is already one group with the same name
                             return false;
                         }
