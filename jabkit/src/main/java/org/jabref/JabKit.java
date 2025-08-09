@@ -39,6 +39,7 @@ import com.airhacks.afterburner.injection.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.tinylog.Level;
 import org.tinylog.configuration.Configuration;
 import picocli.CommandLine;
 
@@ -54,15 +55,6 @@ import picocli.CommandLine;
 public class JabKit {
     // J.U.L. bridge to SLF4J must be initialized before any logger is created, see initLogging()
     private static Logger LOGGER;
-
-    private enum LogLevel {
-        DEBUG, INFO, ERROR;
-
-        @Override
-        public String toString() {
-            return name().toLowerCase();
-        }
-    }
 
     private static final String JABKIT_BRAND = "JabKit - command line toolkit for JabRef";
 
@@ -151,13 +143,13 @@ public class JabKit {
 
         // We must configure logging as soon as possible, which is why we cannot wait for the usual
         // argument parsing workflow to parse logging options e.g. --debug or --porcelain
-        LogLevel logLevel;
+        Level logLevel;
         if (Arrays.stream(args).anyMatch("--debug"::equalsIgnoreCase)) {
-            logLevel = LogLevel.DEBUG;
+            logLevel = Level.DEBUG;
         } else if (Arrays.stream(args).anyMatch("--porcelain"::equalsIgnoreCase)) {
-            logLevel = LogLevel.ERROR;
+            logLevel = Level.ERROR;
         } else {
-            logLevel = LogLevel.INFO;
+            logLevel = Level.INFO;
         }
 
         // addLogToDisk
@@ -174,9 +166,9 @@ public class JabKit {
         // The "Shared File Writer" is explained at
         // https://tinylog.org/v2/configuration/#shared-file-writer
         Map<String, String> configuration = Map.of(
-                "level", logLevel.toString(),
+                "level", logLevel.name().toLowerCase(),
                 "writerFile", "rolling file",
-                "writerFile.logLevel", logLevel == LogLevel.DEBUG ? LogLevel.DEBUG.toString() : LogLevel.INFO.toString(),
+                "writerFile.logLevel", logLevel == Level.DEBUG ? "debug" : "info",
                 // We need to manually join the path, because ".resolve" does not work on Windows, because ":" is not allowed in file names on Windows
                 "writerFile.file", directory + File.separator + "log_{date:yyyy-MM-dd_HH-mm-ss}.txt",
                 "writerFile.charset", "UTF-8",
