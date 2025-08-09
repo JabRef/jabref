@@ -22,11 +22,10 @@ public abstract class AbstractCitationKeyPatterns {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractCitationKeyPattern{");
-        sb.append("defaultPattern=").append(defaultPattern);
-        sb.append(", data=").append(data);
-        sb.append('}');
-        return sb.toString();
+        return "AbstractCitationKeyPattern{" +
+                "defaultPattern='" + defaultPattern + '\'' +
+                ", data='" + data + '\'' +
+                "}";
     }
 
     @Override

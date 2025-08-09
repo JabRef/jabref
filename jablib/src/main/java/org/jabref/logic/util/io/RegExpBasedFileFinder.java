@@ -166,11 +166,10 @@ class RegExpBasedFileFinder implements FileFinder {
             }
             switch (dirToProcess) {
                 case "." -> {
-                    continue;  // Stay in current directory
+                    // Stay in current directory
                 }
                 case ".." -> {
                     currentDirectory = currentDirectory.getParent();
-                    continue;
                 }
                 case "*" -> { // for all direct subdirs
                     String restOfFileString = StringUtil.join(fileParts, "/", index + 1, fileParts.length);

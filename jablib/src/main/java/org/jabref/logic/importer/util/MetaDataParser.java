@@ -263,7 +263,7 @@ public class MetaDataParser {
                 res.append((char) c);
             }
         }
-        if (res.length() > 0) {
+        if (!res.isEmpty()) {
             return Optional.of(res.toString());
         }
         return Optional.empty();

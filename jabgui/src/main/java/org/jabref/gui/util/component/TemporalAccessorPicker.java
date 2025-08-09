@@ -11,6 +11,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -89,7 +90,7 @@ public class TemporalAccessorPicker extends DatePicker {
 
         try {
             return YearMonth.from(dateTime).atDay(1);
-        } catch (DateTimeException exception) {
+        } catch (DateTimeException _) {
             return Year.from(dateTime).atDay(1);
         }
     }
@@ -99,7 +100,7 @@ public class TemporalAccessorPicker extends DatePicker {
     }
 
     public final StringConverter<TemporalAccessor> getStringConverter() {
-        StringConverter<TemporalAccessor> newConverter = new StringConverter<>() {
+        Supplier<StringConverter<TemporalAccessor>> converterSupplier = () -> new StringConverter<>() {
             @Override
             public String toString(TemporalAccessor value) {
                 return defaultFormatter.format(value);
@@ -110,7 +111,7 @@ public class TemporalAccessorPicker extends DatePicker {
                 if (StringUtil.isNotBlank(value)) {
                     try {
                         return defaultFormatter.parse(value);
-                    } catch (DateTimeParseException exception) {
+                    } catch (DateTimeParseException _) {
                         return Date.parse(value).map(Date::toTemporalAccessor).orElse(null);
                     }
                 } else {
@@ -118,7 +119,7 @@ public class TemporalAccessorPicker extends DatePicker {
                 }
             }
         };
-        return Objects.requireNonNullElseGet(stringConverterProperty().get(), () -> newConverter);
+        return Objects.requireNonNullElseGet(stringConverterProperty().get(), converterSupplier);
     }
 
     public final void setStringConverter(StringConverter<TemporalAccessor> value) {

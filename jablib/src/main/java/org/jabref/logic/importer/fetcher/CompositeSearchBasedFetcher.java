@@ -22,7 +22,7 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositeSearchBasedFetcher.class);
 
-    private Set<SearchBasedFetcher> fetchers;
+    private final Set<SearchBasedFetcher> fetchers;
     private final int maximumNumberOfReturnedResults;
 
     public CompositeSearchBasedFetcher(Set<SearchBasedFetcher> searchBasedFetchers, ImporterPreferences importerPreferences, int maximumNumberOfReturnedResults)
@@ -59,11 +59,11 @@ public class CompositeSearchBasedFetcher implements SearchBasedFetcher {
                            try {
                                return searchBasedFetcher.performSearch(luceneQuery).stream();
                            } catch (FetcherException e) {
-                               LOGGER.warn("%s API request failed".formatted(searchBasedFetcher.getName()), e);
+                               LOGGER.warn("{} API request failed", searchBasedFetcher.getName(), e);
                                return Stream.empty();
                            }
                        })
                        .limit(maximumNumberOfReturnedResults)
-                       .collect(Collectors.toList());
+                       .toList();
     }
 }
