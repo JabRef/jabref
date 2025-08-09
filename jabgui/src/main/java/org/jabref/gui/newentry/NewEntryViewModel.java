@@ -149,14 +149,14 @@ public class NewEntryViewModel {
         Optional<BibDatabaseContext> activeDatabase = stateManager.getActiveDatabase();
 
         activeDatabase.map(BibDatabaseContext::getEntries)
-                    .ifPresent(entries -> {
-                        entries.forEach(entry -> {
-                            entry.getField(StandardField.DOI)
-                                 .ifPresent(doi -> {
-                                     doiCache.put(doi, entry);
-                                 });
-                        });
-                    });
+                      .ifPresent(entries -> {
+                          entries.forEach(entry -> {
+                              entry.getField(StandardField.DOI)
+                                   .ifPresent(doi -> {
+                                       doiCache.put(doi, entry);
+                                   });
+                          });
+                      });
     }
 
     public Optional<ValidationMessage> checkDOI(String doiInput) {
