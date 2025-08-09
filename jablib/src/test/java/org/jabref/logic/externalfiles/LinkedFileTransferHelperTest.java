@@ -22,384 +22,384 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class LinkedFileTransferHelperTest {
-  private BibDatabaseContext sourceContext;
-  private BibDatabaseContext targetContext;
-  private Path sourceDir;
-  private Path targetDir;
-  private Path testFile;
-  private BibEntry sourceEntry;
-  private BibEntry targetEntry;
-  private final FilePreferences filePreferences = mock(FilePreferences.class);
+    private BibDatabaseContext sourceContext;
+    private BibDatabaseContext targetContext;
+    private Path sourceDir;
+    private Path targetDir;
+    private Path testFile;
+    private BibEntry sourceEntry;
+    private BibEntry targetEntry;
+    private final FilePreferences filePreferences = mock(FilePreferences.class);
 
-  // region Case 1: Directory reachable - path adjustment needed
+    // region Case 1: Directory reachable - path adjustment needed
 
-  @Test
-  void pathDiffersShouldAdjustPath(@TempDir Path tempDir) throws Exception {
-    sourceDir = tempDir.resolve("source/subdir");
-    targetDir = tempDir.resolve("source");
+    @Test
+    void pathDiffersShouldAdjustPath(@TempDir Path tempDir) throws Exception {
+        sourceDir = tempDir.resolve("source/subdir");
+        targetDir = tempDir.resolve("source");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-    Files.createDirectories(sourceDir);
-    Files.createDirectories(targetDir);
+        Files.createDirectories(sourceDir);
+        Files.createDirectories(targetDir);
 
-    testFile = sourceDir.resolve("sourcefiles/test.pdf");
-    Files.createDirectories(testFile.getParent());
-    Files.createFile(testFile);
+        testFile = sourceDir.resolve("sourcefiles/test.pdf");
+        Files.createDirectories(testFile.getParent());
+        Files.createFile(testFile);
 
-    sourceContext = new BibDatabaseContext(new BibDatabase());
-    sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        sourceContext = new BibDatabaseContext(new BibDatabase());
+        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    sourceEntry = new BibEntry();
-    LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
+        sourceEntry = new BibEntry();
+        LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
-    sourceEntry.setFiles(List.of(linkedFile));
-    targetEntry = new BibEntry(sourceEntry);
-    targetEntry.setFiles(List.of(linkedFile));
+        sourceEntry.setFiles(List.of(linkedFile));
+        targetEntry = new BibEntry(sourceEntry);
+        targetEntry.setFiles(List.of(linkedFile));
 
-    sourceContext.getDatabase().insertEntry(sourceEntry);
-    targetContext.getDatabase().insertEntry(targetEntry);
+        sourceContext.getDatabase().insertEntry(sourceEntry);
+        targetContext.getDatabase().insertEntry(targetEntry);
 
-    Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-      filePreferences);
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+          filePreferences);
 
-    BibEntry expectedEntry = new BibEntry();
-    LinkedFile expectedLinkedFile = new LinkedFile("Test", "subdir/sourcefiles/test.pdf", "PDF");
-    expectedEntry.setFiles(List.of(expectedLinkedFile));
+        BibEntry expectedEntry = new BibEntry();
+        LinkedFile expectedLinkedFile = new LinkedFile("Test", "subdir/sourcefiles/test.pdf", "PDF");
+        expectedEntry.setFiles(List.of(expectedLinkedFile));
 
-    Set<BibEntry> expectedEntries = Set.of(expectedEntry);
+        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
 
-    assertEquals(expectedEntries, returnedEntries);
-  }
+        assertEquals(expectedEntries, returnedEntries);
+    }
 
-  // endregion
+    // endregion
 
-  // region Case 2: Directory not reachable - file copying with same relative paths
+    // region Case 2: Directory not reachable - file copying with same relative paths
 
-  @Test
-  void fileNotReachableShouldCopyFile(@TempDir Path tempDir) throws Exception {
-    sourceDir = tempDir.resolve("source/targetfiles");
-    targetDir = tempDir.resolve("target/sourcefiles");
+    @Test
+    void fileNotReachableShouldCopyFile(@TempDir Path tempDir) throws Exception {
+        sourceDir = tempDir.resolve("source/targetfiles");
+        targetDir = tempDir.resolve("target/sourcefiles");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-    Files.createDirectories(sourceDir);
-    Files.createDirectories(targetDir);
+        Files.createDirectories(sourceDir);
+        Files.createDirectories(targetDir);
 
-    testFile = sourceDir.resolve("test.pdf");
-    Files.createDirectories(testFile.getParent());
-    Files.createFile(testFile);
+        testFile = sourceDir.resolve("test.pdf");
+        Files.createDirectories(testFile.getParent());
+        Files.createFile(testFile);
 
-    sourceContext = new BibDatabaseContext(new BibDatabase());
-    sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        sourceContext = new BibDatabaseContext(new BibDatabase());
+        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    sourceEntry = new BibEntry();
-    LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+        sourceEntry = new BibEntry();
+        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
-    sourceEntry.setFiles(List.of(linkedFile));
-    targetEntry = new BibEntry(sourceEntry);
-    targetEntry.setFiles(List.of(linkedFile));
+        sourceEntry.setFiles(List.of(linkedFile));
+        targetEntry = new BibEntry(sourceEntry);
+        targetEntry.setFiles(List.of(linkedFile));
 
-    sourceContext.getDatabase().insertEntry(sourceEntry);
-    targetContext.getDatabase().insertEntry(targetEntry);
+        sourceContext.getDatabase().insertEntry(sourceEntry);
+        targetContext.getDatabase().insertEntry(targetEntry);
 
-    Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-      filePreferences);
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+          filePreferences);
 
-    BibEntry expectedEntry = new BibEntry();
-    LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
-    expectedEntry.setFiles(List.of(expectedLinkedFile));
+        BibEntry expectedEntry = new BibEntry();
+        LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+        expectedEntry.setFiles(List.of(expectedLinkedFile));
 
-    Set<BibEntry> expectedEntries = Set.of(expectedEntry);
+        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
 
-    assertEquals(expectedEntries, returnedEntries);
-  }
+        assertEquals(expectedEntries, returnedEntries);
+    }
 
-  // endregion
+    // endregion
 
-  // region Case 3: Directory not reachable with different paths - file copying with directory structure
+    // region Case 3: Directory not reachable with different paths - file copying with directory structure
 
-  @Test
-  void fileNotReachableAndPathsDifferShouldCopyFileAndCreateDirectory(@TempDir Path tempDir) throws Exception {
-    sourceDir = tempDir.resolve("source");
-    targetDir = tempDir.resolve("target");
+    @Test
+    void fileNotReachableAndPathsDifferShouldCopyFileAndCreateDirectory(@TempDir Path tempDir) throws Exception {
+        sourceDir = tempDir.resolve("source");
+        targetDir = tempDir.resolve("target");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-    Files.createDirectories(sourceDir);
-    Files.createDirectories(targetDir);
+        Files.createDirectories(sourceDir);
+        Files.createDirectories(targetDir);
 
-    testFile = sourceDir.resolve("sourcefiles/test.pdf");
-    Files.createDirectories(testFile.getParent());
-    Files.createFile(testFile);
+        testFile = sourceDir.resolve("sourcefiles/test.pdf");
+        Files.createDirectories(testFile.getParent());
+        Files.createFile(testFile);
 
-    sourceContext = new BibDatabaseContext(new BibDatabase());
-    sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        sourceContext = new BibDatabaseContext(new BibDatabase());
+        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    sourceEntry = new BibEntry();
-    LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
+        sourceEntry = new BibEntry();
+        LinkedFile linkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
 
-    sourceEntry.setFiles(List.of(linkedFile));
-    targetEntry = new BibEntry(sourceEntry);
-    targetEntry.setFiles(List.of(linkedFile));
+        sourceEntry.setFiles(List.of(linkedFile));
+        targetEntry = new BibEntry(sourceEntry);
+        targetEntry.setFiles(List.of(linkedFile));
 
-    sourceContext.getDatabase().insertEntry(sourceEntry);
-    targetContext.getDatabase().insertEntry(targetEntry);
+        sourceContext.getDatabase().insertEntry(sourceEntry);
+        targetContext.getDatabase().insertEntry(targetEntry);
 
-    Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-      filePreferences);
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+          filePreferences);
 
-    BibEntry expectedEntry = new BibEntry();
-    LinkedFile expectedLinkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
-    expectedEntry.setFiles(List.of(expectedLinkedFile));
+        BibEntry expectedEntry = new BibEntry();
+        LinkedFile expectedLinkedFile = new LinkedFile("Test", "sourcefiles/test.pdf", "PDF");
+        expectedEntry.setFiles(List.of(expectedLinkedFile));
 
-    Set<BibEntry> expectedEntries = Set.of(expectedEntry);
+        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
 
-    assertEquals(expectedEntries, returnedEntries);
+        assertEquals(expectedEntries, returnedEntries);
 
-    Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
-    assertTrue(Files.exists(expectedFile));
-  }
+        Path expectedFile = targetDir.resolve("sourcefiles/test.pdf");
+        assertTrue(Files.exists(expectedFile));
+    }
 
-  // endregion
+    // endregion
 
-  // region BibFile-specific directory (relative to .bib file)
+    // region BibFile-specific directory (relative to .bib file)
 
-  @Test
-  void shouldStoreFilesRelativeToBibFile(@TempDir Path tempDir) throws Exception {
-    sourceDir = tempDir.resolve("source");
-    targetDir = tempDir.resolve("target");
+    @Test
+    void shouldStoreFilesRelativeToBibFile(@TempDir Path tempDir) throws Exception {
+        sourceDir = tempDir.resolve("source");
+        targetDir = tempDir.resolve("target");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
 
-    Files.createDirectories(sourceDir);
-    Files.createDirectories(targetDir);
+        Files.createDirectories(sourceDir);
+        Files.createDirectories(targetDir);
 
-    testFile = sourceDir.resolve("test.pdf");
-    Files.createFile(testFile);
+        testFile = sourceDir.resolve("test.pdf");
+        Files.createFile(testFile);
 
-    sourceContext = new BibDatabaseContext(new BibDatabase());
-    sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        sourceContext = new BibDatabaseContext(new BibDatabase());
+        sourceContext.setDatabasePath(sourceDir.resolve("personal.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    sourceEntry = new BibEntry();
-    LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+        sourceEntry = new BibEntry();
+        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
-    sourceEntry.setFiles(List.of(linkedFile));
-    targetEntry = new BibEntry(sourceEntry);
-    targetEntry.setFiles(List.of(linkedFile));
+        sourceEntry.setFiles(List.of(linkedFile));
+        targetEntry = new BibEntry(sourceEntry);
+        targetEntry.setFiles(List.of(linkedFile));
 
-    sourceContext.getDatabase().insertEntry(sourceEntry);
-    targetContext.getDatabase().insertEntry(targetEntry);
+        sourceContext.getDatabase().insertEntry(sourceEntry);
+        targetContext.getDatabase().insertEntry(targetEntry);
 
-    Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
-      filePreferences);
+        Set<BibEntry> returnedEntries = LinkedFileTransferHelper.adjustLinkedFilesForTarget(sourceContext, targetContext,
+          filePreferences);
 
-    BibEntry expectedEntry = new BibEntry();
-    LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
-    expectedEntry.setFiles(List.of(expectedLinkedFile));
+        BibEntry expectedEntry = new BibEntry();
+        LinkedFile expectedLinkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+        expectedEntry.setFiles(List.of(expectedLinkedFile));
 
-    Set<BibEntry> expectedEntries = Set.of(expectedEntry);
+        Set<BibEntry> expectedEntries = Set.of(expectedEntry);
 
-    assertEquals(expectedEntries, returnedEntries);
+        assertEquals(expectedEntries, returnedEntries);
 
-    Path expectedFile = targetDir.resolve("test.pdf");
-    assertTrue(Files.exists(expectedFile));
-  }
+        Path expectedFile = targetDir.resolve("test.pdf");
+        assertTrue(Files.exists(expectedFile));
+    }
 
-  // endregion
+    // endregion
 
-  // region Global latex directory tests
+    // region Global latex directory tests
 
-  @Test
-  void fileInGlobalLatexDirectoryShouldBeAccessible(@TempDir Path tempDir) throws Exception {
-    targetDir = tempDir.resolve("target");
-    Path globalLatexDir = tempDir.resolve("global_latex");
+    @Test
+    void fileInGlobalLatexDirectoryShouldBeAccessible(@TempDir Path tempDir) throws Exception {
+        targetDir = tempDir.resolve("target");
+        Path globalLatexDir = tempDir.resolve("global_latex");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-    when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
-    when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
+        when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
 
-    Files.createDirectories(targetDir);
-    Files.createDirectories(globalLatexDir);
+        Files.createDirectories(targetDir);
+        Files.createDirectories(globalLatexDir);
 
-    testFile = globalLatexDir.resolve("test.pdf");
-    Files.createFile(testFile);
+        testFile = globalLatexDir.resolve("test.pdf");
+        Files.createFile(testFile);
 
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
-    Optional<Path> foundPath = linkedFile.findIn(targetContext, filePreferences);
-    assertTrue(foundPath.isPresent());
-    assertTrue(foundPath.get().toString().contains("global_latex"));
+        Optional<Path> foundPath = linkedFile.findIn(targetContext, filePreferences);
+        assertTrue(foundPath.isPresent());
+        assertTrue(foundPath.get().toString().contains("global_latex"));
 
-    Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
-    assertTrue(primaryPath.isPresent());
-    assertTrue(primaryPath.get().toString().contains("global_latex"));
-  }
+        Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
+        assertTrue(primaryPath.isPresent());
+        assertTrue(primaryPath.get().toString().contains("global_latex"));
+    }
 
-  // endregion
+    // endregion
 
-  // region Library-specific directory tests
+    // region Library-specific directory tests
 
-  @Test
-  void fileInLibrarySpecificDirectoryShouldBeAccessible(@TempDir Path tempDir) throws Exception {
-    targetDir = tempDir.resolve("target");
-    Path librarySpecificDir = tempDir.resolve("library_specific");
+    @Test
+    void fileInLibrarySpecificDirectoryShouldBeAccessible(@TempDir Path tempDir) throws Exception {
+        targetDir = tempDir.resolve("target");
+        Path librarySpecificDir = tempDir.resolve("library_specific");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-    when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
 
-    Files.createDirectories(targetDir);
-    Files.createDirectories(librarySpecificDir);
+        Files.createDirectories(targetDir);
+        Files.createDirectories(librarySpecificDir);
 
-    testFile = librarySpecificDir.resolve("test.pdf");
-    Files.createFile(testFile);
+        testFile = librarySpecificDir.resolve("test.pdf");
+        Files.createFile(testFile);
 
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    MetaData targetMetaData = targetContext.getMetaData();
-    targetMetaData.setLibrarySpecificFileDirectory(librarySpecificDir.toString());
+        MetaData targetMetaData = targetContext.getMetaData();
+        targetMetaData.setLibrarySpecificFileDirectory(librarySpecificDir.toString());
 
-    LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
-    Optional<Path> foundPath = linkedFile.findIn(targetContext, filePreferences);
-    assertTrue(foundPath.isPresent());
-    assertTrue(foundPath.get().toString().contains("library_specific"));
+        Optional<Path> foundPath = linkedFile.findIn(targetContext, filePreferences);
+        assertTrue(foundPath.isPresent());
+        assertTrue(foundPath.get().toString().contains("library_specific"));
 
-    List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
-    assertTrue(fileDirectories.stream().anyMatch(path -> path.toString().contains("library_specific")));
-  }
+        List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
+        assertTrue(fileDirectories.stream().anyMatch(path -> path.toString().contains("library_specific")));
+    }
 
-  // endregion
+    // endregion
 
-  // region User-specific directory tests
+    // region User-specific directory tests
 
-  @Test
-  void fileInUserSpecificDirectoryShouldBeAccessible(@TempDir Path tempDir) throws Exception {
-    targetDir = tempDir.resolve("target");
-    Path userSpecificDir = tempDir.resolve("user_specific");
+    @Test
+    void fileInUserSpecificDirectoryShouldBeAccessible(@TempDir Path tempDir) throws Exception {
+        targetDir = tempDir.resolve("target");
+        Path userSpecificDir = tempDir.resolve("user_specific");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-    when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
 
-    Files.createDirectories(targetDir);
-    Files.createDirectories(userSpecificDir);
+        Files.createDirectories(targetDir);
+        Files.createDirectories(userSpecificDir);
 
-    testFile = userSpecificDir.resolve("test.pdf");
-    Files.createFile(testFile);
+        testFile = userSpecificDir.resolve("test.pdf");
+        Files.createFile(testFile);
 
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    MetaData targetMetaData = targetContext.getMetaData();
-    targetMetaData.setUserFileDirectory("testuser@testhost", userSpecificDir.toString());
+        MetaData targetMetaData = targetContext.getMetaData();
+        targetMetaData.setUserFileDirectory("testuser@testhost", userSpecificDir.toString());
 
-    LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
+        LinkedFile linkedFile = new LinkedFile("Test", "test.pdf", "PDF");
 
-    Optional<Path> foundPath = linkedFile.findIn(targetContext, filePreferences);
-    assertTrue(foundPath.isPresent());
-    assertTrue(foundPath.get().toString().contains("user_specific"));
+        Optional<Path> foundPath = linkedFile.findIn(targetContext, filePreferences);
+        assertTrue(foundPath.isPresent());
+        assertTrue(foundPath.get().toString().contains("user_specific"));
 
-    List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
-    assertTrue(fileDirectories.stream().anyMatch(path -> path.toString().contains("user_specific")));
-  }
+        List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
+        assertTrue(fileDirectories.stream().anyMatch(path -> path.toString().contains("user_specific")));
+    }
 
-  // endregion
+    // endregion
 
-  // region Directory precedence tests
+    // region Directory precedence tests
 
-  @Test
-  void userSpecificDirectoryHasHighestPrecedence(@TempDir Path tempDir) throws Exception {
-    targetDir = tempDir.resolve("target");
-    Path librarySpecificDir = tempDir.resolve("library_specific");
-    Path userSpecificDir = tempDir.resolve("user_specific");
+    @Test
+    void userSpecificDirectoryHasHighestPrecedence(@TempDir Path tempDir) throws Exception {
+        targetDir = tempDir.resolve("target");
+        Path librarySpecificDir = tempDir.resolve("library_specific");
+        Path userSpecificDir = tempDir.resolve("user_specific");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-    when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
 
-    Files.createDirectories(targetDir);
-    Files.createDirectories(librarySpecificDir);
-    Files.createDirectories(userSpecificDir);
+        Files.createDirectories(targetDir);
+        Files.createDirectories(librarySpecificDir);
+        Files.createDirectories(userSpecificDir);
 
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    MetaData targetMetaData = targetContext.getMetaData();
-    targetMetaData.setLibrarySpecificFileDirectory(librarySpecificDir.toString());
-    targetMetaData.setUserFileDirectory("testuser@testhost", userSpecificDir.toString());
+        MetaData targetMetaData = targetContext.getMetaData();
+        targetMetaData.setLibrarySpecificFileDirectory(librarySpecificDir.toString());
+        targetMetaData.setUserFileDirectory("testuser@testhost", userSpecificDir.toString());
 
-    Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
-    assertTrue(primaryPath.isPresent());
-    assertTrue(primaryPath.get().toString().contains("user_specific"));
+        Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
+        assertTrue(primaryPath.isPresent());
+        assertTrue(primaryPath.get().toString().contains("user_specific"));
 
-    List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
-    assertEquals(3, fileDirectories.size());
-    assertTrue(fileDirectories.get(0).toString().contains("user_specific"));
-    assertTrue(fileDirectories.get(1).toString().contains("library_specific"));
-    assertTrue(fileDirectories.get(2).toString().contains("target"));
-  }
+        List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
+        assertEquals(3, fileDirectories.size());
+        assertTrue(fileDirectories.getFirst().toString().contains("user_specific"));
+        assertTrue(fileDirectories.get(1).toString().contains("library_specific"));
+        assertTrue(fileDirectories.get(2).toString().contains("target"));
+    }
 
-  @Test
-  void librarySpecificDirectoryHasHigherPrecedenceThanBibFileDirectory(@TempDir Path tempDir) throws Exception {
-    targetDir = tempDir.resolve("target");
-    Path librarySpecificDir = tempDir.resolve("library_specific");
+    @Test
+    void librarySpecificDirectoryHasHigherPrecedenceThanBibFileDirectory(@TempDir Path tempDir) throws Exception {
+        targetDir = tempDir.resolve("target");
+        Path librarySpecificDir = tempDir.resolve("library_specific");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
-    when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(true);
+        when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
 
-    Files.createDirectories(targetDir);
-    Files.createDirectories(librarySpecificDir);
+        Files.createDirectories(targetDir);
+        Files.createDirectories(librarySpecificDir);
 
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    MetaData targetMetaData = targetContext.getMetaData();
-    targetMetaData.setLibrarySpecificFileDirectory(librarySpecificDir.toString());
+        MetaData targetMetaData = targetContext.getMetaData();
+        targetMetaData.setLibrarySpecificFileDirectory(librarySpecificDir.toString());
 
-    Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
-    assertTrue(primaryPath.isPresent());
-    assertTrue(primaryPath.get().toString().contains("library_specific"));
+        Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
+        assertTrue(primaryPath.isPresent());
+        assertTrue(primaryPath.get().toString().contains("library_specific"));
 
-    List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
-    assertEquals(2, fileDirectories.size());
-    assertTrue(fileDirectories.get(0).toString().contains("library_specific"));
-    assertTrue(fileDirectories.get(1).toString().contains("target"));
-  }
+        List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
+        assertEquals(2, fileDirectories.size());
+        assertTrue(fileDirectories.getFirst().toString().contains("library_specific"));
+        assertTrue(fileDirectories.get(1).toString().contains("target"));
+    }
 
-  @Test
-  void globalLatexDirectoryTakesPrecedenceWhenConfigured(@TempDir Path tempDir) throws Exception {
-    targetDir = tempDir.resolve("target");
-    Path globalLatexDir = tempDir.resolve("global_latex");
+    @Test
+    void globalLatexDirectoryTakesPrecedenceWhenConfigured(@TempDir Path tempDir) throws Exception {
+        targetDir = tempDir.resolve("target");
+        Path globalLatexDir = tempDir.resolve("global_latex");
 
-    when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
-    when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
-    when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
+        when(filePreferences.shouldStoreFilesRelativeToBibFile()).thenReturn(false);
+        when(filePreferences.getMainFileDirectory()).thenReturn(java.util.Optional.of(globalLatexDir));
+        when(filePreferences.getUserAndHost()).thenReturn("testuser@testhost");
 
-    Files.createDirectories(targetDir);
-    Files.createDirectories(globalLatexDir);
+        Files.createDirectories(targetDir);
+        Files.createDirectories(globalLatexDir);
 
-    targetContext = new BibDatabaseContext(new BibDatabase());
-    targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
+        targetContext = new BibDatabaseContext(new BibDatabase());
+        targetContext.setDatabasePath(targetDir.resolve("papers.bib"));
 
-    Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
-    assertTrue(primaryPath.isPresent());
-    assertTrue(primaryPath.get().toString().contains("global_latex"));
+        Optional<Path> primaryPath = LinkedFileTransferHelper.getPrimaryPath(targetContext, filePreferences);
+        assertTrue(primaryPath.isPresent());
+        assertTrue(primaryPath.get().toString().contains("global_latex"));
 
-    List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
-    assertEquals(1, fileDirectories.size());
-    assertTrue(fileDirectories.getFirst().toString().contains("global_latex"));
-  }
+        List<Path> fileDirectories = targetContext.getFileDirectories(filePreferences);
+        assertEquals(1, fileDirectories.size());
+        assertTrue(fileDirectories.getFirst().toString().contains("global_latex"));
+    }
 
-  // endregion
+    // endregion
 }
