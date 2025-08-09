@@ -176,7 +176,7 @@ public class GroupDialogViewModel {
         keywordRegexValidator = new FunctionBasedValidator<>(
                 keywordGroupSearchTermProperty,
                 input -> {
-                    if (Boolean.FALSE.equals(keywordGroupRegexProperty.getValue())) {
+                    if (!keywordGroupRegexProperty.get()) {
                         return true;
                     }
 
