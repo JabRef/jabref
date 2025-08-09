@@ -32,8 +32,8 @@ import org.jabref.logic.exporter.BibDatabaseWriter;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.exporter.SelfContainedSaveConfiguration;
-import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.logic.shared.prefs.SharedDatabasePreferences;
 import org.jabref.logic.util.BackgroundTask;
@@ -307,8 +307,12 @@ public class SaveDatabaseAction {
                 .filter(buttonType -> buttonType.equals(tryDifferentEncoding))
                 .isPresent();
         if (saveWithDifferentEncoding) {
-            Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(Localization.lang("Save library"), Localization.lang("Select new encoding"),
-                    Localization.lang("Save library"), encoding, Encodings.getCharsets());
+            Optional<Charset> newEncoding = dialogService.showChoiceDialogAndWait(
+                    Localization.lang("Save library"),
+                    Localization.lang("Select new encoding"),
+                    Localization.lang("Save library"),
+                    encoding,
+                    OS.ENCODINGS);
             if (newEncoding.isPresent()) {
                 // Make sure to remember which encoding we used.
                 libraryTab.getBibDatabaseContext().getMetaData().setEncoding(newEncoding.get(), ChangePropagation.DO_NOT_POST_EVENT);
