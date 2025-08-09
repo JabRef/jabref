@@ -52,8 +52,7 @@ public class OS {
         if (StringUtil.isBlank(hostName)) {
             try {
                 hostName = InetAddress.getLocalHost().getHostName();
-            } catch (
-                    UnknownHostException e) {
+            } catch (UnknownHostException e) {
                 LoggerFactory.getLogger(OS.class).info("Hostname not found. Using \"localhost\" as fallback.", e);
                 hostName = "localhost";
             }
@@ -68,16 +67,13 @@ public class OS {
                 return false;
             }
             keyring.deletePassword("JabRef", "keyringTest");
-        } catch (
-                BackendNotSupportedException ex) {
+        } catch (BackendNotSupportedException ex) {
             LoggerFactory.getLogger(OS.class).warn("Credential store not supported.");
             return false;
-        } catch (
-                PasswordAccessException ex) {
+        } catch (PasswordAccessException ex) {
             LoggerFactory.getLogger(OS.class).warn("Password storage in credential store failed.");
             return false;
-        } catch (
-                Exception ex) {
+        } catch (Exception ex) {
             LoggerFactory.getLogger(OS.class).warn("Connection to credential store failed");
             return false;
         }
@@ -94,8 +90,7 @@ public class OS {
                 try {
                     ShellLink link = new ShellLink(texworksLinkPath);
                     return link.resolveTarget();
-                } catch (
-                        IOException |
+                } catch (IOException |
                         ShellLinkException e) {
                     // Static logger instance cannot be used. See the class comment.
                     Logger logger = LoggerFactory.getLogger(OS.class);
