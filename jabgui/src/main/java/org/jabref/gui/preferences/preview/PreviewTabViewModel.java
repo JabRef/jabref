@@ -28,6 +28,7 @@ import javafx.scene.input.TransferMode;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.DragAndDropDataFormats;
 import org.jabref.gui.StateManager;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.util.CustomLocalDragboard;
@@ -80,8 +81,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private final StringProperty sourceTextProperty = new SimpleStringProperty("");
 
     private final DialogService dialogService;
-    private final PreviewPreferences previewPreferences;
     private final TaskExecutor taskExecutor;
+    private final GuiPreferences preferences;
 
     private final Validator chosenListValidator;
 
@@ -90,13 +91,13 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     private ObjectProperty<MultipleSelectionModel<PreviewLayout>> dragSourceSelectionModel = null;
 
     public PreviewTabViewModel(DialogService dialogService,
-                               PreviewPreferences previewPreferences,
+                               GuiPreferences preferences,
                                TaskExecutor taskExecutor,
                                StateManager stateManager) {
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
         this.localDragboard = stateManager.getLocalDragboard();
-        this.previewPreferences = previewPreferences;
+        this.preferences = preferences;
 
         sourceTextProperty.addListener((_, _, _) -> {
             if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
@@ -118,6 +119,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+
         showAsExtraTabProperty.set(previewPreferences.shouldShowPreviewAsExtraTab());
         showPreviewInEntryTableTooltip.set(previewPreferences.shouldShowPreviewEntryTableTooltip());
         chosenListProperty().getValue().clear();
@@ -193,6 +196,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
      */
     @Override
     public void storeSettings() {
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+
         if (chosenListProperty.isEmpty()) {
             chosenListProperty.add(previewPreferences.getCustomPreviewLayout());
         }
@@ -291,6 +296,8 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
     }
 
     public void resetDefaultLayout() {
+        PreviewPreferences previewPreferences = preferences.getPreviewPreferences();
+
         PreviewLayout defaultLayout = findLayoutByName(TextBasedPreviewLayout.NAME);
         if (defaultLayout instanceof TextBasedPreviewLayout layout) {
             layout.setText(previewPreferences.getDefaultCustomPreviewLayout());
