@@ -159,6 +159,7 @@ public class WelcomeTab extends Tab {
         scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         scrollPane.getStyleClass().add("welcome-columns-scroll");
+        scrollPane.setStyle("-fx-background-color: transparent;"); // Using class selector is insufficient to prevent background from turning white on click.
         return scrollPane;
     }
 
