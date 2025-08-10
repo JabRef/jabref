@@ -40,18 +40,14 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
     private final ProtectedTermsLoader termsLoader;
     private final ListProperty<ProtectedTermsListItemModel> termsFilesProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final DialogService dialogService;
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
-    private final FilePreferences filePreferences;
-    private final ProtectedTermsPreferences protectedTermsPreferences;
+    private final GuiPreferences preferences;
 
     public ProtectedTermsTabViewModel(ProtectedTermsLoader termsLoader,
                                       DialogService dialogService,
                                       GuiPreferences preferences) {
         this.termsLoader = termsLoader;
         this.dialogService = dialogService;
-        this.externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
-        this.filePreferences = preferences.getFilePreferences();
-        this.protectedTermsPreferences = preferences.getProtectedTermsPreferences();
+        this.preferences = preferences;
     }
 
     @Override
@@ -62,6 +58,8 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        ProtectedTermsPreferences protectedTermsPreferences = preferences.getProtectedTermsPreferences();
+
         List<String> enabledExternalList = new ArrayList<>();
         List<String> disabledExternalList = new ArrayList<>();
         List<String> enabledInternalList = new ArrayList<>();
@@ -96,7 +94,7 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
         FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder()
                 .addExtensionFilter(Localization.lang("Protected terms file"), StandardFileType.TERMS)
                 .withDefaultExtension(Localization.lang("Protected terms file"), StandardFileType.TERMS)
-                .withInitialDirectory(filePreferences.getWorkingDirectory())
+                .withInitialDirectory(preferences.getFilePreferences().getWorkingDirectory())
                 .build();
 
         dialogService.showFileOpenDialog(fileDialogConfiguration)
@@ -120,10 +118,13 @@ public class ProtectedTermsTabViewModel implements PreferenceTabViewModel {
     }
 
     public void createNewFile() {
-        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsFilesProperty, dialogService, filePreferences));
+        dialogService.showCustomDialogAndWait(new NewProtectedTermsFileDialog(termsFilesProperty, dialogService, preferences.getFilePreferences()));
     }
 
     public void edit(ProtectedTermsListItemModel file) {
+        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+        FilePreferences filePreferences = preferences.getFilePreferences();
+
         Optional<ExternalFileType> termsFileType = OptionalUtil.<ExternalFileType>orElse(
                 ExternalFileTypes.getExternalFileTypeByExt("terms", externalApplicationsPreferences),
                 ExternalFileTypes.getExternalFileTypeByExt("txt", externalApplicationsPreferences)
