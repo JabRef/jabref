@@ -16,6 +16,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import org.jabref.gui.ClipBoardManager;
 import org.jabref.gui.DialogService;
@@ -63,8 +64,10 @@ public class WelcomeTab extends Tab {
     private final TaskExecutor taskExecutor;
     private final FileHistoryMenu fileHistoryMenu;
     private final BuildInfo buildInfo;
+    private final Stage stage;
 
-    public WelcomeTab(LibraryTabContainer tabContainer,
+    public WelcomeTab(Stage stage,
+                      LibraryTabContainer tabContainer,
                       GuiPreferences preferences,
                       AiService aiService,
                       DialogService dialogService,
@@ -90,6 +93,7 @@ public class WelcomeTab extends Tab {
         this.taskExecutor = taskExecutor;
         this.fileHistoryMenu = fileHistoryMenu;
         this.buildInfo = buildInfo;
+        this.stage = stage;
         this.recentLibrariesBox = new VBox();
         recentLibrariesBox.getStyleClass().add("welcome-recent-libraries");
 
@@ -105,11 +109,11 @@ public class WelcomeTab extends Tab {
     }
 
     private Button createWalkthroughButton(String text, IconTheme.JabRefIcons icon, String walkthroughId) {
-        Button button = new Button(Localization.lang(text));
+        Button button = new Button(text);
         button.setGraphic(icon.getGraphicNode());
         button.getStyleClass().add("quick-settings-button");
         button.setMaxWidth(Double.MAX_VALUE);
-        button.setOnAction(_ -> new WalkthroughAction(walkthroughId).execute());
+        button.setOnAction(_ -> new WalkthroughAction(stage, tabContainer, stateManager, walkthroughId).execute());
         return button;
     }
 
@@ -160,18 +164,24 @@ public class WelcomeTab extends Tab {
         walkthroughsContainer.getStyleClass().add("walkthroughs-container");
 
         Button mainFileDirWalkthroughButton = createWalkthroughButton(
-                "Set main file directory",
+                Localization.lang("Set main file directory"),
                 IconTheme.JabRefIcons.FOLDER,
-                "mainFileDirectory"
+                WalkthroughAction.MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME
         );
 
         Button entryTableWalkthroughButton = createWalkthroughButton(
-                "Customize entry table",
+                Localization.lang("Customize entry table"),
                 IconTheme.JabRefIcons.TOGGLE_GROUPS,
-                "customizeEntryTable"
+                WalkthroughAction.CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME
         );
 
-        walkthroughsContainer.getChildren().addAll(mainFileDirWalkthroughButton, entryTableWalkthroughButton);
+        Button linkPdfWalkthroughButton = createWalkthroughButton(
+                Localization.lang("Link PDF to entries"),
+                IconTheme.JabRefIcons.TOGGLE_GROUPS,
+                WalkthroughAction.PDF_LINK_WALKTHROUGH_NAME
+        );
+
+        walkthroughsContainer.getChildren().addAll(mainFileDirWalkthroughButton, entryTableWalkthroughButton, linkPdfWalkthroughButton);
 
         return createVBoxContainer(header, walkthroughsContainer);
     }
