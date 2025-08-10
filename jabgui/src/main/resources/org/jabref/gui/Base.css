@@ -2904,10 +2904,10 @@ journalInfo .grid-cell-b {
 
 .walkthrough-tooltip-title > *,
 .walkthrough-title > * {
-    -fx-text-fill: -jr-theme;
-    -fx-fill: -jr-theme;
+    -fx-text-fill: -jr-theme!important;
+    -fx-fill: -jr-theme!important;
     -fx-font-weight: bold;
-    -fx-font-size: 2em;
+    -fx-font-size: 1.75em;
     -fx-line-spacing: -0.25em;
 }
 
