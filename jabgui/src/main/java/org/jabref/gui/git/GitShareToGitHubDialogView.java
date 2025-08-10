@@ -56,8 +56,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     @FXML
     private void initialize() {
         patHelpTooltip.setText(
-                Localization.lang("Need help?") + "\n" +
-                        Localization.lang("Click to open GitHub Personal Access Token documentation")
+                Localization.lang("Click to open GitHub Personal Access Token documentation")
         );
 
         username.setPromptText(Localization.lang("Your GitHub username"));

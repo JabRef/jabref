@@ -3,24 +3,30 @@ package org.jabref.logic.git;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.prefs.GitPreferences;
 
+import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.PullCommand;
+import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryState;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.merge.MergeStrategy;
-import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
+import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +79,7 @@ public class GitHandler {
         }
     }
 
-    private Optional<CredentialsProvider> resolveCredentialsOrLoad() throws JabRefException {
+    private Optional<CredentialsProvider> resolveCredentials() {
         if (credentialsProvider != null) {
             return Optional.of(credentialsProvider);
         }
@@ -105,6 +111,46 @@ public class GitHandler {
             pat = "";
         }
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(username, pat);
+    }
+
+    private static Optional<String> currentRemoteUrl(Repository repo) {
+        try {
+            StoredConfig config = repo.getConfig();
+            String branch = repo.getBranch();
+
+            String remote = config.getString("branch", branch, "remote");
+            if (remote == null) {
+                Set<String> remotes = config.getSubsections("remote");
+                if (remotes.contains("origin")) {
+                    remote = "origin";
+                } else if (!remotes.isEmpty()) {
+                    remote = remotes.iterator().next();
+                }
+            }
+            if (remote == null) {
+                return Optional.empty();
+            }
+            String url = config.getString("remote", remote, "url");
+            if (url == null || url.isBlank()) {
+                return Optional.empty();
+            }
+            return Optional.of(url);
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    private static boolean requiresCredentialsForUrl(String url) {
+        try {
+            URIish uri = new URIish(url);
+            String scheme = uri.getScheme();
+            if (scheme == null) {
+                return false;
+            }
+            return "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme);
+        } catch (URISyntaxException e) {
+            return false;
+        }
     }
 
     void setupGitIgnore() {
@@ -231,37 +277,65 @@ public class GitHandler {
      * If pushing to remote fails, it fails silently.
      */
     public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
-        CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
-
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            git.push()
-               .setCredentialsProvider(provider)
-               .call();
+            Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
+            Optional<CredentialsProvider> credsOpt = resolveCredentials();
+
+            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
+            if (needCreds && credsOpt.isEmpty()) {
+                throw new IOException("Missing Git credentials (username and Personal Access Token).");
+            }
+
+            PushCommand pushCommand = git.push();
+            if (credsOpt.isPresent()) {
+                pushCommand.setCredentialsProvider(credsOpt.get());
+            }
+            pushCommand.call();
         }
     }
 
     public void pushCurrentBranchCreatingUpstream() throws IOException, GitAPIException, JabRefException {
         try (Git git = open()) {
-            CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
-            String branch = git.getRepository().getBranch();
-            git.push()
-               .setRemote("origin")
-               .setCredentialsProvider(provider)
-               .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch))
-               .call();
+            Repository repo = git.getRepository();
+            StoredConfig config = repo.getConfig();
+            String remoteUrl = config.getString("remote", "origin", "url");
+
+            Optional<CredentialsProvider> credsOpt = resolveCredentials();
+            boolean needCreds = (remoteUrl != null) && requiresCredentialsForUrl(remoteUrl);
+            if (needCreds && credsOpt.isEmpty()) {
+                throw new IOException("Missing Git credentials (username and Personal Access Token).");
+            }
+
+            String branch = repo.getBranch();
+
+            PushCommand pushCommand = git.push()
+                                 .setRemote("origin")
+                                 .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch));
+
+            if (credsOpt.isPresent()) {
+                pushCommand.setCredentialsProvider(credsOpt.get());
+            }
+            pushCommand.call();
         }
     }
 
-    public void pullOnCurrentBranch() throws IOException, JabRefException {
-        CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
+    public void pullOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                git.pull()
-                   .setCredentialsProvider(provider)
-                   .call();
-            } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
+            Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
+            Optional<CredentialsProvider> credsOpt = resolveCredentials();
+
+            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
+            if (needCreds && credsOpt.isEmpty()) {
+                throw new IOException("Missing Git credentials (username and Personal Access Token).");
             }
+
+            PullCommand pullCommand = git.pull();
+            if (credsOpt.isPresent()) {
+                pullCommand.setCredentialsProvider(credsOpt.get());
+            }
+            pullCommand.call();
+        } catch (GitAPIException e) {
+            throw new IOException("Failed to pull from remote: " + e.getMessage(), e);
         }
     }
 
@@ -271,14 +345,22 @@ public class GitHandler {
         }
     }
 
-    public void fetchOnCurrentBranch() throws IOException, JabRefException {
-        CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
+    public void fetchOnCurrentBranch() throws IOException {
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            git.fetch()
-               .setCredentialsProvider(provider)
-               .call();
+            Optional<String> urlOpt = currentRemoteUrl(git.getRepository());
+            Optional<CredentialsProvider> credsOpt = resolveCredentials();
+
+            boolean needCreds = urlOpt.map(GitHandler::requiresCredentialsForUrl).orElse(false);
+            if (needCreds && credsOpt.isEmpty()) {
+                throw new IOException("Missing Git credentials (username and Personal Access Token).");
+            }
+            FetchCommand fetchCommand = git.fetch();
+            if (credsOpt.isPresent()) {
+                fetchCommand.setCredentialsProvider(credsOpt.get());
+            }
+            fetchCommand.call();
         } catch (GitAPIException e) {
-            LOGGER.error("Failed to fetch from remote", e);
+            throw new IOException("Failed to fetch from remote: " + e.getMessage(), e);
         }
     }
 
@@ -311,5 +393,16 @@ public class GitHandler {
 
     public Git open() throws IOException {
         return Git.open(this.repositoryPathAsFile);
+    }
+
+    public boolean hasRemote(String remoteName) {
+        try (Git git = Git.open(this.repositoryPathAsFile)) {
+            return git.getRepository().getConfig()
+                      .getSubsections("remote")
+                      .contains(remoteName);
+        } catch (IOException e) {
+            LOGGER.error("Failed to check remote configuration", e);
+            return false;
+        }
     }
 }

@@ -86,53 +86,62 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
         try {
             GitInitService.initRepoAndSetRemote(bibPath, url);
+        } catch (JabRefException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Git error"), e.getMessage(), e);
+            return false;
+        }
 
-            GitHandlerRegistry registry = new GitHandlerRegistry();
-            GitHandler handler = registry.get(bibPath.getParent());
+        GitHandlerRegistry registry = new GitHandlerRegistry();
+        GitHandler handler = registry.get(bibPath.getParent());
 
-            boolean hasStoredPat = gitPreferences.getPersonalAccessToken().isPresent();
-            if (!rememberSettingsProperty().get() || !hasStoredPat) {
-                handler.setCredentials(user, pat);
-            }
-            GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);
+        boolean hasStoredPat = gitPreferences.getPersonalAccessToken().isPresent();
+        if (!rememberSettingsProperty().get() || !hasStoredPat) {
+            handler.setCredentials(user, pat);
+        }
 
-            if (status.syncStatus() == SyncStatus.BEHIND) {
-                dialogService.showWarningDialogAndWait(
-                        Localization.lang("Remote repository is not empty"),
-                        Localization.lang("Please pull changes before pushing.")
-                );
-                return false;
-            }
+        GitStatusSnapshot status = null;
+        try {
+            status = GitStatusChecker.checkStatusAndFetch(handler);
+        } catch (IOException | JabRefException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Cannot reach remote"), e);
+            return false;
+        }
 
-            handler.createCommitOnCurrentBranch(Localization.lang("Share library to GitHub"), false);
-            try {
-                if (status.syncStatus() == SyncStatus.REMOTE_EMPTY) {
-                    handler.pushCurrentBranchCreatingUpstream();
-                } else {
-                    handler.pushCommitsToRemoteRepository();
-                }
-            } catch (IOException | GitAPIException e) {
-                LOGGER.error("Push failed", e);
-                dialogService.showErrorDialogAndWait(Localization.lang("Git error"), e);
-                return false;
-            }
-
-            setGitPreferences(url, user, pat);
-
-            dialogService.showInformationDialogAndWait(
-                    Localization.lang("GitHub Share"),
-                    Localization.lang("Successfully pushed to %0", url)
+        if (status.syncStatus() == SyncStatus.BEHIND) {
+            dialogService.showWarningDialogAndWait(
+                    Localization.lang("Remote repository is not empty"),
+                    Localization.lang("Please pull changes before pushing.")
             );
-            return true;
-        } catch (GitAPIException |
-                 IOException e) {
-            LOGGER.error("Error sharing to GitHub", e);
+            return false;
+        }
+
+        try {
+            handler.createCommitOnCurrentBranch(Localization.lang("Share library to GitHub"), false);
+        } catch (IOException | GitAPIException e) {
+            dialogService.showErrorDialogAndWait(Localization.lang("Create commit failed", e));
+        }
+
+        try {
+            if (status.syncStatus() == SyncStatus.REMOTE_EMPTY) {
+                handler.pushCurrentBranchCreatingUpstream();
+            } else {
+                handler.pushCommitsToRemoteRepository();
+            }
+        } catch (IOException | GitAPIException e) {
+            LOGGER.error("Push failed", e);
             dialogService.showErrorDialogAndWait(Localization.lang("Git error"), e);
             return false;
         } catch (JabRefException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Git error"), e);
-            return false;
+            dialogService.showErrorDialogAndWait(Localization.lang("Missing Git credentials"), e);
         }
+
+        setGitPreferences(url, user, pat);
+
+        dialogService.showInformationDialogAndWait(
+                Localization.lang("GitHub Share"),
+                Localization.lang("Successfully pushed to %0", url)
+        );
+        return true;
     }
 
     private void applyGitPreferences() {
@@ -158,7 +167,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     }
 
     private static String trimOrEmpty(String s) {
-        return (s == null) ? "" : s.trim();
+        return s == null ? "" : s.trim();
     }
 
     public StringProperty githubUsernameProperty() {
