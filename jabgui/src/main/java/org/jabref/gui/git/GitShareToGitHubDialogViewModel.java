@@ -99,7 +99,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
             handler.setCredentials(user, pat);
         }
 
-        GitStatusSnapshot status = null;
+        GitStatusSnapshot status;
         try {
             status = GitStatusChecker.checkStatusAndFetch(handler);
         } catch (IOException | JabRefException e) {
