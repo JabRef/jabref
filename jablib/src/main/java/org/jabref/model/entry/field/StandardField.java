@@ -93,7 +93,7 @@ public enum StandardField implements Field {
     ORIGDATE("origdate", FieldProperty.DATE),
     ORIGLANGUAGE("origlanguage", FieldProperty.LANGUAGE),
     PAGES("pages"),
-    PAGETOTAL("pagetotal"),
+    PAGETOTAL("pagetotal", FieldProperty.NUMERIC),
     PAGINATION("pagination", FieldProperty.PAGINATION),
     PART("part"),
     PDF("pdf", "PDF"),

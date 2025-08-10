@@ -5,6 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.git.GitHandler;
+import org.jabref.logic.git.util.GitHandlerRegistry;
+
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.internal.storage.file.WindowCache;
@@ -28,6 +31,7 @@ class GitStatusCheckerTest {
     private Git localGit;
     private Git remoteGit;
     private Git seedGit;
+    private GitHandlerRegistry gitHandlerRegistry;
 
     private final PersonIdent author = new PersonIdent("Tester", "tester@example.org");
 
@@ -69,6 +73,7 @@ class GitStatusCheckerTest {
 
     @BeforeEach
     void setup(@TempDir Path tempDir) throws Exception {
+        gitHandlerRegistry = new GitHandlerRegistry();
         Path remoteDir = tempDir.resolve("remote.git");
         remoteGit = Git.init().setBare(true).setDirectory(remoteDir.toFile()).call();
 
@@ -132,13 +137,16 @@ class GitStatusCheckerTest {
     void untrackedStatusWhenNotGitRepo(@TempDir Path tempDir) {
         Path nonRepoPath = tempDir.resolve("somefile.bib");
         GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(nonRepoPath);
+
         assertFalse(snapshot.tracking());
         assertEquals(SyncStatus.UNTRACKED, snapshot.syncStatus());
     }
 
     @Test
     void upToDateStatusAfterInitialSync() {
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
+
         assertTrue(snapshot.tracking());
         assertEquals(SyncStatus.UP_TO_DATE, snapshot.syncStatus());
     }
@@ -159,14 +167,17 @@ class GitStatusCheckerTest {
                        .call();
         }
         localGit.fetch().setRemote("origin").call();
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
+
         assertEquals(SyncStatus.BEHIND, snapshot.syncStatus());
     }
 
     @Test
     void aheadStatusWhenLocalHasNewCommit() throws Exception {
         commitFile(localGit, localUpdatedContent, "Local update");
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
         assertEquals(SyncStatus.AHEAD, snapshot.syncStatus());
     }
 
@@ -188,7 +199,8 @@ class GitStatusCheckerTest {
                        .call();
         }
         localGit.fetch().setRemote("origin").call();
-        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(localLibrary);
+        GitHandler gitHandler = gitHandlerRegistry.get(localLibrary.getParent());
+        GitStatusSnapshot snapshot = GitStatusChecker.checkStatus(gitHandler);
         assertEquals(SyncStatus.DIVERGED, snapshot.syncStatus());
     }
 

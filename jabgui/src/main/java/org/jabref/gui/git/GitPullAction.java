@@ -14,6 +14,7 @@ import org.jabref.logic.git.GitSyncService;
 import org.jabref.logic.git.conflicts.GitConflictResolverStrategy;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutor;
 import org.jabref.logic.git.merge.GitSemanticMergeExecutorImpl;
+import org.jabref.logic.git.util.GitHandlerRegistry;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -27,15 +28,18 @@ public class GitPullAction extends SimpleCommand {
     private final StateManager stateManager;
     private final GuiPreferences guiPreferences;
     private final TaskExecutor taskExecutor;
+    private final GitHandlerRegistry handlerRegistry;
 
     public GitPullAction(DialogService dialogService,
                          StateManager stateManager,
                          GuiPreferences guiPreferences,
-                         TaskExecutor taskExecutor) {
+                         TaskExecutor taskExecutor,
+                         GitHandlerRegistry handlerRegistry) {
         this.dialogService = dialogService;
         this.stateManager = stateManager;
         this.guiPreferences = guiPreferences;
         this.taskExecutor = taskExecutor;
+        this.handlerRegistry = handlerRegistry;
     }
 
     @Override
@@ -65,7 +69,7 @@ public class GitPullAction extends SimpleCommand {
         GitConflictResolverStrategy resolver = new GuiGitConflictResolverStrategy(dialog);
         GitSemanticMergeExecutor mergeExecutor = new GitSemanticMergeExecutorImpl(guiPreferences.getImportFormatPreferences());
 
-        GitSyncService syncService = new GitSyncService(guiPreferences.getImportFormatPreferences(), handler, resolver, mergeExecutor);
+        GitSyncService syncService = new GitSyncService(guiPreferences.getImportFormatPreferences(), handlerRegistry, resolver, mergeExecutor);
         GitStatusViewModel statusViewModel = new GitStatusViewModel(stateManager, bibFilePath);
         GitPullViewModel viewModel = new GitPullViewModel(syncService, statusViewModel);
 
