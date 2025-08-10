@@ -11,6 +11,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.layout.format.NameFormatterPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.strings.StringUtil;
 
 public class NameFormatterTabViewModel implements PreferenceTabViewModel {
@@ -19,14 +20,15 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
     private final StringProperty addFormatterNameProperty = new SimpleStringProperty();
     private final StringProperty addFormatterStringProperty = new SimpleStringProperty();
 
-    private final NameFormatterPreferences nameFormatterPreferences;
+    private final CliPreferences preferences;
 
-    NameFormatterTabViewModel(NameFormatterPreferences preferences) {
-        this.nameFormatterPreferences = preferences;
+    NameFormatterTabViewModel(CliPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
     public void setValues() {
+        NameFormatterPreferences nameFormatterPreferences = preferences.getNameFormatterPreferences();
         formatterListProperty.clear();
         List<String> names = nameFormatterPreferences.getNameFormatterKey();
         List<String> formats = nameFormatterPreferences.getNameFormatterValue();
@@ -42,6 +44,8 @@ public class NameFormatterTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        NameFormatterPreferences nameFormatterPreferences = preferences.getNameFormatterPreferences();
+
         formatterListProperty.removeIf(formatter -> formatter.getName().isEmpty());
 
         List<String> names = new ArrayList<>(formatterListProperty.size());

@@ -43,7 +43,7 @@ public class NameFormatterTab extends AbstractPreferenceTabView<NameFormatterTab
     }
 
     public void initialize() {
-        this.viewModel = new NameFormatterTabViewModel(preferences.getNameFormatterPreferences());
+        this.viewModel = new NameFormatterTabViewModel(preferences);
 
         formatterNameColumn.setSortable(true);
         formatterNameColumn.setReorderable(false);
