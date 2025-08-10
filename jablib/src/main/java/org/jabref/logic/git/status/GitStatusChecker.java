@@ -12,6 +12,7 @@ import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.BranchConfig;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -37,7 +38,20 @@ public class GitStatusChecker {
             String trackingBranch = new BranchConfig(repo.getConfig(), repo.getBranch()).getTrackingBranch();
             ObjectId remoteHead = trackingBranch != null ? repo.resolve(trackingBranch) : null;
 
-            SyncStatus syncStatus = determineSyncStatus(repo, localHead, remoteHead);
+            SyncStatus syncStatus;
+
+            if (remoteHead == null) {
+                boolean remoteEmpty = isRemoteEmpty(gitHandler);
+                if (remoteEmpty) {
+                    LOGGER.debug("Remote has NO heads -> REMOTE_EMPTY");
+                    syncStatus = SyncStatus.REMOTE_EMPTY;
+                } else {
+                    LOGGER.debug("Remote is NOT empty but remoteHead unresolved -> UNKNOWN");
+                    syncStatus = SyncStatus.UNKNOWN;
+                }
+            } else {
+                syncStatus = determineSyncStatus(repo, localHead, remoteHead);
+            }
 
             return new GitStatusSnapshot(
                     GitStatusSnapshot.TRACKING,
@@ -73,6 +87,15 @@ public class GitStatusChecker {
         return checkStatus(handlerOpt.get());
     }
 
+    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) {
+        try {
+            gitHandler.fetchOnCurrentBranch();
+        } catch (IOException e) {
+            LOGGER.warn("Failed to fetch before checking status", e);
+        }
+        return checkStatus(gitHandler);
+    }
+
     private static SyncStatus determineSyncStatus(Repository repo, ObjectId localHead, ObjectId remoteHead) throws IOException {
         if (localHead == null || remoteHead == null) {
             LOGGER.debug("localHead or remoteHead null");
@@ -101,6 +124,25 @@ public class GitStatusChecker {
                 LOGGER.debug("Could not determine git sync status. All commits differ or mergeBase is null.");
                 return SyncStatus.UNKNOWN;
             }
+        }
+    }
+
+    public static boolean isRemoteEmpty(GitHandler gitHandler) {
+        try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {
+            Iterable<Ref> heads = git.lsRemote()
+                                     .setRemote("origin")
+                                     .setHeads(true)
+                                     .call();
+            boolean empty = (heads == null) || !heads.iterator().hasNext();
+            if (empty) {
+                LOGGER.debug("ls-remote: origin has NO heads.");
+            } else {
+                LOGGER.debug("ls-remote: origin has heads.");
+            }
+            return empty;
+        } catch (IOException | GitAPIException e) {
+            LOGGER.debug("ls-remote failed when checking remote emptiness; assume NOT empty.", e);
+            return false;
         }
     }
 }

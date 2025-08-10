@@ -7,13 +7,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.logic.git.prefs.GitPreferences;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.eclipse.jgit.transport.CredentialsProvider;
+import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +30,7 @@ public class GitHandler {
     static final Logger LOGGER = LoggerFactory.getLogger(GitHandler.class);
     final Path repositoryPath;
     final File repositoryPathAsFile;
-    String gitUsername = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
-    String gitPassword = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-    final CredentialsProvider credentialsProvider = new UsernamePasswordCredentialsProvider(gitUsername, gitPassword);
+    private CredentialsProvider credentialsProvider;
 
     /**
      * Initialize the handler for the given repository
@@ -38,30 +40,68 @@ public class GitHandler {
     public GitHandler(Path repositoryPath) {
         this.repositoryPath = repositoryPath;
         this.repositoryPathAsFile = this.repositoryPath.toFile();
-        if (!isGitRepository()) {
-            try {
-                try (Git git = Git.init()
-                   .setDirectory(repositoryPathAsFile)
-                   .setInitialBranch("main")
-                   .call()) {
-                    // "git" object is not used later, but we need to close it after initialization
-                }
-                setupGitIgnore();
-                String initialCommit = "Initial commit";
-                if (!createCommitOnCurrentBranch(initialCommit, false)) {
-                    // Maybe, setupGitIgnore failed and did not add something
-                    // Then, we create an empty commit
-                    try (Git git = Git.open(repositoryPathAsFile)) {
-                        git.commit()
-                           .setAllowEmpty(true)
-                           .setMessage(initialCommit)
-                           .call();
-                    }
-                }
-            } catch (GitAPIException | IOException e) {
-                LOGGER.error("Initialization failed");
-            }
+    }
+
+    public void initIfNeeded() {
+        if (isGitRepository()) {
+            return;
         }
+        try {
+            try (Git git = Git.init()
+                              .setDirectory(repositoryPathAsFile)
+                              .setInitialBranch("main")
+                              .call()) {
+                // "git" object is not used later, but we need to close it after initialization
+            }
+            setupGitIgnore();
+            String initialCommit = "Initial commit";
+            if (!createCommitOnCurrentBranch(initialCommit, false)) {
+                // Maybe, setupGitIgnore failed and did not add something
+                // Then, we create an empty commit
+                try (Git git = Git.open(repositoryPathAsFile)) {
+                    git.commit()
+                       .setAllowEmpty(true)
+                       .setMessage(initialCommit)
+                       .call();
+                }
+            }
+        } catch (GitAPIException | IOException e) {
+            LOGGER.error("Git repository initialization failed at {}", repositoryPath, e);
+        }
+    }
+
+    private CredentialsProvider resolveCredentialsOrLoad() throws IOException {
+        if (credentialsProvider != null) {
+            return credentialsProvider;
+        }
+
+        String user = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
+        String password = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
+
+        GitPreferences preferences = new GitPreferences();
+        if (user.isBlank()) {
+            user = preferences.getUsername().orElse("");
+        }
+        if (password.isBlank()) {
+            password = preferences.getPersonalAccessToken().orElse("");
+        }
+
+        if (user.isBlank() || password.isBlank()) {
+            throw new IOException("Missing Git credentials (username, password or PAT).");
+        }
+
+        this.credentialsProvider = new UsernamePasswordCredentialsProvider(user, password);
+        return this.credentialsProvider;
+    }
+
+    public void setCredentials(String username, String pat) {
+        if (username == null) {
+            username = "";
+        }
+        if (pat == null) {
+            pat = "";
+        }
+        this.credentialsProvider = new UsernamePasswordCredentialsProvider(username, pat);
     }
 
     void setupGitIgnore() {
@@ -124,7 +164,11 @@ public class GitHandler {
         boolean commitCreated = false;
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             Status status = git.status().call();
-            if (!status.isClean()) {
+            boolean dirty = !status.isClean();
+            RepositoryState state = git.getRepository().getRepositoryState();
+            boolean inMerging = (state == RepositoryState.MERGING) || (state == RepositoryState.MERGING_RESOLVED);
+
+            if (dirty) {
                 commitCreated = true;
                 // Add new and changed files to index
                 git.add()
@@ -140,6 +184,14 @@ public class GitHandler {
                 git.commit()
                    .setAmend(amend)
                    .setAllowEmpty(false)
+                   .setMessage(commitMessage)
+                   .call();
+            } else if (inMerging) {
+                // No content changes, but merge must be completed (create parent commit)
+                commitCreated = true;
+                git.commit()
+                   .setAmend(amend)
+                   .setAllowEmpty(true)
                    .setMessage(commitMessage)
                    .call();
             }
@@ -175,23 +227,33 @@ public class GitHandler {
      * Pushes all commits made to the branch that is tracked by the currently checked out branch.
      * If pushing to remote fails, it fails silently.
      */
-    public void pushCommitsToRemoteRepository() throws IOException {
+    public void pushCommitsToRemoteRepository() throws IOException, GitAPIException {
+        CredentialsProvider provider = resolveCredentialsOrLoad();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
-            try {
-                git.push()
-                   .setCredentialsProvider(credentialsProvider)
-                   .call();
-            } catch (GitAPIException e) {
-                LOGGER.info("Failed to push");
-            }
+            git.push()
+               .setCredentialsProvider(provider)
+               .call();
+        }
+    }
+
+    public void pushCurrentBranchCreatingUpstream() throws IOException, GitAPIException {
+        try (Git git = open()) {
+            CredentialsProvider provider = resolveCredentialsOrLoad();
+            String branch = git.getRepository().getBranch();
+            git.push()
+               .setRemote("origin")
+               .setCredentialsProvider(provider)
+               .setRefSpecs(new RefSpec("refs/heads/" + branch + ":refs/heads/" + branch))
+               .call();
         }
     }
 
     public void pullOnCurrentBranch() throws IOException {
+        CredentialsProvider provider = resolveCredentialsOrLoad();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
-                   .setCredentialsProvider(credentialsProvider)
+                   .setCredentialsProvider(provider)
                    .call();
             } catch (GitAPIException e) {
                 LOGGER.info("Failed to push");
@@ -206,9 +268,10 @@ public class GitHandler {
     }
 
     public void fetchOnCurrentBranch() throws IOException {
+        CredentialsProvider provider = resolveCredentialsOrLoad();
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             git.fetch()
-               .setCredentialsProvider(credentialsProvider)
+               .setCredentialsProvider(provider)
                .call();
         } catch (GitAPIException e) {
             LOGGER.error("Failed to fetch from remote", e);
