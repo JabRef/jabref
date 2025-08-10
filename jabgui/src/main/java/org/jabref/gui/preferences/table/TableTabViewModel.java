@@ -75,16 +75,10 @@ public class TableTabViewModel implements PreferenceTabViewModel {
     private final GuiPreferences preferences;
 
     private ColumnPreferences initialColumnPreferences;
-    private final SpecialFieldsPreferences specialFieldsPreferences;
-    private final NameDisplayPreferences nameDisplayPreferences;
-    private final MainTablePreferences mainTablePreferences;
 
     public TableTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
-        this.nameDisplayPreferences = preferences.getNameDisplayPreferences();
-        this.mainTablePreferences = preferences.getMainTablePreferences();
 
         specialFieldsEnabledProperty.addListener((observable, oldValue, newValue) -> {
             if (newValue) {
@@ -113,6 +107,10 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        SpecialFieldsPreferences specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
+        NameDisplayPreferences nameDisplayPreferences = preferences.getNameDisplayPreferences();
+        MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
+
         initialColumnPreferences = mainTablePreferences.getColumnPreferences();
 
         specialFieldsEnabledProperty.setValue(specialFieldsPreferences.isSpecialFieldsEnabled());
@@ -234,6 +232,10 @@ public class TableTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        SpecialFieldsPreferences specialFieldsPreferences = preferences.getSpecialFieldsPreferences();
+        NameDisplayPreferences nameDisplayPreferences = preferences.getNameDisplayPreferences();
+        MainTablePreferences mainTablePreferences = preferences.getMainTablePreferences();
+
         mainTablePreferences.getColumnPreferences().setColumns(columnsListProperty.getValue());
         mainTablePreferences.setResizeColumnsToFit(autoResizeColumnsProperty.getValue());
         mainTablePreferences.setExtraFileColumnsEnabled(extraFileColumnsEnabledProperty.getValue());
