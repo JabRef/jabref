@@ -67,6 +67,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We changed the validation error dialog for overriding the default file directories to a confirmation dialog for saving other preferences under the library properties. [#13488](https://github.com/JabRef/jabref/pull/13488)
 - We improved file exists warning dialog with clearer options and tooltips [#12565](https://github.com/JabRef/jabref/issues/12565)
 - We introduced walkthrough functionality [#12664](https://github.com/JabRef/jabref/issues/12664)
+- We introduced responsive layout in WelcomeTab [#12664](https://github.com/JabRef/jabref/issues/12664)
+- We introduced donation prompt in WelcomeTab [#12664](https://github.com/JabRef/jabref/issues/12664)
 
 ### Fixed
 
