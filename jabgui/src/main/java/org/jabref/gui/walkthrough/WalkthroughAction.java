@@ -16,6 +16,7 @@ import org.jabref.gui.fieldeditors.LinkedFilesEditor;
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.preferences.PreferencesDialogView;
+import org.jabref.gui.search.GlobalSearchBar;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.Trigger;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
@@ -24,6 +25,7 @@ import org.jabref.gui.walkthrough.declarative.effect.WalkthroughEffect;
 import org.jabref.gui.walkthrough.declarative.effect.WindowEffect;
 import org.jabref.gui.walkthrough.declarative.richtext.InfoBlock;
 import org.jabref.gui.walkthrough.declarative.richtext.TextBlock;
+import org.jabref.gui.walkthrough.declarative.sideeffect.EnsureSearchSettingsSideEffect;
 import org.jabref.gui.walkthrough.declarative.sideeffect.OpenLibrarySideEffect;
 import org.jabref.gui.walkthrough.declarative.step.PanelPosition;
 import org.jabref.gui.walkthrough.declarative.step.QuitButtonPosition;
@@ -31,11 +33,14 @@ import org.jabref.gui.walkthrough.declarative.step.TooltipPosition;
 import org.jabref.gui.walkthrough.declarative.step.WalkthroughStep;
 import org.jabref.logic.l10n.Localization;
 
+import org.controlsfx.control.textfield.CustomTextField;
+
 public class WalkthroughAction extends SimpleCommand {
     public static final String PDF_LINK_WALKTHROUGH_NAME = "pdfLink";
     public static final String MAIN_FILE_DIRECTORY_WALKTHROUGH_NAME = "mainFileDirectory";
     public static final String CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME = "customizeEntryTable";
     public static final String GROUP_WALKTHROUGH_NAME = "group";
+    public static final String SEARCH_WALKTHROUGH_NAME = "search";
 
     private static final Map<String, Walkthrough> WALKTHROUGH_CACHE = new ConcurrentHashMap<>();
 
@@ -65,6 +70,7 @@ public class WalkthroughAction extends SimpleCommand {
                     case CUSTOMIZE_ENTRY_TABLE_WALKTHROUGH_NAME ->
                             createCustomizeEntryTableWalkthrough();
                     case GROUP_WALKTHROUGH_NAME -> createGroupWalkthrough();
+                    case SEARCH_WALKTHROUGH_NAME -> createSearchWalkthrough();
                     default ->
                             throw new IllegalArgumentException("Unknown walkthrough: " + name);
                 }
@@ -312,11 +318,11 @@ public class WalkthroughAction extends SimpleCommand {
                 .create(stateManager)
                 // Step 1: Open example library
                 .addStep(WalkthroughStep.sideEffect(Localization.lang("Open Example Library"))
-                        .sideEffect(new OpenLibrarySideEffect(frame)))
+                                        .sideEffect(new OpenLibrarySideEffect(frame)))
                 // Step 2: Highlight groups sidepane
                 .addStep(WalkthroughStep
                         .panel(Localization.lang("Welcome to groups walkthrough"))
-                    .content(
+                        .content(
                                 new TextBlock(Localization.lang("This walkthrough will guide you through creating and managing groups in JabRef. Groups help you organize your bibliography entries into collections. We've opened an example library so you can practice with real entries.")),
                                 new InfoBlock(Localization.lang("The groups panel on the left side shows all your groups in a tree structure. You can create groups, add entries to them, and organize them hierarchically."))
                         )
@@ -430,6 +436,162 @@ public class WalkthroughAction extends SimpleCommand {
                         .continueButton(Localization.lang("Finish"))
                         .position(PanelPosition.RIGHT)
                         .highlight(HighlightEffect.SPOT_LIGHT))
+                .build();
+    }
+
+    private Walkthrough createSearchWalkthrough() {
+        NodeResolver searchFieldResolver = scene -> NodeResolver
+                .predicate(GlobalSearchBar.class::isInstance)
+                .resolve(scene)
+                .flatMap(node -> node instanceof GlobalSearchBar bar ?
+                        bar.getChildren().stream().filter(CustomTextField.class::isInstance).findAny() :
+                        Optional.empty());
+
+        return Walkthrough
+                .create(stateManager)
+                // Step 1: Open example library
+                .addStep(WalkthroughStep.sideEffect(Localization.lang("Open Example Library"))
+                                        .sideEffect(new OpenLibrarySideEffect(frame, "SearchExamples.bib")))
+                // Step 1b: Ensure initial search settings
+                .addStep(WalkthroughStep.sideEffect(Localization.lang("Prepare search settings"))
+                                        .sideEffect(new EnsureSearchSettingsSideEffect()))
+                // Step 2: Introduction
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Welcome to the search walkthrough"))
+                        .content(
+                                new TextBlock(Localization.lang("This walkthrough will guide you through JabRef's search capabilities. We've loaded a sample library to demonstrate various search techniques."))
+                        )
+                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("MainTable")))
+                        .continueButton(Localization.lang("Continue"))
+                        .position(PanelPosition.BOTTOM)
+                        .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                // Step 3: Focus on GlobalSearchBar
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Click in the search field to begin"))
+                        .content(new InfoBlock(Localization.lang("You can also use `Ctrl+F` or `Cmd+F` to focus the search field.")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                // Step 4-7: Simple text search
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `machine learning`"))
+                        .content(new TextBlock(Localization.lang("As you type, JabRef instantly dims all non-matching entries. By default, searches are case-insensitive and look through all fields like title, author, abstract, and keywords.")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextEquals("machine learning"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Understanding search results"))
+                        .content(
+                                new TextBlock(Localization.lang("Notice how entries not containing \"machine learning\" are dimmed.")),
+                                new InfoBlock(Localization.lang("This found entries with at least a field in their metadata (*e.g.,* title, author, abstract, *etc.*) containing \"machine learning\"."))
+                        )
+                        .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("MainTable")))
+                        .continueButton(Localization.lang("Continue"))
+                        .position(PanelPosition.RIGHT)
+                        .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT)
+                        .highlight(HighlightEffect.NONE))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Toggle filter mode to hide non-matching entries"))
+                        .content(new TextBlock(Localization.lang("Filter mode shows only matching entries, hiding everything else.")))
+                        .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.FILTER))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Clear the search to see all entries again"))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextEquals(""))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 8: Field-specific search
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `author = Son`"))
+                        .content(
+                                new TextBlock(Localization.lang("The equals sign (`=`) means \"contains\" and is case-insensitive by default.")),
+                                new InfoBlock(Localization.lang("This query finds all papers where any author's name contains \"Son,\" including \"Maddison,\" \"Watson, J.,\" or \"Matson, Robert P.\". It won't match \"Son\" appearing in titles or abstracts."))
+                        )
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextMatchesRegex("(?i)\\s*author\\s*=\\s*son\\s*"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 9: Exact field matching
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `date == 2023`"))
+                        .content(new TextBlock(Localization.lang("The double equals (`==`) means exact match, not just contains. This query finds only papers with field \"date\" exactly in 2023.")),
+                                new InfoBlock(Localization.lang("With single equals (*e.g.,* `date = 23`), you'd also match dates like 1923 or 2230.")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextMatchesRegex("(?i)\\s*date\\s*==\\s*2023\\s*"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 10: Combining search terms with AND
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `shortauthor = WHO AND date == 2023`"))
+                        .content(new TextBlock(Localization.lang("This query finds papers by WHO from 2023. `AND` requires both conditions to be true.")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextMatchesRegex("(?i)shortauthor\\s*=\\s*WHO\\s+AND\\s+date\\s*==\\s*2023|date\\s*==\\s*2023\\s+AND\\s+shortauthor\\s*=\\s*WHO"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 11: Using OR for alternatives
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `title = covid OR title = pandemic`"))
+                        .content(new TextBlock(Localization.lang("This query finds paper with title containing either COVID or pandemics in general.")),
+                                new InfoBlock(Localization.lang("`OR` can be satisified with either of the conditions being true.")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextMatchesRegex("(?i)title\\s*=\\s*covid\\s+OR\\s+title\\s*=\\s*pandemic|title\\s*=\\s*pandemic\\s+OR\\s+title\\s*=\\s*covid"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 12: Negation with NOT
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `deep learning NOT title = survey`"))
+                        .content(new TextBlock(Localization.lang("This query finds entries with \"deep learning\" in its metadata, but not \"survey\" in the title.")),
+                                new InfoBlock(Localization.lang("NOT helps you filter out unwanted results.")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextMatchesRegex("(?i)deep\\s+learning\\s+NOT\\s+title\\s*=\\s*survey"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 13: Regex
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Enable regular expressions for pattern matching"))
+                        .content(new TextBlock(Localization.lang("Regular expressions allow sophisticated pattern matching. Click this button to enable regex mode for advanced searches.")))
+                        .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.REG_EX))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 14: Using regex patterns
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `title =~ \\(deep|machine\\) learning`"))
+                        .content(new TextBlock(Localization.lang("The `=~` operator explicitly uses regex. The pipe operator `|` allows `(deep|machine)` matches either word (deep or machine). This finds \"deep learning\" and \"machine learning\" but not \"learning\" alone.")),
+                                new InfoBlock(Localization.lang("Click on the regex button on previous step enables regex mode, allowing you to type `\\(deep|machine\\) learning` directly to search for any entry with metadata matching the regex. If you use `=~`, regardless of whether regex mode is enabled, it will always treat the search as a regex.")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextMatchesRegex("(?i)title\\s*=~\\s*\\\\\\(deep\\|machine\\\\\\)\\s*learning"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 15-16: Case sensitivity
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Enable case-sensitive searching"))
+                        .content(new TextBlock(Localization.lang("This is useful when case matters, like distinguishing \"WHO\" (World Health Organization) from \"who\".")))
+                        .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.CASE_SENSITIVE))
+                        .trigger(Trigger.onClick())
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.SPOT_LIGHT))
+                .addStep(WalkthroughStep
+                        .tooltip(Localization.lang("Type `WHO`"))
+                        .content(new TextBlock(Localization.lang("This query finds entries with capital WHO only. With case sensitivity on, this won't match \"who\" or \"Who\".")))
+                        .resolver(searchFieldResolver)
+                        .trigger(Trigger.onTextEquals("WHO"))
+                        .position(TooltipPosition.BOTTOM)
+                        .highlight(HighlightEffect.PING))
+                // Step 17: Completion
+                .addStep(WalkthroughStep
+                        .panel(Localization.lang("Search walkthrough completed"))
+                        .content(new TextBlock(Localization.lang("**Quick reference:**\n- Press **Ctrl+F** to jump to search\n- Use **field = value** for field searches\n- Combine with **AND**, **OR**, **NOT**\n- Enable **regex** for pattern matching")),
+                                new InfoBlock(Localization.lang("For complete search documentation and more examples, visit [Search documentation](https://docs.jabref.org/finding-sorting-and-cleaning-entries/search)")))
+                        .continueButton(Localization.lang("Finish"))
+                        .position(PanelPosition.RIGHT)
+                        .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT))
                 .build();
     }
 

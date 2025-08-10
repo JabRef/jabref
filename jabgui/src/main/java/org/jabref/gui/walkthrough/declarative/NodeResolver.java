@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBase;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.DialogPane;
@@ -17,9 +18,11 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIconView;
 import org.jabref.logic.l10n.Localization;
 
+import com.google.common.collect.Streams;
 import com.sun.javafx.scene.control.LabeledText;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 /// Resolves nodes from a Scene
 @FunctionalInterface
@@ -41,7 +44,7 @@ public interface NodeResolver {
     /// Creates a resolver that finds a node by its fx:id.
     ///
     /// @param fxId the fx:id of the node
-    /// @return a resolver that finds the node by fx:id
+    /// @returWn a resolver that finds the node by fx:id
     static NodeResolver fxId(@NonNull String fxId) {
         return scene -> Optional.ofNullable(scene.lookup("#" + fxId));
     }
@@ -51,12 +54,17 @@ public interface NodeResolver {
     /// @param glyph the graphic of the button
     /// @return a resolver that finds the button by graphic
     static NodeResolver buttonWithGraphic(IconTheme.JabRefIcons glyph) {
-        return scene -> scene.getRoot().lookupAll(".button").stream()
-                             .filter(node -> node instanceof Button button
-                                     && Optional.ofNullable(findNode(button.getGraphic(), JabRefIconView.class::isInstance))
-                                                .map(JabRefIconView.class::cast).filter(icon -> icon.getGlyph() == glyph)
-                                                .isPresent())
-                             .findFirst();
+        return scene -> Streams.concat(scene.getRoot().lookupAll(".button").stream(),
+                                       scene.getRoot().lookupAll(".icon-button").stream())
+                               .filter(node -> {
+                                   if (!(node instanceof ButtonBase button)) {
+                                       return false;
+                                   }
+                                   Node graphic = button.getGraphic();
+                                   return (graphic instanceof JabRefIconView jabRefIconView) && jabRefIconView.getGlyph() == glyph ||
+                                           (graphic instanceof FontIcon fontIcon) && fontIcon.getIconCode() == glyph.getIkon();
+                               })
+                               .findFirst();
     }
 
     /// Creates a resolver that finds a node by a predicate.
@@ -82,8 +90,8 @@ public interface NodeResolver {
     /// @return a resolver that finds the button by button type
     static NodeResolver buttonType(@NonNull ButtonType buttonType) {
         return scene -> predicate(DialogPane.class::isInstance)
-                                .resolve(scene)
-                                .map(node -> node instanceof DialogPane pane ? pane.lookupButton(buttonType) : null);
+                .resolve(scene)
+                .map(node -> node instanceof DialogPane pane ? pane.lookupButton(buttonType) : null);
     }
 
     /// Creates a resolver that finds a node by selector first, then predicate.

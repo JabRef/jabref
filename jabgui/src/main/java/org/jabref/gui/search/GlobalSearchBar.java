@@ -275,24 +275,32 @@ public class GlobalSearchBar extends HBox {
             updateSearchQuery();
         });
 
-        regexButton.selectedProperty().bind(Bindings.createBooleanBinding(
-                () -> searchPreferences.getObservableSearchFlags().contains(SearchFlags.REGULAR_EXPRESSION),
-                searchPreferences.getObservableSearchFlags()
-        ));
+        regexButton.setSelected(searchPreferences.isRegularExpression());
         regexButton.setTooltip(new Tooltip(Localization.lang("Regular expression") + "\n" + Localization.lang("This only affects unfielded terms. For using RegEx in a fielded term, use =~ operator.")));
         initSearchModifierButton(regexButton);
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) change -> {
+            if (change.wasAdded() && change.getElementAdded() == SearchFlags.REGULAR_EXPRESSION) {
+                regexButton.setSelected(true);
+            } else if (change.wasRemoved() && change.getElementRemoved() == SearchFlags.REGULAR_EXPRESSION) {
+                regexButton.setSelected(false);
+            }
+        });
         regexButton.setOnAction(_ -> {
             searchPreferences.setSearchFlag(SearchFlags.REGULAR_EXPRESSION, regexButton.isSelected());
             searchField.requestFocus();
             updateSearchQuery();
         });
 
-        caseSensitiveButton.selectedProperty().bind(Bindings.createBooleanBinding(
-                () -> searchPreferences.getObservableSearchFlags().contains(SearchFlags.CASE_SENSITIVE),
-                searchPreferences.getObservableSearchFlags()
-        ));
+        caseSensitiveButton.setSelected(searchPreferences.isCaseSensitive());
         caseSensitiveButton.setTooltip(new Tooltip(Localization.lang("Case sensitive") + "\n" + Localization.lang("This only affects unfielded terms. For using case-sensitive in a fielded term, use =! operator.")));
         initSearchModifierButton(caseSensitiveButton);
+        searchPreferences.getObservableSearchFlags().addListener((SetChangeListener<SearchFlags>) change -> {
+            if (change.wasAdded() && change.getElementAdded() == SearchFlags.CASE_SENSITIVE) {
+                caseSensitiveButton.setSelected(true);
+            } else if (change.wasRemoved() && change.getElementRemoved() == SearchFlags.CASE_SENSITIVE) {
+                caseSensitiveButton.setSelected(false);
+            }
+        });
         caseSensitiveButton.setOnAction(_ -> {
             searchPreferences.setSearchFlag(SearchFlags.CASE_SENSITIVE, caseSensitiveButton.isSelected());
             searchField.requestFocus();
@@ -304,12 +312,10 @@ public class GlobalSearchBar extends HBox {
         initSearchModifierButton(keepSearchString);
         keepSearchString.selectedProperty().addListener((_, _, _) -> searchField.requestFocus());
 
-        filterModeButton.selectedProperty().bind(Bindings.createBooleanBinding(
-                () -> searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER,
-                searchPreferences.searchDisplayModeProperty()
-        ));
+        filterModeButton.setSelected(searchPreferences.getSearchDisplayMode() == SearchDisplayMode.FILTER);
         filterModeButton.setTooltip(new Tooltip(Localization.lang("Filter search results")));
         initSearchModifierButton(filterModeButton);
+        searchPreferences.searchDisplayModeProperty().addListener((_, _, newVal) -> filterModeButton.setSelected(newVal == SearchDisplayMode.FILTER));
         filterModeButton.setOnAction(_ -> {
             searchPreferences.setSearchDisplayMode(filterModeButton.isSelected() ? SearchDisplayMode.FILTER : SearchDisplayMode.FLOAT);
             searchField.requestFocus();
