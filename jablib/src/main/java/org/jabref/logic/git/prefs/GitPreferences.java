@@ -27,21 +27,23 @@ public class GitPreferences {
         this.prefs = Preferences.userRoot().node(PREF_PATH);
     }
 
-    public void savePersonalAccessToken(String pat, String username) {
+    public boolean savePersonalAccessToken(String pat, String username) {
         Objects.requireNonNull(username, "username");
         Objects.requireNonNull(pat, "pat");
-        char[] patChars = pat != null ? pat.toCharArray() : new char[0];
+        char[] patChars = pat.toCharArray();
         final String encrypted;
         try {
             encrypted = new Password(patChars, username).encrypt();
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
             LOGGER.error("Failed to encrypt PAT", e);
-            return;
+            clearGitHubPersonalAccessToken();
+            return false;
         } finally {
             Arrays.fill(patChars, '\0');
         }
         setUsername(username);
         setPat(encrypted);
+        return true;
     }
 
     public Optional<String> getPersonalAccessToken() {

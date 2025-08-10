@@ -160,7 +160,16 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         gitPreferences.setRememberPat(rememberSettings.get());
 
         if (rememberSettings.get()) {
-            gitPreferences.savePersonalAccessToken(pat, user);
+            boolean ok = gitPreferences.savePersonalAccessToken(pat, user);
+            if (ok) {
+                gitPreferences.setRememberPat(true);
+            } else {
+                gitPreferences.setRememberPat(false);
+                dialogService.showErrorDialogAndWait(
+                        Localization.lang("GitHub preferences not saved"),
+                        Localization.lang("Failed to save Personal Access Token.")
+                );
+            }
         } else {
             gitPreferences.clearGitHubPersonalAccessToken();
         }
