@@ -354,6 +354,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .resolver(NodeResolver.fxId("descriptionField"))
                         .trigger(Trigger.onTextInput())
                         .position(TooltipPosition.RIGHT)
+                        .continueButton(Localization.lang("Continue"))
                         .activeWindow(WindowResolver.title(Localization.lang("Add group")))
                         .showQuitButton(false)
                         .highlight(groupHighlight))
@@ -559,7 +560,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .resolver(NodeResolver.buttonWithGraphic(IconTheme.JabRefIcons.REG_EX))
                         .trigger(Trigger.onClick())
                         .position(TooltipPosition.BOTTOM)
-                        .highlight(HighlightEffect.PING))
+                        .highlight(HighlightEffect.SPOT_LIGHT))
                 // Step 14: Using regex patterns
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Type `title =~ \\(deep|machine\\) learning`"))
