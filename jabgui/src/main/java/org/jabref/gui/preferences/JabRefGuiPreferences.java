@@ -403,6 +403,31 @@ public class JabRefGuiPreferences extends JabRefCliPreferences implements GuiPre
         return JabRefGuiPreferences.singleton;
     }
 
+    @Override
+    public void invalidateCache() {
+        super.invalidateCache();
+
+        entryEditorPreferences = null;
+        mergeDialogPreferences = null;
+        autoCompletePreferences = null;
+        coreGuiPreferences = null;
+        workspacePreferences = null;
+        unlinkedFilesDialogPreferences = null;
+        externalApplicationsPreferences = null;
+        sidePanePreferences = null;
+        groupsPreferences = null;
+        specialFieldsPreferences = null;
+        previewPreferences = null;
+        pushToApplicationPreferences = null;
+        nameDisplayPreferences = null;
+        mainTablePreferences = null;
+        mainTableColumnPreferences = null;
+        searchDialogColumnPreferences = null;
+        keyBindingRepository = null;
+        copyToPreferences = null;
+        newEntryPreferences = null;
+    }
+
     public CopyToPreferences getCopyToPreferences() {
         if (copyToPreferences != null) {
             return copyToPreferences;

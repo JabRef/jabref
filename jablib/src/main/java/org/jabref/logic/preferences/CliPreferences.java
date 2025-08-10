@@ -45,6 +45,8 @@ public interface CliPreferences {
 
     void importPreferences(Path file) throws JabRefException;
 
+    void invalidateCache();
+
     InternalPreferences getInternalPreferences();
 
     BibEntryPreferences getBibEntryPreferences();

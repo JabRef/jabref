@@ -1,6 +1,7 @@
 package org.jabref.gui.preferences.xmp;
 
 import java.util.Comparator;
+import java.util.function.Supplier;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -30,13 +31,13 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<Field> addFieldProperty = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
-    private final XmpPreferences xmpPreferences;
+    private final Supplier<XmpPreferences> preferencesSupplier;
 
     private final Validator xmpFilterListValidator;
 
-    XmpPrivacyTabViewModel(DialogService dialogService, XmpPreferences xmpPreferences) {
+    XmpPrivacyTabViewModel(DialogService dialogService, Supplier<XmpPreferences> preferencesSupplier) {
         this.dialogService = dialogService;
-        this.xmpPreferences = xmpPreferences;
+        this.preferencesSupplier = preferencesSupplier;
 
         xmpFilterListValidator = new FunctionBasedValidator<>(
                 xmpFilterListProperty,
@@ -49,6 +50,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        XmpPreferences xmpPreferences = preferencesSupplier.get();
         xmpFilterEnabledProperty.setValue(xmpPreferences.shouldUseXmpPrivacyFilter());
 
         xmpFilterListProperty.clear();
@@ -61,6 +63,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        XmpPreferences xmpPreferences = preferencesSupplier.get();
         xmpPreferences.setUseXmpPrivacyFilter(xmpFilterEnabledProperty.getValue());
         xmpPreferences.getXmpPrivacyFilter().clear();
         xmpPreferences.getXmpPrivacyFilter().addAll(xmpFilterListProperty.getValue());

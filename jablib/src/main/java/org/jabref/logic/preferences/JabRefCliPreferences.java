@@ -1164,6 +1164,39 @@ public class JabRefCliPreferences implements CliPreferences {
                     Localization.lang("Could not import preferences"),
                     ex);
         }
+
+        invalidateCache();
+    }
+
+    @Override
+    public void invalidateCache() {
+        libraryPreferences = null;
+        doiPreferences = null;
+        ownerPreferences = null;
+        timestampPreferences = null;
+        openOfficePreferences = null;
+        importerPreferences = null;
+        grobidPreferences = null;
+        protectedTermsPreferences = null;
+        mrDlibPreferences = null;
+        filePreferences = null;
+        remotePreferences = null;
+        proxyPreferences = null;
+        sslPreferences = null;
+        searchPreferences = null;
+        autoLinkPreferences = null;
+        exportPreferences = null;
+        nameFormatterPreferences = null;
+        bibEntryPreferences = null;
+        internalPreferences = null;
+        xmpPreferences = null;
+        cleanupPreferences = null;
+        citationKeyPatternPreferences = null;
+        journalAbbreviationPreferences = null;
+        fieldPreferences = null;
+        aiPreferences = null;
+        lastFilesOpenedPreferences = null;
+        pushToApplicationPreferences = null;
     }
 
     //*************************************************************************************************************
