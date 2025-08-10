@@ -70,36 +70,24 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final CliPreferences preferences;
-    private final DOIPreferences doiPreferences;
-    private final GrobidPreferences grobidPreferences;
-    private final ImporterPreferences importerPreferences;
-    private final FilePreferences filePreferences;
-    private final ImportFormatPreferences importFormatPreferences;
-    private final LibraryPreferences libraryPreferences;
 
     private final ReadOnlyBooleanProperty refAiEnabled;
 
     public WebSearchTabViewModel(CliPreferences preferences, DialogService dialogService, ReadOnlyBooleanProperty refAiEnabled) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.importerPreferences = preferences.getImporterPreferences();
-        this.grobidPreferences = preferences.getGrobidPreferences();
-        this.doiPreferences = preferences.getDOIPreferences();
-        this.filePreferences = preferences.getFilePreferences();
-        this.importFormatPreferences = preferences.getImportFormatPreferences();
-        this.libraryPreferences = preferences.getLibraryPreferences();
 
         this.refAiEnabled = refAiEnabled;
 
-        setupPlainCitationParsers(preferences);
+        setupPlainCitationParsers();
     }
 
-    private void setupPlainCitationParsers(CliPreferences preferences) {
+    private void setupPlainCitationParsers() {
         if (!refAiEnabled.get()) {
             plainCitationParsers.remove(PlainCitationParserChoice.LLM);
         }
 
-        refAiEnabled.addListener((observable, oldValue, newValue) -> {
+        refAiEnabled.addListener((_, _, newValue) -> {
             if (newValue) {
                 plainCitationParsers.add(PlainCitationParserChoice.LLM);
             } else {
@@ -134,6 +122,13 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        ImporterPreferences importerPreferences = preferences.getImporterPreferences();
+        GrobidPreferences grobidPreferences = preferences.getGrobidPreferences();
+        DOIPreferences doiPreferences = preferences.getDOIPreferences();
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        ImportFormatPreferences importFormatPreferences = preferences.getImportFormatPreferences();
+        LibraryPreferences libraryPreferences = preferences.getLibraryPreferences();
+
         enableWebSearchProperty.setValue(importerPreferences.areImporterEnabled());
         warnAboutDuplicatesOnImportProperty.setValue(importerPreferences.shouldWarnAboutDuplicatesOnImport());
         shouldDownloadLinkedOnlineFiles.setValue(filePreferences.shouldDownloadLinkedFiles());
@@ -168,6 +163,12 @@ public class WebSearchTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        ImporterPreferences importerPreferences = preferences.getImporterPreferences();
+        GrobidPreferences grobidPreferences = preferences.getGrobidPreferences();
+        DOIPreferences doiPreferences = preferences.getDOIPreferences();
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        LibraryPreferences libraryPreferences = preferences.getLibraryPreferences();
+
         importerPreferences.setImporterEnabled(enableWebSearchProperty.getValue());
         importerPreferences.setWarnAboutDuplicatesOnImport(warnAboutDuplicatesOnImportProperty.getValue());
         filePreferences.setDownloadLinkedFiles(shouldDownloadLinkedOnlineFiles.getValue());
