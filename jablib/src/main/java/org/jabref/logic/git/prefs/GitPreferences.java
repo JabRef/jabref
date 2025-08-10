@@ -2,6 +2,7 @@ package org.jabref.logic.git.prefs;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
@@ -26,13 +27,18 @@ public class GitPreferences {
     }
 
     public void savePersonalAccessToken(String pat, String username) {
+        char[] patChars = pat != null ? pat.toCharArray() : new char[0];
+        final String encrypted;
         try {
-            setUsername(username);
-            String encrypted = new Password(pat.toCharArray(), username).encrypt();
-            setPat(encrypted);
+            encrypted = new Password(patChars, username).encrypt();
         } catch (GeneralSecurityException | UnsupportedEncodingException e) {
-            LOGGER.error("Failed to encrypt and store GitHub PAT", e);
+            LOGGER.error("Failed to encrypt PAT", e);
+            return;
+        } finally {
+            Arrays.fill(patChars, '\0');
         }
+        setUsername(username);
+        setPat(encrypted);
     }
 
     public Optional<String> getPersonalAccessToken() {

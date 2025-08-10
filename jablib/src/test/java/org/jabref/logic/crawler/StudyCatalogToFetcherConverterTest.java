@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.SaveConfiguration;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ImportFormatPreferences;
@@ -50,7 +51,7 @@ class StudyCatalogToFetcherConverterTest {
     }
 
     @Test
-    void getActiveFetcherInstances() throws IOException, URISyntaxException {
+    void getActiveFetcherInstances() throws IOException, URISyntaxException, JabRefException {
         Path studyDefinition = tempRepositoryDirectory.resolve(StudyRepository.STUDY_DEFINITION_FILE_NAME);
         copyTestStudyDefinitionFileIntoDirectory(studyDefinition);
 

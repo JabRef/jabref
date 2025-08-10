@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyGenerator;
 import org.jabref.logic.database.DatabaseMerger;
 import org.jabref.logic.exporter.AtomicFileWriter;
@@ -84,7 +85,7 @@ public class StudyRepository {
                            SlrGitHandler gitHandler,
                            CliPreferences preferences,
                            FileUpdateMonitor fileUpdateMonitor,
-                           BibEntryTypesManager bibEntryTypesManager) throws IOException {
+                           BibEntryTypesManager bibEntryTypesManager) throws IOException, JabRefException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         this.preferences = preferences;
@@ -218,7 +219,7 @@ public class StudyRepository {
      *     <li>Update the remote tracking branches of the work and search branch</li>
      * </ol>
      */
-    public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException {
+    public void persist(List<QueryResult> crawlResults) throws IOException, GitAPIException, SaveException, JabRefException {
         updateWorkAndSearchBranch();
 
         gitHandler.checkoutBranch(SEARCH_BRANCH);
@@ -237,6 +238,8 @@ public class StudyRepository {
             updateRemoteSearchAndWorkBranch();
         } catch (GitAPIException e) {
             LOGGER.error("Updating remote repository failed", e);
+        } catch (JabRefException e) {
+            LOGGER.error("Missing Git credentials", e);
         }
     }
 
@@ -244,7 +247,7 @@ public class StudyRepository {
      * Update the remote tracking branches of the work and search branches
      * The currently checked out branch is not changed if the method is executed successfully
      */
-    private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException {
+    private void updateRemoteSearchAndWorkBranch() throws IOException, GitAPIException, JabRefException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
 
         // update remote search branch
@@ -262,7 +265,7 @@ public class StudyRepository {
      * Updates the local work and search branches with changes from their tracking remote branches
      * The currently checked out branch is not changed if the method is executed successfully
      */
-    private void updateWorkAndSearchBranch() throws IOException, GitAPIException {
+    private void updateWorkAndSearchBranch() throws IOException, GitAPIException, JabRefException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
 
         // update search branch

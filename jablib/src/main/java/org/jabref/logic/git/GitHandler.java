@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.prefs.GitPreferences;
 
 import org.eclipse.jgit.api.Git;
@@ -14,8 +15,10 @@ import org.eclipse.jgit.api.RmCommand;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryState;
 import org.eclipse.jgit.merge.MergeStrategy;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
@@ -70,9 +73,9 @@ public class GitHandler {
         }
     }
 
-    private CredentialsProvider resolveCredentialsOrLoad() throws IOException {
+    private Optional<CredentialsProvider> resolveCredentialsOrLoad() throws JabRefException {
         if (credentialsProvider != null) {
-            return credentialsProvider;
+            return Optional.of(credentialsProvider);
         }
 
         String user = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
@@ -87,11 +90,11 @@ public class GitHandler {
         }
 
         if (user.isBlank() || password.isBlank()) {
-            throw new IOException("Missing Git credentials (username, password or PAT).");
+            return Optional.empty();
         }
 
         this.credentialsProvider = new UsernamePasswordCredentialsProvider(user, password);
-        return this.credentialsProvider;
+        return Optional.of(this.credentialsProvider);
     }
 
     public void setCredentials(String username, String pat) {
@@ -227,8 +230,9 @@ public class GitHandler {
      * Pushes all commits made to the branch that is tracked by the currently checked out branch.
      * If pushing to remote fails, it fails silently.
      */
-    public void pushCommitsToRemoteRepository() throws IOException, GitAPIException {
-        CredentialsProvider provider = resolveCredentialsOrLoad();
+    public void pushCommitsToRemoteRepository() throws IOException, GitAPIException, JabRefException {
+        CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
+
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             git.push()
                .setCredentialsProvider(provider)
@@ -236,9 +240,9 @@ public class GitHandler {
         }
     }
 
-    public void pushCurrentBranchCreatingUpstream() throws IOException, GitAPIException {
+    public void pushCurrentBranchCreatingUpstream() throws IOException, GitAPIException, JabRefException {
         try (Git git = open()) {
-            CredentialsProvider provider = resolveCredentialsOrLoad();
+            CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
             String branch = git.getRepository().getBranch();
             git.push()
                .setRemote("origin")
@@ -248,8 +252,8 @@ public class GitHandler {
         }
     }
 
-    public void pullOnCurrentBranch() throws IOException {
-        CredentialsProvider provider = resolveCredentialsOrLoad();
+    public void pullOnCurrentBranch() throws IOException, JabRefException {
+        CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             try {
                 git.pull()
@@ -267,8 +271,8 @@ public class GitHandler {
         }
     }
 
-    public void fetchOnCurrentBranch() throws IOException {
-        CredentialsProvider provider = resolveCredentialsOrLoad();
+    public void fetchOnCurrentBranch() throws IOException, JabRefException {
+        CredentialsProvider provider = resolveCredentialsOrLoad().orElseThrow(() -> new IOException("Missing Git credentials (username and Personal Access Token)."));
         try (Git git = Git.open(this.repositoryPathAsFile)) {
             git.fetch()
                .setCredentialsProvider(provider)

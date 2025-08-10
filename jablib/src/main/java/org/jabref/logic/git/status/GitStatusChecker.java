@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.git.GitHandler;
 import org.jabref.logic.git.io.GitRevisionLocator;
 
@@ -87,12 +88,8 @@ public class GitStatusChecker {
         return checkStatus(handlerOpt.get());
     }
 
-    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) {
-        try {
-            gitHandler.fetchOnCurrentBranch();
-        } catch (IOException e) {
-            LOGGER.warn("Failed to fetch before checking status", e);
-        }
+    public static GitStatusSnapshot checkStatusAndFetch(GitHandler gitHandler) throws IOException, JabRefException {
+        gitHandler.fetchOnCurrentBranch();
         return checkStatus(gitHandler);
     }
 
