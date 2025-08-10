@@ -1,7 +1,6 @@
 package org.jabref.gui.preferences.xmp;
 
 import java.util.Comparator;
-import java.util.function.Supplier;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ListProperty;
@@ -14,6 +13,7 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.xmp.XmpPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
@@ -31,13 +31,13 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
     private final ObjectProperty<Field> addFieldProperty = new SimpleObjectProperty<>();
 
     private final DialogService dialogService;
-    private final Supplier<XmpPreferences> preferencesSupplier;
+    private final CliPreferences preferences;
 
     private final Validator xmpFilterListValidator;
 
-    XmpPrivacyTabViewModel(DialogService dialogService, Supplier<XmpPreferences> preferencesSupplier) {
+    XmpPrivacyTabViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
-        this.preferencesSupplier = preferencesSupplier;
+        this.preferences = preferences;
 
         xmpFilterListValidator = new FunctionBasedValidator<>(
                 xmpFilterListProperty,
@@ -50,7 +50,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        XmpPreferences xmpPreferences = preferencesSupplier.get();
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
         xmpFilterEnabledProperty.setValue(xmpPreferences.shouldUseXmpPrivacyFilter());
 
         xmpFilterListProperty.clear();
@@ -63,7 +63,7 @@ public class XmpPrivacyTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
-        XmpPreferences xmpPreferences = preferencesSupplier.get();
+        XmpPreferences xmpPreferences = preferences.getXmpPreferences();
         xmpPreferences.setUseXmpPrivacyFilter(xmpFilterEnabledProperty.getValue());
         xmpPreferences.getXmpPrivacyFilter().clear();
         xmpPreferences.getXmpPrivacyFilter().addAll(xmpFilterListProperty.getValue());

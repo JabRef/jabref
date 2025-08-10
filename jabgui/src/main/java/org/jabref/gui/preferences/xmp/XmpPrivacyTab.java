@@ -54,7 +54,7 @@ public class XmpPrivacyTab extends AbstractPreferenceTabView<XmpPrivacyTabViewMo
     }
 
     public void initialize() {
-        this.viewModel = new XmpPrivacyTabViewModel(dialogService, () -> preferences.getXmpPreferences());
+        this.viewModel = new XmpPrivacyTabViewModel(dialogService, preferences);
 
         enableXmpFilter.selectedProperty().bindBidirectional(viewModel.xmpFilterEnabledProperty());
         filterList.disableProperty().bind(viewModel.xmpFilterEnabledProperty().not());

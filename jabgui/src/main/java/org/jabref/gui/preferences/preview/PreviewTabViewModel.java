@@ -98,7 +98,7 @@ public class PreviewTabViewModel implements PreferenceTabViewModel {
         this.localDragboard = stateManager.getLocalDragboard();
         this.previewPreferences = previewPreferences;
 
-        sourceTextProperty.addListener((observable, oldValue, newValue) -> {
+        sourceTextProperty.addListener((_, _, _) -> {
             if (selectedLayoutProperty.getValue() instanceof TextBasedPreviewLayout layout) {
                 layout.setText(sourceTextProperty.getValue());
             }
