@@ -59,11 +59,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     private final DialogService dialogService;
     private final CliPreferences preferences;
 
-
-    private final ProxyPreferences proxyPreferences;
-    private final ProxyPreferences backupProxyPreferences;
-    private final InternalPreferences internalPreferences;
-
     private final TrustStoreManager trustStoreManager;
 
     private final AtomicBoolean sslCertificatesChanged = new AtomicBoolean(false);
@@ -72,17 +67,6 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
                                CliPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.proxyPreferences = preferences.getProxyPreferences();
-        this.internalPreferences = preferences.getInternalPreferences();
-
-        backupProxyPreferences = new ProxyPreferences(
-                proxyPreferences.shouldUseProxy(),
-                proxyPreferences.getHostname(),
-                proxyPreferences.getPort(),
-                proxyPreferences.shouldUseAuthentication(),
-                proxyPreferences.getUsername(),
-                proxyPreferences.getPassword(),
-                proxyPreferences.shouldPersistPassword());
 
         proxyHostnameValidator = new FunctionBasedValidator<>(
                 proxyHostnameProperty,
@@ -121,6 +105,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        InternalPreferences internalPreferences = preferences.getInternalPreferences();
+
         versionCheckProperty.setValue(internalPreferences.isVersionCheckEnabled());
 
         setProxyValues();
@@ -128,6 +114,8 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
     }
 
     private void setProxyValues() {
+        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
+
         proxyUseProperty.setValue(proxyPreferences.shouldUseProxy());
         proxyHostnameProperty.setValue(proxyPreferences.getHostname());
         proxyPortProperty.setValue(proxyPreferences.getPort());
@@ -158,6 +146,9 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        InternalPreferences internalPreferences = preferences.getInternalPreferences();
+        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
+
         internalPreferences.setVersionCheckEnabled(versionCheckProperty.getValue());
         proxyPreferences.setUseProxy(proxyUseProperty.getValue());
         proxyPreferences.setHostname(proxyHostnameProperty.getValue().trim());
@@ -227,6 +218,16 @@ public class NetworkTabViewModel implements PreferenceTabViewModel {
         final String dialogTitle = Localization.lang("Check Proxy Setting");
 
         final String testUrl = "http://jabref.org";
+
+        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
+        ProxyPreferences backupProxyPreferences = new ProxyPreferences(
+                proxyPreferences.shouldUseProxy(),
+                proxyPreferences.getHostname(),
+                proxyPreferences.getPort(),
+                proxyPreferences.shouldUseAuthentication(),
+                proxyPreferences.getUsername(),
+                proxyPreferences.getPassword(),
+                proxyPreferences.shouldPersistPassword());
 
         ProxyRegisterer.register(new ProxyPreferences(
                 proxyUseProperty.getValue(),
