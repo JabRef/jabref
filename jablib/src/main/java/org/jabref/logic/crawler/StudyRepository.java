@@ -85,7 +85,7 @@ public class StudyRepository {
                            SlrGitHandler gitHandler,
                            CliPreferences preferences,
                            FileUpdateMonitor fileUpdateMonitor,
-                           BibEntryTypesManager bibEntryTypesManager) throws IOException, JabRefException {
+                           BibEntryTypesManager bibEntryTypesManager) throws IOException {
         this.repositoryPath = pathToRepository;
         this.gitHandler = gitHandler;
         this.preferences = preferences;
@@ -265,7 +265,7 @@ public class StudyRepository {
      * Updates the local work and search branches with changes from their tracking remote branches
      * The currently checked out branch is not changed if the method is executed successfully
      */
-    private void updateWorkAndSearchBranch() throws IOException, GitAPIException, JabRefException {
+    private void updateWorkAndSearchBranch() throws IOException, GitAPIException {
         String currentBranch = gitHandler.getCurrentlyCheckedOutBranch();
 
         // update search branch

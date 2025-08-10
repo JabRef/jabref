@@ -3,6 +3,7 @@ package org.jabref.logic.git.prefs;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.prefs.Preferences;
 
@@ -27,6 +28,8 @@ public class GitPreferences {
     }
 
     public void savePersonalAccessToken(String pat, String username) {
+        Objects.requireNonNull(username, "username");
+        Objects.requireNonNull(pat, "pat");
         char[] patChars = pat != null ? pat.toCharArray() : new char[0];
         final String encrypted;
         try {
@@ -62,6 +65,7 @@ public class GitPreferences {
     }
 
     public void setUsername(String username) {
+        Objects.requireNonNull(username, "username");
         prefs.put(GITHUB_USERNAME_KEY, username);
     }
 
@@ -70,6 +74,7 @@ public class GitPreferences {
     }
 
     public void setPat(String encryptedToken) {
+        Objects.requireNonNull(encryptedToken, "encryptedToken");
         prefs.put(GITHUB_PAT_KEY, encryptedToken);
     }
 
@@ -82,6 +87,7 @@ public class GitPreferences {
     }
 
     public void setRepositoryUrl(String url) {
+        Objects.requireNonNull(url, "url");
         prefs.put(GITHUB_REMOTE_URL_KEY, url);
     }
 
@@ -91,27 +97,5 @@ public class GitPreferences {
 
     public void setRememberPat(boolean remember) {
         prefs.putBoolean(GITHUB_REMEMBER_PAT_KEY, remember);
-    }
-
-    public void setPersonalAccessToken(String pat, boolean remember) {
-        setRememberPat(remember);
-        if (!remember) {
-            clearGitHubPersonalAccessToken();
-            return;
-        }
-
-        Optional<String> user = getUsername();
-        if (user.isEmpty()) {
-            LOGGER.warn("Cannot store PAT: username is empty.");
-            clearGitHubPersonalAccessToken();
-            return;
-        }
-
-        if (pat == null) {
-            LOGGER.warn("Cannot store PAT: token is null.");
-            clearGitHubPersonalAccessToken();
-            return;
-        }
-        savePersonalAccessToken(pat, user.get());
     }
 }
