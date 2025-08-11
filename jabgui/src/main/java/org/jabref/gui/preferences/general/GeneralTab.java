@@ -25,13 +25,10 @@ import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseMode;
-import org.jabref.model.entry.BibEntryTypesManager;
-import org.jabref.model.util.FileUpdateMonitor;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
 import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
-import jakarta.inject.Inject;
 
 public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> implements PreferencesTab {
 
@@ -60,8 +57,6 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private CheckBox enableHttpServer;
     @FXML private TextField httpServerPort;
     @FXML private Button remoteHelp;
-    @Inject private FileUpdateMonitor fileUpdateMonitor;
-    @Inject private BibEntryTypesManager entryTypesManager;
 
     private final ControlsFxVisualizer validationVisualizer = new ControlsFxVisualizer();
 
@@ -87,7 +82,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     }
 
     public void initialize() {
-        this.viewModel = new GeneralTabViewModel(dialogService, preferences, fileUpdateMonitor);
+        this.viewModel = new GeneralTabViewModel(dialogService, preferences);
 
         new ViewModelListCellFactory<Language>()
                 .withText(Language::getDisplayName)

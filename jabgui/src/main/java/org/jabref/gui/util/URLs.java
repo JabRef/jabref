@@ -13,6 +13,7 @@ public class URLs {
     public static final String DEV_VERSION_LINK_URL = "https://builds.jabref.org/master/";
     public static final String CHANGELOG_URL = "https://github.com/JabRef/jabref/blob/main/CHANGELOG.md";
     public static final String HELP_URL = "https://docs.jabref.org/";
+    public static final String THEMES_URL = "https://themes.jabref.org";
 
     // Quick Settings URLs
     public static final String FILE_LINKS_DOC = "https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks";
