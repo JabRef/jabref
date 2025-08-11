@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Download PR number
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: pr_number
           github-token: ${{ secrets.GITHUB_TOKEN }}
