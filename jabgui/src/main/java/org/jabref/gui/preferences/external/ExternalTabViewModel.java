@@ -55,23 +55,11 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     private final FileDialogConfiguration fileDialogConfiguration = new FileDialogConfiguration.Builder().build();
 
-    private final ExternalApplicationsPreferences initialExternalApplicationPreferences;
-    private final PushToApplicationPreferences initialPushToApplicationPreferences;
-    private final PushToApplicationPreferences workingPushToApplicationPreferences;
+    private PushToApplicationPreferences workingPushToApplicationPreferences;
 
     public ExternalTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.initialExternalApplicationPreferences = this.preferences.getExternalApplicationsPreferences();
-        this.initialPushToApplicationPreferences = this.preferences.getPushToApplicationPreferences();
-        this.workingPushToApplicationPreferences = new PushToApplicationPreferences(
-                initialPushToApplicationPreferences.getActiveApplicationName(),
-                new HashMap<>(initialPushToApplicationPreferences.getCommandPaths()),
-                initialPushToApplicationPreferences.getEmacsArguments(),
-                initialPushToApplicationPreferences.getVimServer(),
-                initialPushToApplicationPreferences.getCiteCommand(),
-                initialPushToApplicationPreferences.getDefaultCiteCommand()
-        );
 
         terminalCommandValidator = new FunctionBasedValidator<>(
                 customTerminalCommandProperty,
@@ -92,27 +80,40 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
-        eMailReferenceSubjectProperty.setValue(initialExternalApplicationPreferences.getEmailSubject());
-        autoOpenAttachedFoldersProperty.setValue(initialExternalApplicationPreferences.shouldAutoOpenEmailAttachmentsFolder());
+        ExternalApplicationsPreferences externalApplicationsPreferences = this.preferences.getExternalApplicationsPreferences();
+        PushToApplicationPreferences pushToApplicationPreferences = this.preferences.getPushToApplicationPreferences();
+        workingPushToApplicationPreferences = new PushToApplicationPreferences(
+                pushToApplicationPreferences.getActiveApplicationName(),
+                new HashMap<>(pushToApplicationPreferences.getCommandPaths()),
+                pushToApplicationPreferences.getEmacsArguments(),
+                pushToApplicationPreferences.getVimServer(),
+                pushToApplicationPreferences.getCiteCommand(),
+                pushToApplicationPreferences.getDefaultCiteCommand()
+        );
+
+        eMailReferenceSubjectProperty.setValue(externalApplicationsPreferences.getEmailSubject());
+        autoOpenAttachedFoldersProperty.setValue(externalApplicationsPreferences.shouldAutoOpenEmailAttachmentsFolder());
 
         pushToApplicationsListProperty.setValue(
                 FXCollections.observableArrayList(GuiPushToApplications.getAllGUIApplications(dialogService, preferences.getPushToApplicationPreferences())));
         selectedPushToApplicationProperty.setValue(
-                GuiPushToApplications.getGUIApplicationByName(initialPushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences.getPushToApplicationPreferences())
+                GuiPushToApplications.getGUIApplicationByName(pushToApplicationPreferences.getActiveApplicationName(), dialogService, preferences.getPushToApplicationPreferences())
                                      .orElseGet(() -> new GuiPushToEmacs(dialogService, preferences.getPushToApplicationPreferences())));
 
-        citeCommandProperty.setValue(initialPushToApplicationPreferences.getCiteCommand().toString());
+        citeCommandProperty.setValue(pushToApplicationPreferences.getCiteCommand().toString());
 
-        useCustomTerminalProperty.setValue(initialExternalApplicationPreferences.useCustomTerminal());
-        customTerminalCommandProperty.setValue(initialExternalApplicationPreferences.getCustomTerminalCommand());
-        useCustomFileBrowserProperty.setValue(initialExternalApplicationPreferences.useCustomFileBrowser());
-        customFileBrowserCommandProperty.setValue(initialExternalApplicationPreferences.getCustomFileBrowserCommand());
-        kindleEmailProperty.setValue(initialExternalApplicationPreferences.getKindleEmail());
+        useCustomTerminalProperty.setValue(externalApplicationsPreferences.useCustomTerminal());
+        customTerminalCommandProperty.setValue(externalApplicationsPreferences.getCustomTerminalCommand());
+        useCustomFileBrowserProperty.setValue(externalApplicationsPreferences.useCustomFileBrowser());
+        customFileBrowserCommandProperty.setValue(externalApplicationsPreferences.getCustomFileBrowserCommand());
+        kindleEmailProperty.setValue(externalApplicationsPreferences.getKindleEmail());
     }
 
     @Override
     public void storeSettings() {
         ExternalApplicationsPreferences externalPreferences = preferences.getExternalApplicationsPreferences();
+        PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
+
         externalPreferences.setEMailSubject(eMailReferenceSubjectProperty.getValue());
         externalPreferences.setAutoOpenEmailAttachmentsFolder(autoOpenAttachedFoldersProperty.getValue());
         externalPreferences.setUseCustomTerminal(useCustomTerminalProperty.getValue());
@@ -121,7 +122,6 @@ public class ExternalTabViewModel implements PreferenceTabViewModel {
         externalPreferences.setCustomFileBrowserCommand(customFileBrowserCommandProperty.getValue());
         externalPreferences.setKindleEmail(kindleEmailProperty.getValue());
 
-        PushToApplicationPreferences pushPreferences = preferences.getPushToApplicationPreferences();
         pushPreferences.setActiveApplicationName(selectedPushToApplicationProperty.getValue().getDisplayName());
         pushPreferences.setCommandPaths(workingPushToApplicationPreferences.getCommandPaths());
         pushPreferences.setEmacsArguments(workingPushToApplicationPreferences.getEmacsArguments());
