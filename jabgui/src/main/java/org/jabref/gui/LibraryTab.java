@@ -217,7 +217,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
             tableModel.unbind();
         }
 
-        autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences);
+        autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, preferences.getFilePreferences());
         autoRenameFileOnEntryChange.bindToDatabase();
 
         this.selectedGroupsProperty = new SimpleListProperty<>(stateManager.getSelectedGroups(bibDatabaseContext));
