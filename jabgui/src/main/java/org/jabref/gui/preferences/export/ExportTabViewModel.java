@@ -11,7 +11,7 @@ import javafx.collections.FXCollections;
 
 import org.jabref.gui.commonfxcontrols.SortCriterionViewModel;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
-import org.jabref.logic.exporter.ExportPreferences;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.FieldFactory;
 import org.jabref.model.entry.field.InternalField;
@@ -26,15 +26,15 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
     private final ListProperty<Field> sortableFieldsProperty = new SimpleListProperty<>(FXCollections.observableArrayList());
     private final ListProperty<SortCriterionViewModel> sortCriteriaProperty = new SimpleListProperty<>(FXCollections.observableArrayList(new ArrayList<>()));
 
-    private final ExportPreferences exportPreferences;
+    private final CliPreferences preferences;
 
-    public ExportTabViewModel(ExportPreferences exportPreferences) {
-        this.exportPreferences = exportPreferences;
+    public ExportTabViewModel(CliPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
     public void setValues() {
-        SaveOrder exportSaveOrder = exportPreferences.getExportSaveOrder();
+        SaveOrder exportSaveOrder = preferences.getExportPreferences().getExportSaveOrder();
         switch (exportSaveOrder.getOrderType()) {
             case SPECIFIED -> exportInSpecifiedOrderProperty.setValue(true);
             case ORIGINAL -> exportInOriginalProperty.setValue(true);
@@ -57,7 +57,7 @@ public class ExportTabViewModel implements PreferenceTabViewModel {
         SaveOrder newSaveOrder = new SaveOrder(
                 SaveOrder.OrderType.fromBooleans(exportInSpecifiedOrderProperty.getValue(), exportInOriginalProperty.getValue()),
                 sortCriteriaProperty.stream().map(SortCriterionViewModel::getCriterion).toList());
-        exportPreferences.setExportSaveOrder(newSaveOrder);
+        preferences.getExportPreferences().setExportSaveOrder(newSaveOrder);
     }
 
     public BooleanProperty saveInOriginalProperty() {
