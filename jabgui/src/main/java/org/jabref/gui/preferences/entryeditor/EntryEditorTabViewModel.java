@@ -41,18 +41,17 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     private final DialogService dialogService;
     private final GuiPreferences preferences;
-    private final EntryEditorPreferences entryEditorPreferences;
-    private final MrDlibPreferences mrDlibPreferences;
 
     public EntryEditorTabViewModel(DialogService dialogService, GuiPreferences preferences) {
         this.dialogService = dialogService;
         this.preferences = preferences;
-        this.entryEditorPreferences = preferences.getEntryEditorPreferences();
-        this.mrDlibPreferences = preferences.getMrDlibPreferences();
     }
 
     @Override
     public void setValues() {
+        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
+        MrDlibPreferences mrDlibPreferences = preferences.getMrDlibPreferences();
+
         // ToDo: Include CustomizeGeneralFieldsDialog in PreferencesDialog
         //       Therefore yet unused: entryEditorPreferences.getEntryEditorTabList();
 
@@ -93,6 +92,9 @@ public class EntryEditorTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        EntryEditorPreferences entryEditorPreferences = preferences.getEntryEditorPreferences();
+        MrDlibPreferences mrDlibPreferences = preferences.getMrDlibPreferences();
+
         // entryEditorPreferences.setEntryEditorTabList();
         entryEditorPreferences.setShouldOpenOnNewEntry(openOnNewEntryProperty.getValue());
         entryEditorPreferences.setShouldShowRecommendationsTab(enableRelatedArticlesTabProperty.getValue());
