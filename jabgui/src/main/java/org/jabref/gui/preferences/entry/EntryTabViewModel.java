@@ -36,20 +36,19 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty addCreationDateProperty = new SimpleBooleanProperty();
     private final BooleanProperty addModificationDateProperty = new SimpleBooleanProperty();
 
-    private final FieldPreferences fieldPreferences;
-    private final BibEntryPreferences bibEntryPreferences;
-    private final OwnerPreferences ownerPreferences;
-    private final TimestampPreferences timestampPreferences;
+    private final CliPreferences preferences;
 
     public EntryTabViewModel(CliPreferences preferences) {
-        this.bibEntryPreferences = preferences.getBibEntryPreferences();
-        this.fieldPreferences = preferences.getFieldPreferences();
-        this.ownerPreferences = preferences.getOwnerPreferences();
-        this.timestampPreferences = preferences.getTimestampPreferences();
+        this.preferences = preferences;
     }
 
     @Override
     public void setValues() {
+        BibEntryPreferences bibEntryPreferences = preferences.getBibEntryPreferences();
+        FieldPreferences fieldPreferences = preferences.getFieldPreferences();
+        OwnerPreferences ownerPreferences = preferences.getOwnerPreferences();
+        TimestampPreferences timestampPreferences = preferences.getTimestampPreferences();
+
         keywordSeparatorProperty.setValue(bibEntryPreferences.getKeywordSeparator().toString());
 
         resolveStringsProperty.setValue(fieldPreferences.shouldResolveStrings());
@@ -66,6 +65,11 @@ public class EntryTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        BibEntryPreferences bibEntryPreferences = preferences.getBibEntryPreferences();
+        FieldPreferences fieldPreferences = preferences.getFieldPreferences();
+        OwnerPreferences ownerPreferences = preferences.getOwnerPreferences();
+        TimestampPreferences timestampPreferences = preferences.getTimestampPreferences();
+
         bibEntryPreferences.keywordSeparatorProperty().setValue(keywordSeparatorProperty.getValue().charAt(0));
 
         fieldPreferences.setResolveStrings(resolveStringsProperty.getValue());
