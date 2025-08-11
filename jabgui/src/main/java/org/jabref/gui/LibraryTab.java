@@ -120,7 +120,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private BibDatabaseContext bibDatabaseContext;
 
-    // All subsccribers needing "coarse" change events should use this filter
+    // All subscribers needing "coarse" change events should use this filter
     // See https://devdocs.jabref.org/code-howtos/eventbus.html for details
     private CoarseChangeFilter coarseChangeFilter;
 
