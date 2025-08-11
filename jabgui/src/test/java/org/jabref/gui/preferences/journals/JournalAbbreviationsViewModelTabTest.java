@@ -18,6 +18,7 @@ import org.jabref.logic.journals.Abbreviation;
 import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.CurrentThreadTaskExecutor;
 import org.jabref.logic.util.TaskExecutor;
 
@@ -176,13 +177,14 @@ class JournalAbbreviationsViewModelTabTest {
 
     @BeforeEach
     void setUpViewModel(@TempDir Path tempFolder) throws IOException {
-        JournalAbbreviationPreferences abbreviationPreferences = mock(JournalAbbreviationPreferences.class);
+        CliPreferences cliPreferences = mock(CliPreferences.class);
+        when(cliPreferences.getJournalAbbreviationPreferences()).thenReturn(mock(JournalAbbreviationPreferences.class));
 
         dialogService = mock(DialogService.class);
         this.tempFolder = tempFolder;
 
         TaskExecutor taskExecutor = new CurrentThreadTaskExecutor();
-        viewModel = new JournalAbbreviationsTabViewModel(abbreviationPreferences, dialogService, taskExecutor, repository);
+        viewModel = new JournalAbbreviationsTabViewModel(cliPreferences, dialogService, taskExecutor, repository);
 
         emptyTestFile = createTestFile(new CsvFileNameAndContent("emptyTestFile.csv", ""));
     }

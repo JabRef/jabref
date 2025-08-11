@@ -21,6 +21,7 @@ import org.jabref.logic.journals.JournalAbbreviationLoader;
 import org.jabref.logic.journals.JournalAbbreviationPreferences;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.StandardFileType;
 import org.jabref.logic.util.TaskExecutor;
@@ -50,30 +51,30 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty(false);
     private final SimpleBooleanProperty useFJournal = new SimpleBooleanProperty(true);
 
+    private final CliPreferences preferences;
     private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
 
-    private final JournalAbbreviationPreferences abbreviationsPreferences;
     private final JournalAbbreviationRepository journalAbbreviationRepository;
     private boolean shouldWriteLists;
 
-    public JournalAbbreviationsTabViewModel(JournalAbbreviationPreferences abbreviationsPreferences,
+    public JournalAbbreviationsTabViewModel(CliPreferences preferences,
                                             DialogService dialogService,
                                             TaskExecutor taskExecutor,
                                             JournalAbbreviationRepository journalAbbreviationRepository) {
+        this.preferences = preferences;
         this.dialogService = Objects.requireNonNull(dialogService);
         this.taskExecutor = Objects.requireNonNull(taskExecutor);
         this.journalAbbreviationRepository = Objects.requireNonNull(journalAbbreviationRepository);
-        this.abbreviationsPreferences = abbreviationsPreferences;
 
         abbreviationsCount.bind(abbreviations.sizeProperty());
-        currentAbbreviation.addListener((observable, oldValue, newValue) -> {
+        currentAbbreviation.addListener((_, _, newValue) -> {
             boolean isAbbreviation = (newValue != null) && !newValue.isPseudoAbbreviation();
             boolean isEditableFile = (currentFile.get() != null) && !currentFile.get().isBuiltInListProperty().get();
             isEditableAndRemovable.set(isEditableFile);
             isAbbreviationEditableAndRemovable.set(isAbbreviation && isEditableFile);
         });
-        currentFile.addListener((observable, oldValue, newValue) -> {
+        currentFile.addListener((_, oldValue, newValue) -> {
             if (oldValue != null) {
                 abbreviations.unbindBidirectional(oldValue.abbreviationsProperty());
                 currentAbbreviation.set(null);
@@ -118,6 +119,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      * Read all saved file paths and read their abbreviations.
      */
     public void createFileObjects() {
+        JournalAbbreviationPreferences abbreviationsPreferences = preferences.getJournalAbbreviationPreferences();
         List<String> externalFiles = abbreviationsPreferences.getExternalJournalLists();
         externalFiles.forEach(name -> openFile(Path.of(name)));
     }
@@ -325,6 +327,8 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
      */
     @Override
     public void storeSettings() {
+        JournalAbbreviationPreferences abbreviationsPreferences = preferences.getJournalAbbreviationPreferences();
+
         BackgroundTask
                 .wrap(() -> {
                     List<String> journalStringList = journalFiles.stream()
@@ -341,7 +345,7 @@ public class JournalAbbreviationsTabViewModel implements PreferenceTabViewModel 
                         shouldWriteLists = false;
                     }
                 })
-                .onSuccess(success -> Injector.setModelOrService(
+                .onSuccess(_ -> Injector.setModelOrService(
                         JournalAbbreviationRepository.class,
                         JournalAbbreviationLoader.loadRepository(abbreviationsPreferences)))
                 .onFailure(exception -> LOGGER.error("Failed to store journal preferences.", exception))
