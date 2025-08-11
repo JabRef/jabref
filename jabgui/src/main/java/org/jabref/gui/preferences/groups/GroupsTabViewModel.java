@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 
 import org.jabref.gui.groups.GroupViewMode;
 import org.jabref.gui.groups.GroupsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 
 public class GroupsTabViewModel implements PreferenceTabViewModel {
@@ -14,14 +15,15 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty autoAssignGroupProperty = new SimpleBooleanProperty();
     private final BooleanProperty displayGroupCountProperty = new SimpleBooleanProperty();
 
-    private final GroupsPreferences groupsPreferences;
+    private final GuiPreferences preferences;
 
-    public GroupsTabViewModel(GroupsPreferences groupsPreferences) {
-        this.groupsPreferences = groupsPreferences;
+    public GroupsTabViewModel(GuiPreferences preferences) {
+        this.preferences = preferences;
     }
 
     @Override
     public void setValues() {
+        GroupsPreferences groupsPreferences = preferences.getGroupsPreferences();
         if (groupsPreferences.getGroupViewMode().contains(GroupViewMode.INTERSECTION)) {
             groupViewModeIntersectionProperty.setValue(true);
             groupViewModeUnionProperty.setValue(false);
@@ -35,6 +37,7 @@ public class GroupsTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        GroupsPreferences groupsPreferences = preferences.getGroupsPreferences();
         groupsPreferences.setGroupViewMode(GroupViewMode.INTERSECTION, groupViewModeIntersectionProperty.getValue());
         groupsPreferences.setAutoAssignGroup(autoAssignGroupProperty.getValue());
         groupsPreferences.setDisplayGroupCount(displayGroupCountProperty.getValue());
