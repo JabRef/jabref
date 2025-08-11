@@ -65,7 +65,7 @@ class AutoRenameFileOnEntryChangeTest {
                 .withField(StandardField.YEAR, "2081");
 
         bibDatabaseContext.getDatabase().insertEntry(entry);
-        AutoRenameFileOnEntryChange autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, guiPreferences);
+        AutoRenameFileOnEntryChange autoRenameFileOnEntryChange = new AutoRenameFileOnEntryChange(bibDatabaseContext, guiPreferences.getFilePreferences());
         autoRenameFileOnEntryChange.bindToDatabase();
 
         // Update citation-key when author/year changes
