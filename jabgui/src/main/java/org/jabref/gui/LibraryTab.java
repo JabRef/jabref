@@ -120,7 +120,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
     private BibDatabaseContext bibDatabaseContext;
 
-    // All subsccribers needing "coarse" change events should use this filter
+    // All subscribers needing "coarse" change events should use this filter
     // See https://devdocs.jabref.org/code-howtos/eventbus.html for details
     private CoarseChangeFilter coarseChangeFilter;
 
@@ -178,7 +178,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                        TaskExecutor taskExecutor,
                        boolean isDummyContext) {
         this.bibDatabaseContext = bibDatabaseContext;
-        this.coarseChangeFilter = new CoarseChangeFilter(bibDatabaseContext);
         this.tabContainer = tabContainer;
         this.undoManager = undoManager;
         this.dialogService = dialogService;
@@ -232,6 +231,8 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
 
         setupMainPanel();
         setupAutoCompletion();
+
+        this.coarseChangeFilter = new CoarseChangeFilter(bibDatabaseContext);
 
         this.getDatabase().registerListener(new IndexUpdateListener());
 
@@ -325,7 +326,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         dialogService.showErrorDialogAndWait(title, content, ex);
     }
 
-    private void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+    private void setDatabaseContext(@NonNull BibDatabaseContext bibDatabaseContext) {
         TabPane tabPane = this.getTabPane();
 
         if (tabPane == null) {
@@ -342,7 +343,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         Optional<BibDatabaseContext> foundExistingBibDatabase = stateManager.getOpenDatabases().stream().filter(databaseContext -> databaseContext.equals(this.bibDatabaseContext)).findFirst();
         foundExistingBibDatabase.ifPresent(databaseContext -> stateManager.getOpenDatabases().remove(databaseContext));
 
-        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        this.bibDatabaseContext = bibDatabaseContext;
 
         stateManager.getOpenDatabases().add(bibDatabaseContext);
 
@@ -993,7 +994,7 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
         return newTab;
     }
 
-    public static LibraryTab createLibraryTab(BibDatabaseContext databaseContext,
+    public static LibraryTab createLibraryTab(@NonNull BibDatabaseContext databaseContext,
                                               LibraryTabContainer tabContainer,
                                               DialogService dialogService,
                                               AiService aiService,
@@ -1004,8 +1005,6 @@ public class LibraryTab extends Tab implements CommandSelectionTab {
                                               UndoManager undoManager,
                                               ClipBoardManager clipBoardManager,
                                               TaskExecutor taskExecutor) {
-        Objects.requireNonNull(databaseContext);
-
         return new LibraryTab(
                 databaseContext,
                 tabContainer,
