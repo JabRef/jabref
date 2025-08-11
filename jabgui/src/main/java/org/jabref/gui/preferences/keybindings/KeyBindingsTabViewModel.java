@@ -39,8 +39,8 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
 
     private final List<String> restartWarning = new ArrayList<>();
 
-    public KeyBindingsTabViewModel(KeyBindingRepository keyBindingRepository, DialogService dialogService, GuiPreferences preferences) {
-        this.keyBindingRepository = new KeyBindingRepository(keyBindingRepository.getKeyBindings());
+    public KeyBindingsTabViewModel(DialogService dialogService, GuiPreferences preferences) {
+        this.keyBindingRepository = new KeyBindingRepository();
         this.dialogService = Objects.requireNonNull(dialogService);
         this.preferences = Objects.requireNonNull(preferences);
 
@@ -53,6 +53,9 @@ public class KeyBindingsTabViewModel implements PreferenceTabViewModel {
      */
     @Override
     public void setValues() {
+        KeyBindingRepository newKeyBindingRepository = new KeyBindingRepository(preferences.getKeyBindingRepository().getKeyBindings());
+        keyBindingRepository.getBindingsProperty().set(newKeyBindingRepository.getBindingsProperty());
+
         KeyBindingViewModel root = new KeyBindingViewModel(keyBindingRepository, KeyBindingCategory.FILE);
         rootKeyBinding.set(root);
         filterValues("");

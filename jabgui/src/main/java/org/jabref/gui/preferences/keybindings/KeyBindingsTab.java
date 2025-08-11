@@ -16,7 +16,6 @@ import javafx.scene.paint.Color;
 
 import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.icon.JabRefIcon;
-import org.jabref.gui.keyboard.KeyBindingRepository;
 import org.jabref.gui.preferences.AbstractPreferenceTabView;
 import org.jabref.gui.preferences.PreferencesTab;
 import org.jabref.gui.preferences.keybindings.presets.KeyBindingPreset;
@@ -27,7 +26,6 @@ import org.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.ViewLoader;
 import com.tobiasdiez.easybind.EasyBind;
-import jakarta.inject.Inject;
 import org.controlsfx.control.textfield.CustomTextField;
 
 public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabViewModel> implements PreferencesTab {
@@ -39,8 +37,6 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
     @FXML private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> resetColumn;
     @FXML private TreeTableColumn<KeyBindingViewModel, KeyBindingViewModel> clearColumn;
     @FXML private MenuButton presetsButton;
-
-    @Inject private KeyBindingRepository keyBindingRepository;
 
     public KeyBindingsTab() {
         ViewLoader.view(this)
@@ -55,7 +51,7 @@ public class KeyBindingsTab extends AbstractPreferenceTabView<KeyBindingsTabView
 
     @FXML
     private void initialize() {
-        viewModel = new KeyBindingsTabViewModel(keyBindingRepository, dialogService, preferences);
+        viewModel = new KeyBindingsTabViewModel(dialogService, preferences);
 
         keyBindingsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         viewModel.selectedKeyBindingProperty().bind(
