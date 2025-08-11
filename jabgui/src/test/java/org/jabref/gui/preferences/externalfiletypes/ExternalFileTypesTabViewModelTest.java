@@ -4,6 +4,7 @@ import javafx.collections.ObservableList;
 
 import org.jabref.gui.DialogService;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,18 +18,22 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class ExternalFileTypesTabViewModelTest {
 
-    private ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
-    private DialogService dialogService = mock(DialogService.class);
-    private ExternalFileTypeItemViewModel externalFileTypeItemViewModel = new ExternalFileTypeItemViewModel();
+    private final ExternalApplicationsPreferences externalApplicationsPreferences = mock(ExternalApplicationsPreferences.class);
+    private final DialogService dialogService = mock(DialogService.class);
+    private final GuiPreferences preferences = mock(GuiPreferences.class);
+    private final ExternalFileTypeItemViewModel externalFileTypeItemViewModel = new ExternalFileTypeItemViewModel();
 
     @Spy
-    private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = spy(new ExternalFileTypesTabViewModel(externalApplicationsPreferences, dialogService));
+    private ExternalFileTypesTabViewModel externalFileTypesTabViewModel = spy(new ExternalFileTypesTabViewModel(preferences, dialogService));
 
     @BeforeEach
     void setUp() {
+        when(preferences.getExternalApplicationsPreferences()).thenReturn(externalApplicationsPreferences);
+
         externalFileTypeItemViewModel.nameProperty().set("Excel 2007");
         externalFileTypeItemViewModel.extensionProperty().set("xlsx");
         externalFileTypeItemViewModel.mimetypeProperty().set("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -54,12 +59,12 @@ public class ExternalFileTypesTabViewModelTest {
     }
 
     @Test
-    void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenisValidExternalFileTypeReturnTrue() {
+    void whenExternalFileTypeItemViewModelWithNonEmptyStringValueThenIsValidExternalFileTypeReturnTrue() {
         assertTrue(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel));
     }
 
     @Test
-    void whenExternalFileTypeItemViewModelWithEmptyNameThenisValidExternalFileTypeReturnFalse() {
+    void whenExternalFileTypeItemViewModelWithEmptyNameThenIsValidExternalFileTypeReturnFalse() {
         this.setupViewModelWithoutName();
         assertFalse(externalFileTypesTabViewModel.isValidExternalFileType(externalFileTypeItemViewModel));
     }
@@ -67,7 +72,7 @@ public class ExternalFileTypesTabViewModelTest {
     @Test
     void WhenExternalFileTypeItemViewModelIsValidThenAddNewTypeIsSuccessful() {
         ArgumentCaptor<ExternalFileTypeItemViewModel> itemCaptor = ArgumentCaptor.forClass(ExternalFileTypeItemViewModel.class);
-        doAnswer(mocked -> {
+        doAnswer(_ -> {
             ExternalFileTypeItemViewModel capturedItem = itemCaptor.getValue();
             this.viewModelClone(capturedItem);
             return null;

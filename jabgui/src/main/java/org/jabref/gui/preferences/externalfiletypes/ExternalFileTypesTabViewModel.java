@@ -11,6 +11,7 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.externalfiletype.ExternalFileType;
 import org.jabref.gui.externalfiletype.ExternalFileTypes;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
+import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.preferences.PreferenceTabViewModel;
 import org.jabref.logic.l10n.Localization;
 
@@ -22,16 +23,18 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExternalFileTypesTabViewModel.class);
     private final ObservableList<ExternalFileTypeItemViewModel> fileTypes = FXCollections.observableArrayList();
 
-    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+    private final GuiPreferences preferences;
     private final DialogService dialogService;
 
-    public ExternalFileTypesTabViewModel(ExternalApplicationsPreferences externalApplicationsPreferences, DialogService dialogService) {
-        this.externalApplicationsPreferences = externalApplicationsPreferences;
+    public ExternalFileTypesTabViewModel(GuiPreferences preferences, DialogService dialogService) {
+        this.preferences = preferences;
         this.dialogService = dialogService;
     }
 
     @Override
     public void setValues() {
+        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+
         fileTypes.clear();
         fileTypes.addAll(externalApplicationsPreferences.getExternalFileTypes().stream()
                                                         .map(ExternalFileTypeItemViewModel::new)
@@ -40,6 +43,8 @@ public class ExternalFileTypesTabViewModel implements PreferenceTabViewModel {
     }
 
     public void storeSettings() {
+        ExternalApplicationsPreferences externalApplicationsPreferences = preferences.getExternalApplicationsPreferences();
+
         Set<ExternalFileType> saveList = new HashSet<>();
 
         fileTypes.stream().map(ExternalFileTypeItemViewModel::toExternalFileType)
