@@ -174,7 +174,7 @@ jobs:
     name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: 'true'

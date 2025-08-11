@@ -133,7 +133,7 @@ jobs:
           comment-tag:
             wisdom
           mode: recreate
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Remove label
         run: |
           gh issue edit ${{ github.event.issue.number }} --remove-label "dev: wisdom"
