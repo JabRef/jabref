@@ -47,7 +47,7 @@ jobs:
 
       - name: Checkout
         # required for gh tool and .github/ghprcomment.yml
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           show-progress: 'false'
           token: ${{ secrets.GITHUB_TOKEN }}
