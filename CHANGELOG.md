@@ -12,6 +12,8 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 ### Added
 
 - We introduced an option in Preferences under (under Linked files -> Linked file name conventions) to automatically rename linked files when an entry data changes. [#11316](https://github.com/JabRef/jabref/issues/11316)
+- A space is now added by default after citations inserted via the Libre/OpenOffice integration. [#13559](https://github.com/JabRef/jabref/issues/13559)
+- We added the option to configure 'Add space after citation' in Libre/OpenOffice panel settings. [#13559](https://github.com/JabRef/jabref/issues/13559)
 - We added automatic lookup of DOI at citation information. [#13561](https://github.com/JabRef/jabref/issues/13561)
 - We added a field for the citation count field on the General tab. [#13477](https://github.com/JabRef/jabref/issues/13477)
 - We added automatic lookup of DOI at citation relations [#13234](https://github.com/JabRef/jabref/issues/13234)
@@ -21,9 +23,11 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - When adding an entry to a library, a warning is displayed if said entry already exists in an active library. [#13261](https://github.com/JabRef/jabref/issues/13261)
 - We added the field `monthfiled` to the default list of fields to resolve BibTeX-Strings for [#13375](https://github.com/JabRef/jabref/issues/13375)
 - We added a new ID based fetcher for [EuropePMC](https://europepmc.org/). [#13389](https://github.com/JabRef/jabref/pull/13389)
+- We added quick settings for welcome tab. [#12664](https://github.com/JabRef/jabref/issues/12664)
 - We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)
 - We added "copy preview as markdown" feature. [#12552](https://github.com/JabRef/jabref/issues/12552)
 - In case no citation relation information can be fetched, we show the data providers reason. [#13549](https://github.com/JabRef/jabref/pull/13549)
+- We added a new button for shortening the DOI near the DOI field in the general tab when viewing an entry. [#13639](https://github.com/JabRef/jabref/issues/13639)
 
 ### Changed
 
@@ -36,6 +40,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a new "Add JabRef suggested groups" option in the context menu of "All entries". [#12659](https://github.com/JabRef/jabref/issues/12659)
 - We added an option to create entries directly from Bib(La)TeX sources to the 'Create New Entry' tool. [#8808](https://github.com/JabRef/jabref/issues/8808)
 - We added the provision to choose different CSL bibliography body formats (e.g. First Line Indent, Hanging Indent, Bibliography 1, etc.) in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
+- We use `https` to connect to [shortDOI](https://shortdoi.org/) service. [#13637](https://github.com/JabRef/jabref/pull/13637)
 - We added "Bibliography Heading" to the available CSL bibliography header formats in the LibreOffice integration. [#13049](https://github.com/JabRef/jabref/issues/13049)
 - We added [LOBID](https://lobid.org/) as an alternative ISBN-Fetcher. [#13076](https://github.com/JabRef/jabref/issues/13076)
 - We added a success dialog when using the "Copy to" option, indicating whether the entry was successfully copied and specifying if a cross-reference entry was included. [#12486](https://github.com/JabRef/jabref/issues/12486)
@@ -64,13 +69,17 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added a progress dialog to the "Check consistency" action and progress output to the corresponding cli command. [#12487](https://github.com/JabRef/jabref/issues/12487)
 - We made the `check-consistency` command of the toolkit always return an exit code; 0 means no issues found, a non-zero exit code reflects any issues, which allows CI to fail in these cases [#13328](https://github.com/JabRef/jabref/issues/13328).
 - We changed the validation error dialog for overriding the default file directories to a confirmation dialog for saving other preferences under the library properties. [#13488](https://github.com/JabRef/jabref/pull/13488)
-- We improved file exists warning dialog with clearer options and tooltips [#12565](https://github.com/JabRef/jabref/issues/12565)]
+- We improved file exists warning dialog with clearer options and tooltips [#12565](https://github.com/JabRef/jabref/issues/12565)
+- We introduced walkthrough functionality [#12664](https://github.com/JabRef/jabref/issues/12664)
 
 ### Fixed
-
+  
+- We fixed an issue whereby the 'About' dialog was not honouring the user's configured font preferences. [#13558](https://github.com/JabRef/jabref/issues/13558)
+- We fixed an issue where the Pagetotal column was sorting the values alphabetically instead of numerically. [#12533](https://github.com/JabRef/jabref/issues/12533)
 - We fixed dark mode of BibTeX Source dialog in Citation Relations tab. [#13599](https://github.com/JabRef/jabref/issues/13599)
 - We fixed an issue where the LibreOffice integration did not support citation keys containing Unicode characters. [#13301](https://github.com/JabRef/jabref/issues/13301)
-- We fixed an issue where the "Search ShortScience" action did not convert LaTeX-formatted titles to Unicode.[#13418](https://github.com/JabRef/jabref/issues/13418)
+- We fixed an issue where the "Search ShortScience" action did not convert LaTeX-formatted titles to Unicode. [#13418](https://github.com/JabRef/jabref/issues/13418)
+- We fixed an issue where LaTeX file directories were not properly shared between different users on the same host. [#9990](https://github.com/JabRef/jabref/issues/9990)
 - We added a fallback for the "Convert to biblatex" cleanup when it failed to populate the `date` field if `year` contained a full date in ISO format (e.g., `2011-11-11`). [#11868](https://github.com/JabRef/jabref/issues/11868)
 - We fixed an issue where directory check for relative path was not handled properly under library properties. [#13017](https://github.com/JabRef/jabref/issues/13017)
 - We fixed an exception on tab dragging. [#12921](https://github.com/JabRef/jabref/issues/12921)

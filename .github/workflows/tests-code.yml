@@ -305,7 +305,7 @@ jobs:
         run: scripts/after-failure.sh
 
   tests-windows:
-    name: "Unit tests (Windows) – ${{ matrix.module }}"
+    name: "Unit tests (Windows)"
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
     runs-on: windows-latest
     strategy:
