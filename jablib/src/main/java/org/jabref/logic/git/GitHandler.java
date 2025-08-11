@@ -519,7 +519,9 @@ public class GitHandler {
             } catch (IOException | GitAPIException e) {
                 LOGGER.debug("Abort semantic merge failed (best-effort cleanup). path={}", bibFilePath, e);
             } catch (RuntimeException e) {
-                LOGGER.debug("Abort semantic merge failed with runtime exception. path={}", bibFilePath, e);
+                // Deliberately catching RuntimeException here because this is a best-effort cleanup in AutoCloseable.close().
+                // have to NOT throw from close() to avoid masking the primary failure/result of pull/merge.
+                LOGGER.warn("Unexpected runtime exception during cleanup; rethrowing. path={}", bibFilePath, e);
             }
         }
     }
