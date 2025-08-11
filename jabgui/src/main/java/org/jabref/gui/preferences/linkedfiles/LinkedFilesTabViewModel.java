@@ -47,13 +47,11 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
     private final Validator mainFileDirValidator;
 
     private final DialogService dialogService;
-    private final FilePreferences filePreferences;
-    private final AutoLinkPreferences autoLinkPreferences;
+    private final CliPreferences preferences;
 
     public LinkedFilesTabViewModel(DialogService dialogService, CliPreferences preferences) {
         this.dialogService = dialogService;
-        this.filePreferences = preferences.getFilePreferences();
-        this.autoLinkPreferences = preferences.getAutoLinkPreferences();
+        this.preferences = preferences;
 
         mainFileDirValidator = new FunctionBasedValidator<>(
                 mainFileDirectoryProperty,
@@ -77,6 +75,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void setValues() {
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        AutoLinkPreferences autoLinkPreferences = preferences.getAutoLinkPreferences();
+
         // External files preferences / Attached files preferences / File preferences
         mainFileDirectoryProperty.setValue(filePreferences.getMainFileDirectory().orElse(Path.of("")).toString());
         useMainFileDirectoryProperty.setValue(!filePreferences.shouldStoreFilesRelativeToBibFile());
@@ -101,6 +102,9 @@ public class LinkedFilesTabViewModel implements PreferenceTabViewModel {
 
     @Override
     public void storeSettings() {
+        FilePreferences filePreferences = preferences.getFilePreferences();
+        AutoLinkPreferences autoLinkPreferences = preferences.getAutoLinkPreferences();
+
         // External files preferences / Attached files preferences / File preferences
         filePreferences.setMainFileDirectory(mainFileDirectoryProperty.getValue());
         filePreferences.setStoreFilesRelativeToBibFile(useBibLocationAsPrimaryProperty.getValue());
