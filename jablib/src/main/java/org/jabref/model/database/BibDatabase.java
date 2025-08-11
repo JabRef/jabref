@@ -189,16 +189,15 @@ public class BibDatabase {
         insertEntries(entries, EntriesEventSource.LOCAL);
     }
 
-    public synchronized void insertEntries(List<BibEntry> newEntries, EntriesEventSource eventSource) {
-        Objects.requireNonNull(newEntries);
+    public synchronized void insertEntries(@NonNull List<BibEntry> newEntries, EntriesEventSource eventSource) {
+        if (newEntries.isEmpty()) {
+            return;
+        }
+
         for (BibEntry entry : newEntries) {
             entry.registerListener(this);
         }
-        if (newEntries.isEmpty()) {
-            eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
-        } else {
-            eventBus.post(new EntriesAddedEvent(newEntries, newEntries.getFirst(), eventSource));
-        }
+        eventBus.post(new EntriesAddedEvent(newEntries, eventSource));
         entries.addAll(newEntries);
         newEntries.forEach(entry -> {
                     entriesId.put(entry.getId(), entry);
