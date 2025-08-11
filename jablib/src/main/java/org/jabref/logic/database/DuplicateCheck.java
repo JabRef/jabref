@@ -337,8 +337,7 @@ public class DuplicateCheck {
         }
 
         // TODO: Work on haveDifferentEntryType - InCollection and InProceedings could point to the same publication
-        if (haveDifferentEntryType(one, two) ||
-                haveDifferentEditions(one, two) ||
+        if (haveDifferentEditions(one, two) ||
                 haveDifferentChaptersOrPagesOfTheSameBook(one, two)) {
             return false;
         }
