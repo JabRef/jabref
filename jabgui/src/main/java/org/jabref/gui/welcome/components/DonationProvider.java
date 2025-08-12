@@ -25,7 +25,6 @@ import org.jabref.logic.l10n.Localization;
 
 public class DonationProvider {
     private static final int DONATION_INTERVAL_DAYS = 365;
-    private static final int DONATION_FIRST_BACKDATE_DAYS = 348;
     private static final double DONATION_POPUP_ANIM_MS = 200;
     private static final double DONATION_POPUP_TIMEOUT_SECONDS = 15;
     private static final String DONATION_URL = URLs.DONATE_URL;
@@ -47,26 +46,23 @@ public class DonationProvider {
             return;
         }
         int lastShown = preferences.getDonationPreferences().getLastShownEpochDay();
+        scheduleAfterDays(calculateDaysUntilNextPopup(lastShown));
+    }
+
+    public int calculateDaysUntilNextPopup(int lastShownEpochDay) {
         int today = (int) LocalDate.now().toEpochDay();
-        if (lastShown < 0) {
-            // 7 days after first-launch, show the donation popup
-            preferences.getDonationPreferences().setLastShownEpochDay(today - DONATION_FIRST_BACKDATE_DAYS);
-            lastShown = preferences.getDonationPreferences().getLastShownEpochDay();
+        if (lastShownEpochDay < 0) {
+            return 7; // 7 days after first-launch, show the donation popup
         }
-        int daysSince = today - lastShown;
-        if (daysSince >= DONATION_INTERVAL_DAYS) {
-            preferences.getDonationPreferences().setLastShownEpochDay(today);
-            showToast();
-            scheduleAfterDays(DONATION_INTERVAL_DAYS);
-        } else {
-            scheduleAfterDays(DONATION_INTERVAL_DAYS - daysSince);
-        }
+        return Math.max(0, DONATION_INTERVAL_DAYS - (today - lastShownEpochDay));
     }
 
     public void showToast() {
         if (donationToast != null && rootPane.getChildren().contains(donationToast)) {
             return;
         }
+
+        preferences.getDonationPreferences().setLastShownEpochDay((int) LocalDate.now().toEpochDay());
 
         Label title = new Label(Localization.lang("Support JabRef"));
         title.getStyleClass().add("donation-toast-title");
@@ -139,7 +135,8 @@ public class DonationProvider {
     private void scheduleAfterDays(int days) {
         cancelScheduled();
         if (days <= 0) {
-            scheduledShow = new DelayedExecution(Duration.millis(1), this::showIfNeeded);
+            showToast();
+            scheduledShow = new DelayedExecution(Duration.millis(DONATION_INTERVAL_DAYS), this::showIfNeeded);
         } else {
             scheduledShow = new DelayedExecution(Duration.hours(days * 24), this::showIfNeeded);
         }
