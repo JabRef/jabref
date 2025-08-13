@@ -99,7 +99,7 @@ public class KeywordList implements Iterable<Keyword> {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
     }
 
-    public static KeywordList bibTeXparse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
+    public static KeywordList bibteXparse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
         if (StringUtil.isBlank(keywordString)) {
             return new KeywordList();
         }

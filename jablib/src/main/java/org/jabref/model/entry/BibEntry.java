@@ -1054,7 +1054,7 @@ public class BibEntry {
         }
         // TODO: We need to implement new KeywordList.parse() method for bibtexContext parsing
         KeywordList keywords = getField(field)
-                .map(content -> KeywordList.parse(content, keywordSeparator))
+                .map(content -> KeywordList.bibteXparse(content, keywordSeparator, Keyword.DEFAULT_HIERARCHICAL_DELIMITER))
                 .orElse(new KeywordList());
 
         if (field instanceof StandardField standardField) {
