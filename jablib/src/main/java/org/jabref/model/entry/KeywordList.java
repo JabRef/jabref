@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -96,6 +97,25 @@ public class KeywordList implements Iterable<Keyword> {
      */
     public static KeywordList parse(String keywordString, Character delimiter) {
         return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
+    }
+
+    public static KeywordList bibTeXparse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(hierarchicalDelimiter);
+
+        KeywordList keywordList = new KeywordList();
+
+        StringTokenizer tok = new StringTokenizer(keywordString, delimiter.toString());
+        while (tok.hasMoreTokens()) {
+            String chain = tok.nextToken();
+            Keyword chainRoot = Keyword.of(chain.split(hierarchicalDelimiter.toString()));
+            keywordList.add(chainRoot);
+        }
+        return keywordList;
     }
 
     // TODO: this will be the method we will use for BibTeX Context serializing -> escaping and autoescaping
