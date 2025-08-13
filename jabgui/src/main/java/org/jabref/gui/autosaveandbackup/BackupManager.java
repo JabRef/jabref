@@ -63,9 +63,9 @@ public class BackupManager {
     private static final Set<BackupManager> RUNNING_INSTANCES = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
+    private final CoarseChangeFilter coarseChangeFilter;
     private final CliPreferences preferences;
     private final ScheduledThreadPoolExecutor executor;
-    private final CoarseChangeFilter changeFilter;
     private final BibEntryTypesManager entryTypesManager;
     private final LibraryTab libraryTab;
 
@@ -74,15 +74,13 @@ public class BackupManager {
     private final Queue<Path> backupFilesQueue = new LinkedBlockingQueue<>();
     private boolean needsBackup = false;
 
-    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
+    BackupManager(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
         this.bibDatabaseContext = bibDatabaseContext;
+        this.coarseChangeFilter = coarseChangeFilter;
         this.entryTypesManager = entryTypesManager;
         this.preferences = preferences;
         this.executor = new ScheduledThreadPoolExecutor(2);
         this.libraryTab = libraryTab;
-
-        changeFilter = new CoarseChangeFilter(bibDatabaseContext);
-        changeFilter.registerListener(this);
     }
 
     /**
@@ -102,14 +100,15 @@ public class BackupManager {
     /**
      * Starts the BackupManager which is associated with the given {@link BibDatabaseContext}. As long as no database
      * file is present in {@link BibDatabaseContext}, the {@link BackupManager} will do nothing.
-     *
+     * <p>
      * This method is not thread-safe. The caller has to ensure that this method is not called in parallel.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
-    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
-        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, entryTypesManager, preferences);
+    public static BackupManager start(LibraryTab libraryTab, BibDatabaseContext bibDatabaseContext, CoarseChangeFilter coarseChangeFilter, BibEntryTypesManager entryTypesManager, CliPreferences preferences) {
+        BackupManager backupManager = new BackupManager(libraryTab, bibDatabaseContext, coarseChangeFilter, entryTypesManager, preferences);
         backupManager.startBackupTask(preferences.getFilePreferences().getBackupDirectory());
+        coarseChangeFilter.registerListener(backupManager);
         RUNNING_INSTANCES.add(backupManager);
         return backupManager;
     }
@@ -127,8 +126,8 @@ public class BackupManager {
      * Shuts down the BackupManager which is associated with the given {@link BibDatabaseContext}.
      *
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
-     * @param createBackup True, if a backup should be created
-     * @param backupDir The path to the backup directory
+     * @param backupDir          The path to the backup directory
+     * @param createBackup       True, if a backup should be created
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext, Path backupDir, boolean createBackup) {
         RUNNING_INSTANCES.stream().filter(instance -> instance.bibDatabaseContext == bibDatabaseContext).forEach(backupManager -> backupManager.shutdown(backupDir, createBackup));
@@ -375,8 +374,7 @@ public class BackupManager {
      * @param createBackup If the backup manager should still perform a backup
      */
     private void shutdown(Path backupDir, boolean createBackup) {
-        changeFilter.unregisterListener(this);
-        changeFilter.shutdown();
+        coarseChangeFilter.unregisterListener(this);
         executor.shutdown();
 
         if (createBackup) {

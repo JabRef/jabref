@@ -297,7 +297,7 @@ public class JabRefCliPreferences implements CliPreferences {
     public static final String OO_CSL_BIBLIOGRAPHY_TITLE = "cslBibliographyTitle";
     public static final String OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT = "cslBibliographyHeaderFormat";
     public static final String OO_CSL_BIBLIOGRAPHY_BODY_FORMAT = "cslBibliographyBodyFormat";
-
+    public static final String OO_ADD_SPACE_AFTER = "ooAddSpaceAfter";
     // Prefs node for CitationKeyPatterns
     public static final String CITATION_KEY_PATTERNS_NODE = "bibtexkeypatterns";
     // Prefs node for customized entry types
@@ -471,7 +471,6 @@ public class JabRefCliPreferences implements CliPreferences {
     private FieldPreferences fieldPreferences;
     private AiPreferences aiPreferences;
     private LastFilesOpenedPreferences lastFilesOpenedPreferences;
-    private WalkthroughPreferences walkthroughPreferences;
     private PushToApplicationPreferences pushToApplicationPreferences;
 
     /**
@@ -481,8 +480,9 @@ public class JabRefCliPreferences implements CliPreferences {
      */
     public JabRefCliPreferences() {
         try {
-            if (Files.exists(Path.of("jabref.xml"))) {
-                importPreferences(Path.of("jabref.xml"));
+            Path preferencesPath = Path.of("jabref.xml");
+            if (Files.exists(preferencesPath)) {
+                importPreferences(preferencesPath);
             }
         } catch (JabRefException e) {
             LOGGER.warn("Could not import preferences from jabref.xml", e);
@@ -629,6 +629,7 @@ public class JabRefCliPreferences implements CliPreferences {
         defaults.put(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT, "Heading 2");
         defaults.put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, "Text body");
         defaults.put(OO_EXTERNAL_CSL_STYLES, "");
+        defaults.put(OO_ADD_SPACE_AFTER, Boolean.TRUE);
 
         defaults.put(FETCHER_CUSTOM_KEY_NAMES, "Springer;IEEEXplore;SAO/NASA ADS;ScienceDirect;Biodiversity Heritage");
         defaults.put(FETCHER_CUSTOM_KEY_USES, "FALSE;FALSE;FALSE;FALSE;FALSE");
@@ -2422,12 +2423,14 @@ public class JabRefCliPreferences implements CliPreferences {
                 get(OO_CSL_BIBLIOGRAPHY_TITLE),
                 get(OO_CSL_BIBLIOGRAPHY_HEADER_FORMAT),
                 get(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT),
-                getStringList(OO_EXTERNAL_CSL_STYLES));
+                getStringList(OO_EXTERNAL_CSL_STYLES),
+                getBoolean(OO_ADD_SPACE_AFTER));
 
         EasyBind.listen(openOfficePreferences.executablePathProperty(), (_, _, newValue) -> put(OO_EXECUTABLE_PATH, newValue));
         EasyBind.listen(openOfficePreferences.useAllDatabasesProperty(), (_, _, newValue) -> putBoolean(OO_USE_ALL_OPEN_BASES, newValue));
         EasyBind.listen(openOfficePreferences.alwaysAddCitedOnPagesProperty(), (_, _, newValue) -> putBoolean(OO_ALWAYS_ADD_CITED_ON_PAGES, newValue));
         EasyBind.listen(openOfficePreferences.syncWhenCitingProperty(), (_, _, newValue) -> putBoolean(OO_SYNC_WHEN_CITING, newValue));
+        EasyBind.listen(openOfficePreferences.addSpaceAfterProperty(), (_, _, newValue) -> putBoolean(OO_ADD_SPACE_AFTER, newValue));
 
         openOfficePreferences.getExternalJStyles().addListener((InvalidationListener) _ ->
                 putStringList(OO_EXTERNAL_STYLE_FILES, openOfficePreferences.getExternalJStyles()));
@@ -2441,16 +2444,5 @@ public class JabRefCliPreferences implements CliPreferences {
         EasyBind.listen(openOfficePreferences.cslBibliographyBodyFormatProperty(), (_, _, newValue) -> put(OO_CSL_BIBLIOGRAPHY_BODY_FORMAT, newValue));
 
         return openOfficePreferences;
-    }
-
-    @Override
-    public WalkthroughPreferences getWalkthroughPreferences() {
-        if (walkthroughPreferences != null) {
-            return walkthroughPreferences;
-        }
-
-        walkthroughPreferences = new WalkthroughPreferences(getBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED));
-        EasyBind.listen(walkthroughPreferences.mainFileDirectoryCompletedProperty(), (_, _, newValue) -> putBoolean(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, newValue));
-        return walkthroughPreferences;
     }
 }
