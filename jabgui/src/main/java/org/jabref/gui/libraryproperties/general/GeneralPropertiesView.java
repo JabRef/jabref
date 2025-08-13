@@ -86,7 +86,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
         laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
 
-        userSpecificFileDirectoryTooltip.setText(Localization.lang(preferences.getFilePreferences().getUserAndHost()));
+        userSpecificFileDirectoryTooltip.setText(preferences.getFilePreferences().getUserAndHost());
         userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);
         laTexFileDirectoryTooltip.setText(viewModel.laTexFileDirectoryProperty().isEmpty().get()
                 ? laTexFileDirectoryTooltipText
