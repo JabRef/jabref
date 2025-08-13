@@ -31,7 +31,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private ComboBox<BibDatabaseMode> databaseMode;
     @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
-    @FXML private TextField laexFileDirectory;
+    @FXML private TextField latexFileDirectory;
     @FXML private Button libSpecificFileDirSwitchId;
     @FXML private Button userSpecificFileDirSwitchId;
     @FXML private Button laTexSpecificFileDirSwitchId;
@@ -88,7 +88,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         librarySpecificFileDirectory.setTooltip(librarySpecificFileDirectoryTooltip);
 
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
-        laexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        latexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
 
         userSpecificFileDirectoryTooltip.setText(Localization.lang("User-specific file directory: %0", preferences.getFilePreferences().getUserAndHost()));
         userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);
@@ -114,7 +114,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
 
-        laexFileDirectory.textProperty().addListener((_, _, newValue) -> {
+        latexFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
@@ -125,7 +125,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
             userSpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.userSpecificFileDirectoryStatus(), userSpecificFileDirectory);
-            latexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), laexFileDirectory);
+            latexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), latexFileDirectory);
 
             librarySpecificFileDirectory.requestFocus();
         });

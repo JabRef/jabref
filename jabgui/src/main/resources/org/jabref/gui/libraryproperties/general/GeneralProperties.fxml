@@ -93,7 +93,7 @@
 
         <Label text="%LaTeX file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <TextField fx:id="laexFileDirectory"
+        <TextField fx:id="latexFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="3">
             <tooltip>
                 <Tooltip fx:id="latexFileDirectoryTooltip"/>
