@@ -51,6 +51,7 @@ import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.entry.BibEntryTypesManager;
 import org.jabref.model.util.FileUpdateMonitor;
 
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +77,7 @@ public class WelcomeTab extends Tab {
     private Walkthroughs walkthroughs;
 
     private QuickSettings quickSettings;
+    private final DonationProvider donationProvider;
 
     public WelcomeTab(Stage stage,
                       LibraryTabContainer tabContainer,
@@ -126,8 +128,10 @@ public class WelcomeTab extends Tab {
         StackPane rootPane = new StackPane(container);
         setContent(rootPane);
 
-        DonationProvider donationProvider = new DonationProvider(rootPane, preferences, dialogService);
+        donationProvider = new DonationProvider(rootPane, preferences, dialogService);
         donationProvider.showIfNeeded();
+
+        setOnClosed(_ -> donationProvider.cleanUp());
     }
 
     private VBox createTopTitles() {
@@ -182,7 +186,10 @@ public class WelcomeTab extends Tab {
         return rightColumn;
     }
 
-    private void updateColumnsLayout(GridPane grid, VBox leftColumn, VBox rightColumn, double availableWidth) {
+    private void updateColumnsLayout(@NonNull GridPane grid,
+                                     @NonNull VBox leftColumn,
+                                     @NonNull VBox rightColumn,
+                                     double availableWidth) {
         grid.getChildren().clear();
         grid.getColumnConstraints().clear();
 

@@ -34,6 +34,7 @@ public class DonationProvider {
     private final DialogService dialogService;
     private HBox donationToast;
     private DelayedExecution scheduledShow;
+    private DelayedExecution autoHide;
 
     public DonationProvider(StackPane rootPane, GuiPreferences preferences, DialogService dialogService) {
         this.rootPane = rootPane;
@@ -115,7 +116,11 @@ public class DonationProvider {
         slideDown.setToY(0);
         slideDown.play();
 
-        new DelayedExecution(Duration.seconds(DONATION_POPUP_TIMEOUT_SECONDS), this::hideToast).start();
+        if (autoHide != null) {
+            autoHide.cancel();
+        }
+        autoHide = new DelayedExecution(Duration.seconds(DONATION_POPUP_TIMEOUT_SECONDS), this::hideToast);
+        autoHide.start();
     }
 
     private void hideToast() {
@@ -125,7 +130,14 @@ public class DonationProvider {
         TranslateTransition slideUp = new TranslateTransition(Duration.millis(DONATION_POPUP_ANIM_MS), donationToast);
         slideUp.setFromY(donationToast.getTranslateY());
         slideUp.setToY(-40);
-        slideUp.setOnFinished(_ -> rootPane.getChildren().remove(donationToast));
+        slideUp.setOnFinished(_ -> {
+            rootPane.getChildren().remove(donationToast);
+            donationToast = null;
+            if (autoHide != null) {
+                autoHide.cancel();
+                autoHide = null;
+            }
+        });
         slideUp.play();
     }
 
@@ -147,6 +159,18 @@ public class DonationProvider {
         if (scheduledShow != null) {
             scheduledShow.cancel();
             scheduledShow = null;
+        }
+    }
+
+    public void cleanUp() {
+        cancelScheduled();
+        if (autoHide != null) {
+            autoHide.cancel();
+            autoHide = null;
+        }
+        if (donationToast != null) {
+            rootPane.getChildren().remove(donationToast);
+            donationToast = null;
         }
     }
 }

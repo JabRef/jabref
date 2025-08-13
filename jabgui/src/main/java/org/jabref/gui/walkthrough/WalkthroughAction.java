@@ -17,6 +17,7 @@ import org.jabref.gui.icon.IconTheme;
 import org.jabref.gui.maintable.MainTable;
 import org.jabref.gui.preferences.PreferencesDialogView;
 import org.jabref.gui.search.GlobalSearchBar;
+import org.jabref.gui.util.URLs;
 import org.jabref.gui.walkthrough.declarative.NodeResolver;
 import org.jabref.gui.walkthrough.declarative.Trigger;
 import org.jabref.gui.walkthrough.declarative.WindowResolver;
@@ -135,7 +136,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .panel(Localization.lang("Click \"Save\" to save changes"))
                         .content(
                                 new TextBlock(Localization.lang("Your entry table columns are now configured. These settings will be applied to all your libraries in JabRef.")),
-                                new InfoBlock(Localization.lang("You can find more information about customizing JabRef at [documentation](https://docs.jabref.org/advanced/main-window)"))
+                                new InfoBlock(Localization.lang("You can find more information about customizing JabRef at [documentation](%0)", URLs.ENTRY_TABLE_COLUMNS_DOC))
                         )
                         .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("Save").equals(text)))
                         .trigger(Trigger.onClick())
@@ -275,7 +276,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .highlight(HighlightEffect.SPOT_LIGHT))
                 .addStep(WalkthroughStep
                         .tooltip(Localization.lang("Enter URL for download"))
-                        .content(new TextBlock(Localization.lang("Enter the URL of the PDF file you want to download. You can try this example URL: https://nutritionandmetabolism.biomedcentral.com/counter/pdf/10.1186/1743-7075-3-2.pdf")))
+                        .content(new TextBlock(Localization.lang("Enter the URL of the PDF file you want to download. You can try this example URL: %0", URLs.LINK_EXTERNAL_FILE_WALKTHROUGH_EXAMPLE_PDF)))
                         .resolver(NodeResolver.selector(".text-input"))
                         .trigger(Trigger.onTextInput())
                         .activeWindow(WindowResolver.not(stage))
@@ -294,7 +295,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .panel(Localization.lang("PDF file linked successfully"))
                         .content(
                                 new TextBlock(Localization.lang("Congratulations. You have successfully linked a PDF file to a bibliography entry. This makes it easy to access your research documents directly from JabRef. You can repeat this process for all your entries.")),
-                                new InfoBlock(Localization.lang("For detailed information: [Adding PDFs](https://docs.jabref.org/collect/add-pdfs-to-an-entry), [Managing files](https://docs.jabref.org/finding-sorting-and-cleaning-entries/filelinks), [Finding unlinked files](https://docs.jabref.org/collect/findunlinkedfiles)."))
+                                new InfoBlock(Localization.lang("For detailed information: [Adding PDFs](%0), [Managing files](%1), [Finding unlinked files](%2).", URLs.ADD_PDF_DOC, URLs.MANAGE_ASSOCIATED_FILES_DOC, URLs.FIND_UNLINKED_FILES_DOC))
                         )
                         .resolver(NodeResolver.predicate(LinkedFilesEditor.class::isInstance))
                         .continueButton(Localization.lang("Finish"))
@@ -431,7 +432,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .panel(Localization.lang("Groups walkthrough completed"))
                         .content(
                                 new TextBlock(Localization.lang("You've learned how to create groups and add entries to them. Groups are a powerful way to organize your bibliography and can be nested to create hierarchical structures.")),
-                                new InfoBlock(Localization.lang("For more information about groups: [Groups documentation](https://docs.jabref.org/finding-sorting-and-cleaning-entries/groups)"))
+                                new InfoBlock(Localization.lang("For more information about groups: [Groups documentation](%0)", URLs.GROUPS_DOC))
                         )
                         .resolver(NodeResolver.predicate(node -> node.getClass().getName().contains("GroupsSidePaneComponent")))
                         .continueButton(Localization.lang("Finish"))
@@ -589,7 +590,7 @@ public class WalkthroughAction extends SimpleCommand {
                 .addStep(WalkthroughStep
                         .panel(Localization.lang("Search walkthrough completed"))
                         .content(new TextBlock(Localization.lang("**Quick reference:**\n- Press **Ctrl+F** to jump to search\n- Use **field = value** for field searches\n- Combine with **AND**, **OR**, **NOT**\n- Enable **regex** for pattern matching")),
-                                new InfoBlock(Localization.lang("For complete search documentation and more examples, visit [Search documentation](https://docs.jabref.org/finding-sorting-and-cleaning-entries/search)")))
+                                new InfoBlock(Localization.lang("For complete search documentation and more examples, visit [Search documentation](%0)", URLs.SEARCH_WITH_IN_LIBRARY_DOC)))
                         .continueButton(Localization.lang("Finish"))
                         .position(PanelPosition.RIGHT)
                         .quitButtonPosition(QuitButtonPosition.BOTTOM_LEFT))
@@ -660,7 +661,7 @@ public class WalkthroughAction extends SimpleCommand {
                         .panel(Localization.lang("Click \"Save\" to save changes"))
                         .content(
                                 new TextBlock(Localization.lang("Congratulations. Your main file directory is now configured. JabRef will use this location to automatically find and organize your research documents.")),
-                                new InfoBlock(Localization.lang("Additional information on main file directory can be found in [help](https://docs.jabref.org/v5/finding-sorting-and-cleaning-entries/filelinks)"))
+                                new InfoBlock(Localization.lang("Additional information on main file directory can be found in [Manage Associated Files Documentation](%0)", URLs.MANAGE_ASSOCIATED_FILES_DOC))
                         )
                         .resolver(NodeResolver.selectorWithText(".button", text -> Localization.lang("Save").equals(text)))
                         .trigger(Trigger.onClick())

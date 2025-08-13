@@ -307,7 +307,7 @@ public class GlobalSearchBar extends HBox {
             updateSearchQuery();
         });
 
-        keepSearchString.selectedProperty().bindBidirectional(searchPreferences.keepSearchStingProperty());
+        keepSearchString.selectedProperty().bindBidirectional(searchPreferences.keepSearchStringProperty());
         keepSearchString.setTooltip(new Tooltip(Localization.lang("Keep search string across libraries")));
         initSearchModifierButton(keepSearchString);
         keepSearchString.selectedProperty().addListener((_, _, _) -> searchField.requestFocus());

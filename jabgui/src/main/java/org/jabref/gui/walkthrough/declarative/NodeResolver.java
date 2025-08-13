@@ -44,7 +44,7 @@ public interface NodeResolver {
     /// Creates a resolver that finds a node by its fx:id.
     ///
     /// @param fxId the fx:id of the node
-    /// @returWn a resolver that finds the node by fx:id
+    /// @return a resolver that finds the node by fx:id
     static NodeResolver fxId(@NonNull String fxId) {
         return scene -> Optional.ofNullable(scene.lookup("#" + fxId));
     }
@@ -54,6 +54,7 @@ public interface NodeResolver {
     /// @param glyph the graphic of the button
     /// @return a resolver that finds the button by graphic
     static NodeResolver buttonWithGraphic(IconTheme.JabRefIcons glyph) {
+        // .icon-button, .button selector is not used, because lookupAll doesn't support multiple selectors
         return scene -> Streams.concat(scene.getRoot().lookupAll(".button").stream(),
                                        scene.getRoot().lookupAll(".icon-button").stream())
                                .filter(node -> {
