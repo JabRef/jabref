@@ -89,10 +89,10 @@
 
         <Label text="%LaTeX file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-        <TextField fx:id="laTexFileDirectory"
+        <TextField fx:id="laexFileDirectory"
                    GridPane.columnIndex="1" GridPane.rowIndex="3">
             <tooltip>
-                <Tooltip fx:id="laTexFileDirectoryTooltip"/>
+                <Tooltip fx:id="latexFileDirectoryTooltip"/>
             </tooltip>
         </TextField>
         <Button fx:id="laTexSpecificFileDirSwitchId" onAction="#laTexSpecificFileDirPathSwitch"

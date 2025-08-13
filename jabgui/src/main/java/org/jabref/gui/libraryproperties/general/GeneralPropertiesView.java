@@ -31,7 +31,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private ComboBox<BibDatabaseMode> databaseMode;
     @FXML private TextField librarySpecificFileDirectory;
     @FXML private TextField userSpecificFileDirectory;
-    @FXML private TextField laTexFileDirectory;
+    @FXML private TextField laexFileDirectory;
     @FXML private Button libSpecificFileDirSwitchId;
     @FXML private Button userSpecificFileDirSwitchId;
     @FXML private Button laTexSpecificFileDirSwitchId;
@@ -42,11 +42,11 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
     @FXML private Tooltip userSpecificFileDirSwitchTooltip;
     @FXML private Tooltip laTexSpecificFileDirSwitchTooltip;
     @FXML private Tooltip userSpecificFileDirectoryTooltip;
-    @FXML private Tooltip laTexFileDirectoryTooltip;
+    @FXML private Tooltip latexFileDirectoryTooltip;
 
     private final ControlsFxVisualizer librarySpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final ControlsFxVisualizer userSpecificFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
-    private final ControlsFxVisualizer laTexFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
+    private final ControlsFxVisualizer latexFileDirectoryValidationVisualizer = new ControlsFxVisualizer();
     private final String switchToRelativeText = Localization.lang("Switch to relative path: converts the path to a relative path.");
     private final String switchToAbsoluteText = Localization.lang("Switch to absolute path: converts the path to an absolute path.");
     private final String laTexFileDirectoryTooltipText = Localization.lang("LaTeX files directory:");
@@ -84,18 +84,14 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
 
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
-        laTexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
+        laexFileDirectory.textProperty().bindBidirectional(viewModel.laTexFileDirectoryProperty());
 
         userSpecificFileDirectoryTooltip.setText(preferences.getFilePreferences().getUserAndHost());
         userSpecificFileDirectory.setTooltip(userSpecificFileDirectoryTooltip);
-        laTexFileDirectoryTooltip.setText(viewModel.laTexFileDirectoryProperty().isEmpty().get()
-                ? laTexFileDirectoryTooltipText
-                : viewModel.laTexFileDirectoryProperty().getValue());
-        laTexFileDirectory.setTooltip(laTexFileDirectoryTooltip);
 
         librarySpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
         userSpecificFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
-        laTexFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
+        latexFileDirectoryValidationVisualizer.setDecoration(new IconValidationDecorator());
 
         libSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());
         userSpecificFileDirSwitchId.setDisable(this.databaseContext.getDatabasePath().isEmpty());
@@ -112,17 +108,18 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             userSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
         });
 
-        laTexFileDirectory.textProperty().addListener((_, _, newValue) -> {
+        laexFileDirectory.textProperty().addListener((_, _, newValue) -> {
             boolean isAbsolute = Path.of(newValue).isAbsolute();
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
-            laTexFileDirectoryTooltip.setText(newValue.trim().isEmpty()
+            latexFileDirectoryTooltip.setText(newValue.trim().isEmpty()
                     ? laTexFileDirectoryTooltipText : laTexFileDirectoryTooltipText + " " + newValue);
         });
+
         Platform.runLater(() -> {
             librarySpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.librarySpecificFileDirectoryStatus(), librarySpecificFileDirectory);
             userSpecificFileDirectoryValidationVisualizer.initVisualization(viewModel.userSpecificFileDirectoryStatus(), userSpecificFileDirectory);
-            laTexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), laTexFileDirectory);
+            latexFileDirectoryValidationVisualizer.initVisualization(viewModel.laTexFileDirectoryStatus(), laexFileDirectory);
 
             librarySpecificFileDirectory.requestFocus();
         });
