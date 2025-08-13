@@ -34,7 +34,11 @@
         <Label text="%Library-specific file directory"
                GridPane.columnIndex="0" GridPane.rowIndex="1"/>
         <TextField fx:id="librarySpecificFileDirectory"
-                   GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                   GridPane.columnIndex="1" GridPane.rowIndex="1">
+        <tooltip>
+            <Tooltip fx:id="librarySpecificFileDirectoryTooltip"/>
+        </tooltip>
+        </TextField>
         <Button fx:id="libSpecificFileDirSwitchId" onAction="#libSpecificFileDirPathSwitch"
                 styleClass="icon-button,narrow" prefHeight="20.0" prefWidth="20.0"
                 GridPane.columnIndex="2" GridPane.rowIndex="1">
