@@ -5,16 +5,16 @@ import java.net.CookieManager;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
-import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
+import org.jabref.model.search.query.SearchQueryNode;
 
 import org.apache.hc.core5.net.URIBuilder;
-import org.apache.lucene.queryparser.flexible.core.nodes.QueryNode;
 
 public class ACMPortalFetcher implements SearchBasedParserFetcher {
 
@@ -37,20 +37,25 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
         return Optional.of(HelpFile.FETCHER_ACM);
     }
 
-    private static String createQueryString(QueryNode query) {
-        return new DefaultQueryTransformer().transformLuceneQuery(query).orElse("");
+    private static String createQueryString(List<SearchQueryNode> queryList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (SearchQueryNode term : queryList) {
+            stringBuilder.append(term.term());
+            stringBuilder.append(" "); // Append a space as a delimiter
+        }
+        return stringBuilder.toString().trim();
     }
 
     /**
      * Constructing the url for the searchpage.
      *
-     * @param query query node
+     * @param queryList list that contains the parsed nodes
      * @return query URL
      */
     @Override
-    public URL getURLForQuery(QueryNode query) throws URISyntaxException, MalformedURLException {
+    public URL getURLForQuery(List<SearchQueryNode> queryList) throws URISyntaxException, MalformedURLException {
         URIBuilder uriBuilder = new URIBuilder(SEARCH_URL);
-        uriBuilder.addParameter("AllField", createQueryString(query));
+        uriBuilder.addParameter("AllField", createQueryString(queryList));
         return uriBuilder.build().toURL();
     }
 
