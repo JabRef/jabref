@@ -582,7 +582,7 @@ public class BstFunctions {
         }
 
         if (!(o1 instanceof String)) {
-            LOGGER.warn("Not a string or missing field in operation missing$ (line %d)".formatted(ctx.start.getLine()));
+            LOGGER.warn("Not a string or missing field in operation missing$ (line {})", ctx.start.getLine());
             stack.push(BstVM.TRUE);
             return;
         }

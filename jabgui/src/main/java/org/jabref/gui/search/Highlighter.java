@@ -19,7 +19,6 @@ import org.jabref.model.search.query.SearchQueryNode;
 import org.jabref.model.util.Range;
 
 import com.airhacks.afterburner.injection.Injector;
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -38,6 +37,10 @@ public class Highlighter {
     private static final String REGEXP_POSITIONS = "SELECT * FROM regexp_positions(?, ?)";
     private static Connection connection;
 
+    private Highlighter() {
+        // prevent instantiation
+    }
+
     public static String highlightHtml(String htmlText, SearchQuery searchQuery) {
         Optional<String> searchTermsPattern = buildSearchPattern(searchQuery);
         if (searchTermsPattern.isEmpty()) {
@@ -45,16 +48,11 @@ public class Highlighter {
         }
 
         Document document = Jsoup.parse(htmlText);
-        try {
-            highlightTextNodes(document.body(), searchTermsPattern.get());
-            return document.outerHtml();
-        } catch (InvalidTokenOffsetsException e) {
-            LOGGER.debug("Error highlighting search terms in HTML", e);
-            return htmlText;
-        }
+        highlightTextNodes(document.body(), searchTermsPattern.get());
+        return document.outerHtml();
     }
 
-    private static void highlightTextNodes(Element element, String searchPattern) throws InvalidTokenOffsetsException {
+    private static void highlightTextNodes(Element element, String searchPattern) {
         for (Node node : element.childNodes()) {
             if (node instanceof TextNode textNode) {
                 String highlightedText = highlightNode(textNode.text(), searchPattern);

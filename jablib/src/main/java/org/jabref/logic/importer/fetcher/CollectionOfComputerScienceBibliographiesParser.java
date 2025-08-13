@@ -34,9 +34,7 @@ public class CollectionOfComputerScienceBibliographiesParser implements Parser {
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
             List<String> links = matchRegexFromInputStreamHtml(inputStream, REGEX_FOR_LINKS);
-            String bibtexDataString = parseBibtexStringsFromLinks(links)
-                    .stream()
-                    .collect(Collectors.joining());
+            String bibtexDataString = String.join("", parseBibtexStringsFromLinks(links));
 
             return bibtexParser.parseEntries(bibtexDataString);
         } catch (IOException | FetcherException e) {
