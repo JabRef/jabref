@@ -82,6 +82,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
         databaseMode.itemsProperty().bind(viewModel.databaseModesProperty());
         databaseMode.valueProperty().bindBidirectional(viewModel.selectedDatabaseModeProperty());
 
+        librarySpecificFileDirectoryTooltip.setText(Localization.lang("Library-specific file directory"));
         librarySpecificFileDirectory.textProperty().bindBidirectional(viewModel.librarySpecificDirectoryProperty());
 
         userSpecificFileDirectory.textProperty().bindBidirectional(viewModel.userSpecificFileDirectoryProperty());
@@ -116,7 +117,7 @@ public class GeneralPropertiesView extends AbstractPropertiesTabView<GeneralProp
             laTexSpecificFileDirSwitchIcon.setGlyph(isAbsolute ? RELATIVE_PATH : ABSOLUTE_PATH);
             laTexSpecificFileDirSwitchTooltip.setText(isAbsolute ? switchToRelativeText : switchToAbsoluteText);
             latexFileDirectoryTooltip.setText(newValue.trim().isEmpty()
-                    ? Localization.lang("LaTeX files directory") : Localization.lang("LaTeX files directory: %0", newValue));
+                    ? Localization.lang("LaTeX file directory") : Localization.lang("LaTeX file directory: %0", newValue));
         });
 
         Platform.runLater(() -> {
