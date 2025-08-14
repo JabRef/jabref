@@ -20,7 +20,7 @@ import org.jspecify.annotations.NonNull;
  */
 public class BibtexLogParser {
     private static final Pattern BIBTEX_WARNING_PATTERN = Pattern.compile("^Warning--(?<message>[a-zA-Z ]+) in (?<entryKey>[^\\s]+)$");
-    private static final Pattern BIBLATEXT_WARNING_PATTERN = Pattern.compile(
+    private static final Pattern BIBLATEX_WARNING_PATTERN = Pattern.compile(
             "(?:(?:\\[\\d+\\] )?Biber\\.pm:\\d+> )?WARN - Datamodel: [a-z]+ entry '(?<entryKey>[^']+)' \\((?<fileName>[^)]+)\\): (?<message>.+)");
 
     private static final String EMPTY_FIELD_PREFIX = "empty";
@@ -77,7 +77,7 @@ public class BibtexLogParser {
         }
 
         // For BiblaTex warnings
-        Matcher biblaTexMatcher = BIBLATEXT_WARNING_PATTERN.matcher(line);
+        Matcher biblaTexMatcher = BIBLATEX_WARNING_PATTERN.matcher(line);
         if (biblaTexMatcher.find()) {
             String message = biblaTexMatcher.group("message").trim();
             String entryKey = biblaTexMatcher.group("entryKey");
