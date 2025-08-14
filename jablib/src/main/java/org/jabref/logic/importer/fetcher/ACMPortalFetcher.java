@@ -41,7 +41,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
         StringBuilder stringBuilder = new StringBuilder();
         for (SearchQueryNode term : queryList) {
             stringBuilder.append(term.term());
-            stringBuilder.append(" "); // Append a space as a delimiter
+            stringBuilder.append(" ");
         }
         return stringBuilder.toString().trim();
     }
