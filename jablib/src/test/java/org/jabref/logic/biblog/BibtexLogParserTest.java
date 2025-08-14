@@ -38,12 +38,12 @@ public class BibtexLogParserTest {
     }
 
     @ParameterizedTest
-    @MethodSource("biblaTexValidationWarningsProvider")
-    void parsesBiblaTexValidationWarnings(String warningLine, Optional<BibWarning> expectedWarning) {
+    @MethodSource("biblatexValidationWarningsProvider")
+    void parsesBiblatexValidationWarnings(String warningLine, Optional<BibWarning> expectedWarning) {
         assertEquals(expectedWarning, parser.parseWarningLine(warningLine));
     }
 
-    private static Stream<Arguments> biblaTexValidationWarningsProvider() {
+    private static Stream<Arguments> biblatexValidationWarningsProvider() {
         return Stream.of(
                 Arguments.of("[1124] Biber.pm:131> WARN - Datamodel: article entry 'Corti_2009' (chocolate.bib): Invalid field 'publisher' for entrytype 'article'",
                         Optional.of(new BibWarning(SeverityType.WARNING, "Invalid field 'publisher' for entrytype 'article'", "publisher", "Corti_2009"))),

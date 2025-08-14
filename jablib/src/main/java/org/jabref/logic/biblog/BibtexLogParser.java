@@ -37,30 +37,28 @@ public class BibtexLogParser {
         return warnings;
     }
 
-    /**
-     * Parses a single line from a .blg file to identify a warning.
-     * <p>
-     * This method supports two warning formats:
-     * <ol>
-     * <li><b>BibTeX Warnings:</b> Simple warnings from the legacy BibTeX backend.
-     * <pre>{@code Warning--[message] in [entryKey]}</pre>
-     * For example: {@code Warning--empty journal in Scholey_2013}
-     * </li>
-     * <li><b>BibLaTeX Datamodel Warnings:</b> Detailed warnings from the Biber backend, including datamodel validation issues.
-     * <pre>{@code [Log line] > WARN - Datamodel: [entry type] entry '[entryKey]' ([fileName]): [message]}</pre>
-     * For example: {@code Biber.pm:123> WARN - Datamodel: article entry 'Scholey_2013' (file.bib): Invalid field 'journal'}
-     * </li>
-     * </ol>
-     *
-     * @param line The single line from the .blg file to parse.
-     * @return An {@link Optional} containing a {@link BibWarning} if a match is found, or an empty {@code Optional} otherwise.
-     */
+    /// Parses a single line from a .blg file to identify a warning.
+    ///
+    /// This method supports two warning formats:
+    ///
+    /// 1.  **BibTeX Warnings:** Simple warnings from the legacy BibTeX backend.
+    ///     `Warning--[message] in [entryKey]`
+    ///     For example: `Warning--empty journal in Scholey_2013`
+    ///
+    /// 2.  **BibLaTeX Datamodel Warnings:** Detailed warnings from the Biber backend, including datamodel validation issues.
+    ///     `[Log line] > WARN - Datamodel: [entry type] entry '[entryKey]' ([fileName]): [message]`
+    ///     For example: `Biber.pm:123> WARN - Datamodel: article entry 'Scholey_2013' (file.bib): Invalid field 'journal'`
+    ///
+    /// **Parameters:**
+    /// * `line` - The single line from the .blg file to parse.
+    ///
+    /// **Returns:**
+    /// * An `Optional` containing a `BibWarning` if a match is found, or an empty `Optional` otherwise.
     Optional<BibWarning> parseWarningLine(String line) {
-        // For BibTeX warnings
-        Matcher bibTexMatcher = BIBTEX_WARNING_PATTERN.matcher(line);
-        if (bibTexMatcher.find()) {
-            String message = bibTexMatcher.group("message").trim();
-            String entryKey = bibTexMatcher.group("entryKey");
+        Matcher bibtexMatcher = BIBTEX_WARNING_PATTERN.matcher(line);
+        if (bibtexMatcher.find()) {
+            String message = bibtexMatcher.group("message").trim();
+            String entryKey = bibtexMatcher.group("entryKey");
             // Extract field name for warnings related to empty fields  (e.g., "empty journal" -> fieldName = "journal")
             String fieldName = null;
             if (message.startsWith(EMPTY_FIELD_PREFIX)) {
@@ -76,11 +74,10 @@ public class BibtexLogParser {
             ));
         }
 
-        // For BiblaTex warnings
-        Matcher biblaTexMatcher = BIBLATEX_WARNING_PATTERN.matcher(line);
-        if (biblaTexMatcher.find()) {
-            String message = biblaTexMatcher.group("message").trim();
-            String entryKey = biblaTexMatcher.group("entryKey");
+        Matcher biblatexMatcher = BIBLATEX_WARNING_PATTERN.matcher(line);
+        if (biblatexMatcher.find()) {
+            String message = biblatexMatcher.group("message").trim();
+            String entryKey = biblatexMatcher.group("entryKey");
             String fieldName = null;
 
             // Extract field name for warnings related to invalid fields (e.g., "Invalid field 'publisher' for entrytype 'article'" -> fieldName = "publisher")
