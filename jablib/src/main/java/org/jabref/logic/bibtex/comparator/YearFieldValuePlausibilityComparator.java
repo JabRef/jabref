@@ -26,12 +26,14 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
         boolean leftValid = checker.checkValue(leftValue).isEmpty();
 
         if (leftValid) {
+            boolean rightValid = checker.checkValue(rightValue).isEmpty();
+
+            if (rightValid) {
+                return ComparisonResult.LEFT_BETTER;
+            }
+
             Optional<Integer> leftYear = extractYear(leftValue);
             Optional<Integer> rightYear = extractYear(rightValue);
-
-           if (leftYear.isEmpty() || rightYear.isEmpty()) {
-               return checkEmptyValues(leftYear, rightYear);
-           }
 
             boolean leftYearInRange = (leftYear.get() >= 1800) && (leftYear.get() <= Year.now().getValue() + 2);
 
@@ -62,22 +64,5 @@ public class YearFieldValuePlausibilityComparator extends FieldValuePlausibility
             return Optional.of(Integer.parseInt(matcher.group(1)));
         }
         return Optional.empty();
-    }
-
-    /**
-     * Checks if one or both of the years are empty and returns the correct ComparisonResult
-     *
-     * @param leftValue year from the library (or candidate)
-     * @param rightValue year from the fetcher ((or existing record)
-     * @return ComparisonResult depending on which value is empty: RIGHT_BETTER, LEFT_BETTER, or UNDETERMINED
-     */
-    private ComparisonResult checkEmptyValues(Optional<Integer> leftValue, Optional<Integer> rightValue) {
-        if (leftValue.isEmpty() && rightValue.isEmpty()) {
-            return ComparisonResult.UNDETERMINED;
-        } else if (leftValue.isEmpty()) {
-            return ComparisonResult.RIGHT_BETTER;
-        } else {
-            return ComparisonResult.LEFT_BETTER;
-        }
     }
 }
