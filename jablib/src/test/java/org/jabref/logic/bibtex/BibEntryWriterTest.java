@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
 import org.jabref.logic.os.OS;
@@ -206,7 +205,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripTest() throws IOException, JabRefException {
+    void roundTripTest() throws Exception {
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -229,7 +228,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripKeepsFilePathWithBackslashes() throws IOException, JabRefException {
+    void roundTripKeepsFilePathWithBackslashes() throws Exception {
         String bibtexEntry = """
                 @Article{,
                   file = {Tagungen\\2013\\KWTK45},
@@ -249,7 +248,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripKeepsEscapedCharacters() throws IOException, JabRefException {
+    void roundTripKeepsEscapedCharacters() throws Exception {
         String bibtexEntry = """
                 @Article{,
                   demofield = {Tagungen\\2013\\KWTK45},
@@ -269,7 +268,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripKeepsFilePathEndingWithBackslash() throws IOException, JabRefException {
+    void roundTripKeepsFilePathEndingWithBackslash() throws Exception {
         String bibtexEntry = """
                 @Article{,
                   file = {dir\\},
@@ -289,7 +288,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithPrependingNewlines() throws IOException, JabRefException {
+    void roundTripWithPrependingNewlines() throws Exception {
         // @formatter:off
         String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -312,7 +311,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithKeepsCRLFLineBreakStyle() throws IOException, JabRefException {
+    void roundTripWithKeepsCRLFLineBreakStyle() throws Exception {
         // @formatter:off
         String bibtexEntry = "@Article{test,\r\n" +
                 "  Author                   = {Foo Bar},\r\n" +
@@ -337,7 +336,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithKeepsLFLineBreakStyle() throws IOException, JabRefException {
+    void roundTripWithKeepsLFLineBreakStyle() throws Exception {
         // @formatter:off
         String bibtexEntry = "@Article{test,\n" +
                 "  Author                   = {Foo Bar},\n" +
@@ -362,7 +361,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithModification() throws IOException, JabRefException {
+    void roundTripWithModification() throws Exception {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -400,7 +399,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException, JabRefException {
+    void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws Exception {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -440,7 +439,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void entryTypeChange() throws IOException, JabRefException {
+    void entryTypeChange() throws Exception {
         // @formatter:off
         String expected = """
 
@@ -481,7 +480,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithAppendedNewlines() throws IOException, JabRefException {
+    void roundTripWithAppendedNewlines() throws Exception {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -507,7 +506,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripNormalizesNewLines() throws IOException, JabRefException {
+    void roundTripNormalizesNewLines() throws Exception {
         // @formatter:off
         String bibtexEntry = "@Article{test,\n" +
                 "  Author                   = {Foo Bar},\r\n" +
@@ -537,7 +536,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void multipleWritesWithoutModification() throws IOException, JabRefException {
+    void multipleWritesWithoutModification() throws Exception {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -556,7 +555,7 @@ class BibEntryWriterTest {
         assertEquals(bibtexEntry, result);
     }
 
-    private String testSingleWrite(String bibtexEntry) throws IOException, JabRefException {
+    private String testSingleWrite(String bibtexEntry) throws Exception {
         // read in bibtex string
         BibEntry entry = BibDatabaseContext
                 .of(bibtexEntry, importFormatPreferences)
@@ -574,7 +573,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void monthFieldSpecialSyntax() throws IOException, JabRefException {
+    void monthFieldSpecialSyntax() throws Exception {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -603,7 +602,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void customTypeCanBewritten() throws IOException, JabRefException {
+    void customTypeCanBewritten() throws Exception {
         // @formatter:off
         String bibtexEntry = """
                 @reference{Broecker1984,
@@ -687,7 +686,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void filenameIsUnmodifiedDuringWrite() throws IOException, JabRefException {
+    void filenameIsUnmodifiedDuringWrite() throws Exception {
         // source: https://github.com/JabRef/jabref/issues/7012#issuecomment-707788107
         String bibtexEntry = """
                     @Book{Hue17,
@@ -714,7 +713,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void addFieldWithLongerLength() throws IOException, JabRefException {
+    void addFieldWithLongerLength() throws Exception {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author =  {BlaBla}," + OS.NEWLINE +
@@ -772,7 +771,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithPrecedingCommentTest() throws IOException, JabRefException {
+    void roundTripWithPrecedingCommentTest() throws Exception {
         // @formatter:off
         String bibtexEntry = """
                 % Some random comment that should stay here
@@ -798,7 +797,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithPrecedingCommentAndModificationTest() throws IOException, JabRefException {
+    void roundTripWithPrecedingCommentAndModificationTest() throws Exception {
         // @formatter:off
         String bibtexEntry = """
                 % Some random comment that should stay here

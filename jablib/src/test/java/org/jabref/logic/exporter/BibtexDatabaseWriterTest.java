@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -435,7 +433,7 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripUtf8EncodingHeaderRemoved() throws IOException, JabRefException {
+    void roundtripUtf8EncodingHeaderRemoved() throws Exception {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "% Encoding: UTF8" + OS.NEWLINE +
                 OS.NEWLINE +
@@ -460,7 +458,7 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws IOException, URISyntaxException {
+    void roundtripWin1252HeaderKept(@TempDir Path bibFolder) throws Exception {
         Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-windows-1252-with-header.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
@@ -484,7 +482,7 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws URISyntaxException, IOException {
+    void roundtripUtf8HeaderKept(@TempDir Path bibFolder) throws Exception {
         Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-utf-8-with-header-with-databasetypecomment.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
@@ -508,7 +506,7 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws URISyntaxException, IOException {
+    void roundtripNotExplicitUtf8HeaderNotInsertedDuringWrite(@TempDir Path bibFolder) throws Exception {
         Path testFile = Path.of(BibDatabaseWriterTest.class.getResource("encoding-utf-8-without-header-with-databasetypecomment.bib").toURI());
         ParserResult result = new BibtexImporter(importFormatPreferences, new DummyFileUpdateMonitor()).importDatabase(testFile);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
