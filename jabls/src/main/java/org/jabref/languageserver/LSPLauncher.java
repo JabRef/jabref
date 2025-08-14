@@ -28,13 +28,13 @@ public class LSPLauncher {
     private JournalAbbreviationRepository abbreviationRepository;
 
     public void run(CliPreferences cliPreferences) {
-        run(cliPreferences, new JournalAbbreviationRepository());
+        run(cliPreferences, new JournalAbbreviationRepository(), 2087);
     }
 
-    public void run(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository) {
+    public void run(CliPreferences cliPreferences, JournalAbbreviationRepository abbreviationRepository, int port) {
         this.cliPreferences = cliPreferences;
         this.abbreviationRepository = abbreviationRepository;
-        start(2087);
+        start(port);
     }
 
     public void start(int port) {
@@ -83,7 +83,6 @@ public class LSPLauncher {
     }
 
     public void shutdown() {
-        running = false;
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {
                 serverSocket.close();
@@ -94,6 +93,11 @@ public class LSPLauncher {
         } catch (IOException e) {
             LOGGER.error("Error during LSP shutdown", e);
         }
+        running = false;
         LOGGER.info("LSP Server shutdown.");
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

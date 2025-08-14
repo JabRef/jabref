@@ -2,6 +2,7 @@ open module org.jabref {
     requires org.jabref.jablib;
 
     requires org.jabref.jabsrv;
+    requires org.jabref.jabls;
 
     // Swing
     requires java.desktop;

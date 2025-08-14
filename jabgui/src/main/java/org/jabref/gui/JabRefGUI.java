@@ -32,6 +32,7 @@ import org.jabref.gui.util.DirectoryMonitor;
 import org.jabref.gui.util.UiTaskExecutor;
 import org.jabref.gui.util.WebViewStore;
 import org.jabref.http.manager.HttpServerManager;
+import org.jabref.languageserver.manager.LanguageServerManager;
 import org.jabref.logic.UiCommand;
 import org.jabref.logic.ai.AiService;
 import org.jabref.logic.citation.SearchCitationsRelationsService;
@@ -85,6 +86,7 @@ public class JabRefGUI extends Application {
 
     private static RemoteListenerServerManager remoteListenerServerManager;
     private static HttpServerManager httpServerManager;
+    private static LanguageServerManager languageServerManager;
 
     private Stage mainStage;
 
@@ -166,6 +168,9 @@ public class JabRefGUI extends Application {
 
         JabRefGUI.httpServerManager = new HttpServerManager();
         Injector.setModelOrService(HttpServerManager.class, JabRefGUI.httpServerManager);
+
+        JabRefGUI.languageServerManager = new LanguageServerManager();
+        Injector.setModelOrService(LanguageServerManager.class, JabRefGUI.languageServerManager);
 
         JabRefGUI.stateManager = new JabRefGuiStateManager();
         Injector.setModelOrService(StateManager.class, stateManager);
@@ -422,6 +427,9 @@ public class JabRefGUI extends Application {
         if (remotePreferences.enableHttpServer()) {
             httpServerManager.start(stateManager, remotePreferences.getHttpServerUri());
         }
+        if (remotePreferences.enableLanguageServer()) {
+            languageServerManager.start(preferences, Injector.instantiateModelOrService(JournalAbbreviationRepository.class), remotePreferences.getLanguageServerPort());
+        }
     }
 
     @Override
@@ -463,6 +471,12 @@ public class JabRefGUI extends Application {
                 LOGGER.trace("Shutting down http server manager");
                 httpServerManager.stop();
                 LOGGER.trace("HttpServerManager shut down");
+            });
+
+            executor.submit(() -> {
+                LOGGER.trace("Shutting down language server manager");
+                languageServerManager.stop();
+                LOGGER.trace("LanguageServerManager shut down");
             });
 
             executor.submit(() -> {

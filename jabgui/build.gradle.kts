@@ -24,6 +24,7 @@ dependencies {
     implementation("org.openjfx:javafx-web")
 
     implementation(project(":jabsrv"))
+    implementation(project(":jabls"))
 
     implementation("com.pixelduke:fxthemes")
 

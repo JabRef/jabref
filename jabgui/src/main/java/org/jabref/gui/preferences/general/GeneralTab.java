@@ -59,6 +59,8 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
     @FXML private TextField remotePort;
     @FXML private CheckBox enableHttpServer;
     @FXML private TextField httpServerPort;
+    @FXML private CheckBox enableLanguageServer;
+    @FXML private TextField languageServerPort;
     @FXML private Button remoteHelp;
     @Inject private FileUpdateMonitor fileUpdateMonitor;
     @Inject private BibEntryTypesManager entryTypesManager;
@@ -145,6 +147,7 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         Platform.runLater(() -> {
             validationVisualizer.initVisualization(viewModel.remotePortValidationStatus(), remotePort);
             validationVisualizer.initVisualization(viewModel.httpPortValidationStatus(), httpServerPort);
+            validationVisualizer.initVisualization(viewModel.languageServerPortValidationStatus(), languageServerPort);
             validationVisualizer.initVisualization(viewModel.fontSizeValidationStatus(), fontSize);
             validationVisualizer.initVisualization(viewModel.customPathToThemeValidationStatus(), customThemePath);
         });
@@ -156,6 +159,10 @@ public class GeneralTab extends AbstractPreferenceTabView<GeneralTabViewModel> i
         enableHttpServer.selectedProperty().bindBidirectional(viewModel.enableHttpServerProperty());
         httpServerPort.textProperty().bindBidirectional(viewModel.httpPortProperty());
         httpServerPort.disableProperty().bind(enableHttpServer.selectedProperty().not());
+
+        enableLanguageServer.selectedProperty().bindBidirectional(viewModel.enableLanguageServerProperty());
+        languageServerPort.textProperty().bindBidirectional(viewModel.languageServerPortProperty());
+        languageServerPort.disableProperty().bind(enableLanguageServer.selectedProperty().not());
     }
 
     @FXML
