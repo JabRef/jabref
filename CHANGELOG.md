@@ -73,7 +73,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
-- We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard [#13597](https://github.com/JabRef/jabref/issues/13597).    
+- We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard [#13597](https://github.com/JabRef/jabref/issues/13597)
 - We fixed an issue whereby the 'About' dialog was not honouring the user's configured font preferences. [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We fixed an issue where the Pagetotal column was sorting the values alphabetically instead of numerically. [#12533](https://github.com/JabRef/jabref/issues/12533)
 - We fixed the dark mode of the BibTeX Source dialog in the Citation Relations tab. [#13599](https://github.com/JabRef/jabref/issues/13599)
