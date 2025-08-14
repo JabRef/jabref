@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.jabref.logic.help.HelpFile;
 import org.jabref.logic.importer.Parser;
 import org.jabref.logic.importer.SearchBasedParserFetcher;
+import org.jabref.logic.importer.fetcher.transformers.DefaultQueryTransformer;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
 import org.jabref.model.search.query.SearchQueryNode;
 
@@ -38,12 +39,7 @@ public class ACMPortalFetcher implements SearchBasedParserFetcher {
     }
 
     private static String createQueryString(List<SearchQueryNode> queryList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (SearchQueryNode term : queryList) {
-            stringBuilder.append(term.term());
-            stringBuilder.append(" ");
-        }
-        return stringBuilder.toString().trim();
+        return new DefaultQueryTransformer().transformSearchQuery(queryList).orElse("");
     }
 
     /**
