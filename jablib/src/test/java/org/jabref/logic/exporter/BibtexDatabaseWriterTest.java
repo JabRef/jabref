@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.bibtex.FieldPreferences;
 import org.jabref.logic.citationkeypattern.AbstractCitationKeyPatterns;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
@@ -434,7 +435,7 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripUtf8EncodingHeaderRemoved() throws IOException {
+    void roundtripUtf8EncodingHeaderRemoved() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "% Encoding: UTF8" + OS.NEWLINE +
                 OS.NEWLINE +
@@ -445,8 +446,7 @@ class BibDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+        BibDatabaseContext context = BibDatabaseContext.of(bibtexEntry, importFormatPreferences);
         databaseWriter.saveDatabase(context);
         // @formatter:off
         String expected = "@Article{," + OS.NEWLINE +

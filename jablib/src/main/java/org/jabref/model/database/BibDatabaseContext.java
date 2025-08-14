@@ -1,6 +1,9 @@
 package org.jabref.model.database;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -282,14 +285,27 @@ public class BibDatabaseContext {
         return indexPath;
     }
 
-    public static BibDatabaseContext of(String bibContent, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+    public static BibDatabaseContext of(Reader bibContentReader, ImportFormatPreferences importFormatPreferences) throws JabRefException {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
         try {
-            Reader reader = Reader.of(bibContent);
-            ParserResult result = parser.parse(reader);
+            ParserResult result = parser.parse(bibContentReader);
             return result.getDatabaseContext();
         } catch (IOException e) {
             throw new JabRefException("Failed to parse BibTeX content", e);
+        }
+    }
+
+    public static BibDatabaseContext of(String bibContent, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+        return of(Reader.of(bibContent), importFormatPreferences);
+    }
+
+    public static BibDatabaseContext of(InputStream bibContentStream, ImportFormatPreferences importFormatPreferences) throws JabRefException {
+        try {
+            try (Reader reader = new BufferedReader(new InputStreamReader(bibContentStream))) {
+                return of(reader, importFormatPreferences);
+            }
+        } catch (IOException e) {
+            throw new JabRefException("Failed to close bib content stream", e);
         }
     }
 

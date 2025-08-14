@@ -1,18 +1,17 @@
 package org.jabref.logic.bibtex;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.BibWriter;
 import org.jabref.logic.importer.ImportFormatPreferences;
-import org.jabref.logic.importer.ParserResult;
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.os.OS;
+import org.jabref.model.database.BibDatabaseContext;
 import org.jabref.model.database.BibDatabaseMode;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
@@ -207,7 +206,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripTest() throws IOException {
+    void roundTripTest() throws IOException, JabRefException {
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -218,8 +217,10 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -228,7 +229,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripKeepsFilePathWithBackslashes() throws IOException {
+    void roundTripKeepsFilePathWithBackslashes() throws IOException, JabRefException {
         String bibtexEntry = """
                 @Article{,
                   file = {Tagungen\\2013\\KWTK45},
@@ -236,8 +237,10 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -246,7 +249,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripKeepsEscapedCharacters() throws IOException {
+    void roundTripKeepsEscapedCharacters() throws IOException, JabRefException {
         String bibtexEntry = """
                 @Article{,
                   demofield = {Tagungen\\2013\\KWTK45},
@@ -254,8 +257,10 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -264,7 +269,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripKeepsFilePathEndingWithBackslash() throws IOException {
+    void roundTripKeepsFilePathEndingWithBackslash() throws IOException, JabRefException {
         String bibtexEntry = """
                 @Article{,
                   file = {dir\\},
@@ -272,8 +277,10 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -282,7 +289,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithPrependingNewlines() throws IOException {
+    void roundTripWithPrependingNewlines() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -293,8 +300,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -303,7 +312,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithKeepsCRLFLineBreakStyle() throws IOException {
+    void roundTripWithKeepsCRLFLineBreakStyle() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = "@Article{test,\r\n" +
                 "  Author                   = {Foo Bar},\r\n" +
@@ -314,8 +323,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         // need to reconfigure writer to use "\r\n"
@@ -326,7 +337,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithKeepsLFLineBreakStyle() throws IOException {
+    void roundTripWithKeepsLFLineBreakStyle() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = "@Article{test,\n" +
                 "  Author                   = {Foo Bar},\n" +
@@ -337,8 +348,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         // need to reconfigure writer to use "\n"
@@ -349,7 +362,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithModification() throws IOException {
+    void roundTripWithModification() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -362,8 +375,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // Modify entry
         entry.setField(StandardField.AUTHOR, "BlaBla");
@@ -385,7 +400,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException {
+    void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -399,8 +414,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // modify entry
         entry.setField(StandardField.AUTHOR, "BlaBla");
@@ -423,7 +440,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void entryTypeChange() throws IOException {
+    void entryTypeChange() throws IOException, JabRefException {
         // @formatter:off
         String expected = """
 
@@ -438,8 +455,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(expected));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(expected, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // modify entry
         entry.setType(StandardEntryType.InProceedings);
@@ -462,7 +481,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithAppendedNewlines() throws IOException {
+    void roundTripWithAppendedNewlines() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -473,8 +492,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -486,7 +507,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripNormalizesNewLines() throws IOException {
+    void roundTripNormalizesNewLines() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = "@Article{test,\n" +
                 "  Author                   = {Foo Bar},\r\n" +
@@ -497,8 +518,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -514,7 +537,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void multipleWritesWithoutModification() throws IOException {
+    void multipleWritesWithoutModification() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -533,10 +556,12 @@ class BibEntryWriterTest {
         assertEquals(bibtexEntry, result);
     }
 
-    private String testSingleWrite(String bibtexEntry) throws IOException {
+    private String testSingleWrite(String bibtexEntry) throws IOException, JabRefException {
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         StringWriter writer = new StringWriter();
@@ -549,7 +574,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void monthFieldSpecialSyntax() throws IOException {
+    void monthFieldSpecialSyntax() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = """
                 @Article{test,
@@ -561,8 +586,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // check month field
         Set<Field> fields = entry.getFields();
@@ -576,7 +603,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void customTypeCanBewritten() throws IOException {
+    void customTypeCanBewritten() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = """
                 @reference{Broecker1984,
@@ -596,8 +623,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         entry.setField(FieldFactory.parseField("location"), "NY");
 
@@ -658,7 +687,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void filenameIsUnmodifiedDuringWrite() throws IOException {
+    void filenameIsUnmodifiedDuringWrite() throws IOException, JabRefException {
         // source: https://github.com/JabRef/jabref/issues/7012#issuecomment-707788107
         String bibtexEntry = """
                     @Book{Hue17,
@@ -673,8 +702,10 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -683,7 +714,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void addFieldWithLongerLength() throws IOException {
+    void addFieldWithLongerLength() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author =  {BlaBla}," + OS.NEWLINE +
@@ -694,8 +725,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // modify entry
         entry.setField(StandardField.HOWPUBLISHED, "asdf");
@@ -739,7 +772,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithPrecedingCommentTest() throws IOException {
+    void roundTripWithPrecedingCommentTest() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = """
                 % Some random comment that should stay here
@@ -753,8 +786,10 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -763,7 +798,7 @@ class BibEntryWriterTest {
     }
 
     @Test
-    void roundTripWithPrecedingCommentAndModificationTest() throws IOException {
+    void roundTripWithPrecedingCommentAndModificationTest() throws IOException, JabRefException {
         // @formatter:off
         String bibtexEntry = """
                 % Some random comment that should stay here
@@ -777,8 +812,11 @@ class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibEntry entry = result.getDatabase().getEntries().getFirst();
+
+        BibEntry entry = BibDatabaseContext
+                .of(bibtexEntry, importFormatPreferences)
+                .getEntries()
+                .getFirst();
 
         // change the entry
         entry.setField(StandardField.AUTHOR, "John Doe");
