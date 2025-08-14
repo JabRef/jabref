@@ -291,7 +291,7 @@ public class BibDatabaseContext {
             ParserResult result = parser.parse(bibContentReader);
             return result.getDatabaseContext();
         } catch (IOException e) {
-            throw new JabRefException("Failed to parse BibTeX content", e);
+            throw new JabRefException("Failed to parse BibTeX", e);
         }
     }
 
@@ -300,12 +300,10 @@ public class BibDatabaseContext {
     }
 
     public static BibDatabaseContext of(InputStream bibContentStream, ImportFormatPreferences importFormatPreferences) throws JabRefException {
-        try {
-            try (Reader reader = new BufferedReader(new InputStreamReader(bibContentStream))) {
-                return of(reader, importFormatPreferences);
-            }
+        try (Reader reader = new BufferedReader(new InputStreamReader(bibContentStream))) {
+            return of(reader, importFormatPreferences);
         } catch (IOException e) {
-            throw new JabRefException("Failed to close bib content stream", e);
+            throw new JabRefException("Failed to close stream", e);
         }
     }
 

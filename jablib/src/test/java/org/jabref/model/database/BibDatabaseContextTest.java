@@ -174,7 +174,7 @@ class BibDatabaseContextTest {
     @Test
     void ofParsesValidBibtexStringCorrectly() throws Exception {
         String bibContent = """
-        @article{a,
+        @article{Alice2023,
             author = {Alice},
             title = {Test Title},
             year = {2023}
@@ -183,7 +183,7 @@ class BibDatabaseContextTest {
 
         BibDatabaseContext context = BibDatabaseContext.of(bibContent, importPrefs);
         BibEntry expected = new BibEntry(StandardEntryType.Article)
-                .withCitationKey("a")
+                .withCitationKey("Alice2023")
                 .withField(StandardField.AUTHOR, "Alice")
                 .withField(StandardField.TITLE, "Test Title")
                 .withField(StandardField.YEAR, "2023");
@@ -194,7 +194,7 @@ class BibDatabaseContextTest {
     @Test
     void ofParsesValidBibtexStreamCorrectly() throws Exception {
         String bibContent = """
-        @article{a,
+        @article{Alice2023,
             author = {Alice},
             title = {Test Title},
             year = {2023}
@@ -204,7 +204,7 @@ class BibDatabaseContextTest {
         try (InputStream bibContentStream = new ByteArrayInputStream(bibContent.getBytes(StandardCharsets.UTF_8))) {
             BibDatabaseContext context = BibDatabaseContext.of(bibContentStream, importPrefs);
             BibEntry expected = new BibEntry(StandardEntryType.Article)
-                    .withCitationKey("a")
+                    .withCitationKey("Alice2023")
                     .withField(StandardField.AUTHOR, "Alice")
                     .withField(StandardField.TITLE, "Test Title")
                     .withField(StandardField.YEAR, "2023");
