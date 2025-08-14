@@ -435,7 +435,7 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripUtf8EncodingHeaderRemoved() throws IOException, JabRefException {
+    void roundtripUtf8EncodingHeaderRemoved() throws IOException {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "% Encoding: UTF8" + OS.NEWLINE +
                 OS.NEWLINE +
@@ -446,9 +446,11 @@ class BibDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-        BibDatabaseContext context = BibDatabaseContext.of(bibtexEntry, importFormatPreferences);
-        databaseWriter.saveDatabase(context);
-        // @formatter:off
+
+        try {
+            BibDatabaseContext context = BibDatabaseContext.of(bibtexEntry, importFormatPreferences);
+            databaseWriter.saveDatabase(context);
+            // @formatter:off
         String expected = "@Article{," + OS.NEWLINE +
                 "  author  = {Foo Bar}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
@@ -456,7 +458,10 @@ class BibDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-        assertEquals(expected, stringWriter.toString());
+            assertEquals(expected, stringWriter.toString());
+        } catch (JabRefException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

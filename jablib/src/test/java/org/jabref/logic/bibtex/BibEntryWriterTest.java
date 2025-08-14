@@ -864,7 +864,7 @@ class BibEntryWriterTest {
 
         try {
             // read in bibtex string
-            BibEntry entry = entry = BibDatabaseContext
+            BibEntry entry = BibDatabaseContext
                     .of(bibtexEntry, importFormatPreferences)
                     .getEntries()
                     .getFirst();
