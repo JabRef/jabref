@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.JabRefException;
+import org.jabref.model.strings.StringUtil;
 
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
@@ -85,6 +86,8 @@ public class GitHandler {
             return Optional.of(credentialsProvider);
         }
 
+        // TODO: This should be removed - only GitPasswordPreferences should be used
+        //       Not implemented in August, 2025, because implications to SLR component not clear.
         String user = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
         String password = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
 
@@ -96,6 +99,8 @@ public class GitHandler {
         return Optional.of(this.credentialsProvider);
     }
 
+    // TODO: GitHandlerRegistry should get passed GitPasswordPreferences (or similar), pass this to GitHandler instance, which uses it here#
+    //       As a result, this method will be gone
     public void setCredentials(String username, String pat) {
         if (username == null) {
             username = "";
@@ -124,7 +129,7 @@ public class GitHandler {
                 return Optional.empty();
             }
             String url = config.getString("remote", remote, "url");
-            if (url == null || url.isBlank()) {
+            if (StringUtil.isBlank(url)) {
                 return Optional.empty();
             }
             return Optional.of(url);
