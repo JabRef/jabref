@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DonationProviderTest {
     @Test
-    public void testCalculateDaysUntilNextPopup() {
+    public void calculateDaysUntilNextPopup() {
         DonationProvider donationProvider = new DonationProvider(null, null, null);
 
         int lastShownEpochDay = (int) LocalDate.now().minusDays(400).toEpochDay();
