@@ -261,14 +261,12 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithPrependingNewlines() throws Exception {
-        // @formatter:off
         String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
                 "  Note                     = {some note}," + OS.NEWLINE +
                 "  Number                   = {1}" + OS.NEWLINE +
                 "}" + OS.NEWLINE;
-        // @formatter:on
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -278,14 +276,12 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithKeepsCRLFLineBreakStyle() throws Exception {
-        // @formatter:off
         String bibtexEntry = "@Article{test,\r\n" +
                 "  Author                   = {Foo Bar},\r\n" +
                 "  Journal                  = {International Journal of Something},\r\n" +
                 "  Note                     = {some note},\r\n" +
                 "  Number                   = {1}\r\n" +
                 "}\r\n";
-        // @formatter:on
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         // need to reconfigure writer to use "\r\n"
@@ -297,14 +293,12 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithKeepsLFLineBreakStyle() throws Exception {
-        // @formatter:off
         String bibtexEntry = "@Article{test,\n" +
                 "  Author                   = {Foo Bar},\n" +
                 "  Journal                  = {International Journal of Something},\n" +
                 "  Note                     = {some note},\n" +
                 "  Number                   = {1}\n" +
                 "}\n";
-        // @formatter:on
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         // need to reconfigure writer to use "\n"
@@ -316,7 +310,6 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithModification() throws Exception {
-        // @formatter:off
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -325,7 +318,6 @@ class BibEntryWriterTest {
                   Number                   = {1},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
 
@@ -335,7 +327,6 @@ class BibEntryWriterTest {
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        // @formatter:off
         String expected = """
                 @Article{test,
                   author  = {BlaBla},
@@ -344,13 +335,11 @@ class BibEntryWriterTest {
                   number  = {1},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
 
     @Test
     void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws Exception {
-        // @formatter:off
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -360,7 +349,6 @@ class BibEntryWriterTest {
                   HowPublished             = {asdf},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
 
@@ -370,7 +358,6 @@ class BibEntryWriterTest {
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        // @formatter:off
         String expected = """
                 @Article{test,
                   author       = {BlaBla},
@@ -380,13 +367,11 @@ class BibEntryWriterTest {
                   howpublished = {asdf},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
 
     @Test
     void entryTypeChange() throws Exception {
-        // @formatter:off
         String expected = """
 
                 @Article{test,
@@ -397,7 +382,6 @@ class BibEntryWriterTest {
                   howpublished = {asdf},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
         final BibEntry entry = firstEntryFrom(expected);
 
         // modify entry
@@ -406,7 +390,6 @@ class BibEntryWriterTest {
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        // @formatter:off
         String expectedNewEntry = """
                 @InProceedings{test,
                   author       = {BlaBla},
@@ -416,20 +399,17 @@ class BibEntryWriterTest {
                   journal      = {International Journal of Something},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
         assertEquals(expectedNewEntry, stringWriter.toString());
     }
 
     @Test
     void roundTripWithAppendedNewlines() throws Exception {
-        // @formatter:off
         String bibtexEntry = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
                 "  Number                   = {1}," + OS.NEWLINE +
                 "  Note                     = {some note}" + OS.NEWLINE +
                 "}\n\n";
-        // @formatter:on
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
@@ -442,33 +422,28 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripNormalizesNewLines() throws Exception {
-        // @formatter:off
         String bibtexEntry = "@Article{test,\n" +
                 "  Author                   = {Foo Bar},\r\n" +
                 "  Journal                  = {International Journal of Something},\n" +
                 "  Number                   = {1},\n" +
                 "  Note                     = {some note}\r\n" +
                 "}\n\n";
-        // @formatter:on
 
         final BibEntry entry = firstEntryFrom(bibtexEntry);
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
-        // @formatter:off
         String expected = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
                 "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
                 "  Number                   = {1}," + OS.NEWLINE +
                 "  Note                     = {some note}" + OS.NEWLINE +
                 "}" + OS.NEWLINE;
-        // @formatter:on
         assertEquals(expected, actual);
     }
 
     @Test
     void multipleWritesWithoutModification() throws Exception {
-        // @formatter:off
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -477,7 +452,6 @@ class BibEntryWriterTest {
                   Number                   = {1}
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         String result = testSingleWrite(bibtexEntry);
         result = testSingleWrite(result);
@@ -499,7 +473,6 @@ class BibEntryWriterTest {
 
     @Test
     void monthFieldSpecialSyntax() throws Exception {
-        // @formatter:off
         String bibtexEntry = """
                 @Article{test,
                   Author                   = {Foo Bar},
@@ -507,7 +480,6 @@ class BibEntryWriterTest {
                   Number                   = {1}
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
@@ -524,7 +496,6 @@ class BibEntryWriterTest {
 
     @Test
     void customTypeCanBewritten() throws Exception {
-        // @formatter:off
         String bibtexEntry = """
                 @reference{Broecker1984,
                   title = {International Center of Photography},
@@ -540,7 +511,6 @@ class BibEntryWriterTest {
                   publisher = {Crown},
                 }
                 """;
-        // @formatter:on
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
@@ -549,7 +519,6 @@ class BibEntryWriterTest {
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        // @formatter:off
         String expected = """
                 @Reference{Broecker1984,
                   date       = {1984},
@@ -565,7 +534,6 @@ class BibEntryWriterTest {
                   title      = {International Center of Photography},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -627,14 +595,12 @@ class BibEntryWriterTest {
 
     @Test
     void addFieldWithLongerLength() throws Exception {
-        // @formatter:off
         String bibtexEntry = OS.NEWLINE + OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author =  {BlaBla}," + OS.NEWLINE +
                 "  journal = {International Journal of Something}," + OS.NEWLINE +
                 "  number =  {1}," + OS.NEWLINE +
                 "  note =    {some note}," + OS.NEWLINE +
                 "}";
-        // @formatter:on
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
@@ -644,7 +610,6 @@ class BibEntryWriterTest {
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        // @formatter:off
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
                 "  journal      = {International Journal of Something}," + OS.NEWLINE +
@@ -652,7 +617,6 @@ class BibEntryWriterTest {
                 "  number       = {1}," + OS.NEWLINE +
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
-        // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -680,7 +644,6 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithPrecedingCommentTest() throws Exception {
-        // @formatter:off
         String bibtexEntry = """
                 % Some random comment that should stay here
                 @Article{test,
@@ -690,7 +653,6 @@ class BibEntryWriterTest {
                   Number                   = {1}
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
@@ -702,7 +664,6 @@ class BibEntryWriterTest {
 
     @Test
     void roundTripWithPrecedingCommentAndModificationTest() throws Exception {
-        // @formatter:off
         String bibtexEntry = """
                 % Some random comment that should stay here
                 @Article{test,
@@ -712,7 +673,6 @@ class BibEntryWriterTest {
                   Note                     = {some note}
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
 
         BibEntry entry = firstEntryFrom(bibtexEntry);
 
@@ -722,7 +682,6 @@ class BibEntryWriterTest {
         // write out bibtex string
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
-        // @formatter:off
         String expected = """
                 % Some random comment that should stay here
                 @Article{test,
@@ -732,7 +691,6 @@ class BibEntryWriterTest {
                   number  = {1},
                 }
                 """.replace("\n", OS.NEWLINE);
-        // @formatter:on
         assertEquals(expected, stringWriter.toString());
     }
 
