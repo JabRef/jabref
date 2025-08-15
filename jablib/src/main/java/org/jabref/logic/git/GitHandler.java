@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jabref.logic.JabRefException;
-import org.jabref.logic.git.prefs.GitPreferences;
 
 import org.eclipse.jgit.api.FetchCommand;
 import org.eclipse.jgit.api.Git;
@@ -88,14 +87,6 @@ public class GitHandler {
 
         String user = Optional.ofNullable(System.getenv("GIT_EMAIL")).orElse("");
         String password = Optional.ofNullable(System.getenv("GIT_PW")).orElse("");
-
-        GitPreferences preferences = new GitPreferences();
-        if (user.isBlank()) {
-            user = preferences.getUsername().orElse("");
-        }
-        if (password.isBlank()) {
-            password = preferences.getPersonalAccessToken().orElse("");
-        }
 
         if (user.isBlank() || password.isBlank()) {
             return Optional.empty();
