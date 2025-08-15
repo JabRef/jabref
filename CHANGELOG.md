@@ -11,6 +11,9 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Added
 
+- We added tooltips (on hover) for 'Library-specific file directory', 'User-specific file directory' and 'LaTeX file directory' fields of the library properties window. [#12269](https://github.com/JabRef/jabref/issues/12269)
+- A space is now added by default after citations inserted via the Libre/OpenOffice integration. [#13559](https://github.com/JabRef/jabref/issues/13559)
+- We added the option to configure 'Add space after citation' in Libre/OpenOffice panel settings. [#13559](https://github.com/JabRef/jabref/issues/13559)
 - We added automatic lookup of DOI at citation information. [#13561](https://github.com/JabRef/jabref/issues/13561)
 - We added a field for the citation count field on the General tab. [#13477](https://github.com/JabRef/jabref/issues/13477)
 - We added automatic lookup of DOI at citation relations [#13234](https://github.com/JabRef/jabref/issues/13234)
@@ -24,6 +27,7 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 - We added an initial [cite as you write](https://retorque.re/zotero-better-bibtex/citing/cayw/) endpoint. [#13187](https://github.com/JabRef/jabref/issues/13187)
 - We added "copy preview as markdown" feature. [#12552](https://github.com/JabRef/jabref/issues/12552)
 - In case no citation relation information can be fetched, we show the data providers reason. [#13549](https://github.com/JabRef/jabref/pull/13549)
+- We added a new button for shortening the DOI near the DOI field in the general tab when viewing an entry. [#13639](https://github.com/JabRef/jabref/issues/13639)
 
 ### Changed
 
@@ -72,8 +76,10 @@ Note that this project **does not** adhere to [Semantic Versioning](https://semv
 
 ### Fixed
 
+- We fixed an issue where "Specify Bib(La)TeX" tab was not focused when Bib(La)TeX was in the clipboard [#13597](https://github.com/JabRef/jabref/issues/13597)
+- We fixed an issue whereby the 'About' dialog was not honouring the user's configured font preferences. [#13558](https://github.com/JabRef/jabref/issues/13558)
 - We fixed an issue where the Pagetotal column was sorting the values alphabetically instead of numerically. [#12533](https://github.com/JabRef/jabref/issues/12533)
-- We fixed dark mode of BibTeX Source dialog in Citation Relations tab. [#13599](https://github.com/JabRef/jabref/issues/13599)
+- We fixed the dark mode of the BibTeX Source dialog in the Citation Relations tab. [#13599](https://github.com/JabRef/jabref/issues/13599)
 - We fixed an issue where the LibreOffice integration did not support citation keys containing Unicode characters. [#13301](https://github.com/JabRef/jabref/issues/13301)
 - We fixed an issue where the "Search ShortScience" action did not convert LaTeX-formatted titles to Unicode. [#13418](https://github.com/JabRef/jabref/issues/13418)
 - We fixed an issue where LaTeX file directories were not properly shared between different users on the same host. [#9990](https://github.com/JabRef/jabref/issues/9990)
