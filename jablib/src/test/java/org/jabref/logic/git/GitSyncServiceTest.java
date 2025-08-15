@@ -121,7 +121,6 @@ class GitSyncServiceTest {
     void aliceBobSimple(@TempDir Path tempDir) throws Exception {
         SystemReader.setInstance(new NoopGitSystemReader());
 
-
         importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         when(importFormatPreferences.bibEntryPreferences().getKeywordSeparator()).thenReturn(',');
 

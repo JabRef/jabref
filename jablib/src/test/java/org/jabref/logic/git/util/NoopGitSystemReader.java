@@ -11,21 +11,21 @@ import org.eclipse.jgit.util.SystemReader;
  */
 public class NoopGitSystemReader extends SystemReader {
 
-    private static final SystemReader proxy = SystemReader.getInstance();
+    private static final SystemReader PROXY = SystemReader.getInstance();
 
     @Override
     public String getHostname() {
-        return proxy.getHostname();
+        return PROXY.getHostname();
     }
 
     @Override
     public String getenv(String variable) {
-        return proxy.getenv(variable);
+        return PROXY.getenv(variable);
     }
 
     @Override
     public String getProperty(String key) {
-        return proxy.getProperty(key);
+        return PROXY.getProperty(key);
     }
 
     @Override
@@ -72,11 +72,11 @@ public class NoopGitSystemReader extends SystemReader {
 
     @Override
     public long getCurrentTime() {
-        return proxy.getCurrentTime();
+        return PROXY.getCurrentTime();
     }
 
     @Override
     public int getTimezone(long when) {
-        return proxy.getTimezone(when);
+        return PROXY.getTimezone(when);
     }
 }
