@@ -51,11 +51,9 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
-        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
-
-        repositoryUrlValidator = new FunctionBasedValidator<>(repositoryUrl, notEmpty, ValidationMessage.error(Localization.lang("Repository URL is required")));
-        githubUsernameValidator = new FunctionBasedValidator<>(githubUsername, notEmpty, ValidationMessage.error(Localization.lang("GitHub username is required")));
-        githubPatValidator = new FunctionBasedValidator<>(githubPat, notEmpty, ValidationMessage.error(Localization.lang("Personal Access Token is required")));
+        repositoryUrlValidator = new FunctionBasedValidator<>(repositoryUrl, githubHttpsUrlValidator(), ValidationMessage.error(Localization.lang("Repository URL is required")));
+        githubUsernameValidator = new FunctionBasedValidator<>(githubUsername, notEmptyValidator(), ValidationMessage.error(Localization.lang("GitHub username is required")));
+        githubPatValidator = new FunctionBasedValidator<>(githubPat, notEmptyValidator(), ValidationMessage.error(Localization.lang("Personal Access Token is required")));
 
         applyGitPreferences();
     }
@@ -83,10 +81,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         GitHandlerRegistry registry = new GitHandlerRegistry();
         GitHandler handler = registry.get(bibPath.getParent());
 
-        boolean hasStoredPat = gitPreferences.getPersonalAccessToken().isPresent();
-        if (!rememberSettingsProperty().get() || !hasStoredPat) {
-            handler.setCredentials(user, pat);
-        }
+        handler.setCredentials(user, pat);
 
         GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);
 
@@ -121,16 +116,7 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         gitPreferences.setRememberPat(rememberSettings.get());
 
         if (rememberSettings.get()) {
-            boolean ok = gitPreferences.savePersonalAccessToken(pat, user);
-            if (ok) {
-                gitPreferences.setRememberPat(true);
-            } else {
-                gitPreferences.setRememberPat(false);
-                dialogService.showErrorDialogAndWait(
-                        Localization.lang("GitHub preferences not saved"),
-                        Localization.lang("Failed to save Personal Access Token.")
-                );
-            }
+            gitPreferences.setPersonalAccessToken(pat);
         } else {
             gitPreferences.clearGitHubPersonalAccessToken();
         }
@@ -166,5 +152,18 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
     public ValidationStatus githubPatValidation() {
         return githubPatValidator.getValidationStatus();
+    }
+
+    private Predicate<String> notEmptyValidator() {
+        return input -> input != null && !input.trim().isEmpty();
+    }
+
+    private Predicate<String> githubHttpsUrlValidator() {
+        return input -> {
+            if (input == null || input.trim().isEmpty()) {
+                return false;
+            }
+            return input.trim().matches("^https://.+");
+        };
     }
 }

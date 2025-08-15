@@ -140,7 +140,7 @@ public class GitHandler {
             if (scheme == null) {
                 return false;
             }
-            return "http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme);
+            return "https".equalsIgnoreCase(scheme);
         } catch (URISyntaxException e) {
             return false;
         }
