@@ -3,6 +3,7 @@ package org.jabref.gui.git;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -23,6 +24,10 @@ import org.jabref.logic.git.util.GitInitService;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.database.BibDatabaseContext;
 
+import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
+import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
+import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
+import de.saxsys.mvvmfx.utils.validation.Validator;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,58 +43,42 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private final StringProperty githubPat = new SimpleStringProperty();
     private final StringProperty repositoryUrl = new SimpleStringProperty();
     private final BooleanProperty rememberSettings = new SimpleBooleanProperty();
+    private final Validator repositoryUrlValidator;
+    private final Validator githubUsernameValidator;
+    private final Validator githubPatValidator;
 
     public GitShareToGitHubDialogViewModel(StateManager stateManager, DialogService dialogService) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
 
+        Predicate<String> notEmpty = input -> (input != null) && !input.trim().isEmpty();
+
+        repositoryUrlValidator = new FunctionBasedValidator<>(repositoryUrl, notEmpty, ValidationMessage.error(Localization.lang("Repository URL is required")));
+        githubUsernameValidator = new FunctionBasedValidator<>(githubUsername, notEmpty, ValidationMessage.error(Localization.lang("GitHub username is required")));
+        githubPatValidator = new FunctionBasedValidator<>(githubPat, notEmpty, ValidationMessage.error(Localization.lang("Personal Access Token is required")));
+
         applyGitPreferences();
     }
 
-    public boolean shareToGitHub() {
+    public void shareToGitHub() throws JabRefException, IOException, GitAPIException {
         String url = trimOrEmpty(repositoryUrl.get());
         String user = trimOrEmpty(githubUsername.get());
         String pat = trimOrEmpty(githubPat.get());
 
-        if (url.isBlank()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("GitHub repository URL is required"));
-            return false;
-        }
-
-        if (pat.isBlank()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Personal Access Token is required to push"));
-            return false;
-        }
-        if (user.isBlank()) {
-            dialogService.showErrorDialogAndWait(Localization.lang("GitHub username is required"));
-            return false;
-        }
         Optional<BibDatabaseContext> activeDatabaseOpt = stateManager.getActiveDatabase();
         if (activeDatabaseOpt.isEmpty()) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("No library open")
-            );
-            return false;
+            throw new JabRefException(Localization.lang("No library open"));
         }
 
         BibDatabaseContext activeDatabase = activeDatabaseOpt.get();
         Optional<Path> bibFilePathOpt = activeDatabase.getDatabasePath();
         if (bibFilePathOpt.isEmpty()) {
-            dialogService.showErrorDialogAndWait(
-                    Localization.lang("No library file path"),
-                    Localization.lang("Cannot share: Please save the library to a file first.")
-            );
-            return false;
+            throw new JabRefException(Localization.lang("No library file path. Please save the library to a file first."));
         }
 
         Path bibPath = bibFilePathOpt.get();
 
-        try {
-            GitInitService.initRepoAndSetRemote(bibPath, url);
-        } catch (JabRefException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Git error"), e.getMessage(), e);
-            return false;
-        }
+        GitInitService.initRepoAndSetRemote(bibPath, url);
 
         GitHandlerRegistry registry = new GitHandlerRegistry();
         GitHandler handler = registry.get(bibPath.getParent());
@@ -99,49 +88,21 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
             handler.setCredentials(user, pat);
         }
 
-        GitStatusSnapshot status;
-        try {
-            status = GitStatusChecker.checkStatusAndFetch(handler);
-        } catch (IOException | JabRefException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Cannot reach remote"), e);
-            return false;
-        }
+        GitStatusSnapshot status = GitStatusChecker.checkStatusAndFetch(handler);
 
         if (status.syncStatus() == SyncStatus.BEHIND) {
-            dialogService.showWarningDialogAndWait(
-                    Localization.lang("Remote repository is not empty"),
-                    Localization.lang("Please pull changes before pushing.")
-            );
-            return false;
+            throw new JabRefException(Localization.lang("Remote repository is not empty. Please pull changes before pushing."));
         }
 
-        try {
-            handler.createCommitOnCurrentBranch(Localization.lang("Share library to GitHub"), false);
-        } catch (IOException | GitAPIException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Create commit failed", e));
-        }
+        handler.createCommitOnCurrentBranch(Localization.lang("Share library to GitHub"), false);
 
-        try {
-            if (status.syncStatus() == SyncStatus.REMOTE_EMPTY) {
-                handler.pushCurrentBranchCreatingUpstream();
-            } else {
-                handler.pushCommitsToRemoteRepository();
-            }
-        } catch (IOException | GitAPIException e) {
-            LOGGER.error("Push failed", e);
-            dialogService.showErrorDialogAndWait(Localization.lang("Git error"), e);
-            return false;
-        } catch (JabRefException e) {
-            dialogService.showErrorDialogAndWait(Localization.lang("Missing Git credentials"), e);
+        if (status.syncStatus() == SyncStatus.REMOTE_EMPTY) {
+            handler.pushCurrentBranchCreatingUpstream();
+        } else {
+            handler.pushCommitsToRemoteRepository();
         }
 
         setGitPreferences(url, user, pat);
-
-        dialogService.showInformationDialogAndWait(
-                Localization.lang("GitHub Share"),
-                Localization.lang("Successfully pushed to %0", url)
-        );
-        return true;
     }
 
     private void applyGitPreferences() {
@@ -193,5 +154,17 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
 
     public StringProperty repositoryUrlProperty() {
         return repositoryUrl;
+    }
+
+    public ValidationStatus repositoryUrlValidation() {
+        return repositoryUrlValidator.getValidationStatus();
+    }
+
+    public ValidationStatus githubUsernameValidation() {
+        return githubUsernameValidator.getValidationStatus();
+    }
+
+    public ValidationStatus githubPatValidation() {
+        return githubPatValidator.getValidationStatus();
     }
 }

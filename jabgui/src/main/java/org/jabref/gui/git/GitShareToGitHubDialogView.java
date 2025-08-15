@@ -1,5 +1,6 @@
 package org.jabref.gui.git;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -14,9 +15,13 @@ import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
+import org.jabref.gui.util.IconValidationDecorator;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.util.BackgroundTask;
+import org.jabref.logic.util.TaskExecutor;
 
 import com.airhacks.afterburner.views.ViewLoader;
+import de.saxsys.mvvmfx.utils.validation.visualization.ControlsFxVisualizer;
 
 public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     private static final String GITHUB_PAT_DOCS_URL =
@@ -37,11 +42,14 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     private final GitShareToGitHubDialogViewModel viewModel;
     private final DialogService dialogService;
     private final StateManager stateManager;
+    private final TaskExecutor taskExecutor;
     private final GuiPreferences preferences;
+    private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public GitShareToGitHubDialogView(StateManager stateManager, DialogService dialogService, GuiPreferences preferences) {
+    public GitShareToGitHubDialogView(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, GuiPreferences preferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.taskExecutor = taskExecutor;
         this.preferences = preferences;
 
         this.setTitle(Localization.lang("Share this library to GitHub"));
@@ -87,13 +95,30 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
         username.textProperty().bindBidirectional(viewModel.githubUsernameProperty());
         personalAccessToken.textProperty().bindBidirectional(viewModel.githubPatProperty());
         rememberSettingsCheck.selectedProperty().bindBidirectional(viewModel.rememberSettingsProperty());
+
+        Platform.runLater(() -> {
+            visualizer.setDecoration(new IconValidationDecorator());
+
+            visualizer.initVisualization(viewModel.repositoryUrlValidation(), repositoryUrl, true);
+            visualizer.initVisualization(viewModel.githubUsernameValidation(), username, true);
+            visualizer.initVisualization(viewModel.githubPatValidation(), personalAccessToken, true);
+        });
     }
 
     @FXML
     private void shareToGitHub() {
-        boolean success = viewModel.shareToGitHub();
-        if (success) {
+        BackgroundTask.wrap(() -> {
+            viewModel.shareToGitHub();
+            return true;
+        })
+        .onSuccess(result -> {
+            dialogService.showInformationDialogAndWait(
+                    Localization.lang("GitHub Share"),
+                    Localization.lang("Successfully pushed to GitHub.")
+            );
             this.close();
-        }
+        })
+      .onFailure(e -> dialogService.showErrorDialogAndWait("GitHub share failed", e.getMessage(), e))
+      .executeWith(taskExecutor);
     }
 }
