@@ -70,7 +70,6 @@ class BibEntryWriterTest {
                   number  = {1},
                 }
                 """.replace("\n", OS.NEWLINE);
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -106,18 +105,18 @@ class BibEntryWriterTest {
 
     @Test
     void writeOtherTypeTest() throws IOException {
-        String expected = """
-                @Other{test,
-                  comment = {testentry},
-                }
-                """.replace("\n", OS.NEWLINE);
-
         BibEntry entry = new BibEntry(new UnknownEntryType("other"))
                 .withField(StandardField.COMMENT, "testentry")
                 .withCitationKey("test")
                 .withChanged(true);
 
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
+        String expected = """
+                @Other{test,
+                  comment = {testentry},
+                }
+                """.replace("\n", OS.NEWLINE);
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -157,7 +156,6 @@ class BibEntryWriterTest {
                   journal = {International Journal of Something},
                 }
                 """.replace("\n", OS.NEWLINE);
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -184,24 +182,22 @@ class BibEntryWriterTest {
                   journal = {International Journal of Something},
                 }
                 """.replace("\n", OS.NEWLINE);
-
         assertEquals(expected, stringWriter.toString());
     }
 
     @Test
     void writeReallyUnknownTypeTest() throws IOException {
-        String expected = """
-                @Reallyunknowntype{test,
-                  comment = {testentry},
-                }
-                """.replace("\n", OS.NEWLINE);
-
         BibEntry entry = new BibEntry();
         entry.setType(new UnknownEntryType("ReallyUnknownType"));
         entry.setField(StandardField.COMMENT, "testentry");
         entry.setCitationKey("test");
         bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
+        String expected = """
+                @Reallyunknowntype{test,
+                  comment = {testentry},
+                }
+                """.replace("\n", OS.NEWLINE);
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -331,6 +327,14 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
 
+        final BibEntry entry = firstEntryFrom(bibtexEntry);
+
+        // Modify entry
+        entry.setField(StandardField.AUTHOR, "BlaBla");
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
         // @formatter:off
         String expected = """
                 @Article{test,
@@ -341,15 +345,6 @@ class BibEntryWriterTest {
                 }
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
-
-        final BibEntry entry = firstEntryFrom(bibtexEntry);
-
-        // Modify entry
-        entry.setField(StandardField.AUTHOR, "BlaBla");
-
-        // write out bibtex string
-        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -367,6 +362,14 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
 
+        final BibEntry entry = firstEntryFrom(bibtexEntry);
+
+        // modify entry
+        entry.setField(StandardField.AUTHOR, "BlaBla");
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
         // @formatter:off
         String expected = """
                 @Article{test,
@@ -378,15 +381,6 @@ class BibEntryWriterTest {
                 }
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
-
-        final BibEntry entry = firstEntryFrom(bibtexEntry);
-
-        // modify entry
-        entry.setField(StandardField.AUTHOR, "BlaBla");
-
-        // write out bibtex string
-        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -404,6 +398,13 @@ class BibEntryWriterTest {
                 }
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
+        final BibEntry entry = firstEntryFrom(expected);
+
+        // modify entry
+        entry.setType(StandardEntryType.InProceedings);
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
 
         // @formatter:off
         String expectedNewEntry = """
@@ -416,15 +417,6 @@ class BibEntryWriterTest {
                 }
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
-
-        final BibEntry entry = firstEntryFrom(expected);
-
-        // modify entry
-        entry.setType(StandardEntryType.InProceedings);
-
-        // write out bibtex string
-        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
-
         assertEquals(expectedNewEntry, stringWriter.toString());
     }
 
@@ -459,6 +451,10 @@ class BibEntryWriterTest {
                 "}\n\n";
         // @formatter:on
 
+        final BibEntry entry = firstEntryFrom(bibtexEntry);
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
         // @formatter:off
         String expected = "@Article{test," + OS.NEWLINE +
                 "  Author                   = {Foo Bar}," + OS.NEWLINE +
@@ -467,11 +463,6 @@ class BibEntryWriterTest {
                 "  Note                     = {some note}" + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-
-        final BibEntry entry = firstEntryFrom(bibtexEntry);
-        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
-        String actual = stringWriter.toString();
-
         assertEquals(expected, actual);
     }
 
@@ -551,6 +542,13 @@ class BibEntryWriterTest {
                 """;
         // @formatter:on
 
+        BibEntry entry = firstEntryFrom(bibtexEntry);
+
+        entry.setField(FieldFactory.parseField("location"), "NY");
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
         // @formatter:off
         String expected = """
                 @Reference{Broecker1984,
@@ -568,14 +566,6 @@ class BibEntryWriterTest {
                 }
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
-
-        BibEntry entry = firstEntryFrom(bibtexEntry);
-
-        entry.setField(FieldFactory.parseField("location"), "NY");
-
-        // write out bibtex string
-        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -646,6 +636,14 @@ class BibEntryWriterTest {
                 "}";
         // @formatter:on
 
+        BibEntry entry = firstEntryFrom(bibtexEntry);
+
+        // modify entry
+        entry.setField(StandardField.HOWPUBLISHED, "asdf");
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
         // @formatter:off
         String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
                 "  author       = {BlaBla}," + OS.NEWLINE +
@@ -655,15 +653,6 @@ class BibEntryWriterTest {
                 "  howpublished = {asdf}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-
-        BibEntry entry = firstEntryFrom(bibtexEntry);
-
-        // modify entry
-        entry.setField(StandardField.HOWPUBLISHED, "asdf");
-
-        // write out bibtex string
-        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -678,7 +667,6 @@ class BibEntryWriterTest {
         String expected = "@Article{," + OS.NEWLINE +
                 "  note   = {some note}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -726,6 +714,14 @@ class BibEntryWriterTest {
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
 
+        BibEntry entry = firstEntryFrom(bibtexEntry);
+
+        // change the entry
+        entry.setField(StandardField.AUTHOR, "John Doe");
+
+        // write out bibtex string
+        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
+
         // @formatter:off
         String expected = """
                 % Some random comment that should stay here
@@ -737,15 +733,6 @@ class BibEntryWriterTest {
                 }
                 """.replace("\n", OS.NEWLINE);
         // @formatter:on
-
-        BibEntry entry = firstEntryFrom(bibtexEntry);
-
-        // change the entry
-        entry.setField(StandardField.AUTHOR, "John Doe");
-
-        // write out bibtex string
-        bibEntryWriter.write(entry, bibWriter, BibDatabaseMode.BIBTEX);
-
         assertEquals(expected, stringWriter.toString());
     }
 
@@ -778,7 +765,6 @@ class BibEntryWriterTest {
                   year         = {2019},
                 }
                 """.replace("\n", OS.NEWLINE);
-
         assertEquals(expected, stringWriter.toString());
     }
 
