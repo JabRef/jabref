@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.exporter.SaveException;
 import org.jabref.logic.git.SlrGitHandler;
 import org.jabref.logic.importer.ParseException;
@@ -36,7 +37,7 @@ public class Crawler {
                    SlrGitHandler gitHandler,
                    CliPreferences preferences,
                    BibEntryTypesManager bibEntryTypesManager,
-                   FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException {
+                   FileUpdateMonitor fileUpdateMonitor) throws IllegalArgumentException, IOException, ParseException, JabRefException {
         this.studyRepository = new StudyRepository(
                 studyRepositoryRoot,
                 gitHandler,
@@ -66,7 +67,7 @@ public class Crawler {
      *
      * @throws IOException Thrown if a problem occurred during the persistence of the result.
      */
-    public void performCrawl() throws IOException, GitAPIException, SaveException {
+    public void performCrawl() throws IOException, GitAPIException, SaveException, JabRefException {
         List<QueryResult> results = studyFetcher.crawl();
         studyRepository.persist(results);
     }

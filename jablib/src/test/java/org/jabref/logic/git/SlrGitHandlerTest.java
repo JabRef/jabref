@@ -30,6 +30,7 @@ class SlrGitHandlerTest {
     @BeforeEach
     void setUpGitHandler() {
         gitHandler = new SlrGitHandler(repositoryPath);
+        gitHandler.initIfNeeded();
     }
 
     @AfterEach

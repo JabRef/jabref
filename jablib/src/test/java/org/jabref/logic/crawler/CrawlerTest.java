@@ -9,6 +9,7 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.citationkeypattern.CitationKeyPatternPreferences;
 import org.jabref.logic.citationkeypattern.GlobalCitationKeyPatterns;
 import org.jabref.logic.exporter.SaveConfiguration;
@@ -106,7 +107,7 @@ class CrawlerTest {
     }
 
     @Test
-    void whetherAllFilesAreCreated() throws IOException, ParseException, GitAPIException, SaveException {
+    void whetherAllFilesAreCreated() throws IOException, ParseException, GitAPIException, SaveException, JabRefException {
         Crawler testCrawler = new Crawler(getPathToStudyDefinitionFile(),
                 gitHandler,
                 preferences,

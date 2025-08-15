@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Optional;
 
+import org.jabref.logic.JabRefException;
+
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -46,6 +48,8 @@ class GitHandlerTest {
                            .call()) {
             // This ensures the remote repository is initialized and properly closed
         }
+
+        gitHandler.initIfNeeded();
         Path testFile = repositoryPath.resolve("initial.txt");
         Files.writeString(testFile, "init");
 
@@ -111,7 +115,7 @@ class GitHandlerTest {
     }
 
     @Test
-    void fetchOnCurrentBranch() throws IOException, GitAPIException {
+    void fetchOnCurrentBranch() throws IOException, GitAPIException, JabRefException {
         try (Git cloneGit = Git.cloneRepository()
                                .setURI(remoteRepoPath.toUri().toString())
                                .setDirectory(clonePath.toFile())
