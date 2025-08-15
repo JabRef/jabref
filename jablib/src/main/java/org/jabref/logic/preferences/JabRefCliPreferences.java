@@ -109,6 +109,7 @@ import org.jabref.model.entry.types.EntryType;
 import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.SaveOrder;
 import org.jabref.model.metadata.SelfContainedSaveOrder;
+import org.jabref.model.metadata.UserHostInfo;
 import org.jabref.model.search.SearchDisplayMode;
 import org.jabref.model.search.SearchFlags;
 import org.jabref.model.strings.StringUtil;
@@ -444,7 +445,7 @@ public class JabRefCliPreferences implements CliPreferences {
     /**
      * Cache variables
      */
-    private String userAndHost;
+    private UserHostInfo userAndHost;
 
     private LibraryPreferences libraryPreferences;
     private DOIPreferences doiPreferences;
@@ -1600,7 +1601,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 Version.parse(get(VERSION_IGNORED_UPDATE)),
                 getBoolean(VERSION_CHECK_ENABLED),
                 getPath(PREFS_EXPORT_PATH, getDefaultPath()),
-                getUserAndHost(),
+                userAndHost.getUserHostString(),
                 getBoolean(MEMORY_STICK_MODE));
 
         EasyBind.listen(internalPreferences.ignoredVersionProperty(),
@@ -1624,11 +1625,11 @@ public class JabRefCliPreferences implements CliPreferences {
         return internalPreferences;
     }
 
-    private String getUserAndHost() {
-        if (StringUtil.isNotBlank(userAndHost)) {
+    private UserHostInfo getUserHostInfo() {
+        if (userAndHost != null) {
             return userAndHost;
         }
-        userAndHost = get(DEFAULT_OWNER) + '-' + OS.getHostName();
+        userAndHost = new UserHostInfo(get(DEFAULT_OWNER), OS.getHostName());
         return userAndHost;
     }
 
@@ -1678,7 +1679,7 @@ public class JabRefCliPreferences implements CliPreferences {
         }
 
         filePreferences = new FilePreferences(
-                getInternalPreferences().getUserAndHost(),
+                getUserHostInfo().getUserHostString(),
                 getPath(MAIN_FILE_DIRECTORY, getDefaultPath()).toString(),
                 getBoolean(STORE_RELATIVE_TO_BIB),
                 getBoolean(AUTO_RENAME_FILES_ON_CHANGE),
