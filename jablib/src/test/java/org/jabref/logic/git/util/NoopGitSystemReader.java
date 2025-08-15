@@ -6,12 +6,13 @@ import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.SystemReader;
 
 /**
- *  Nooop implementation of {@link SystemReader}
- *  just
+ * Nooop implementation of {@link SystemReader}
+ * to prevent leaking of system and user git config into tests.
  */
 public class NoopGitSystemReader extends SystemReader {
 
     private static final SystemReader proxy = SystemReader.getInstance();
+
     @Override
     public String getHostname() {
         return proxy.getHostname();
@@ -57,16 +58,13 @@ public class NoopGitSystemReader extends SystemReader {
 
     @Override
     public FileBasedConfig openJGitConfig(Config parent, FS fs) {
-        return new FileBasedConfig(parent, null, fs)
-        {
+        return new FileBasedConfig(parent, null, fs) {
             @Override
-            public void load()
-            {
+            public void load() {
             }
 
             @Override
-            public boolean isOutdated()
-            {
+            public boolean isOutdated() {
                 return false;
             }
         };
