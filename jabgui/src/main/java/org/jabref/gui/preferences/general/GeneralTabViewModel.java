@@ -33,8 +33,10 @@ import org.jabref.gui.theme.ThemeTypes;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
 import org.jabref.gui.util.FileDialogConfiguration;
 import org.jabref.http.manager.HttpServerManager;
+import org.jabref.languageserver.manager.LanguageServerManager;
 import org.jabref.logic.FilePreferences;
 import org.jabref.logic.LibraryPreferences;
+import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.l10n.Language;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.net.ssl.TrustStoreManager;
@@ -111,6 +113,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
     private final BooleanProperty enableHttpServerProperty = new SimpleBooleanProperty();
     private final StringProperty httpPortProperty = new SimpleStringProperty("");
     private final Validator httpPortValidator;
+    private final Validator languageServerPortValidator;
+    private final BooleanProperty enableLanguageServerProperty = new SimpleBooleanProperty();
+    private final StringProperty languageServerPortProperty = new SimpleStringProperty("");
     private final TrustStoreManager trustStoreManager;
 
     private final FileUpdateMonitor fileUpdateMonitor;
@@ -171,6 +176,19 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
                     }
                 },
                 ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
+        languageServerPortValidator = new FunctionBasedValidator<>(
+                languageServerPortProperty,
+                input -> {
+                    try {
+                        int portNumber = Integer.parseInt(languageServerPortProperty().getValue());
+                        return RemoteUtil.isUserPort(portNumber);
+                    } catch (NumberFormatException ex) {
+                        return false;
+                    }
+                },
+                ValidationMessage.error("%s".formatted(Localization.lang("You must enter an integer value in the interval 1025-65535"))));
+
         this.trustStoreManager = new TrustStoreManager(Path.of(preferences.getSSLPreferences().getTruststorePath()));
     }
 
@@ -180,6 +198,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public ValidationStatus httpPortValidationStatus() {
         return httpPortValidator.getValidationStatus();
+    }
+
+    public ValidationStatus languageServerPortValidationStatus() {
+        return languageServerPortValidator.getValidationStatus();
     }
 
     @Override
@@ -225,6 +247,9 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         enableHttpServerProperty.setValue(remotePreferences.enableHttpServer());
         httpPortProperty.setValue(String.valueOf(remotePreferences.getHttpPort()));
+
+        enableLanguageServerProperty.setValue(remotePreferences.enableLanguageServer());
+        languageServerPortProperty.setValue(String.valueOf(remotePreferences.getLanguageServerPort()));
     }
 
     @Override
@@ -297,6 +322,12 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
             }
         });
 
+        getPortAsInt(languageServerPortProperty.getValue()).ifPresent(newPort -> {
+            if (remotePreferences.isDifferentLanguageServerPort(newPort)) {
+                remotePreferences.setLanguageServerPort(newPort);
+            }
+        });
+
         HttpServerManager httpServerManager = Injector.instantiateModelOrService(HttpServerManager.class);
         // stop in all cases, because the port might have changed
         httpServerManager.stop();
@@ -307,6 +338,17 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
         } else {
             remotePreferences.setEnableHttpServer(false);
             httpServerManager.stop();
+        }
+
+        LanguageServerManager languageServerManager = Injector.instantiateModelOrService(LanguageServerManager.class);
+        // stop in all cases, because the port might have changed
+        languageServerManager.stop();
+        if (enableLanguageServerProperty.getValue()) {
+            remotePreferences.setEnableLanguageServer(true);
+            languageServerManager.start(preferences, Injector.instantiateModelOrService(JournalAbbreviationRepository.class), remotePreferences.getLanguageServerPort());
+        } else {
+            remotePreferences.setEnableLanguageServer(false);
+            languageServerManager.stop();
         }
 
         trustStoreManager.flush();
@@ -330,6 +372,10 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
         if (enableHttpServerProperty.getValue()) {
             validator.addValidators(httpPortValidator);
+        }
+
+        if (enableLanguageServerProperty.getValue()) {
+            validator.addValidators(languageServerPortValidator);
         }
 
         if (fontOverrideProperty.getValue()) {
@@ -468,6 +514,14 @@ public class GeneralTabViewModel implements PreferenceTabViewModel {
 
     public StringProperty httpPortProperty() {
         return httpPortProperty;
+    }
+
+    public BooleanProperty enableLanguageServerProperty() {
+        return enableLanguageServerProperty;
+    }
+
+    public StringProperty languageServerPortProperty() {
+        return languageServerPortProperty;
     }
 
     public void openBrowser() {
