@@ -781,6 +781,13 @@ public class JabRefCliPreferences implements CliPreferences {
 
         // WalkThrough
         defaults.put(MAIN_FILE_DIRECTORY_WALKTHROUGH_COMPLETED, Boolean.FALSE);
+
+        // region: Git preferences
+        defaults.put(GITHUB_PAT_KEY, "");
+        defaults.put(GITHUB_USERNAME_KEY, "");
+        defaults.put(GITHUB_REMOTE_URL_KEY, "");
+        defaults.put(GITHUB_REMEMBER_PAT_KEY, Boolean.FALSE);
+        // endregion
     }
 
     public void setLanguageDependentDefaultValues() {
@@ -2485,8 +2492,8 @@ public class JabRefCliPreferences implements CliPreferences {
         if (getBoolean(GITHUB_REMEMBER_PAT_KEY)) {
             try (var keyring = Keyring.create()) {
                 return new Password(
-                        keyring.getPassword("org.jabref", "github"),
-                        getInternalPreferences().getUserAndHost()
+                    keyring.getPassword("org.jabref", "github"),
+                    getInternalPreferences().getUserAndHost()
                 ).decrypt();
             } catch (PasswordAccessException ex) {
                 LOGGER.warn("No GitHub token stored in keyring");
@@ -2494,7 +2501,7 @@ public class JabRefCliPreferences implements CliPreferences {
                 LOGGER.warn("Could not read GitHub token from keyring", ex);
             }
         }
-        return "";
+        return (String) defaults.get(GITHUB_PAT_KEY);
     }
 
     private void setGitHubPat(String pat) {
