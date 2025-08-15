@@ -12,10 +12,12 @@ import javafx.scene.control.Tooltip;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
+import org.jabref.gui.frame.ExternalApplicationsPreferences;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
+import org.jabref.logic.git.prefs.GitPreferences;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.util.BackgroundTask;
 import org.jabref.logic.util.TaskExecutor;
@@ -43,17 +45,17 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     private final DialogService dialogService;
     private final StateManager stateManager;
     private final TaskExecutor taskExecutor;
-    private final GuiPreferences preferences;
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
-    public GitShareToGitHubDialogView(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, GuiPreferences preferences) {
+    public GitShareToGitHubDialogView(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, ExternalApplicationsPreferences externalApplicationsPreferences, GitPreferences gitPreferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-        this.preferences = preferences;
+
+        this.externalApplicationPrefernces = externalApplicationsPreferences;
 
         this.setTitle(Localization.lang("Share this library to GitHub"));
-        this.viewModel = new GitShareToGitHubDialogViewModel(stateManager, dialogService);
+        this.viewModel = new GitShareToGitHubDialogViewModel(gitPreferences, stateManager, dialogService);
 
         ViewLoader.view(this)
                   .load()

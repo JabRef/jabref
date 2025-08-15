@@ -1,72 +1,80 @@
 package org.jabref.logic.git.prefs;
 
-import java.util.Objects;
 import java.util.Optional;
-import java.util.prefs.Preferences;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+import org.jabref.model.util.OptionalUtil;
+
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GitPreferences {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitPreferences.class);
+    private final StringProperty username;
+    private final StringProperty pat;
+    private final StringProperty repositoryUrl;
+    private final BooleanProperty rememberPat;
 
-    private static final String PREF_PATH = "/org/jabref-git";
-    private static final String GITHUB_PAT_KEY = "githubPersonalAccessToken";
-    private static final String GITHUB_USERNAME_KEY = "githubUsername";
-    private static final String GITHUB_REMOTE_URL_KEY = "githubRemoteUrl";
-    private static final String GITHUB_REMEMBER_PAT_KEY = "githubRememberPat";
-
-    private final Preferences preferences;
-
-    public GitPreferences() {
-        this.preferences = Preferences.userRoot().node(PREF_PATH);
+    public GitPreferences(String username,
+                          String pat,
+                          String repositoryUrl,
+                          Boolean rememberPat) {
+        this.username = new SimpleStringProperty(username);
+        this.pat = new SimpleStringProperty(pat);
+        this.repositoryUrl = new SimpleStringProperty(repositoryUrl);
+        this.rememberPat = new SimpleBooleanProperty(rememberPat);
     }
 
-    public void setPersonalAccessToken(String pat) {
-        Objects.requireNonNull(pat, "pat");
-        preferences.put(GITHUB_PAT_KEY, pat);
-    }
-
-    public Optional<String> getPersonalAccessToken() {
-        return Optional.ofNullable(preferences.get(GITHUB_PAT_KEY, null));
-    }
-
-    public void clearGitHubPersonalAccessToken() {
-        preferences.remove(GITHUB_PAT_KEY);
-    }
-
-    public void setUsername(String username) {
-        Objects.requireNonNull(username, "username");
-        preferences.put(GITHUB_USERNAME_KEY, username);
+    public void setUsername(@NonNull String username) {
+        this.username.set(username);
     }
 
     public Optional<String> getUsername() {
-        return Optional.ofNullable(preferences.get(GITHUB_USERNAME_KEY, null));
+        return OptionalUtil.fromStringProperty(username);
     }
 
-    public void setPat(String encryptedToken) {
-        Objects.requireNonNull(encryptedToken, "encryptedToken");
-        preferences.put(GITHUB_PAT_KEY, encryptedToken);
+    public void setPat(@NonNull String pat) {
+        this.pat.set(pat);
     }
 
     public Optional<String> getPat() {
-        return Optional.ofNullable(preferences.get(GITHUB_PAT_KEY, null));
+        return OptionalUtil.fromStringProperty(pat);
     }
 
     public Optional<String> getRepositoryUrl() {
-        return Optional.ofNullable(preferences.get(GITHUB_REMOTE_URL_KEY, null));
+        return OptionalUtil.fromStringProperty(repositoryUrl);
     }
 
-    public void setRepositoryUrl(String url) {
-        Objects.requireNonNull(url, "url");
-        preferences.put(GITHUB_REMOTE_URL_KEY, url);
+    public void setRepositoryUrl(@NonNull String repositoryUrl) {
+        this.repositoryUrl.set(repositoryUrl);
     }
 
-    public boolean getRememberPat() {
-        return preferences.getBoolean(GITHUB_REMEMBER_PAT_KEY, false);
+    public Boolean getRememberPat() {
+        return this.rememberPat.get();
     }
 
     public void setRememberPat(boolean remember) {
-        preferences.putBoolean(GITHUB_REMEMBER_PAT_KEY, remember);
+        this.rememberPat.set(remember);
+    }
+
+    public StringProperty usernameProperty() {
+        return username;
+    }
+
+    public StringProperty patProperty() {
+        return pat;
+    }
+
+    public StringProperty repositoryUrlProperty() {
+        return repositoryUrl;
+    }
+
+    public BooleanProperty rememberPatProperty() {
+        return rememberPat;
     }
 }

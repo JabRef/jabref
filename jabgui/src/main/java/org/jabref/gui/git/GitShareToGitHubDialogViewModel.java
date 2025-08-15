@@ -5,9 +5,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import org.jabref.gui.AbstractViewModel;
@@ -28,32 +25,46 @@ import de.saxsys.mvvmfx.utils.validation.FunctionBasedValidator;
 import de.saxsys.mvvmfx.utils.validation.ValidationMessage;
 import de.saxsys.mvvmfx.utils.validation.ValidationStatus;
 import de.saxsys.mvvmfx.utils.validation.Validator;
+import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/// This dialog makes the connection to GitHub configurable
+/// We do not go through the JabRef preferences dialog, because need the prefernce close to the user
 public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitShareToGitHubDialogViewModel.class);
 
     private final StateManager stateManager;
     private final DialogService dialogService;
-    private final GitPreferences gitPreferences = new GitPreferences();
 
-    private final StringProperty githubUsername = new SimpleStringProperty();
-    private final StringProperty githubPat = new SimpleStringProperty();
-    private final StringProperty repositoryUrl = new SimpleStringProperty();
-    private final BooleanProperty rememberSettings = new SimpleBooleanProperty();
+    // The preferences stored in JabRef
+    private final GitPreferences gitPreferences;
+
+    // The preferences of this dialog
+    private final StringProperty username;
+    private final StringProperty pat;
+    // TODO: This should be a library preference -> the library is connected to repository; not all JabRef libraries to the same one
+    //       Reason: One could have https://github.com/JabRef/JabRef-exmple-libraries as one repo and https://github.com/myexampleuser/demolibs as onther repository
+    //               Both share the same secrets, but are different URLs.
+    //       Also think of having two .bib files in the same folder - they will have the same repository URL -- should make no issues, but let's see...
+
+    private final StringProperty repositoryUrl;
+
     private final Validator repositoryUrlValidator;
     private final Validator githubUsernameValidator;
     private final Validator githubPatValidator;
 
-    public GitShareToGitHubDialogViewModel(StateManager stateManager, DialogService dialogService) {
+    public GitShareToGitHubDialogViewModel(GitPreferences gitPreferences, StateManager stateManager, DialogService dialogService) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
+        this.gitPreferences = gitPreferences;
 
-        repositoryUrlValidator = new FunctionBasedValidator<>(repositoryUrl, githubHttpsUrlValidator(), ValidationMessage.error(Localization.lang("Repository URL is required")));
-        githubUsernameValidator = new FunctionBasedValidator<>(githubUsername, notEmptyValidator(), ValidationMessage.error(Localization.lang("GitHub username is required")));
-        githubPatValidator = new FunctionBasedValidator<>(githubPat, notEmptyValidator(), ValidationMessage.error(Localization.lang("Personal Access Token is required")));
+        // Copy the existing preferences and make them available for modification
+        localGitPrefernces = GitPrefernces.of(preferences);
+        repositoryUrlValidator = new FunctionBasedValidator<>(gitPreferences.repositoryUrlProperty(), githubHttpsUrlValidator(), ValidationMessage.error(Localization.lang("Repository URL is required")));
+        githubUsernameValidator = new FunctionBasedValidator<>(gitPreferences.usernameProperty(), notEmptyValidator(), ValidationMessage.error(Localization.lang("GitHub username is required")));
+        githubPatValidator = new FunctionBasedValidator<>(gitPreferences.patProperty(), notEmptyValidator(), ValidationMessage.error(Localization.lang("Personal Access Token is required")));
 
         applyGitPreferences();
     }
@@ -100,46 +111,15 @@ public class GitShareToGitHubDialogViewModel extends AbstractViewModel {
         setGitPreferences(url, user, pat);
     }
 
-    private void applyGitPreferences() {
-        gitPreferences.getUsername().ifPresent(githubUsername::set);
-        gitPreferences.getPersonalAccessToken().ifPresent(token -> {
-            githubPat.set(token);
-            rememberSettings.set(true);
-        });
-        gitPreferences.getRepositoryUrl().ifPresent(repositoryUrl::set);
-        rememberSettings.set(gitPreferences.getRememberPat() || rememberSettings.get());
-    }
-
     private void setGitPreferences(String url, String user, String pat) {
         gitPreferences.setUsername(user);
         gitPreferences.setRepositoryUrl(url);
         gitPreferences.setRememberPat(rememberSettings.get());
-
-        if (rememberSettings.get()) {
-            gitPreferences.setPersonalAccessToken(pat);
-        } else {
-            gitPreferences.clearGitHubPersonalAccessToken();
-        }
+        gitPreferences.setPersonalAccessToken(pat);
     }
 
     private static String trimOrEmpty(String s) {
         return s == null ? "" : s.trim();
-    }
-
-    public StringProperty githubUsernameProperty() {
-        return githubUsername;
-    }
-
-    public StringProperty githubPatProperty() {
-        return githubPat;
-    }
-
-    public BooleanProperty rememberSettingsProperty() {
-        return rememberSettings;
-    }
-
-    public StringProperty repositoryUrlProperty() {
-        return repositoryUrl;
     }
 
     public ValidationStatus repositoryUrlValidation() {
