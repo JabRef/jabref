@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ListChangeListener;
@@ -65,6 +66,14 @@ public interface Trigger {
 
     static Trigger onFetchFulltextCompleted() {
         return create().onFetchFulltextCompleted().build();
+    }
+
+    static Trigger onTextEquals(String expected) {
+        return create().onTextEquals(expected).build();
+    }
+
+    static Trigger onTextMatchesRegex(String regex) {
+        return create().onTextMatchesRegex(regex).build();
     }
 
     static Builder create() {
@@ -177,6 +186,41 @@ public interface Trigger {
             return this;
         }
 
+        public Builder onTextEquals(String expected) {
+            Objects.requireNonNull(expected, "expected must not be null");
+            setGenerator((node, onNavigate) -> {
+                if (!(node instanceof TextInputControl textInput)) {
+                    throw new IllegalArgumentException("onTextEquals can only be used with TextInputControl");
+                }
+                ChangeListener<String> listener = (_, _, newText) -> {
+                    if (expected.equals(newText)) {
+                        onNavigate.apply(NOTHING);
+                    }
+                };
+                textInput.textProperty().addListener(listener);
+                return () -> textInput.textProperty().removeListener(listener);
+            });
+            return this;
+        }
+
+        public Builder onTextMatchesRegex(String regex) {
+            Objects.requireNonNull(regex, "regex must not be null");
+            final Pattern compiled = Pattern.compile(regex);
+            setGenerator((node, onNavigate) -> {
+                if (!(node instanceof TextInputControl textInput)) {
+                    throw new IllegalArgumentException("onTextMatchesRegex can only be used with TextInputControl");
+                }
+                ChangeListener<String> listener = (_, _, newText) -> {
+                    if (newText != null && compiled.matcher(newText).matches()) {
+                        onNavigate.apply(NOTHING);
+                    }
+                };
+                textInput.textProperty().addListener(listener);
+                return () -> textInput.textProperty().removeListener(listener);
+            });
+            return this;
+        }
+
         public Builder onDoubleClick() {
             setGenerator((node, onNavigate) -> {
                 EventHandler<MouseEvent> handler = event -> {
@@ -186,6 +230,23 @@ public interface Trigger {
                 };
                 node.addEventFilter(MouseEvent.MOUSE_CLICKED, handler);
                 return () -> node.removeEventFilter(MouseEvent.MOUSE_CLICKED, handler);
+            });
+            return this;
+        }
+
+        public Builder onRightClick() {
+            setGenerator((node, onNavigate) -> {
+                final EventDispatcher originalDispatcher = node.getEventDispatcher();
+                final EventDispatcher newDispatcher = (event, tail) -> {
+                    if (event.getEventType() == MouseEvent.MOUSE_PRESSED && ((MouseEvent) event).getButton() == javafx.scene.input.MouseButton.SECONDARY) {
+                        node.setEventDispatcher(originalDispatcher);
+                        Supplier<Event> originalAction = () -> originalDispatcher.dispatchEvent(event, tail);
+                        return (Event) onNavigate.apply(originalAction);
+                    }
+                    return originalDispatcher.dispatchEvent(event, tail);
+                };
+                node.setEventDispatcher(newDispatcher);
+                return () -> node.setEventDispatcher(originalDispatcher);
             });
             return this;
         }
