@@ -434,7 +434,7 @@ class BibDatabaseWriterTest {
     }
 
     @Test
-    void roundtripUtf8EncodingHeaderRemoved() throws IOException {
+    void roundtripUtf8EncodingHeaderRemoved() throws Exception {
         // @formatter:off
         String bibtexEntry = OS.NEWLINE + "% Encoding: UTF8" + OS.NEWLINE +
                 OS.NEWLINE +
@@ -445,8 +445,8 @@ class BibDatabaseWriterTest {
                 "  number  = {1}," + OS.NEWLINE +
                 "}" + OS.NEWLINE;
         // @formatter:on
-        ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
-        BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData());
+
+        BibDatabaseContext context = BibDatabaseContext.of(bibtexEntry, importFormatPreferences);
         databaseWriter.saveDatabase(context);
         // @formatter:off
         String expected = "@Article{," + OS.NEWLINE +
@@ -576,7 +576,6 @@ class BibDatabaseWriterTest {
                 "  author     = {Mr. Author},\n" +
                 "}\n";
 
-        // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibEntry));
 
@@ -609,7 +608,6 @@ class BibDatabaseWriterTest {
                 "  author     = {Mr. Author},\n" +
                 "}\n";
 
-        // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ParserResult result = new BibtexParser(importFormatPreferences).parse(Reader.of(bibEntry));
 
@@ -981,7 +979,6 @@ class BibDatabaseWriterTest {
                 "}";
         // @formatter:on
 
-        // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ParserResult firstParse = new BibtexParser(importFormatPreferences).parse(Reader.of(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
@@ -1029,7 +1026,6 @@ class BibDatabaseWriterTest {
                 "}" + OS.NEWLINE;
         // @formatter:on
 
-        // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Reader.of(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();
@@ -1059,7 +1055,6 @@ class BibDatabaseWriterTest {
                 "}" + OS.NEWLINE;
         // @formatter:on
 
-        // read in bibtex string
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class, Answers.RETURNS_DEEP_STUBS);
         ParserResult firstParse = new BibtexParser(importFormatPreferences, new DummyFileUpdateMonitor()).parse(Reader.of(bibtexEntry));
         Collection<BibEntry> entries = firstParse.getDatabase().getEntries();

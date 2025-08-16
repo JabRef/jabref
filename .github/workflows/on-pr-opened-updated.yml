@@ -93,7 +93,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Assign PR creator to issue
@@ -146,7 +146,7 @@ jobs:
     name: Conflicts with target branch
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Check PR mergeability
