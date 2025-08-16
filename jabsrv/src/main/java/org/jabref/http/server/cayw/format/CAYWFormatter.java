@@ -13,5 +13,5 @@ public interface CAYWFormatter {
 
     MediaType getMediaType();
 
-    String format(CAYWQueryParams caywQueryParams, List<CAYWEntry> caywEntries);
+    String format(CAYWQueryParams caywQueryParams, List<CAYWEntry> cawEntries);
 }

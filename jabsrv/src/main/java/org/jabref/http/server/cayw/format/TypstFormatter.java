@@ -11,11 +11,11 @@ import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
 
 @Service
-public class BibLatexFormatter implements CAYWFormatter {
+public class TypstFormatter implements CAYWFormatter {
 
     @Override
     public String getFormatName() {
-        return "biblatex";
+        return "typst";
     }
 
     @Override
@@ -25,15 +25,12 @@ public class BibLatexFormatter implements CAYWFormatter {
 
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> cawEntries) {
-        String command = queryParams.getCommand();
-
         List<BibEntry> bibEntries = cawEntries.stream()
                                               .map(CAYWEntry::bibEntry)
                                               .toList();
 
-        return "\\%s{%s}".formatted(command,
-                bibEntries.stream()
-                          .map(entry -> entry.getCitationKey().orElse(""))
-                          .collect(Collectors.joining(",")));
+        return bibEntries.stream()
+                         .map(entry -> "@" + entry.getCitationKey().orElse(""))
+                         .collect(Collectors.joining(" "));
     }
 }
