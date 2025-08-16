@@ -49,7 +49,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImportEntriesViewModel.class);
     private static final int PAGE_SIZE = 20;
-    private int CURRENT_PAGE = 0;
 
     private final StringProperty message;
     private final TaskExecutor taskExecutor;
@@ -108,7 +107,7 @@ public class ImportEntriesViewModel extends AbstractViewModel {
             this.parserResult = parserResult;
             // fill in the list for the user, where one can select the entries to import
             entries.addAll(parserResult.getDatabase().getEntries());
-            loadAllEntries(entries);
+            loadEntries(entries);
             updatePagedEntries();
             updateTotalPages();
             if (entries.isEmpty()) {
@@ -152,9 +151,8 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         return allEntries;
     }
 
-    public void loadAllEntries(List<BibEntry> entries) {
+    public void loadEntries(List<BibEntry> entries) {
         allEntries.addAll(entries);
-        this.CURRENT_PAGE = 0;
     }
 
     public boolean hasDuplicate(BibEntry entry) {
@@ -224,7 +222,6 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void prevPage() {
         if (hasPrevPage()) {
             currentPageProperty.set(currentPageProperty.get() - 1);
-            CURRENT_PAGE--;
             updatePagedEntries();
             updateTotalPages();
         }
@@ -233,18 +230,17 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     public void nextPage() {
         if (hasNextPage()) {
             currentPageProperty.set(currentPageProperty.get() + 1);
-            CURRENT_PAGE++;
             updatePagedEntries();
             updateTotalPages();
         }
     }
 
     public boolean hasNextPage() {
-        return (CURRENT_PAGE + 1) * PAGE_SIZE < allEntries.size();
+        return (currentPageProperty.get() + 1) * PAGE_SIZE < allEntries.size();
     }
 
     public boolean hasPrevPage() {
-        return CURRENT_PAGE > 0;
+        return currentPageProperty.get() > 0;
     }
 
     public IntegerProperty currentPageProperty() {
@@ -260,18 +256,24 @@ public class ImportEntriesViewModel extends AbstractViewModel {
         totalPagesProperty.set(total);
     }
 
+    private boolean isFromWebSearch() {
+        return fetcher != null && query != null;
+    }
+
     private void updatePagedEntries() {
-        if (fetcher == null && query == null) {
+        if (!isFromWebSearch()) {
             // For entries other than web search, show all entries at once
             pagedEntries.setAll(allEntries);
             return;
         }
-        if (!loadingProperty().get() && fetcher instanceof PagedSearchBasedFetcher pagedFetcher && (CURRENT_PAGE + 1) * PAGE_SIZE >= allEntries.size()) {
+        if (!loadingProperty().get()
+                && fetcher instanceof PagedSearchBasedFetcher pagedFetcher
+                && (currentPageProperty.get() + 1) * PAGE_SIZE >= allEntries.size()) {
             loading.set(true);
             fetchMoreEntries(pagedFetcher);
         }
 
-        int fromIdx = CURRENT_PAGE * PAGE_SIZE;
+        int fromIdx = currentPageProperty.get() * PAGE_SIZE;
         int toIdx = Math.min(fromIdx + PAGE_SIZE, allEntries.size());
         pagedEntries.setAll(allEntries.subList(fromIdx, toIdx));
     }
@@ -279,15 +281,15 @@ public class ImportEntriesViewModel extends AbstractViewModel {
     private void fetchMoreEntries(PagedSearchBasedFetcher pagedFetcher) {
         BackgroundTask<ArrayList<BibEntry>> fetchTask = BackgroundTask
                 .wrap(() -> {
-                    LOGGER.info("Fetching entries from {} for page {}", fetcher.getName(), CURRENT_PAGE + 2);
-                    return new ArrayList<>(pagedFetcher.performSearchPaged(query, CURRENT_PAGE + 1).getContent());
+                    LOGGER.info("Fetching entries from {} for page {}", fetcher.getName(), currentPageProperty.get() + 2);
+                    return new ArrayList<>(pagedFetcher.performSearchPaged(query, currentPageProperty.get() + 1).getContent());
                 })
                 .onSuccess(newEntries -> {
                     if (newEntries != null && !newEntries.isEmpty()) {
                         allEntries.addAll(newEntries);
                         updateTotalPages();
                     } else {
-                        LOGGER.warn("No new entries fetched from {} for page {}", fetcher.getName(), CURRENT_PAGE + 2);
+                        LOGGER.warn("No new entries fetched from {} for page {}", fetcher.getName(), currentPageProperty.get() + 2);
                     }
                     loading.set(false);
                 })

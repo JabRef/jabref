@@ -228,7 +228,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
                 return Localization.lang("Fetching...");
             }
             if (totalPages != 0) {
-                return currentPage + " " + Localization.lang("of") + " " + totalPages;
+                return Localization.lang("%0 of %1", currentPage, totalPages);
             }
             return "";
         }, viewModel.currentPageProperty(), viewModel.totalPagesProperty()));
