@@ -103,10 +103,10 @@ public class JabKit {
         }
     }
 
-    private static void applyUsageFooters(CommandLine commandLine,
-                                          List<Pair<String, String>> inputFormats,
-                                          List<Pair<String, String>> outputFormats,
-                                          Set<SearchBasedFetcher> fetchers) {
+    static void applyUsageFooters(CommandLine commandLine,
+                                  List<Pair<String, String>> inputFormats,
+                                  List<Pair<String, String>> outputFormats,
+                                  Set<SearchBasedFetcher> fetchers) {
         String inputFooter = "\n"
                 + Localization.lang("Available import formats:") + "\n"
                 + StringUtil.alignStringTable(inputFormats);
@@ -118,7 +118,7 @@ public class JabKit {
             boolean hasInputOption = subCommand.getCommandSpec().options().stream()
                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--input-format"));
             boolean hasOutputOption = subCommand.getCommandSpec().options().stream()
-                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output-format"));
+                                                .anyMatch(opt -> Arrays.asList(opt.names()).contains("--output"));
 
             String footerText = "";
             footerText += hasInputOption ? inputFooter : "";
