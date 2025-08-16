@@ -19,7 +19,6 @@ import org.jabref.gui.preview.PreviewPreferences;
 import org.jabref.gui.specialfields.SpecialFieldsPreferences;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.push.PushToApplicationPreferences;
-import org.jabref.gui.preferences.DonationPreferences;
 
 public interface GuiPreferences extends CliPreferences {
     CopyToPreferences getCopyToPreferences();
