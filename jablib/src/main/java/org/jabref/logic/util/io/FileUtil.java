@@ -219,7 +219,7 @@ public class FileUtil {
      * @param pathToSourceFile      Path Source file
      * @param pathToDestinationFile Path Destination file
      * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
-     * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
+     * @return boolean Whether the copy succeeded or was stopped due to the file already existing.
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
@@ -255,13 +255,38 @@ public class FileUtil {
         if (!file.isAbsolute()) {
             return file;
         }
+        Optional<Path> realFileOpt = tryRealPath(file);
 
         for (Path directory : directories) {
+            Optional<Path> realDirOpt = tryRealPath(directory);
+
+            if (realFileOpt.isPresent() && realDirOpt.isPresent()) {
+                Path realFile = realFileOpt.get();
+                Path realDir = realDirOpt.get();
+                if (realFile.startsWith(realDir)) {
+                    int nameCountToDrop = realDir.getNameCount();
+                    Path relativePart = realFile.subpath(nameCountToDrop, realFile.getNameCount());
+                    return relativePart;
+                }
+            }
+
             if (file.startsWith(directory)) {
                 return directory.relativize(file);
             }
         }
         return file;
+    }
+
+    private static Optional<Path> tryRealPath(Path path) {
+        if (Files.exists(path)) {
+            try {
+                return Optional.of(path.toRealPath());
+            } catch (IOException e) {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.of(path.toAbsolutePath());
+        }
     }
 
     /**
