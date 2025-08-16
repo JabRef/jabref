@@ -32,6 +32,7 @@ import org.jabref.model.entry.types.EntryTypeFactory;
 import org.jabref.model.metadata.ContentSelectors;
 import org.jabref.model.metadata.MetaData;
 import org.jabref.model.metadata.SaveOrder;
+import org.jabref.model.metadata.UserHostInfo;
 import org.jabref.model.strings.StringUtil;
 import org.jabref.model.util.FileUpdateMonitor;
 
@@ -128,10 +129,22 @@ public class MetaDataParser {
                 String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
                 metaData.setUserFileDirectory(user, parseDirectory(entry.getValue()));
             } else if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY_LATEX)) {
-                // The user name starts directly after FILE_DIRECTORY_LATEX + '-'
-                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
+                // The user-host string starts directly after FILE_DIRECTORY_LATEX + '-'
+                String userHostString = entry.getKey().substring(MetaData.FILE_DIRECTORY_LATEX.length() + 1);
                 Path path = Path.of(parseDirectory(entry.getValue())).normalize();
-                metaData.setLatexFileDirectory(user, path);
+                
+                UserHostInfo userHostInfo = UserHostInfo.parse(userHostString);
+                String currentHost = org.jabref.logic.os.OS.getHostName();
+                
+                if (!userHostInfo.host().isEmpty() && !userHostInfo.host().equals(currentHost)) {
+                    // If the host doesn't match the current host, we need to use the current user-host
+                    // This w that the LaTeX file directory is set for the current user on the current host
+                    LOGGER.warn("Host mismatch for LaTeX file directory: {} vs current host {}", userHostInfo.host(), currentHost);
+                    // We don't have access to the current user-host here, so we'll just store the path
+                    // The correct user-host will be used when the path is retrieved via the GUI
+                }
+                
+                metaData.setLatexFileDirectory(userHostString, path);
             } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
                 metaData.setSaveActions(fieldFormatterCleanupsParse(values));
             } else if (MetaData.DATABASE_TYPE.equals(entry.getKey())) {
@@ -250,7 +263,7 @@ public class MetaDataParser {
                 res.append((char) c);
             }
         }
-        if (res.length() > 0) {
+        if (!res.isEmpty()) {
             return Optional.of(res.toString());
         }
         return Optional.empty();

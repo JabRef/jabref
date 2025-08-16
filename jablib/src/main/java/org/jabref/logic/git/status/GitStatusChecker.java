@@ -26,21 +26,8 @@ import org.slf4j.LoggerFactory;
 public class GitStatusChecker {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitStatusChecker.class);
 
-    public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
-        Optional<GitHandler> gitHandlerOpt = GitHandler.fromAnyPath(anyPathInsideRepo);
-
-        if (gitHandlerOpt.isEmpty()) {
-            return new GitStatusSnapshot(
-                    !GitStatusSnapshot.TRACKING,
-                    SyncStatus.UNTRACKED,
-                    !GitStatusSnapshot.CONFLICT,
-                    !GitStatusSnapshot.UNCOMMITTED,
-                    Optional.empty()
-            );
-        }
-        GitHandler handler = gitHandlerOpt.get();
-
-        try (Git git = Git.open(handler.getRepositoryPathAsFile())) {
+    public static GitStatusSnapshot checkStatus(GitHandler gitHandler) {
+        try (Git git = Git.open(gitHandler.getRepositoryPathAsFile())) {
             Repository repo = git.getRepository();
             Status status = git.status().call();
             boolean hasConflict = !status.getConflicting().isEmpty();
@@ -69,6 +56,21 @@ public class GitStatusChecker {
                     Optional.empty()
             );
         }
+    }
+
+    public static GitStatusSnapshot checkStatus(Path anyPathInsideRepo) {
+        Optional<GitHandler> handlerOpt = GitHandler.fromAnyPath(anyPathInsideRepo);
+        if (handlerOpt.isEmpty()) {
+            return new GitStatusSnapshot(
+                    !GitStatusSnapshot.TRACKING,
+                    SyncStatus.UNTRACKED,
+                    !GitStatusSnapshot.CONFLICT,
+                    !GitStatusSnapshot.UNCOMMITTED,
+                    Optional.empty()
+            );
+        }
+
+        return checkStatus(handlerOpt.get());
     }
 
     private static SyncStatus determineSyncStatus(Repository repo, ObjectId localHead, ObjectId remoteHead) throws IOException {

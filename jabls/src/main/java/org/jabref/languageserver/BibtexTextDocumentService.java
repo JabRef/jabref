@@ -1,10 +1,8 @@
 package org.jabref.languageserver;
 
-import java.io.StringReader;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.jabref.logic.importer.fileformat.BibtexParser;
 import org.jabref.logic.integrity.IntegrityCheck;
 import org.jabref.logic.journals.JournalAbbreviationRepository;
 import org.jabref.logic.preferences.CliPreferences;
@@ -69,7 +67,7 @@ public class BibtexTextDocumentService implements TextDocumentService {
     private void handleDiagnostics(String uri, String content, int version) {
         BibDatabaseContext bibDatabaseContext;
         try {
-            bibDatabaseContext = new BibtexParser(jabRefCliPreferences.getImportFormatPreferences()).parse(StringReader.of(content)).getDatabaseContext();
+            bibDatabaseContext = BibDatabaseContext.of(content, jabRefCliPreferences.getImportFormatPreferences());
         } catch (Exception e) {
             Diagnostic parseDiagnostic = new Diagnostic(
                     NULL_RANGE,
