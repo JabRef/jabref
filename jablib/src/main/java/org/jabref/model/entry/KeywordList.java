@@ -43,7 +43,63 @@ public class KeywordList implements Iterable<Keyword> {
         this(Arrays.asList(keywordChains));
     }
 
+    // TODO: #12810: we need a different parse method for BibTeX Context,
+    //  which preserves escaping and autoescaping
     public static KeywordList parse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
+        if (StringUtil.isBlank(keywordString)) {
+            return new KeywordList();
+        }
+
+        Objects.requireNonNull(delimiter);
+        Objects.requireNonNull(hierarchicalDelimiter);
+
+        KeywordList keywordList = new KeywordList();
+        List<String> hierarchy = new ArrayList<>();
+        StringBuilder currentToken = new StringBuilder();
+        boolean isEscaping = false;
+
+        for (int i = 0; i < keywordString.length(); i++) {
+            char currentChar = keywordString.charAt(i);
+
+            if (isEscaping && currentChar == delimiter) { // we only escape the keyword delimiter
+                currentToken.append(currentChar);
+                isEscaping = false;
+            } else if (currentChar == '\\') {
+                isEscaping = true;
+            } else if (currentChar == hierarchicalDelimiter) {
+                hierarchy.add(currentToken.toString().trim());
+                currentToken.setLength(0);
+            } else if (currentChar == delimiter) {
+                hierarchy.add(currentToken.toString());
+                currentToken.setLength(0);
+                keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
+                hierarchy.clear();
+            } else {
+                currentToken.append(currentChar);
+            }
+        }
+
+        // Handle the final token
+        if (!currentToken.isEmpty() || !hierarchy.isEmpty()) {
+            hierarchy.add(currentToken.toString().trim());
+            keywordList.add(Keyword.of(hierarchy.toArray(new String[0])));
+        }
+
+        return keywordList;
+    }
+
+    /**
+     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
+     *
+     * @param keywordString a String of keywordChains
+     * @param delimiter     The delimiter used for separating the keywords
+     * @return an parsed list containing the keywordChains
+     */
+    public static KeywordList parse(String keywordString, Character delimiter) {
+        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
+    }
+
+    public static KeywordList bibteXparse(String keywordString, Character delimiter, Character hierarchicalDelimiter) {
         if (StringUtil.isBlank(keywordString)) {
             return new KeywordList();
         }
@@ -62,19 +118,9 @@ public class KeywordList implements Iterable<Keyword> {
         return keywordList;
     }
 
-    /**
-     * Parses the keyword list and uses {@link Keyword#DEFAULT_HIERARCHICAL_DELIMITER} as hierarchical delimiter.
-     *
-     * @param keywordString a String of keywordChains
-     * @param delimiter     The delimiter used for separating the keywords
-     * @return an parsed list containing the keywordChains
-     */
-    public static KeywordList parse(String keywordString, Character delimiter) {
-        return parse(keywordString, delimiter, Keyword.DEFAULT_HIERARCHICAL_DELIMITER);
-    }
-
+    // TODO: this will be the method we will use for BibTeX Context serializing -> escaping and autoescaping
     public static String serialize(List<Keyword> keywords, Character delimiter) {
-        return keywords.stream().map(Keyword::get).collect(Collectors.joining(delimiter.toString()));
+        return keywords.stream().map(keyword -> keyword.getEscaped(delimiter)).collect(Collectors.joining(delimiter.toString()));
     }
 
     public static KeywordList merge(String keywordStringA, String keywordStringB, Character delimiter) {
