@@ -265,9 +265,7 @@ public class ImportEntriesDialog extends BaseDialog<Boolean> {
 
     public void unselectAll() {
         viewModel.getCheckedEntries().clear();
-        for (int i = 0; i < entriesListView.getItems().size(); i++) {
-            entriesListView.getCheckModel().clearCheck(i);
-        }
+        entriesListView.getItems().forEach(entry -> entriesListView.getCheckModel().clearCheck(entry));
     }
 
     public void selectAllNewEntries() {
