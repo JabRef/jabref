@@ -1,6 +1,5 @@
 package org.jabref.gui.consistency;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -12,10 +11,10 @@ import org.jabref.gui.StateManager;
 import org.jabref.gui.actions.SimpleCommand;
 import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.UiTaskExecutor;
+import org.jabref.logic.JabRefException;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.logic.quality.consistency.BibliographyConsistencyCheck;
 import org.jabref.model.database.BibDatabaseContext;
-import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.BibEntryTypesManager;
 
 import static org.jabref.gui.actions.ActionHelper.needsDatabase;
@@ -53,12 +52,13 @@ public class ConsistencyCheckAction extends SimpleCommand {
 
                 Optional<BibDatabaseContext> databaseContext = stateManager.getActiveDatabase();
                 if (databaseContext.isEmpty()) {
-                    throw new IllegalStateException((Localization.lang("No library present")));
+                    throw new JabRefException("No library present.");
                 }
-                List<BibEntry> entries = databaseContext.get().getEntries();
+
+                BibDatabaseContext bibContext = databaseContext.get();
 
                 BibliographyConsistencyCheck consistencyCheck = new BibliographyConsistencyCheck();
-                return consistencyCheck.check(entries, (count, total) ->
+                return consistencyCheck.check(bibContext, (count, total) ->
                         UiTaskExecutor.runInJavaFXThread(() -> {
                             updateProgress(count, total);
                             updateMessage(Localization.lang("%0/%1 entry types", count + 1, total));
