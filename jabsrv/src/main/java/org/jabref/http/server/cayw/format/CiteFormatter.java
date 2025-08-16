@@ -11,11 +11,11 @@ import jakarta.ws.rs.core.MediaType;
 import org.jvnet.hk2.annotations.Service;
 
 @Service
-public class BibLatexFormatter implements CAYWFormatter {
+public class CiteFormatter implements CAYWFormatter {
 
     @Override
     public String getFormatName() {
-        return "biblatex";
+        return "citep";
     }
 
     @Override
@@ -26,6 +26,9 @@ public class BibLatexFormatter implements CAYWFormatter {
     @Override
     public String format(CAYWQueryParams queryParams, List<CAYWEntry> cawEntries) {
         String command = queryParams.getCommand();
+        if (command == null || command.isBlank()) {
+            command = "citep"; // default for citep
+        }
 
         List<BibEntry> bibEntries = cawEntries.stream()
                                               .map(CAYWEntry::bibEntry)

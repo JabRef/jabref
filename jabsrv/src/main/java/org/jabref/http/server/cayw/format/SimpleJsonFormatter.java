@@ -31,10 +31,10 @@ public class SimpleJsonFormatter implements CAYWFormatter {
     }
 
     @Override
-    public String format(CAYWQueryParams queryParams, List<CAYWEntry> caywEntries) {
-        List<SimpleJson> simpleJsons = caywEntries.stream()
-                                              .map(caywEntry -> SimpleJson.fromBibEntry(caywEntry.bibEntry()))
-                                              .toList();
+    public String format(CAYWQueryParams queryParams, List<CAYWEntry> cawEntries) {
+        List<SimpleJson> simpleJsons = cawEntries.stream()
+                                                 .map(caywEntry -> SimpleJson.fromBibEntry(caywEntry.bibEntry()))
+                                                 .toList();
         return gson.toJson(simpleJsons);
     }
 }

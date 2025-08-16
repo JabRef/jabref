@@ -17,6 +17,13 @@ public class FormatterService {
         this.formatters = new HashMap<>();
         registerFormatter(new SimpleJsonFormatter());
         registerFormatter(new BibLatexFormatter());
+        registerFormatter(new LatexFormatter());
+        registerFormatter(new CiteFormatter());
+        registerFormatter(new nabbingFormatter());
+        registerFormatter(new MMDFormatter());
+        registerFormatter(new PandocFormatter());
+        registerFormatter(new TypstFormatter());
+        registerFormatter(new SimpleJsonFormatter());
     }
 
     public void registerFormatter(CAYWFormatter formatter) {
