@@ -51,5 +51,3 @@ public class EnsureSearchSettingsSideEffect implements WalkthroughSideEffect {
         return Localization.lang("Prepare search settings");
     }
 }
-
-

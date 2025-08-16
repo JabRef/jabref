@@ -174,6 +174,3 @@ public class DonationProvider {
         }
     }
 }
-
-
-
