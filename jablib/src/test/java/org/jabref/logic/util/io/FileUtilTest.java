@@ -38,7 +38,6 @@ import static org.mockito.Mockito.when;
 @AllowedToUseLogic("uses OS from logic package")
 class FileUtilTest {
 
-    // Needs to be class variable, otherwise "@MethodSource" does not work
     @TempDir
     private static Path bibTempDir;
 
