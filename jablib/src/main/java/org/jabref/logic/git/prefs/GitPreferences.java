@@ -10,11 +10,8 @@ import javafx.beans.property.StringProperty;
 import org.jabref.model.util.OptionalUtil;
 
 import org.jspecify.annotations.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GitPreferences {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GitPreferences.class);
     private final StringProperty username;
     private final StringProperty pat;
     private final StringProperty repositoryUrl;

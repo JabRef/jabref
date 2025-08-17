@@ -13,7 +13,6 @@ import org.jabref.gui.DialogService;
 import org.jabref.gui.StateManager;
 import org.jabref.gui.desktop.os.NativeDesktop;
 import org.jabref.gui.frame.ExternalApplicationsPreferences;
-import org.jabref.gui.preferences.GuiPreferences;
 import org.jabref.gui.util.BaseDialog;
 import org.jabref.gui.util.ControlHelper;
 import org.jabref.gui.util.IconValidationDecorator;
@@ -42,17 +41,19 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
     @FXML private Tooltip repoHelpTooltip;
 
     private final GitShareToGitHubDialogViewModel viewModel;
-    private final DialogService dialogService;
+
     private final StateManager stateManager;
+    private final DialogService dialogService;
     private final TaskExecutor taskExecutor;
+    private final ExternalApplicationsPreferences externalApplicationsPreferences;
+
     private final ControlsFxVisualizer visualizer = new ControlsFxVisualizer();
 
     public GitShareToGitHubDialogView(StateManager stateManager, DialogService dialogService, TaskExecutor taskExecutor, ExternalApplicationsPreferences externalApplicationsPreferences, GitPreferences gitPreferences) {
         this.stateManager = stateManager;
         this.dialogService = dialogService;
         this.taskExecutor = taskExecutor;
-
-        this.externalApplicationPrefernces = externalApplicationsPreferences;
+        this.externalApplicationsPreferences = externalApplicationsPreferences;
 
         this.setTitle(Localization.lang("Share this library to GitHub"));
         this.viewModel = new GitShareToGitHubDialogViewModel(gitPreferences, stateManager, dialogService);
@@ -60,7 +61,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
         ViewLoader.view(this)
                   .load()
                   .setAsDialogPane(this);
-        ControlHelper.setAction(shareButton, this.getDialogPane(), event -> shareToGitHub());
+        ControlHelper.setAction(shareButton, this.getDialogPane(), _ -> shareToGitHub());
     }
 
     @FXML
@@ -80,7 +81,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 NativeDesktop.openBrowserShowPopup(
                         GITHUB_NEW_REPO_URL,
                         dialogService,
-                        this.preferences.getExternalApplicationsPreferences()
+                        externalApplicationsPreferences
                 )
         );
 
@@ -89,7 +90,7 @@ public class GitShareToGitHubDialogView extends BaseDialog<Void> {
                 NativeDesktop.openBrowserShowPopup(
                         GITHUB_PAT_DOCS_URL,
                         dialogService,
-                        this.preferences.getExternalApplicationsPreferences()
+                        externalApplicationsPreferences
                 )
         );
 
