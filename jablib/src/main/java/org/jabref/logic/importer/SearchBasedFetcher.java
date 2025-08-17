@@ -2,10 +2,10 @@ package org.jabref.logic.importer;
 
 import java.util.List;
 
-import org.jabref.logic.search.query.SearchQueryExtractorVisitor;
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
+import org.jabref.model.search.query.BaseQueryNode;
 import org.jabref.model.search.query.SearchQuery;
-import org.jabref.model.search.query.SearchQueryNode;
 
 /**
  * Searches web resources for bibliographic information based on a free-text query.
@@ -22,7 +22,7 @@ public interface SearchBasedFetcher extends WebFetcher {
      * @param queryList the list that contains the parsed nodes
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    List<BibEntry> performSearch(List<SearchQueryNode> queryList) throws FetcherException;
+    List<BibEntry> performSearch(BaseQueryNode queryList) throws FetcherException;
 
     /**
      * Looks for hits which are matched by the given free-text query.
@@ -36,14 +36,14 @@ public interface SearchBasedFetcher extends WebFetcher {
         }
 
         SearchQuery searchQueryObject = new SearchQuery(searchQuery);
-        SearchQueryExtractorVisitor visitor = new SearchQueryExtractorVisitor(searchQueryObject.getSearchFlags());
-        List<SearchQueryNode> queryList;
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
+        BaseQueryNode queryNode;
         try {
-            queryList = visitor.visitStart(searchQueryObject.getContext());
+            queryNode = visitor.visitStart(searchQueryObject.getContext());
         } catch (Exception e) {
             throw new FetcherException("An error occurred when parsing the query");
         }
 
-        return this.performSearch(queryList);
+        return this.performSearch(queryNode);
     }
 }

@@ -103,7 +103,7 @@ interface SearchBasedFetcherCapabilityTest {
      */
     @Test
     default void supportsJournalSearch() throws FetcherException {
-        List<BibEntry> result = getFetcher().performSearch("journal:\"" + getTestJournal() + "\"");
+        List<BibEntry> result = getFetcher().performSearch("journal=\"" + getTestJournal() + "\"");
         FieldPreferences fieldPreferences = mock(FieldPreferences.class);
         when(fieldPreferences.getNonWrappableFields()).thenReturn(FXCollections.observableArrayList());
         ImportCleanup.targeting(BibDatabaseMode.BIBTEX, fieldPreferences).doPostCleanup(result);
@@ -111,8 +111,8 @@ interface SearchBasedFetcherCapabilityTest {
         assertFalse(result.isEmpty());
         result.forEach(bibEntry -> {
             assertTrue(bibEntry.hasField(StandardField.JOURNAL));
-            String journal = bibEntry.getField(StandardField.JOURNAL).orElse("");
-            assertTrue(journal.contains(getTestJournal().replace("\"", "")));
+            String journal = bibEntry.getField(StandardField.JOURNAL).orElse("").toLowerCase();
+            assertTrue(journal.contains(getTestJournal().replace("\"", "").toLowerCase()));
         });
     }
 
