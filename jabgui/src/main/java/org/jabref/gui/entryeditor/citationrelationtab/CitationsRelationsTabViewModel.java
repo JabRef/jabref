@@ -41,7 +41,7 @@ public class CitationsRelationsTabViewModel {
         List<BibEntry> entries = entriesToImport.stream()
                                                 .map(CitationRelationItem::entry)
                                                 // We need to have a clone of the entry, because we add the entry to the library (and keep it in the citation relation tab, too)
-                                                .map(entry -> (BibEntry) entry.clone())
+                                                .map(BibEntry::new)
                                                 .toList();
 
         ImportHandler importHandler = new ImportHandler(

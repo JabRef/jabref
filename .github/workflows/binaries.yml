@@ -174,7 +174,7 @@ jobs:
     name: ${{ matrix.displayName }} installer and portable version
     steps:
       - name: Fetch all history for all tags and branches
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -208,7 +208,6 @@ jobs:
       - name: Use cache
         uses: actions/cache@v4
         with:
-          lookup-only: true
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
@@ -363,7 +362,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Download from GitHub workflow artifacts store (macOS)
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: JabRef-${{ matrix.os }}-tbn
       - name: Notarize dmg

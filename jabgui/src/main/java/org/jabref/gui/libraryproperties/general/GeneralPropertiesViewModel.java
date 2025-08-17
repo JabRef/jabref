@@ -20,8 +20,8 @@ import javafx.collections.FXCollections;
 import org.jabref.gui.DialogService;
 import org.jabref.gui.libraryproperties.PropertiesTabViewModel;
 import org.jabref.gui.util.DirectoryDialogConfiguration;
-import org.jabref.logic.l10n.Encodings;
 import org.jabref.logic.l10n.Localization;
+import org.jabref.logic.os.OS;
 import org.jabref.logic.preferences.CliPreferences;
 import org.jabref.logic.shared.DatabaseLocation;
 import org.jabref.model.database.BibDatabaseContext;
@@ -36,8 +36,8 @@ import de.saxsys.mvvmfx.utils.validation.Validator;
 public class GeneralPropertiesViewModel implements PropertiesTabViewModel {
 
     private final BooleanProperty encodingDisableProperty = new SimpleBooleanProperty();
-    private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(Encodings.getCharsets()));
-    private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>(Encodings.getCharsets().getFirst());
+    private final ListProperty<Charset> encodingsProperty = new SimpleListProperty<>(FXCollections.observableArrayList(OS.ENCODINGS));
+    private final ObjectProperty<Charset> selectedEncodingProperty = new SimpleObjectProperty<>(OS.ENCODINGS.getFirst());
     private final ListProperty<BibDatabaseMode> databaseModesProperty = new SimpleListProperty<>(FXCollections.observableArrayList(BibDatabaseMode.values()));
     private final SimpleObjectProperty<BibDatabaseMode> selectedDatabaseModeProperty = new SimpleObjectProperty<>(BibDatabaseMode.BIBLATEX);
     private final StringProperty librarySpecificDirectoryProperty = new SimpleStringProperty("");

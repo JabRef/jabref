@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -57,6 +57,20 @@ jobs:
           checkstyle_config: 'config/checkstyle/checkstyle_reviewdog.xml'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Run checkstyle using gradle
         run: ./gradlew checkstyleMain checkstyleTest checkstyleJmh
 
@@ -65,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -84,7 +98,6 @@ jobs:
       - name: Use cache
         uses: actions/cache@v4
         with:
-          lookup-only: true
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
@@ -100,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -111,6 +124,20 @@ jobs:
           distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Run modernizer
         run: |
           # enable failing of this task if modernizer complains
@@ -122,7 +149,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -138,7 +165,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -146,21 +173,20 @@ jobs:
         id: cache-key
         shell: bash
         run: |
-          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+          echo "cache_key=jbang-heylogs-$(date +%F)" >> $GITHUB_OUTPUT
       - name: Use cache
         uses: actions/cache@v4
         with:
-          lookup-only: true
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
-            jbang-
+            jbang-heylogs-
       - name: Setup JBang
         uses: jbangdev/setup-jbang@main
       - name: Lint CHANGELOG.md
         run: |
           # run heylogs verification
-          jbang com.github.nbbrd.heylogs:heylogs-cli:0.10.0:bin check CHANGELOG.md > heylogs.txt || true
+          jbang com.github.nbbrd.heylogs:heylogs-cli:0.11.1:bin check CHANGELOG.md > heylogs.txt || true
 
           # improve output
           sed -i 's/all-h2-contain-a-version/all-h2-contain-a-version (ignored)/' heylogs.txt
@@ -177,7 +203,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -207,7 +233,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -215,6 +241,20 @@ jobs:
           distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - run: ./gradlew javadoc
 
   tests:
@@ -225,7 +265,7 @@ jobs:
         module: [jablib, jabkit, jabsrv, jabgui]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -242,7 +282,6 @@ jobs:
       - name: Use cache
         uses: actions/cache@v4
         with:
-          lookup-only: true
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
@@ -266,7 +305,7 @@ jobs:
         run: scripts/after-failure.sh
 
   tests-windows:
-    name: "Unit tests (Windows) – ${{ matrix.module }}"
+    name: "Unit tests (Windows)"
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (github.repository_owner == 'JabRef')
     runs-on: windows-latest
     strategy:
@@ -274,7 +313,7 @@ jobs:
         module: [jablib]
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -285,6 +324,20 @@ jobs:
           distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Run ${{ matrix.module }} tests
         run: ./gradlew :${{ matrix.module }}:check -x checkstyleJmh -x checkstyleMain -x checkstyleTest -x modernizer
         env:
@@ -309,7 +362,7 @@ jobs:
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop # Shutdown the Default MySQL to save memory, "sudo" is necessary, please do not remove it
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -320,6 +373,20 @@ jobs:
           distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Run tests on PostgreSQL
         run: ./gradlew :jablib:databaseTest --rerun-tasks
         env:
@@ -333,7 +400,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'false'
           show-progress: 'false'
@@ -350,7 +417,6 @@ jobs:
       - name: Use cache
         uses: actions/cache@v4
         with:
-          lookup-only: true
           path: ~/.jbang
           key: ${{ steps.cache-key.outputs.cache_key }}
           restore-keys:
@@ -394,7 +460,7 @@ jobs:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       - name: Checkout source
         if: github.ref == 'refs/heads/main'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           submodules: 'true'
           show-progress: 'false'
@@ -406,6 +472,20 @@ jobs:
           distribution: 'zulu'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Generate JBang cache key
+        id: cache-key
+        shell: bash
+        run: |
+          echo "cache_key=jbang-$(date +%F)" >> $GITHUB_OUTPUT
+      - name: Use cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.jbang
+          key: ${{ steps.cache-key.outputs.cache_key }}
+          restore-keys:
+            jbang-
+      - name: Setup JBang
+        uses: jbangdev/setup-jbang@main
       - name: Update test coverage metrics
         if: (github.ref == 'refs/heads/main') && (steps.checksecrets.outputs.secretspresent == 'YES')
         run: xvfb-run --auto-servernum ./gradlew jacocoTestReport
@@ -427,7 +507,7 @@ jobs:
     name: "Validate requirement coverage"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - name: Set up JDK
@@ -447,7 +527,7 @@ jobs:
     name: "Validate Gradle Wrapper"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           show-progress: 'false'
       - uses: gradle/actions/wrapper-validation@v4

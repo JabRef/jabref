@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import org.jabref.gui.util.component.HelpButton?>
+<?import javafx.scene.control.ButtonType?>
+<DialogPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.jabref.gui.welcome.quicksettings.OnlineServicesDialog">
+    <content>
+        <VBox styleClass="quick-settings-dialog-container">
+            <HBox alignment="CENTER_LEFT" spacing="4">
+                <Label text="%Configure online catalogues and services for importing entries. Enable web search, update checking, and metadata extraction services."
+                       wrapText="true" HBox.hgrow="ALWAYS"/>
+                <HelpButton fx:id="helpButton"/>
+            </HBox>
+
+            <CheckBox fx:id="versionCheckBox" text="%Check for updates at startup"/>
+            <CheckBox fx:id="webSearchBox" text="%Enable web search"/>
+            <CheckBox fx:id="dlibCheckBox"
+                      text="%Enable recommendations by Mr. DLib"/>
+            <CheckBox fx:id="grobidCheckBox"
+                      text="%Enable Grobid (metadata extraction service)"/>
+
+            <HBox fx:id="grobidUrlContainer" spacing="4">
+                <Label text="%Service URL"/>
+                <TextField fx:id="grobidUrlField" HBox.hgrow="ALWAYS"/>
+                <HelpButton fx:id="grobidHelpButton"/>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="4">
+                <Label text="%Web search databases"/>
+                <HelpButton fx:id="fetchersHelpButton"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" maxHeight="288"
+                        hbarPolicy="NEVER">
+                <VBox fx:id="fetchersContainer" styleClass="fetchers-container"/>
+            </ScrollPane>
+        </VBox>
+    </content>
+
+    <ButtonType fx:constant="CLOSE"/>
+    <ButtonType fx:constant="OK"/>
+</DialogPane>
