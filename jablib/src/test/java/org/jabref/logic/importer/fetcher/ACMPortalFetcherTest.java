@@ -8,7 +8,7 @@ import java.util.Optional;
 
 import org.jabref.logic.importer.FetcherException;
 import org.jabref.logic.importer.fileformat.ACMPortalParser;
-import org.jabref.logic.search.query.SearchQueryExtractorVisitor;
+import org.jabref.logic.search.query.SearchQueryVisitor;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.entry.field.StandardField;
 import org.jabref.model.entry.types.StandardEntryType;
@@ -63,7 +63,7 @@ class ACMPortalFetcherTest {
     void getURLForQuery() throws MalformedURLException, URISyntaxException {
         String testQuery = "test query url";
         SearchQuery searchQueryObject = new SearchQuery(testQuery);
-        SearchQueryExtractorVisitor visitor = new SearchQueryExtractorVisitor(searchQueryObject.getSearchFlags());
+        SearchQueryVisitor visitor = new SearchQueryVisitor(searchQueryObject.getSearchFlags());
         URL url = fetcher.getURLForQuery(visitor.visitStart(searchQueryObject.getContext()));
         String expected = "https://dl.acm.org/action/doSearch?AllField=test%20query%20url";
         assertEquals(expected, url.toString());
